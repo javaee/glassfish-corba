@@ -1,0 +1,10 @@
+org/omg/CORBA/ORB*.class
+javax/rmi/PortableRemoteObject.class
+javax/rmi/CORBA/Stub.class
+javax/rmi/CORBA/Util.class
+org/omg/CORBA/TSIdentification.class
+org/omg/CORBA/TSIdentificationPackage/AlreadyIdentified.class
+org/omg/CORBA/TSIdentificationPackage/NotAvailable.class
+org/omg/CosTransactions/*.class
+org/omg/CosTSPortability/*.class
+org/omg/CosTSInteroperation/*.class

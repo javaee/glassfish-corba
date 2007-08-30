@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <!--Do not use Project Properties customizer when editing this file manually.-->
+            <name>Java CORBA Development: codegen workspace</name>
+            <properties>
+                <property name="ant.script">make/build.xml</property>
+            </properties>
+            <folders>
+                <source-folder>
+                    <label>src/share/classes</label>
+                    <type>java</type>
+                    <location>src/share/classes</location>
+                </source-folder>
+                <source-folder>
+                    <label>optional/src/share/classes</label>
+                    <type>java</type>
+                    <location>optional/src/share/classes</location>
+                </source-folder>
+                <source-folder>
+                    <label>test/src/share/classes</label>
+                    <type>java</type>
+                    <location>test/src/share/classes</location>
+                </source-folder>
+                <source-folder>
+                    <label>optional/test/src/share/classes</label>
+                    <type>java</type>
+                    <location>optional/test/src/share/classes</location>
+                </source-folder>
+                <source-folder>
+                    <label>build/gensrc</label>
+                    <type>java</type>
+                    <location>build/gensrc</location>
+                </source-folder>
+                <source-folder>
+                    <label>test/src/share/classes/test12</label>
+                    <type>java</type>
+                    <location>test/src/share/classes/test12</location>
+                </source-folder>
+                <source-folder>
+                    <label>test/src/share/classes/values1</label>
+                    <type>java</type>
+                    <location>test/src/share/classes/values1</location>
+                </source-folder>
+                <source-folder>
+                    <label>test/src/share/classes/values2</label>
+                    <type>java</type>
+                    <location>test/src/share/classes/values2</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <script>${ant.script}</script>
+                    <target>build</target>
+                </action>
+                <action name="clean">
+                    <script>${ant.script}</script>
+                    <target>clean</target>
+                </action>
+                <action name="rebuild">
+                    <script>${ant.script}</script>
+                    <target>clean</target>
+                    <target>build</target>
+                </action>
+                <action name="test">
+                    <script>${ant.script}</script>
+                    <target>test</target>
+                </action>
+                <action name="javadoc">
+                    <script>${ant.script}</script>
+                    <target>javadoc</target>
+                </action>
+            </ide-actions>
+            <export>
+                <type>folder</type>
+                <location>build/classes</location>
+                <script>${ant.script}</script>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>test/build/classes</location>
+                <script>${ant.script}</script>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>optional/build/classes</location>
+                <script>${ant.script}</script>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>test/build/classes</location>
+                <script>${ant.script}</script>
+                <build-target>build</build-target>
+            </export>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src/share/classes</label>
+                        <location>src/share/classes</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>optional/src/share/classes</label>
+                        <location>optional/src/share/classes</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test/src/share/classes</label>
+                        <location>test/src/share/classes</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>optional/test/src/share/classes</label>
+                        <location>optional/test/src/share/classes</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>build/gensrc</label>
+                        <location>build/gensrc</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test/src/share/classes/test12</label>
+                        <location>test/src/share/classes/test12</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test/src/share/classes/values1</label>
+                        <location>test/src/share/classes/values1</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test/src/share/classes/values2</label>
+                        <location>test/src/share/classes/values2</location>
+                    </source-folder>
+                    <source-file>
+                        <location>${ant.script}</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>Build and Test Project</label>
+                        <target>build</target>
+                        <target>compile-tests</target>
+                        <target>test</target>
+                    </action>
+                    <ide-action name="clean"/>
+                    <ide-action name="rebuild"/>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>Compile all tests</label>
+                        <target>compile-tests</target>
+                    </action>
+                    <ide-action name="test"/>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>Main test suite</label>
+                        <target>test-corba</target>
+                    </action>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>copyobject test suite</label>
+                        <target>test-copyobject</target>
+                    </action>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>Hopper (J2SE 1.4.1) test suite</label>
+                        <target>test-hopper</target>
+                    </action>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>Mantis (J2SE 1.4.2) test suite</label>
+                        <target>test-mantis</target>
+                    </action>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>Cos Naming test suite</label>
+                        <target>test-naming</target>
+                    </action>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>Performance test suite</label>
+                        <target>test-perf</target>
+                    </action>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>Portable Interceptor test suite</label>
+                        <target>test-pi</target>
+                    </action>
+                    <action>
+                        <script>${ant.script}</script>
+                        <label>RMI-IIOP test suite</label>
+                        <target>test-rmi-iiop</target>
+                    </action>
+                    <ide-action name="javadoc"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
+            <compilation-unit>
+                <package-root>src/share/classes</package-root>
+                <classpath mode="compile">lib/ejb-2_1-api.jar:lib/jdom.jar:lib/jscheme.jar:lib/jschemelogutil.jar:lib/junit.jar:lib/xalan.jar:lib/xerces.jar</classpath>
+                <built-to>build/classes</built-to>
+                <built-to>test/build/classes</built-to>
+                <built-to>optional/build/classes</built-to>
+                <built-to>test/build/classes</built-to>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>optional/src/share/classes</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>test/src/share/classes</package-root>
+                <unit-tests/>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>optional/test/src/share/classes</package-root>
+                <unit-tests/>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>build/gensrc</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>test/src/share/classes/test12</package-root>
+                <unit-tests/>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>test/src/share/classes/values1</package-root>
+                <unit-tests/>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>test/src/share/classes/values2</package-root>
+                <unit-tests/>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

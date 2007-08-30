@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->
+<html>
+<head>
+
+
+  <title>Project Home Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#ffffff" text="#000000">
+
+<h1>GlassFish-Corba&nbsp; </h1>
+
+<p>This project contains the source code, documentation, and tests for
+the CORBA ORB that is used in the GlassFish application server project.
+&nbsp;The GlassFish ORB complies with the CORBA 2.3.1 specification,
+with CORBA 3.0 extensions for the Interoperable Name Service and
+Portable Interceptors. It includes both IDL and RMI-IIOP support. The
+GlassFish ORB has an open, extensible architecture that supports
+flexible configuration and extension through an open SPI. This ORB is
+written completely in Java.</p>
+<h2>Special Features of the GlassFish ORB</h2>
+<p>This ORB has a number of special features specifically for GlassFish:</p>
+<ol>
+  <li>An optimized, streaming transport for GIOP 1.2 that uses NIO select for scalability.</li>
+  <li>An implementation of RMI-IIOP that uses runtime bytecode generation to avoid the need for the 
+  rmic compiler for either stubs or skeletons</li>
+  <li>An optimized fast object copier to speed up co-located RMI-IIOP calls that require pass-by-value semantics for argument passing</li>
+  <li>Highly optimized colocated RMI-IIOP calls that short circuit most of the ORB object adapter and transport code for speed.</li>
+  <li>The ORB architecture is based in part on the <a href="http://haroldcarr.net/computerScience/pept/indexPept.html">PEPt</a>
+work by Harold Carr (a former member of the ORB team), that provides
+clean separation between protocol, encoding, presentation, and
+transport without impacting performance.</li>
+  <li>The ORB includes a code generation library (codegen) that
+supports runtime generation of classes from a high-level java-like API.
+This is currently used to generate the classes needed to support the
+remote view for EJB 3.</li>
+  <li>Support is included for dynamic failover and load balancing of IIOP requests. </li>
+</ol>
+<h2>Documentation</h2>
+<p>The ORB documentation is available <a href="contents.html">here</a>.</p>
+<h2>Building the Project</h2>
+<p>The simplest thing to do is to use NetBeans:</p>
+<ol>
+  <li>Set the CVSROOT to :pserver:&lt;yourname&gt;@cvs.dev.java.net:/cvs. You must have a java.net account to do this.</li>
+  <li>Everything is in the glassfish-corba module, so checkout the entire module (about 6400 files).</li>
+  <li>NetBeans should automatically recognize the project, so just open the project.</li>
+  <li>Use NetBeans to&nbsp;build and run tests as desired.</li>
+</ol>
+<p>More details (and other options) are described <a href="design/orb_notes.html">here</a> 
+(<a href="design/orb_notes.pdf">pdf</a>) in the ORB documentation.</p>
+<h2>Obtaining ORB builds</h2>
+<P>All of the ORB files are contained in the GlassFish appserv-rt.jar
+file. You can get this from GlassFish. We also maintain copies of the
+ORB builds in the maven repostitory (TBD).</P>
+<h2>Planned Work</h2>
+<p>There are a number of efforts underway right now to improve the ORB:</p>
+<ol>
+    <li>Replace the current ORB monitoring framework with JMX, and expand its coverage.
+    The intent here is to make it easy to add monitoring to any interesting state in the
+    ORB, and make the monitored data available to any standard MBean client like jconsole.
+    We will also work to get the additional data integrated with the app server's administration
+    GUI.</li>
+    <li>Improve the transport and low-level encoding performance.  This includes fixing some
+    problems with reading and writing non-blocking SocketChannels, as well as some issues with
+    how the ORB uses direct ByteBuffers.</li>
+    <li>Improve the internal code generation library (codegen).  Codegen provides a java-level API
+    for generating classes at runtime.  This is used for things like generating the EJB 3 remote view 
+    from a EJB 3 POJO business interface.  Planned improvements include:
+    <ul>
+        <li>Extend codegen with more language constructs (e.g. break, continue, switch)</li>
+        <li>Add line number table and local variable table generation for debugging 
+        dynamically generated classes.</li>
+        <li>Complete method overload resolution support.</li>
+        <li>Make the code generator API extensible (e.g. scheme-like macros).</li>
+        <li>Make more extensive use of codegen in the ORB to improve performance.</li>
+    </ul>
+    Note that the most current version of codegen is not yet in this project.  The
+    current documentation is limited to the javadocs (see the 
+    com.sun.corba.se.spi.codegen.Wrapper class in the optional branch of the project).</li>
+</ol>
+<p>Here are some additional items that we plan to work on (some will only take a few days,
+some may take several months):</p>
+<ol>
+    <li>Integrate CheckStyle into the project and fix style problems.</li>
+    <li>Integrate FindBugs and fix any issues it finds.</li>
+    <li>Replace the current rmic -iiop backend with code that takes advantage
+    of the dynamic RMI-IIOP implementation and the codegen library.</li>
+    <li>Use TestNG to drive the CORBA test framework, so that we can use TestNG's
+    parameterization and grouping capabilities to improve our test coverage.</li>
+    <li>Fix redundant IDL and RMIC compilation problems with the tests.</li>
+    <li>Improve the documentation coverage, particularly in the <A HREF="design/orb_notes.html">
+        ORB Notes</A> Document.</li>
+    <li>Move the makefile-based rename to ant.</li>
+    <li>Develop a secure bootstrap protocol to supplement the Interoperable Name Service.</li>
+    <li>Make more extensive use of the internal ORB timer library (take a look at the
+    com.sun.corba.se.spi.orbutil.newtimer package in the main branch) to support ORB
+    microbenchmarks as regression tests.</li>
+    <li>Support Java 5 enums in RMI-IIOP.</li>
+    <li>Explore how we can speed up marshalling of complex data types.</li>
+    <li>As always, fix bugs.</li>
+</ol>
+</body>
+</html>

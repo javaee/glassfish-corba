@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//SoftQuad Software//DTD HoTMetaL PRO 6.0::19990601::extensions to HTML 4.0//EN" "hmpro6.dtd">
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->
+<html>
+<head>
+  <title>Procedures</title>
+</head>
+  <body>
+  	  
+<h2>Procedures</h2>
+<p>There is a set procedure that must always be followed for CORBA development.  This will evolve
+as the GlassFish-CORBA project evolves, so this is simply a first cut at defining the current 
+development model.
+</p>
+<ol>
+<li>Discuss the idea for a change to the project on the dev@glassfish-corba.dev.java.net alias.
+Make sure to give enough detail that others on the alias can reasonably understand what needs
+to be changed, why the change is needed, and roughly what code will be changed.</li>
+<li>Decide what new tests (if any) need to be written for the change.  In the case of a
+bug, a new test is always required.  For a bug, the test must fail without the fix,
+and pass with the fix. Any new tests must be integrated into the existing CORBA test framework.
+Junit or TestNG can also be used, but they require a simple wrapper to integrate with the
+test framework.</li>
+<li>Make the modifications using whatever tools you like.  Some of us use emacs or vim,
+others use NetBeans, but any choice could be made here.</li>
+<li>Run all of the ORB tests (ant test) and make sure that they all pass.  No modifications
+will be accepted that cause existing tests to fail.</li>
+<li>Prepare a collection of all differences in modified files.  We used to use a Sun 
+internal tool called webrev that did this for a TeamWare workspace.  Now that we are
+using CVS, a different tool will be required.  As of this writing, I don't have any
+specific tool recommendations here, but that will change over time.</li>
+<li>Get the changes reviewed by at least one other team member.  We usually prefer to
+do this using a telephone call and a shared VNC session, but that may not always be 
+possible.  If necessary, a review could be conducted by email.</li>
+<li>Finally, commit the changes to the CVS repository.  This is the usual CVS
+repository on java.net at cvs.dev.java.net.  Everything in this project is in
+the glassfish-corba module.</li>
+
+</ol>
+</body>
+</html>

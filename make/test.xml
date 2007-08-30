@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->
+
+<macrodef name="run-test">
+    <attribute name="args"/>
+    <sequential>
+	<echo message="Called run-test with args=@{args}"/>
+	<java classname="test.Test" classpathref="test-classpath.master" fork="true" dir="test/make">
+	    <jvmarg value="-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
+	    <jvmarg value="-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
+	    <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
+	    <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}"/>
+	    <jvmarg value="-Dhttp.server.port=9090"/>
+	    <jvmarg value="-Djava.rmi.server.codebase=http://localhost:9090/"/>
+	    <jvmarg value="-Dhttp.server.root.directory=../build/values2/classes"/>
+	    <jvmarg value="-Djava.security.policy=../src/share/classes/test.policy"/>
+	    <jvmarg value="-Djava.security.debug=debug"/>
+	    <jvmarg value="-Dorg.omg.CORBA.ORBClass=com.sun.corba.se.impl.orb.ORBImpl"/>
+	    <jvmarg value="-Dorg.omg.CORBA.ORBSingletonClass=com.sun.corba.se.impl.orb.ORBSingleton"/>
+	    <jvmarg value="-Dcom.sun.corba.se.POA.ORBServerId=1"/>
+	    <jvmarg value="-Dcom.sun.corba.se.ORBBase=${basedir}"/>
+	    <jvmarg value="-Dcom.sun.corba.se.test.sourcepath=${test.source.path}"/>
+	    <jvmarg value="-Dcom.sun.corba.se.ORBUseDynamicStub=${use.dynamic.stub}"/>
+	    <jvmarg value="-Dcom.sun.corba.se.ORBUseBCELReflectiveCopyobject=${use.bcel.copyobject}"/>
+	    <jvmarg value="-Dcom.sun.corba.se.encoding.ORBEnableJavaSerialization=${use.java.serialization}"/>
+	    <jvmarg value="-Dcom.sun.corba.se.ORBDebugForkedProcess=${debug.forked.process}"/>
+	    <jvmarg value="-Dcom.sun.corba.se.ORBDebugStubGeneration=false"/>
+	    <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
+	    <jvmarg value="-Demma.coverage.out.merge=true"/>
+	    <jvmarg value="-Demma.rt.control=false"/>
+	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/>
+	    <jvmarg line="${debug.args}"/>
+	    <!-- was:
+	    <arg line="-file ../src/share/classes/@{testfile}"/>
+	    <arg value="-verbose"/>
+	    -->
+
+	    <arg line="@{args}"/>
+
+	    <!-- Uncomment this to dump information about arguments to forked processes.
+	    <arg line="-forkdebuglevel 1"/>
+	    -->
+	    <arg line="-output gen"/>
+	</java>
+    </sequential>
+</macrodef>
+
+<target name="run-test-target" depends="make-output-directory">
+    <property environment="env"/>
+    <property name="test-args" value="${env.TEST_ARGS}"/>
+    <run-test args="${test-args}"/>
+</target>
+
+<target name="test-all" depends="init, clean-test-output, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
+
+<target name="test" depends="init, build-tests, test-all"/>
+
+<target name="clean-test-output">
+    <delete dir="${test.output}" quiet="true"/>
+</target>
+
+<target name="make-output-directory" depends="init">
+    <mkdir dir="${test.output}"/>
+</target>
+
+<target name="test-rmi-iiop" depends="make-output-directory">
+    <java classname="com.sun.corba.se.impl.util.ORBProperties" classpathref="test-classpath.master"/>
+    <run-test args="-file ../src/share/classes/test/AllTests.tdesc -verbose"/>
+</target>
+
+<target name="test-corba" depends="make-output-directory">
+    <run-test args="-file ../src/share/classes/corba/CORBATests.tdesc -verbose"/>
+</target>
+
+<target name="test-copyobject" depends="make-output-directory">
+    <run-test args="-file ../src/share/classes/corba/CopyObjectTests.tdesc -verbose"/>
+</target>
+
+<target name="test-pi" depends="make-output-directory">
+    <run-test args="-file ../src/share/classes/pi/PITests.tdesc -verbose"/>
+</target>
+
+<target name="test-hopper" depends="make-output-directory">
+    <run-test args="-file ../src/share/classes/hopper/HopperTests.tdesc -verbose"/>
+</target>
+
+<target name="test-mantis" depends="make-output-directory">
+    <run-test args="-file ../src/share/classes/mantis/MantisTests.tdesc -verbose"/>
+</target>
+
+<target name="test-naming" depends="make-output-directory">
+    <run-test args="-file ../src/share/classes/naming/NamingTests.tdesc -verbose"/>
+</target>
+
+<target name="test-perf" depends="make-output-directory">
+    <run-test args="-file ../src/share/classes/performance/Tests.tdesc -verbose"/>
+</target>

@@ -1,0 +1,239 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+ * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
+/*
+ * @(#)GIOP.idl	1.0 00/05/21
+ *
+ */
+
+#include "IOP.idl"
+
+module GIOP { // IDL extended for version 1.1 and 1.2
+
+	struct Version {
+		octet major;
+		octet minor;
+	};
+
+
+	// GIOP 1.0
+
+	struct MessageHeader_1_0 { // Renamed from MessageHeader
+		char magic [4];
+		Version GIOP_version;
+		boolean byte_order;
+		octet message_type;
+		unsigned long message_size;
+	};
+
+	// GIOP 1.1
+
+	struct MessageHeader_1_1 {
+		char magic [4];
+		Version GIOP_version;
+		octet flags; // GIOP 1.1 change
+		octet message_type;
+		unsigned long message_size;
+	};
+
+	// GIOP 1.2
+        // Same Header contents for 1.1 and 1.2
+	typedef MessageHeader_1_1 MessageHeader_1_2;
+
+
+        // GIOP 1.0
+        struct RequestHeader_1_0 { // Renamed from RequestHeader
+                IOP::ServiceContextList service_context;
+                unsigned long request_id;
+                boolean response_expected;
+                sequence<octet> object_key;
+                string operation;
+                sequence<octet> requesting_principal;
+        };
+
+        // GIOP 1.1
+        struct RequestHeader_1_1 {
+                IOP::ServiceContextList service_context;
+                unsigned long request_id;
+                boolean response_expected;
+                octet reserved[3]; // Added in GIOP 1.1
+                sequence <octet> object_key;
+                string operation;
+                sequence<octet> requesting_principal;
+        };
+
+        // GIOP 1.2
+        typedef short AddressingDisposition;
+        const short KeyAddr = 0;
+        const short ProfileAddr = 1;
+        const short ReferenceAddr = 2;
+        struct IORAddressingInfo {
+                unsigned long selected_profile_index;
+                IOP::IOR ior;
+        };
+        union TargetAddress switch (AddressingDisposition) {
+                case KeyAddr: sequence <octet> object_key;
+                case ProfileAddr: IOP::TaggedProfile profile;
+                case ReferenceAddr: IORAddressingInfo ior;
+        };
+        struct RequestHeader_1_2 {
+                unsigned long request_id;
+                octet response_flags;
+                octet reserved[3];
+                TargetAddress target;
+                string operation;
+                IOP::ServiceContextList service_context;
+                // Principal not in GIOP 1.2
+        };
+
+
+        #ifndef GIOP_1_2   //We're supporting all versions
+
+        // GIOP 1.0 and 1.1
+        enum ReplyStatusType_1_0 { // Renamed from ReplyStatusType
+                NO_EXCEPTION,
+                USER_EXCEPTION,
+                SYSTEM_EXCEPTION,
+                LOCATION_FORWARD
+        };
+
+        // GIOP 1.0
+        struct ReplyHeader_1_0 { // Renamed from ReplyHeader
+                IOP::ServiceContextList service_context;
+                unsigned long request_id;
+                ReplyStatusType_1_0 reply_status;
+        };
+
+        // GIOP 1.1
+        // Same Header contents for 1.0 and 1.1
+        typedef ReplyHeader_1_0 ReplyHeader_1_1;
+
+        #else
+
+        // GIOP 1.2
+        enum ReplyStatusType_1_2 {
+                NO_EXCEPTION,
+                USER_EXCEPTION,
+                SYSTEM_EXCEPTION,
+                LOCATION_FORWARD,
+                LOCATION_FORWARD_PERM,// new value for 1.2
+                NEEDS_ADDRESSING_MODE // new value for 1.2
+        };
+
+        struct ReplyHeader_1_2 {
+                unsigned long request_id;
+                ReplyStatusType_1_2 reply_status;
+                IOP::ServiceContextList service_context;
+        };
+
+        #endif // GIOP_1_2
+
+
+        struct SystemExceptionReplyBody {
+                string exception_id;
+                unsigned long minor_code_value;
+                unsigned long completion_status;
+        };
+
+
+
+        struct CancelRequestHeader {
+                unsigned long request_id;
+        };
+
+
+
+        // GIOP 1.0
+        struct LocateRequestHeader_1_0 { // Renamed LocationRequestHeader
+                unsigned long request_id;
+                sequence <octet> object_key;
+        };
+
+        // GIOP 1.1
+        // Same Header contents for 1.0 and 1.1
+        typedef LocateRequestHeader_1_0 LocateRequestHeader_1_1;
+
+        // GIOP 1.2
+        struct LocateRequestHeader_1_2 {
+                unsigned long request_id;
+                TargetAddress target;
+        };
+
+
+        #ifndef GIOP_1_2   // We're supporting all versions
+
+        // GIOP 1.0 and 1.1
+        enum LocateStatusType_1_0 { // Renamed from LocateStatusType
+                UNKNOWN_OBJECT,
+                OBJECT_HERE,
+                OBJECT_FORWARD
+        };
+
+
+        // GIOP 1.0
+        struct LocateReplyHeader_1_0 { // Renamed from LocateReplyHeader
+                unsigned long request_id;
+                LocateStatusType_1_0 locate_status;
+        };
+
+        // GIOP 1.1
+        // same Header contents for 1.0 and 1.1
+        typedef LocateReplyHeader_1_0 LocateReplyHeader_1_1;
+
+        #else
+
+        // GIOP 1.2
+        enum LocateStatusType_1_2 {
+                UNKNOWN_OBJECT,
+                OBJECT_HERE,
+                OBJECT_FORWARD,
+                OBJECT_FORWARD_PERM, // new value for GIOP 1.2
+                LOC_SYSTEM_EXCEPTION, // new value for GIOP 1.2
+                LOC_NEEDS_ADDRESSING_MODE // new value for GIOP 1.2
+        };
+
+        struct LocateReplyHeader_1_2 {
+                unsigned long request_id;
+                LocateStatusType_1_2 locate_status;
+        };
+
+        #endif // GIOP_1_2
+
+
+        // GIOP 1.2
+        struct FragmentHeader_1_2 {
+                unsigned long request_id;
+        };
+};

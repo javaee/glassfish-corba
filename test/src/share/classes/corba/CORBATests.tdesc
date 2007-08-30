@@ -1,0 +1,136 @@
+//  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+// 
+//  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+// 
+//  The contents of this file are subject to the terms of either the GNU
+//  General Public License Version 2 only ("GPL") or the Common Development
+//  and Distribution License("CDDL") (collectively, the "License").  You
+//  may not use this file except in compliance with the License. You can obtain
+//  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+//  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+//  language governing permissions and limitations under the License.
+// 
+//  When distributing the software, include this License Header Notice in each
+//  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+//  Sun designates this particular file as subject to the "Classpath" exception
+//  as provided by Sun in the GPL Version 2 section of the License file that
+//  accompanied this code.  If applicable, add the following below the License
+//  Header, with the fields enclosed by brackets [] replaced by your own
+//  identifying information: "Portions Copyrighted [year]
+//  [name of copyright owner]"
+// 
+//  Contributor(s):
+// 
+//  If you wish your version of this file to be governed by only the CDDL or
+//  only the GPL Version 2, indicate your decision by adding "[Contributor]
+//  elects to include this software in this distribution under the [CDDL or GPL
+//  Version 2] license."  If you don't indicate a single choice of license, a
+//  recipient has the option to distribute your version of this file under
+//  either the CDDL, the GPL Version 2 or to extend the choice of license to
+//  its licensees as provided above.  However, if you add GPL Version 2 code
+//  and therefore, elected the GPL Version 2 license, then the option applies
+//  only if the new code is made subject to such option by the copyright
+//  holder.
+
+// Batch tests
+// Run 'java test.Test' for syntax
+//
+// These are the CORBA Technologies tests found under
+// test/src/share/classes/corba
+//
+// POAAndEquals and PCOSNamingTest seem to conflict when run
+// in the test process.  As a safety measure, any test which
+// clients or servers within the test process will be run
+// with the -separateprocess flag. 
+
+-test corba.connectioncache.ConnectionCacheTest
+-test corba.timer.TimerTest
+// MixedOrbTest passes when run outside of the framework,
+// but fails in the framework.  It is commented out
+// until that problem is fixed.
+// -test corba.mixedorb.MixedOrbTest
+-test corba.resolve_deadlock.ResolveDeadlockTest
+
+// These two tests are for the special HW LB plugin code
+-test corba.lb.LBTest -ifpresent
+-test corba.retryplugin.RetryPluginTest -ifpresent
+
+-test corba.giopgen.GIOPGenTest
+-test corba.rfm.TestRFM
+-test corba.codegen.CodegenTest -ifpresent
+-test corba.messagetrace.MessageTraceTest
+-test corba.misc.MiscTest
+-test corba.requestpartitioning.RequestPartitioningTest
+-test corba.rogueclient.RogueClientTest
+// Commented out until we get the ORB retry logic fixed.
+// -test corba.folb.FolbTest -ifpresent
+-test corba.folb_8_1.FolbTest
+-test corba.fwddecl.ForwardDeclTest
+-test corba.security.PermissionTest
+-test corba.unarrow.UncheckedNarrowTest
+-test corba.legacyorbclasses.LegacyORBClassesTest
+-test corba.legacybootstrapserver.LegacyBootstrapServerTest
+-test corba.stubserialization.StubSerializationTest
+-test corba.dynamicrmiiiop.DynamicRmiIIOPTest
+-test corba.threadpoolmonitoring.ThreadPoolMonitoringTests
+-test corba.adapteractivator.AdapterActivator
+-test corba.monitoring.MonitoringTests
+-test corba.exceptiondetailsc.ExceptionDetailSCTest
+-test corba.preinvokepostinvoke.PreInvokePostInvokeTest
+-test corba.poacallback.POACallbackTest
+-test corba.islocal.IsLocalTest
+//-test corba.pept.PEPTTest
+-test corba.strm2.Strm2Test
+-test corba.orbconfig.NewORBTests
+//-test corba.orbconfigappserv.ORBConfigAppServTest
+-test corba.iorintsockfact.IorIntSockFactTest
+-test corba.connectintercept_1_4.ConnectIntercept_1_4Test
+// connections is commented out until we fix the connection management
+// failure on J2SE 5.
+// -test corba.connections.ConnectionsTest
+-test corba.cdrext.CDRExtTest
+-test corba.serialization.zerolengthstring.ZeroLengthStringTest
+// Commented out until we update to more recent XML tools
+// -test corba.genericRPCMSGFramework.GenericRPCMSGFrameworkTest
+-test corba.purgecalls.PurgecallsTest
+-test corba.codeset.CodeSetTest
+-test corba.codebase.CodeBaseTest
+-test corba.hcks.HcksTest
+-test corba.ior.IORTests
+-test corba.ortremote.ORTRemoteTest
+-test corba.poamanager.POAManagerTest
+-test corba.example.Example
+-test corba.oneway.OneWayTest
+-test corba.poatest.OneWayTest
+-test corba.rmipoacounter.RMIPOACounterTest -separateprocess
+-test corba.poapolicies.POAPoliciesTest
+-test corba.poaandequals.POAAndEquals -separateprocess
+-test corba.multiorb.MultiORBTest
+-test corba.serialization.good.GoodRepIdTest
+-test corba.serialization.bad.BadRepIdTest
+-test corba.cdrstreams.CDRTests
+-test corba.giopheaderpadding.GIOPHeaderPaddingTest
+-test corba.systemexceptions.SystemExceptionsTest
+-test corba.rmic.RmicTest
+-test corba.jsg.JSGTest
+-test corba.repid.RepIdTest
+-test corba.invocation.InvocationTest
+-test corba.custom.CustomTest
+-test corba.evolve.EvolveTest
+
+// Leave these last four at the end. 
+// They go through long combinations of fragments sizes or GIOP combinations.
+-test corba.cmvt.CMVTTest
+-test corba.fragment2.FragmentTest
+-test corba.fragment.FragmentTest 
+-test corba.msgtypes.MsgTypesTest 
+
+// If JSG is ON, the following tests internally skip all tests,
+// because they have been excluded programmatically.
+//
+// corba.messagetrace.MessageTraceTest
+// corba.strm2.Strm2Test
+// corba.ortremote.ORTRemoteTest
+// corba.codebase.CodeBaseTest
+// corba.cdrstreams.CDRTests
+// corba.giopheaderpadding.GIOPHeaderPaddingTest

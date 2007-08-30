@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 1993-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->
+</head>
+<body bgcolor="white">
+
+Provides a portability layer, that is, a set of ORB APIs
+that makes it possible for code generated
+by one vendor to run on another vendor's ORB. 
+Stubs and other code, generated either from IDL or 
+interfaces written in the Java programming language, 
+can call into these ORB APIs.
+
+
+
+<p>
+<a name="unimpl"></a>
+<hr>
+<h1>CORBA Features Throwing NO_IMPLEMENT() Exceptions</h1>
+<hr>
+Some methods throw NO_IMPLEMENT() exceptions by default, but ORB vendors
+can override them to provide real implementations.  The ORB included in
+Sun's release of the Java[tm] Platform, Standard Edition 6, includes 
+implementations for the following methods.
+<p>
+<h2>List of Unimplemented Features in Package
+<code>org.omg.CORBA.portable</code></h2>
+<p>
+<h3>Unimplemented Interfaces in package <code>org.omg.CORBA.portable</code></h3>
+  <ul>
+<code>
+    <li>InvokeHandler
+    <li>ResponseHandler
+</code>
+  </ul>
+<p>
+<h3>Unimplemented Methods in package <code>org.omg.CORBA.portable</code></h3>
+<ul>
+<code>
+<li>InputStream
+  <ul>
+    <li>public int read()
+    <li>public.math.BigDecimal read_fixed()
+    <li>public org.omg.CORBA.Context read_Context() 
+    <li>public  org.omg.CORBA.Object read_Object(java.lang.Class clz)
+    <li>public org.omg.CORBA.ORB orb() 
+  </ul>
+<li>OutputStream
+  <ul>
+    <li>public org.omg.CORBA.ORB orb()
+    <li>public void write_Context(org.omg.CORBA.Context ctx,
+			      org.omg.CORBA.ContextList contexts) 
+    <li>public void write_fixed(java.math.BigDecimal value) 
+    <li>public void write(int b) 
+  </ul>
+<li>Delegate
+  <ul>
+    <li>public void releaseReply(org.omg.CORBA.Object self, InputStream input)
+    <li>public InputStream invoke(org.omg.CORBA.Object self, OutputStream output)
+    <li>public OutputStream request(org.omg.CORBA.Object self, String operation,
+				 boolean responseExpected)
+    <li>public org.omg.CORBA.Object set_policy_override(org.omg.CORBA.Object self,
+                                        org.omg.CORBA.Policy[] policies,
+                                        org.omg.CORBA.SetOverrideType set_add)
+    <li>public org.omg.CORBA.DomainManager[] get_domain_managers(
+                                                org.omg.CORBA.Object
+						self)
+    <li>public org.omg.CORBA.Policy get_policy(org.omg.CORBA.Object self,
+                                         int policy_type)
+  </ul>
+</code>
+</ul>
+
+@since JDK1.2
+@serial exclude
+</body>
+</html>
+

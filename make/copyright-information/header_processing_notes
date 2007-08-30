@@ -1,0 +1,69 @@
+Scripts:
+    - check out all files (rsccs edit)
+    - check in all files (rsccs delget)
+
+File scanner
+    - starts with one or more file objects, which may be directories
+    - has a recognizer for pruning directories by name
+	(need to prune **/SCCS, lib, optional/**/org/apache, optional/**/org/objectweb)
+    - performs action for each file
+
+File recognizer
+    - Perform action based on known file name
+    - Perform action based on known file suffix
+    - Perform action based on file content check (really only need #! handler)
+    - Perform default action
+	- print out full name of unrecognized file
+
+Copyright scanner
+    Sun copyrights: line contains:
+	Copyright YYYY * Sun 
+	(ignore all but first date)
+
+    Scanner for .java:
+	- read file into List<Block>
+	    - each Block contains List<Block> of contents
+	    - Blocks can be skipped or replaced on output
+	    - Blocks can be comment or text
+		- if comment, may be SUN_COPYRIGHT or OTHER_COPYRIGHT
+		    - extract start year from SUN_COPYRIGHT
+		    - otherwise default is 1997
+	    - create new sun copyright block with correct license header and start date
+	    - Output new sun copyright block
+	    - Output all other blocks except old Sun copyright
+
+Put the source code for all of this in the orblib under (spi/impl)/orbutil/file
+
+Scanners we need:
+    recognizer
+	Java patterns: (/* ... */ blocks)
+	    - Remove existing Sun copyright block (if any, obtaining start year)
+	    - prepend new Java format copyright block
+	XML patterns: (<!-- ... --> blocks)
+	    - Remove existing Sun copyright block (if any, obtaining start year)
+	    - prepend new XML format copyright block
+	Scheme patterns:
+	    - prepend new Scheme format copyright block
+	Shell patterns:
+	    - prepend new shell format copyright block
+	No process patterns:
+	    - use ActionFactory.getSkipAction
+	Default action:
+	    - use default, which prints file name and stops.
+
+Handling copyright:
+    - text is a really simple template: only supports @NAME@, with Map<String,String> giving replacement of NAME
+    - text is NOT in comment form
+    - making it into comment form is simple:
+	- block case: need initial, end, start strings
+	- line case: just need start string
+
+Converting files into blocks:
+    - turn one file into a single block
+    - use start, end to turn file into sequence of blocks
+	(white)*start(anything) identifies start of block
+	(white)*end(anything) identifies end of block
+    - can append or prepend string to block
+    - can append prefix to every string in block
+    - Use Algorithm.find to search block
+

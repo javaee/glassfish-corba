@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->
+
+
+<!-- Checks to see if the generated file for the jscheme script invocation exists
+     and if it does exist then has the jscheme script been changed in reference to 
+     the generated files  -->
+<target name="check-minorcode-file-changed">
+    <basename property="only-file-name" suffix=".mc" file="${minorcode-file-name}"/>
+    <condition property="minorcode-file-changed">
+	<or>
+	    <not>
+		<available file="${output.dir}/${only-file-name}SystemException.java"/>
+	    </not>
+	    <not>
+		<available file="${output.dir}/${only-file-name}SystemException.resource"/>
+	    </not>
+	    <uptodate property="minorcode-file-changed" targetfile="${minorcode-file-name}">
+		<srcfiles dir="${output.dir}" includes="${only-file-name}SystemException.*"/>
+	    </uptodate>
+	</or>
+    </condition>
+</target>
+
+<!-- This target is called repeatedly for each jscheme invocation -->
+<target name="call-jscheme" depends="check-minorcode-file-changed" if="minorcode-file-changed">
+    <echo message="Running jscheme on ${only-file-name}.mc"/>
+    <java classname="jscheme.REPL" classpathref="classpath.master" fork="true">
+	<classpath>
+	    <pathelement location="${jscheme-jar}"/>
+	    <pathelement location="${jschemelogutil-jar}"/>
+	</classpath>
+	<arg value="${jscheme-script-name}"/>
+	<arg line="-main main"/>
+	<arg value="make-class"/>
+	<arg value="${minorcode-file-name}"/>
+	<arg value="${output.dir}"/>
+    </java>
+    <java classname="jscheme.REPL" classpathref="classpath.master" fork="true">
+	<classpath>
+	    <pathelement location="${jscheme-jar}"/>
+	    <pathelement location="${jschemelogutil-jar}"/>
+	</classpath>
+	<arg value="${jscheme-script-name}"/>
+	<arg line="-main main"/>
+	<arg value="make-resource"/>
+	<arg value="${minorcode-file-name}"/>
+	<arg value="${output.dir}"/>
+    </java>
+</target>
+
+<!-- This target runs all the jscheme invocations -->
+<target name="run-all-jscheme" depends="init">
+    <mkdir dir="${gensrc.dir}/com/sun/corba/se/impl/logging"/>
+    <property name="logging-spi-src.dir" value="${src.dir}/com/sun/corba/se/spi/logging"/>
+    <property name="jscheme.output.dir" value="${gensrc.dir}/com/sun/corba/se/impl/logging"/>
+    <property name="jscheme-script-name" value="${src.dir}/com/sun/tools/corba/se/logutil/scripts/mc.scm"/>
+    <java classname="jscheme.REPL" classpathref="classpath.master" fork="true">
+	<classpath>
+	    <pathelement location="${jscheme-jar}"/>
+	    <pathelement location="${jschemelogutil-jar}"/>
+	</classpath>
+	<arg value="${jscheme-script-name}"/>
+	<arg line="-main main"/>
+	<arg value="make-CORBALogDomains-classes"/>
+	<arg value="${logging-spi-src.dir}/data/LogDomains.mcd"/>
+	<arg value="${jscheme.output.dir}"/>
+    </java>
+    <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
+	<param name="minorcode-file-name" value="${logging-spi-src.dir}/data/Activation.mc"/>
+	<param name="output.dir" value="${jscheme.output.dir}"/>
+    </antcall>
+    <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
+	<param name="minorcode-file-name" value="${logging-spi-src.dir}/data/IOR.mc"/>
+	<param name="output.dir" value="${jscheme.output.dir}"/>
+    </antcall>
+    <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
+	<param name="minorcode-file-name" value="${logging-spi-src.dir}/data/Interceptors.mc"/>
+	<param name="output.dir" value="${jscheme.output.dir}"/>
+    </antcall>
+    <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
+	<param name="minorcode-file-name" value="${logging-spi-src.dir}/data/Naming.mc"/>
+	<param name="output.dir" value="${jscheme.output.dir}"/>
+    </antcall>
+    <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
+	<param name="minorcode-file-name" value="${logging-spi-src.dir}/data/OMG.mc"/>
+	<param name="output.dir" value="${jscheme.output.dir}"/>
+    </antcall>
+    <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
+	<param name="minorcode-file-name" value="${logging-spi-src.dir}/data/ORBUtil.mc"/>
+	<param name="output.dir" value="${jscheme.output.dir}"/>
+    </antcall>
+    <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
+	<param name="minorcode-file-name" value="${logging-spi-src.dir}/data/POA.mc"/>
+	<param name="output.dir" value="${jscheme.output.dir}"/>
+    </antcall>
+    <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
+	<param name="minorcode-file-name" value="${logging-spi-src.dir}/data/Util.mc"/>
+	<param name="output.dir" value="${jscheme.output.dir}"/>
+    </antcall>
+    <!-- Create the LogStrings.properties file from concatenating all
+	 the *.resource files -->
+    <echo message="Concatenating resource files to create LogStrings.properties"/>
+    <concat destfile="${jscheme.output.dir}/LogStrings.properties">
+	<fileset dir="${jscheme.output.dir}" includes="*.resource"/>
+    </concat>
+</target>

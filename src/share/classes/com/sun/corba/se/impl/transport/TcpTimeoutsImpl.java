@@ -1,0 +1,198 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+ * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
+
+package com.sun.corba.se.impl.transport;
+
+import com.sun.corba.se.spi.orb.ORB;
+
+import com.sun.corba.se.spi.transport.TcpTimeouts;
+
+import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+
+/**
+ * @author Charlie Hunt
+ * @author Ken Cavanaugh
+ */
+public class TcpTimeoutsImpl implements TcpTimeouts
+{
+    private ORBUtilSystemException wrapper ;
+
+    private final int initial_time_to_wait;
+    private final int max_time_to_wait;
+    private int backoff_factor;
+    private final int max_single_wait_time;
+
+    public TcpTimeoutsImpl( String args ) {
+	this.wrapper = ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
+	String[] data = args.split( ":" ) ;
+	if ((data.length <= 3) || (data.length > 4))
+	    wrapper.badTimeoutDataLength() ;
+
+	initial_time_to_wait = parseArg( "initial_time_to_wait", data[0] ) ;
+	max_time_to_wait     = parseArg( "max_time_to_wait", data[1] ) ;
+	setBackoffFactor( parseArg( "backoff_factor", data[2] ) ) ;
+	if (data.length == 4)
+	    max_single_wait_time = parseArg( "max_single_wait_time", data[3] ) ;
+	else
+	    max_single_wait_time = Integer.MAX_VALUE ;
+    }
+
+    public TcpTimeoutsImpl( int initial_time, int max_time, 
+	int backoff_percent) {
+	this( initial_time, max_time, backoff_percent, Integer.MAX_VALUE ) ;
+    }
+
+    public TcpTimeoutsImpl( int initial_time, int max_time, 
+	int backoff_percent, int max_single_wait_time ) {
+	this.wrapper = ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
+	this.initial_time_to_wait = initial_time;
+	this.max_time_to_wait = max_time;
+	setBackoffFactor( backoff_percent ) ;
+	this.max_single_wait_time = max_single_wait_time ;
+    }
+
+    private void setBackoffFactor( int backoff_percent ) {
+        // Avoiding floating point number. Timeout is obtained by
+        // dividing by 100 after multiplying by backoff_factor.
+	this.backoff_factor = 100 + backoff_percent;
+    }
+
+    private int parseArg( String name, String value ) {
+	try {
+	    int result = Integer.parseInt( value ) ;
+	    if (result <= 0)
+		throw wrapper.badTimeoutStringData( value, name ) ;
+	    return result ;
+	} catch (NumberFormatException exc) {
+	    throw wrapper.badTimeoutStringData( exc, value, name ) ;
+	}
+    }
+
+    public int get_initial_time_to_wait() { return initial_time_to_wait; }
+
+    public int get_max_time_to_wait() { return max_time_to_wait; }
+
+    public int get_backoff_factor() { return backoff_factor; }
+
+    public int get_max_single_wait_time() { return max_single_wait_time; }
+
+    public Waiter waiter() {
+	return new Waiter() {
+	    // Use long so that arithmetic works correctly if
+	    // max_single_wait_time is set to Integer.MAX_VALUE.
+	    private long current_wait = initial_time_to_wait ;
+	    private long total_time = 0 ;
+
+	    public void advance() {
+		if (current_wait != max_single_wait_time) {
+		    current_wait = (current_wait * backoff_factor) / 100 ;
+		    if (current_wait > max_single_wait_time)
+			current_wait = max_single_wait_time ;
+		}
+	    }
+
+	    public void reset() {
+		current_wait = initial_time_to_wait ;
+	    }
+
+	    public int getTime() {
+		return (int)current_wait ;
+	    }
+
+	    public int getTimeForSleep() {
+		int result = (int)current_wait ;
+		if (total_time < max_time_to_wait)
+		    total_time += current_wait ;
+		return result ;
+	    }
+
+	    public int timeWaiting() {
+		return (int)total_time ;
+	    }
+
+	    public boolean sleepTime() {
+		if (isExpired())
+		    return false ;
+
+		try {
+		    Thread.sleep( getTimeForSleep() ) ;
+		    return true ;
+		} catch (InterruptedException exc) {
+		    // this happens so rarely that we will
+		    // ignore it.  Just log at FINE level.
+		    wrapper.interruptedExceptionInTimeout() ;
+		}
+
+		// actually unreachable, but the compiler doesn't know that
+		return false ;
+	    }
+
+	    public boolean isExpired() {
+		return total_time > max_time_to_wait ;
+	    }
+	} ;
+    }
+
+    public String toString() {
+	return "TcpTimeoutsImpl[" 
+	    + initial_time_to_wait + ":"
+	    + max_time_to_wait + ":" 
+	    + backoff_factor + ":"
+	    + max_single_wait_time + "]" ;
+    }
+
+    public boolean equals( Object obj ) {
+	if (obj == this)
+	    return true ;
+
+	if (!(obj instanceof TcpTimeouts))
+	    return false ;
+
+	TcpTimeouts other = (TcpTimeouts)obj ;
+
+	return (initial_time_to_wait == other.get_initial_time_to_wait()) &&
+	    (max_time_to_wait == other.get_max_time_to_wait()) &&
+	    (backoff_factor == other.get_backoff_factor()) &&
+	    (max_single_wait_time == other.get_max_single_wait_time()) ;
+    }
+
+    public int hashCode() {
+	return initial_time_to_wait ^ max_time_to_wait ^
+	    backoff_factor ^ max_single_wait_time ;
+    }
+}
+
+// End of file.

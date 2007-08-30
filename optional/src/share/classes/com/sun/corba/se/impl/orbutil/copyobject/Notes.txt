@@ -1,0 +1,153 @@
+#  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+# 
+#  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+# 
+#  The contents of this file are subject to the terms of either the GNU
+#  General Public License Version 2 only ("GPL") or the Common Development
+#  and Distribution License("CDDL") (collectively, the "License").  You
+#  may not use this file except in compliance with the License. You can obtain
+#  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+#  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+#  language governing permissions and limitations under the License.
+# 
+#  When distributing the software, include this License Header Notice in each
+#  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+#  Sun designates this particular file as subject to the "Classpath" exception
+#  as provided by Sun in the GPL Version 2 section of the License file that
+#  accompanied this code.  If applicable, add the following below the License
+#  Header, with the fields enclosed by brackets [] replaced by your own
+#  identifying information: "Portions Copyrighted [year]
+#  [name of copyright owner]"
+# 
+#  Contributor(s):
+# 
+#  If you wish your version of this file to be governed by only the CDDL or
+#  only the GPL Version 2, indicate your decision by adding "[Contributor]
+#  elects to include this software in this distribution under the [CDDL or GPL
+#  Version 2] license."  If you don't indicate a single choice of license, a
+#  recipient has the option to distribute your version of this file under
+#  either the CDDL, the GPL Version 2 or to extend the choice of license to
+#  its licensees as provided above.  However, if you add GPL Version 2 code
+#  and therefore, elected the GPL Version 2 license, then the option applies
+#  only if the new code is made subject to such option by the copyright
+#  holder.
+
+Note on improving the reflective copy object architecture.
+
+Basic abstractions:
+
+/** Creates an instance of an ObjectCopier to be used for a single session.
+ */
+ObjectCopierFactory {
+    ObjectCopier make() ;
+}
+
+/** Used to copy objects in a single session: multiple calls to the
+ * same ObjectCopier instance will share all aliases.
+ObjectCopier {
+    Object copy( Object obj ) throws ReflectiveCopyException ;
+}
+
+------------------------
+New Reflective case:
+
+/** Used to copy an Object of a particular type.  Preserves aliasing through
+ * oldToNew.
+ */
+interface ClassCopier {
+    Object copy( IdentityHashMap oldToNew, Object source ) throws ReflectiveCopyException ;
+}
+
+/** Create a ClassCopier for a particular type.
+ */
+ClassCopierFactory {
+    ClassCopier get( Class cls ) throws ReflectiveCopyException ;
+}
+
+Use filter pattern: use a chain of ClassCopierFactory instances, take first non-null result.
+
+Special ClassCopier instances:
+    DefaultClassCopiers
+	ClassCopier makeMapCopier( ClassCopierFactory ccf ) 
+	ClassCopier getIdentityCopier() 
+	ClassCopier getErrorCopier()
+
+ClassCopierFactory instances:
+
+    - A client may create a special ClassCopierFactory with arbitrary behavior.
+    - An ArrayClassCopierFactory that returns a ClassCopier for an array, and 
+      null for non-array
+    - A OrdinaryClassCopierFactory that returns a ClassCopier for any Class,
+      and throws ReflectiveCopyException if it cannot create a ClassCopier.
+    - An ImmutableClassCopierFactory that returns an IdentityClassCopier if
+      the class is immutable (also has registration API).
+    - A CachingClassCopierFactory that maintains a cache of know ClassCopier
+      instances for particular classes (also has a registration API).
+    - PipelineCopierFactory:
+	- Does Caching -> Special (if present) -> Array -> Ordinary
+	- Updates cache if needed
+	- Provides API for:
+	    - registration of know ClassCopier instances
+	    - registration of immutable classes (go straight to cache)
+	    - registration of optional special ClassCopierFactory
+	- passes itself to Array and Ordinary ClassCopierFactory instances
+
+    DefaultClassCopierFactories:
+	ClassCopierFactory makeCachingClassCopierFactory()
+	ClassCopierFactory makeArrayClassCopierFactory( ClassCopierFactory ) 
+	ClassCopierFactory makeOrdinaryClassCopierFactory( ClassCopierFactory ) 
+
+The "Ordinary" ClassCopier
+
+The basic idea of the ordinary ClassCopier is to create a new instance according
+to the serialization rules, then somehow copy all of the non-static fields from
+the old object to the new one.  The field copying is done through an instance
+of the ClassFieldCopier interface.
+
+There are two approaches to copying the fields: reflection and unsafe.
+
+The reflection approach works fine on all 1.4.x JVMs.  However, it cannot copy
+non-static final fields.  It may also be slightly slower than the unsafe
+version.
+
+The unsafe approach does not work on 1.4.1_03 (it crashes the VM!).  But it
+can copy non-static final fields, giving it somewhat greater applicability.
+
+The appropriate ClassFieldCopier is chosen dynamically based on the JVM type.
+The intent is that the copyObject code will work correctly on any 1.4.x
+JDK (at least if we know from testing which ones have problems).
+It is also cached to avoid recalculation.  But this needs some further explanation.
+
+Another interesting problem here is the interaction between copying using ClassFieldCopier
+and the special classes that are pre-populated in the cache (the ClassCopier cache in this
+case).  The problem here is that these ClassCopiers only work (generally) if they
+construct the result.  In the case of a class A (say CustomHashMap) derived from B
+(say HashMap), A is not in the cache, so we just use the Ordinary
+copier, and analyze the CustomHashMap class in order to create a ClassFieldCopier.
+The analysis will then look for a copier for B.  However, this must result in using
+a ClassFieldCopier (which is NOT a ClassCopier, because it does not create the result,
+which in this case has already been created).  Since B is copied specially, this is at
+best inconsistent.  So, we must not reflectively copy class B in this situation.
+
+We also need to keep in mind that some classes simply cannot be copied by reflection
+(e.g. IdentityHashMap).  The only way to recognize such classes is that they define
+both readObject and writeObject.  But many classes that can be reflectively copied also 
+define both readObject and writeObject (such as ArrayList).  So, we will define two
+additional mechanisms:
+
+1. An exclude list that defines custom marshalled classes that can be reflectively copied.
+2. Special ClassCopiers for some special classes.  This is achieved simply by
+   initializing the cache with the special copiers.
+
+This leads to different choices depending on whether the JDK supports the unsafe 
+ClassFieldCopier or not:
+
+1. JDK supports unsafe: here we can just avoid registering special handlers for things
+   like HashMap and Hashtable, as they can be copied just fine (non-static finals, non-
+   serializable classes are copied).  However, the special copiers MAY (unknown at present)
+   be faster in the common cases.  In any case, this choice gives broader coverage, and
+   can correctly handle Properties.
+
+2. JDK does not support unsafe (meaning the VM crashes with the ClassFieldCopier code):
+   Here we must register special copiers in any case.
+

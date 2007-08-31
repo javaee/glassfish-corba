@@ -927,10 +927,10 @@ public abstract class Test implements java.lang.Runnable
 	return ORB.getPresentationManager().useDynamicStubs() ;
     }
 
-    private static boolean useBCELReflectiveCopyobject()
+    private static boolean useCodegenReflectiveCopyobject()
     {
 	return Boolean.getBoolean( 
-	    ORBConstants.USE_BCEL_REFLECTIVE_COPYOBJECT ) ;
+	    ORBConstants.USE_CODEGEN_REFLECTIVE_COPYOBJECT ) ;
     }
 
     // This is needed in several tests.
@@ -949,8 +949,8 @@ public abstract class Test implements java.lang.Runnable
     public static void identifyEnvironment() 
     {
 	System.out.println( "Running on " + new Date() ) ;
-	System.out.println( "Running with " + (useBCELReflectiveCopyobject() ?
-	    "BCEL" : "standard") + " reflective object copier" ) ;
+	System.out.println( "Running with " + (useCodegenReflectiveCopyobject() ?
+	    "codegen" : "standard") + " reflective object copier" ) ;
 	System.out.println( "Running with " + (useDynamicStubs() ? 
 	    "dynamic" : "static") + " stubs" ) ;
 	System.out.println("Running with serialization encoding: " +

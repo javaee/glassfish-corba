@@ -204,7 +204,7 @@ public class Client {
 	int numExceptions = 0 ;
 	for (int ctr=0; ctr<NUMBER_ITERATIONS; ctr++) {
 	    if (ctr==COUNT_TO_BREAK_CONNECTION) {
-		// NortelSocketFactory.disconnectSocket() ;
+		NortelSocketFactory.disconnectSocket() ;
 	    }
 
 	    try {
@@ -223,10 +223,11 @@ public class Client {
     @Configuration( beforeTest = true ) 
     public void setUp() {
 	setSystemProperties() ;
-	serverORB = makeORB( true ) ;
-	clientORB = makeORB( false ) ;
 
 	try {
+	    serverORB = makeORB( true ) ;
+	    clientORB = makeORB( false ) ;
+	    
 	    serverORB.resolve_initial_references( "NameService" ) ;
 
 	    // Make sure that the FVD codebase IOR is not shared between
@@ -237,6 +238,9 @@ public class Client {
 
 	    clientORB.resolve_initial_references( "NameService" ) ;
 	} catch (Exception exc) {
+	    System.out.println( "Setup failed with exception " + exc ) ;
+	    exc.printStackTrace() ;
+
 	    throw new RuntimeException( exc ) ;
 	}
 

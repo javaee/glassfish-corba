@@ -1119,65 +1119,29 @@ public class SocketOrChannelConnectionImpl
         // be the one to handle writing the data here?
 
         try {
-
             // Write the fragment/message
-
 	    CDROutputObject cdrOutputObject = (CDROutputObject) outputObject;
 	    cdrOutputObject.writeTo(this);
+
 	    // REVISIT - no flush?
             //socket.getOutputStream().flush();
 
-        } catch (IOException e1) {
-
-            /*
-             * ADDED(Ram J) 10/13/2000 In the event of an IOException, try
-             * sending a CancelRequest for regular requests / locate requests
-             */
-
+        } catch (IOException exc) {
             // Since IIOPOutputStream's msgheader is set only once, and not
             // altered during sending multiple fragments, the original 
             // msgheader will always have the requestId.
 	    // REVISIT This could be optimized to send a CancelRequest only
 	    // if any fragments had been sent already.
 
-	    /* REVISIT: MOVE TO SUBCONTRACT
-            Message msg = os.getMessage();
-            if (msg.getType() == Message.GIOPRequest ||
-                    msg.getType() == Message.GIOPLocateRequest) {
-                GIOPVersion requestVersion = msg.getGIOPVersion();
-                int requestId = MessageBase.getRequestId(msg);
-                try {
-                    sendCancelRequest(requestVersion, requestId);
-                } catch (IOException e2) {
-                    // most likely an abortive connection closure.
-                    // ignore, since nothing more can be done.
-		    if (orb.transportDebugFlag) {
-		    
-                }
-            }
-	    */
-
-            // REVISIT When a send failure happens, purgeCalls() need to be 
-            // called to ensure that the connection is properly removed from
-            // further usage (ie., cancelling pending requests with COMM_FAILURE 
-            // with an appropriate minor_code CompletionStatus.MAY_BE).            
-
-            // Relying on the IIOPOutputStream (as noted below) is not 
-            // sufficient as it handles COMM_FAILURE only for the final 
-            // fragment (during invoke processing). Note that COMM_FAILURE could 
-            // happen while sending the initial fragments. 
-            // Also the IIOPOutputStream does not properly close the connection.
-            // It simply removes the connection from the table. An orderly
-            // closure is needed (ie., cancel pending requests on the connection
-            // COMM_FAILURE as well.
-            
             // IIOPOutputStream will cleanup the connection info when it
             // sees this exception.
-	    if (state == CLOSE_RECVD) {
-		throw wrapper.connectionRebind();
-	    } else {
-	        throw wrapper.writeErrorSend(e1) ;
-	    }
+	    final SystemException sysexc = (state == CLOSE_RECVD) ?
+		wrapper.connectionRebind( CompletionStatus.COMPLETED_MAYBE, exc ) :
+	        wrapper.writeErrorSend(CompletionStatus.COMPLETED_MAYBE, exc ) ;
+
+	    purgeCalls( sysexc, false, true ) ;
+
+	    throw sysexc ;
         }
     }
 

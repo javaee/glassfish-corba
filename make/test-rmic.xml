@@ -52,7 +52,7 @@
 	    debug="${javac.debug}" 
 	    optimize="${javac.optimize}"
 	    failonerror="true">
-	<src path="${testsrc.dir}"/>
+	<src path="${test.src.dir}"/>
 	<src path="${test-gensrc.dir}"/>
 	<include name="${sourcefile-name}"/>
 	<compilerarg value="-Xbootclasspath/p:${classes.dir}"/>

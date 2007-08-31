@@ -972,7 +972,7 @@ public class Options
 	copySystemProperty("java.security.debug", props ) ;
 	copySystemProperty("java.security.manager", props ) ;
 
-	copySystemProperty(ORBConstants.USE_BCEL_REFLECTIVE_COPYOBJECT, props ) ;   
+	copySystemProperty(ORBConstants.USE_CODEGEN_REFLECTIVE_COPYOBJECT, props ) ;   
 	copySystemProperty(ORBConstants.USE_DYNAMIC_STUB_PROPERTY, props ) ;   
 	copySystemProperty(ORBConstants.DYNAMIC_STUB_FACTORY_FACTORY_CLASS, 
 	    props ) ;   

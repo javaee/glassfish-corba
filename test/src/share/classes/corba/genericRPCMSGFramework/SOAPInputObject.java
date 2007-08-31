@@ -53,6 +53,7 @@ import com.sun.corba.se.spi.orb.ORB;
 
 import java.io.ByteArrayInputStream;
 
+// XXX convert this to JAXP DOM
 import org.jdom.input.DOMBuilder;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -75,19 +76,23 @@ public class SOAPInputObject
 	this.corbaBroker = (ORB) broker;
 	this.envelopeString = envelopeString;
 
+	// Use javax.xml.parser.DOMBuilder, which we get from DOMBuilderFactory
 	DOMBuilder builder = 
            new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
 	Document doc = null;
 	try {
+	    // builder.parse
 	    doc = builder.build(new ByteArrayInputStream(envelopeString.getBytes()));
 	} catch (JDOMException e) {
 	    System.out.println("SOAPInputObject: " + e);
 	}
+	// The document is the root?
 	Element root = doc.getRootElement();
 	Namespace soapEnvNamespace =
 	    Namespace.getNamespace(
 	        "SOAP-ENV",
 		"http://schemas.xmlsoap.org/soap/envelope/");
+	// not sure about this: need to search?
 	body = root.getChild("Body", soapEnvNamespace);
     }
 

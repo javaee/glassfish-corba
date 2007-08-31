@@ -43,7 +43,7 @@
 	    <jvmarg value="-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
-	    <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}"/>
+	    <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}"/>
 	    <jvmarg value="-Dhttp.server.port=9090"/>
 	    <jvmarg value="-Djava.rmi.server.codebase=http://localhost:9090/"/>
 	    <jvmarg value="-Dhttp.server.root.directory=../build/values2/classes"/>
@@ -55,14 +55,14 @@
 	    <jvmarg value="-Dcom.sun.corba.se.ORBBase=${basedir}"/>
 	    <jvmarg value="-Dcom.sun.corba.se.test.sourcepath=${test.source.path}"/>
 	    <jvmarg value="-Dcom.sun.corba.se.ORBUseDynamicStub=${use.dynamic.stub}"/>
-	    <jvmarg value="-Dcom.sun.corba.se.ORBUseBCELReflectiveCopyobject=${use.bcel.copyobject}"/>
+	    <jvmarg value="-Dcom.sun.corba.se.ORBUseCodegenReflectiveCopyobject=${use.codegen.copyobject}"/>
 	    <jvmarg value="-Dcom.sun.corba.se.encoding.ORBEnableJavaSerialization=${use.java.serialization}"/>
 	    <jvmarg value="-Dcom.sun.corba.se.ORBDebugForkedProcess=${debug.forked.process}"/>
 	    <jvmarg value="-Dcom.sun.corba.se.ORBDebugStubGeneration=false"/>
 	    <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
 	    <jvmarg value="-Demma.coverage.out.merge=true"/>
 	    <jvmarg value="-Demma.rt.control=false"/>
-	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/>
+	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/>
 	    <jvmarg line="${debug.args}"/>
 	    <!-- was:
 	    <arg line="-file ../src/share/classes/@{testfile}"/>

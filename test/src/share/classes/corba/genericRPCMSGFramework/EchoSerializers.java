@@ -44,6 +44,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+// XXX Convert this to JAXP DOM.
 import org.jdom.Namespace;
 import org.jdom.Element;
 

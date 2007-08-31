@@ -142,6 +142,26 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	return "State[UNKNOWN]" ;
     }
 
+    public int hashCode() 
+    {
+	return myId ;
+    }
+
+    public boolean equals( Object obj ) 
+    {
+	if (obj == this) {
+	    return true ;
+	}
+
+	if (!(obj instanceof POAManagerImpl)) {
+	    return false ;
+	}
+
+	POAManagerImpl other = (POAManagerImpl)obj ;
+
+	return other.myId == myId ;
+    }
+
     public String toString()
     {
 	return "POAManagerImpl[" + myId + 

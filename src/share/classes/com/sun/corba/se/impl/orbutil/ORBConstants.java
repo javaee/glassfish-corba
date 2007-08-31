@@ -408,8 +408,8 @@ public class ORBConstants {
     
     // Not available through ORBData: used only in test.Test
     // and in the optional ClassCopierOrdinaryImpl class.
-    public static final String USE_BCEL_REFLECTIVE_COPYOBJECT = 
-	SUN_PREFIX + "ORBUseBCELReflectiveCopyobject" ;
+    public static final String USE_CODEGEN_REFLECTIVE_COPYOBJECT = 
+	SUN_PREFIX + "ORBUseCodegenReflectiveCopyobject" ;
 
     public static final String DYNAMIC_STUB_FACTORY_FACTORY_CLASS =
 	SUN_PREFIX + "ORBDynamicStubFactoryFactoryClass" ;

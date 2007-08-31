@@ -136,7 +136,7 @@ public abstract class PresentationDefaults
 
 			final String className = System.getProperty( 
 			    ORBConstants.DYNAMIC_STUB_FACTORY_FACTORY_CLASS,
-			    "com.sun.corba.se.impl.presentation.rmi.bcel.StubFactoryFactoryBCELImpl" ) ;
+			    "com.sun.corba.se.impl.presentation.rmi.codegen.StubFactoryFactoryCodegenImpl" ) ;
 
 			try {
 			    // First try the configured class name, if any

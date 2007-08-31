@@ -47,7 +47,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/legacybootstrapserver/X.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/legacybootstrapserver/X.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/legacybootstrapserver"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -60,7 +60,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/legacybootstrapserver/X.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/legacybootstrapserver/X.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/legacybootstrapserver"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -73,7 +73,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/connectintercept_1_4/Ex.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/connectintercept_1_4/Ex.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/connectintercept_1_4"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -86,7 +86,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/connectintercept_1_4/Ex.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/connectintercept_1_4/Ex.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/connectintercept_1_4"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -99,7 +99,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/connectintercept_1_4/Ex.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/connectintercept_1_4/Ex.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/connectintercept_1_4"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -112,7 +112,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/connectintercept_1_4/Ex.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/connectintercept_1_4/Ex.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/connectintercept_1_4"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -126,7 +126,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/folb_8_1/folb.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/folb_8_1/folb.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/folb_8_1"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -139,7 +139,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/folb_8_1/folb.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/folb_8_1/folb.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/folb_8_1"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -152,7 +152,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/folb_8_1/folb.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/folb_8_1/folb.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/folb_8_1"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -165,7 +165,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/folb_8_1/folb.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/folb_8_1/folb.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/folb_8_1"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -179,7 +179,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/requestpartitioning/Tester.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/requestpartitioning/Tester.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/requestpartitioning"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -192,7 +192,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/hcks/hcks.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/hcks/hcks.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/hcks"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -205,7 +205,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/hcks/hcks.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/hcks/hcks.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/hcks"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -218,7 +218,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/hcks/hcks.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/hcks/hcks.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/hcks"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -231,7 +231,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/hcks/hcks.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/hcks/hcks.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/hcks"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -244,7 +244,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/exceptiondetailsc/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/exceptiondetailsc/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/exceptiondetailsc"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -257,7 +257,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/exceptiondetailsc/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/exceptiondetailsc/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/exceptiondetailsc"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -270,7 +270,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/exceptiondetailsc/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/exceptiondetailsc/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/exceptiondetailsc"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -283,7 +283,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/exceptiondetailsc/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/exceptiondetailsc/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/exceptiondetailsc"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -296,7 +296,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/islocal/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/islocal/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/islocal"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -309,7 +309,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/islocal/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/islocal/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/islocal"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -322,7 +322,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/islocal/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/islocal/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/islocal"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -335,7 +335,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/islocal/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/islocal/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/islocal"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -348,7 +348,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/iorintsockfact/iorintsockfact.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/iorintsockfact/iorintsockfact.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/iorintsockfact"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -361,7 +361,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/iorintsockfact/iorintsockfact.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/iorintsockfact/iorintsockfact.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/iorintsockfact"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -374,7 +374,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/iorintsockfact/iorintsockfact.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/iorintsockfact/iorintsockfact.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/iorintsockfact"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -387,7 +387,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/iorintsockfact/iorintsockfact.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/iorintsockfact/iorintsockfact.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/iorintsockfact"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -400,7 +400,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/pept/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/pept/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/pept"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -413,7 +413,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/pept/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/pept/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/pept"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -426,7 +426,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/pept/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/pept/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/pept"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -439,7 +439,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/pept/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/pept/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/pept"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -452,7 +452,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/purgecalls/purgecalls.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/purgecalls/purgecalls.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/purgecalls"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -465,7 +465,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/purgecalls/purgecalls.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/purgecalls/purgecalls.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/purgecalls"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -478,7 +478,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/purgecalls/purgecalls.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/purgecalls/purgecalls.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/purgecalls"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -491,7 +491,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/purgecalls/purgecalls.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/purgecalls/purgecalls.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/purgecalls"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -504,7 +504,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/genericRPCMSGFramework/g.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/genericRPCMSGFramework/g.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/genericRPCMSGFramework/"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -517,7 +517,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/genericRPCMSGFramework/g.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/genericRPCMSGFramework/g.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/genericRPCMSGFramework/"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -530,7 +530,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/genericRPCMSGFramework/g.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/genericRPCMSGFramework/g.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/genericRPCMSGFramework/"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -543,7 +543,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/genericRPCMSGFramework/g.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/genericRPCMSGFramework/g.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/genericRPCMSGFramework/"/>
 	<param name="generated-files" value="*_Tie.java"/>
     </antcall>
@@ -556,7 +556,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/mantis/m4764130/SendingContext.idl"/>
+	<param name="idl-value" value="${test.src.dir}/mantis/m4764130/SendingContext.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/mantis/m4764130"/>
 	<param name="generated-files" value="*.java"/>
     </antcall>
@@ -569,7 +569,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/mantis/m4764130/SendingContext.idl"/>
+	<param name="idl-value" value="${test.src.dir}/mantis/m4764130/SendingContext.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/mantis/m4764130"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -582,7 +582,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/codec/codec.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/codec/codec.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/codec"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -595,7 +595,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/serviceexample/serviceexample.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/serviceexample/serviceexample.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/serviceexample"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -608,7 +608,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/ort/iorinterceptor.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/ort/iorinterceptor.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/ort"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -621,7 +621,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/picurrent/hello.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/picurrent/hello.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/picurrent"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -634,7 +634,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/orbinit/orbinit.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/orbinit/orbinit.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/orbinit"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -647,7 +647,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/iorinterceptor/iorinterceptor.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/iorinterceptor/iorinterceptor.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/iorinterceptor"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -660,7 +660,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/clientinterceptor/clientinterceptor.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/clientinterceptor/clientinterceptor.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/clientinterceptor"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -673,7 +673,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/clientinterceptor/clientinterceptor.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/clientinterceptor/clientinterceptor.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/clientinterceptor"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -686,7 +686,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/clientrequestinfo/clientrequestinfo.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/clientrequestinfo/clientrequestinfo.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/clientrequestinfo"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -699,7 +699,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/clientrequestinfo/clientrequestinfo.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/clientrequestinfo/clientrequestinfo.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/clientrequestinfo"/>
 	<param name="generated-files" value="_*ImplBase.java"/>
     </antcall>
@@ -712,7 +712,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/pi/serverrequestinfo/serverrequestinfo.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/serverrequestinfo/serverrequestinfo.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/serverrequestinfo"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -725,7 +725,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value="-pkgPrefix PortableInterceptor org.omg -pkgPrefix IOP org.omg -pkgPrefix Messaging org.omg"/>
-	<param name="idl-value" value="${testsrc.dir}/pi/serverinterceptor/serverinterceptor.idl"/>
+	<param name="idl-value" value="${test.src.dir}/pi/serverinterceptor/serverinterceptor.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/serverinterceptor"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -738,7 +738,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/adapteractivator/hello.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/adapteractivator/hello.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/adapteractivator"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -751,7 +751,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/codeset/codeset.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/codeset/codeset.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/codeset"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -764,7 +764,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/fwddecl/legal.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/fwddecl/legal.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/fwddecl"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -777,7 +777,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/copyobject/typecode.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/copyobject/typecode.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/copyobject/fwddecl"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -790,7 +790,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/multiorb/policy2.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/multiorb/policy2.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/multiorb"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -803,7 +803,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/oneway/hello.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/oneway/hello.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/oneway"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -816,7 +816,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/poaandequals/Wombat.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/poaandequals/Wombat.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/poaandequals"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -829,7 +829,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/poacallback/idlI1.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/poacallback/idlI1.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/poacallback"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -842,7 +842,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/poacallback/idlI2.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/poacallback/idlI2.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/poacallback"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -855,7 +855,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value="-pkgPrefix PortableServer org.omg"/>
-	<param name="idl-value" value="${testsrc.dir}/corba/poamanager/Hello.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/poamanager/Hello.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/poamanager"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -868,7 +868,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/poapolicies/Hello.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/poapolicies/Hello.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/poapolicies"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -881,7 +881,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/poatest/hello.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/poatest/hello.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/poatest"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -894,7 +894,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/idlj/ConstantsAndTypedefs.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/idlj/ConstantsAndTypedefs.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/idlj"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -907,7 +907,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/idlj/NestedTypeDeclsAndInheritedTypes.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/idlj/NestedTypeDeclsAndInheritedTypes.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/idlj"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -920,7 +920,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/systemexceptions/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/systemexceptions/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/systemexceptions"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -933,7 +933,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/unarrow/hello.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/unarrow/hello.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/unarrow"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -946,7 +946,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/jsg/idlI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/jsg/idlI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/jsg"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -959,7 +959,7 @@
 	<param name="oldImplBase-value" value=""/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/repid/BoxedValueTypes.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/repid/BoxedValueTypes.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/repid"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -972,7 +972,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/invocation/hello.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/invocation/hello.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/invocation"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>
@@ -985,7 +985,7 @@
 	<param name="oldImplBase-value" value="-oldImplBase"/>
 	<param name="pkg-translate" value=""/>
 	<param name="pkg-prefixes" value=""/>
-	<param name="idl-value" value="${testsrc.dir}/corba/tcpreadtimeout/ildI.idl"/>
+	<param name="idl-value" value="${test.src.dir}/corba/tcpreadtimeout/ildI.idl"/>
 	<param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/tcpreadtimeout"/>
 	<param name="generated-files" value="*POATie.java"/>
     </antcall>

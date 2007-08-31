@@ -55,13 +55,15 @@ grant CodeBase "file:${com.sun.corba.se.ORBBase}/build/-" {
     permission java.util.logging.LoggingPermission "control";
     permission java.util.PropertyPermission "*", "read, write" ;
     permission sun.corba.BridgePermission "getBridge";
+    permission com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission "access";
+    permission java.lang.management.ManagementPermission "monitor";
 };
 
 // The permissions here must be identical to the permissions specified above,
 // as the base ORB and the optional classes will have different CodeSources.
 // The policy file syntax does not permit multiple codeBases on a grant entry.
 
-grant CodeBase "file:${com.sun.corba.se.ORBBase}/optional/build/-" {
+grant CodeBase "file:${com.sun.corba.se.ORBBase}/orblib/build/-" {
     permission java.io.SerializablePermission "enableSubstitution";
     permission java.io.SerializablePermission "enableSubclassImplementation";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.corba" ;
@@ -78,6 +80,8 @@ grant CodeBase "file:${com.sun.corba.se.ORBBase}/optional/build/-" {
     permission java.util.logging.LoggingPermission "control";
     permission java.util.PropertyPermission "*", "read, write" ;
     permission sun.corba.BridgePermission "getBridge";
+    permission com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission "access";
+    permission java.lang.management.ManagementPermission "monitor";
 };
 
 // These permissions are granted to all tests

@@ -66,7 +66,7 @@
 	<instr mode="copy" merge="true" outdir="${emma.classes.dir}" outfile="${emma.metadata.file}">
 	    <instrpath>
 		<pathelement location="${classes.dir}"/>
-		<pathelement location="${optionalclasses.dir}"/>
+		<pathelement location="${orblib.classes.dir}"/>
 	    </instrpath>
 	    <filter includes="com.sun.corba.se.pept.*"/>
 	    <filter includes="com.sun.corba.se.pept.*.*"/>
@@ -80,24 +80,27 @@
 	    <filter includes="javax.rmi.PortableRemoteObject"/>
 	    <filter includes="javax.rmi.CORBA.*"/>
 	    <filter includes="com.sun.corba.se.spi.folb.GroupInfoServiceBase"/>
+
+	    <!-- exclude IDL and scheme generated classes -->
 	    <filter excludes="com.sun.corba.se.spi.folb.*"/>
-	    <filter excludes="com.sun.corba.se.impl.activation.*"/>
-	    <filter excludes="com.sun.corba.se.impl.copyobject.BCELCopier*"/>
-	    <filter excludes="com.sun.corba.se.impl.copyobject.FastCache*"/>
+	    <filter excludes="com.sun.corba.se.impl.logging.*"/>
+
+	    <!-- exclude ORB classes not used in the app server -->
 	    <filter excludes="com.sun.corba.se.spi.activation.*"/>
-	    <filter excludes="com.sun.corba.se.spi.orbutil.proxy.*"/>
-	    <filter excludes="com.sun.corba.se.impl.orbutil.*1_3"/>
-	    <filter excludes="com.sun.corba.se.impl.orbutil.*1_3_1"/>
 	    <filter excludes="com.sun.corba.se.spi.activation.InitialNameServicePackage.*"/>
 	    <filter excludes="com.sun.corba.se.spi.activation.LocatorPackage.*"/>
 	    <filter excludes="com.sun.corba.se.spi.activation.RepositoryPackage.*"/>
+	    <filter excludes="com.sun.corba.se.impl.activation.*"/>
+	    <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.CodegenCopier*"/>
+	    <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.FastCache*"/>
+	    <filter excludes="com.sun.corba.se.spi.orbutil.proxy.*"/>
+	    <filter excludes="com.sun.corba.se.impl.orbutil.*1_3"/>
+	    <filter excludes="com.sun.corba.se.impl.orbutil.*1_3_1"/>
 	    <filter excludes="com.sun.corba.se.impl.dynamicany.*"/>
-	    <filter excludes="com.sun.corba.se.impl.logging.*"/>
 	    <filter excludes="com.sun.corba.se.impl.naming.pcosnaming.*"/>
 	    <filter excludes="com.sun.corba.se.internal.*.*"/>
 	    <filter excludes="com.sun.corba.se.org.omg"/>
 	    <filter excludes="com.sun.org.omg"/>
-	    <filter excludes="com.sun.corba.se.org.apache"/>
 	    <filter excludes="com.sun.corba.se.org.objectweb"/>
 	</instr>
     </emma>

@@ -240,5 +240,18 @@
 	<param name="idl-gensrc-dir" value="${gensrc.dir}/com/sun/corba/se/spi/activation"/>
 	<param name="generated-files" value="**/*.java"/>
     </antcall>
+    <antcall target="call-idl" inheritAll="true" inheritRefs="true">
+	<param name="td-value" value="-td ${gensrc.dir}"/>
+	<param name="includes-value" value="-i ${gensrc.dir}/com/sun/corba/se/spi/folb"/>
+	<param name="corba-value" value=""/>
+	<param name="fall-value" value="-fall"/>
+	<param name="D-value" value=""/>
+	<param name="oldImplBase-value" value="-oldImplBase"/>
+	<param name="pkg-translate" value=""/>
+	<param name="pkg-prefixes" value="-pkgPrefix folb com.sun.corba.se.spi"/>
+	<param name="idl-value" value="${src.dir}/com/sun/corba/se/spi/folb/folb.idl"/>
+	<param name="idl-gensrc-dir" value="${gensrc.dir}/com/sun/corba/se/spi/folb"/>
+	<param name="generated-files" value="**/*.java"/>
+    </antcall>
 </target>
 

@@ -46,6 +46,8 @@ import com.sun.corba.se.impl.orbutil.copyobject.FallbackObjectCopierImpl ;
 import com.sun.corba.se.impl.copyobject.ReferenceObjectCopierImpl ;
 import com.sun.corba.se.impl.copyobject.ORBStreamObjectCopierImpl ;
 import com.sun.corba.se.impl.copyobject.JavaStreamORBObjectCopierImpl ;
+import com.sun.corba.se.impl.copyobject.OldReflectObjectCopierImpl ;
+import com.sun.corba.se.impl.copyobject.ReflectObjectCopierImpl ;
 
 public abstract class CopyobjectDefaults
 {
@@ -109,6 +111,34 @@ public abstract class CopyobjectDefaults
 		ObjectCopier c1 = f1.make() ;
 		ObjectCopier c2 = f2.make() ;
 		return new FallbackObjectCopierImpl( c1, c2 ) ;
+	    }
+	} ;
+    }
+
+    /** Obtain the old version of the reflective copier factory.  This is provided only
+     * for benchmarking purposes.
+     */
+    public static ObjectCopierFactory makeOldReflectObjectCopierFactory( final ORB orb ) 
+    {
+	return new ObjectCopierFactory() {
+	    public ObjectCopier make()
+	    {
+		return new OldReflectObjectCopierImpl( orb ) ;
+	    }
+	} ;
+    }
+
+    /** Obtain the new reflective copier factory.  This is 3-4 times faster than the stream
+     * copier, and about 10% faster than the old reflective copier.  It should
+     * normally be used with a fallback copier, as there are some classes that simply
+     * cannot be copied reflectively.
+     */
+    public static ObjectCopierFactory makeReflectObjectCopierFactory( final ORB orb ) 
+    {
+	return new ObjectCopierFactory() {
+	    public ObjectCopier make( )
+	    {
+		return new ReflectObjectCopierImpl( orb ) ;
 	    }
 	} ;
     }

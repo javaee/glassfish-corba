@@ -55,16 +55,14 @@ import org.omg.PortableServer.ServantLocator ;
 import org.omg.PortableServer.ServantRetentionPolicyValue ;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
-import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.copyobject.CopierManager ;
-
 import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+
 import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
+import com.sun.corba.se.spi.copyobject.CopyobjectDefaults ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 
@@ -232,25 +230,13 @@ public class counterClient implements InternalProcess
 	environment.setProperty( ORBConstants.ORB_ID_PROPERTY, id ) ; 
 	ORB orb = (ORB)org.omg.CORBA.ORB.init(args, environment);
 
-	// If OptimizedCopyObjectDefaults is available, use it.
-	try {
-	    Class defClass = Class.forName( 
-		"com.sun.corba.se.spi.copyobject.OptimizedCopyobjectDefaults" ) ;
-	    Method makeReflectObjectCopierFactory = defClass.getMethod( 
-		"makeReflectObjectCopierFactory", new Class[] { ORB.class } ) ;
-	    ObjectCopierFactory ocf = (ObjectCopierFactory)
-		makeReflectObjectCopierFactory.invoke( null, 
-		    new Object[] { orb } ) ;
-	    CopierManager cm = orb.getCopierManager() ;
-	    int defaultId = cm.getDefaultId() ;
-	    cm.registerObjectCopierFactory( ocf, defaultId ) ;
-	    
-	    System.out.println( "Using optimized reflective copier" ) ;
-	} catch (Exception exc) {
-	    exc.printStackTrace() ;
-	    // Whatever the exception, ignore it, and just use the default copier.
-	    System.out.println( "Using default stream copier" ) ;
-	}
+	// Use the optimized reflective object copier for this test
+	ObjectCopierFactory ocf = CopyobjectDefaults.makeReflectObjectCopierFactory( orb ) ;
+	CopierManager cm = orb.getCopierManager() ;
+	int defaultId = cm.getDefaultId() ;
+	cm.registerObjectCopierFactory( ocf, defaultId ) ;
+	
+	System.out.println( "Using optimized reflective copier" ) ;
 
 	return orb ;
     }

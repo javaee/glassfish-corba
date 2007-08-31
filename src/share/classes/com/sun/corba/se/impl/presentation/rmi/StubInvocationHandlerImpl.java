@@ -76,9 +76,10 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.orbutil.proxy.InvocationHandlerFactory ;
 import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler ;
 
+import com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission ;
+
 import com.sun.corba.se.impl.corba.CORBAObjectImpl ;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
-
 
 public final class StubInvocationHandlerImpl implements LinkedInvocationHandler  
 {

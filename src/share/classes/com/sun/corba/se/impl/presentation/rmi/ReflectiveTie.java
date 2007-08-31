@@ -59,6 +59,8 @@ import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission ;
+
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.oa.poa.POAManagerImpl ;

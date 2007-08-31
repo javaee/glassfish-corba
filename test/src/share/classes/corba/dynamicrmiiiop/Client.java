@@ -171,9 +171,9 @@ public class Client extends TestCase
 	ts.addTest( new TestSuite( TestIDLNameTranslator.class ) ) ;
 	ts.addTest( new TestSuite( TestRMIIDLTypes.class ) ) ;
 
-	// Add the BCEL ProxyCreator test suite if it is available.
+	// Add the Codegen ProxyCreator test suite if it is available.
 	// It is part of the optional ORB build.
-	String testName = "corba.dynamicrmiiiop.TestBCELProxyCreator" ;
+	String testName = "corba.dynamicrmiiiop.TestCodegenProxyCreator" ;
 	try {
 	    Class cls = ORBClassLoader.loadClass( testName ) ;
 	    ts.addTest( (TestSuite)TestCaseTools.makeTestSuite( cls ) ) ;

@@ -566,23 +566,23 @@ public class TestClient {
     // Info for creating clients:
     // threadId, delay, refname, callDelay 
     private static Object[][] clientData = {
-	{ 1,   0, "cache/0", 5 },
-	{ 2,   7, "cache/0", 0 },
+	{ 1,   5, "cache/0", 5 },
+	{ 2,   9, "cache/0", 0 },
 	{ 3,  16, "cache/0", 0 },
-	{ 4,   0, "cache/5", 0 },
-	{ 5,   7, "cache/5", 5 },
+	{ 4,   5, "cache/5", 0 },
+	{ 5,   9, "cache/5", 5 },
 	{ 6,  16, "cache/5", 0 },
-	{ 7,   0, "cache/23", 0 },
-	{ 8,   7, "cache/23", 0 },
+	{ 7,   5, "cache/23", 0 },
+	{ 8,   9, "cache/23", 0 },
 	{ 9,  16, "cache/23", 5 },
-	{ 10,  0, "nocache/0", 5 },
-	{ 11,  7, "nocache/0", 0 },
+	{ 10,  5, "nocache/0", 5 },
+	{ 11,  9, "nocache/0", 0 },
 	{ 12, 16, "nocache/0", 0 },
-	{ 13,  0, "nocache/5", 0 },
-	{ 14,  7, "nocache/5", 5 },
+	{ 13,  5, "nocache/5", 0 },
+	{ 14,  9, "nocache/5", 5 },
 	{ 15, 16, "nocache/5", 0 },
-	{ 16,  0, "nocache/23", 0 },
-	{ 17,  7, "nocache/23", 0 },
+	{ 16,  5, "nocache/23", 0 },
+	{ 17,  9, "nocache/23", 0 },
 	{ 18, 16, "nocache/23", 5 }} ;
 
     // calls echo: Client( int threadId, int delay, Test testref ) 
@@ -622,7 +622,7 @@ public class TestClient {
 	}
     }
 
-    private static final int RUN_TIME = 4*1000 ; // 4 seconds
+    private static final int RUN_TIME = 1000 ; // 1 second
 
     public static void reconfigure() {
 	// deactivate the old ServantLocator
@@ -649,7 +649,7 @@ public class TestClient {
 	    // At this point all clients are running and sending
 	    // requests.  Now the test begins.
 	    
-	    for (int ctr=0; ctr<5; ctr++) {
+	    for (int ctr=0; ctr<3; ctr++) {
 		sleep( RUN_TIME ) ;
 		log( "RFM>>>Suspend" ) ;
 		rfm.suspend() ;

@@ -766,24 +766,31 @@
 	    </sequential>
 	</macrodef>
 
-    <!-- ======================== findbugs integration ========= -->
+    <!-- ======================== findbugs integration ========= 
+	 This uses the findbugs command instead of the findbugs ant task because it
+	 is easier to use the command than to arrange that findbugs-ant.jar is properly
+	 installed where it is needed.
+      -->
 
-    <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+    <!-- <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/> -->
     
     <target name="findbugs" depends="init"> 
 	<mkdir dir="${test.output}"/>
-	<findbugs home="${findbugs.home}"
-		  output="html"
-		  outputFile="${test.output}/orb-fb.html"
-		  excludeFilter="${findbugs.exclude.file}">
-	    <class location="${releaselib.dir}/omgapi.jar"/>
-	    <!-- <class location="${releaselib.dir}/idlj.jar"/> -->
-	    <class location="${releaselib.dir}/orblib.jar"/>
-	    <class location="${releaselib.dir}/peorb.jar"/>
-	    <!-- <class location="${test-classes.dir}"/> -->
-	    <!-- <sourcepath path="${src.dir}:${test.src.dir}:${orblib.src.dir}" /> -->
-	    <sourcepath path="${src.dir}:${orblib.src.dir}" />
-	</findbugs>
+	<exec executable="findbugs">
+	    <arg value="-textui"/>
+	    <arg value="-html"/>
+	    <arg value="-outputfile"/>
+	    <arg file="${test.output}/orb-fb.html"/>
+	    <arg value="-exclude"/>
+	    <arg file="${findbugs.exclude.file}"/>
+	    <arg value="-sourcepath"/>
+	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
+	    <arg file="${releaselib.dir}/omgapi.jar"/>
+	    <!-- <arg file="${releaselib.dir}/idlj.jar"/> -->
+	    <arg file="${releaselib.dir}/orblib.jar"/>
+	    <arg file="${releaselib.dir}/peorb.jar"/>
+	    <!-- <arg file="${test-classes.dir}"/> -->
+	</exec>
     </target>
 
     <target name="rename" depends="init, orb-library">

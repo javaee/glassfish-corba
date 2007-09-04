@@ -779,7 +779,7 @@
 	<exec executable="findbugs">
 	    <arg value="-textui"/>
 	    <arg value="-html"/>
-	    <arg value="-outputfile"/>
+	    <arg value="-outputFile"/>
 	    <arg file="${test.output}/orb-fb.html"/>
 	    <arg value="-exclude"/>
 	    <arg file="${findbugs.exclude.file}"/>

@@ -1843,9 +1843,13 @@ public final class Wrapper {
     /** Create an expression representing the application of the
      * unary operator op to the given expression.
      */
-    public static final Expression _unary( ExpressionFactory.UnaryOperator op, 
+    private static final Expression _unary( ExpressionFactory.UnaryOperator op, 
 	Expression expr )  {
 	return env().ef().unaryOp( op, expr ) ;
+    }
+
+    public static final Expression _not( Expression expr ) {
+	return _unary( ExpressionFactory.UnaryOperator.NOT, expr ) ;
     }
 
     private static final Expression _binary( Expression left, 
@@ -1859,7 +1863,7 @@ public final class Wrapper {
      * + operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _plus( Expression left, 
+    public static final Expression _add( Expression left, 
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.PLUS,
 	    right ) ;
@@ -1869,7 +1873,7 @@ public final class Wrapper {
      * + operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _minus( Expression left, 
+    public static final Expression _sub( Expression left, 
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.MINUS,
 	    right ) ;
@@ -1879,7 +1883,7 @@ public final class Wrapper {
      * + operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _times( Expression left, 
+    public static final Expression _mul( Expression left, 
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.TIMES,
 	    right ) ;

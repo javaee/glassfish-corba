@@ -1,0 +1,14 @@
+<FindBugsFilter>
+    <Match>
+	<Package name="~sun.rmi.*"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.tools.corba.se.idl.*"/>
+    </Match>
+    <Match>
+	<Package name="~org.objectweb.*"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.org.objectweb.*"/>
+    </Match>
+</FindBugsFilter>

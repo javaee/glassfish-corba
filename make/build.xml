@@ -767,9 +767,11 @@
 	</macrodef>
 
     <!-- ======================== findbugs integration ========= 
+
 	 This uses the findbugs command instead of the findbugs ant task because it
 	 is easier to use the command than to arrange that findbugs-ant.jar is properly
 	 installed where it is needed.
+
       -->
 
     <!-- <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/> -->

@@ -105,12 +105,13 @@ import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
  * advanced applications aimed at extending the Java language or providing
  * significant performance enhancements.
  * <P>
- * The supported language is best thought of as a subset of Java 1.0.2.  The following
- * features from Java 5 and earlier are currently NOT supported:
+ * The supported language is best thought of as a subset of Java 1.0.2.  
+ * The following features from Java 5 and earlier are currently NOT supported:
  * <UL>
  * <LI>Generics.
- * <LI>Annotations.
- * <LI>For loops (of any sort, but this may be added through extension at some point).
+ * <LI>Annotations (this may be added at some point).
+ * <LI>For loops (of any sort, but this may be added through extension at some 
+ * point).
  * <LI>Enums.
  * <LI>Autoboxing.
  * <LI>Varargs methods.
@@ -122,9 +123,9 @@ import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
  * <LI>Static fields in interfaces.
  * <LI>Labels, or labelled break or continue.
  * </UL>
- * The intent is that dynamically generated code should be a simplified form of Java,
- * much like the original Java 1.0 definition.  This moves dynamic code generation to a level
- * much closer to Java than to raw bytecode manipulation.
+ * The intent is that dynamically generated code should be a simplified form of 
+ * Java, much like the original Java 1.0 definition.  This moves dynamic code 
+ * generation to a level much closer to Java than to raw bytecode manipulation.
  * <P>
  * As much as possible, this class uses standard Java keywords prefixed by "_" as 
  * method names.  This helps to remember what the method name is for creating
@@ -137,9 +138,10 @@ import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
  * <P>A typical use of this class looks something like:
  * <PRE>
  * _clear() ;		    // clean up any state from previous uses
- * (optional) _setClassLoader(cl) ; // If you need a specific ClassLoader, set it early
-				    // so that your generated code can be checked against 
-				    // those classes that it references.
+ *			    // optional:
+ * _setClassLoader(cl) ;    // If you need a specific ClassLoader, set it early
+			    // so that your generated code can be checked against 
+			    // those classes that it references.
  * _package( "YYY" ) ;	    // set the package to use for the generated code
  * _import( "AAA.BBB" ) ;   // repeat as needed.  As in Java, this makes "BBB"
  *			    // a synonym for "AAA.BBB".  Collisions are not 
@@ -159,6 +161,16 @@ import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
  * _end() ; // of package
  * Class<?>  newClass = _generate( ... ) ;
  * </PRE>
+ * Alternatively, the last line could be
+ * <PRE>
+ * GenericClass<T> gc = _generate( T.class, props ) ;
+ * </PRE>
+ * which makes it easy to create an instance of the generated class
+ * by calling:
+ * <PRE>
+ * T instance = gc.create( <constructor args> ) ;
+ * </PRE>
+ * <P>
  * Currently only one class can be defined at a time.
  * There is a grammar defined below that gives more detail.
  * One small note: it is necessary to call _expr( expr ) in order to

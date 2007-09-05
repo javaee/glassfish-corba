@@ -1672,7 +1672,6 @@ public final class Wrapper {
 
     /** Generate a call to an instance method, using the Java method 
      * overload resolution algorithm to determine the signature.
-     * NOT IMPLEMENTED YET.
      */
     public static final Expression _call( Expression target, String ident, 
 	Expression... args )  {
@@ -1681,7 +1680,6 @@ public final class Wrapper {
 
     /** Generate a call to an instance method, using the Java method 
      * overload resolution algorithm to determine the signature.
-     * NOT IMPLEMENTED YET.
      */
     public static final Expression _call( Expression target, String ident, 
 	List<Expression> args )  {
@@ -1706,7 +1704,6 @@ public final class Wrapper {
 
     /** Generate a call to a static method, using the Java method 
      * overload resolution algorithm to determine the signature.
-     * NOT IMPLEMENTED YET.
      */
     public static final Expression _call( Type target, String ident, 
 	Expression... args )  {
@@ -1715,7 +1712,6 @@ public final class Wrapper {
 
     /** Generate a call to a static method, using the Java method 
      * overload resolution algorithm to determine the signature.
-     * NOT IMPLEMENTED YET.
      */
     public static final Expression _call( Type target, String ident, 
 	List<Expression> args )  {
@@ -1740,7 +1736,7 @@ public final class Wrapper {
 
     /** Generate a call to an instance method in the current super
      * class using the Java method overload resolution algorithm to
-     * determine the signature.  NOT IMPLEMENTED YET.
+     * determine the signature.  
      */
     public static final Expression _super( String ident, 
 	Expression... exprs )  {
@@ -1749,7 +1745,7 @@ public final class Wrapper {
 
     /** Generate a call to an instance method in the current super
      * class using the Java method overload resolution algorithm to
-     * determine the signature.  NOT IMPLEMENTED YET.
+     * determine the signature.  
      */
     public static final Expression _super( String ident, 
 	List<Expression> exprs )  {
@@ -1786,7 +1782,6 @@ public final class Wrapper {
      * This may only be used as the first expression
      * in a constructor.  Every constructor must begin with
      * either a super(...) call or a this(...) call.
-     * NOT IMPLEMENTED YET.
      */
     public static final Expression _super( List<Expression> exprs )  {
 	return env().ef().superObj( exprs ) ;
@@ -1798,7 +1793,6 @@ public final class Wrapper {
      * This may only be used as the first expression
      * in a constructor.  Every constructor must begin with
      * either a super(...) call or a this(...) call.
-     * NOT IMPLEMENTED YET.
      */
     public static final Expression _super( Expression... exprs )  {
 	return env().ef().superObj( asList(exprs) ) ;
@@ -1834,7 +1828,6 @@ public final class Wrapper {
      * This may only be used as the first expression
      * in a constructor.  Every constructor must begin with
      * either a super(...) call or a this(...) call.
-     * NOT IMPLEMENTED YET.
      */
     public static final Expression _this( Expression... exprs )  {
 	return env().ef().thisObj( asList(exprs) ) ;
@@ -1846,7 +1839,6 @@ public final class Wrapper {
      * This may only be used as the first expression
      * in a constructor.  Every constructor must begin with
      * either a super(...) call or a this(...) call.
-     * NOT IMPLEMENTED YET.
      */
     public static final Expression _this( List<Expression> exprs )  {
 	return env().ef().thisObj( exprs ) ;
@@ -2069,6 +2061,7 @@ public final class Wrapper {
      * expressions to initialize the array.  We really only
      * support single dimensional arrays here.  The size of the
      * resulting array is the number of expressions given here.
+     * Equivalent to new A[] = { exprList }.
      */
     public static final Expression _new_array_init( Type type, 
 	List<Expression> args )  {
@@ -2077,6 +2070,7 @@ public final class Wrapper {
 
     /** Create an expression representing the construction of a
      * new array of the given size with the given component type. 
+     * Equivalent to new A[x].
      */
     public static final Expression _new_array( Type type, Expression size )  {
 	return env().ef().newArr( type, size ) ;

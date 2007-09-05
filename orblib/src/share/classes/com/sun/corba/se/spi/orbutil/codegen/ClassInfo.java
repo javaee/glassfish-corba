@@ -48,6 +48,8 @@ import com.sun.corba.se.spi.orbutil.codegen.Signature ;
  * and pre-existing Java classes.
  */
 public interface ClassInfo {
+    /** Return the modifiers on this class as specified in java.lang.reflect.Modifier.
+     */
     public int modifiers() ;
 
     /** Return the Type of the class represented by this
@@ -74,8 +76,13 @@ public interface ClassInfo {
      */
     public String className() ;
 
+    /** Return the Type of the supertype of this class.
+     */
     public Type superType() ;
 
+    /** Return the list of Types of interfaces implemented by this class.
+     * May be empty, but never null.
+     */
     public List<Type> impls() ;
 
     /** Return a map from field names to FieldInfo instances for

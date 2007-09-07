@@ -100,7 +100,7 @@ public final class ObjectStreamClassUtil_1_3 {
               //} catch (IllegalAccessException ex) {
               //     suid = _computeSerialVersionUID(cl);
               }
-	      return new Long(suid);
+	      return Long.valueOf(suid);
 	   }
 	});
     }

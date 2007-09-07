@@ -98,7 +98,7 @@ public final class OldJIDLObjectKeyTemplate extends OldObjectKeyTemplateBase
             else if (patchVersion > ObjectKeyFactoryImpl.JDK1_3_1_01_PATCH_LEVEL)
                 setORBVersion(ORBVersionFactory.getORBVersion());
             else
-		throw wrapper.invalidJdk131PatchLevel( new Integer( patchVersion ) ) ;
+		throw wrapper.invalidJdk131PatchLevel( Integer.valueOf( patchVersion ) ) ;
         }
     }
     

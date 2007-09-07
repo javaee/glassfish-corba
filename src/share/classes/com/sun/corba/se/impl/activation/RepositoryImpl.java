@@ -411,13 +411,13 @@ public class RepositoryImpl extends _RepositoryImplBase
 	    // initialize the Server Id counter and hashtable.
 	    // the lower id range is reserved for system servers
 	    serverTable     = new HashMap<Integer,DBServerDef>(255);
-	    serverIdCounter = new Integer(256); 
+	    serverIdCounter = Integer.valueOf(256); 
 	}
 
 	int incrementServerIdCounter()
 	{
 	    int value = serverIdCounter.intValue();
-	    serverIdCounter = new Integer(++value);
+	    serverIdCounter = Integer.valueOf(++value);
  
 	    return value;
 	}

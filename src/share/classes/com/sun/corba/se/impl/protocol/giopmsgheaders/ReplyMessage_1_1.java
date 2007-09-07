@@ -160,7 +160,7 @@ public final class ReplyMessage_1_1 extends Message_1_1
                 break;
             default:
 		throw wrapper.badCompletionStatusInReply( 
-		    CompletionStatus.COMPLETED_MAYBE, new Integer(status) );
+		    CompletionStatus.COMPLETED_MAYBE, status );
             }
         } else if (this.reply_status == USER_EXCEPTION) {
             // do nothing. The client stub will read the exception from body.

@@ -98,7 +98,7 @@ public class Terminal extends Expression
     if (lv > Integer.MAX_VALUE || lv < Integer.MIN_VALUE)
       value (longValue);
     else
-      value (new Integer (longValue.intValue ()));
+      value (Integer.valueOf (longValue.intValue ()));
   } // ctor
 
   protected Terminal (String representation, Double doubleValue)

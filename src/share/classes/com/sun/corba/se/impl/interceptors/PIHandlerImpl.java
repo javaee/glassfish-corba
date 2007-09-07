@@ -863,7 +863,7 @@ public class PIHandlerImpl implements PIHandler
 	// We will assume interceptor is not null, since it is called
 	// internally.
 	if( (type >= InterceptorList.NUM_INTERCEPTOR_TYPES) || (type < 0) ) {
-	    throw wrapper.typeOutOfRange( new Integer( type ) ) ;
+	    throw wrapper.typeOutOfRange( Integer.valueOf( type ) ) ;
 	}
 
         String interceptorName = interceptor.name();
@@ -930,12 +930,12 @@ public class PIHandlerImpl implements PIHandler
         if( policyFactoryTable == null ) {
             policyFactoryTable = new HashMap<Integer,PolicyFactory>();
         }
-        Integer key = new Integer( type );
+        Integer key = Integer.valueOf( type );
         PolicyFactory val = policyFactoryTable.get( key );
         if (val == null) {
             policyFactoryTable.put( key, factory );
         } else { 
-	    throw omgWrapper.policyFactoryRegFailed( new Integer( type ) ) ;
+	    throw omgWrapper.policyFactoryRegFailed( Integer.valueOf( type ) ) ;
         }
     }
     

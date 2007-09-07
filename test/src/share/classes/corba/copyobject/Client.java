@@ -515,38 +515,38 @@ public abstract class Client extends TestCase
 
     public void testImmutableByte()
     {
-	doImmutableTest( new Byte( (byte)26 ) ) ;
+	doImmutableTest( Byte.valueOf( (byte)26 ) ) ;
     }
 
     public void testImmutableChar()
     {
-        doImmutableTest(new Character('a'));
-	//doImmutableTest(new Character('\u00FF'));
+        doImmutableTest(Character.valueOf('a'));
+	//doImmutableTest(Character.valueOf('\u00FF'));
     }
 
     public void testImmutableShort()
     {
-	doImmutableTest(new Short((short) 1234));
+	doImmutableTest(Short.valueOf((short)1234));
     }
 
     public void testImmutableInteger()
     {
-	doImmutableTest(new Integer(1234));
+	doImmutableTest(Integer.valueOf(1234));
     }
 
     public void testImmutableLong()
     {
-	doImmutableTest(new Long(903283420L));
+	doImmutableTest(Long.valueOf(903283420L));
     }
 
     public void testImmutableFloat()
     {
-	doImmutableTest(new Float(93.0320F));
+	doImmutableTest(Float.valueOf(93.0320F));
     }
 
     public void testImmutableDouble()
     {
-	doImmutableTest(new Double(093209.329320));
+	doImmutableTest(Double.valueOf(093209.329320));
     }
 
     public void testPrimitiveBooleanArray() {
@@ -686,7 +686,7 @@ public abstract class Client extends TestCase
     {
         Byte[] byteArray = new Byte[10];
         for (int i = 0; i < byteArray.length; i++) {
-            byteArray[i] = new Byte((byte) i);
+            byteArray[i] =(byte)i;
         }
 
         doStandardTest(byteArray);
@@ -696,7 +696,7 @@ public abstract class Client extends TestCase
 
         Short[] shortArray = new Short[10];
         for (short i = 0; i < shortArray.length; i++) {
-            shortArray[i] = new Short((short) i);
+            shortArray[i] = i;
         }
 
         doStandardTest(shortArray);
@@ -705,7 +705,7 @@ public abstract class Client extends TestCase
     public  void testImmutableIntegerArray() {
         Integer[] intArray = new Integer[10];
         for (int i = 0; i < intArray.length; i++) {
-            intArray[i] = new Integer(i);
+            intArray[i] = i;
         }
         doStandardTest(intArray);
     }
@@ -713,7 +713,7 @@ public abstract class Client extends TestCase
     public  void testImmutableLongArray() {
         Long[] longArray = new Long[10];
         for (int i = 0; i < longArray.length; i++) {
-            longArray[i] = new Long((long) i);
+            longArray[i] = (long) i;
         }
         doStandardTest(longArray);
     }
@@ -722,7 +722,7 @@ public abstract class Client extends TestCase
 
         Float[] floatArray = new Float[10];
         for (int i = 0; i < floatArray.length; i++) {
-            floatArray[i] = new Float((float) 3.2 + (float) i);
+            floatArray[i] = (float) 3.2 + (float) i;
         }
         doStandardTest(floatArray);
     }
@@ -731,7 +731,7 @@ public abstract class Client extends TestCase
 
         Double[] doubleArray = new Double[10];
         for (int i = 0; i < doubleArray.length; i++) {
-            doubleArray[i] = new Double(10.35 + (double) i);
+            doubleArray[i] = 10.35 + (double) i;
         }
         doStandardTest(doubleArray);
     }
@@ -740,7 +740,7 @@ public abstract class Client extends TestCase
 
         Character[] latinCharArray = new Character[128];
         for (int i = 0; i < latinCharArray.length; i++) {
-            latinCharArray[i] = new Character((char) i);
+            latinCharArray[i] = (char) i;
         }
         doStandardTest(latinCharArray);
     }
@@ -749,8 +749,7 @@ public abstract class Client extends TestCase
 
         Character[] unicodeCharArray = new Character[100];
         for (int i = 0; i < unicodeCharArray.length; i++) {
-            unicodeCharArray[i] = new Character( (char) ((char) '\u6D77'
-                                                         + (char) i));
+            unicodeCharArray[i] = (char) ((char) '\u6D77' + (char) i);
         }
         doStandardTest(unicodeCharArray);
     }
@@ -776,43 +775,43 @@ public abstract class Client extends TestCase
     public  void testImmutableBooleanArrayAlias() {
 
         Boolean[] boolArray =
-        { Boolean.TRUE, Boolean.FALSE, new Boolean("true"), Boolean.FALSE };
+        { Boolean.TRUE, Boolean.FALSE, Boolean.valueOf("true"), Boolean.FALSE };
 
         doStandardTest(boolArray);
     }
 
     public  void testImmutableByteArrayAlias()
     {
-        Byte b1 = new Byte(Byte.MAX_VALUE);
-        Byte b2 = new Byte((byte) 2);
-        Byte b11 = new Byte((byte) 1);
+        Byte b1 = Byte.valueOf(Byte.MAX_VALUE);
+        Byte b2 = Byte.valueOf((byte) 2);
+        Byte b11 = Byte.valueOf((byte) 1);
 
         Byte[] byteArray =
-        { b1, b11, b1, new Byte((byte) 2), b2 };
+        { b1, b11, b1, Byte.valueOf((byte) 2), b2 };
 
         doStandardTest(byteArray);
     }
 
     public  void testImmutableShortArrayAlias() {
 
-        Short s1 = new Short(Short.MAX_VALUE);
+        Short s1 = Short.MAX_VALUE;
         Short[] shortArray = { s1, s1, s1 };
 
         doStandardTest(shortArray);
     }
 
     public  void testImmutableIntegerArrayAlias() {
-        Integer one = new Integer(1);
-        Integer two = new Integer(2);
+        Integer one = Integer.valueOf(1);
+        Integer two = Integer.valueOf(2);
 
         Integer[] intArray =  new Integer[]
-        { one, two, new Integer(1), one, new Integer(2) } ;
+        { one, two, Integer.valueOf(1), one, Integer.valueOf(2) } ;
         doStandardTest(intArray);
     }
 
     public  void testImmutableLongArrayAlias() {
-        Long l1 = new Long(1);
-        Long l2 = new Long(Long.MIN_VALUE);
+        Long l1 = Long.valueOf(1);
+        Long l2 = Long.MIN_VALUE;
 
         Long[] longArray = new Long[]
         {  l2, l2, l1 };
@@ -821,26 +820,26 @@ public abstract class Client extends TestCase
     }
 
     public  void testImmutableFloatArrayAlias() {
-        Float f1 = new Float(Float.MAX_VALUE);
-        Float f2 = new Float(Float.MIN_VALUE);
+        Float f1 = Float.MAX_VALUE;
+        Float f2 = Float.MIN_VALUE;
 
-        Float[] floatArray = { f1 , f1, new Float(8938.9329f), f2, f2 };
+        Float[] floatArray = { f1 , f1, Float.valueOf(8938.9329f), f2, f2 };
         doStandardTest(floatArray);
     }
 
     public  void testImmutableDoubleArrayAlias() {
 
-        Double d1 = new Double(823.932);
-        Double d2 = new Double(823.932);
+        Double d1 = Double.valueOf(823.932);
+        Double d2 = Double.valueOf(823.932);
 
-        Double[] doubleArray = { d1, d1, d2, new Double(823.932) };
+        Double[] doubleArray = { d1, d1, d2, Double.valueOf(823.932) };
         doStandardTest(doubleArray);
     }
 
     public  void testImmutableCharArrayAlias() {
 
-        Character c1 = new Character((char) 65);
-        Character c2 = new Character('\u6d77');
+        Character c1 = Character.valueOf((char) 65);
+        Character c2 = Character.valueOf('\u6d77');
         Character c3 = c1;
 
         Character[] latinCharArray = { c1, c2, c3 };
@@ -923,8 +922,8 @@ public abstract class Client extends TestCase
     public  void testHashtable() {
 
         Hashtable data = new Hashtable();
-        Integer one = new Integer(1);
-        Integer two = new Integer(2);
+        Integer one = Integer.valueOf(1);
+        Integer two = Integer.valueOf(2);
         Integer[] array = { one, two } ;
         data.put(one, array);
         data.put(two, "this is a test");
@@ -943,7 +942,7 @@ public abstract class Client extends TestCase
     public  void testHashMap() {
 
         HashMap data = new HashMap(20, 0.75f);
-        data.put("int", new Integer(1));
+        data.put("int", Integer.valueOf(1));
         data.put("this is a test", "this is a test");
 
         doStandardTest(data);
@@ -960,7 +959,7 @@ public abstract class Client extends TestCase
         map1.put("test", test);
 
         HashMap map2 = new HashMap();
-        map2.put("key", new Character('a'));
+        map2.put("key", Character.valueOf('a'));
 
         Hashtable table = new Hashtable();
         table.put("key", test);
@@ -986,8 +985,8 @@ public abstract class Client extends TestCase
 
     public  void testCustomMap() {
         CustomMap data = new CustomMap();
-        data.put("int", new Integer(Integer.MIN_VALUE));
-        data.put("float", new Float(Float.MIN_VALUE));
+        data.put("int", Integer.MIN_VALUE);
+        data.put("float", Float.MIN_VALUE);
         doStandardTest(data);
     }
 
@@ -1009,7 +1008,7 @@ public abstract class Client extends TestCase
 
     public  void testArrayList() {
 
-        Object[] obj = { "test",  new Integer(1), new Boolean(true) };
+        Object[] obj = { "test",  Integer.valueOf(1), Boolean.valueOf(true) };
 
         //create an immutable list
         List data = Collections.nCopies(3, obj);
@@ -1022,7 +1021,7 @@ public abstract class Client extends TestCase
         String[] strArray = { "this" , "is", "a" , "test" };
 
         Object[] objectArray =
-        { new Byte((byte) 1), new Short((short) 1), strArray };
+        { Byte.valueOf((byte) 1), Short.valueOf((short) 1), strArray };
 
         Vector vector = new Vector();
         vector.add(strArray);
@@ -1101,15 +1100,15 @@ public abstract class Client extends TestCase
 
     public  void testLinkedHashMap() {
         LinkedHashMap data = new LinkedHashMap(10, 0.25f, true);
-        data.put("int", new Integer(Integer.MIN_VALUE));
-        data.put("float", new Float(Float.MIN_VALUE));
+        data.put("int", Integer.MIN_VALUE);
+        data.put("float", Float.MIN_VALUE);
         doStandardTest(data);
     }
 
     public  void testLinkedHashSet() {
         Collection c = new Vector();
         Hashtable hashtable = new Hashtable();
-        hashtable.put("one", new Integer(Integer.MAX_VALUE));
+        hashtable.put("one", Integer.MAX_VALUE);
         c.add(hashtable);
         c.add(ExtendedOperation.LIST);
         c.add(new Date());
@@ -2079,7 +2078,7 @@ public abstract class Client extends TestCase
             (Map) Proxy.newProxyInstance(hashMapClass.getClassLoader(),
                                          hashMapClass.getInterfaces(),
                                          impl);
-        map.put("one", new Integer(1));
+        map.put("one", Integer.valueOf(1));
         map.put("test", new String("hello"));
 
         doStandardTest(map);
@@ -2107,7 +2106,7 @@ public abstract class Client extends TestCase
     {
         Integer[] array = new Integer[10];
         for (int i = 0; i < array.length; i++) {
-            array[i] = new Integer(i * 10);
+            array[i] = i * 10;
         }
         doCopyObjectsTest(array);
     }

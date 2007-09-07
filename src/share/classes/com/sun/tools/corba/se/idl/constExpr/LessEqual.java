@@ -64,7 +64,6 @@ public class LessEqual extends BinaryExpr
     try
     {
       Object left = left ().evaluate ();
-      Object right = right ().evaluate ();
       if (left instanceof Boolean)
       {
         String[] parameters = {Util.getMessage ("EvaluationException.lessEqual"), left ().value ().getClass ().getName (), right ().value ().getClass ().getName ()};
@@ -75,10 +74,10 @@ public class LessEqual extends BinaryExpr
         Number l = (Number)left;
         Number r = (Number)right ().evaluate ();
         if (l instanceof Float || l instanceof Double || r instanceof Float || r instanceof Double)
-          value (new Boolean (l.doubleValue () <= r.doubleValue ()));
+          value (Boolean.valueOf (l.doubleValue () <= r.doubleValue ()));
         else
-          //daz          value (new Boolean (l.longValue () <= r.longValue ()));
-          value (new Boolean ( ((BigInteger)l).compareTo ((BigInteger)r) <= 0));
+          //daz          value (Boolean.valueOf (l.longValue () <= r.longValue ()));
+          value (Boolean.valueOf ( ((BigInteger)l).compareTo ((BigInteger)r) <= 0));
       }
     }
     catch (ClassCastException e)

@@ -60,6 +60,6 @@ public class TaggedProfileTemplateFactoryFinderImpl extends
 
     public TaggedProfileTemplate handleMissingFactory( int id, InputStream is) 
     {
-	throw wrapper.taggedProfileTemplateFactoryNotFound( new Integer(id) ) ;
+	throw wrapper.taggedProfileTemplateFactoryNotFound( Integer.valueOf(id) ) ;
     }
 }

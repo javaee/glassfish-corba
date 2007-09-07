@@ -177,7 +177,7 @@ public class Interceptor
 	    // These are only available when the classes generated from
 	    // interceptors.idl are present in org.omg.*.
 	    try {
-		tab("server_id", new Integer(ri.server_id()).toString());
+		tab("server_id", Integer.valueOf(ri.server_id()).toString());
 	    } catch (Exception e) {
 		tab("server_id", e);
 	    }
@@ -243,10 +243,10 @@ public class Interceptor
 	} catch (Exception e) {
 	    tab("result", e);
 	}
-	tab("response_expected", new Boolean(ri.response_expected()).toString());
-	tab("sync_scope", new Short(ri.sync_scope()).toString());
+	tab("response_expected", Boolean.valueOf(ri.response_expected()).toString());
+	tab("sync_scope", Short.valueOf(ri.sync_scope()).toString());
 	try {
-	    tab("reply_status", new Short(ri.reply_status()).toString());
+	    tab("reply_status", Short.valueOf(ri.reply_status()).toString());
 	} catch (Exception e) {
 	    tab("reply_status", e);
 	}

@@ -173,7 +173,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             }
         } else if (streamFormatVersion != 1) {
 	    throw omgWrapper.invalidStreamFormatVersion( 
-		new Integer(streamFormatVersion) ) ;
+		Integer.valueOf(streamFormatVersion) ) ;
         }
 
         writeValueWithVersion(out, value, streamFormatVersion);
@@ -701,7 +701,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                             // ValueHandlers aren't allowed to throw
                             // IOExceptions
 			    throw utilWrapper.invalidIndirection( ie,
-				new Integer( cdrie.offset ) ) ;
+				                            cdrie.offset ) ;
                         }
                     }
                     
@@ -801,7 +801,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                             // ValueHandlers aren't allowed to throw
                             // IOExceptions
 			    throw utilWrapper.invalidIndirection( ioe,
-				new Integer( cdrie.offset ) ) ;
+                                                               cdrie.offset ) ;
                         }
                     }
                     

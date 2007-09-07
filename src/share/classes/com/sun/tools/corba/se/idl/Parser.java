@@ -1681,15 +1681,15 @@ class Parser
    **/
   private Terminal booleanLiteral () throws IOException, ParseException
   {
-    Boolean bool = null;
+    boolean bool;
     if (token.name.equals ("TRUE"))
-      bool = new Boolean (true);
+      bool = true;
     else if (token.name.equals ("FALSE"))
-      bool = new Boolean (false);
+      bool = false;
     else
     {
       ParseException.invalidConst (scanner, token.name);
-      bool = new Boolean (false);
+      bool = false;
     }
     String name = token.name;
     match (Token.BooleanLiteral);

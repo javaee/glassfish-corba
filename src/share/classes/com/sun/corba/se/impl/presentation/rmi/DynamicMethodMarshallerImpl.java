@@ -150,7 +150,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	public Object read( InputStream is ) 
 	{
 	    boolean value = is.read_boolean() ;
-	    return new Boolean( value ) ;
+	    return Boolean.valueOf( value ) ;
 	}
 
 	public void write( OutputStream os, Object value ) 
@@ -165,7 +165,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	public Object read( InputStream is ) 
 	{
 	    byte value = is.read_octet() ;
-	    return new Byte( value ) ;
+	    return Byte.valueOf( value ) ;
 	}
 
 	public void write( OutputStream os, Object value ) 
@@ -180,7 +180,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	public Object read( InputStream is ) 
 	{
 	    char value = is.read_wchar() ;
-	    return new Character( value ) ;
+	    return Character.valueOf( value ) ;
 	}
     
 	public void write( OutputStream os, Object value ) 
@@ -195,7 +195,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	public Object read( InputStream is ) 
 	{
 	    short value = is.read_short() ;
-	    return new Short( value ) ;
+	    return Short.valueOf( value ) ;
 	}
     
 	public void write( OutputStream os, Object value ) 
@@ -210,7 +210,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	public Object read( InputStream is ) 
 	{
 	    int value = is.read_long() ;
-	    return new Integer( value ) ;
+	    return Integer.valueOf( value ) ;
 	}
     
 	public void write( OutputStream os, Object value ) 
@@ -225,7 +225,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	public Object read( InputStream is ) 
 	{
 	    long value = is.read_longlong() ;
-	    return new Long( value ) ;
+	    return Long.valueOf( value ) ;
 	}
     
 	public void write( OutputStream os, Object value ) 
@@ -240,7 +240,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	public Object read( InputStream is ) 
 	{
 	    float value = is.read_float() ;
-	    return new Float( value ) ;
+	    return Float.valueOf( value ) ;
 	}
     
 	public void write( OutputStream os, Object value ) 
@@ -255,7 +255,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	public Object read( InputStream is ) 
 	{
 	    double value = is.read_double() ;
-	    return new Double( value ) ;
+	    return Double.valueOf( value ) ;
 	}
     
 	public void write( OutputStream os, Object value ) 

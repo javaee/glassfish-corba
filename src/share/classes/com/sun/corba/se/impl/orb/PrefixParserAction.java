@@ -107,7 +107,7 @@ public class PrefixParserAction extends ParserActionBase {
 	    } catch (Throwable thr) {
 		throw wrapper.couldNotCreateArray( thr,
 		    getPropertyName(), componentType,
-		    new Integer( size ) ) ;
+		    Integer.valueOf( size ) ) ;
 	    }
 
 	    Iterator iter2 = matches.iterator() ;
@@ -119,8 +119,8 @@ public class PrefixParserAction extends ParserActionBase {
 		    Array.set( result, ctr, obj ) ;
 		} catch (Throwable thr) {
 		    throw wrapper.couldNotSetArray( thr,
-			getPropertyName(), new Integer(ctr), 
-			componentType, new Integer(size),
+			getPropertyName(), Integer.valueOf(ctr), 
+			componentType, Integer.valueOf(size),
 			ObjectUtility.compactObjectToString( obj )) ;
 		}
 		ctr++ ;

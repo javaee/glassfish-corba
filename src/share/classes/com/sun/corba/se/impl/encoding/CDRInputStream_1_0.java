@@ -542,7 +542,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     protected final void checkForNegativeLength(int length) {
         if (length < 0)
 	    throw wrapper.negativeStringLength( CompletionStatus.COMPLETED_MAYBE,
-		new Integer(length) ) ;
+		                                length ) ;
     }
 
     protected final String readStringOrIndirection(boolean allowIndirection) {
@@ -1516,7 +1516,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // at the end tag position!
             if (anEndTag >= 0) {
 		throw wrapper.positiveEndTag( CompletionStatus.COMPLETED_MAYBE,
-		    new Integer(anEndTag), new Integer( get_offset() - 4 ) ) ;
+		                              anEndTag, get_offset() - 4 ) ;
             }
 
             // If the ORB is null, or if we're sure we're talking to
@@ -1532,8 +1532,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 // chunked valuetypes than we have.  Throw an exception.
                 if (anEndTag < chunkedValueNestingLevel)
 		    throw wrapper.unexpectedEnclosingValuetype( 
-			CompletionStatus.COMPLETED_MAYBE, new Integer( anEndTag ),
-			new Integer( chunkedValueNestingLevel ) ) ;
+			CompletionStatus.COMPLETED_MAYBE, anEndTag ,
+			                    chunkedValueNestingLevel ) ;
 
                 // If the end tag is bigger than what we expected, but
                 // still negative, then the sender has done some end tag
@@ -1657,7 +1657,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // other than maxBlockLength even though we weren't 
             // starting a new chunk.
 	    throw wrapper.couldNotSkipBytes( CompletionStatus.COMPLETED_MAYBE,
-		new Integer( nextLong ), new Integer( get_offset() ) ) ;
+		                                     nextLong , get_offset() ) ;
         }
     }
 
@@ -1674,8 +1674,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 if (blockLength > get_offset()) {
                     skipToOffset(blockLength);
                 } else {
-		    throw wrapper.badChunkLength( new Integer( blockLength ),
-			new Integer( get_offset() ) ) ;
+		    throw wrapper.badChunkLength( blockLength, get_offset() ) ;
                 }
             }
         }
@@ -1782,7 +1781,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             if (repositoryIdCache != null && repositoryIdCache.containsVal(indirection))
 		return (String)repositoryIdCache.getKey(indirection);
             else
-		throw wrapper.unableToLocateRepIdArray( new Integer( indirection ) ) ;
+		throw wrapper.unableToLocateRepIdArray( indirection ) ;
 	} else {
 
 	    // read first array element and store it as an indirection to the whole array
@@ -1813,7 +1812,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 return (String)repositoryIdCache.getKey(indirection);
             else
 		throw wrapper.badRepIdIndirection( CompletionStatus.COMPLETED_MAYBE,
-		    new Integer(bbwi.position()) ) ;
+		                                   bbwi.position() ) ;
         } else {
             if (repositoryIdCache == null)
                 repositoryIdCache = new CacheTable(orb,false);
@@ -1835,7 +1834,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             else
 		throw wrapper.badCodebaseIndirection( 
 		    CompletionStatus.COMPLETED_MAYBE, 
-		    new Integer(bbwi.position()) ) ;
+		    bbwi.position() ) ;
 	} else {
 	    if (codebaseCache == null)
 		codebaseCache = new CacheTable(orb,false);
@@ -1911,8 +1910,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // digits isn't really needed here
         StringBuffer buffer = read_fixed_buffer();
         if (digits != buffer.length())
-	    throw wrapper.badFixed( new Integer(digits),
-		new Integer(buffer.length()) ) ;
+	    throw wrapper.badFixed( digits, buffer.length() ) ;
         buffer.insert(digits - scale, '.');
         return new BigDecimal(buffer.toString());
     }

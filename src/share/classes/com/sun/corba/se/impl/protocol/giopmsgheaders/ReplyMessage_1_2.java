@@ -180,7 +180,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
 		    break;
 		default:
 		    throw wrapper.badCompletionStatusInReply( 
-			CompletionStatus.COMPLETED_MAYBE, new Integer(status) );
+			CompletionStatus.COMPLETED_MAYBE, status );
 		}
 
 	    } else if (this.reply_status == USER_EXCEPTION) {

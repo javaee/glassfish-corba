@@ -61,7 +61,7 @@ public final class IIOPAddressImpl extends IIOPAddressBase
 	wrapper = orb.getLogWrapperTable().get_OA_IOR_IOR() ;
 
 	if ((port < 0) || (port > 65535))
-	    throw wrapper.badIiopAddressPort( new Integer(port)) ;
+	    throw wrapper.badIiopAddressPort( Integer.valueOf(port)) ;
 
 	this.host = host ;
 	this.port = port ;

@@ -91,7 +91,7 @@ public final class TypeCodeImpl extends TypeCode
     //static final boolean debug = false;
 
     // the indirection TCKind, needed for recursive typecodes. 
-    protected static final int tk_indirect = 0xFFFFFFFF;
+    private static final int tk_indirect = 0xFFFFFFFF;
   
     // typecode encodings have three different categories that determine
     // how the encoding should be done.
@@ -1423,7 +1423,7 @@ public final class TypeCodeImpl extends TypeCode
 	    if (_kind == tk_indirect) {
 		int streamOffset = tcis.read_long();
 		if (streamOffset > -4)
-		    throw wrapper.invalidIndirection( new Integer(streamOffset) ) ;
+		    throw wrapper.invalidIndirection( streamOffset ) ;
 
 		// The encoding used for indirection is the same as that used for recursive ,
 		// TypeCodes i.e., a 0xffffffff indirection marker followed by a long offset
@@ -1439,7 +1439,7 @@ public final class TypeCodeImpl extends TypeCode
 		//topPos + " - 4 + offset " + streamOffset + " = " + indirectTypePosition);
 		TypeCodeImpl type = topStream.getTypeCodeAtPosition(indirectTypePosition);
 		if (type == null)
-		    throw wrapper.indirectionNotFound( new Integer(indirectTypePosition) ) ;
+		    throw wrapper.indirectionNotFound( indirectTypePosition ) ;
 		setIndirectType(type);
 		return false;
 	    }
@@ -2164,8 +2164,7 @@ public final class TypeCodeImpl extends TypeCode
 		    s = src.read_string();
 		    // make sure length bound in typecode is not violated
 		    if ((_length != 0) && (s.length() > _length))
-			throw wrapper.badStringBounds( new Integer(s.length()),
-			    new Integer(_length) ) ;
+			throw wrapper.badStringBounds( s.length(), _length ) ;
 		    dst.write_string(s);
 		}
 		break;
@@ -2176,8 +2175,7 @@ public final class TypeCodeImpl extends TypeCode
 		    s = src.read_wstring();
 		    // make sure length bound in typecode is not violated
 		    if ((_length != 0) && (s.length() > _length))
-			throw wrapper.badStringBounds( new Integer(s.length()),
-			    new Integer(_length) ) ;
+			throw wrapper.badStringBounds( s.length(), _length ) ;
 		    dst.write_wstring(s);
 		}
 		break;
@@ -2389,8 +2387,7 @@ public final class TypeCodeImpl extends TypeCode
 
 		// check for sequence bound violated
 		if ((_length != 0) && (seqLength > _length))
-		    throw wrapper.badSequenceBounds( new Integer(seqLength),
-			new Integer(_length) ) ;
+		    throw wrapper.badSequenceBounds( seqLength, _length ) ;
 
 		// write the length of the sequence
 		dst.write_long(seqLength);

@@ -346,7 +346,7 @@ public class Client
 	}
 	/* 
 	 * Gets NoSuchMethodException isIdenticalWithSavedIOR
-	U.expect(ea, U.result, new Boolean(true),
+	U.expect(ea, U.result, Boolean.valueOf(true),
 		 ridlStaticPOA, C.isIdenticalWithSavedIOR, o);
 	*/
 
@@ -411,7 +411,7 @@ public class Client
 
 	ridlControllerStatic.action(C.disconnectRidlStaticServant);
 	U.sop(ridlStaticForDisconnect._non_existent());
-	U.expect(ea, U.result, new Boolean(true),
+	U.expect(ea, U.result, Boolean.valueOf(true),
 		 ridlStaticForDisconnect, C._non_existent);
 
 	try {
@@ -512,7 +512,7 @@ public class Client
 	    /*
 	    REVISIT - says no such method.
 	    U.expect(ea, U.exception, new BAD_PARAM(),
-	             rrmiiSA, C.returnObjectFromServer, new Boolean(false));
+	             rrmiiSA, C.returnObjectFromServer, Boolean.valueOf(false));
 	    */
 
 	    // This caused server threads to wait forever for input when
@@ -815,8 +815,8 @@ public class Client
 	
 
 	byte[] bytes = new byte[100];
-	U.sop(new Integer(rrmiiI1.sendBytes(bytes)));
-	U.expect(ea, U.result, new Integer(100),
+	U.sop(Integer.valueOf(rrmiiI1.sendBytes(bytes)));
+	U.expect(ea, U.result, Integer.valueOf(100),
 		 rrmiiI1, C.sendBytes, bytes);
 
 	U.sop(rrmiiI1.sendOneObject(new java.util.Hashtable()));
@@ -922,17 +922,17 @@ public class Client
 
 	U.sop( StubAdapter.isLocal(ridlStaticPOA) ) ;
 	StubWrapper sw = new StubWrapper( ridlStaticPOA ) ;
-	U.expect(ea, U.result, new Boolean(allowLocalOptimization && isColocated),
+	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 
 	U.sop( StubAdapter.isLocal(ridlStatic) ) ;
 	sw = new StubWrapper( ridlStatic ) ;
-	U.expect(ea, U.result, new Boolean(allowLocalOptimization && isColocated),
+	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 
 	U.sop( StubAdapter.isLocal(rrmiiI1) ) ;
 	sw = new StubWrapper( (org.omg.CORBA.Object)rrmiiI1 ) ;
-	U.expect(ea, U.result, new Boolean(allowLocalOptimization && isColocated),
+	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 	//if (StubAdapter.isLocal((Stub)rrmiiI1) != false) {
 	    //throw new Exception("should be false");
@@ -940,7 +940,7 @@ public class Client
 
 	U.sop( StubAdapter.isLocal(rrmiiSA) ) ;
 	sw = new StubWrapper( (org.omg.CORBA.Object)rrmiiSA ) ;
-	U.expect(ea, U.result, new Boolean(allowLocalOptimization && isColocated),
+	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 	//if (StubAdapter.isLocal((Stub)rrmiiSA) != false) {
 	    //throw new Exception("should be false");
@@ -948,7 +948,7 @@ public class Client
 
 	U.sop( StubAdapter.isLocal(rrmiiSL) ) ;
 	sw = new StubWrapper( (org.omg.CORBA.Object)rrmiiSL ) ;
-	U.expect(ea, U.result, new Boolean(allowLocalOptimization && isColocated),
+	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 	//if (StubAdapter.isLocal((Stub)rrmiiSL) != false) {
 	    //throw new Exception("should be false");
@@ -994,18 +994,18 @@ public class Client
 	refreshIdlAlwaysForward();
 	U.sop(ridlAlwaysForward._is_a(C.idlAlwaysForward));
 
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlStaticPOA, C._is_a, C.idlDynamic);
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlDynamicPOA, C._is_a, C.idlDynamicPOA);
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlStatic, C._is_a, C.idlStatic);
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlStaticTie, C._is_a, C.idlStaticTie);
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlDynamic, C._is_a, C.idlDynamic);
 	refreshIdlAlwaysForward();
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlAlwaysForward, C._is_a, C.idlAlwaysForward);
     }
 
@@ -1027,18 +1027,18 @@ public class Client
 	refreshIdlAlwaysForward();
 	U.sop(ridlAlwaysForward._non_existent());
 
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlStaticPOA, C._non_existent);
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlDynamicPOA, C._non_existent);
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlStatic, C._non_existent);
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlStaticTie, C._non_existent);
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlDynamic, C._non_existent);
 	refreshIdlAlwaysForward();
-	U.expect(ea, U.result, new Boolean(false),
+	U.expect(ea, U.result, Boolean.valueOf(false),
 		 ridlAlwaysForward, C._non_existent);
     }
 

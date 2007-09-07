@@ -75,9 +75,9 @@ public class BooleanOr extends BinaryExpr
       if (tmpL instanceof Number)
       {
         if (tmpL instanceof BigInteger)
-          l = new Boolean (((BigInteger)tmpL).compareTo (zero) != 0);
+          l = Boolean.valueOf (((BigInteger)tmpL).compareTo (zero) != 0);
         else
-          l = new Boolean (((Number)tmpL).longValue () != 0);
+          l = Boolean.valueOf (((Number)tmpL).longValue () != 0);
       }
       else
         l = (Boolean)tmpL;
@@ -88,13 +88,13 @@ public class BooleanOr extends BinaryExpr
       if (tmpR instanceof Number)
       {
         if (tmpR instanceof BigInteger)
-          r = new Boolean (((BigInteger)tmpR).compareTo (BigInteger.valueOf (0)) != 0);
+          r = Boolean.valueOf (((BigInteger)tmpR).compareTo (BigInteger.valueOf (0)) != 0);
         else
-          r = new Boolean (((Number)tmpR).longValue () != 0);
+          r = Boolean.valueOf (((Number)tmpR).longValue () != 0);
       }
       else
         r = (Boolean)tmpR;
-      value (new Boolean (l.booleanValue () || r.booleanValue ()));
+      value (Boolean.valueOf (l.booleanValue () || r.booleanValue ()));
     }
     catch (ClassCastException e)
     {

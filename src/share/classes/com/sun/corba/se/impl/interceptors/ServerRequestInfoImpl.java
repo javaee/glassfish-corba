@@ -188,23 +188,21 @@ public final class ServerRequestInfoImpl
 
     // Method IDs for all methods in ServerRequestInfo.  This allows for a 
     // convenient O(1) lookup for checkAccess().
-    protected static final int MID_SENDING_EXCEPTION       = MID_RI_LAST +  1;
-    protected static final int MID_OBJECT_ID               = MID_RI_LAST +  2;
-    protected static final int MID_ADAPTER_ID              = MID_RI_LAST +  3;
-    protected static final int MID_TARGET_MOST_DERIVED_INTERFACE 
-                                                           = MID_RI_LAST +  4;
-    protected static final int MID_GET_SERVER_POLICY       = MID_RI_LAST +  5;
-    protected static final int MID_SET_SLOT                = MID_RI_LAST +  6;
-    protected static final int MID_TARGET_IS_A             = MID_RI_LAST +  7;
-    protected static final int MID_ADD_REPLY_SERVICE_CONTEXT
-                                                           = MID_RI_LAST +  8;
-    protected static final int MID_SERVER_ID               = MID_RI_LAST +  9;
-    protected static final int MID_ORB_ID                  = MID_RI_LAST +  10;
-    protected static final int MID_ADAPTER_NAME            = MID_RI_LAST +  11;
+    private static final int MID_SENDING_EXCEPTION             = MID_RI_LAST + 1;
+    private static final int MID_OBJECT_ID                     = MID_RI_LAST + 2;
+    private static final int MID_ADAPTER_ID                    = MID_RI_LAST + 3;
+    private static final int MID_TARGET_MOST_DERIVED_INTERFACE = MID_RI_LAST + 4;
+    private static final int MID_GET_SERVER_POLICY             = MID_RI_LAST + 5;
+    private static final int MID_SET_SLOT                      = MID_RI_LAST + 6;
+    private static final int MID_TARGET_IS_A                   = MID_RI_LAST + 7;
+    private static final int MID_ADD_REPLY_SERVICE_CONTEXT     = MID_RI_LAST + 8;
+    private static final int MID_SERVER_ID                     = MID_RI_LAST + 9;
+    private static final int MID_ORB_ID                        = MID_RI_LAST + 10;
+    private static final int MID_ADAPTER_NAME                  = MID_RI_LAST + 11;
     
     // ServerRequestInfo validity table (see ptc/00-08-06 table 21-2).
     // Note: These must be in the same order as specified in contants.
-    protected static final boolean validCall[][] = {
+    private static final boolean validCall[][] = {
         // LEGEND:
         // r_rsc = receive_request_service_contexts
         // r_req = receive_request
@@ -699,7 +697,7 @@ public final class ServerRequestInfoImpl
 		    addReplyServiceContextQueue.set( i, addReply );
 		} else {
 		    throw stdWrapper.serviceContextAddFailed( 
-			new Integer( cmd.service_context.context_id ) ) ;
+			               cmd.service_context.context_id ) ;
 		}
 		break;
 	    }

@@ -636,10 +636,9 @@ public abstract class RequestInfoImpl
 	ServiceContexts serviceContexts, int id )
     {
         org.omg.IOP.ServiceContext result = null;
-        Integer integerId = new Integer( id );
 
 	// Search cache first:
-        result = cachedServiceContexts.get( integerId );
+        result = cachedServiceContexts.get( id );
 
 	// null could normally mean that either we cached the value null 
 	// or it's not in the cache.  However, there is no way for us to 
@@ -669,7 +668,7 @@ public abstract class RequestInfoImpl
 	    InputStream inputStream = out.create_input_stream();
 	    result = ServiceContextHelper.read( inputStream );
 
-	    cachedServiceContexts.put( integerId, result );
+	    cachedServiceContexts.put( id, result );
 	}
 
 	// Good citizen: For increased efficiency, we assume that interceptors
@@ -717,7 +716,7 @@ public abstract class RequestInfoImpl
 	    if (replace)
 		serviceContexts.delete( id );
 	    else 
-		throw stdWrapper.serviceContextAddFailed( new Integer(id) ) ;
+		throw stdWrapper.serviceContextAddFailed( id ) ;
 
 	serviceContexts.put( coreServiceContext );
 

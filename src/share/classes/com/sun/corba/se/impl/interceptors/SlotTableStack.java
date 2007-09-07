@@ -154,8 +154,8 @@ public class SlotTableStack
             // Add will cause the table to grow.
             tableContainer.add( currentIndex, table );
         } else if (currentIndex > tableContainer.size()) {
-	    throw wrapper.slotTableInvariant( new Integer( currentIndex ),
-		new Integer( tableContainer.size() ) ) ;
+	    throw wrapper.slotTableInvariant( Integer.valueOf( currentIndex ),
+		Integer.valueOf( tableContainer.size() ) ) ;
         } else {
             // Set will override unused slots.
             tableContainer.set( currentIndex, table );

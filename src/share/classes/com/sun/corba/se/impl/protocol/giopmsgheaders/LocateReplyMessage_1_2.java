@@ -153,7 +153,7 @@ public final class LocateReplyMessage_1_2 extends Message_1_2
                 break;
             default:
 		throw wrapper.badCompletionStatusInLocateReply( 
-		    CompletionStatus.COMPLETED_MAYBE, new Integer(status) );
+		    CompletionStatus.COMPLETED_MAYBE, status );
             }
         } else if ( (this.reply_status == OBJECT_FORWARD) ||
                 (this.reply_status == OBJECT_FORWARD_PERM) ){

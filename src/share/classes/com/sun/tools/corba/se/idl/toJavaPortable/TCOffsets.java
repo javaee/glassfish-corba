@@ -85,7 +85,7 @@ public class TCOffsets
       offset += 8;
     else
     {
-      tcs.put (entry.fullName (), new Integer (offset));
+      tcs.put (entry.fullName (), Integer.valueOf (offset));
       offset += 4;
       String repID = Util.stripLeadingUnderscoresFromID (entry.repositoryID ().ID ());
       if (entry instanceof InterfaceEntry)

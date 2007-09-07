@@ -231,7 +231,7 @@ public abstract class OperationFactory {
     {
 	public Object operate( Object value )
 	{
-	    return new Boolean( getString( value ) ) ;
+	    return Boolean.valueOf( getString( value ) ) ;
 	}
 
 	public String toString() { return "booleanAction" ; }
@@ -243,7 +243,7 @@ public abstract class OperationFactory {
     {
 	public Object operate( Object value )
 	{
-	    return new Integer( getString( value ) ) ;
+	    return Integer.valueOf( getString( value ) ) ;
 	}
 
 	public String toString() { return "integerAction" ; }

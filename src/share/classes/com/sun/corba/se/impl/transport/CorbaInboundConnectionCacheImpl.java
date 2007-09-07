@@ -174,7 +174,7 @@ public class CorbaInboundConnectionCacheImpl
 		MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS_DESCRIPTION)
 	    {
 		public Object getValue() {
-		    return new Long(CorbaInboundConnectionCacheImpl.this.numberOfConnections());
+		    return Long.valueOf(CorbaInboundConnectionCacheImpl.this.numberOfConnections());
 		}
 	    };
 	thisMO.addAttribute(attribute);
@@ -186,7 +186,7 @@ public class CorbaInboundConnectionCacheImpl
 		MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS_DESCRIPTION)
 	    {
 		public Object getValue() {
-		    return new Long(CorbaInboundConnectionCacheImpl.this.numberOfIdleConnections());
+		    return Long.valueOf(CorbaInboundConnectionCacheImpl.this.numberOfIdleConnections());
 		}
 	    };
 	thisMO.addAttribute(attribute);
@@ -198,7 +198,7 @@ public class CorbaInboundConnectionCacheImpl
 		MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS_DESCRIPTION)
 	    {
 		public Object getValue() {
-		    return new Long(CorbaInboundConnectionCacheImpl.this.numberOfBusyConnections());
+		    return Long.valueOf(CorbaInboundConnectionCacheImpl.this.numberOfBusyConnections());
 		}
 	    };
 	thisMO.addAttribute(attribute);

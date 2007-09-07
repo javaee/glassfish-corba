@@ -62,6 +62,6 @@ public abstract class OldObjectKeyTemplateBase extends ObjectKeyTemplateBase
 	else if (magic == ObjectKeyFactoryImpl.JAVAMAGIC_NEW)
 	    setORBVersion( ORBVersionFactory.getNEW() ) ;
 	else // any other magic should not be here
-	    throw wrapper.badMagic( new Integer( magic ) ) ;
+	    throw wrapper.badMagic( Integer.valueOf( magic ) ) ;
     }
 }

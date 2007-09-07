@@ -156,7 +156,7 @@ public final class ClientRequestInfoImpl
     private Map<Integer,TaggedComponent[]> cachedEffectiveComponents;
 
 
-    protected boolean piCurrentPushed;
+    private boolean piCurrentPushed;
     
     //////////////////////////////////////////////////////////////////////
     //
@@ -211,21 +211,19 @@ public final class ClientRequestInfoImpl
     
     // Method IDs for all methods in ClientRequestInfo.  This allows for a 
     // convenient O(1) lookup for checkAccess().
-    protected static final int MID_TARGET                  = MID_RI_LAST + 1;
-    protected static final int MID_EFFECTIVE_TARGET        = MID_RI_LAST + 2;
-    protected static final int MID_EFFECTIVE_PROFILE       = MID_RI_LAST + 3;
-    protected static final int MID_RECEIVED_EXCEPTION      = MID_RI_LAST + 4;
-    protected static final int MID_RECEIVED_EXCEPTION_ID   = MID_RI_LAST + 5;
-    protected static final int MID_GET_EFFECTIVE_COMPONENT = MID_RI_LAST + 6;
-    protected static final int MID_GET_EFFECTIVE_COMPONENTS
-                                                           = MID_RI_LAST + 7;
-    protected static final int MID_GET_REQUEST_POLICY      = MID_RI_LAST + 8;
-    protected static final int MID_ADD_REQUEST_SERVICE_CONTEXT 
-                                                           = MID_RI_LAST + 9;
+    private static final int MID_TARGET                      = MID_RI_LAST + 1;
+    private static final int MID_EFFECTIVE_TARGET            = MID_RI_LAST + 2;
+    private static final int MID_EFFECTIVE_PROFILE           = MID_RI_LAST + 3;
+    private static final int MID_RECEIVED_EXCEPTION          = MID_RI_LAST + 4;
+    private static final int MID_RECEIVED_EXCEPTION_ID       = MID_RI_LAST + 5;
+    private static final int MID_GET_EFFECTIVE_COMPONENT     = MID_RI_LAST + 6;
+    private static final int MID_GET_EFFECTIVE_COMPONENTS    = MID_RI_LAST + 7;
+    private static final int MID_GET_REQUEST_POLICY          = MID_RI_LAST + 8;
+    private static final int MID_ADD_REQUEST_SERVICE_CONTEXT = MID_RI_LAST + 9;
     
     // ClientRequestInfo validity table (see ptc/00-08-06 table 21-1).
     // Note: These must be in the same order as specified in contants.
-    protected static final boolean validCall[][] = {
+    private static final boolean validCall[][] = {
         // LEGEND:
         // s_req = send_request     r_rep = receive_reply
         // s_pol = send_poll        r_exc = receive_exception
@@ -412,7 +410,6 @@ public final class ClientRequestInfoImpl
      */
     public TaggedComponent[] get_effective_components (int id){
         checkAccess( MID_GET_EFFECTIVE_COMPONENTS );
-	Integer integerId = new Integer( id );
 	TaggedComponent[] result = null;
 	boolean justCreatedCache = false;
 
@@ -421,13 +418,13 @@ public final class ClientRequestInfoImpl
 	    justCreatedCache = true;
 	} else {
 	    // Look in cache:
-	    result = cachedEffectiveComponents.get( integerId );
+	    result = cachedEffectiveComponents.get( id );
 	}
         
 	// null could mean we cached null or not in cache.
 	if( (result == null) &&
 	    (justCreatedCache ||
-	    !cachedEffectiveComponents.containsKey( integerId ) ) )
+	    !cachedEffectiveComponents.containsKey( id ) ) )
 	{
 	    // Not in cache.  Get it from the profile:
 	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
@@ -436,13 +433,13 @@ public final class ClientRequestInfoImpl
 		(IIOPProfileTemplate)corbaContactInfo.getEffectiveProfile().
 		getTaggedProfileTemplate();
 	    result = ptemp.getIOPComponents(myORB, id);
-	    cachedEffectiveComponents.put( integerId, result );
+	    cachedEffectiveComponents.put( id, result );
 	}
         
         // As per ptc/00-08-06, section 21.3.13.6., If not found, raise 
         // BAD_PARAM with minor code INVALID_COMPONENT_ID.
         if( (result == null) || (result.length == 0) ) {
-	    throw stdWrapper.invalidComponentId( integerId ) ;
+	    throw stdWrapper.invalidComponentId( id ) ;
         }
 
 	// Good citizen: In the interest of efficiency, we will assume 

@@ -84,9 +84,9 @@ public class RequestPartitioningComponentImpl extends TaggedComponentBase
 	if (thePartitionToUse < ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID ||
 	    thePartitionToUse > ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID) {
 	    throw wrapper.invalidRequestPartitioningComponentValue(
-		  new Integer(thePartitionToUse),
-		  new Integer(ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID),
-		  new Integer(ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID));
+                    thePartitionToUse,
+                    ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID,
+                    ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID);
 	}
         partitionToUse = thePartitionToUse;
     }

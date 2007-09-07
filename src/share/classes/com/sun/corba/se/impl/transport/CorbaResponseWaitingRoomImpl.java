@@ -198,8 +198,7 @@ public class CorbaResponseWaitingRoomImpl
                                 call.exception =
                                         wrapper.communicationsTimeoutWaitingForResponse(
                                         CompletionStatus.COMPLETED_MAYBE,
-                                        new Long(orb.getORBData().
-                                        getWaitForResponseTimeout()));
+                                        orb.getORBData().getWaitForResponseTimeout());
                                 // REVISIT:
                                 // Normally the inputObject or exception is
                                 // created from the response stream.

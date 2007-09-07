@@ -124,7 +124,8 @@ public class BufferConnectionImpl
     
     // Server request map: used on the server side of Connection
     // Maps request ID to IIOPInputStream.
-    Map serverRequestMap = new HashMap() ;
+    Map<Integer, CorbaMessageMediator> serverRequestMap = 
+                      new HashMap<Integer, CorbaMessageMediator>() ;
 
     ConcurrentHashMap<CorbaRequestId,Queue> fragmentMap = 
 	new ConcurrentHashMap<CorbaRequestId,Queue>();
@@ -415,18 +416,17 @@ public class BufferConnectionImpl
     public void serverRequestMapPut(int requestId, 
 				    CorbaMessageMediator messageMediator)
     {
-	serverRequestMap.put(new Integer(requestId), messageMediator);
+	serverRequestMap.put(requestId, messageMediator);
     }
 
     public CorbaMessageMediator serverRequestMapGet(int requestId)
     {
-	return (CorbaMessageMediator)
-	    serverRequestMap.get(new Integer(requestId));
+	return serverRequestMap.get(requestId);
     }
 
     public void serverRequestMapRemove(int requestId)
     {
-	serverRequestMap.remove(new Integer(requestId));
+	serverRequestMap.remove(requestId);
     }
 
     public Queue<CorbaMessageMediator> getFragmentList(CorbaRequestId requestId) {

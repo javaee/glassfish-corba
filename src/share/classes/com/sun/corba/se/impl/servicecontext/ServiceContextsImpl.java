@@ -422,7 +422,7 @@ public class ServiceContextsImpl implements ServiceContexts
 	}
 	
 	try {
-	    scMap.remove(new Integer(scId));
+	    scMap.remove(scId);
 	} finally {
 	    if (orb.serviceContextDebugFlag) {
 		dprint( "<-delete" ) ;

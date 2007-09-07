@@ -103,7 +103,7 @@ public class WorkQueueImpl implements WorkQueue
 	    LongMonitoredAttributeBase(MonitoringConstants.WORKQUEUE_TOTAL_WORK_ITEMS_ADDED, 
 		    MonitoringConstants.WORKQUEUE_TOTAL_WORK_ITEMS_ADDED_DESCRIPTION) {
 		public Object getValue() {
-		    return new Long(WorkQueueImpl.this.totalWorkItemsAdded());
+		    return Long.valueOf(WorkQueueImpl.this.totalWorkItemsAdded());
 		}
 	    };
 	workqueueMonitoredObject.addAttribute(b1);
@@ -111,7 +111,7 @@ public class WorkQueueImpl implements WorkQueue
 	    LongMonitoredAttributeBase(MonitoringConstants.WORKQUEUE_WORK_ITEMS_IN_QUEUE, 
 		    MonitoringConstants.WORKQUEUE_WORK_ITEMS_IN_QUEUE_DESCRIPTION) {
 		public Object getValue() {
-		    return new Long(WorkQueueImpl.this.workItemsInQueue());
+		    return Long.valueOf(WorkQueueImpl.this.workItemsInQueue());
 		}
 	    };
 	workqueueMonitoredObject.addAttribute(b2);
@@ -119,7 +119,7 @@ public class WorkQueueImpl implements WorkQueue
 	    LongMonitoredAttributeBase(MonitoringConstants.WORKQUEUE_AVERAGE_TIME_IN_QUEUE, 
 		    MonitoringConstants.WORKQUEUE_AVERAGE_TIME_IN_QUEUE_DESCRIPTION) {
 		public Object getValue() {
-		    return new Long(WorkQueueImpl.this.averageTimeInQueue());
+		    return Long.valueOf(WorkQueueImpl.this.averageTimeInQueue());
 		}
 	    };
 	workqueueMonitoredObject.addAttribute(b3);

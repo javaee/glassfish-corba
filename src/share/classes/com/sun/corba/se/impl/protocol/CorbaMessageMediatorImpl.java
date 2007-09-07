@@ -364,10 +364,12 @@ public class CorbaMessageMediatorImpl
 	return getRequestHeader().getRequestId();
     }
 
+    // REVISIT: The use of requestIdInteger should be removed and use Java's
+    //          autoboxing instead.
     public Integer getRequestIdInteger()
     {
 	if (requestIdInteger == null) {
-	    requestIdInteger = new Integer(getRequestHeader().getRequestId());
+	    requestIdInteger = Integer.valueOf(getRequestHeader().getRequestId());
 	}
 	return requestIdInteger;
     }

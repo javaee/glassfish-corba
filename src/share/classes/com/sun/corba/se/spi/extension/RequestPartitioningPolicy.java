@@ -59,11 +59,9 @@ public class RequestPartitioningPolicy extends LocalObject implements Policy
 	if (value < ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID ||
 	    value > ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID) {
 	    throw wrapper.invalidRequestPartitioningPolicyValue(
-		  new Integer(value),
-	          new Integer(
-		      ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID),
-	          new Integer(
-		      ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID));
+		      value,
+		      ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID,
+	              ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID);
 	}
 	this.value = value;
     }

@@ -299,14 +299,14 @@ public final class IORInfoImpl
     private void checkState( int expectedState )
     {
 	if (expectedState != state)
-	    throw wrapper.badState1( new Integer(expectedState), new Integer(state) ) ;
+	    throw wrapper.badState1( Integer.valueOf(expectedState), Integer.valueOf(state) ) ;
     }
 
     private void checkState( int expectedState1, int expectedState2 )
     {
 	if ((expectedState1 != state) && (expectedState2 != state))
-	    throw wrapper.badState2( new Integer(expectedState1), 
-		new Integer(expectedState2), new Integer(state) ) ;
+	    throw wrapper.badState2( Integer.valueOf(expectedState1), 
+		Integer.valueOf(expectedState2), Integer.valueOf(state) ) ;
     }
 
     void makeStateEstablished()

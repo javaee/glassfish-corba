@@ -68,7 +68,7 @@ public class Equal extends BinaryExpr
       {
         Boolean l = (Boolean)left;
         Boolean r = (Boolean)right ().evaluate ();
-        value (new Boolean (l.booleanValue () == r.booleanValue()));
+        value (Boolean.valueOf (l.booleanValue () == r.booleanValue()));
       }
       else
       {
@@ -77,8 +77,8 @@ public class Equal extends BinaryExpr
         if (l instanceof Float || l instanceof Double || r instanceof Float || r instanceof Double)
           value (new Boolean (l.doubleValue () == r.doubleValue ()));
         else
-          //daz          value (new Boolean (l.longValue () == r.longValue ()));
-          value (new Boolean (((BigInteger)l).equals ((BigInteger)r)));
+          //daz          value (Boolean.valueOf (l.longValue () == r.longValue ()));
+          value (Boolean.valueOf (((BigInteger)l).equals ((BigInteger)r)));
       }
     }
     catch (ClassCastException e)

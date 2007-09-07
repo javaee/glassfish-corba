@@ -62,7 +62,7 @@ public abstract class NewObjectKeyTemplateBase extends ObjectKeyTemplateBase
 	// subclass must set the version, since we don't have the object key here.
 
 	if (magic != ObjectKeyFactoryImpl.JAVAMAGIC_NEWER)
-	    throw wrapper.badMagic( new Integer( magic ) ) ;
+	    throw wrapper.badMagic( Integer.valueOf( magic ) ) ;
     }
    
     public void write(ObjectId objectId, OutputStream os) 

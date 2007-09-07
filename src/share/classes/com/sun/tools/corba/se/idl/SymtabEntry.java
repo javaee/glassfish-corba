@@ -277,17 +277,17 @@ public class SymtabEntry
     _isReferencable = value ;
   }
 
-  static Stack includeStack = new Stack ();
+  static Stack<Boolean> includeStack = new Stack<Boolean> ();
 
   static void enteringInclude ()
   {
-    includeStack.push (new Boolean (setEmit));
+    includeStack.push (setEmit);
     setEmit = false;
   } // enteringInclude
 
   static void exitingInclude ()
   {
-    setEmit = ((Boolean)includeStack.pop ()).booleanValue ();
+    setEmit = includeStack.pop ().booleanValue ();
   } // exitingInclude
 
   /** Other variables besides the default ones can be dynamically placed

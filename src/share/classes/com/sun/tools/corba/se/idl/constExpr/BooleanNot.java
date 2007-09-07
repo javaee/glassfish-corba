@@ -72,14 +72,14 @@ public class BooleanNot extends UnaryExpr
       if (tmp instanceof Number)
       {
         if (tmp instanceof BigInteger)
-          op = new Boolean (((BigInteger)tmp).compareTo (zero) != 0);
+          op = Boolean.valueOf (((BigInteger)tmp).compareTo (zero) != 0);
         else
-          op = new Boolean (((Number)tmp).longValue () != 0);
+          op = Boolean.valueOf (((Number)tmp).longValue () != 0);
       }
       else
         op = (Boolean)tmp;
 
-      value (new Boolean (!op.booleanValue ()));
+      value (Boolean.valueOf (!op.booleanValue ()));
     }
     catch (ClassCastException e)
     {

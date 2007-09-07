@@ -331,23 +331,23 @@ public class Client
 	// test indexAction
 	Operation indexAction = OperationFactory.indexAction( 3 ) ;
 
-	Integer[] data1 = { new Integer(0), new Integer(1) } ;
+	Integer[] data1 = { Integer.valueOf(0), Integer.valueOf(1) } ;
 	expectError( data1, indexAction, 
 	    java.lang.IndexOutOfBoundsException.class ) ;
 
-	Integer[] data2 = { new Integer(0), new Integer(1), new Integer(2), 
-	    new Integer(3) } ;
-	expectResult( data2, indexAction, new Integer(3) ) ;
+	Integer[] data2 = { Integer.valueOf(0), Integer.valueOf(1), 
+                            Integer.valueOf(2), Integer.valueOf(3) } ;
+	expectResult( data2, indexAction, Integer.valueOf(3) ) ;
 
 	// test booleanAction
 	Operation booleanAction = OperationFactory.booleanAction() ;
-	expectResult( "TRUE", booleanAction, new Boolean( true ) ) ;
-	expectResult( "false", booleanAction, new Boolean( false ) ) ;
-	expectResult( "XXffOP2", booleanAction, new Boolean( false ) ) ;
+	expectResult( "TRUE", booleanAction, Boolean.valueOf( true ) ) ;
+	expectResult( "false", booleanAction, Boolean.valueOf( false ) ) ;
+	expectResult( "XXffOP2", booleanAction, Boolean.valueOf( false ) ) ;
 
 	// test integerAction
 	Operation integerAction = OperationFactory.integerAction() ;
-	expectResult( "123", integerAction, new Integer( 123 ) ) ;
+	expectResult( "123", integerAction, Integer.valueOf( 123 ) ) ;
 	expectError( "123ACE", integerAction, 
 	    java.lang.NumberFormatException.class ) ;
 
@@ -362,7 +362,7 @@ public class Client
 
 	// test setFlagAction
 	Operation setFlagAction = OperationFactory.setFlagAction() ;
-	expectResult( "", setFlagAction, new Boolean( true ) ) ;
+	expectResult( "", setFlagAction, Boolean.valueOf( true ) ) ;
 
 	// test URLAction
 	Operation URLAction = OperationFactory.URLAction() ;
@@ -379,7 +379,7 @@ public class Client
 	// test integerRangeAction
 	Operation integerRangeAction = OperationFactory.integerRangeAction(
 	    12, 24 ) ;
-	expectResult( "13", integerRangeAction, new Integer( 13 ) ) ;
+	expectResult( "13", integerRangeAction, Integer.valueOf( 13 ) ) ;
 	expectError( "123ACE", integerRangeAction, 
 	    java.lang.NumberFormatException.class ) ;
 	expectError( "2", integerRangeAction, 
@@ -389,8 +389,8 @@ public class Client
 	Operation listAction = OperationFactory.listAction( ",", 
 	    integerAction ) ;
 	String arg = "12,23,34,56,129" ;
-	Object[] expectedResult = { new Integer( 12 ), new Integer( 23 ),
-	    new Integer( 34 ), new Integer( 56 ), new Integer( 129 ) } ;
+	Object[] expectedResult = { Integer.valueOf( 12 ), Integer.valueOf( 23 ),
+	    Integer.valueOf( 34 ), Integer.valueOf( 56 ), Integer.valueOf( 129 ) } ;
 
 	expectResult( arg, listAction, expectedResult ) ;
 
@@ -401,21 +401,21 @@ public class Client
 	    actions ) ;
 
 	String arg2 = "12,23,this_thing,true" ;
-	Object[] expectedResult2 = { new Integer( 12 ), new Integer( 23 ),
-	    "this_thing", new Boolean( true ) } ;
+	Object[] expectedResult2 = { Integer.valueOf( 12 ), Integer.valueOf( 23 ),
+	    "this_thing", Boolean.valueOf( true ) } ;
 
 	expectResult( arg2, sequenceAction, expectedResult2 ) ;
 
 	// test compose
 	Operation composition = OperationFactory.compose( listAction, 
 	    indexAction ) ;
-	expectResult( arg, composition, new Integer( 56 ) ) ;
+	expectResult( arg, composition, Integer.valueOf( 56 ) ) ;
 
 	// test mapAction
 	Operation map = OperationFactory.mapAction( integerAction ) ;
 	String[] strings = { "12", "23", "473", "2" } ;
-	Object[] result = { new Integer( 12 ), new Integer( 23 ), new Integer( 473 ),
-	    new Integer( 2 ) } ;
+	Object[] result = { Integer.valueOf( 12 ), Integer.valueOf( 23 ), Integer.valueOf( 473 ),
+	    Integer.valueOf( 2 ) } ;
 	expectResult( strings, map, result ) ;
 
 	session.end() ;
@@ -456,8 +456,8 @@ public class Client
     private Map makeResult() 
     {
 	Map map = new HashMap() ;
-	map.put( "arg", new Integer( 273 ) ) ;
-	map.put( "flag", new Boolean( true ) ) ;
+	map.put( "arg", Integer.valueOf( 273 ) ) ;
+	map.put( "flag", Boolean.valueOf( true ) ) ;
 	map.put( "str", "AValue" ) ;
 
 	// This is the order the result comes in: the order is not
@@ -471,9 +471,9 @@ public class Client
 	map.put( "prefix", list ) ; 
 
 	Object[][] data = { 
-	    { "red", new Integer( 0 ) },
-	    { "blue", new Integer( 1 ) },
-	    { "green", new Integer( 2 ) },
+	    { "red", Integer.valueOf( 0 ) },
+	    { "blue", Integer.valueOf( 1 ) },
+	    { "green", Integer.valueOf( 2 ) },
 	} ;
 
 	map.put( "list", data ) ;
@@ -751,12 +751,12 @@ public class Client
     {
 	Closure isAppletClosure = new Closure() {
 	    public Object evaluate() {
-		return new Boolean( dc.isApplet() ) ;
+		return Boolean.valueOf( dc.isApplet() ) ;
 	    }
 	} ;
 
 	session.testForPass( name + "isApplet", isAppletClosure, 
-	    new Boolean( expectedAppletResult ) ) ;
+	    Boolean.valueOf( expectedAppletResult ) ) ;
 
 	Closure getPropertiesClosure = new Closure() {
 	    public Object evaluate() {

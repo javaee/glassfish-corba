@@ -326,7 +326,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	try {
 	    return primitiveTypeCodeConstants[kind] ;
 	} catch (Throwable t) {
-	    throw wrapper.invalidTypecodeKind( t, new Integer(kind) ) ;
+	    throw wrapper.invalidTypecodeKind( t, Integer.valueOf(kind) ) ;
 	}
     }
 

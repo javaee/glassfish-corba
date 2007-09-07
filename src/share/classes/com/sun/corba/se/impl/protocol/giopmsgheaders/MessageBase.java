@@ -633,9 +633,9 @@ public abstract class MessageBase implements Message{
 
 	    if (poolToUse < ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID ||
 		poolToUse > ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID) {
-		throw wrapper.invalidRequestPartitioningId(new Integer(poolToUse),
-		      new Integer(ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID),
-	      	      new Integer(ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID));
+		throw wrapper.invalidRequestPartitioningId(poolToUse,
+		          ORBConstants.REQUEST_PARTITIONING_MIN_THREAD_POOL_ID,
+	      	          ORBConstants.REQUEST_PARTITIONING_MAX_THREAD_POOL_ID);
 	    }
 	    requestMessage.setThreadPoolToUse(poolToUse);
 	}

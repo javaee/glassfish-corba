@@ -214,7 +214,7 @@ public class ThreadPoolImpl implements ThreadPool
 	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_CURRENT_NUMBER_OF_THREADS, 
 		    MonitoringConstants.THREADPOOL_CURRENT_NUMBER_OF_THREADS_DESCRIPTION) {
 		public Object getValue() {
-		    return new Long(ThreadPoolImpl.this.currentNumberOfThreads());
+		    return Long.valueOf(ThreadPoolImpl.this.currentNumberOfThreads());
 		}
 	    };
 	threadpoolMonitoredObject.addAttribute(b1);
@@ -222,7 +222,7 @@ public class ThreadPoolImpl implements ThreadPool
 	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_NUMBER_OF_AVAILABLE_THREADS, 
 		    MonitoringConstants.THREADPOOL_CURRENT_NUMBER_OF_THREADS_DESCRIPTION) {
 		public Object getValue() {
-		    return new Long(ThreadPoolImpl.this.numberOfAvailableThreads());
+		    return Long.valueOf(ThreadPoolImpl.this.numberOfAvailableThreads());
 		}
 	    };
 	threadpoolMonitoredObject.addAttribute(b2);
@@ -230,7 +230,7 @@ public class ThreadPoolImpl implements ThreadPool
 	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_NUMBER_OF_BUSY_THREADS, 
 		    MonitoringConstants.THREADPOOL_NUMBER_OF_BUSY_THREADS_DESCRIPTION) {
 		public Object getValue() {
-		    return new Long(ThreadPoolImpl.this.numberOfBusyThreads());
+		    return Long.valueOf(ThreadPoolImpl.this.numberOfBusyThreads());
 		}
 	    };
 	threadpoolMonitoredObject.addAttribute(b3);
@@ -238,7 +238,7 @@ public class ThreadPoolImpl implements ThreadPool
 	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_AVERAGE_WORK_COMPLETION_TIME, 
 		    MonitoringConstants.THREADPOOL_AVERAGE_WORK_COMPLETION_TIME_DESCRIPTION) {
 		public Object getValue() {
-		    return new Long(ThreadPoolImpl.this.averageWorkCompletionTime());
+		    return Long.valueOf(ThreadPoolImpl.this.averageWorkCompletionTime());
 		}
 	    };
 	threadpoolMonitoredObject.addAttribute(b4);
@@ -246,7 +246,7 @@ public class ThreadPoolImpl implements ThreadPool
 	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_CURRENT_PROCESSED_COUNT, 
 		    MonitoringConstants.THREADPOOL_CURRENT_PROCESSED_COUNT_DESCRIPTION) {
 		public Object getValue() {
-		    return new Long(ThreadPoolImpl.this.currentProcessedCount());
+		    return Long.valueOf(ThreadPoolImpl.this.currentProcessedCount());
 		}
 	    };
 	threadpoolMonitoredObject.addAttribute(b5);

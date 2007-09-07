@@ -195,7 +195,7 @@ public class ParserTable {
 	    ParserDataFactory.make( ORBConstants.INITIAL_PORT_PROPERTY, 
 		OperationFactory.integerAction(), 
 		"ORBInitialPort", new Integer( ORBConstants.DEFAULT_INITIAL_PORT ),
-		new Integer( 27314 ), "27314" ),
+		Integer.valueOf( 27314 ), "27314" ),
 	    // Where did this come from?
 	    //ParserDataFactory.make( ORBConstants.INITIAL_PORT_PROPERTY, 
 		//OperationFactory.booleanAction(), 
@@ -207,8 +207,8 @@ public class ParserTable {
 		"camelot", "camelot" ),
 	    ParserDataFactory.make( ORBConstants.SERVER_PORT_PROPERTY, 
 		OperationFactory.integerAction(), 
-		"ORBServerPort", new Integer( 0 ),
-		new Integer( 38143 ), "38143" ),
+		"ORBServerPort", Integer.valueOf( 0 ),
+		Integer.valueOf( 38143 ), "38143" ),
 	    ParserDataFactory.make( ORBConstants.ORB_ID_PROPERTY, 
 		OperationFactory.stringAction(), 
 		"orbId", "",
@@ -219,8 +219,8 @@ public class ParserTable {
                 "foo", "foo" ),
 	    ParserDataFactory.make( ORBConstants.ORB_SERVER_ID_PROPERTY, 
 		OperationFactory.integerAction(), 
-		"persistentServerId", new Integer(-1),
-		new Integer( 1234), "1234" ),
+		"persistentServerId", Integer.valueOf(-1),
+		Integer.valueOf( 1234), "1234" ),
 	    ParserDataFactory.make( 
                 ORBConstants.ORB_SERVER_ID_PROPERTY, 
 		OperationFactory.setFlagAction(), 
@@ -237,36 +237,36 @@ public class ParserTable {
 		// "Fooref", "Fooref" ),
 	    ParserDataFactory.make( ORBConstants.HIGH_WATER_MARK_PROPERTY, 
 		OperationFactory.integerAction(), 
-	        "highWaterMark", new Integer( 240 ),
-		new Integer( 3745 ), "3745" ),
+	        "highWaterMark", Integer.valueOf( 240 ),
+		Integer.valueOf( 3745 ), "3745" ),
 	    ParserDataFactory.make( ORBConstants.LOW_WATER_MARK_PROPERTY, 
 		OperationFactory.integerAction(), 
-	        "lowWaterMark", new Integer( 100 ),
-		new Integer( 12 ), "12" ),
+	        "lowWaterMark", Integer.valueOf( 100 ),
+		Integer.valueOf( 12 ), "12" ),
 	    ParserDataFactory.make( ORBConstants.NUMBER_TO_RECLAIM_PROPERTY, 
 		OperationFactory.integerAction(), 
-		"numberToReclaim", new Integer( 5 ),
-		new Integer( 231 ), "231" ),
+		"numberToReclaim", Integer.valueOf( 5 ),
+		Integer.valueOf( 231 ), "231" ),
 	    ParserDataFactory.make( ORBConstants.GIOP_VERSION, 
 		makeGVOperation(), 
 		"giopVersion", GIOPVersion.DEFAULT_VERSION,
 		new GIOPVersion( 2, 3 ), "2.3" ),
 	    ParserDataFactory.make( ORBConstants.GIOP_FRAGMENT_SIZE, 
 		makeFSOperation(), "giopFragmentSize",
-		new Integer( ORBConstants.GIOP_DEFAULT_FRAGMENT_SIZE ),
-		new Integer( 65536 ), "65536" ),
+		Integer.valueOf( ORBConstants.GIOP_DEFAULT_FRAGMENT_SIZE ),
+		Integer.valueOf( 65536 ), "65536" ),
 	    ParserDataFactory.make( ORBConstants.GIOP_BUFFER_SIZE, 
 		OperationFactory.integerAction(), 
-		"giopBufferSize", new Integer( ORBConstants.GIOP_DEFAULT_BUFFER_SIZE ),
-		new Integer( 234000 ), "234000" ),
+		"giopBufferSize", Integer.valueOf( ORBConstants.GIOP_DEFAULT_BUFFER_SIZE ),
+		Integer.valueOf( 234000 ), "234000" ),
 	    ParserDataFactory.make( ORBConstants.GIOP_11_BUFFMGR, 
 		makeBMGROperation(),
-		"giop11BuffMgr", new Integer( ORBConstants.DEFAULT_GIOP_11_BUFFMGR ),
-		new Integer( 1 ), "CLCT" ),
+		"giop11BuffMgr", Integer.valueOf( ORBConstants.DEFAULT_GIOP_11_BUFFMGR ),
+		Integer.valueOf( 1 ), "CLCT" ),
 	    ParserDataFactory.make( ORBConstants.GIOP_12_BUFFMGR, 
 		makeBMGROperation(),
-		"giop12BuffMgr", new Integer( ORBConstants.DEFAULT_GIOP_12_BUFFMGR ),
-		new Integer( 0 ), "GROW" ),
+		"giop12BuffMgr", Integer.valueOf( ORBConstants.DEFAULT_GIOP_12_BUFFMGR ),
+		Integer.valueOf( 0 ), "GROW" ),
 
 	    // Note that the same property is used to set two different 
 	    // fields here.  This requires that both entries use the same test
@@ -275,12 +275,12 @@ public class ParserTable {
 		OperationFactory.compose( OperationFactory.integerRangeAction( 0, 3 ), 
 		    OperationFactory.convertIntegerToShort() ),
 		"giopTargetAddressPreference", 
-		new Short( ORBConstants.ADDR_DISP_HANDLE_ALL ),
-		new Short( (short)2 ), "2" ),
+		Short.valueOf( ORBConstants.ADDR_DISP_HANDLE_ALL ),
+		Short.valueOf( (short)2 ), "2" ),
 	    ParserDataFactory.make( ORBConstants.GIOP_TARGET_ADDRESSING, 
 		makeADOperation(), 
-		"giopAddressDisposition", new Short( KeyAddr.value ),
-		new Short( (short)2 ), "2" ),
+		"giopAddressDisposition", Short.valueOf( KeyAddr.value ),
+		Short.valueOf( (short)2 ), "2" ),
 	    ParserDataFactory.make( ORBConstants.ALWAYS_SEND_CODESET_CTX_PROPERTY, 
 		OperationFactory.booleanAction(), 
 		"alwaysSendCodeSetCtx", Boolean.TRUE,
@@ -340,8 +340,8 @@ public class ParserTable {
 		MY_CLASS_NAME + "$TestContactInfoListFactory" ),
 	    ParserDataFactory.make( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, 
 		OperationFactory.integerAction(), 
-		"persistentServerPort", new Integer( 0 ),
-		new Integer( 2743 ), "2743" ),
+		"persistentServerPort", Integer.valueOf( 0 ),
+		Integer.valueOf( 2743 ), "2743" ),
 	    ParserDataFactory.make( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, 
 		OperationFactory.setFlagAction(), 
 		"persistentPortInitialized", Boolean.FALSE,
@@ -412,7 +412,7 @@ public class ParserTable {
 	    ParserDataFactory.make( ORBConstants.WAIT_FOR_RESPONSE_TIMEOUT,
 	        OperationFactory.integerAction(),
 		"waitForResponseTimeout", 1000 * 60 * 30,
-		new Integer(1234), "1234"),
+		Integer.valueOf(1234), "1234"),
 	    ParserDataFactory.make( ORBConstants.DISABLE_DIRECT_BYTE_BUFFER_USE_PROPERTY,
 		OperationFactory.booleanAction(),
 		"disableDirectByteBufferUse", Boolean.TRUE, // was Boolean.FALSE,
@@ -454,36 +454,36 @@ public class ParserTable {
 		"isAppServerMode", Boolean.FALSE,
 		Boolean.FALSE, "FALSE"),
             ParserDataFactory.make(ORBConstants.READ_BYTE_BUFFER_SIZE_PROPERTY,
-                 OperationFactory.integerAction(), 
+                OperationFactory.integerAction(), 
 		"readByteBufferSize",
-                 new Integer(ORBConstants.DEFAULT_READ_BYTE_BUFFER_SIZE),
-		new Integer(8192), "8192"),
+                Integer.valueOf(ORBConstants.DEFAULT_READ_BYTE_BUFFER_SIZE),
+		Integer.valueOf(8192), "8192"),
             ParserDataFactory.make(ORBConstants.MAX_READ_BYTE_BUFFER_SIZE_THRESHOLD_PROPERTY,
-                 OperationFactory.integerAction(), 
+                OperationFactory.integerAction(), 
 		"maxReadByteBufferSizeThreshold",
-                 new Integer(ORBConstants.MAX_READ_BYTE_BUFFER_SIZE_THRESHOLD),
-		new Integer(4000000), "4000000"),            
+                Integer.valueOf(ORBConstants.MAX_READ_BYTE_BUFFER_SIZE_THRESHOLD),
+		Integer.valueOf(4000000), "4000000"),            
             ParserDataFactory.make(
-                      ORBConstants.POOLED_DIRECT_BYTE_BUFFER_SLAB_SIZE_PROPERTY,
-                 OperationFactory.integerAction(), 
+                ORBConstants.POOLED_DIRECT_BYTE_BUFFER_SLAB_SIZE_PROPERTY,
+                OperationFactory.integerAction(), 
 		"pooledDirectByteBufferSlabSize",
-                new Integer(ORBConstants.DEFAULT_POOLED_DIRECT_BYTE_BUFFER_SLAB_SIZE),
-		new Integer(1048576), "1048576"),
+                Integer.valueOf(ORBConstants.DEFAULT_POOLED_DIRECT_BYTE_BUFFER_SLAB_SIZE),
+		Integer.valueOf(1048576), "1048576"),
             ParserDataFactory.make(
-                      ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY,
-                 OperationFactory.booleanAction(),
+                ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY,
+                OperationFactory.booleanAction(),
 		"alwaysEnterBlockingRead", Boolean.TRUE,
 		Boolean.TRUE, "TRUE"),
             ParserDataFactory.make(
-                      ORBConstants.NON_BLOCKING_READ_CHECK_MESSAGE_PARSER_PROPERTY,
-                 OperationFactory.booleanAction(),
+                ORBConstants.NON_BLOCKING_READ_CHECK_MESSAGE_PARSER_PROPERTY,
+                OperationFactory.booleanAction(),
 		"nonBlockingReadCheckMessageParser", Boolean.TRUE,
                 Boolean.TRUE, "TRUE"),
             ParserDataFactory.make(
-                      ORBConstants.BLOCKING_READ_CHECK_MESSAGE_PARSER_PROPERTY,
-                 OperationFactory.booleanAction(),
+                ORBConstants.BLOCKING_READ_CHECK_MESSAGE_PARSER_PROPERTY,
+                OperationFactory.booleanAction(),
 		"blockingReadCheckMessageParser", Boolean.FALSE,
-                    Boolean.FALSE, "FALSE"),
+                Boolean.FALSE, "FALSE"),
 	    ParserDataFactory.make( ORBConstants.TIMING_POINTS_ENABLED,
 		OperationFactory.booleanAction(),
 		"timingPointsEnabled", Boolean.FALSE,
@@ -642,9 +642,9 @@ public class ParserTable {
     private Operation makeBMGROperation()
     {
 	Map map = new HashMap() ;
-	map.put( "GROW", new Integer(0) ) ;
-	map.put( "CLCT", new Integer(1) ) ;
-	map.put( "STRM", new Integer(2) ) ;
+	map.put( "GROW", Integer.valueOf(0) ) ;
+	map.put( "CLCT", Integer.valueOf(1) ) ;
+	map.put( "STRM", Integer.valueOf(2) ) ;
 	return makeMapOperation( map ) ;
     }
 
@@ -818,10 +818,10 @@ public class ParserTable {
     {
 	Operation admap = new Operation() {
 	    private Integer[] map = { 
-		new Integer( KeyAddr.value ), 
-		new Integer( ProfileAddr.value ), 
-		new Integer( ReferenceAddr.value ),
-		new Integer( KeyAddr.value ) } ;
+		Integer.valueOf( KeyAddr.value ), 
+		Integer.valueOf( ProfileAddr.value ), 
+		Integer.valueOf( ReferenceAddr.value ),
+		Integer.valueOf( KeyAddr.value ) } ;
 
 	    public Object operate( Object value ) 
 	    {
@@ -843,13 +843,13 @@ public class ParserTable {
 	    {
 		int giopFragmentSize = ((Integer)value).intValue() ;
 		if (giopFragmentSize < ORBConstants.GIOP_FRAGMENT_MINIMUM_SIZE){
-		    throw wrapper.fragmentSizeMinimum( new Integer( giopFragmentSize ),
-			new Integer( ORBConstants.GIOP_FRAGMENT_MINIMUM_SIZE ) ) ;
+		    throw wrapper.fragmentSizeMinimum( Integer.valueOf( giopFragmentSize ),
+			Integer.valueOf( ORBConstants.GIOP_FRAGMENT_MINIMUM_SIZE ) ) ;
 		}
 
                 if (giopFragmentSize % ORBConstants.GIOP_FRAGMENT_DIVISOR != 0)
-		    throw wrapper.fragmentSizeDiv( new Integer( giopFragmentSize ),
-			    new Integer( ORBConstants.GIOP_FRAGMENT_DIVISOR ) ) ;
+		    throw wrapper.fragmentSizeDiv( Integer.valueOf( giopFragmentSize ),
+			    Integer.valueOf( ORBConstants.GIOP_FRAGMENT_DIVISOR ) ) ;
 
 		return value ;
 	    }

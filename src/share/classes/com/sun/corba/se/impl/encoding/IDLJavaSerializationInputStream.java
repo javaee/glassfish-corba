@@ -38,14 +38,12 @@ package com.sun.corba.se.impl.encoding;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ObjectStreamClass;
 import java.io.ObjectStreamConstants;
 import java.nio.ByteBuffer;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
-
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactories;
@@ -53,15 +51,11 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults;
-
-import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.impl.util.RepositoryId;
 import com.sun.corba.se.impl.corba.TypeCodeImpl;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
@@ -415,7 +409,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	try {
 	    char value = is.readChar();
 	    if (markOn) { // enqueue
-		markedItemQ.addLast(new Character(value));
+		markedItemQ.addLast(Character.valueOf(value));
 	    }
 	    return value;
 	} catch (Exception e) {
@@ -453,8 +447,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	    }
 
 	    if (markOn) { // enqueue
-		//markedItemQ.addLast(Byte.valueOf(value)); // only in JDK 1.5
-		markedItemQ.addLast(new Byte(value));
+		markedItemQ.addLast(Byte.valueOf(value));
 	    }
 
 	    return value;
@@ -472,7 +465,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	try {
 	    short value = is.readShort();
 	    if (markOn) { // enqueue
-		markedItemQ.addLast(new Short(value));
+		markedItemQ.addLast(Short.valueOf(value));
 	    }
 	    return value;
 	} catch (Exception e) {
@@ -525,7 +518,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	    }
 
 	    if (markOn) { // enqueue
-		markedItemQ.addLast(new Integer(value));
+		markedItemQ.addLast(Integer.valueOf(value));
 	    }
 
 	    return value;
@@ -547,7 +540,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	try {
 	    long value = is.readLong();
 	    if (markOn) { // enqueue
-		markedItemQ.addLast(new Long(value));
+		markedItemQ.addLast(Long.valueOf(value));
 	    }
 	    return value;
 	} catch (Exception e) {
@@ -567,7 +560,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	try {
 	    float value = is.readFloat();
 	    if (markOn) { // enqueue
-		markedItemQ.addLast(new Float(value));
+		markedItemQ.addLast(Float.valueOf(value));
 	    }
 	    return value;
 	} catch (Exception e) {
@@ -583,7 +576,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	try {
 	    double value = is.readDouble();
 	    if (markOn) { // enqueue
-		markedItemQ.addLast(new Double(value));
+		markedItemQ.addLast(Double.valueOf(value));
 	    }
 	    return value;
 	} catch (Exception e) {
@@ -1018,8 +1011,8 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
         // digits isn't really needed here
         StringBuffer buffer = read_fixed_buffer();
         if (digits != buffer.length())
-	    throw wrapper.badFixed( new Integer(digits),
-		new Integer(buffer.length()) ) ;
+	    throw wrapper.badFixed( Integer.valueOf(digits),
+		Integer.valueOf(buffer.length()) ) ;
         buffer.insert(digits - scale, '.');
         return new BigDecimal(buffer.toString());
     }

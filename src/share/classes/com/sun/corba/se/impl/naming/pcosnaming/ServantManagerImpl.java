@@ -220,7 +220,7 @@ class CounterDB {
     {
 	counterFile = new File(logDir, counterFileName);
 	if (!counterFile.exists()) {
-	    counter = new Integer(rootCounter);
+	    counter = Integer.valueOf(rootCounter);
     	    writeCounter();
 	} else {
 	    readCounter();
@@ -255,7 +255,7 @@ class CounterDB {
     public synchronized int getNextCounter()
     {
 	int counterVal = counter.intValue();
-	counter = new Integer(++counterVal); 
+	counter = Integer.valueOf(++counterVal); 
 	writeCounter();
 
 	return counterVal;

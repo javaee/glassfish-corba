@@ -2012,11 +2012,11 @@ public class IIOPInputStream
 
                 case TCKind._tk_octet:
                     byte byteValue = orbStream.read_octet();
-                    fieldToValueMap.put(fields[i].name, new Byte(byteValue));
+                    fieldToValueMap.put(fields[i].name, Byte.valueOf(byteValue));
                     break;
                 case TCKind._tk_boolean:
                     boolean booleanValue = orbStream.read_boolean();
-                    fieldToValueMap.put(fields[i].name, new Boolean(booleanValue));
+                    fieldToValueMap.put(fields[i].name, Boolean.valueOf(booleanValue));
                     break;
                 case TCKind._tk_char:
                     // Backwards compatibility.  Older Sun ORBs sent
@@ -2026,27 +2026,27 @@ public class IIOPInputStream
                     // Fall through to the _tk_wchar case.
                 case TCKind._tk_wchar:
                     char charValue = orbStream.read_wchar();
-                    fieldToValueMap.put(fields[i].name, new Character(charValue));
+                    fieldToValueMap.put(fields[i].name, Character.valueOf(charValue));
                     break;
                 case TCKind._tk_short:
                     short shortValue = orbStream.read_short();
-                    fieldToValueMap.put(fields[i].name, new Short(shortValue));
+                    fieldToValueMap.put(fields[i].name, Short.valueOf(shortValue));
                     break;
                 case TCKind._tk_long:
                     int intValue = orbStream.read_long();
-                    fieldToValueMap.put(fields[i].name, new Integer(intValue));
+                    fieldToValueMap.put(fields[i].name, Integer.valueOf(intValue));
                     break;
                 case TCKind._tk_longlong:
                     long longValue = orbStream.read_longlong();
-                    fieldToValueMap.put(fields[i].name, new Long(longValue));
+                    fieldToValueMap.put(fields[i].name, Long.valueOf(longValue));
                     break;
                 case TCKind._tk_float:
                     float floatValue = orbStream.read_float();
-                    fieldToValueMap.put(fields[i].name, new Float(floatValue));
+                    fieldToValueMap.put(fields[i].name, Float.valueOf(floatValue));
                     break;
                 case TCKind._tk_double:
                     double doubleValue = orbStream.read_double();
-                    fieldToValueMap.put(fields[i].name, new Double(doubleValue));
+                    fieldToValueMap.put(fields[i].name, Double.valueOf(doubleValue));
                     break;
                 case TCKind._tk_value:
                 case TCKind._tk_objref:
@@ -2101,42 +2101,42 @@ public class IIOPInputStream
                 case 'B':
                     byte byteValue = orbStream.read_octet();
                     fieldToValueMap.put(fields[i].getName(),
-                                        new Byte(byteValue));
+                                        Byte.valueOf(byteValue));
                     break;
                 case 'Z':
                    boolean booleanValue = orbStream.read_boolean();
                    fieldToValueMap.put(fields[i].getName(),
-                                       new Boolean(booleanValue));
+                                       Boolean.valueOf(booleanValue));
                    break;
 		case 'C':
                     char charValue = orbStream.read_wchar();
                     fieldToValueMap.put(fields[i].getName(),
-                                        new Character(charValue));
+                                        Character.valueOf(charValue));
                     break;
 		case 'S':
                     short shortValue = orbStream.read_short();
                     fieldToValueMap.put(fields[i].getName(),
-                                        new Short(shortValue));
+                                        Short.valueOf(shortValue));
                     break;
 		case 'I':
                     int intValue = orbStream.read_long();
                     fieldToValueMap.put(fields[i].getName(),
-                                        new Integer(intValue));
+                                        Integer.valueOf(intValue));
                     break;
 		case 'J':
                     long longValue = orbStream.read_longlong();
                     fieldToValueMap.put(fields[i].getName(),
-                                        new Long(longValue));
+                                        Long.valueOf(longValue));
                     break;
 		case 'F' :
                     float floatValue = orbStream.read_float();
                     fieldToValueMap.put(fields[i].getName(),
-                                        new Float(floatValue));
+                                        Float.valueOf(floatValue));
                     break;
 		case 'D' :
                     double doubleValue = orbStream.read_double();
                     fieldToValueMap.put(fields[i].getName(),
-                                        new Double(doubleValue));
+                                        Double.valueOf(doubleValue));
                     break;
 		default:
 		    // XXX I18N, logging needed.
@@ -2537,8 +2537,7 @@ public class IIOPInputStream
 	    bridge.putBoolean( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetBooleanField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		new Boolean(v) ) ;
+		ObjectUtility.compactObjectToString( o ), v ) ;
 	}
     }
 
@@ -2550,8 +2549,7 @@ public class IIOPInputStream
 	    bridge.putByte( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetByteField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		new Byte(v) ) ;
+		ObjectUtility.compactObjectToString( o ), v ) ;
 	}
     }
 
@@ -2563,8 +2561,7 @@ public class IIOPInputStream
 	    bridge.putChar( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetCharField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		new Character(v) ) ;
+		ObjectUtility.compactObjectToString( o ), v ) ;
 	}
     }
 
@@ -2576,8 +2573,7 @@ public class IIOPInputStream
 	    bridge.putShort( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetShortField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		new Short(v) ) ;
+		ObjectUtility.compactObjectToString( o ), v ) ;
 	}
     }
 
@@ -2589,8 +2585,7 @@ public class IIOPInputStream
 	    bridge.putInt( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetIntField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		new Integer(v) ) ;
+		ObjectUtility.compactObjectToString( o ), v ) ;
 	}
     }
 
@@ -2602,8 +2597,7 @@ public class IIOPInputStream
 	    bridge.putLong( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetLongField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		new Long(v) ) ;
+		ObjectUtility.compactObjectToString( o ), v ) ;
 	}
     }
 
@@ -2615,8 +2609,7 @@ public class IIOPInputStream
 	    bridge.putFloat( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetFloatField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		new Float(v) ) ;
+		ObjectUtility.compactObjectToString( o ), v ) ;
 	}
     }
 
@@ -2628,8 +2621,7 @@ public class IIOPInputStream
 	    bridge.putDouble( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetDoubleField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		new Double(v) ) ;
+		ObjectUtility.compactObjectToString( o ), v ) ;
 	}
     }
 
@@ -2664,7 +2656,7 @@ public class IIOPInputStream
         // Otherwise, it returns a reference to the
         // object.
         public Object getObject(int offset) throws IOException {
-            Integer position = new Integer(offset);
+            Integer position = Integer.valueOf(offset);
 
             if (!offsetToObjectMap.containsKey(position))
 		// XXX I18N, logging needed.

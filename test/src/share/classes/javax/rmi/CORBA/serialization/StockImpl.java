@@ -64,7 +64,7 @@ public class StockImpl extends Stock
 	    current = 30.0f;
 	} else {
 	    // generate random stock price between 20 and 60
-	    current = (float)(Math.abs(random.nextInt()) % 40 + 20);
+            current = (float)(random.nextInt(40) + 20);
 	}
 	//nk
     }

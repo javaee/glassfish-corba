@@ -141,7 +141,6 @@ public class ByteBufferPoolImpl implements ByteBufferPool {
      * into the returned <code>ByteBuffer</code>.
      */
     public ByteBuffer reAllocate(ByteBuffer oldByteBuffer, int minimumSize) {
-        ByteBuffer newByteBuffer = null;
         int size = orb.getORBData().getReadByteBufferSize();
         while (size <= minimumSize) {
             size *= 2;
@@ -160,7 +159,7 @@ public class ByteBufferPoolImpl implements ByteBufferPool {
             }
         }
         
-        newByteBuffer = getByteBuffer(size);
+        ByteBuffer newByteBuffer = getByteBuffer(size);
         
         // copy oldByteBuffer into newByteBuffer
         newByteBuffer.put(oldByteBuffer);

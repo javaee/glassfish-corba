@@ -1197,7 +1197,7 @@ public abstract class Test implements java.lang.Runnable
 		dprint( "finishAnIteration called" ) ;
                 Error status = testObj.finishAnIteration(i+1, duration);
                 testObj.results[i] = new Hashtable();
-                testObj.results[i].put(DURATION, new Long(duration));
+                testObj.results[i].put(DURATION, Long.valueOf(duration));
                 if (status != null) {
                     testObj.results[i].put(STATUS, status);
                     mainResult = 1;

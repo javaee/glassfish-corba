@@ -590,7 +590,7 @@ public class AnyImpl extends Any
 	    int kind = realType().kind().value();
 	    if (kind >= isStreamed.length) {
 		throw wrapper.invalidIsstreamedTckind( CompletionStatus.COMPLETED_MAYBE,
-		    new Integer(kind)) ;
+		              kind) ;
 	    }
 
 	    if (AnyImpl.isStreamed[kind]) {
@@ -978,8 +978,8 @@ public class AnyImpl extends Any
 
 	    // Check if bounded strings length is not exceeded
 	    if (length != 0 && s != null && s.length() > length) {
-		throw wrapper.badStringBounds( new Integer(s.length()),
-		    new Integer(length) ) ;
+		throw wrapper.badStringBounds( Integer.valueOf( s.length() ),
+                                               Integer.valueOf( length ) ) ;
 	    }
 	} else {
 	    typeCode = orb.get_primitive_tc(TCKind._tk_string);
@@ -1015,8 +1015,8 @@ public class AnyImpl extends Any
 
 	    // Check if bounded strings length is not exceeded
 	    if (length != 0 && s != null && s.length() > length) {
-		throw wrapper.badStringBounds( new Integer(s.length()),
-		    new Integer(length) ) ;
+		throw wrapper.badStringBounds( Integer.valueOf( s.length() ),
+                                               Integer.valueOf( length ) ) ;
 	    }
 	} else {
 	    typeCode = orb.get_primitive_tc(TCKind._tk_wstring);

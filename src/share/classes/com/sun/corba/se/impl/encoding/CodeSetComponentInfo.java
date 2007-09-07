@@ -312,7 +312,7 @@ public final class CodeSetComponentInfo {
             nativeSet = Integer.decode(stok.nextToken()).intValue();
 
             if (OSFCodeSetRegistry.lookupEntry(nativeSet) == null)
-		throw wrapper.unknownNativeCodeset( new Integer(nativeSet) ) ;
+		throw wrapper.unknownNativeCodeset( Integer.valueOf(nativeSet) ) ;
 
             List<Integer> conversionList = new ArrayList<Integer>(10);
 

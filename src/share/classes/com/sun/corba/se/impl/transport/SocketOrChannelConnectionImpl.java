@@ -112,7 +112,7 @@ public class SocketOrChannelConnectionImpl
 	Work
 {
 
-    public static boolean dprintWriteLocks = false;
+    final public static boolean dprintWriteLocks = false;
 
     //
     // New transport.
@@ -600,9 +600,8 @@ public class SocketOrChannelConnectionImpl
                     } while (n < size && !waiter.isExpired());
                 } catch (IOException ioe) {
                     throw wrapper.exceptionWhenReadingWithTemporarySelector(
-                         new Integer(n), new Integer(size),
-                         new Long(waiter.timeWaiting()),
-			 new Long(tcpTimeouts.get_max_time_to_wait()));
+                                            n, size, waiter.timeWaiting(), 
+                                            tcpTimeouts.get_max_time_to_wait());
                 } finally {
                     if (tmpSelector != null) {
                         tmpSelector.cancelAndFlushSelector(sk);
@@ -619,10 +618,9 @@ public class SocketOrChannelConnectionImpl
 
 	if (n < size && waiter.isExpired()) {
 	    // failed to read entire message
-	    throw wrapper.transportReadTimeoutExceeded(new Integer(size),
-                                      new Integer(n), 
-				      new Long(tcpTimeouts.get_max_time_to_wait()),
-				      new Long(waiter.timeWaiting()));
+	    throw wrapper.transportReadTimeoutExceeded(size, n, 
+				      tcpTimeouts.get_max_time_to_wait(),
+				      waiter.timeWaiting());
 	}
     }
 
@@ -684,9 +682,8 @@ public class SocketOrChannelConnectionImpl
 	if (n < size && waiter.isExpired()) {
 	    // failed to read entire message
 	    throw wrapper.transportReadTimeoutExceeded(
-		new Integer(size), new Integer(n), 
-		new Long(tcpTimeouts.get_max_time_to_wait()), 
-		new Long(waiter.timeWaiting()));
+		size, n, tcpTimeouts.get_max_time_to_wait(), 
+		waiter.timeWaiting());
 	}
     }    
 
@@ -739,10 +736,8 @@ public class SocketOrChannelConnectionImpl
                         }
                     } catch (IOException ioe) {
                         throw wrapper.exceptionWhenWritingWithTemporarySelector(
-                            new Integer(byteBuffer.position()),
-                            new Integer(byteBuffer.limit()),
-                            new Long(waiter.timeWaiting()), 
-			    new Long(tcpTimeouts.get_max_time_to_wait()));
+                            byteBuffer.position(), byteBuffer.limit(),
+                            waiter.timeWaiting(), tcpTimeouts.get_max_time_to_wait());
                     } finally {
                         if (tmpSelector != null) {
                             tmpSelector.cancelAndFlushSelector(sk);
@@ -756,8 +751,7 @@ public class SocketOrChannelConnectionImpl
                     if (byteBuffer.hasRemaining() && waiter.isExpired()) {
                         // failed to write entire message
                         throw wrapper.transportWriteTimeoutExceeded( 
-			    new Long(tcpTimeouts.get_max_time_to_wait()),
-			    new Long(waiter.timeWaiting()));
+			    tcpTimeouts.get_max_time_to_wait(), waiter.timeWaiting());
                     }
                 }
 	    } else {
@@ -1690,7 +1684,7 @@ public class SocketOrChannelConnectionImpl
             } while (nonBlockingReadWhileLoopConditionIsTrue(messageParser,bytesRead));
 
             // if expecting more data or using 'always enter blocking read'
-            // strategy (not the default), then go to a blocking read using
+            // strategy (the default), then go to a blocking read using
             // a temporary selector.
             if (orb.getORBData().alwaysEnterBlockingRead() || 
                 messageParser.isExpectingMoreData()) {
@@ -1825,8 +1819,8 @@ public class SocketOrChannelConnectionImpl
                 // failed to read data when we were expecting more
                 // and exceeded time willing to wait for additional data
                 throw wrapper.blockingReadTimeout(
-		    new Long(tcpTimeouts.get_max_time_to_wait()), 
-		    new Long(waiter.timeWaiting()));
+		    Long.valueOf(tcpTimeouts.get_max_time_to_wait()), 
+		    Long.valueOf(waiter.timeWaiting()));
             }
         } catch (IOException ioe) {
             throw wrapper.exceptionBlockingReadWithTemporarySelector( ioe, this ) ;

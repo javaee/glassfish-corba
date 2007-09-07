@@ -139,7 +139,7 @@ public class Preprocessor
           else
           {
             alreadyProcessedABranch.pop ();
-            alreadyProcessedABranch.push (new Boolean (true));
+            alreadyProcessedABranch.push (true);
             token = scanner.getToken ();
           }
           break;
@@ -340,7 +340,7 @@ public class Preprocessor
       expr = ((Boolean)boolExpr.value ()).booleanValue ();
     else
       expr = ((Number)boolExpr.value ()).longValue () != 0;
-    alreadyProcessedABranch.push (new Boolean (expr));
+    alreadyProcessedABranch.push (expr);
     if (!expr)
       skipToEndiforElse ();
   } // constExpr
@@ -549,12 +549,12 @@ public class Preprocessor
     if (token.equals (Token.Identifier))
       if ((not && symbols.containsKey (token.name)) || (!not && !symbols.containsKey (token.name)))
       {
-        alreadyProcessedABranch.push (new Boolean (false));
+        alreadyProcessedABranch.push (false);
         skipToEndiforElse ();
       }
       else
       {
-        alreadyProcessedABranch.push (new Boolean (true));
+        alreadyProcessedABranch.push (true);
         match (Token.Identifier);
         if (inParens)
           match (Token.RightParen);
@@ -575,12 +575,12 @@ public class Preprocessor
     if (token.equals (Token.Identifier))
       if ((not && symbols.containsKey (token.name)) || (!not && !symbols.containsKey (token.name)))
       {
-        alreadyProcessedABranch.push (new Boolean (false));
+        alreadyProcessedABranch.push (false);
         skipToEndiforElse ();
       }
       else
       {
-        alreadyProcessedABranch.push (new Boolean (true));
+        alreadyProcessedABranch.push (true);
         match (Token.Identifier);
       }
     else
@@ -612,7 +612,7 @@ public class Preprocessor
     {
       if (token.equals (Token.Ifdef) || token.equals (Token.Ifndef))
       {
-        alreadyProcessedABranch.push (new Boolean (true));
+        alreadyProcessedABranch.push (true);
         skipToEndif ();
       }
       else
@@ -631,7 +631,7 @@ public class Preprocessor
       token = scanner.skipUntil ('#');
       if (token.equals (Token.Ifdef) || token.equals (Token.Ifndef))
       {
-        alreadyProcessedABranch.push (new Boolean (true));
+        alreadyProcessedABranch.push (true);
         skipToEndif ();
       }
     }
@@ -1436,7 +1436,7 @@ public class Preprocessor
   //     push (true);
   // case #endif
   //   pop ();
-  private        Stack  alreadyProcessedABranch = new Stack ();
+  private        Stack<Boolean>  alreadyProcessedABranch = new Stack<Boolean> ();
                  Token  token;
 
   private static String indent = "";

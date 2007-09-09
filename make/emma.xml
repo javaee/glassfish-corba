@@ -116,7 +116,7 @@
       >
 	<sourcepath>
 	  <pathelement location="${src.dir}"/>
-	  <pathelement location="${optionalsrc.dir}"/>
+	  <pathelement location="${orblib.src.dir}"/>
 	</sourcepath>
         <!-- collect all EMMA data dumps (metadata and runtime)
              [this can be done via nested <fileset> fileset elements

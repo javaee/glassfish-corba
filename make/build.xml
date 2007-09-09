@@ -517,7 +517,7 @@
 		    -verbose: normally set to false, except when debugging this
 		    -dryrun: normally set to false, except when debugging this
 		    -root: set to the root directories to process: 
-			experimental, make, nbproject, optional, src, test, tools, www
+			experimental, make, nbproject, src, test, tools, www
 		    -skipdirs: set to the directories to skip:
 			SCCS, .hg, Codemgr_wsdata, deleted_files, headers, freezepoint
 		    -copyright: this is set to the copyright template, currently in make/headers/copyrights.txt

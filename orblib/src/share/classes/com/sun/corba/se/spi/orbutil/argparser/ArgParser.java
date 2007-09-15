@@ -179,7 +179,8 @@ public class ArgParser<T> {
      * <li>A primitive type
      * <li>A String type
      * <li>A type that has a public constructor that takes a single String argument
-     * <li>An Enum * <li>A List parameterized by one of the above types
+     * <li>An Enum 
+     * <li>A List parameterized by one of the above types
      * <li>An array of one of the first four types
      * </ul>
      * The name of the method is the name of the keyword.

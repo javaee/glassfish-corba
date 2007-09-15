@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testSuite name="WSpex" xmlns="http://www.sun.com/japex/testSuite">
+    <param name="japex.warmupTime" value="15"/>
+    <param name="japex.runTime" value="15"/>
+    <param name="japex.runsPerDriver" value="2"/>
+    <param name="japex.reportsDirectory" value="./reports/non-periodic"/>
+    
+    <driver name="TestServiceIIOPDriver" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+    </driver>
+    
+    <testCase name="echoVoid">
+        <param name="methodName" value="echoVoid"/>
+    </testCase>
+
+    <testCase name="echoString">
+        <param name="methodName" value="echoString"/>
+    </testCase>
+
+    <testCase name="echoStruct">
+        <param name="methodName" value="echoStruct"/>
+    </testCase>
+
+    <testCase name="echoSynthetic4K">
+        <param name="methodName" value="echoSynthetic"/>
+        <param name="size" value="4096"/>
+    </testCase>
+
+    <testCase name="echoSynthetic8K">
+        <param name="methodName" value="echoSynthetic"/>
+        <param name="size" value="8192"/>
+    </testCase>
+
+    <testCase name="echoSynthetic12K">
+        <param name="methodName" value="echoSynthetic"/>
+        <param name="size" value="12288"/>
+    </testCase>
+
+    <testCase name="echoArray40">
+        <param name="methodName" value="echoArray"/>
+        <param name="size" value="40"/>
+    </testCase>
+
+    <testCase name="echoArray80">
+        <param name="methodName" value="echoArray"/>
+        <param name="size" value="80"/>
+    </testCase>
+
+    <testCase name="echoArray120">
+        <param name="methodName" value="echoArray"/>
+        <param name="size" value="120"/>
+    </testCase>
+
+    <testCase name="getOrder50">
+        <param name="methodName" value="getOrder"/>
+    </testCase>
+
+    <testCase name="echoOrder200">
+        <param name="methodName" value="echoOrder"/>
+        <param name="size" value="200"/>
+    </testCase>
+
+    <testCase name="echoOrder500">
+        <param name="methodName" value="echoOrder"/>
+        <param name="size" value="500"/>
+    </testCase>
+</testSuite>

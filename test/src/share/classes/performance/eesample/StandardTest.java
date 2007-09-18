@@ -173,6 +173,7 @@ public class StandardTest extends JapexDriverBase {
 
     // set up default parameters
     private static ArgumentData argData = ap.parse( new String[]{} ) ;
+    private static int numInstances = 0 ;
 
     static {
 	// The following must be set as system properties 
@@ -185,6 +186,8 @@ public class StandardTest extends JapexDriverBase {
 	System.setProperty( ORBConstants.USE_DYNAMIC_STUB_PROPERTY,
 	    "true" ) ;
     }
+
+    private int instance = numInstances++ ;
 
     // Client state
     private ORB clientORB = null ;
@@ -200,16 +203,16 @@ public class StandardTest extends JapexDriverBase {
 	// nothing to do here
     }
 
-    private String getTransportDescription() {
+    private static String getTransportDescription() {
 	return (argData.blocking() ? "Blocking transport(" : "Default transport(")
 	    + argData.fragmentSize() + ")" ;
     }
 
     private synchronized void log( String msg ) {
-	System.out.println( msg ) ;
+	System.out.println( "(" + instance + ") " + msg ) ;
     }
 
-    private void decodeAddress(Address address) {
+    private static void decodeAddress(Address address) {
         decodeString(address.getAddress1());
         decodeString(address.getAddress2());
         decodeString(address.getCity());
@@ -219,14 +222,14 @@ public class StandardTest extends JapexDriverBase {
         decodeString(address.getZip());
     }
 
-    private void decodeArray(ItemArrayType echoArray) {
+    private static void decodeArray(ItemArrayType echoArray) {
         List<Item> items = echoArray.getItems();
         for (Item item : items) {
             decodeItem(item);
         }
     }
 
-    private void decodeCustomer(Customer customer) {
+    private static void decodeCustomer(Customer customer) {
         decodeAddress(customer.getBillingAddress());
         decodeString(customer.getContactFirstName());
         decodeString(customer.getContactLastName());
@@ -238,7 +241,7 @@ public class StandardTest extends JapexDriverBase {
         decodeAddress(customer.getShippingAddress());
     }
 
-    private void decodeItem(Item item) {
+    private static void decodeItem(Item item) {
         XMLGregorianCalendar calendar = item.getCreationdate();
         decodeString(item.getDescription());
         decodeString(item.getId());
@@ -247,7 +250,7 @@ public class StandardTest extends JapexDriverBase {
         decodeLocation(item.getLocation());
     }
 
-    private void decodeLineItem(LineItem lineItem) {
+    private static void decodeLineItem(LineItem lineItem) {
         int itemId = lineItem.getItemId();
         int orderId = lineItem.getOrderId();
         int q = lineItem.getOrderQuantity();
@@ -256,20 +259,20 @@ public class StandardTest extends JapexDriverBase {
         float price = lineItem.getUnitPrice();
     }
 
-    private void decodeLineItems(ArrayOfLineItem lineItems) {
+    private static void decodeLineItems(ArrayOfLineItem lineItems) {
         List<LineItem> lineitems = lineItems.getLineItem();
         for (LineItem lineItem : lineitems) {
             decodeLineItem(lineItem);
         }
     }
 
-    private void decodeLocation(Location location) {
+    private static void decodeLocation(Location location) {
         decodeString(location.getAddress());
         decodeString(location.getDescription());
         decodeString(location.getId());
     }
 
-    private void decodeOrder(Order echoOrder) {
+    private static void decodeOrder(Order echoOrder) {
         decodeCustomer(echoOrder.getCustomer());
         decodeLineItems(echoOrder.getLineItems());
         XMLGregorianCalendar calendar = echoOrder.getOrderDate();
@@ -278,17 +281,17 @@ public class StandardTest extends JapexDriverBase {
         float amount = echoOrder.getOrderTotalAmount();
     }
 
-    private void decodeString(String echoString) {
+    private static void decodeString(String echoString) {
         int length = echoString.length();
     }
     
-    private void decodeStruct(Struct echoStruct) {
+    private static void decodeStruct(Struct echoStruct) {
         float f = echoStruct.getVarFloat();
         int i = echoStruct.getVarInt();
         decodeString(echoStruct.getVarString());
     }
 
-    private void decodeSynthetic(Synthetic echoSynthetic) {
+    private static void decodeSynthetic(Synthetic echoSynthetic) {
         byte[] b = echoSynthetic.getBytes();
         decodeStruct(echoSynthetic.getS());
         decodeString(echoSynthetic.getStr());
@@ -312,7 +315,7 @@ public class StandardTest extends JapexDriverBase {
 	void run() throws Exception ;
     }
 
-    public abstract class SingleTestBase implements SingleTest {
+    public abstract static class SingleTestBase implements SingleTest {
 	protected int size = 0 ;
 	protected final Test testRef ;
 
@@ -339,7 +342,7 @@ public class StandardTest extends JapexDriverBase {
 	// All subclasses must define run.
     }
 
-    private class EchoTest extends SingleTestBase {
+    public static class EchoTest extends SingleTestBase {
 	private int value = 0 ;
 
 	public EchoTest( Test testRef ) {
@@ -351,7 +354,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class GetDataTest extends SingleTestBase {
+    public static class GetDataTest extends SingleTestBase {
 	public GetDataTest( Test testRef ) {
 	    super( testRef ) ;
 	}
@@ -361,7 +364,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class GetDataArrayTest extends SingleTestBase {
+    public static class GetDataArrayTest extends SingleTestBase {
 	public GetDataArrayTest( Test testRef ) {
 	    super( testRef ) ;
 	}
@@ -371,7 +374,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class GetTestRefsTest extends SingleTestBase {
+    public static class GetTestRefsTest extends SingleTestBase {
 	public GetTestRefsTest( Test testRef ) {
 	    super( testRef ) ;
 	}
@@ -381,7 +384,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class EchoStringTest extends SingleTestBase {
+    public static class EchoStringTest extends SingleTestBase {
 	public EchoStringTest( Test testRef ) {
 	    super( testRef ) ;
 	}
@@ -392,7 +395,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class EchoVoidTest extends SingleTestBase {
+    public static class EchoVoidTest extends SingleTestBase {
 	public EchoVoidTest( Test testRef ) {
 	    super( testRef ) ;
 	}
@@ -402,7 +405,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class EchoStructTest extends SingleTestBase {
+    public static class EchoStructTest extends SingleTestBase {
 	private Struct struct ;
 
 	public EchoStructTest( Test testRef ) {
@@ -421,7 +424,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class EchoSyntheticTest extends SingleTestBase {
+    public static class EchoSyntheticTest extends SingleTestBase {
 	private Synthetic synthetic ;
 
 	public EchoSyntheticTest( Test testRef ) {
@@ -446,7 +449,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class EchoArrayTest extends SingleTestBase {
+    public static class EchoArrayTest extends SingleTestBase {
 	private ItemArrayType items ;
 
 	public EchoArrayTest( Test testRef ) {
@@ -493,7 +496,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class GetOrderTest extends SingleTestBase {
+    public static class GetOrderTest extends SingleTestBase {
 	private int orderId ;
 	private int customerId ;
 
@@ -515,7 +518,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-     private class EchoOrderTest extends SingleTestBase {
+     public static class EchoOrderTest extends SingleTestBase {
 	private int orderId ;
 	private int customerId ;
 	private int size ;
@@ -604,7 +607,8 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class IntCopyTest implements SingleTest {
+    /*
+    public static class IntCopyTest implements SingleTest {
 	private int value = 0 ;
 
 	public String description() {
@@ -620,7 +624,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private class DataCopyTest implements SingleTest {
+    public static class DataCopyTest implements SingleTest {
 	private final List<SampleData.Data> value ;
 
 	public DataCopyTest() {
@@ -640,6 +644,7 @@ public class StandardTest extends JapexDriverBase {
 	    Object data = copy( value ) ;
 	}
     }
+    */
 
     @Target( ElementType.METHOD ) 
     @Retention( RetentionPolicy.RUNTIME )
@@ -696,6 +701,9 @@ public class StandardTest extends JapexDriverBase {
 	    if (!cls.isInterface()) 
 		throw new IllegalArgumentException( 
 		    "TestMapper requires an interface, not a class" ) ;
+
+	    mmap = new HashMap<String,Class<? extends SingleTest>>() ;
+
 	    for (Method m : cls.getDeclaredMethods()) {
 		TestClass tc = m.getAnnotation( TestClass.class ) ;
 		if (tc != null) {
@@ -851,14 +859,14 @@ public class StandardTest extends JapexDriverBase {
 	    }
 	}
     }
-   
-    private Object copy( Object obj ) throws ReflectiveCopyException {
+  /* 
+    private static Object copy( Object obj ) throws ReflectiveCopyException {
 	ObjectCopierFactory ocf = 
 	    CopyobjectDefaults.makeORBStreamObjectCopierFactory( clientORB ) ;
 	ObjectCopier oc = ocf.make() ;
 	return oc.copy( obj ) ;
     }
-
+*/
     private Properties getBaseProps() {
 	// initializer client and server ORBs.
 	// Initialize server using RFM and register objrefs in naming
@@ -870,7 +878,7 @@ public class StandardTest extends JapexDriverBase {
 	baseProps.setProperty( ORBConstants.INITIAL_HOST_PROPERTY,
 	    argData.hostName() ) ;
 	baseProps.setProperty( ORBConstants.INITIAL_PORT_PROPERTY,
-	    Integer.toString( argData.port() ) ) ;
+	    Integer.toString( argData.port() + instance ) ) ;
 	baseProps.setProperty( ORBConstants.GIOP_FRAGMENT_SIZE,
 	    Integer.toString( argData.fragmentSize() ) ) ;
 	baseProps.setProperty( ORBConstants.USE_NIO_SELECT_TO_WAIT_PROPERTY,
@@ -899,7 +907,7 @@ public class StandardTest extends JapexDriverBase {
 	Properties baseProps = getBaseProps() ;
 	Properties serverProps = new Properties( baseProps ) ;
 	serverProps.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
-	    Integer.toString( argData.port() ) ) ;
+	    Integer.toString( argData.port() + instance ) ) ;
 	serverProps.setProperty( ORBConstants.SERVER_HOST_PROPERTY,
 	    argData.hostName() ) ;
 	serverProps.setProperty( ORBConstants.ORB_ID_PROPERTY,
@@ -919,7 +927,10 @@ public class StandardTest extends JapexDriverBase {
     }
 
     // Test must call this method for initialization
-    protected void initializeClientORB() {
+    protected synchronized void initializeClientORB() {
+	if (clientORB != null)
+	    return ;
+
 	try {
 	    String[] myArgs = {} ;
 
@@ -950,8 +961,12 @@ public class StandardTest extends JapexDriverBase {
 	// { "testref/nocache", false }
     } ;
    
-    protected void initializeServer() {
+    protected synchronized void initializeServer() {
 	String[] myArgs = {} ;
+
+	if (serverORB != null)
+	    // already initialized
+	    return ;
 
         Properties serverProps = getServerProperties() ;
 	serverORB = (ORB)ORB.init( myArgs, serverProps ) ;
@@ -1062,6 +1077,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
+    /*
     public void testNullStreamCopy() {
 	SingleTest st = new IntCopyTest() ;
 	performSingleTest( st ) ;
@@ -1071,6 +1087,7 @@ public class StandardTest extends JapexDriverBase {
 	SingleTest st = new DataCopyTest() ;
 	performSingleTest( st ) ;
     }
+    */
     
     public void testNullCall() {
 	for ( Object[] data : objrefData) {
@@ -1108,7 +1125,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    public void run() {
+    public void standaloneRun() {
 	switch (argData.mode()) {
 	    case CLIENT :
 		runClient() ;
@@ -1133,10 +1150,12 @@ public class StandardTest extends JapexDriverBase {
 	try {
 	    initializeClientORB() ;
 
+	    /*
 	    if (argData.doCopyTests()) {
 		testNullStreamCopy() ;
 		testDataStreamCopy() ;
 	    } 
+	    */
 
 	    if (argData.testNullCall())
 		testNullCall() ;
@@ -1164,6 +1183,7 @@ public class StandardTest extends JapexDriverBase {
     private Test testRef = null ;
 
     public void initializeDriver() {
+	log( "Calling initializeDriver" ) ;
 	// initialize the ORB here
 	if (argData.mode() == TestMode.LOCAL) {
 	    initializeServer() ;
@@ -1174,6 +1194,7 @@ public class StandardTest extends JapexDriverBase {
     }
 
     public void prepare( TestCase testCase ) {
+	log( "Calling prepare" ) ;
 	// find the SingleTest for this testCase and prepare it
 	String methodName = testCase.getParam( "methodName" ) ;
 	int size = testCase.getIntParam( "size" ) ;
@@ -1183,11 +1204,13 @@ public class StandardTest extends JapexDriverBase {
     }
 
     public void warmup( TestCase testCase ) {
+	// log( "Calling warmup" ) ;
 	// no difference between warmup and run for us.
 	run( testCase ) ;
     }
 
     public void run( TestCase testCase ) {
+	// log( "Calling run" ) ;
 	// run the test method
 	try {
 	    testToRun.run() ;
@@ -1197,10 +1220,12 @@ public class StandardTest extends JapexDriverBase {
     }
 
     public void finish( TestCase testCase ) {
+	log( "Calling finish" ) ;
 	// set japex.resultValue and japex.resultType here if necessary
     }
 
     public void terminateDriver() {
+	log( "Calling terminateDriver" ) ;
 	cleanUpClient() ;
 	if (argData.mode() == TestMode.LOCAL) {
 	    cleanUpServer() ;
@@ -1225,7 +1250,7 @@ public class StandardTest extends JapexDriverBase {
 	@DefaultValue( "4096" ) 
 	int fragmentSize() ;
 
-	@DefaultValue( "true" ) 
+	@DefaultValue( "false" ) 
 	boolean blocking() ;
 
 	@DefaultValue( "500" ) 
@@ -1234,8 +1259,10 @@ public class StandardTest extends JapexDriverBase {
 	@DefaultValue( "500" ) 
 	int count() ;
 
+	/*
 	@DefaultValue( "true" )
 	boolean doCopyTests() ;
+	*/
 
 	@DefaultValue( "true" )
 	boolean testNullCall() ;
@@ -1278,14 +1305,16 @@ public class StandardTest extends JapexDriverBase {
 	System.out.println( "-----------------------------------------------" ) ;
 
 	if (argData.useJapex()) {
-	    StandardTest st = new StandardTest()  ;
-	    st.run() ;
-	} else {
+	    System.out.println( "Running with japex" ) ;
 	    String[] jargs = { "test.xml" } ;
 
 	    // This will re-use the static argData when it creates a new StandardTest
 	    // as a Japex driver.
 	    com.sun.japex.Japex.main( jargs ) ;
+	} else {
+	    System.out.println( "Running standalone" ) ;
+	    StandardTest st = new StandardTest()  ;
+	    st.standaloneRun() ;
 	}
     }
 }

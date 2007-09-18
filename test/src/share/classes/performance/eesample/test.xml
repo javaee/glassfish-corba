@@ -4,22 +4,29 @@
     <param name="japex.runTime" value="15"/>
     <param name="japex.runsPerDriver" value="2"/>
     <param name="japex.reportsDirectory" value="./reports/non-periodic"/>
+
+    <param name="japex.classPath" value="../../../../../../build/classes"/>
+    <param name="japex.classPath" value="../../../../../../orblib/build/classes"/>
+    <param name="japex.classPath" value="../../../../../../test/build/classes"/>
     
-    <driver name="TestServiceIIOPDriver" xmlns="http://www.sun.com/japex/testSuite">
+    <driver name="StandardTest" xmlns="http://www.sun.com/japex/testSuite">
 	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
 	<param name="description" value="TestService IIOP Driver"/>
     </driver>
     
     <testCase name="echoVoid">
         <param name="methodName" value="echoVoid"/>
+        <param name="size" value="0"/>
     </testCase>
 
     <testCase name="echoString">
         <param name="methodName" value="echoString"/>
+        <param name="size" value="0"/>
     </testCase>
 
     <testCase name="echoStruct">
         <param name="methodName" value="echoStruct"/>
+        <param name="size" value="0"/>
     </testCase>
 
     <testCase name="echoSynthetic4K">
@@ -54,6 +61,7 @@
 
     <testCase name="getOrder50">
         <param name="methodName" value="getOrder"/>
+        <param name="size" value="0"/>
     </testCase>
 
     <testCase name="echoOrder200">

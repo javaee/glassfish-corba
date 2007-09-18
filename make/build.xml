@@ -793,7 +793,8 @@
 	</exec>
     </target>
 
-    <target name="rename" depends="init, orb-library">
+    <!-- also depends on orb-library, but we need to prevent the recompilation -->
+    <target name="rename" depends="init">
 	<mkdir dir="build/rename/ee"/>
 	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
 	    dir="${root.dir}">

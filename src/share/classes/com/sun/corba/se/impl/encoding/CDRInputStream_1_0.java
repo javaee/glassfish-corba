@@ -809,7 +809,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 		clz ) ;
 	} else {
 	    // clz is an interface class
-	    boolean isIDL = ClassInfoCache.get( clz ).isAIDLEntity() ;
+	    boolean isIDL = ClassInfoCache.get( clz ).isAIDLEntity(clz) ;
 
 	    stubFactory = sff.createStubFactory( clz.getName(), 
 		isIDL, codeBase, clz, clz.getClassLoader() ) ;
@@ -1047,7 +1047,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 		}
 		
 		if (valueClass != null && 
-		    ClassInfoCache.get( valueClass ).isAIDLEntity()) {
+		    ClassInfoCache.get( valueClass ).isAIDLEntity(valueClass)) {
 		    value = readIDLValue(indirection, repositoryIDString, 
 			valueClass, codebase_URL);
 		} else {
@@ -1474,8 +1474,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
 	    // Could not get a factory, so try alternatives
 	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-	    if (!cinfo.isAStreamableValue() && 
-		!cinfo.isACustomValue() && cinfo.isAValueBase()) {
+	    if (!cinfo.isAStreamableValue(clazz) && 
+		!cinfo.isACustomValue(clazz) && cinfo.isAValueBase(clazz)) {
 
 		// use old-style OBV support (helper object)
 		BoxedValueHelper helper = Utility.getHelper(clazz, codebase, 

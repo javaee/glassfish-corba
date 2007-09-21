@@ -507,10 +507,10 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 	    if (cinfo.isInterface()) { 
 		String className = type.getName();
 				
-		if (cinfo.isARemote()) {
+		if (cinfo.isARemote(type)) {
 		    // RMI Object reference...
 		    callType = kRemoteType;
-		} else if (cinfo.isACORBAObject()) {
+		} else if (cinfo.isACORBAObject(type)) {
 		    // IDL Object reference...
 		    callType = kRemoteType;
 		} else if (RepositoryId.isAbstractBase(type)) {
@@ -670,14 +670,14 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                     boolean loadStubClass = false;
                     // String className = componentType.getName();
                         
-		    if (cinfo.isARemote()) {
+		    if (cinfo.isARemote(componentType)) {
                         // RMI Object reference...
                         callType = kRemoteType;
                         
                         // for better performance, load the stub class once
                         // instead of for each element of the array
                         loadStubClass = true;
-		    } else if (cinfo.isACORBAObject()) {
+		    } else if (cinfo.isACORBAObject(componentType)) {
                         // IDL Object reference...
                         callType = kRemoteType;
                         loadStubClass = true;

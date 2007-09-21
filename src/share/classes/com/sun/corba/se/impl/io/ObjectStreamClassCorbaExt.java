@@ -75,7 +75,7 @@ class ObjectStreamClassCorbaExt {
      */
     static final boolean isAbstractInterface(Class cl) {
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
-	if (!cinfo.isInterface() || cinfo.isARemote()) {
+	if (!cinfo.isInterface() || cinfo.isARemote(cl)) {
             return false;
         }
 

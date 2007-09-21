@@ -137,7 +137,7 @@ public class ObjectStreamClass implements java.io.Serializable {
 	    if (desc == null) {
                 /* Check if it's serializable */
 		ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
-                boolean serializable = cinfo.isASerializable() ;
+                boolean serializable = cinfo.isASerializable(cl) ;
 
                 /* If the class is only Serializable,
                  * lookup the descriptor for the superclass.
@@ -157,7 +157,7 @@ public class ObjectStreamClass implements java.io.Serializable {
                 if (serializable) {
                     externalizable =
                         ((superdesc != null) && superdesc.isExternalizable()) ||
-                        cinfo.isAExternalizable();
+                        cinfo.isAExternalizable(cl);
                     if (externalizable) {
                         serializable = false;
                     }
@@ -987,7 +987,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     private static Constructor getSerializableConstructor(Class cl) {
 	Class initCl = cl;
-	while (ClassInfoCache.get( initCl ).isASerializable()) {
+	while (ClassInfoCache.get( initCl ).isASerializable( initCl )) {
 	    if ((initCl = initCl.getSuperclass()) == null) {
 		return null;
 	    }
@@ -1291,11 +1291,11 @@ public class ObjectStreamClass implements java.io.Serializable {
 		
 	long h = 0;
 	try {
-	    if (!cinfo.isASerializable() || cinfo.isInterface()) {
+	    if (!cinfo.isASerializable(cl) || cinfo.isInterface()) {
 		return 0;
 	    }
 
-	    if (cinfo.isAExternalizable()) {
+	    if (cinfo.isAExternalizable(cl)) {
 		return 1;
 	    }
 

@@ -193,7 +193,7 @@ public class ExceptionHandlerImpl implements ExceptionHandler
 	int count = 0 ;
 	for (int ctr=0; ctr<exceptions.length; ctr++) {
 	    Class cls = exceptions[ctr] ;
-	    if (!ClassInfoCache.get(cls).isARemoteException())
+	    if (!ClassInfoCache.get(cls).isARemoteException(cls))
 		count++ ;
 	}
 
@@ -203,9 +203,9 @@ public class ExceptionHandlerImpl implements ExceptionHandler
 	for (int ctr=0; ctr<exceptions.length; ctr++) {
 	    Class cls = exceptions[ctr] ;
 	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
-	    if (!cinfo.isARemoteException()) {
+	    if (!cinfo.isARemoteException(cls)) {
 		ExceptionRW erw = null ;
-		if (cinfo.isAUserException())
+		if (cinfo.isAUserException(cls))
 		    erw = new ExceptionRWIDLImpl( cls ) ;
 		else
 		    erw = new ExceptionRWRMIImpl( cls ) ;

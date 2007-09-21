@@ -722,10 +722,10 @@ public class IIOPOutputStream
             if (cinfo.isInterface()) { 
                 String className = type.getName();
                 
-		if (cinfo.isARemote()) {
+		if (cinfo.isARemote(type)) {
                     // RMI Object reference...
                     callType = ValueHandlerImpl.kRemoteType;
-		} else if (cinfo.isACORBAObject()) {
+		} else if (cinfo.isACORBAObject(type)) {
                     // IDL Object reference...
                     callType = ValueHandlerImpl.kRemoteType;
                 } else if (RepositoryId.isAbstractBase(type)) {

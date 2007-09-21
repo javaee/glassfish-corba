@@ -90,7 +90,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	// Either cls is an interface that extends IDLEntity, or else
 	// cls does not extend java.rmi.Remote and all of its methods
 	// throw RemoteException.
-	if (cinfo.isAIDLEntity())
+	if (cinfo.isAIDLEntity(cls))
 	    return cinfo.isInterface() ;
 	else 
 	    return cinfo.isInterface() && allMethodsThrowRemoteException( cls ) ;
@@ -119,7 +119,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	// Check that some exceptionType is a subclass of RemoteException
 	for (int ctr=0; ctr<exceptionTypes.length; ctr++) {
 	    Class exceptionType = exceptionTypes[ctr] ;
-	    if (ClassInfoCache.get( exceptionType ).isARemoteException())
+	    if (ClassInfoCache.get( exceptionType ).isARemoteException(exceptionType))
 		return true ;
 	}
 
@@ -329,7 +329,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	    return floatRW ;
 	else if (cls.equals( double.class ))
 	    return doubleRW ;
-	else if (cinfo.isARemote()) 
+	else if (cinfo.isARemote(cls)) 
 	    return new ReaderWriterBase( "remote(" + cls.getName() + ")" ) 
 	    {
 		public Object read( InputStream is ) 
@@ -345,7 +345,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	    } ;
 	else if (cls.equals(org.omg.CORBA.Object.class))
 	    return corbaObjectRW ;
-	else if (cinfo.isACORBAObject())
+	else if (cinfo.isACORBAObject(cls))
 	    return new ReaderWriterBase( "org.omg.CORBA.Object(" + 
 		cls.getName() + ")" ) 
 	    {

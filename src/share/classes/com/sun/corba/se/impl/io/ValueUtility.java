@@ -198,7 +198,7 @@ public class ValueUtility {
 			
 	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get(
 		interfaces[interfaceIndex] ) ;
-	    if (!cinfo.isARemote() ||
+	    if (!cinfo.isARemote(interfaces[interfaceIndex]) ||
 		(!Modifier.isPublic(interfaces[interfaceIndex].getModifiers())))
 		abstractCount++;
 	}
@@ -209,7 +209,7 @@ public class ValueUtility {
 	    interfaceIndex++) {
 	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get(
 		interfaces[interfaceIndex] ) ;
-	    if (!cinfo.isARemote() ||
+	    if (!cinfo.isARemote(interfaces[interfaceIndex]) ||
 		(!Modifier.isPublic(interfaces[interfaceIndex].getModifiers())))
 		result.abstract_base_values[interfaceIndex] =
 		    vhandler.createForAnyType(interfaces[interfaceIndex]);
@@ -220,7 +220,7 @@ public class ValueUtility {
 		
 	// Set FVD base_value
 	Class superClass = osc.forClass().getSuperclass();
-	if (ClassInfoCache.get( superClass ).isASerializable())
+	if (ClassInfoCache.get( superClass ).isASerializable(superClass))
 	    result.base_value = vhandler.getRMIRepositoryID(superClass);
 	else 
 	    result.base_value = "";
@@ -427,9 +427,9 @@ public class ValueUtility {
 	    // Strings
 	    TypeCode t = orb.create_string_tc (0);
 	    return orb.create_value_box_tc (id, "StringValue", t);
-	} else if (cinfo.isARemote()) {
+	} else if (cinfo.isARemote(c)) {
 	    return orb.get_primitive_tc(TCKind.tk_objref);
-	} else if (cinfo.isACORBAObject()) {
+	} else if (cinfo.isACORBAObject(c)) {
 	    return orb.get_primitive_tc(TCKind.tk_objref);
 	} 
 		
@@ -451,7 +451,7 @@ public class ValueUtility {
         TypeCode base = null;
         Class superClass = c.getSuperclass();
         if (superClass != null && 
-	    ClassInfoCache.get( superClass ).isASerializable()) {
+	    ClassInfoCache.get( superClass ).isASerializable( superClass )) {
             base = createTypeCodeForClassInternal(orb, superClass, vh, 
 		createdIDs);
         }

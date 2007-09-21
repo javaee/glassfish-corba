@@ -133,15 +133,15 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 		
 		// Handle Remote: this must come before CORBA.Object,
 		// since a corba Object may also be a Remote.
-		if (cinfo.isARemote())
+		if (cinfo.isARemote(cls))
 		    return remoteClassCopier ;
 
 		// Handle org.omg.CORBA.portable.ObjectImpl
-		if (cinfo.isAObjectImpl())
+		if (cinfo.isAObjectImpl(cls))
 		    return corbaClassCopier ;
 
 		// Need this case to handle TypeCode.
-		if (cinfo.isAORB() || cinfo.isALogWrapperBase())
+		if (cinfo.isAORB(cls) || cinfo.isALogWrapperBase(cls))
 		    return DefaultClassCopiers.getIdentityClassCopier() ;
 
 		return null ;

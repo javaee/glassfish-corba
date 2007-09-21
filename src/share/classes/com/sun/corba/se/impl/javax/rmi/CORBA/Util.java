@@ -779,7 +779,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
 	Class compType = obj.getClass().getComponentType() ;
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( compType ) ;
-	if (cinfo.isARemote() && cinfo.isInterface()) {
+	if (cinfo.isARemote(compType) && cinfo.isInterface()) {
 	    // obj is an array of remote impl types.  This
 	    // causes problems with stream copier, so we copy
 	    // it over to an array of Remotes instead.

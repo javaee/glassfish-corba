@@ -667,7 +667,7 @@ public class RepositoryId {
     private static String createHashString(java.lang.Class clazz) {
 
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-	if (cinfo.isInterface() || !cinfo.isASerializable())
+	if (cinfo.isInterface() || !cinfo.isASerializable(clazz))
 	    return kInterfaceHashCode;
 
 	long actualLong = ObjectStreamClass.getActualSerialVersionUID(clazz);
@@ -879,7 +879,7 @@ public class RepositoryId {
 	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( type ) ;
 	    if (cinfo.isArray()) {
 		return createSequenceRepID(type);
-	    } else if (cinfo.isAIDLEntity()) {
+	    } else if (cinfo.isAIDLEntity(type)) {
 		try{
 		    return getIdFromHelper(type);
 		} catch(Throwable t) {
@@ -895,8 +895,8 @@ public class RepositoryId {
 
     public static boolean isAbstractBase(Class clazz) {
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-	return cinfo.isInterface() && cinfo.isAIDLEntity() 
-	    && !cinfo.isAValueBase() && !cinfo.isACORBAObject() ;
+	return cinfo.isInterface() && cinfo.isAIDLEntity(clazz) 
+	    && !cinfo.isAValueBase(clazz) && !cinfo.isACORBAObject(clazz) ;
     }
 
     public static boolean isAnyRequired(Class clazz) {

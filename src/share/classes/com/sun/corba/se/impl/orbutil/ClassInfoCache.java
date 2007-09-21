@@ -63,25 +63,72 @@ import com.sun.corba.se.spi.logging.LogWrapperBase ;
  * to obtain, notably the results of isInterface(), isArray(), and isAssignableFrom.
  * A user simply calls ClassInfoCache.get( Class ) to get the information about
  * a class.
+ * <P>
+ * All of the isA methods on ClassInfo need to be passed the same Class that was
+ * used in the get call!  This is an awkward interface, but the alternative is
+ * to store the class in the ClassInfo, which would create a strong reference from
+ * the value to the key, making the WeakHashMap useless.  It also appears to be
+ * difficult to use a weak or soft reference here, because I can't handle the
+ * case of an empty reference to the class inside the ClassInfo object.
+ * If ClassInfoCache supported the methods directly, we could work around this,
+ * but then we would in some case be doing multiple lookups for a class to get
+ * class information, which would slow things down significantly (the get call
+ * is a significant cost in the benchmarks).
  */
 public class ClassInfoCache {
-    // Do NOT put a reference to the Class in ClassInfo: we don't want to
+    // Do NOT put a strong reference to the Class in ClassInfo: we don't want to
     // pin ClassLoaders in memory!
     public static class ClassInfo {
-	private boolean isARemote ;
-	private boolean isARemoteException ;
-	private boolean isAUserException ;
-	private boolean isAObjectImpl ;
-	private boolean isAORB ;
-	private boolean isALogWrapperBase ;
-	private boolean isAIDLEntity ;
-	private boolean isAStreamable ;
-	private boolean isAStreamableValue ;
-	private boolean isACustomValue ;
-	private boolean isAValueBase ;
-	private boolean isACORBAObject ;
-	private boolean isASerializable ;
-	private boolean isAExternalizable ;
+
+	public static class LazyWrapper {
+	    Class isAClass ;
+	    boolean initialized ;
+	    boolean value ;
+
+	    public LazyWrapper( Class isAClass ) {
+		this.isAClass = isAClass ;
+		this.initialized = false ;
+		this.value = false ;
+	    }
+
+	    synchronized boolean get( Class cls ) {
+		if (!initialized) {
+		    initialized = true ;
+		    value = isAClass.isAssignableFrom( cls ) ;
+		}
+
+		return value ;
+	    }
+	}
+
+	private LazyWrapper isARemote = new LazyWrapper( 
+	    Remote.class ) ;
+	private LazyWrapper isARemoteException = new LazyWrapper( 
+	    RemoteException.class ) ;
+	private LazyWrapper isAUserException = new LazyWrapper( 
+	    UserException.class ) ;
+	private LazyWrapper isAObjectImpl = new LazyWrapper( 
+	    ObjectImpl.class ) ;
+	private LazyWrapper isAORB = new LazyWrapper( 
+	    ORB.class ) ;
+	private LazyWrapper isALogWrapperBase = new LazyWrapper( 
+	    LogWrapperBase.class ) ;
+	private LazyWrapper isAIDLEntity = new LazyWrapper( 
+	    IDLEntity.class ) ;
+	private LazyWrapper isAStreamable = new LazyWrapper( 
+	    Streamable.class ) ;
+	private LazyWrapper isAStreamableValue = new LazyWrapper( 
+	    StreamableValue.class ) ;
+	private LazyWrapper isACustomValue = new LazyWrapper( 
+	    CustomValue.class ) ;
+	private LazyWrapper isAValueBase = new LazyWrapper( 
+	    ValueBase.class ) ;
+	private LazyWrapper isACORBAObject = new LazyWrapper( 
+	    org.omg.CORBA.Object.class ) ;
+	private LazyWrapper isASerializable = new LazyWrapper( 
+	    Serializable.class ) ;
+	private LazyWrapper isAExternalizable = new LazyWrapper( 
+	    Externalizable.class ) ;
 
 	private boolean isArray ;
 	private boolean isEnum ;
@@ -89,41 +136,55 @@ public class ClassInfoCache {
 	private boolean isProxyClass ;
 
 	ClassInfo( Class cls ) {
-	    isARemote = Remote.class.isAssignableFrom( cls ) ;
-	    isARemoteException = RemoteException.class.isAssignableFrom( cls ) ;
-	    isAUserException = UserException.class.isAssignableFrom( cls ) ;
-	    isAObjectImpl = ObjectImpl.class.isAssignableFrom( cls ) ;
-	    isAORB = ORB.class.isAssignableFrom( cls ) ;
-	    isALogWrapperBase = LogWrapperBase.class.isAssignableFrom( cls ) ;
-	    isAIDLEntity = IDLEntity.class.isAssignableFrom( cls ) ;
-	    isAStreamable = Streamable.class.isAssignableFrom( cls ) ;
-	    isAStreamableValue = StreamableValue.class.isAssignableFrom( cls ) ;
-	    isACustomValue = CustomValue.class.isAssignableFrom( cls ) ;
-	    isAValueBase = ValueBase.class.isAssignableFrom( cls ) ;
-	    isACORBAObject = org.omg.CORBA.Object.class.isAssignableFrom( cls ) ;
-	    isASerializable = Serializable.class.isAssignableFrom( cls ) ;
-	    isAExternalizable = Externalizable.class.isAssignableFrom( cls ) ;
-
 	    isArray = cls.isArray() ;
 	    isEnum = cls.isEnum() ;
 	    isInterface = cls.isInterface() ;
 	    isProxyClass = Proxy.isProxyClass( cls ) ;
 	}
 
-	public boolean isARemote() { return isARemote ; }
-	public boolean isARemoteException() { return isARemoteException ; }
-	public boolean isAUserException() { return isAUserException ; }
-	public boolean isAObjectImpl() { return isAObjectImpl ; }
-	public boolean isAORB() { return isAORB ; }
-	public boolean isALogWrapperBase() { return isALogWrapperBase ; }
-	public boolean isAIDLEntity() { return isAIDLEntity ; }
-	public boolean isAStreamable() { return isAStreamable ; }
-	public boolean isAStreamableValue() { return isAStreamableValue ; }
-	public boolean isACustomValue() { return isACustomValue ; }
-	public boolean isAValueBase() { return isAValueBase ; }
-	public boolean isACORBAObject() { return isACORBAObject ; }
-	public boolean isASerializable() { return isASerializable ; }
-	public boolean isAExternalizable() { return isAExternalizable ; }
+	public boolean isARemote( Class cls ) { 
+	    return isARemote.get(cls) ; 
+	}
+	public boolean isARemoteException( Class cls ) { 
+	    return isARemoteException.get(cls) ; 
+	}
+	public boolean isAUserException( Class cls ) { 
+	    return isAUserException.get(cls) ; 
+	}
+	public boolean isAObjectImpl( Class cls ) { 
+	    return isAObjectImpl.get(cls) ; 
+	}
+	public boolean isAORB( Class cls ) { 
+	    return isAORB.get(cls) ; 
+	}
+	public boolean isALogWrapperBase( Class cls ) { 
+	    return isALogWrapperBase.get(cls) ; 
+	}
+	public boolean isAIDLEntity( Class cls ) { 
+	    return isAIDLEntity.get(cls) ; 
+	}
+	public boolean isAStreamable( Class cls ) { 
+	    return isAStreamable.get(cls) ; 
+	}
+	public boolean isAStreamableValue( Class cls ) { 
+	    return isAStreamableValue.get(cls) ; 
+	}
+	public boolean isACustomValue( Class cls ) { 
+	    return isACustomValue.get(cls) ; 
+	}
+	public boolean isAValueBase( Class cls ) { 
+	    return isAValueBase.get(cls) ; 
+	}
+	public boolean isACORBAObject( Class cls ) { 
+	    return isACORBAObject.get(cls) ; 
+	}
+	public boolean isASerializable( Class cls ) { 
+	    return isASerializable.get(cls) ; 
+	}
+	public boolean isAExternalizable( Class cls ) { 
+	    return isAExternalizable.get(cls) ; 
+	}
+
 	public boolean isArray() { return isArray ; }
 	public boolean isEnum() { return isEnum ; }
 	public boolean isInterface() { return isInterface ; }

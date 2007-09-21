@@ -1924,10 +1924,10 @@ public class IIOPInputStream
         if (cinfo.isInterface()) { 
             boolean loadStubClass = false;
             
-	    if (cinfo.isARemote()) {
+	    if (cinfo.isARemote(fieldType)) {
                 // RMI Object reference...
                 callType = ValueHandlerImpl.kRemoteType;
-	    } else if (cinfo.isACORBAObject()) {
+	    } else if (cinfo.isACORBAObject(fieldType)) {
                 // IDL Object reference...
                 callType = ValueHandlerImpl.kRemoteType;
                 loadStubClass = true;

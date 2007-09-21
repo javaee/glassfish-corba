@@ -81,7 +81,7 @@ public abstract class StubFactoryFactoryDynamicBase extends
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
 	PresentationManager pm = ORB.getPresentationManager() ;
 
-	if (cinfo.isAIDLEntity() && !cinfo.isARemote()) {
+	if (cinfo.isAIDLEntity(cls) && !cinfo.isARemote(cls)) {
 	    // IDL stubs must always use static factories.
 	    PresentationManager.StubFactoryFactory sff = 
 		pm.getStubFactoryFactory( false ) ; 

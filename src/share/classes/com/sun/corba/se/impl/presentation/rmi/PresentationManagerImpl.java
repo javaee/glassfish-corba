@@ -353,7 +353,7 @@ public final class PresentationManagerImpl implements PresentationManager
 		Class cls = interfaces[ctr] ;
 		ClassInfoCache.ClassInfo cinfo = 
 		    ClassInfoCache.get( cls ) ;
-		if (cinfo.isARemote() &&
+		if (cinfo.isARemote(cls) &&
 		    !Remote.class.equals(cls))
 		    result.add( new NodeImpl( cls ) ) ;
 	    }

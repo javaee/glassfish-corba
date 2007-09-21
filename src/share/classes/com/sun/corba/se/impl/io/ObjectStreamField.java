@@ -53,6 +53,8 @@ import sun.corba.Bridge ;
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 /**
  * A description of a field in a serializable class.
  * A array of these is used to declare the persistent fields of
@@ -76,6 +78,7 @@ public class ObjectStreamField implements Comparable
     ObjectStreamField(String n, Class clazz) {
     	name = n;
     	this.clazz = clazz;
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
 
 	// Compute the typecode for easy switching
 	if (clazz.isPrimitive()) {
@@ -96,7 +99,7 @@ public class ObjectStreamField implements Comparable
 	    } else if (clazz == Boolean.TYPE) {
 		type = 'Z';
 	    }
-	} else if (clazz.isArray()) {
+	} else if (cinfo.isArray()) {
 	    type = '[';
 	    typeString = ObjectStreamClass.getSignature(clazz);
 	} else {

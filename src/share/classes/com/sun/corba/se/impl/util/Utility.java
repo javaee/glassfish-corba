@@ -94,6 +94,8 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 /**
  *  Handy class full of static functions.
  */

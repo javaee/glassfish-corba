@@ -149,6 +149,8 @@ import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
 
 import com.sun.org.omg.SendingContext.CodeBase;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 public class CDRInputStream_1_0 extends CDRInputStreamBase 
     implements RestorableInputStream
 {
@@ -807,7 +809,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 		clz ) ;
 	} else {
 	    // clz is an interface class
-	    boolean isIDL = IDLEntity.class.isAssignableFrom( clz ) ;
+	    boolean isIDL = ClassInfoCache.get( clz ).isAIDLEntity() ;
 
 	    stubFactory = sff.createStubFactory( clz.getName(), 
 		isIDL, codeBase, clz, clz.getClassLoader() ) ;
@@ -1044,8 +1046,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 			repositoryID.getClassName()) ;
 		}
 		
-		if (valueClass != null && IDLEntity.class.isAssignableFrom(
-			valueClass)) {
+		if (valueClass != null && 
+		    ClassInfoCache.get( valueClass ).isAIDLEntity()) {
 		    value = readIDLValue(indirection, repositoryIDString, 
 			valueClass, codebase_URL);
 		} else {
@@ -1471,14 +1473,17 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	    // XXX log marshal at one of the INFO levels
 
 	    // Could not get a factory, so try alternatives
-	    if (!StreamableValue.class.isAssignableFrom(clazz) &&
-		!CustomValue.class.isAssignableFrom(clazz) &&
-	        ValueBase.class.isAssignableFrom(clazz)) {
+	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
+	    if (!cinfo.isAStreamableValue() && 
+		!cinfo.isACustomValue() && cinfo.isAValueBase()) {
+
 		// use old-style OBV support (helper object)
-		BoxedValueHelper helper = Utility.getHelper(clazz, codebase, repId);
+		BoxedValueHelper helper = Utility.getHelper(clazz, codebase, 
+		    repId);
 		if (helper instanceof com.sun.org.omg.CORBA.portable.ValueHelper)
 		    return readIDLValueWithHelper(
-			(com.sun.org.omg.CORBA.portable.ValueHelper)helper, indirection);
+			(com.sun.org.omg.CORBA.portable.ValueHelper)helper, 
+			indirection);
 		else
 		    return helper.read_value(parent);
 	    } else {

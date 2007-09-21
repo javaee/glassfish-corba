@@ -47,6 +47,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 // This file contains some utility methods that
 // originally were in the OSC in the RMI-IIOP
@@ -73,10 +74,11 @@ class ObjectStreamClassCorbaExt {
      *	  java.rmi.RemoteException's super classes.
      */
     static final boolean isAbstractInterface(Class cl) {
-        if (!cl.isInterface() || // #1
-	        java.rmi.Remote.class.isAssignableFrom(cl)) { // #2
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+	if (!cinfo.isInterface() || cinfo.isARemote()) {
             return false;
         }
+
         Method[] methods = cl.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Class exceptions[] = methods[i].getExceptionTypes();
@@ -93,6 +95,7 @@ class ObjectStreamClassCorbaExt {
 		return false;
 	    }
 	}
+
 	return true;
     }
 

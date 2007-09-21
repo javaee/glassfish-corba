@@ -64,6 +64,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import javax.rmi.CORBA.ValueHandler;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 /**
  * Holds utility methods for converting from ObjectStreamClass to
  * FullValueDescription and generating typecodes from ObjectStreamClass.
@@ -194,8 +196,9 @@ public class ValueUtility {
 	    result.supported_interfaces[interfaceIndex] =
 		vhandler.createForAnyType(interfaces[interfaceIndex]);
 			
-	    if ((!(java.rmi.Remote.class.isAssignableFrom(
-		interfaces[interfaceIndex]))) ||
+	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get(
+		interfaces[interfaceIndex] ) ;
+	    if (!cinfo.isARemote() ||
 		(!Modifier.isPublic(interfaces[interfaceIndex].getModifiers())))
 		abstractCount++;
 	}
@@ -204,8 +207,9 @@ public class ValueUtility {
 	result.abstract_base_values = new String[abstractCount];
 	for (int interfaceIndex = 0; interfaceIndex < interfaces.length;
 	    interfaceIndex++) {
-	    if ((!(java.rmi.Remote.class.isAssignableFrom(
-		interfaces[interfaceIndex]))) ||
+	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get(
+		interfaces[interfaceIndex] ) ;
+	    if (!cinfo.isARemote() ||
 		(!Modifier.isPublic(interfaces[interfaceIndex].getModifiers())))
 		result.abstract_base_values[interfaceIndex] =
 		    vhandler.createForAnyType(interfaces[interfaceIndex]);
@@ -216,7 +220,7 @@ public class ValueUtility {
 		
 	// Set FVD base_value
 	Class superClass = osc.forClass().getSuperclass();
-	if (java.io.Serializable.class.isAssignableFrom(superClass))
+	if (ClassInfoCache.get( superClass ).isASerializable())
 	    result.base_value = vhandler.getRMIRepositoryID(superClass);
 	else 
 	    result.base_value = "";
@@ -226,7 +230,6 @@ public class ValueUtility {
 	result.type = orb.get_primitive_tc(TCKind.tk_value); 
 
 	return result;
-		
     }
 
     private static ValueMember[] translateMembers( ORB orb, 
@@ -405,7 +408,8 @@ public class ValueUtility {
     private static TypeCode createTypeCodeInternal (ORB orb, java.lang.Class c, 
 	ValueHandler vh, String id, IdentityKeyValueStack createdIDs) {
 
-        if ( c.isArray() ) {
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( c ) ;
+	if (cinfo.isArray()) {
 	    // Arrays - may recurse for multi-dimensional arrays
 	    Class componentClass = c.getComponentType();
 	    TypeCode embeddedType;
@@ -423,9 +427,9 @@ public class ValueUtility {
 	    // Strings
 	    TypeCode t = orb.create_string_tc (0);
 	    return orb.create_value_box_tc (id, "StringValue", t);
-	} else if (java.rmi.Remote.class.isAssignableFrom(c)) {
+	} else if (cinfo.isARemote()) {
 	    return orb.get_primitive_tc(TCKind.tk_objref);
-	} else if (org.omg.CORBA.Object.class.isAssignableFrom(c)) {
+	} else if (cinfo.isACORBAObject()) {
 	    return orb.get_primitive_tc(TCKind.tk_objref);
 	} 
 		
@@ -447,8 +451,9 @@ public class ValueUtility {
         TypeCode base = null;
         Class superClass = c.getSuperclass();
         if (superClass != null && 
-	    java.io.Serializable.class.isAssignableFrom(superClass)) {
-            base = createTypeCodeForClassInternal(orb, superClass, vh, createdIDs);
+	    ClassInfoCache.get( superClass ).isASerializable()) {
+            base = createTypeCodeForClassInternal(orb, superClass, vh, 
+		createdIDs);
         }
 
         // members
@@ -458,23 +463,23 @@ public class ValueUtility {
     }
 
     public static TypeCode getPrimitiveTypeCodeForClass (ORB orb, 
-                                                         Class c,
-                                                         ValueHandler vh) {
+	Class c, ValueHandler vh) {
 		
 	if (c == Integer.TYPE) {
-	    return orb.get_primitive_tc (TCKind.tk_long);
+	    return orb.get_primitive_tc(TCKind.tk_long);
 	} else if (c == Byte.TYPE) {
-	    return orb.get_primitive_tc (TCKind.tk_octet);
+	    return orb.get_primitive_tc(TCKind.tk_octet);
 	} else if (c == Long.TYPE) {
-	    return orb.get_primitive_tc (TCKind.tk_longlong);
+	    return orb.get_primitive_tc(TCKind.tk_longlong);
 	} else if (c == Float.TYPE) {
-	    return orb.get_primitive_tc (TCKind.tk_float);
+	    return orb.get_primitive_tc(TCKind.tk_float);
 	} else if (c == Double.TYPE) {
-	    return orb.get_primitive_tc (TCKind.tk_double);
+	    return orb.get_primitive_tc(TCKind.tk_double);
 	} else if (c == Short.TYPE) {
 	    return orb.get_primitive_tc (TCKind.tk_short);
 	} else if (c == Character.TYPE) {
-            return orb.get_primitive_tc (((ValueHandlerImpl)vh).getJavaCharTCKind());
+            return orb.get_primitive_tc(
+		((ValueHandlerImpl)vh).getJavaCharTCKind());
 	} else if (c == Boolean.TYPE) {
 	    return orb.get_primitive_tc (TCKind.tk_boolean);
 	} else {

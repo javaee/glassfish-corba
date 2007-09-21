@@ -96,6 +96,8 @@ import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.logging.UtilSystemException ;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 /**
  * IIOPInputStream is used by the ValueHandlerImpl to handle Java serialization
  * input semantics.
@@ -1779,18 +1781,18 @@ public class IIOPInputStream
             /* This case should never happen. If the field types
                are not the same, InvalidClassException is raised when
                matching the local class to the serialized ObjectStreamClass. */
-            ClassCastException cce = new ClassCastException("Assigning instance of class " +
-                                         field.getType().getName() +
-                                         " to field " +
-                                         currentClassDesc.getName() + '#' +
-                                         field.getField().getName());
+            ClassCastException cce = new ClassCastException(
+		"Assigning instance of class " 
+		+ field.getType().getName() + " to field " 
+		+ currentClassDesc.getName() + '#' 
+		+ field.getField().getName());
 	    cce.initCause( e ) ;
 	    throw cce ;
 	}
-     }
+    }
 
     private Object inputObjectField(org.omg.CORBA.ValueMember field,
-                                    com.sun.org.omg.SendingContext.CodeBase sender)
+	com.sun.org.omg.SendingContext.CodeBase sender)
         throws IndirectionException, ClassNotFoundException, IOException,
                StreamCorruptedException {
 
@@ -1809,9 +1811,9 @@ public class IIOPInputStream
         if (type != null)
             signature = ValueUtility.getSignature(field);
 								
-        if (signature != null && (signature.equals("Ljava/lang/Object;") ||
-                                  signature.equals("Ljava/io/Serializable;") ||
-                                  signature.equals("Ljava/io/Externalizable;"))) {
+        if (signature != null && (signature.equals("Ljava/lang/Object;") 
+	    || signature.equals("Ljava/io/Serializable;") 
+	    || signature.equals("Ljava/io/Externalizable;"))) {
             objectValue = Util.getInstance().readAny(orbStream);
         } else {
             // Decide what method call to make based on the type. If
@@ -1826,13 +1828,12 @@ public class IIOPInputStream
             
             if (!vhandler.isSequence(id)) {
 
-                if (field.type.kind().value() == kRemoteTypeCode.kind().value()) {
+                if (field.type.kind().value() == 
+		    kRemoteTypeCode.kind().value()) {
 
                     // RMI Object reference...
                     callType = ValueHandlerImpl.kRemoteType;
-                    
                 } else {
-
                     // REVISIT.  If we don't have the local class,
                     // we should probably verify that it's an RMI type, 
                     // query the remote FVD, and use is_abstract.
@@ -1846,7 +1847,9 @@ public class IIOPInputStream
                     // evolve to become a CORBA abstract interface or
                     // a RMI abstract interface.
 
-                    if (type != null && type.isInterface() &&
+		    ClassInfoCache.ClassInfo cinfo =
+			ClassInfoCache.get( type ) ;
+                    if (type != null && cinfo.isInterface() &&
                         (vhandler.isAbstractBase(type) ||
                          ObjectStreamClassCorbaExt.isAbstractInterface(type))) {
                 
@@ -1917,28 +1920,24 @@ public class IIOPInputStream
         int callType = ValueHandlerImpl.kValueType;
         boolean narrow = false;
         
-        if (fieldType.isInterface()) { 
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( fieldType ) ;
+        if (cinfo.isInterface()) { 
             boolean loadStubClass = false;
             
-            if (java.rmi.Remote.class.isAssignableFrom(fieldType)) {
-                
+	    if (cinfo.isARemote()) {
                 // RMI Object reference...
                 callType = ValueHandlerImpl.kRemoteType;
-                
-            } else if (org.omg.CORBA.Object.class.isAssignableFrom(fieldType)){
-                
+	    } else if (cinfo.isACORBAObject()) {
                 // IDL Object reference...
                 callType = ValueHandlerImpl.kRemoteType;
                 loadStubClass = true;
-                
             } else if (vhandler.isAbstractBase(fieldType)) {
                 // IDL Abstract Object reference...
-                
                 callType = ValueHandlerImpl.kAbstractType;
                 loadStubClass = true;
-            } else if (ObjectStreamClassCorbaExt.isAbstractInterface(fieldType)) {
+            } else if (ObjectStreamClassCorbaExt.isAbstractInterface(
+		fieldType)) {
                 // RMI Abstract Object reference...
-                
                 callType = ValueHandlerImpl.kAbstractType;
             }
             
@@ -2356,10 +2355,10 @@ public class IIOPInputStream
     }
 
     private void skipCustomUsingFVD(ValueMember[] fields,
-                                    com.sun.org.omg.SendingContext.CodeBase sender)
-                                    throws InvalidClassException, StreamCorruptedException,
-                                           ClassNotFoundException, IOException 
-    {
+	com.sun.org.omg.SendingContext.CodeBase sender
+    ) throws InvalidClassException, StreamCorruptedException, 
+	ClassNotFoundException, IOException {
+
         readFormatVersion();
         boolean calledDefaultWriteObject = readBoolean();
 
@@ -2374,18 +2373,16 @@ public class IIOPInputStream
     }
 	
     /*
-     * Read the fields of the specified class from the input stream throw data away.
-     * This must handle same switch logic as above.
+     * Read the fields of the specified class from the input stream throw data 
+     * away.  This must handle same switch logic as above.
      */
-    private void throwAwayData(ValueMember[] fields,
-			       com.sun.org.omg.SendingContext.CodeBase sender)
-	throws InvalidClassException, StreamCorruptedException,
-	       ClassNotFoundException, IOException
-    {
+    private void throwAwayData(ValueMember[] fields, 
+	com.sun.org.omg.SendingContext.CodeBase sender
+    ) throws InvalidClassException, StreamCorruptedException, 
+	ClassNotFoundException, IOException {
+
 	for (int i = 0; i < fields.length; ++i) {
-	
 	    try {
-					
 		switch (fields[i].type.kind().value()) {
 		case TCKind._tk_octet:
 		    orbStream.read_octet();
@@ -2436,22 +2433,22 @@ public class IIOPInputStream
 								
 		    // Read value
 		    try {
-			if ((signature != null) && ( signature.equals("Ljava/lang/Object;") ||
-						     signature.equals("Ljava/io/Serializable;") ||
-						     signature.equals("Ljava/io/Externalizable;")) ) {
+			if ((signature != null) && ( 
+			    signature.equals("Ljava/lang/Object;") 
+			    || signature.equals("Ljava/io/Serializable;") 
+			    || signature.equals("Ljava/io/Externalizable;")) ) {
 			    Util.getInstance().readAny(orbStream);
-			}
-			else {
+			} else {
 			    // Decide what method call to make based on the type.
 			    //
-			    // NOTE : Since FullValueDescription does not allow us
-			    // to ask whether something is an interface we do not
-			    // have the ability to optimize this check.
-										
+			    // NOTE : Since FullValueDescription does not allow 
+			    // us to ask whether something is an interface we 
+			    // do not have the ability to optimize this check.
 			    int callType = ValueHandlerImpl.kValueType;
 
 			    if (!vhandler.isSequence(id)) {
-				FullValueDescription fieldFVD = sender.meta(fields[i].id);
+				FullValueDescription fieldFVD = 
+				    sender.meta(fields[i].id);
 				if (kRemoteTypeCode == fields[i].type) {
 
 				    // RMI Object reference...
@@ -2463,10 +2460,12 @@ public class IIOPInputStream
 				}
 			    }
 										
-			    // Now that we have used the FVD of the field to determine the proper course
-			    // of action, it is ok to use the type (Class) from this point forward since 
-			    // the rep. id for this read will also follow on the wire.
-
+			    // Now that we have used the FVD of the field to 
+			    // determine the proper course
+			    // of action, it is ok to use the type (Class) 
+			    // from this point forward since 
+			    // the rep. id for this read will also follow on 
+			    // the wire.
 			    switch (callType) {
 			    case ValueHandlerImpl.kRemoteType: 
 				orbStream.read_Object();
@@ -2483,30 +2482,30 @@ public class IIOPInputStream
 				break;
                             default:
 				// XXX I18N, logging needed.
-                                throw new StreamCorruptedException("Unknown callType: "
-                                                                   + callType);
+                                throw new StreamCorruptedException(
+				    "Unknown callType: " + callType);
 			    }
 			}
-										
-		    }
-		    catch(IndirectionException cdrie) {
-			// Since we are throwing this away, don't bother handling recursion.
+		    } catch(IndirectionException cdrie) {
+			// Since we are throwing this away, don't bother 
+			// handling recursion.
 			continue;
 		    }
 									
 		    break;
                 default:
 		    // XXX I18N, logging needed.
-                    throw new StreamCorruptedException("Unknown kind: "
-                                                       + fields[i].type.kind().value());
-
+                    throw new StreamCorruptedException(
+			"Unknown kind: " + fields[i].type.kind().value());
 		}
 	    } catch (IllegalArgumentException e) {
 		/* This case should never happen. If the field types
 		   are not the same, InvalidClassException is raised when
-		   matching the local class to the serialized ObjectStreamClass. */
+		   matching the local class to the serialized ObjectStreamClass.
+		*/
 		// XXX I18N, logging needed.
-		ClassCastException cce = new ClassCastException("Assigning instance of class " + 
+		ClassCastException cce = new ClassCastException(
+		    "Assigning instance of class " + 
 		    fields[i].id + " to field " + currentClassDesc.getName() + 
 		    '#' + fields[i].name);
 		cce.initCause(e) ;
@@ -2516,8 +2515,9 @@ public class IIOPInputStream
 		
     }
 
-    private static void setObjectField(Object o, Class c, String fieldName, Object v)
-    {
+    private static void setObjectField(Object o, Class c, String fieldName, 
+	Object v) {
+
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
 	    long key = bridge.objectFieldOffset( fld ) ;

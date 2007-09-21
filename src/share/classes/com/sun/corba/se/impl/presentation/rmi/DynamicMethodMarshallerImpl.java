@@ -58,6 +58,8 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller 
 {
     private Method method ;
@@ -84,13 +86,14 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
     // Then return whether cls is an RMI-IIOP abstract interface.
     private static boolean isAbstractInterface( Class cls ) 
     {
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
 	// Either cls is an interface that extends IDLEntity, or else
 	// cls does not extend java.rmi.Remote and all of its methods
 	// throw RemoteException.
-	if (IDLEntity.class.isAssignableFrom( cls ))
-	    return cls.isInterface() ;
+	if (cinfo.isAIDLEntity())
+	    return cinfo.isInterface() ;
 	else 
-	    return cls.isInterface() && allMethodsThrowRemoteException( cls ) ;
+	    return cinfo.isInterface() && allMethodsThrowRemoteException( cls ) ;
     }
 
     private static boolean allMethodsThrowRemoteException( Class cls ) 
@@ -116,7 +119,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	// Check that some exceptionType is a subclass of RemoteException
 	for (int ctr=0; ctr<exceptionTypes.length; ctr++) {
 	    Class exceptionType = exceptionTypes[ctr] ;
-	    if (java.rmi.RemoteException.class.isAssignableFrom( exceptionType ))
+	    if (ClassInfoCache.get( exceptionType ).isARemoteException())
 		return true ;
 	}
 
@@ -309,6 +312,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
  
     public static ReaderWriter makeReaderWriter( final Class cls ) 
     {
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
 	if (cls.equals( boolean.class ))
 	    return booleanRW ;
 	else if (cls.equals( byte.class ))
@@ -325,7 +329,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	    return floatRW ;
 	else if (cls.equals( double.class ))
 	    return doubleRW ;
-	else if (java.rmi.Remote.class.isAssignableFrom( cls ))
+	else if (cinfo.isARemote()) 
 	    return new ReaderWriterBase( "remote(" + cls.getName() + ")" ) 
 	    {
 		public Object read( InputStream is ) 
@@ -341,7 +345,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	    } ;
 	else if (cls.equals(org.omg.CORBA.Object.class))
 	    return corbaObjectRW ;
-	else if (org.omg.CORBA.Object.class.isAssignableFrom( cls ))
+	else if (cinfo.isACORBAObject())
 	    return new ReaderWriterBase( "org.omg.CORBA.Object(" + 
 		cls.getName() + ")" ) 
 	    {

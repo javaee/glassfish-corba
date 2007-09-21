@@ -88,9 +88,9 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
     // marshalling/unmarshalling
     private transient ValueHandlerImpl vhandler = null;
 
-    void setValueHandler(ValueHandler vh)
-    {
-        vhandler = (com.sun.corba.se.impl.io.ValueHandlerImpl) vh;
+    public FVDCodeBaseImpl( ValueHandler vh ) {
+	// vhandler will never be null
+	this.vhandler = (com.sun.corba.se.impl.io.ValueHandlerImpl)vh ;  
     }
 
     // Operation to obtain the IR from the sending context
@@ -101,12 +101,6 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
     // Operations to obtain a URL to the implementation code
     public String implementation (String x){
 	try{
-	    // default to using the current ORB version in case the
-	    // vhandler is not set
-	    if (vhandler == null) {
-	        vhandler = new ValueHandlerImpl(false);
-	    }
-
             // Util.getCodebase may return null which would
             // cause a BAD_PARAM exception.
 	    String result = Util.getInstance().getCodebase(vhandler.getClassFromType(x));
@@ -135,12 +129,6 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
 	    FullValueDescription result = fvds.get(x);
 
 	    if (result == null) {
-	        // default to using the current ORB version in case the
-	        // vhandler is not set
-	        if (vhandler == null) {
-	            vhandler = new ValueHandlerImpl(false);
-	        }
-
 		try{
 		    result = ValueUtility.translate(_orb(), 
 			ObjectStreamClass.lookup(vhandler.getAnyClassFromType(x)), vhandler);
@@ -176,12 +164,6 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
     // information
     public String[] bases (String x){
 	try {
-	    // default to using the current ORB version in case the
-	    // vhandler is not set
-	    if (vhandler == null) {
-	        vhandler = new ValueHandlerImpl(false);
-	    }
-
 	    Stack<String> repIds = new Stack<String>();
 	    Class parent = ObjectStreamClass.lookup(vhandler.getClassFromType(x)).forClass().getSuperclass();
 

@@ -62,6 +62,8 @@ import com.sun.corba.se.spi.orbutil.misc.SoftCache;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 public class RepositoryId {
 	
     // Legal IDL Identifier characters (1 = legal). Note
@@ -664,8 +666,8 @@ public class RepositoryId {
 
     private static String createHashString(java.lang.Class clazz) {
 
-	if (clazz.isInterface() || 
-	    !java.io.Serializable.class.isAssignableFrom(clazz))
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
+	if (cinfo.isInterface() || !cinfo.isASerializable())
 	    return kInterfaceHashCode;
 
 	long actualLong = ObjectStreamClass.getActualSerialVersionUID(clazz);
@@ -751,21 +753,20 @@ public class RepositoryId {
 
 
     public static String createForSpecialCase(java.lang.Class clazz){
-	if (clazz.isArray()){
+	if (ClassInfoCache.get(clazz).isArray()) {
 	    return createSequenceRepID(clazz);
-	}
-	else {
+	} else {
 	    return (String)kSpecialCasesRepIDs.get(clazz);
 	}
     }
 
     public static String createForSpecialCase(java.io.Serializable ser){
 	Class clazz = ser.getClass();
-	if (clazz.isArray()){
+	if (ClassInfoCache.get(clazz).isArray()) {
 	    return createSequenceRepID(ser);
-	}
-	else
+	} else {
 	    return createForSpecialCase(clazz);
+	}
     }
 	
     /**
@@ -875,31 +876,27 @@ public class RepositoryId {
      **/
     public static String createForAnyType(Class type) {
 	try{
-	    if (type.isArray())
+	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( type ) ;
+	    if (cinfo.isArray()) {
 		return createSequenceRepID(type);
-	    else if (IDLEntity.class.isAssignableFrom(type))
-		{
-		    try{
-			return getIdFromHelper(type);
-		    }
-		    catch(Throwable t) {
-			return createForIDLType(type, 1, 0);
-		    }
+	    } else if (cinfo.isAIDLEntity()) {
+		try{
+		    return getIdFromHelper(type);
+		} catch(Throwable t) {
+		    return createForIDLType(type, 1, 0);
 		}
-	    else return createForJavaType(type);
-	}
-	catch(com.sun.corba.se.impl.io.TypeMismatchException e){ 
+	    } else 
+		return createForJavaType(type);
+	} catch(com.sun.corba.se.impl.io.TypeMismatchException e){ 
 	    return null; 
 	}
 
     }
 
     public static boolean isAbstractBase(Class clazz) {
-	return (clazz.isInterface() && 
-		IDLEntity.class.isAssignableFrom(clazz) &&
-		(!ValueBase.class.isAssignableFrom(clazz)) &&
-		(!org.omg.CORBA.Object.class.isAssignableFrom(clazz)));
-				
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
+	return cinfo.isInterface() && cinfo.isAIDLEntity() 
+	    && !cinfo.isAValueBase() && !cinfo.isACORBAObject() ;
     }
 
     public static boolean isAnyRequired(Class clazz) {

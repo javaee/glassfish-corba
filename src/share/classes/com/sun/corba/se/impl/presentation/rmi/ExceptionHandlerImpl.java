@@ -56,6 +56,8 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 public class ExceptionHandlerImpl implements ExceptionHandler 
 {
     private ExceptionRW[] rws ;
@@ -191,7 +193,7 @@ public class ExceptionHandlerImpl implements ExceptionHandler
 	int count = 0 ;
 	for (int ctr=0; ctr<exceptions.length; ctr++) {
 	    Class cls = exceptions[ctr] ;
-	    if (!RemoteException.class.isAssignableFrom(cls))
+	    if (!ClassInfoCache.get(cls).isARemoteException())
 		count++ ;
 	}
 
@@ -200,9 +202,10 @@ public class ExceptionHandlerImpl implements ExceptionHandler
 	int index = 0 ;
 	for (int ctr=0; ctr<exceptions.length; ctr++) {
 	    Class cls = exceptions[ctr] ;
-	    if (!RemoteException.class.isAssignableFrom(cls)) {
+	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
+	    if (!cinfo.isARemoteException()) {
 		ExceptionRW erw = null ;
-		if (UserException.class.isAssignableFrom(cls))
+		if (cinfo.isAUserException())
 		    erw = new ExceptionRWIDLImpl( cls ) ;
 		else
 		    erw = new ExceptionRWRMIImpl( cls ) ;

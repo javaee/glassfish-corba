@@ -78,6 +78,8 @@ import com.sun.corba.se.impl.util.RepositoryId;
 import com.sun.corba.se.impl.logging.UtilSystemException ;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 /**
  * IIOPOutputStream is ...
  *
@@ -530,11 +532,6 @@ public class IIOPOutputStream
     	    return true;
     	}
 
-    	//if (obj.getClass().isArray()) {
-    	//    outputArray(obj);
-    	//    return true;
-    	//}
-
     	return false;
     }
 
@@ -720,22 +717,17 @@ public class IIOPOutputStream
         else {
             Class type = field.getType();
             int callType = ValueHandlerImpl.kValueType;
-					
-            if (type.isInterface()) { 
+	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( type ) ;
+
+            if (cinfo.isInterface()) { 
                 String className = type.getName();
                 
-                if (java.rmi.Remote.class.isAssignableFrom(type)) {
-                    
+		if (cinfo.isARemote()) {
                     // RMI Object reference...
-                    
                     callType = ValueHandlerImpl.kRemoteType;
-                    
-                    
-                } else if (org.omg.CORBA.Object.class.isAssignableFrom(type)){
-                    
+		} else if (cinfo.isACORBAObject()) {
                     // IDL Object reference...
                     callType = ValueHandlerImpl.kRemoteType;
-                    
                 } else if (RepositoryId.isAbstractBase(type)) {
                     // IDL Abstract Object reference...
                     callType = ValueHandlerImpl.kAbstractType;
@@ -753,13 +745,15 @@ public class IIOPOutputStream
                 break;
             case ValueHandlerImpl.kValueType:
                 try{
-                    orbStream.write_value((java.io.Serializable)objectValue, type);
+                    orbStream.write_value((java.io.Serializable)objectValue, 
+			type);
                 }
                 catch(ClassCastException cce){
                     if (objectValue instanceof java.io.Serializable)
                         throw cce;
                     else
-                        Utility.throwNotSerializableForCorba(objectValue.getClass().getName());
+                        Utility.throwNotSerializableForCorba(
+			    objectValue.getClass().getName());
                 }
             }
         }

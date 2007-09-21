@@ -80,6 +80,8 @@ import org.omg.CORBA.ValueMember;
 
 import sun.corba.Bridge;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 /**
  * A ObjectStreamClass describes a class that can be serialized to a stream
  * or a class that was serialized to a stream.  It contains the name
@@ -134,7 +136,8 @@ public class ObjectStreamClass implements java.io.Serializable {
 	    desc = (ObjectStreamClass)descriptorFor.get( cl ) ;
 	    if (desc == null) {
                 /* Check if it's serializable */
-                boolean serializable = classSerializable.isAssignableFrom(cl);
+		ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+                boolean serializable = cinfo.isASerializable() ;
 
                 /* If the class is only Serializable,
                  * lookup the descriptor for the superclass.
@@ -154,7 +157,7 @@ public class ObjectStreamClass implements java.io.Serializable {
                 if (serializable) {
                     externalizable =
                         ((superdesc != null) && superdesc.isExternalizable()) ||
-                        classExternalizable.isAssignableFrom(cl);
+                        cinfo.isAExternalizable();
                     if (externalizable) {
                         serializable = false;
                     }
@@ -730,14 +733,16 @@ public class ObjectStreamClass implements java.io.Serializable {
 	     * no way to set a permanent serialVersionUID for an array type.
 	     */
 
-            boolean arraySUID = (cl.isArray() && ! cl.getName().equals(name));
+	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+            boolean arraySUID = (cinfo.isArray() && ! cl.getName().equals(name));
 
             if (! arraySUID && ! addedSerialOrExtern ) {
 		// XXX I18N, logging needed
-		throw new InvalidClassException(cl.getName(),
-						"Local class not compatible:" +
-						" stream classdesc serialVersionUID=" + suid +
-						" local class serialVersionUID=" + localClassDesc.suid);
+		throw new InvalidClassException(cl.getName(), 
+		    "Local class not compatible:" 
+		    + " stream classdesc serialVersionUID=" 
+		    + suid + " local class serialVersionUID=" 
+		    + localClassDesc.suid);
 	    }
         }
 
@@ -766,8 +771,8 @@ public class ObjectStreamClass implements java.io.Serializable {
 	    (!serializable && !externalizable))
 
 	    // XXX I18N, logging needed
-	    throw new InvalidClassException(cl.getName(),
-					    "Serialization incompatible with Externalization");
+	    throw new InvalidClassException(cl.getName(), 
+		"Serialization incompatible with Externalization");
 
 	/* Set up the reflected Fields in the class where the value of each
 	 * field in this descriptor should be stored.
@@ -982,7 +987,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     private static Constructor getSerializableConstructor(Class cl) {
 	Class initCl = cl;
-	while (Serializable.class.isAssignableFrom(initCl)) {
+	while (ClassInfoCache.get( initCl ).isASerializable()) {
 	    if ((initCl = initCl.getSuperclass()) == null) {
 		return null;
 	    }
@@ -1097,6 +1102,7 @@ public class ObjectStreamClass implements java.io.Serializable {
 	if (DEBUG_SVUID)
 	    msg( "Computing SerialVersionUID for " + cl ) ; 
 	ByteArrayOutputStream devnull = new ByteArrayOutputStream(512);
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
 
 	long h = 0;
 	try {
@@ -1139,7 +1145,7 @@ public class ObjectStreamClass implements java.io.Serializable {
 	     * Accumulate their names their names in Lexical order
 	     * and add them to the hash
 	     */
-            if (!cl.isArray()) {
+            if (!cinfo.isArray()) {
                 /* In 1.2fcs, getInterfaces() was modified to return
                  * {java.lang.Cloneable, java.io.Serializable} when
                  * called on array classes.  These values would upset
@@ -1277,18 +1283,19 @@ public class ObjectStreamClass implements java.io.Serializable {
 	return h;
     }
 
-    private static long computeStructuralUID(com.sun.corba.se.impl.io.ObjectStreamClass osc, Class cl) {
+    private static long computeStructuralUID(
+	com.sun.corba.se.impl.io.ObjectStreamClass osc, Class cl) {
+
 	ByteArrayOutputStream devnull = new ByteArrayOutputStream(512);
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
 		
 	long h = 0;
 	try {
-
-	    if ((!java.io.Serializable.class.isAssignableFrom(cl)) ||
-		(cl.isInterface())){
+	    if (!cinfo.isASerializable() || cinfo.isInterface()) {
 		return 0;
 	    }
-			
-	    if (java.io.Externalizable.class.isAssignableFrom(cl)) {
+
+	    if (cinfo.isAExternalizable()) {
 		return 1;
 	    }
 
@@ -1304,7 +1311,6 @@ public class ObjectStreamClass implements java.io.Serializable {
 	    // should be computed and put
 	    //     && (parent != java.lang.Object.class)) 
 	    {
-				//data.writeLong(computeSerialVersionUID(null,parent));
 		data.writeLong(computeStructuralUID(lookup(parent), parent));
 	    }
 
@@ -1355,10 +1361,10 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     static String getSignature(Class clazz) {
 	String type = null;
-	if (clazz.isArray()) {
+	if (ClassInfoCache.get( clazz ).isArray()) {
 	    Class cl = clazz;
 	    int dimensions = 0;
-	    while (cl.isArray()) {
+	    while (ClassInfoCache.get( cl ).isArray()) {
 		dimensions++;
 		cl = cl.getComponentType();
 	    }
@@ -1591,8 +1597,6 @@ public class ObjectStreamClass implements java.io.Serializable {
 
 
     /* The Class Object for java.io.Serializable */
-    private static Class<Serializable> classSerializable = 
-	Serializable.class ;
     private static Class<Externalizable> classExternalizable = 
 	Externalizable.class ;
 
@@ -1782,8 +1786,6 @@ public class ObjectStreamClass implements java.io.Serializable {
 
     /**
      * Returns true if classes are defined in the same package, false
-     * otherwise.
-     *
      * Copied from the Merlin java.io.ObjectStreamClass.
      */
     private static boolean packageEquals(Class cl1, Class cl2) {

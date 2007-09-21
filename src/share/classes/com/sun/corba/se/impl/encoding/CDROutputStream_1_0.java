@@ -119,6 +119,8 @@ import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 public class CDROutputStream_1_0 extends CDROutputStreamBase
 {
     private static final int INDIRECTION_TAG = 0xffffffff;
@@ -884,14 +886,15 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	}
 
 	Class clazz = object.getClass();
-	if (clazz.isEnum()) {
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
+	if (cinfo.isEnum()) {
 	    String enumValue = ((Enum)object).name() ;
 	    EnumDesc desc = getEnumDesc( clazz.getName(), enumValue ) ;
 	    write_value( desc, (String)null ) ;
 	    return ;
 	}
 
-	if (Proxy.isProxyClass(clazz)) {
+	if (cinfo.isProxyClass()) {
             Class[] ifaces = clazz.getInterfaces();
             ProxyDesc pd = new ProxyDesc();
 
@@ -918,7 +921,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	if (inBlock)
 	    end_block();
 
-	if (clazz.isArray()) {
+	if (cinfo.isArray()) {
             // Handle arrays
             writeArray(object, clazz);
 	} else if (object instanceof org.omg.CORBA.portable.ValueBase) {

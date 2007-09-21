@@ -49,6 +49,8 @@ import java.lang.reflect.Field;
 import java.lang.Comparable;
 import java.util.Hashtable;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 /**
  * This is duplicated here somewhat in haste since we can't
  * expose this class outside of the com.sun.corba.se.impl.io
@@ -67,7 +69,7 @@ class ObjectStreamField implements Comparable {
     ObjectStreamField(String n, Class clazz) {
     	name = n;
     	this.clazz = clazz;
-
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
 	// Compute the typecode for easy switching
 	if (clazz.isPrimitive()) {
 	    if (clazz == Integer.TYPE) {
@@ -87,7 +89,7 @@ class ObjectStreamField implements Comparable {
 	    } else if (clazz == Boolean.TYPE) {
 		type = 'Z';
 	    }
-	} else if (clazz.isArray()) {
+	} else if (cinfo.isArray()) {
 	    type = '[';
 	    typeString = ObjectStreamClass_1_3_1.getSignature(clazz);
 	} else {

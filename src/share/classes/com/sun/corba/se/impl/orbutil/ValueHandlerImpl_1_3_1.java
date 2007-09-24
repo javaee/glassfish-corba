@@ -54,10 +54,6 @@ public class ValueHandlerImpl_1_3_1
 {
     public ValueHandlerImpl_1_3_1() {}
 
-    public ValueHandlerImpl_1_3_1(boolean isInputStream) {
-	super(isInputStream);
-    }
-
     /**
      * Our JDK 1.3 and JDK 1.3.1 behavior subclasses override this.
      * The correct behavior is for a Java char to map to a CORBA wchar,

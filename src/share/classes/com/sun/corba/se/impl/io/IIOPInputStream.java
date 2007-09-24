@@ -184,10 +184,6 @@ public class IIOPInputStream
 
     private static final String kEmptyStr = "";
 
-    // TCKind TypeCodes used in FVD inputClassFields
-    //public static final TypeCode kRemoteTypeCode = new TypeCodeImpl(TCKind._tk_objref);
-    //public static final TypeCode kValueTypeCode =  new TypeCodeImpl(TCKind._tk_value);
-    // removed TypeCodeImpl dependency
     public static final TypeCode kRemoteTypeCode = ORB.init().get_primitive_tc(TCKind.tk_objref);
     public static final TypeCode kValueTypeCode =  ORB.init().get_primitive_tc(TCKind.tk_value);
 
@@ -595,9 +591,7 @@ public class IIOPInputStream
                                  currentClassDesc,
                                  defaultReadObjectFVDMembers,
                                  cbSender);
-
             } else {
-
                 // Use the local fields to unmarshal.
                 ObjectStreamField[] fields =
                     currentClassDesc.getFieldsNoCopy();
@@ -605,20 +599,13 @@ public class IIOPInputStream
                     inputClassFields(currentObject, currentClass, fields, cbSender); 
                 }
             }
-        }
-        catch(NotActiveException nae)
-	    {
-		bridge.throwException( nae ) ;
-	    }
-        catch(IOException ioe)
-	    {
-		bridge.throwException( ioe ) ;
-	    }
-        catch(ClassNotFoundException cnfe)
-	    {
-		bridge.throwException( cnfe ) ;
-	    }
-
+        } catch(NotActiveException nae) {
+	    bridge.throwException( nae ) ;
+	} catch(IOException ioe) {
+	    bridge.throwException( ioe ) ;
+	} catch(ClassNotFoundException cnfe) {
+	    bridge.throwException( cnfe ) ;
+	}
     }
 
     /**
@@ -1920,7 +1907,7 @@ public class IIOPInputStream
         int callType = ValueHandlerImpl.kValueType;
         boolean narrow = false;
         
-	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( fieldType ) ;
+	ClassInfoCache.ClassInfo cinfo = field.getClassInfo() ;
         if (cinfo.isInterface()) { 
             boolean loadStubClass = false;
             
@@ -2221,8 +2208,8 @@ public class IIOPInputStream
 		    throw exc ;
 		}
 	    } // end : for loop
-	    }
 	}
+    }
 
     /*
      * Read the fields of the specified class from the input stream and set

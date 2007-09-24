@@ -129,6 +129,10 @@ public class ClassInfoCache {
 	    Serializable.class ) ;
 	private LazyWrapper isAExternalizable = new LazyWrapper( 
 	    Externalizable.class ) ;
+	private LazyWrapper isAString = new LazyWrapper( 
+	    String.class ) ;
+	private LazyWrapper isAClass = new LazyWrapper( 
+	    Class.class ) ;
 
 	private boolean isArray ;
 	private boolean isEnum ;
@@ -183,6 +187,12 @@ public class ClassInfoCache {
 	}
 	public boolean isAExternalizable( Class cls ) { 
 	    return isAExternalizable.get(cls) ; 
+	}
+	public boolean isAString( Class cls ) { 
+	    return isAString.get(cls) ; 
+	}
+	public boolean isAClass( Class cls ) { 
+	    return isAClass.get(cls) ; 
 	}
 
 	public boolean isArray() { return isArray ; }

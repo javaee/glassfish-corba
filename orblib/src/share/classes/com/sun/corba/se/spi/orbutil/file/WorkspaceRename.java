@@ -88,7 +88,8 @@ public class WorkspaceRename {
 
     private static final String[] IGNORE_DIRS = {
 	".hg", ".snprj", ".cvs", "SCCS", "obj", "obj_g", "Codemgr_wsdata", 
-	"deleted_files", "build", "rename", "freezepoint", "test-output"
+	"deleted_files", "build", "rename", "freezepoint", "test-output",
+	"webrev"
     } ;
 
     private static final String[][] patterns = {

@@ -135,6 +135,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     protected boolean debug = false;
 	
+    // XXX These appear to always contain the same value: remove one
     protected int blockSizeIndex = -1;
     protected int blockSizePosition = 0;
 
@@ -309,8 +310,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	if (codebaseCache != null)
 	    codebaseCache.clear();
 
-	if (valueCache != null)
-	    valueCache.done();
+	freeValueCache() ;
 		
 	if (repositoryIdCache != null)
 	    repositoryIdCache.done();
@@ -692,37 +692,39 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	write_value(object); 
     }
 
+    private void startValueChunk( boolean useChunking ) {
+        if (useChunking) {
+            start_block();
+            chunkedValueNestingLevel--;
+        } 
+
+	end_flag--;
+    }
+
+    private void endValueChunk( boolean useChunking ) {
+        if (useChunking) {
+            end_block();
+	}
+
+	writeEndTag(useChunking);
+    }
+
     private void writeWStringValue(String string) {
 
         int indirection = writeValueTag(mustChunk, true, null);
             
-        // Write WStringValue's repository ID
         write_repositoryId(repIdStrs.getWStringValueRepId());
             
-        // Add indirection for object to indirection table
         updateIndirectionTable(indirection, string);
 
-        // Write Value chunk
-        if (mustChunk) {
-            start_block();
-            end_flag--;
-            chunkedValueNestingLevel--;
-        } else
-            end_flag--;
-            
+	startValueChunk(mustChunk) ;
         write_wstring(string);
-        
-        if (mustChunk)
-            end_block();
-            
-        // Write end tag
-        writeEndTag(mustChunk);
+	endValueChunk(mustChunk) ; 
     }
 
     private void writeArray(Serializable array, Class clazz) {
-
         if (valueHandler == null)
-            valueHandler = ORBUtility.createValueHandler(orb); //d11638
+            valueHandler = ORBUtility.createValueHandler(orb); 
 
         // Write value_tag
         int indirection = writeValueTag(mustChunk, true, 
@@ -734,25 +736,14 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // Add indirection for object to indirection table
         updateIndirectionTable(indirection, array);
 				
-        // Write Value chunk
-        if (mustChunk) {
-            start_block();
-            end_flag--;
-            chunkedValueNestingLevel--;
-        } else
-            end_flag--;
-
+	boolean currentMustChunk = mustChunk ;
+	startValueChunk(currentMustChunk) ;
         if (valueHandler instanceof ValueHandlerMultiFormat) {
             ValueHandlerMultiFormat vh = (ValueHandlerMultiFormat)valueHandler;
             vh.writeValue(parent, array, streamFormatVersion);
         } else
             valueHandler.writeValue(parent, array);
-
-        if (mustChunk)
-            end_block();
-				
-        // Write end tag
-        writeEndTag(mustChunk);
+	endValueChunk(currentMustChunk) ;
     }
 
     private void writeValueBase(org.omg.CORBA.portable.ValueBase object,
@@ -760,33 +751,24 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // _REVISIT_ could check to see whether chunking really needed 
         mustChunk = true;
 			
-        // Write value_tag
         int indirection = writeValueTag(true, true, 
 	    Util.getInstance().getCodebase(clazz));
 			
-        // Get rep id
         String repId = ((ValueBase)object)._truncatable_ids()[0];
-			
-        // Write rep id
         write_repositoryId(repId);
 			
-        // Add indirection for object to indirection table
         updateIndirectionTable(indirection, object);
         
-        // Write Value chunk
-        start_block();
-        end_flag--;
-        chunkedValueNestingLevel--;
+	startValueChunk(true) ;
         writeIDLValue(object, repId);
-        end_block();
-        
-        // Write end tag
-        writeEndTag(true);
+	endValueChunk(true) ;
     }
 
+    // We know that object is not null, because that was checked in 
+    // write_value( Serializable, String )
     private void writeRMIIIOPValueType(Serializable object, Class clazz) {
         if (valueHandler == null)
-            valueHandler = ORBUtility.createValueHandler(orb); //d11638
+            valueHandler = ORBUtility.createValueHandler(orb); 
 
         Serializable key = object;
 
@@ -794,24 +776,22 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // the Serializable (if the method is present)
         object = valueHandler.writeReplace(key);
 		
-        if (object == null) {
-            // Write null tag and return
-            write_long(0);
-            return;
-        }
-		
         if (object != key) {
-            if (valueCache != null && valueCache.containsKey(object)) {
-                writeIndirection(INDIRECTION_TAG, valueCache.getVal(object));
-                return;
-            }
+	    if (object == null) {
+		// If replaced value is null, write null tag and return
+		write_long(0);
+		return;
+	    }
+		
+	    // write replace changed something
+	    if (writeIndirectionIfPossible( object )) {
+		return ;
+	    }
             
             clazz = object.getClass();
         }
 
-        if (mustChunk || valueHandler.isCustomMarshaled(clazz)) {
-            mustChunk = true;
-        }
+	mustChunk = valueHandler.isCustomMarshaled(clazz) ;
 				
         // Write value_tag
         int indirection = writeValueTag(mustChunk, true, 
@@ -828,25 +808,14 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	if (object != key)
 	    updateIndirectionTable(indirection, object);
 
-        if (mustChunk) {
-            // Write Value chunk
-            end_flag--;
-            chunkedValueNestingLevel--;
-            start_block();
-        } else
-            end_flag--;
-
+	boolean currentMustChunk = mustChunk ;
+	startValueChunk(currentMustChunk) ;
         if (valueHandler instanceof ValueHandlerMultiFormat) {
             ValueHandlerMultiFormat vh = (ValueHandlerMultiFormat)valueHandler;
             vh.writeValue(parent, object, streamFormatVersion);
         } else
             valueHandler.writeValue(parent, object);
-
-        if (mustChunk)
-            end_block();
-				
-        // Write end tag
-        writeEndTag(mustChunk);
+	endValueChunk(currentMustChunk) ;
     }
    
     private EnumDesc getEnumDesc( String className, String enumValue ) {
@@ -905,33 +874,33 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             pd.handler = Proxy.getInvocationHandler(object);
             pd.codebase = Util.getInstance().getCodebase(object.getClass());
             write_value(pd, (String)null);
+	    return ;
         }
 
 	// Handle shared references
-	if (valueCache != null && valueCache.containsKey(object)) {
-            writeIndirection(INDIRECTION_TAG, valueCache.getVal(object));
-	    return;
-	} 
-		
-	boolean oldMustChunk = mustChunk;
+	if (writeIndirectionIfPossible( object )) {
+	    return ;
+	}
 
-        if (mustChunk)
-            mustChunk = true;
+	// Save mustChunk in case a recurisive call from the ValueHandler or IDL
+	// generated code calls write_value with a possibly different value of mustChunk
+	boolean oldMustChunk = mustChunk ;
 
 	if (inBlock)
 	    end_block();
 
+	// XXX Should we classify once, then use a switch to dispatch?
 	if (cinfo.isArray()) {
             // Handle arrays
             writeArray(object, clazz);
-	} else if (object instanceof org.omg.CORBA.portable.ValueBase) {
+	} else if (cinfo.isAValueBase( clazz )) {
             // Handle IDL Value types
             writeValueBase((org.omg.CORBA.portable.ValueBase)object, clazz);
-	} else if (shouldWriteAsIDLEntity(object)) {
+	} else if (cinfo.isAIDLEntity( clazz ) && !cinfo.isACORBAObject( clazz )) {
             writeIDLEntity((IDLEntity)object);
-	} else if (object instanceof java.lang.String) {
+	} else if (cinfo.isAString( clazz )) {
             writeWStringValue((String)object);
-	} else if (object instanceof java.lang.Class) {
+	} else if (cinfo.isAClass( clazz )) {
             writeClass(repository_id, (Class)object);
 	} else {
             // RMI-IIOP value type
@@ -944,7 +913,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	// possible outer value
 	if (mustChunk)
 	    start_block();
-
     }
 
     public void write_value(Serializable object)
@@ -956,7 +924,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     public void write_value(Serializable object, 
 	org.omg.CORBA.portable.BoxedValueHelper factory)
     {
-        // Handle null references
         if (object == null) {
             // Write null tag and return
             write_long(0);
@@ -964,11 +931,12 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
         
         // Handle shared references
-	if ((valueCache != null) && valueCache.containsKey(object)) {
-            writeIndirection(INDIRECTION_TAG, valueCache.getVal(object));
+	if (writeIndirectionIfPossible( object )) {
 	    return;
 	} 
 
+	// Save mustChunk in case a recurisive call from the ValueHandler or IDL
+	// generated code calls write_value with a possibly different value of mustChunk
 	boolean oldMustChunk = mustChunk;
 
 	boolean isCustom = false;
@@ -980,68 +948,38 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	    } catch(BadKind ex) {  // tk_value_box
 		modifier = VM_NONE.value;
 	    }  
+
 	    if (object instanceof CustomMarshal &&
 	        modifier == VM_CUSTOM.value) {
 		isCustom = true;
 		mustChunk = true;
 	    }
+
 	    if (modifier == VM_TRUNCATABLE.value)
 		mustChunk = true;
 	}
 
-	if (mustChunk) {
-			
-	    if (inBlock)
-		end_block();
+	if (mustChunk && inBlock)
+	    end_block() ;
 
-	    // Write value_tag
-	    int indirection = writeValueTag(true,
-					    orb.getORBData().useRepId(),
-					    Util.getInstance().getCodebase(object.getClass())
-					   );
-			
-	    if (orb.getORBData().useRepId()) {
-		write_repositoryId(factory.get_id());
-	    }
-			
-	    // Add indirection for object to indirection table
-	    updateIndirectionTable(indirection, object);
-			
-	    // Write Value chunk
-	    start_block();
-	    end_flag--;
-            chunkedValueNestingLevel--;
-	    if (isCustom)
-		((CustomMarshal)object).marshal(parent);
-	    else 
-		factory.write_value(parent, object);
-	    end_block();
-			
-	    // Write end tag
-	    writeEndTag(true);
+	int indirection = writeValueTag(mustChunk, 
+	    orb.getORBData().useRepId(), 
+	    Util.getInstance().getCodebase(object.getClass()));
+		    
+	if (orb.getORBData().useRepId()) {
+	    write_repositoryId(factory.get_id());
 	}
-	else {
-	    // Write value_tag
-	    int indirection = writeValueTag(false,
-					    orb.getORBData().useRepId(),
-					    Util.getInstance().getCodebase(object.getClass())
-					   );
 			
-	    if (orb.getORBData().useRepId()) {
-		write_repositoryId(factory.get_id());
-	    }
-			
-	    // Add indirection for object to indirection table
-	    updateIndirectionTable(indirection, object);
-			
-	    // Write Value chunk
-	    end_flag--;
-	    // no need to test for custom on the non-chunked path
+	updateIndirectionTable(indirection, object);
+		    
+	boolean currentMustChunk = mustChunk ;
+	startValueChunk(currentMustChunk) ; 
+	if (mustChunk && isCustom) {
+	    ((CustomMarshal)object).marshal(parent);
+	} else {
 	    factory.write_value(parent, object);
-			
-	    // Write end tag
-	    writeEndTag(false);
 	}
+	endValueChunk(currentMustChunk) ;
 
 	mustChunk = oldMustChunk;
 
@@ -1061,29 +999,23 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             dprint("CDROutputStream_1_0 start_block, position" + bbwi.position());
 	}
 
-        //Move inBlock=true to after write_long since write_long might
-        //trigger grow which will lead to erroneous behavior with a
-        //missing blockSizeIndex.
-	//inBlock = true;
-
 	// Save space in the buffer for block size
 	write_long(0);
 
-        //Has to happen after write_long since write_long could
-        //trigger grow which is overridden by supper classes to 
-        //depend on inBlock.
+        // Has to happen after write_long since write_long could
+        // trigger grow which is overridden by subclasses to 
+        // depend on inBlock.
         inBlock = true; 
 
+	// Note that get_offset is overridden in subclasses to handle fragmentation!
+	// Thus blockSizePosition and blockSizeIndex are not always the same!
         blockSizePosition = get_offset();
-
-	// Remember where to put the size of the endblock less 4
-	blockSizeIndex = bbwi.position();
+	blockSizeIndex = bbwi.position() ;
 
         if (debug) {
             dprint("CDROutputStream_1_0 start_block, blockSizeIndex " 
 		   + blockSizeIndex);
 	}
-
     }
 
     // Utility method which will hopefully decrease chunking complexity
@@ -1137,8 +1069,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // System.out.println("      post end_block: " + get_offset() + " " + bbwi.position());
     }
     
-    public org.omg.CORBA.ORB orb()
-    {
+    public org.omg.CORBA.ORB orb() {
         return orb;    
     }
 
@@ -1345,6 +1276,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         bbwi.setByteBuffer(byteBuffer);
     }
 
+    private final void freeValueCache() {
+	if (valueCache != null)
+	    valueCache.done();
+    }
+
     private final void updateIndirectionTable(int indirection, 
         java.lang.Object key) {
 
@@ -1353,12 +1289,27 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	valueCache.put(key, indirection);
     }
 
+    private final boolean writeIndirectionIfPossible( final Serializable object ) {
+	if (valueCache != null) {
+	    final int indir = valueCache.getVal( object ) ;
+	    if (indir != -1) {
+		writeIndirection(INDIRECTION_TAG, indir );
+		return true ;
+	    }
+	}
+
+	return false ;
+    }
+
     private final void write_repositoryId(String id) {
         // Use an indirection if available
-        if (repositoryIdCache != null && repositoryIdCache.containsKey(id)) {
-            writeIndirection(INDIRECTION_TAG, repositoryIdCache.getVal(id));
-	    return;
-        }
+	if (repositoryIdCache != null) {
+	    int indir = repositoryIdCache.getVal( id ) ;
+	    if (indir != -1) {
+		writeIndirection(INDIRECTION_TAG, indir );
+		return;
+	    }
+	}
 
         // Write it as a string.  Note that we have already done the
         // special case conversion of non-Latin-1 characters to escaped
@@ -1370,15 +1321,14 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
         // Add indirection for id to indirection table
         if (repositoryIdCache == null)
-	repositoryIdCache = new CacheTable(orb,true);
+	    repositoryIdCache = new CacheTable(orb,true);
         repositoryIdCache.put(id, indirection);
     }
 
     private void write_codebase(String str, int pos) {
         if (codebaseCache != null && codebaseCache.containsKey(str)) {
 	    writeIndirection(INDIRECTION_TAG,(codebaseCache.get(str)).intValue());
-        }
-        else {
+        } else {
 	    write_string(str);
             if (codebaseCache == null)
         	codebaseCache = new HashMap<String, Integer> ();
@@ -1430,17 +1380,15 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @SuppressWarnings({"deprecation"})
-    private void writeIDLValue(Serializable object, String repID)
-    {
+    private void writeIDLValue(Serializable object, String repID) {
     	if (object instanceof StreamableValue) {
 	    ((StreamableValue)object)._write(parent);
-
 	} else if (object instanceof CustomValue) {
 	    ((CustomValue)object).marshal(parent);
-
 	} else {
 	    BoxedValueHelper helper = Utility.getHelper(object.getClass(), null, repID);
 	    boolean isCustom = false;
+
 	    if (helper instanceof com.sun.org.omg.CORBA.portable.ValueHelper && 
 		object instanceof CustomMarshal) {
 		try {
@@ -1452,6 +1400,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 			ex ) ;
 		}  
 	    }
+
 	    if (isCustom)
 		((CustomMarshal)object).marshal(parent);
 	    else
@@ -1464,16 +1413,12 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 		
 	if (chunked) {
 	    if (get_offset() == end_flag_position) {
-
                 if (bbwi.position() == end_flag_index) {
-
                     // We are exactly at the same position and index as the
                     // end of the last end tag.  Thus, we can back up over it
                     // and compact the tags.
                     bbwi.position(bbwi.position() - 4);
-
                 } else {
-
                     // Special case in which we're at the beginning of a new
                     // fragment, but the position is the same.  We can't back up,
                     // so we just write the new end tag without compaction.  This
@@ -1514,14 +1459,12 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             ORBVersionFactory.getNEWER().compareTo(orb.getORBVersion()) <= 0) {
 
             write_long(chunkedValueNestingLevel);
-
         } else {
             write_long(end_flag);
         }
     }
 
     private void writeClass(String repository_id, Class clz) {
-
         if (repository_id == null)
             repository_id = repIdStrs.getClassDescValueRepId();
 
@@ -1531,21 +1474,9 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             			
         write_repositoryId(repository_id);
 
-        if (mustChunk) {
-	    // Write Value chunk
-	    start_block();
-	    end_flag--;
-            chunkedValueNestingLevel--;
-        } else
-            end_flag--;
-
+	startValueChunk(mustChunk) ;
         writeClassBody(clz);
-
-        if (mustChunk)
-	    end_block();
-			
-        // Write end tag
-        writeEndTag(mustChunk);
+	endValueChunk(mustChunk) ;
     }
 
     // Pre-Merlin/J2EE 1.3 ORBs wrote the repository ID
@@ -1565,15 +1496,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
     }
 
-    private boolean shouldWriteAsIDLEntity(Serializable object)
-    {
-	return ((object instanceof IDLEntity) && (!(object instanceof ValueBase)) &&
-		(!(object instanceof org.omg.CORBA.Object)));
-			
-    }
-	
     private void writeIDLEntity(IDLEntity object) {
-
 	// _REVISIT_ could check to see whether chunking really needed 
 	mustChunk = true;
 
@@ -1581,23 +1504,19 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	final Class clazz = object.getClass();
 	String codebase = Util.getInstance().getCodebase(clazz); 
 		
-	// Write value_tag
 	int indirection = writeValueTag(true, true, codebase);
 	updateIndirectionTable(indirection, object);
-		
-	// Write rep. id
 	write_repositoryId(repository_id);
 		
 	// Write Value chunk
-	end_flag--;
-        chunkedValueNestingLevel--;
-	start_block();
+	startValueChunk(true) ;
 
 	// Write the IDLEntity using reflection 
 	try {
             ClassLoader clazzLoader = (clazz == null ? null : clazz.getClassLoader());
 	    final Class helperClass = Utility.loadClassForClass(clazz.getName()+"Helper", codebase,
                                                    clazzLoader, clazz, clazzLoader);
+	    
             // getDeclaredMethod requires RuntimePermission accessDeclaredMembers
             // if a different class loader is used (even though the javadoc says otherwise)
             Method writeMethod = null;
@@ -1615,19 +1534,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
                 throw (NoSuchMethodException)pae.getException();
             }
 	    writeMethod.invoke(null, parent, object );
-	} catch (ClassNotFoundException cnfe) {
-	    throw wrapper.errorInvokingHelperWrite( CompletionStatus.COMPLETED_MAYBE, cnfe ) ;
-	} catch(NoSuchMethodException nsme) {
-	    throw wrapper.errorInvokingHelperWrite( CompletionStatus.COMPLETED_MAYBE, nsme ) ;
-	} catch(IllegalAccessException iae) {
-	    throw wrapper.errorInvokingHelperWrite( CompletionStatus.COMPLETED_MAYBE, iae ) ;
-	} catch(InvocationTargetException ite) {
-	    throw wrapper.errorInvokingHelperWrite( CompletionStatus.COMPLETED_MAYBE, ite ) ;
+	} catch (Exception exc) {
+	    throw wrapper.errorInvokingHelperWrite( CompletionStatus.COMPLETED_MAYBE, exc ) ;
 	}
-	end_block();
-		
-	// Write end tag
-	writeEndTag(true);
+
+	endValueChunk(true) ;
     }
     
     /* DataOutputStream methods */
@@ -1803,12 +1714,9 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     public void start_value(String rep_id) {
 
         if (debug) {
-            dprint("start_value w/ rep id "
-		   + rep_id
-		   + " called at pos "
-		   + get_offset() 
-		   + " position "
-		   + bbwi.position());
+            dprint("start_value w/ rep id " + rep_id
+		   + " called at pos " + get_offset() 
+		   + " position " + bbwi.position());
 	}
 
 	if (inBlock)

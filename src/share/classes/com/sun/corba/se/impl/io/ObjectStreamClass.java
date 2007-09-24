@@ -99,7 +99,7 @@ public class ObjectStreamClass implements java.io.Serializable {
 
     public static final long kDefaultUID = -1;
 
-    private static Map<java.io.ObjectStreamField[], Object[]> translatedFields;
+    private static Map<java.io.ObjectStreamField[], ObjectStreamField[]> translatedFields;
 
     private static final Bridge bridge = 
 	AccessController.doPrivileged(
@@ -405,192 +405,182 @@ public class ObjectStreamClass implements java.io.Serializable {
      * this change leads to a (rare) deadlock.  This code needs to be
      * significantly re-written as in later (1.4) JDK releases.
      */
-
-
     private void init() {
-      synchronized (lock) {
+	synchronized (lock) {
+	    // See description at definition of initialized.
+	    if (initialized)
+		return;
 
-        // See description at definition of initialized.
-        if (initialized)
-            return;
+	    final Class cl = ofClass;
 
-	final Class cl = ofClass;
+	    if (!serializable || externalizable || forProxyClass ||
+		name.equals("java.lang.String")) {
+		fields = NO_FIELDS;
+	    } else if (serializable) {
+		fields = null ;
 
-	if (!serializable ||
-	    externalizable ||
-	    forProxyClass ||
-	    name.equals("java.lang.String")) {
-	    fields = NO_FIELDS;
-	} else if (serializable) {
-            /* Ask for permission to override field access checks.
-             */
-            AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
-		/* Fill in the list of persistent fields.
-		 * If it is declared, use the declared serialPersistentFields.
-		 * Otherwise, extract the fields from the class itself.
+		/* Ask for permission to override field access checks.
 		 */
-		try {
-                    Field pf = cl.getDeclaredField("serialPersistentFields");
-	            // serial bug 7; the serialPersistentFields were not
-	            // being read and stored as Accessible bit was not set
-		    pf.setAccessible(true);
-	            // serial bug 7; need to find if the field is of type
-	            // java.io.ObjectStreamField
-                    java.io.ObjectStreamField[] f =
-                           (java.io.ObjectStreamField[])pf.get(cl);
-		    int mods = pf.getModifiers();
-		    if ((Modifier.isPrivate(mods)) &&
-			(Modifier.isStatic(mods)) &&
-			(Modifier.isFinal(mods)))
-	            {
-			fields = (ObjectStreamField[])translateFields((Object[])pf.get(cl));
-		    }
-		} catch (NoSuchFieldException e) {
-		    fields = null;
-		} catch (IllegalAccessException e) {
-		    fields = null;
-		} catch (IllegalArgumentException e) {
-		    fields = null;
-                } catch (ClassCastException e) {
-                    /* Thrown if a field serialPersistentField exists
-                     * but it is not of type ObjectStreamField.
-                     */
-                    fields = null;
-                }
-
-
-		if (fields == null) {
-		    /* Get all of the declared fields for this
-		     * Class. setAccessible on all fields so they
-		     * can be accessed later.  Create a temporary
-		     * ObjectStreamField array to hold each
-		     * non-static, non-transient field. Then copy the
-		     * temporary array into an array of the correct
-		     * size once the number of fields is known.
-		     */
-                    Field[] actualfields = cl.getDeclaredFields();
-
-		    int numFields = 0;
-		    ObjectStreamField[] tempFields =
-			new ObjectStreamField[actualfields.length];
-		    for (int i = 0; i < actualfields.length; i++) {
-			Field fld = actualfields[i] ;
-			int modifiers = fld.getModifiers();
-			if (!Modifier.isStatic(modifiers) &&
-			    !Modifier.isTransient(modifiers)) {
-			    fld.setAccessible(true) ;
-			    tempFields[numFields++] = new ObjectStreamField(fld);
-			}
-		    }
-
-		    fields = new ObjectStreamField[numFields];
-		    System.arraycopy(tempFields, 0, fields, 0, numFields);
-
-		} else {
-		    // For each declared persistent field, look for an actual
-		    // reflected Field. If there is one, make sure it's the correct
-		    // type and cache it in the ObjectStreamClass for that field.
-		    for (int j = fields.length-1; j >= 0; j--) {
+		AccessController.doPrivileged(new PrivilegedAction<Object>() {
+		    public Object run() {
+			/* Fill in the list of persistent fields.
+			 * If it is declared, use the declared serialPersistentFields.
+			 * Otherwise, extract the fields from the class itself.
+			 */
 			try {
-                            Field reflField = cl.getDeclaredField(fields[j].getName());
-			    if (fields[j].getType() == reflField.getType()) {
-				reflField.setAccessible(true);
-				fields[j].setField(reflField);
+			    Field pf = cl.getDeclaredField("serialPersistentFields");
+			    // serial bug 7; the serialPersistentFields were not
+			    // being read and stored as Accessible bit was not set
+			    pf.setAccessible(true);
+			    // serial bug 7; need to find if the field is of type
+			    // java.io.ObjectStreamField
+			    java.io.ObjectStreamField[] f =
+				   (java.io.ObjectStreamField[])pf.get(cl);
+			    int mods = pf.getModifiers();
+			    if ((Modifier.isPrivate(mods)) 
+				&& (Modifier.isStatic(mods)) 
+				&& (Modifier.isFinal(mods))) {
+
+				fields = translateFields( f ) ;
 			    }
-			} catch (NoSuchFieldException e) {
-			    // Nothing to do
+			} catch (Exception e) {
+			    // XXX log this at fine level
 			}
+
+			if (fields == null) {
+			    /* Get all of the declared fields for this
+			     * Class. setAccessible on all fields so they
+			     * can be accessed later.  Create a temporary
+			     * ObjectStreamField array to hold each
+			     * non-static, non-transient field. Then copy the
+			     * temporary array into an array of the correct
+			     * size once the number of fields is known.
+			     */
+			    Field[] actualfields = cl.getDeclaredFields();
+
+			    int numFields = 0;
+			    ObjectStreamField[] tempFields =
+				new ObjectStreamField[actualfields.length];
+			    for (int i = 0; i < actualfields.length; i++) {
+				Field fld = actualfields[i] ;
+				int modifiers = fld.getModifiers();
+				if (!Modifier.isStatic(modifiers) &&
+				    !Modifier.isTransient(modifiers)) {
+				    fld.setAccessible(true) ;
+				    tempFields[numFields++] = new ObjectStreamField(fld);
+				}
+			    }
+
+			    fields = new ObjectStreamField[numFields];
+			    System.arraycopy(tempFields, 0, fields, 0, numFields);
+			} else {
+			    // For each declared persistent field, look for an actual
+			    // reflected Field. If there is one, make sure it's the correct
+			    // type and cache it in the ObjectStreamClass for that field.
+			    for (int j = fields.length-1; j >= 0; j--) {
+				try {
+				    Field reflField = cl.getDeclaredField(fields[j].getName());
+				    if (fields[j].getType() == reflField.getType()) {
+					reflField.setAccessible(true);
+					fields[j].setField(reflField);
+				    } else {
+					// XXX I really think this needs to be handled.
+				    }
+				} catch (NoSuchFieldException e) {
+				    // Nothing to do
+				    // XXX needs a fine log
+				}
+			    }
+			}
+
+			return null;
 		    }
-		}
-	        return null;
+		});
+
+		if (fields.length > 1)
+		    Arrays.sort(fields);
+
+		/* Set up field data for use while writing using the API api. */
+		computeFieldInfo();
 	    }
-	    });
 
-	    if (fields.length > 1)
-		Arrays.sort(fields);
+	    /* Get the serialVersionUID from the class.
+	     * It uses the access override mechanism so make sure
+	     * the field objects is only used here.
+	     *
+	     * NonSerializable classes have a serialVerisonUID of 0L.
+	     */
+	     if (isNonSerializable()) {
+		 suid = 0L;
+	     } else {
+		 // Lookup special Serializable members using reflection.
+		 AccessController.doPrivileged(new PrivilegedAction<Object>() {
+		    public Object run() {
+			if (forProxyClass) {
+			    // proxy classes always have serialVersionUID of 0L
+			    suid = 0L;
+			} else {
+			    try {
+				final Field f = cl.getDeclaredField("serialVersionUID");
+				int mods = f.getModifiers();
+				// SerialBug 5:  static final SUID should be read
+				if (Modifier.isStatic(mods) && Modifier.isFinal(mods) ) {
+				    f.setAccessible(true);
+				    suid = f.getLong(cl);
+				    // SerialBug 2: should be computed after writeObject
+				    // actualSuid = computeStructuralUID(cl);
+				} else {
+				    suid = _computeSerialVersionUID(cl);
+				    // SerialBug 2: should be computed after writeObject
+				    // actualSuid = computeStructuralUID(cl);
+				}
+			    } catch (NoSuchFieldException ex) {
+				suid = _computeSerialVersionUID(cl);
+				// SerialBug 2: should be computed after writeObject
+				// actualSuid = computeStructuralUID(cl);
+			    } catch (IllegalAccessException ex) {
+				suid = _computeSerialVersionUID(cl);
+			    }
+			}
 
-	    /* Set up field data for use while writing using the API api. */
-	    computeFieldInfo();
-	}
+			writeReplaceObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
+			    "writeReplace", Object.class );
 
-        /* Get the serialVersionUID from the class.
-         * It uses the access override mechanism so make sure
-         * the field objects is only used here.
-         *
-         * NonSerializable classes have a serialVerisonUID of 0L.
-         */
-         if (isNonSerializable()) {
-             suid = 0L;
-         } else {
-             // Lookup special Serializable members using reflection.
-             AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
-                if (forProxyClass) {
-                    // proxy classes always have serialVersionUID of 0L
-                    suid = 0L;
-                } else {
-	            try {
-                        final Field f = cl.getDeclaredField("serialVersionUID");
-	                int mods = f.getModifiers();
-			// SerialBug 5:  static final SUID should be read
-	                if (Modifier.isStatic(mods) && Modifier.isFinal(mods) ) {
-                            f.setAccessible(true);
-		            suid = f.getLong(cl);
-			    // SerialBug 2: should be computed after writeObject
-			    // actualSuid = computeStructuralUID(cl);
-	                } else {
-		            suid = _computeSerialVersionUID(cl);
-	                    // SerialBug 2: should be computed after writeObject
-	                    // actualSuid = computeStructuralUID(cl);
-	                }
-	            } catch (NoSuchFieldException ex) {
-	                suid = _computeSerialVersionUID(cl);
-	                // SerialBug 2: should be computed after writeObject
-	                // actualSuid = computeStructuralUID(cl);
-                    } catch (IllegalAccessException ex) {
-                        suid = _computeSerialVersionUID(cl);
-                    }
-	        }
+			readResolveObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
+			    "readResolve", Object.class );
 
-                writeReplaceObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
-		    "writeReplace", Object.class );
+			if (externalizable) 
+			    cons = getExternalizableConstructor(cl) ;
+			else
+			    cons = getSerializableConstructor(cl) ;
 
-                readResolveObjectMethod = ObjectStreamClass.getInheritableMethod(cl, 
-		    "readResolve", Object.class );
-	
-		if (externalizable) 
-		    cons = getExternalizableConstructor(cl) ;
-		else
-		    cons = getSerializableConstructor(cl) ;
-
-                if (serializable && !forProxyClass) {
-	            /* Look for the writeObject method
-	             * Set the accessible flag on it here. ObjectOutputStream
-	             * will call it as necessary.
-	             */
-		    writeObjectMethod = getPrivateMethod( cl, "writeObject",
-			Void.TYPE, java.io.ObjectOutputStream.class ) ;
-		    readObjectMethod = getPrivateMethod( cl, "readObject",
-			Void.TYPE, java.io.ObjectInputStream.class ) ;
-	        }
-	        return null;
+			if (serializable && !forProxyClass) {
+			    /* Look for the writeObject method
+			     * Set the accessible flag on it here. ObjectOutputStream
+			     * will call it as necessary.
+			     */
+			    writeObjectMethod = getPrivateMethod( cl, "writeObject",
+				Void.TYPE, java.io.ObjectOutputStream.class ) ;
+			    readObjectMethod = getPrivateMethod( cl, "readObject",
+				Void.TYPE, java.io.ObjectInputStream.class ) ;
+			}
+			return null;
+		    }
+		});
 	    }
-	  });
+
+	    // This call depends on a lot of information computed above!
+	    actualSuid = ObjectStreamClass.computeStructuralUID(this, cl);
+
+	    // If we have a write object method, precompute the
+	    // RMI-IIOP stream format version 2 optional data
+	    // repository ID.  
+	    if (hasWriteObject())
+		rmiiiopOptionalDataRepId = computeRMIIIOPOptionalDataRepId();
+
+	    // This must be done last.
+	    initialized = true;
 	}
-
-        // This call depends on a lot of information computed above!
-        actualSuid = ObjectStreamClass.computeStructuralUID(this, cl);
-
-        // If we have a write object method, precompute the
-        // RMI-IIOP stream format version 2 optional data
-        // repository ID.  
-        if (hasWriteObject())
-            rmiiiopOptionalDataRepId = computeRMIIIOPOptionalDataRepId();
-
-        // This must be done last.
-        initialized = true;
-      }
     }
 
     /**
@@ -655,182 +645,29 @@ public class ObjectStreamClass implements java.io.Serializable {
 	superclass = null;
     }
 
-    private static Object[] translateFields(Object objs[])
-        throws NoSuchFieldException {
-        try{
-            java.io.ObjectStreamField fields[] = (java.io.ObjectStreamField[])objs;
-            Object translation[] = null;
-                       
-            if (translatedFields == null)
-                translatedFields = new HashMap<java.io.ObjectStreamField[],
-		    Object[]>();
-                       
-            translation = translatedFields.get(fields);
-                       
-            if (translation != null)
-                return translation;
-            else {
-                Class osfClass = Class.forName("com.sun.corba.se.impl.io.ObjectStreamField");
-                translation = (Object[])java.lang.reflect.Array.newInstance(osfClass, objs.length);
-                Object arg[] = new Object[2];
-                Class types[] = {String.class, Class.class};
-                Constructor constructor = osfClass.getDeclaredConstructor(types);
-                for (int i = fields.length -1; i >= 0; i--){
-                    arg[0] = fields[i].getName();
-                    arg[1] = fields[i].getType();
-                       
-                    translation[i] = constructor.newInstance(arg);
-                }
-                translatedFields.put(fields, translation);
-                       
-            }
+    private static synchronized ObjectStreamField[] translateFields(
+	java.io.ObjectStreamField fields[]) {
 
-            return (Object[])translation;
-        }
-        catch(Throwable t){
-            NoSuchFieldException nsfe = new NoSuchFieldException();
-	    nsfe.initCause( t ) ;
-	    throw nsfe ;
-        }
-    }
+	ObjectStreamField[] translation = null;
+		   
+	if (translatedFields == null)
+	    translatedFields = new HashMap<java.io.ObjectStreamField[],
+		ObjectStreamField[]>();
+		   
+	translation = translatedFields.get(fields);
+		   
+	if (translation == null) {
+	    translation = new ObjectStreamField[fields.length] ;
+	    for (int ctr = 0; ctr<fields.length; ctr++) {
+		Class cls = (Class)fields[ctr].getType() ;
+		translation[ctr] = new com.sun.corba.se.impl.io.ObjectStreamField( 
+		    fields[ctr].getName(), cls ) ;
+	    }
 
-    /*
-     * Set the class this version descriptor matches.
-     * The base class name and serializable hash must match.
-     * Fill in the reflected Fields that will be used
-     * for reading.
-     */
-    final void setClass(Class cl) throws InvalidClassException {
-
-	if (cl == null) {
-	    localClassDesc = null;
-	    ofClass = null;
-	    computeFieldInfo();
-	    return;
+	    translatedFields.put(fields, translation);
 	}
 
-	localClassDesc = lookupInternal(cl);
-	if (localClassDesc == null)
-	    // XXX I18N, logging needed
-	    throw new InvalidClassException(cl.getName(),
-					    "Local class not compatible");
-	if (suid != localClassDesc.suid) {
-
-            /* Check for exceptional cases that allow mismatched suid. */
-
-            /* Allow adding Serializable or Externalizable
-             * to a later release of the class.
-             */
-            boolean addedSerialOrExtern =
-                isNonSerializable() || localClassDesc.isNonSerializable();
-
-	    /* Disregard the serialVersionUID of an array
-	     * when name and cl.Name differ. If resolveClass() returns
-	     * an array with a different package name,
-	     * the serialVersionUIDs will not match since the fully
-	     * qualified array class is used in the
-	     * computation of the array's serialVersionUID. There is
-	     * no way to set a permanent serialVersionUID for an array type.
-	     */
-
-	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
-            boolean arraySUID = (cinfo.isArray() && ! cl.getName().equals(name));
-
-            if (! arraySUID && ! addedSerialOrExtern ) {
-		// XXX I18N, logging needed
-		throw new InvalidClassException(cl.getName(), 
-		    "Local class not compatible:" 
-		    + " stream classdesc serialVersionUID=" 
-		    + suid + " local class serialVersionUID=" 
-		    + localClassDesc.suid);
-	    }
-        }
-
-	/* compare the class names, stripping off package names. */
-	if (! compareClassNames(name, cl.getName(), '.'))
-	    // XXX I18N, logging needed
-            throw new InvalidClassException(cl.getName(),
-                         "Incompatible local class name. " +
-                         "Expected class name compatible with " +
-                         name);
-
-	/*
-	 * Test that both implement either serializable or externalizable.
-	 */
-
-	// The next check is more generic, since it covers the
-	// Proxy case, the JDK 1.3 serialization code has
-	// both checks
-        //if ((serializable && localClassDesc.externalizable) ||
-        //    (externalizable && localClassDesc.serializable))
-        //    throw new InvalidClassException(localCl.getName(),
-        //            "Serializable is incompatible with Externalizable");
-
-        if ((serializable != localClassDesc.serializable) ||
-            (externalizable != localClassDesc.externalizable) ||
-	    (!serializable && !externalizable))
-
-	    // XXX I18N, logging needed
-	    throw new InvalidClassException(cl.getName(), 
-		"Serialization incompatible with Externalization");
-
-	/* Set up the reflected Fields in the class where the value of each
-	 * field in this descriptor should be stored.
-	 * Each field in this ObjectStreamClass (the source) is located (by
-	 * name) in the ObjectStreamClass of the class(the destination).
-	 * In the usual (non-versioned case) the field is in both
-	 * descriptors and the types match, so the reflected Field is copied.
-	 * If the type does not match, a InvalidClass exception is thrown.
-	 * If the field is not present in the class, the reflected Field
-	 * remains null so the field will be read but discarded.
-	 * If extra fields are present in the class they are ignored. Their
-	 * values will be set to the default value by the object allocator.
-	 * Both the src and dest field list are sorted by type and name.
-	 */
-
-	ObjectStreamField[] destfield =
-	    (ObjectStreamField[])localClassDesc.fields;
-	ObjectStreamField[] srcfield =
-	    (ObjectStreamField[])fields;
-
-	int j = 0;
-    nextsrc:
-	for (int i = 0; i < srcfield.length; i++ ) {
-	    /* Find this field in the dest*/
-	    for (int k = j; k < destfield.length; k++) {
-		if (srcfield[i].getName().equals(destfield[k].getName())) {
-		    /* found match */
-		    if (srcfield[i].isPrimitive() &&
-			!srcfield[i].typeEquals(destfield[k])) {
-			// XXX I18N, logging needed
-			throw new InvalidClassException(cl.getName(),
-							"The type of field " +
-							srcfield[i].getName() +
-							" of class " + name +
-							" is incompatible.");
-		    }
-
-		    /* Skip over any fields in the dest that are not in the src */
-		    j = k;
-
-		    srcfield[i].setField(destfield[j].getField());
-		    // go on to the next source field
-		    continue nextsrc;
-		}
-	    }
-	}
-
-	/* Set up field data for use while reading from the input stream. */
-	computeFieldInfo();
-
-	/* Remember the class this represents */
-	ofClass = cl;
-
-        /* get the cache of these methods from the local class
-         * implementation.
-         */
-        readObjectMethod = localClassDesc.readObjectMethod;
-        readResolveObjectMethod = localClassDesc.readResolveObjectMethod;
+	return translation;
     }
 
     /* Compare the base class names of streamName and localName.

@@ -168,6 +168,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                            java.io.Serializable value,
                            byte streamFormatVersion) {
 
+	// XXX Do we really want this check here?  It will probably never fail.
         if (streamFormatVersion == 2) {
             if (!(out instanceof org.omg.CORBA.portable.ValueOutputStream)) {
 		throw omgWrapper.notAValueoutputstream() ;

@@ -77,10 +77,6 @@ public class ValueHandlerImpl_1_3 extends com.sun.corba.se.impl.io.ValueHandlerI
 	super();
     }
 
-    public ValueHandlerImpl_1_3(boolean isInputStream) {
-	super(isInputStream);
-    }
-
     /**
      * Writes the value to the stream using java semantics.
      * @param out The stream to write the value to

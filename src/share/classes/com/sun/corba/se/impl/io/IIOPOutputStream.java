@@ -717,7 +717,7 @@ public class IIOPOutputStream
         else {
             Class type = field.getType();
             int callType = ValueHandlerImpl.kValueType;
-	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( type ) ;
+	    ClassInfoCache.ClassInfo cinfo = field.getClassInfo() ;
 
             if (cinfo.isInterface()) { 
                 String className = type.getName();
@@ -765,6 +765,11 @@ public class IIOPOutputStream
     private void outputClassFields(Object o, Class cl,
 				   ObjectStreamField[] fields)
 	throws IOException, InvalidClassException {
+
+	// replace this all with
+    	// for (int i = 0; i < fields.length; i++) {
+	//     fields[i].write( o, orbStream ) ;
+	// Should we just put this into ObjectStreamClass?
 
     	for (int i = 0; i < fields.length; i++) {
     	    if (fields[i].getField() == null)

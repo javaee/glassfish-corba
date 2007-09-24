@@ -3,6 +3,7 @@ syntax:glob
 S.*
 ,*
 *.swp
+*.swo
 *.tmp
 s.*
 p.*
@@ -19,6 +20,7 @@ deleted_files/**
 Codemgr_wsdata/**
 freezepoint/**
 make/errorfile
+webrev/**
 NORENAME
 .rename.*
 make/scripts/pkgrename/sed_pattern_file.version

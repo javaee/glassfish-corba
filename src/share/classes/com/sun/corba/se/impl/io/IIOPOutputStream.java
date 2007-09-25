@@ -647,6 +647,7 @@ public class IIOPOutputStream
     	}
     }
 
+    // This is needed for the OutputStreamHook interface.
     void writeField(ObjectStreamField field, Object value) throws IOException {
         switch (field.getTypeCode()) {
             case 'B':
@@ -770,58 +771,56 @@ public class IIOPOutputStream
     	// for (int i = 0; i < fields.length; i++) {
 	//     fields[i].write( o, orbStream ) ;
 	// Should we just put this into ObjectStreamClass?
+	// Could also unroll and codegen this.
 
     	for (int i = 0; i < fields.length; i++) {
-    	    if (fields[i].getField() == null)
-		// XXX I18N, Logging needed.
-    		throw new InvalidClassException(cl.getName(),
-						"Nonexistent field " + fields[i].getName());
-
-	    try {
-		switch (fields[i].getTypeCode()) {
-		    case 'B':
-			byte byteValue = fields[i].getField().getByte( o ) ;
-			orbStream.write_octet(byteValue);
-			break;
-		    case 'C':
-			char charValue = fields[i].getField().getChar( o ) ;
-			orbStream.write_wchar(charValue);
-			break;
-		    case 'F':
-			float floatValue = fields[i].getField().getFloat( o ) ;
-			orbStream.write_float(floatValue);
-			break;
-		    case 'D' :
-			double doubleValue = fields[i].getField().getDouble( o ) ;
-			orbStream.write_double(doubleValue);
-			break;
-		    case 'I':
-			int intValue = fields[i].getField().getInt( o ) ;
-			orbStream.write_long(intValue);
-			break;
-		    case 'J':
-			long longValue = fields[i].getField().getLong( o ) ;
-			orbStream.write_longlong(longValue);
-			break;
-		    case 'S':
-			short shortValue = fields[i].getField().getShort( o ) ;
-			orbStream.write_short(shortValue);
-			break;
-		    case 'Z':
-			boolean booleanValue = fields[i].getField().getBoolean( o ) ;
-			orbStream.write_boolean(booleanValue);
-			break;
-		    case '[':
-		    case 'L':
-			Object objectValue = fields[i].getField().get( o ) ;
-			writeObjectField(fields[i], objectValue);
-			break;
-		    default:
-			// XXX I18N, Logging needed.
-			throw new InvalidClassException(cl.getName());
-		}
-	    } catch (IllegalAccessException exc) {
-		throw wrapper.illegalFieldAccess( exc, fields[i].getName() ) ;
+	    ObjectStreamField field = fields[i] ;
+	    final long offset = field.getFieldID() ;
+    	    if (offset == Bridge.INVALID_FIELD_OFFSET)
+		// XXX I18N, Logging needed.  This should not happend.
+    		throw new InvalidClassException(cl.getName(), 
+		    "Nonexistent field " + fields[i].getName());
+	    switch (field.getTypeCode()) {
+		case 'B':
+		    byte byteValue = bridge.getByte( o, offset ) ;
+		    orbStream.write_octet(byteValue);
+		    break;
+		case 'C':
+		    char charValue = bridge.getChar( o, offset ) ;
+		    orbStream.write_wchar(charValue);
+		    break;
+		case 'F':
+		    float floatValue = bridge.getFloat( o, offset ) ;
+		    orbStream.write_float(floatValue);
+		    break;
+		case 'D' :
+		    double doubleValue = bridge.getDouble( o, offset ) ;
+		    orbStream.write_double(doubleValue);
+		    break;
+		case 'I':
+		    int intValue = bridge.getInt( o, offset ) ;
+		    orbStream.write_long(intValue);
+		    break;
+		case 'J':
+		    long longValue = bridge.getLong( o, offset ) ;
+		    orbStream.write_longlong(longValue);
+		    break;
+		case 'S':
+		    short shortValue = bridge.getShort( o, offset ) ;
+		    orbStream.write_short(shortValue);
+		    break;
+		case 'Z':
+		    boolean booleanValue = bridge.getBoolean( o, offset ) ;
+		    orbStream.write_boolean(booleanValue);
+		    break;
+		case '[':
+		case 'L':
+		    Object objectValue = bridge.getObject( o, offset ) ;
+		    writeObjectField(fields[i], objectValue);
+		    break;
+		default:
+		    // XXX I18N, Logging needed.
+		    throw new InvalidClassException(cl.getName());
 	    }
     	}
     }

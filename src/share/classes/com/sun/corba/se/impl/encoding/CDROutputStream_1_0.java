@@ -766,7 +766,9 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     // We know that object is not null, because that was checked in 
     // write_value( Serializable, String )
-    private void writeRMIIIOPValueType(Serializable object, Class clazz) {
+    private void writeRMIIIOPValueType(Serializable object, Class clazz, 
+	ClassInfoCache.ClassInfo cinfo) {
+
         if (valueHandler == null)
             valueHandler = ORBUtility.createValueHandler(orb); 
 
@@ -798,7 +800,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	    Util.getInstance().getCodebase(clazz));
 				
         // Write rep. id
-        write_repositoryId(repIdStrs.createForJavaType(clazz));
+        write_repositoryId(repIdStrs.createForJavaType(clazz, cinfo ));
 				
         // Add indirection for object to indirection table.
 	// If writeReplace nominated a replacement object,
@@ -813,8 +815,9 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         if (valueHandler instanceof ValueHandlerMultiFormat) {
             ValueHandlerMultiFormat vh = (ValueHandlerMultiFormat)valueHandler;
             vh.writeValue(parent, object, streamFormatVersion);
-        } else
+        } else {
             valueHandler.writeValue(parent, object);
+	}
 	endValueChunk(currentMustChunk) ;
     }
    
@@ -901,10 +904,10 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	} else if (cinfo.isAString( clazz )) {
             writeWStringValue((String)object);
 	} else if (cinfo.isAClass( clazz )) {
-            writeClass(repository_id, (Class)object);
+            writeClass(repository_id, (Class)object, cinfo );
 	} else {
             // RMI-IIOP value type
-            writeRMIIIOPValueType(object, clazz);
+            writeRMIIIOPValueType( object, clazz, cinfo );
         }
 		
 	mustChunk = oldMustChunk;
@@ -1326,13 +1329,17 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     private void write_codebase(String str, int pos) {
-        if (codebaseCache != null && codebaseCache.containsKey(str)) {
-	    writeIndirection(INDIRECTION_TAG,(codebaseCache.get(str)).intValue());
+	Integer value = null ;
+	if (codebaseCache != null)
+	    value = codebaseCache.get(str) ;
+
+	if (value != null) {
+	    writeIndirection(INDIRECTION_TAG, value);
         } else {
 	    write_string(str);
             if (codebaseCache == null)
         	codebaseCache = new HashMap<String, Integer> ();
-            codebaseCache.put(str, Integer.valueOf(pos));
+            codebaseCache.put(str, pos );
         }
     }
 
@@ -1464,7 +1471,9 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
     }
 
-    private void writeClass(String repository_id, Class clz) {
+    private void writeClass(String repository_id, Class clz, 
+	ClassInfoCache.ClassInfo cinfo ) {
+
         if (repository_id == null)
             repository_id = repIdStrs.getClassDescValueRepId();
 
@@ -1475,23 +1484,22 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         write_repositoryId(repository_id);
 
 	startValueChunk(mustChunk) ;
-        writeClassBody(clz);
+        writeClassBody(clz, cinfo);
 	endValueChunk(mustChunk) ;
     }
 
     // Pre-Merlin/J2EE 1.3 ORBs wrote the repository ID
     // and codebase strings in the wrong order.  This handles
     // backwards compatibility.
-    private void writeClassBody(Class clz) {
+    private void writeClassBody(Class clz, ClassInfoCache.ClassInfo cinfo ) {
         if (orb == null ||
             ORBVersionFactory.getFOREIGN().equals(orb.getORBVersion()) ||
             ORBVersionFactory.getNEWER().compareTo(orb.getORBVersion()) <= 0) {
 
 	    write_value(Util.getInstance().getCodebase(clz));
-	    write_value(repIdStrs.createForAnyType(clz));
+	    write_value(repIdStrs.createForAnyType(clz, cinfo ));
         } else {
-
-	    write_value(repIdStrs.createForAnyType(clz));
+	    write_value(repIdStrs.createForAnyType(clz, cinfo ));
 	    write_value(Util.getInstance().getCodebase(clz));
         }
     }

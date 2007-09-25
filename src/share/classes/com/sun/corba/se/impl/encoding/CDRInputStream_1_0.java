@@ -1046,10 +1046,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 			repositoryID.getClassName()) ;
 		}
 		
-		if (valueClass != null && 
-		    ClassInfoCache.get( valueClass ).isAIDLEntity(valueClass)) {
+		ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( valueClass ) ;
+		if (valueClass != null && cinfo.isAIDLEntity(valueClass)) {
 		    value = readIDLValue(indirection, repositoryIDString, 
-			valueClass, codebase_URL);
+			valueClass, cinfo, codebase_URL);
 		} else {
 		    value = readRMIIIOPValueType( indirection, 
 			valueClass, repositoryIDString ) ;
@@ -1453,8 +1453,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	}
     }
 
-    private java.lang.Object readIDLValue(int indirection, String repId,
-					  Class clazz, String codebase)
+    private java.lang.Object readIDLValue(int indirection, String repId, 
+	Class clazz, ClassInfoCache.ClassInfo cinfo, String codebase)
     {					
 	ValueFactory factory ;
 
@@ -1473,7 +1473,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	    // XXX log marshal at one of the INFO levels
 
 	    // Could not get a factory, so try alternatives
-	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
 	    if (!cinfo.isAStreamableValue(clazz) && 
 		!cinfo.isACustomValue(clazz) && cinfo.isAValueBase(clazz)) {
 

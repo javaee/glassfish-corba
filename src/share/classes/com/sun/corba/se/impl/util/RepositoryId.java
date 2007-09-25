@@ -614,15 +614,23 @@ public class RepositoryId {
     	return repId;
     }
 
+    public static boolean useFullValueDescription(Class clazz, 
+	String repositoryID) throws IOException{
+
+	return useFullValueDescription( clazz, ClassInfoCache.get( clazz ),
+	    repositoryID ) ;
+    }
+
     /**
      * Checks to see if the FullValueDescription should be retrieved.
      * @exception IOException if suids do not match or if the repositoryID
      * is not an RMIValueType
      */
     public static boolean useFullValueDescription(Class clazz, 
+	ClassInfoCache.ClassInfo cinfo,
 	String repositoryID) throws IOException{
 
-	String clazzRepIDStr = createForAnyType(clazz);
+	String clazzRepIDStr = createForAnyType(clazz, cinfo );
 
 	if (clazzRepIDStr.equals(repositoryID))
 	    return false;
@@ -753,7 +761,12 @@ public class RepositoryId {
 
 
     public static String createForSpecialCase(java.lang.Class clazz){
-	if (ClassInfoCache.get(clazz).isArray()) {
+	return createForSpecialCase( clazz, ClassInfoCache.get( clazz ) ) ;
+    }
+
+    public static String createForSpecialCase(java.lang.Class clazz,
+	ClassInfoCache.ClassInfo cinfo ){
+	if (cinfo.isArray()) {
 	    return createSequenceRepID(clazz);
 	} else {
 	    return (String)kSpecialCasesRepIDs.get(clazz);
@@ -798,6 +811,12 @@ public class RepositoryId {
 	}
     }
 
+    public static String createForJavaType(Class clz)
+        throws com.sun.corba.se.impl.io.TypeMismatchException
+    {
+	return createForJavaType( clz, ClassInfoCache.get( clz ) ) ;
+    }
+
     /**
      * Creates a repository ID for a normal Java Type.
      * @param clz The Java class to create a repository ID for
@@ -805,11 +824,11 @@ public class RepositoryId {
      * ser implements the * org.omg.CORBA.portable.IDLEntity interface 
      * which indicates it is an IDL Value type.
      **/
-    public static String createForJavaType(Class clz)
+    public static String createForJavaType(Class clz, ClassInfoCache.ClassInfo cinfo )
         throws com.sun.corba.se.impl.io.TypeMismatchException
     {
 	synchronized (classToRepStr){
-	    String repid = createForSpecialCase(clz);
+	    String repid = createForSpecialCase(clz,cinfo);
 	    if (repid != null)
 		return repid;
 
@@ -868,15 +887,19 @@ public class RepositoryId {
 	}
     }
 
+    public static String createForAnyType(Class type ) {
+	return createForAnyType( type, ClassInfoCache.get( type ) ) ;
+    }
+
     /**
      * Createa a repository ID for the type if it is either a java type
      * or an IDL type.
      * @param type The type to create rep. id for
+     * @param cinfo The ClassInfo for the type (pre-computed elsewhere to save time)
      * @return The rep. id.
      **/
-    public static String createForAnyType(Class type) {
+    public static String createForAnyType(Class type, ClassInfoCache.ClassInfo cinfo) {
 	try{
-	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( type ) ;
 	    if (cinfo.isArray()) {
 		return createSequenceRepID(type);
 	    } else if (cinfo.isAIDLEntity(type)) {
@@ -886,7 +909,7 @@ public class RepositoryId {
 		    return createForIDLType(type, 1, 0);
 		}
 	    } else 
-		return createForJavaType(type);
+		return createForJavaType(type, cinfo );
 	} catch(com.sun.corba.se.impl.io.TypeMismatchException e){ 
 	    return null; 
 	}

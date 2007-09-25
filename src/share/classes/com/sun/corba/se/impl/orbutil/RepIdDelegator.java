@@ -37,11 +37,18 @@
 package com.sun.corba.se.impl.orbutil;
 
 import org.omg.CORBA.ORB;
+
 import java.io.Serializable;
+
 import java.util.Hashtable;
-import com.sun.corba.se.impl.io.TypeMismatchException;
+
 import java.net.MalformedURLException;
+
+import com.sun.corba.se.impl.io.TypeMismatchException;
+
 import com.sun.corba.se.impl.util.RepositoryId;
+
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 /**
  * Delegates to the current RepositoryId implementation in
@@ -60,6 +67,10 @@ public final class RepIdDelegator
         return RepositoryId.createForAnyType(type);
     }
 
+    public String createForAnyType(Class type, ClassInfoCache.ClassInfo cinfo ) {
+        return RepositoryId.createForAnyType(type, cinfo);
+    }
+
     public String createForJavaType(Serializable ser)
         throws TypeMismatchException
     {
@@ -70,6 +81,12 @@ public final class RepIdDelegator
         throws TypeMismatchException
     {
         return RepositoryId.createForJavaType(clz);
+    }
+
+    public String createForJavaType(Class clz, ClassInfoCache.ClassInfo cinfo )
+        throws TypeMismatchException
+    {
+        return RepositoryId.createForJavaType(clz,cinfo);
     }
 
     public String createSequenceRepID(java.lang.Object ser) {

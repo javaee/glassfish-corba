@@ -277,39 +277,21 @@ public class JDKBridge {
         setCodebaseProperties();
     }
  
-    public static final void main (String[] args) {
-        System.out.println("1.2 VM");
-        
-	/*       
-		 // If on 1.2, use a policy with all permissions.
-		 System.setSecurityManager (new javax.rmi.download.SecurityManager());
-		 String targetClass = "[[Lrmic.Typedef;";
-		 System.out.println("localCodebase =  "+localCodebase);
-		 System.out.println("Trying to load "+targetClass);
-		 try {
-		 Class clz = loadClass(targetClass,null,localCodebase);
-		 System.out.println("Loaded: "+clz);
-		 } catch (ClassNotFoundException e) {
-		 System.out.println("Caught "+e);
-		 }
-	*/
-    }
- 
     /**
      * Set the codebase and useCodebaseOnly properties. This is public
      * only for test code.
      */
     public static synchronized void setCodebaseProperties () {
         String prop = (String)AccessController.doPrivileged(
-            new GetPropertyAction(LOCAL_CODEBASE_KEY)
-        );
+            new GetPropertyAction(LOCAL_CODEBASE_KEY));
+
         if (prop != null && prop.trim().length() > 0) {
             localCodebase = prop;
         }
 
         prop = (String)AccessController.doPrivileged(
-            new GetPropertyAction(USE_CODEBASE_ONLY_KEY)
-        );
+            new GetPropertyAction(USE_CODEBASE_ONLY_KEY));
+
         if (prop != null && prop.trim().length() > 0) {
             useCodebaseOnly = Boolean.valueOf(prop).booleanValue();
         }

@@ -116,7 +116,8 @@ public class JDKBridge {
 	    new HashMap<String,Map<String,Entry>>() ;
 	private static Map<ClassLoader,Map<String,Entry>> nonNullLoaderMap =
 	    new WeakHashMap<ClassLoader,Map<String,Entry>>() ;
-	private static ReferenceQueue<Class> queue ;
+	private static ReferenceQueue<Class> queue =
+	    new ReferenceQueue<Class>() ;
 
 	private static class Entry extends SoftReference<Class> {
 	    String codeBase ;

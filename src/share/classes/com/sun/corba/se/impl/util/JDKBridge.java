@@ -46,16 +46,30 @@ package com.sun.corba.se.impl.util;
 
 import java.rmi.Remote;
 import java.rmi.NoSuchObjectException;
+
 import java.rmi.server.RMIClassLoader;
 import java.rmi.server.UnicastRemoteObject;
+
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.CompletionStatus;
+
 import java.util.Properties;
+
 import java.io.File;
 import java.io.FileInputStream;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+
 import java.net.MalformedURLException;
+
+import java.util.Map ;
+import java.util.HashMap ;
+import java.util.WeakHashMap ;
+
+import java.lang.ref.SoftReference ;
+import java.lang.ref.ReferenceQueue ;
+
 import com.sun.corba.se.impl.orbutil.GetPropertyAction;
 
 /**
@@ -80,6 +94,121 @@ public class JDKBridge {
         return useCodebaseOnly;
     }
     
+    // Building caches for loadClass
+    //
+    // There are two cases:
+    // 1. loader == null
+    //	    In this case, we need Maps remoteCodeBase -> className -> SoftReference to Class 
+    // 2. loader != null,
+    //	    In this case, we need Maps (weak) loader -> className -> SoftReference to Class
+    //
+    // We might also want to cache not found results.  This can be represented by:
+    // 1. Map remoteCodeBase -> Set classname
+    // 2. Map (weak) loader -> Set classname
+    // But this is assuming that if a ClassLoader cannot load a class at one time, it also cannot
+    // load it later! That is not always true, e.g. a new class file is added to a directory.
+    // Best to avoid this!
+    //
+    // We reclaim soft references using a ReferenceQueue.  
+
+    private static class LoadClassCache {
+	private static Map<String,Map<String,Entry>> nullLoaderMap =
+	    new HashMap<String,Map<String,Entry>>() ;
+	private static Map<ClassLoader,Map<String,Entry>> nonNullLoaderMap =
+	    new WeakHashMap<ClassLoader,Map<String,Entry>>() ;
+	private static ReferenceQueue<Class> queue ;
+
+	private static class Entry extends SoftReference<Class> {
+	    String codeBase ;
+	    ClassLoader loader ;
+
+	    public Entry( Class cls, String codeBase, ClassLoader loader ) {
+		super( cls, queue ) ;
+		this.codeBase = codeBase ;
+		this.loader = loader ;
+	    }
+
+	    public void clear() {
+		codeBase = null ;
+		loader = null ;
+	    }
+	}
+ 
+	private static void checkQueue() {
+	    while (true) {
+		Entry entry = (Entry)queue.poll() ;
+		if (entry == null) {
+		    return ;
+		} else {
+		    String className = entry.get().getName() ;
+		    if (entry.loader == null) {
+			Map<String,Entry> mse = nullLoaderMap.get( entry.codeBase ) ;
+			mse.remove( className ) ;
+			if (mse.isEmpty()) {
+			    nullLoaderMap.remove( entry.codeBase ) ;
+			}
+		    } else {
+			Map<String,Entry> mse = nonNullLoaderMap.get( entry.loader ) ;
+			mse.remove( className ) ;
+			if (mse.isEmpty()) {
+			    nonNullLoaderMap.remove( entry.loader ) ;
+			}
+		    }
+		    entry.clear() ;
+		}
+	    } 
+	}
+
+	/** Returns Class if it is still known to be the resolution of the parameters,
+	 * throws ClassNotFoundException if it is still known that the class 
+	 * can NOT be resolved, or return null if nothing is known.
+	 */
+	public static synchronized Class get( String className, String remoteCodebase, 
+	    ClassLoader loader ) throws ClassNotFoundException {
+	    
+	    checkQueue() ;
+
+	    Map<String,Entry> scm ;
+	    if (loader == null) {
+		scm = nullLoaderMap.get( remoteCodebase ) ;
+	    } else {
+		scm = nonNullLoaderMap.get( loader ) ;
+	    }
+
+	    Class cls = null ;
+	    if (scm != null) {
+		Entry entry = scm.get( className ) ;
+		if (entry != null)
+		    cls = entry.get() ;
+	    }
+
+	    return cls ;
+	}
+
+	public static synchronized void put( String className, String remoteCodebase, 
+	    ClassLoader loader, Class cls ) {
+	    
+	    checkQueue() ;
+
+	    Map<String,Entry> scm ;
+	    if (loader == null) {
+		scm = nullLoaderMap.get( remoteCodebase ) ;
+		if (scm == null) {
+		    scm = new HashMap<String,Entry>() ;
+		    nullLoaderMap.put( remoteCodebase, scm ) ;
+		}
+	    } else {
+		scm = nonNullLoaderMap.get( loader ) ;
+		if (scm == null) {
+		    scm = new HashMap<String,Entry>() ;
+		    nonNullLoaderMap.put( loader, scm ) ;
+		}
+	    }
+
+	    scm.put( className, new Entry( cls, remoteCodebase, loader ) ) ;
+	}
+    }
+
     /**
      * Returns a class instance for the specified class. 
      * @param className the name of the class
@@ -95,15 +224,22 @@ public class JDKBridge {
                                    ClassLoader loader)
 	throws ClassNotFoundException {
         
-        if (loader == null) {
-            return loadClassM(className,remoteCodebase,useCodebaseOnly);
-        } else {
-            try {
-                return loadClassM(className,remoteCodebase,useCodebaseOnly);
-            } catch (ClassNotFoundException e) {
-                return loader.loadClass(className);
-            }
-        }
+	Class cls = LoadClassCache.get( className, remoteCodebase, loader ) ;
+	if (cls == null) {
+	    if (loader == null) {
+		cls = loadClassM(className,remoteCodebase,useCodebaseOnly);
+	    } else {
+		try {
+		    cls = loadClassM(className,remoteCodebase,useCodebaseOnly);
+		} catch (ClassNotFoundException e) {
+		    // XXX log at fine
+		    cls = loader.loadClass(className);
+		}
+	    }
+	    LoadClassCache.put( className, remoteCodebase, loader, cls ) ;
+	}
+
+	return cls ;
     }
     
     /**
@@ -186,14 +322,15 @@ public class JDKBridge {
         localCodebase = codebase;    
     }
  
-    private static Class loadClassM (String className,
-                            String remoteCodebase,
-                            boolean useCodebaseOnly)
-        throws ClassNotFoundException {
+    private static Class loadClassM (String className, String remoteCodebase, 
+	boolean useCodebaseOnly) throws ClassNotFoundException {
 
         try {
             return JDKClassLoader.loadClass(null,className);
-        } catch (ClassNotFoundException e) {}
+        } catch (ClassNotFoundException e) {
+	    // XXX log this
+	}
+
         try {
             if (!useCodebaseOnly && remoteCodebase != null) {
                 return RMIClassLoader.loadClass(remoteCodebase,

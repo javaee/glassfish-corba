@@ -81,7 +81,6 @@ import org.omg.CORBA.DataOutputStream;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.Object;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.VM_CUSTOM;
@@ -148,13 +147,19 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     Map<String,Map<String,EnumDesc>> enumCache = null ;
 
     // Codebase cache
-    private HashMap<String, Integer> codebaseCache = null;
+    // Note that a CacheTable here fails badly on read.  Why?
+    // This suggests that different codebase strings with the
+    // same characters are being used, but that does not explain
+    // the read-side failure.
+    // ALTCODEBASE
+    // private CacheTable<String> codebaseCache = null;
+    private Map<String,Integer> codebaseCache = null;
 
     // Value cache
-    private CacheTable valueCache = null;
+    private CacheTable<java.lang.Object> valueCache = null;
 
     // Repository ID cache
-    private CacheTable repositoryIdCache = null;
+    private CacheTable<String> repositoryIdCache = null;
 
     // Write end flag
     private int end_flag = 0;
@@ -307,8 +312,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     void freeInternalCaches() {
-	if (codebaseCache != null)
+	if (codebaseCache != null) {
+	    // ALTCODEBASE
+	    // codebaseCache.done() ;
 	    codebaseCache.clear();
+	}
 
 	freeValueCache() ;
 		
@@ -1288,7 +1296,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         java.lang.Object key) {
 
 	if (valueCache == null)
-	    valueCache = new CacheTable(orb,true);
+	    valueCache = new CacheTable<java.lang.Object>(
+		"Output valueCache",orb,true);
 	valueCache.put(key, indirection);
     }
 
@@ -1324,21 +1333,28 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
         // Add indirection for id to indirection table
         if (repositoryIdCache == null)
-	    repositoryIdCache = new CacheTable(orb,true);
+	    repositoryIdCache = new CacheTable<String>("Output repositoryIdCache",orb,true);
         repositoryIdCache.put(id, indirection);
     }
 
     private void write_codebase(String str, int pos) {
 	Integer value = null ;
-	if (codebaseCache != null)
+	if (codebaseCache != null) {
+	    // ALTCODEBASE
+	    // value = codebaseCache.getVal(str) ;
 	    value = codebaseCache.get(str) ;
+	}
 
 	if (value != null) {
 	    writeIndirection(INDIRECTION_TAG, value);
         } else {
 	    write_string(str);
-            if (codebaseCache == null)
-        	codebaseCache = new HashMap<String, Integer> ();
+            if (codebaseCache == null) {
+		// ALTCODEBASE
+        	// codebaseCache = new CacheTable<String>("Output codebaseCache",orb,true);
+        	codebaseCache = new HashMap<String,Integer>() ;
+	    }
+
             codebaseCache.put(str, pos );
         }
     }

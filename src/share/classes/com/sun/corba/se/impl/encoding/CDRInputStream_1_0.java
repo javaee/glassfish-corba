@@ -172,13 +172,13 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     protected ValueHandler valueHandler = null;
 
     // Value cache
-    private CacheTable valueCache = null;
+    private CacheTable<Object> valueCache = null;
     
     // Repository ID cache
-    private CacheTable repositoryIdCache = null;
+    private CacheTable<String> repositoryIdCache = null;
 
     // codebase cache
-    private CacheTable codebaseCache = null;
+    private CacheTable<String> codebaseCache = null;
 
     // Current Class Stack (repository Ids of current class being read)
     // private Stack currentStack = null;
@@ -547,6 +547,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 		                                length ) ;
     }
 
+    // Note that this has the side effect of setting the value of stringIndirection.
     protected final String readStringOrIndirection(boolean allowIndirection) {
 
     	int len = read_long();
@@ -1069,7 +1070,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 		
 	    // Cache the valuetype that we read
 	    if (valueCache == null)
-		valueCache = new CacheTable(orb,false);
+		valueCache = new CacheTable<Object>( "Input valueCache",orb,false);
 	    valueCache.put(value, indirection);
 	    
 	    // Allow for possible continuation chunk.
@@ -1202,7 +1203,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
 	    // Put into valueCache
 	    if (valueCache == null)
-		valueCache = new CacheTable(orb,false);
+		valueCache = new CacheTable<Object>("Input valueCache",orb,false);
 	    valueCache.put(value, indirection);
 	
 	    // allow for possible continuation chunk
@@ -1236,7 +1237,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
 	// Put into valueCache using valueIndirection
 	if (valueCache == null)
-	    valueCache = new CacheTable(orb,false);
+	    valueCache = new CacheTable<Object>("Input valueCache",orb,false);
 	valueCache.put(value, valueIndirection);
 
 	if (value instanceof StreamableValue)
@@ -1304,7 +1305,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
 	    // Put into valueCache
 	    if (valueCache == null)
-		valueCache = new CacheTable(orb,false);
+		valueCache = new CacheTable<Object>("Input valueCache",orb,false);
 	    valueCache.put(value, indirection);
 	
 	    // allow for possible continuation chunk
@@ -1392,7 +1393,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
 	// add blank instance to cache table
         if (valueCache == null)
-            valueCache = new CacheTable(orb,false);
+            valueCache = new CacheTable<Object>("Input valueCache",orb,false);
 	valueCache.put(val, indirection);
 
 	// if custom type, call unmarshal method
@@ -1783,7 +1784,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	if (numRepIds == 0xffffffff) {
             int indirection = read_long() + get_offset() - 4;
             if (repositoryIdCache != null && repositoryIdCache.containsVal(indirection))
-		return (String)repositoryIdCache.getKey(indirection);
+		return repositoryIdCache.getKey(indirection);
             else
 		throw wrapper.unableToLocateRepIdArray( indirection ) ;
 	} else {
@@ -1792,7 +1793,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	    int indirection = get_offset(); 
 	    String repID = read_repositoryId();
             if (repositoryIdCache == null)
-        	repositoryIdCache = new CacheTable(orb,false);
+        	repositoryIdCache = new CacheTable<String>("Input repositoryIdCache",orb,false);
             repositoryIdCache.put(repID, indirection);
 
 	    // read and ignore the subsequent array elements, but put them in the
@@ -1805,47 +1806,47 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	}
     }
 
-    private final String read_repositoryId() 
-    {
+    private final String read_repositoryId() {
         String result = readStringOrIndirection(true);
-
         if (result == null) { // Indirection
             int indirection = read_long() + get_offset() - 4;
 
-            if (repositoryIdCache != null && repositoryIdCache.containsVal(indirection))
-                return (String)repositoryIdCache.getKey(indirection);
-            else
-		throw wrapper.badRepIdIndirection( CompletionStatus.COMPLETED_MAYBE,
-		                                   bbwi.position() ) ;
+	    if (repositoryIdCache != null) 
+		result = repositoryIdCache.getKey( indirection ) ;
         } else {
             if (repositoryIdCache == null)
-                repositoryIdCache = new CacheTable(orb,false);
+                repositoryIdCache = new CacheTable<String>("Input repositoryIdCache",
+		    orb,false);
             repositoryIdCache.put(result, stringIndirection);
         }
 
-	return result ;
+	if (result != null)
+	    return result ;
+
+	throw wrapper.badRepIdIndirection( CompletionStatus.COMPLETED_MAYBE, 
+	    bbwi.position() ) ;
     }
 
-    private final String read_codebase_URL() 
-    {
+    private final String read_codebase_URL() {
         String result = readStringOrIndirection(true);
-
         if (result == null) { // Indirection
             int indirection = read_long() + get_offset() - 4;
 
-            if (codebaseCache != null && codebaseCache.containsVal(indirection))
-                return (String)codebaseCache.getKey(indirection);
-            else
-		throw wrapper.badCodebaseIndirection( 
-		    CompletionStatus.COMPLETED_MAYBE, 
-		    bbwi.position() ) ;
+	    if (codebaseCache != null) {
+		result = codebaseCache.getKey(indirection) ;
+	    }
 	} else {
 	    if (codebaseCache == null)
-		codebaseCache = new CacheTable(orb,false);
+		codebaseCache = new CacheTable<String>("Input codebaseCache",
+		    orb,false);
 	    codebaseCache.put(result, stringIndirection);
         }
 
-	return result;
+	if (result != null)
+	    return result ;
+
+	throw wrapper.badCodebaseIndirection( CompletionStatus.COMPLETED_MAYBE, 
+	    bbwi.position() ) ;
     }
 
     /* DataInputStream methods */

@@ -187,7 +187,7 @@ public class StandardTest extends JapexDriverBase {
     static {
 	// Make sure that we don't get the name->class mapping set up with the
 	// wrong ClassLoaders from a previous run!
-	Type.clearCaches() ;
+	// Type.clearCaches() ;
 	try {
 	    proDelegate = javax.rmi.PortableRemoteObject.class.getDeclaredField(
 		"proDelegate" ) ;
@@ -964,6 +964,7 @@ public class StandardTest extends JapexDriverBase {
 	// initializer client and server ORBs.
 	// Initialize server using RFM and register objrefs in naming
 	Properties baseProps = new Properties() ;
+	// baseProps.setProperty( ORBConstants.DEBUG_PROPERTY, "cdrCache" ) ;
 	baseProps.setProperty( "org.omg.CORBA.ORBSingletonClass",
 	    "com.sun.corba.se.impl.orb.ORBSingleton" ) ;
 	baseProps.setProperty( "org.omg.CORBA.ORBClass",
@@ -1342,9 +1343,7 @@ public class StandardTest extends JapexDriverBase {
 	if (argData.mode() == TestMode.LOCAL) {
 	    cleanUpServer() ;
 	}
-	// Don't do this without fixing static init: complicated.
-	// Hopefully single loader mode will solve this.
-	clearCorbaDelegateHack() ;
+	// clearCorbaDelegateHack() ;
     }
     //
     //

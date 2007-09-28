@@ -41,10 +41,14 @@ import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
+import com.sun.corba.se.impl.orbutil.ORBUtility ;
+
 /** This is a hash table implementation that simultaneously maps key to value
  * and value to key.  It is used for marshalling and unmarshalling value types,
  * where it is necessary to track the correspondence between object instances
- * and their offsets in a stream.  Since the offset is always non-negative,
+ * and their offsets in a stream.  It is also used for tracking indirections for
+ * Strings that represent codebases and repositoryids.
+ * Since the offset is always non-negative,
  * only non-negative values should be stored here (and storing -1 will cause
  * failures).  Also note that the same key (Object) may be stored with multiple
  * values (int offsets) due to the way readResolve works (see also GlassFish issue 1605).
@@ -55,13 +59,13 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
  *
  * @author Ken Cavanaugh
  */
-public class CacheTable {
-    private class Entry {
-        Object key;
+public class CacheTable<K> {
+    private class Entry<K> {
+        K key;
         int val;
         Entry next;  // this chains the collision list of table "map"
         Entry rnext; // this chains the collision list of table "rmap" 
-        public Entry(Object k, int v) {
+        public Entry(K k, int v) {
             key = k;
             val = v;
             next = null;
@@ -70,22 +74,24 @@ public class CacheTable {
     }
 
     private boolean noReverseMap;
-    
+    private String cacheType ;
+
     // size must be power of 2
     private static final int INITIAL_SIZE = 16;
     private static final int MAX_SIZE = 1 << 30;
     private int size;
     private int entryCount;
-    private Entry [] map;
-    private Entry [] rmap;
+    private Entry<K>[] map;
+    private Entry<K>[] rmap;
       
     private ORB orb;
     private ORBUtilSystemException wrapper;
 
     private CacheTable() {}
 
-    public  CacheTable(ORB orb, boolean u) {
+    public  CacheTable(String cacheType, ORB orb, boolean u) {
         this.orb = orb;
+	this.cacheType = cacheType ;
 	wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 	noReverseMap = u;
         size = INITIAL_SIZE;
@@ -111,7 +117,7 @@ public class CacheTable {
 	initTables();
 	// now rehash the entries into the new table
 	for (int i = 0; i < oldSize; i++) {
-	    for (Entry e = oldMap[i]; e != null; e = e.next)
+	    for (Entry<K> e = oldMap[i]; e != null; e = e.next)
 	        put_table(e.key, e.val);
 	}
     }
@@ -132,7 +138,7 @@ public class CacheTable {
 	return h & (size - 1);
     }
 
-    private int hash(Object key) {
+    private int hash(K key) {
 	return hashModTableSize(System.identityHashCode(key));
     }
 
@@ -145,7 +151,7 @@ public class CacheTable {
      * pair was added, else false.  val must be non-negative, but
      * this is not checked.
      */
-    public final void put(Object key, int val) {
+    public final void put(K key, int val) {
 	if (put_table(key, val)) {
 	    entryCount++;
 	    if (entryCount > size * 3 / 4)
@@ -153,7 +159,12 @@ public class CacheTable {
 	}
     }
 
-    private boolean put_table(Object key, int val) {
+    private boolean put_table(K key, int val) {
+	if (orb.cdrCacheDebugFlag)
+	    ORBUtility.dprint( this, cacheType + " put_table: " 
+		+ "key=" + key + "(" + System.identityHashCode( key ) + ") "
+		+ "val=" + val + "(" + System.identityHashCode( val ) + ")" ) ;
+
 	int index = hash(key);
 	for (Entry e = map[index]; e != null; e = e.next) {
 	    if (e.key == key) {
@@ -187,13 +198,13 @@ public class CacheTable {
 	return true;
     }
 
-    public final boolean containsKey(Object key) {
+    public final boolean containsKey(K key) {
 	return (getVal(key) != -1);
     }
 
     /** Returns some int val where (key,val) is in this CacheTable.
      */
-    public final int getVal(Object key) {
+    public final int getVal(K key) {
 	int index = hash(key);
         for (Entry e = map[index]; e != null; e = e.next) {
             if (e.key == key) 
@@ -209,12 +220,12 @@ public class CacheTable {
 
     /** Return the key where (key,val) is present in the map.
      */
-    public final Object getKey(int val) {
+    public final K getKey(int val) {
 	if (noReverseMap)
 	    throw wrapper.getKeyInvalidInCacheTable() ;
 
 	int index = hash(val);
-        for (Entry e = rmap[index]; e != null; e = e.rnext) {
+        for (Entry<K> e = rmap[index]; e != null; e = e.rnext) {
             if (e.val == val)
                 return e.key;
         }

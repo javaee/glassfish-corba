@@ -99,20 +99,28 @@ class ObjectStreamClassCorbaExt {
 	return true;
     }
 
+    private static final String objectString         = "Ljava/lang/Object;" ;
+    private static final String serializableString   = "Ljava/io/Serializable;" ;
+    private static final String externalizableString = "Ljava/io/Externalizable;" ;
+
+    // Note that these 3 lengths are different!
+    private static final int objectLength = objectString.length() ;
+    private static final int serializableLength = serializableString.length() ;
+    private static final int externalizableLength = externalizableString.length() ;
+
     /*
      *  Returns TRUE if type is 'any'.
      */
     static final boolean isAny(String typeString) {
+	int length = typeString.length() ;
+	if (length == objectLength)
+	    return objectString.equals( typeString ) ;
+	if (length == serializableLength)
+	    return serializableString.equals( typeString ) ;
+	if (length == externalizableLength)
+	    return externalizableString.equals( typeString ) ;
 
-	int isAny = 0;
-
-	if ( (typeString != null) &&
-	    (typeString.equals("Ljava/lang/Object;") ||
-	     typeString.equals("Ljava/io/Serializable;") ||
-	     typeString.equals("Ljava/io/Externalizable;")) )
-                isAny = 1;
-
-        return (isAny==1);
+	return false ;
     }
 
     private static final Method[] getDeclaredMethods(final Class clz) {

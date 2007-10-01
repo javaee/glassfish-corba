@@ -77,9 +77,11 @@ public class CacheTable<K> {
     private String cacheType ;
 
     // size must be power of 2
-    private static final int INITIAL_SIZE = 16;
+    private static final int INITIAL_SIZE = 64 ;
     private static final int MAX_SIZE = 1 << 30;
+    private static final int INITIAL_THRESHHOLD = 48 ; 
     private int size;
+    private int threshhold ;
     private int entryCount;
     private Entry<K>[] map;
     private Entry<K>[] rmap;
@@ -87,14 +89,13 @@ public class CacheTable<K> {
     private ORB orb;
     private ORBUtilSystemException wrapper;
 
-    private CacheTable() {}
-
     public  CacheTable(String cacheType, ORB orb, boolean u) {
         this.orb = orb;
 	this.cacheType = cacheType ;
 	wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 	noReverseMap = u;
         size = INITIAL_SIZE;
+	threshhold = INITIAL_THRESHHOLD ;
 	entryCount = 0;
 	initTables();
     }
@@ -114,6 +115,8 @@ public class CacheTable<K> {
 	Entry [] oldMap = map;
         int oldSize = size;
 	size <<= 1;
+	threshhold <<= 1 ;
+
 	initTables();
 	// now rehash the entries into the new table
 	for (int i = 0; i < oldSize; i++) {
@@ -123,19 +126,13 @@ public class CacheTable<K> {
     }
 
     private int hashModTableSize(int h) {
-	// This is taken from the oldHash method in HashMap,
-	// which is the old supplemental hash function to defend
-	// again poor hash functions.  This is used for both the
+	// This is taken from the hash method in the JDK 6 HashMap.
+	// This is used for both the
 	// key and the value side of the mapping.  It's not clear
 	// how useful this is in this application, as the low-order
-	// bits change a lot for both sides.  We could also consider
-	// using the newer hash function in the HashMap, which was 
-	// recently updated in JDK 5.
-        h += ~(h << 9);
-        h ^=  (h >>> 14);
-        h +=  (h << 4);
-        h ^=  (h >>> 10);
-	return h & (size - 1);
+	// bits change a lot for both sides.  
+	h ^= (h >>> 20) ^ (h >>> 12) ;
+	return (h ^ (h >>> 7) ^ (h >>> 4)) & (size - 1) ;
     }
 
     private int hash(K key) {
@@ -154,7 +151,7 @@ public class CacheTable<K> {
     public final void put(K key, int val) {
 	if (put_table(key, val)) {
 	    entryCount++;
-	    if (entryCount > size * 3 / 4)
+	    if (entryCount > threshhold)
 		grow();
 	}
     }
@@ -163,9 +160,10 @@ public class CacheTable<K> {
 	if (orb.cdrCacheDebugFlag)
 	    ORBUtility.dprint( this, cacheType + " put_table: " 
 		+ "key=" + key + "(" + System.identityHashCode( key ) + ") "
-		+ "val=" + val + "(" + System.identityHashCode( val ) + ")" ) ;
+		+ "val=" + val + "(" + val + ")" ) ;
 
 	int index = hash(key);
+
 	for (Entry e = map[index]; e != null; e = e.next) {
 	    if (e.key == key) {
 	        if (e.val != val) {
@@ -174,6 +172,7 @@ public class CacheTable<K> {
 		    // a readResolve method that creates a canonical representation
 		    // of a value can legally have the same key occuring at 
 		    // multiple values.  This is GlassFish issue 1605.
+		    // Note: we store this anyway, so that getVal can find the key.
                     wrapper.duplicateIndirectionOffset();
 		} else {	
 		    // if we get here we are trying to put in the same key/val pair
@@ -183,9 +182,6 @@ public class CacheTable<K> {
 	    }
         }
 	
-	// If we get here, the (key,val) mapping is not present in our table
-	// or in our reverse table either.  This means that the map may contain
-	// entries with the same key but different values.
 	Entry newEntry = new Entry(key, val);
 	newEntry.next = map[index];
 	map[index] = newEntry;

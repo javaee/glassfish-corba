@@ -273,6 +273,13 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // No-op for GIOP 1.0
     }
 
+    protected final int computeAlignment4() {
+	int incr = bbwi.position() & 3 ;
+	if (incr != 0)
+	    return 4-incr ;
+	return 0 ;
+    }
+
     protected final int computeAlignment(int align) {
         if (align > 1) {
             int incr = bbwi.position() & (align - 1);
@@ -283,12 +290,25 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         return 0;
     }
 
+    protected void alignAndReserve44() {
+        bbwi.position(bbwi.position() + computeAlignment4());
+
+        if (bbwi.position() + 4  > bbwi.getLength())
+            grow44();
+    }
+
     protected void alignAndReserve(int align, int n) {
 
         bbwi.position(bbwi.position() + computeAlignment(align));
 
         if (bbwi.position() + n  > bbwi.getLength())
             grow(align, n);
+    }
+
+    protected void grow44() {
+        bbwi.setNumberOfBytesNeeded(4);
+
+        bufferManagerWrite.overflow(bbwi);
     }
 
     //
@@ -458,7 +478,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     public void write_long(int x) 
     {
-        alignAndReserve(4, 4);
+	alignAndReserve44() ;
 
     	if (littleEndian) {
     	    writeLittleEndianLong(x);

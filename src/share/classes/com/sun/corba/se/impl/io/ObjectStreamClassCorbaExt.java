@@ -114,7 +114,12 @@ class ObjectStreamClassCorbaExt {
     static final boolean isAny(String typeString) {
 	int length = typeString.length() ;
 	if (length == objectLength)
-	    return objectString.equals( typeString ) ;
+	    // Note that java.lang.String occurs a lot, and has the
+	    // same length as java.lang.Object!
+	    if (objectString.charAt(length-2) == 't')
+		return objectString.equals( typeString ) ;
+	    else
+		return false ;
 	if (length == serializableLength)
 	    return serializableString.equals( typeString ) ;
 	if (length == externalizableLength)

@@ -36,54 +36,16 @@
 
 package com.sun.corba.se.spi.orbutil.misc ;
 
-import java.util.ArrayList ;
-
-/** Utility for managing mappings from densely allocated integer
- * keys to arbitrary objects.  This should only be used for
- * keys in the range 0..max such that "most" of the key space is actually
- * used.
- */
-public class DenseIntMapImpl<E> implements IntMap<E>
+public interface IntMap<E> 
 {
-    private ArrayList<E> list = new ArrayList<E>() ;
-
-    private void checkKey( int key ) 
-    {
-	if (key < 0)
-	    throw new IllegalArgumentException( "Key must be >= 0." ) ;
-    }
-
     /** If key >= 0, return the value bound to key, or null if none.
      * Throws IllegalArgumentException if key <0.
      */
-    public E get( int key ) 
-    {
-	checkKey( key ) ;
-
-	E result = null ;
-	if (key < list.size())
-	    result = list.get( key ) ;
-
-	return result ;
-    }
+    E get( int key ) ;
 
     /** If key >= 0, bind value to the key.
      * Throws IllegalArgumentException if key <0.
      */
-    public void set( int key, E value ) 
-    {
-	checkKey( key ) ;
-	extend( key ) ;
-	list.set( key, value ) ;
-    }
-
-    private void extend( int index )
-    {
-	if (index >= list.size()) {
-	    list.ensureCapacity( index + 1 ) ;
-	    int max = list.size() ;
-	    while (max++ <= index)
-		list.add( null ) ;
-	}
-    }
+    public void set( int key, E value ) ;
 }
+

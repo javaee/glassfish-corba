@@ -178,47 +178,28 @@ public class StandardTest extends JapexDriverBase {
     private static Field singletonORB ;
     private static boolean corbaReinit = false ;
 
-    /*
-    private static Method stubCreateDelegateIfSpecified ;
-    private static Method proCreateDelegateIfSpecified ;
-    private static Method utilCreateDelegateIfSpecified ;
-    */
+    private static boolean useSingleClassLoader = true ;
 
     static {
-	// Make sure that we don't get the name->class mapping set up with the
-	// wrong ClassLoaders from a previous run!
-	// Type.clearCaches() ;
-	try {
-	    proDelegate = javax.rmi.PortableRemoteObject.class.getDeclaredField(
-		"proDelegate" ) ;
-	    stubDelegateClass = Stub.class.getDeclaredField( 
-		"stubDelegateClass" ) ;
-	    utilDelegate = javax.rmi.CORBA.Util.class.getDeclaredField( 
-		"utilDelegate" ) ;
-	    singletonORB = org.omg.CORBA.ORB.class.getDeclaredField(
-		"singleton" ) ;
+	if (!useSingleClassLoader) {
+	    Type.clearCaches() ;
+	    try {
+		proDelegate = javax.rmi.PortableRemoteObject.class.getDeclaredField(
+		    "proDelegate" ) ;
+		stubDelegateClass = Stub.class.getDeclaredField( 
+		    "stubDelegateClass" ) ;
+		utilDelegate = javax.rmi.CORBA.Util.class.getDeclaredField( 
+		    "utilDelegate" ) ;
+		singletonORB = org.omg.CORBA.ORB.class.getDeclaredField(
+		    "singleton" ) ;
 
-	    /*
-	    stubCreateDelegateIfSpecified = Stub.class.getDeclaredMethod(
-		"createDelegateIfSpecified", String.class, String.class ) ;
-	    proCreateDelegateIfSpecified = javax.rmi.PortableRemoteObject.class.getDeclaredMethod(
-		"createDelegateIfSpecified", String.class ) ;
-	    utilCreateDelegateIfSpecified = javax.rmi.CORBA.Util.class.getDeclaredMethod(
-		"createDelegateIfSpecified", String.class, String.class ) ;
-	    */
-
-	    proDelegate.setAccessible( true ) ;
-	    stubDelegateClass.setAccessible( true ) ;
-	    utilDelegate.setAccessible( true ) ;
-	    singletonORB.setAccessible( true ) ;
-
-	    /*
-	    stubCreateDelegateIfSpecified.setAccessible( true ) ;
-	    proCreateDelegateIfSpecified.setAccessible( true ) ;
-	    utilCreateDelegateIfSpecified.setAccessible( true ) ;
-	    */
-	} catch (Exception exc) {
-	    System.out.println( "Error in initializer: " + exc ) ;
+		proDelegate.setAccessible( true ) ;
+		stubDelegateClass.setAccessible( true ) ;
+		utilDelegate.setAccessible( true ) ;
+		singletonORB.setAccessible( true ) ;
+	    } catch (Exception exc) {
+		System.out.println( "Error in initializer: " + exc ) ;
+	    }
 	}
     }
 
@@ -226,22 +207,8 @@ public class StandardTest extends JapexDriverBase {
     // Japex run (to objects in that run's JapexClassLoader) are not reused
     // in a subsequent run, which causes severe problems with objects
     // not having the correct type (because the class names are the same,
-    // but the ClassLoaders are different).  It may be called multiple times
-    // per run, but this is harmless.
-    private static void clearCorbaDelegateHack() {
-	try {
-	    proDelegate.set( null, null ) ;
-	    stubDelegateClass.set( null, null ) ;
-	    utilDelegate.set( null, null ) ;
-
-	    synchronized( org.omg.CORBA.ORB.class ) {
-		singletonORB.set( null, null ) ;
-	    }
-	} catch (Exception exc) {
-	    System.out.println( "Error in corbaDelegateHack: " + exc ) ;
-	}
-    }
-
+    // but the ClassLoaders are different).  This works by re-initializaing delegates
+    // at the beginning of each run. 
     private synchronized static void reinitCorbaDelegateHack() {
 	if (!corbaReinit) {
 	    try {
@@ -1277,7 +1244,8 @@ public class StandardTest extends JapexDriverBase {
     private Test testRef = null ;
 
     public void initializeDriver() {
-	reinitCorbaDelegateHack() ;
+	if (!useSingleClassLoader)
+	    reinitCorbaDelegateHack() ;
 
 	String fragmentSize ;
 	if (hasParam( "fragmentSize" ))

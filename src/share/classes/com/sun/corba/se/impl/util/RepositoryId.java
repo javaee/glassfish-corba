@@ -769,7 +769,13 @@ public class RepositoryId {
 	if (cinfo.isArray()) {
 	    return createSequenceRepID(clazz);
 	} else {
-	    return (String)kSpecialCasesRepIDs.get(clazz);
+	    if (clazz == String.class)
+		return kWStringValueRepID ;
+	    if (clazz == Class.class) 
+		return kClassDescValueRepID ;
+	    if (clazz == java.rmi.Remote.class) 
+		return kRemoteValueRepID ;
+	    return null ;
 	}
     }
 

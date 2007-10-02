@@ -49,6 +49,8 @@ import java.lang.reflect.Method;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
+import com.sun.corba.se.impl.orbutil.ORBUtility ;
+
 // This file contains some utility methods that
 // originally were in the OSC in the RMI-IIOP
 // code delivered by IBM.  They don't make
@@ -99,6 +101,10 @@ class ObjectStreamClassCorbaExt {
 	return true;
     }
 
+    // Common collisions (same length):
+    // java.lang.String
+    // java.math.BigDecimal
+    // java.math.BigInteger
     private static final String objectString         = "Ljava/lang/Object;" ;
     private static final String serializableString   = "Ljava/io/Serializable;" ;
     private static final String externalizableString = "Ljava/io/Externalizable;" ;
@@ -108,20 +114,40 @@ class ObjectStreamClassCorbaExt {
     private static final int serializableLength = serializableString.length() ;
     private static final int externalizableLength = externalizableString.length() ;
 
+    private static final boolean debugIsAny = false ;
+
     /*
      *  Returns TRUE if type is 'any'.
+     *  This is in the marshaling path, so we want it to run as
+     *  fast as possible.
      */
     static final boolean isAny(String typeString) {
+	if (debugIsAny) {
+	    ORBUtility.dprint( 
+		ObjectStreamClassCorbaExt.class.getName(), 
+		"IsAny: typeString = " + typeString ) ;
+	}
+
 	int length = typeString.length() ;
-	if (length == objectLength)
+
+	if (length == objectLength) {
 	    // Note that java.lang.String occurs a lot, and has the
 	    // same length as java.lang.Object!
-	    if (objectString.charAt(length-2) == 't')
+	    if (typeString.charAt(length-2) == 't')
 		return objectString.equals( typeString ) ;
 	    else
 		return false ;
-	if (length == serializableLength)
-	    return serializableString.equals( typeString ) ;
+	}
+
+	if (length == serializableLength) {
+	    // java.math.BigInteger and java.math.BigDecimal have the same
+	    // length as java.io.Serializable
+	    if (typeString.charAt(length-2) == 'e')
+		return serializableString.equals( typeString ) ;
+	    else 
+		return false ;
+	}
+
 	if (length == externalizableLength)
 	    return externalizableString.equals( typeString ) ;
 

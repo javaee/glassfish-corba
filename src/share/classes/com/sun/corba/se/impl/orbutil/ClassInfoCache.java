@@ -134,6 +134,8 @@ public class ClassInfoCache {
 	private LazyWrapper isAClass = new LazyWrapper( 
 	    Class.class ) ;
 
+	private String repositoryId = null ;
+
 	private boolean isArray ;
 	private boolean isEnum ;
 	private boolean isInterface ;
@@ -144,6 +146,14 @@ public class ClassInfoCache {
 	    isEnum = cls.isEnum() ;
 	    isInterface = cls.isInterface() ;
 	    isProxyClass = Proxy.isProxyClass( cls ) ;
+	}
+
+	public synchronized String getRepositoryId() {
+	    return repositoryId ;
+	}
+
+	public synchronized void setRepositoryId( String repositoryId ) {
+	    this.repositoryId = repositoryId ;
 	}
 
 	public boolean isARemote( Class cls ) { 

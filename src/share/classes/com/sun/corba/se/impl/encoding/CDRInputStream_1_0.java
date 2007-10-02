@@ -917,9 +917,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     private String readRepositoryIds(int valueTag,
                                      Class expectedType,
+				     ClassInfoCache.ClassInfo cinfo,
                                      String expectedTypeRepId) {
 	return readRepositoryIds(valueTag, expectedType,
-				 expectedTypeRepId, null);
+				 cinfo, expectedTypeRepId, null);
     }
 
     /**
@@ -932,6 +933,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
      */
     private String readRepositoryIds(int valueTag,
                                      Class expectedType,
+				     ClassInfoCache.ClassInfo cinfo,
                                      String expectedTypeRepId,
 				     BoxedValueHelper factory) {
         switch(repIdUtil.getTypeInfo(valueTag)) {
@@ -949,7 +951,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 			    CompletionStatus.COMPLETED_MAYBE);
 		    }
                 }
-                return repIdStrs.createForAnyType(expectedType);
+                return repIdStrs.createForAnyType(expectedType,cinfo);
             case RepositoryIdUtility.SINGLE_REP_TYPE_INFO :
                 return read_repositoryId(); 
             case RepositoryIdUtility.PARTIAL_LIST_TYPE_INFO :
@@ -990,6 +992,10 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	if (vType == 0xffffffff) {
 	    value = handleIndirection();
 	} else { 
+	    ClassInfoCache.ClassInfo cinfo = null ;
+	    if (expectedType != null)
+		cinfo = ClassInfoCache.get( expectedType ) ;
+
 	    int indirection = get_offset() - 4;
 
 	    // Need to save this special marker variable
@@ -1004,7 +1010,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 			    
 	    // Read repository id(s)
 	    String repositoryIDString = readRepositoryIds(vType, expectedType, 
-		null);
+		cinfo, null);
 
 	    // If isChunked was determined to be true based
 	    // on the valuetag, this will read a chunk length
@@ -1028,7 +1034,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 		// is guaranteed to be non-null.
 		if (valueClass == null || 
 		    !repositoryIDString.equals(repIdStrs.createForAnyType(
-			expectedType))) {
+			expectedType,cinfo))) {
 
 		    valueClass = getClassFromString(repositoryIDString, 
 			codebase_URL, expectedType);
@@ -1047,7 +1053,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 			repositoryID.getClassName()) ;
 		}
 		
-		ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( valueClass ) ;
+		if (cinfo == null)
+		    cinfo = ClassInfoCache.get( valueClass ) ;
+
 		if (valueClass != null && cinfo.isAIDLEntity(valueClass)) {
 		    value = readIDLValue(indirection, repositoryIDString, 
 			valueClass, cinfo, codebase_URL);
@@ -1179,7 +1187,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
             // Read repository id
             String repositoryIDString
-                = readRepositoryIds(vType, null, null, factory);
+                = readRepositoryIds(vType, null, null, null, factory);
 
             // Compare rep. ids to see if we should use passed helper
             if (!repositoryIDString.equals(factory.get_id()))
@@ -1287,7 +1295,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
             // Read repository id
             String repositoryIDString
-                = readRepositoryIds(vType, null, repositoryId);
+                = readRepositoryIds(vType, null, null, repositoryId);
 
 	    ValueFactory factory = 
                Utility.getFactory(null, codebase_URL, orb, repositoryIDString);

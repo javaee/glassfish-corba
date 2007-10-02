@@ -906,16 +906,25 @@ public class RepositoryId {
      **/
     public static String createForAnyType(Class type, ClassInfoCache.ClassInfo cinfo) {
 	try{
-	    if (cinfo.isArray()) {
-		return createSequenceRepID(type);
-	    } else if (cinfo.isAIDLEntity(type)) {
-		try{
-		    return getIdFromHelper(type);
-		} catch(Throwable t) {
-		    return createForIDLType(type, 1, 0);
-		}
-	    } else 
-		return createForJavaType(type, cinfo );
+	    // We may re-compute the repo id more than once, but that's OK, because
+	    // it's always the same.
+	    String result = cinfo.getRepositoryId() ;
+	    if (result == null) {
+		if (cinfo.isArray()) {
+		    result = createSequenceRepID(type);
+		} else if (cinfo.isAIDLEntity(type)) {
+		    try{
+			result = getIdFromHelper(type);
+		    } catch(Throwable t) {
+			return createForIDLType(type, 1, 0);
+		    }
+		} else 
+		    result = createForJavaType(type, cinfo );
+
+		cinfo.setRepositoryId( result ) ;
+	    }
+
+	    return result ;
 	} catch(com.sun.corba.se.impl.io.TypeMismatchException e){ 
 	    return null; 
 	}

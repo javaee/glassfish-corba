@@ -101,6 +101,10 @@ public class ClassInfoCache {
 	    }
 	}
 
+	private boolean isAValueBase ;
+	private boolean isAString ;
+	private boolean isAIDLEntity ;
+
 	private LazyWrapper isARemote = new LazyWrapper( 
 	    Remote.class ) ;
 	private LazyWrapper isARemoteException = new LazyWrapper( 
@@ -113,24 +117,18 @@ public class ClassInfoCache {
 	    ORB.class ) ;
 	private LazyWrapper isALogWrapperBase = new LazyWrapper( 
 	    LogWrapperBase.class ) ;
-	private LazyWrapper isAIDLEntity = new LazyWrapper( 
-	    IDLEntity.class ) ;
 	private LazyWrapper isAStreamable = new LazyWrapper( 
 	    Streamable.class ) ;
 	private LazyWrapper isAStreamableValue = new LazyWrapper( 
 	    StreamableValue.class ) ;
 	private LazyWrapper isACustomValue = new LazyWrapper( 
 	    CustomValue.class ) ;
-	private LazyWrapper isAValueBase = new LazyWrapper( 
-	    ValueBase.class ) ;
 	private LazyWrapper isACORBAObject = new LazyWrapper( 
 	    org.omg.CORBA.Object.class ) ;
 	private LazyWrapper isASerializable = new LazyWrapper( 
 	    Serializable.class ) ;
 	private LazyWrapper isAExternalizable = new LazyWrapper( 
 	    Externalizable.class ) ;
-	private LazyWrapper isAString = new LazyWrapper( 
-	    String.class ) ;
 	private LazyWrapper isAClass = new LazyWrapper( 
 	    Class.class ) ;
 
@@ -146,6 +144,10 @@ public class ClassInfoCache {
 	    isEnum = cls.isEnum() ;
 	    isInterface = cls.isInterface() ;
 	    isProxyClass = Proxy.isProxyClass( cls ) ;
+
+	    isAValueBase = ValueBase.class.isAssignableFrom( cls ) ;
+	    isAString = String.class.isAssignableFrom( cls ) ;
+	    isAIDLEntity = IDLEntity.class.isAssignableFrom( cls ) ;
 	}
 
 	public synchronized String getRepositoryId() {
@@ -175,7 +177,7 @@ public class ClassInfoCache {
 	    return isALogWrapperBase.get(cls) ; 
 	}
 	public boolean isAIDLEntity( Class cls ) { 
-	    return isAIDLEntity.get(cls) ; 
+	    return isAIDLEntity ; 
 	}
 	public boolean isAStreamable( Class cls ) { 
 	    return isAStreamable.get(cls) ; 
@@ -187,7 +189,7 @@ public class ClassInfoCache {
 	    return isACustomValue.get(cls) ; 
 	}
 	public boolean isAValueBase( Class cls ) { 
-	    return isAValueBase.get(cls) ; 
+	    return isAValueBase ; 
 	}
 	public boolean isACORBAObject( Class cls ) { 
 	    return isACORBAObject.get(cls) ; 
@@ -199,7 +201,7 @@ public class ClassInfoCache {
 	    return isAExternalizable.get(cls) ; 
 	}
 	public boolean isAString( Class cls ) { 
-	    return isAString.get(cls) ; 
+	    return isAString ; 
 	}
 	public boolean isAClass( Class cls ) { 
 	    return isAClass.get(cls) ; 

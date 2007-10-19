@@ -309,7 +309,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 		bridge, in, clazz, sender, offset);
         } else {
             result = (java.io.Serializable)bridge.simpleReadObject(
-		clazz, repositoryID, sender, offset);
+		clazz, cinfo, repositoryID, sender, offset);
         }
 
 	return result;

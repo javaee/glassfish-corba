@@ -107,9 +107,11 @@ public final class ORBUtility {
 	} catch (IOException exc ) {
 	    try {
 		sc.close() ;
-	    } finally {
-		throw exc ;
+	    } catch (IOException ioe) {
+		// Ignore this: close exceptions are useless.
 	    }
+
+	    throw exc ;
 	}
     }
 
@@ -269,8 +271,6 @@ public final class ORBUtility {
 
     private static ValueHandler vhandler = 
         new ValueHandlerImpl() ;
-    private static ValueHandler vhandler_1_3 = 
-        new ValueHandlerImpl_1_3() ;
     private static ValueHandler vhandler_1_3_1 = 
         new ValueHandlerImpl_1_3_1() ;
 
@@ -290,8 +290,6 @@ public final class ORBUtility {
         if (version == null)
             return vhandler;
 
-        if (version.equals(ORBVersionFactory.getOLD()))
-            return vhandler_1_3;
         if (version.equals(ORBVersionFactory.getNEW()))
             return vhandler_1_3_1;
 

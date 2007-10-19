@@ -107,7 +107,6 @@
 -test corba.poaandequals.POAAndEquals -separateprocess
 -test corba.multiorb.MultiORBTest
 -test corba.serialization.good.GoodRepIdTest
--test corba.serialization.bad.BadRepIdTest
 -test corba.cdrstreams.CDRTests
 -test corba.giopheaderpadding.GIOPHeaderPaddingTest
 -test corba.systemexceptions.SystemExceptionsTest

@@ -313,12 +313,10 @@ public final class Utility {
                 //into org.omg.stub hierarchy for non-offending
                 //classes. This will encourage people to
                 //produce non-offending class stubs in their own hierarchy.
-                if (!PackagePrefixChecker.hasOffendingPrefix(
-		    PackagePrefixChecker.withoutPackagePrefix(className))){
+		final String wpp = PackagePrefixChecker.withoutPackagePrefix(className) ;
+                if (!PackagePrefixChecker.hasOffendingPrefix( wpp )) {
                     loadedClass = Util.getInstance().loadClass(
-			PackagePrefixChecker.withoutPackagePrefix(className), 
-                        remoteCodebase, 
-                        loader);
+			wpp, remoteCodebase, loader);
                 } else {
                     loadedClass = Util.getInstance().loadClass(className, remoteCodebase, 
                         loader);

@@ -476,7 +476,7 @@ public class IIOPOutputStream
 
     /**
      * Helper method for correcting the Kestrel bug 4367783 (dealing
-     * with larger than 8-bit chars).  The old behavior is preserved
+     * with larger than 8-bit chars).  The old behavior was preserved
      * in orbutil.IIOPInputStream_1_3 in order to interoperate with
      * our legacy ORBs.
      */

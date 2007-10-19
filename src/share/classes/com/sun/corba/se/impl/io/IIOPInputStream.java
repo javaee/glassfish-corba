@@ -395,6 +395,7 @@ public class IIOPInputStream
     }
 
     final Object simpleReadObject(Class clz,
+				  ClassInfoCache.ClassInfo cinfo,
                                   String repositoryID,
                                   com.sun.org.omg.SendingContext.CodeBase sender,
                                   int offset)
@@ -417,7 +418,7 @@ public class IIOPInputStream
 	    if (vhandler.useFullValueDescription(clz, repositoryID)) {
 		obj = inputObjectUsingFVD(clz, repositoryID, sender, offset);
 	    } else {
-                obj = inputObject(clz, repositoryID, sender, offset);
+                obj = inputObject(clz, cinfo, repositoryID, sender, offset);
 	    }
 
 	    obj = currentClassDesc.readResolve(obj);
@@ -887,7 +888,7 @@ public class IIOPInputStream
 
     /**
      * Helper method for correcting the Kestrel bug 4367783 (dealing
-     * with larger than 8-bit chars).  The old behavior is preserved
+     * with larger than 8-bit chars).  The old behavior was preserved
      * in orbutil.IIOPInputStream_1_3 in order to interoperate with
      * our legacy ORBs.
      */
@@ -982,8 +983,8 @@ public class IIOPInputStream
         }
     }
 
-    private Object inputObject(Class clz, String repositoryID, 
-	com.sun.org.omg.SendingContext.CodeBase sender, 
+    private Object inputObject(Class clz, ClassInfoCache.ClassInfo cinfo,
+        String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender, 
 	int offset) throws IOException, ClassNotFoundException {
 
     	currentClassDesc = ObjectStreamClass.lookup(clz);

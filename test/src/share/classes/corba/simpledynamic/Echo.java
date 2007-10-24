@@ -39,6 +39,8 @@ import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 
 public interface Echo extends Remote {
+    String sayHello( Object obj ) throws RemoteException ;
+
     Echo say( Echo obj ) throws RemoteException ;
 
     String name() throws RemoteException ;

@@ -183,16 +183,10 @@ public abstract class Framework {
 	serverORB.destroy() ;
     }
 
-    public static void main( String[] args ) {
+    public static void run( String outputDirectory, Class[] tngClasses ) {
 	TestNG tng = new TestNG() ;
-	tng.setOutputDirectory( "gen/corba/simpledynamic/test-output" ) ;
-
-	Class[] tngClasses = new Class[] {
-	    Client.class 
-	} ;
-
+	tng.setOutputDirectory( outputDirectory ) ;
 	tng.setTestClasses( tngClasses ) ;
-
 	tng.run() ;
 
 	// Make sure we report success/failure to the wrapper.

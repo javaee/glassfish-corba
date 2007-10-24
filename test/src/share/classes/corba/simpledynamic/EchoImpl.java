@@ -46,6 +46,10 @@ public class EchoImpl extends PortableRemoteObject implements Echo {
 	this.name = name ;
     }
 
+    public String sayHello( Object obj ) throws RemoteException {
+	return "Hello " + obj ;
+    }
+
     public Echo say( Echo echo ) {
 	return echo ;
     }

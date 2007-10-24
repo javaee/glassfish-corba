@@ -36,6 +36,8 @@
 
 package corba.simpledynamic;
 
+import java.util.Vector ;
+
 import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 
@@ -89,9 +91,13 @@ public class FrameworkClient extends Framework {
 	    System.out.println( "Creating first echoref" ) ;
 	    Echo ref = toStub( servant, Echo.class ) ;
 
+	    System.out.println( "Hello?" ) ;
 	    System.out.println( "Looking up second echoref" ) ;
 	    Echo sref = narrow( ic.lookup( TEST_REF_NAME ), Echo.class ) ;
 	    Assert.assertEquals( sref.name(), SERVER_NAME ) ;
+
+	    System.out.println( "Running test for bug 6578707" ) ;
+	    testFragmentation( sref ) ;
 
 	    System.out.println( "Echoing first echoref" ) ;
 	    Echo rref = sref.say( ref ) ;
@@ -111,8 +117,59 @@ public class FrameworkClient extends Framework {
 	}
     }
 
+    private static class Fragment implements java.io.Serializable {
+	String str;
+
+	Fragment(int  size) {
+	    str="";
+	    for(int i=0;i<size;i++) {
+		str+="B";
+	    }
+	}
+    }
+
+    private static class Wrapper implements java.io.Serializable{
+	Fragment f = null;
+	Vector vec = null;
+
+	public Wrapper(int len, Vector vec){
+	    this.vec = vec;
+	    f = new Fragment(len);
+
+	}
+
+	private void readObject(java.io.ObjectInputStream is
+	    ) throws java.io.IOException,  ClassNotFoundException{
+
+	    is.defaultReadObject();
+	}
+
+	private void writeObject(java.io.ObjectOutputStream is
+	    ) throws java.io.IOException{
+
+	    is.defaultWriteObject();
+	}
+    }
+
+    public void testFragmentation( Echo sref ) {
+	Throwable t = new Throwable();
+	Vector v = new Vector();
+	v.add(t);
+	for (int i = 0; i < 1024; i++){
+	    try {
+		System.out.println("Hello call " + i);
+		Wrapper w = new Wrapper(i, v);
+		sref.sayHello(w);
+	    } catch (Exception exc) {
+		System.out.println( "Caught exception " + exc ) ;
+		exc.printStackTrace() ;
+		System.exit( 1 ) ;
+	    }
+	}
+    }
+
     public static void main( String[] args ) {
-	Framework.main( args ) ;
+	Class[] classes = { FrameworkClient.class } ;
+	Framework.run( "gen/corba/simpledynamic/test-output", classes ) ;
     }
 }
-

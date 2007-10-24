@@ -9,6 +9,7 @@ s.*
 p.*
 *.sjava
 *.class
+test-output/**
 experimental/**
 build/**
 test/build/**

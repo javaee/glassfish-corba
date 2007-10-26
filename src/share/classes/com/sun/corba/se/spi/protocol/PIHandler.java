@@ -239,7 +239,7 @@ public interface PIHandler {
      * @param servant The servant.  This is java.lang.Object because in the
      *     POA case, this will be a org.omg.PortableServer.Servant whereas
      *     in the ServerRequestDispatcher case this will be an ObjectImpl.
-     * @param targetMostDerivedInterface.  The most derived interface.  This
+     * @param targetMostDerivedInterface  The most derived interface.  This
      *     is passed in instead of calculated when needed because it requires
      *     extra information in the POA case that we didn't want to bother
      *     creating extra methods for to pass in.

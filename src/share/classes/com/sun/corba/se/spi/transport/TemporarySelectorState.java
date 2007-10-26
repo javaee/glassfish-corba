@@ -58,7 +58,7 @@ public interface TemporarySelectorState {
      *
      * <p> This method performs a blocking <a href="#selop">selection
      * operation</a> on theSelector.  It returns only after the
-     * SelectableChannel is selected, theSelector's {@link #wakeup wakeup}
+     * SelectableChannel is selected, theSelector's wakeup
      * method is invoked, the current thread is interrupted, or the given
      * timeout period expires, whichever comes first.
      *
@@ -96,9 +96,6 @@ public interface TemporarySelectorState {
      *
      * @param  theOps
      *         The interest set for the resulting key
-     *
-     * @param  theSelectionKey
-     *         
      *
      * @throws  ClosedChannelException
      *          If theSelectableChannel is closed
@@ -160,8 +157,8 @@ public interface TemporarySelectorState {
      * Closes theSelector.
      *
      * <p> If a thread is currently blocked in one of theSelector's selection
-     * methods then it is interrupted as if by invoking theSelector's {@link
-     * #wakeup wakeup} method.
+     * methods then it is interrupted as if by invoking theSelector's 
+     * wakeup method.
      *
      * <p> Any uncancelled keys still associated with theSelector are
      * invalidated, their SelectableChannels are deregistered, and any other
@@ -171,7 +168,7 @@ public interface TemporarySelectorState {
      * effect.
      *
      * <p> After theSelector is closed, any further attempt to use it, except by
-     * invoking this method, will cause a {@link ClosedSelectorException} to be
+     * invoking this method, will cause a ClosedSelectorException to be
      * thrown. </p>
      *
      * @param  theSelector

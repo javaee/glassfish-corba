@@ -134,20 +134,12 @@ public class StatisticsAccumulator {
     }
 
 
-/**
- * <p>
- * Construct the Statistics Accumulator by providing the unit as a String.
+/** Construct the Statistics Accumulator by providing the unit as a String.
  * The examples of units are &quot;Hours&quot;, &quot;Minutes&quot;, 
  * &quot;Seconds&quot;, &quot;MilliSeconds&quot;, &quot;Micro Seconds&quot; 
  * etc.,
- * </p>
- * <p>
- * 
- * @return a StatisticsAccumulator with ...
- * </p>
  * <p>
  * @param unit a String representing the units for the samples collected
- * </p>
  */
     public StatisticsAccumulator( String unit ) {
         this.unit = unit;

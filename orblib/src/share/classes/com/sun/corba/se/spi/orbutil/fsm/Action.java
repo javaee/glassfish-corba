@@ -57,8 +57,8 @@ public interface Action
 	* in the state machine, as the state could be corrupted.
 	* Any exception thrown by the Action for the transition
 	* will be propagated to doIt.  
-	* @param FSM fsm is the state machine causing this action.
-	* @param Input in is the input that caused the transition.
+	* @param fsm fsm is the state machine causing this action.
+	* @param in in is the input that caused the transition.
 	*/
 	public void doIt( FSM fsm, Input in ) ;
 }

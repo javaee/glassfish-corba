@@ -57,13 +57,10 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 public interface CSIv2SSLTaggedComponentHandler
 {
     /**
-     * @param IORInfo - from IORInterceptor.establish_components.
-
-     * @param List<ClusterInstanceInfo>
-     * On the server-side, the FOLB system will pass all ClusterInstanceInfo
+     * @param iorInfo - from IORInterceptor.establish_components.
+     * @param clusterInstanceInfo On the server-side, the FOLB system will pass all ClusterInstanceInfo
      * to the CSIv2/SSL system.  
-     *
-     * @return <code>null</code> or <code>org.omg.IOP.TaggedComponent</code>
+     * @return null or org.omg.IOP.TaggedComponent.
      * The CSIv2SSL system returns <code>null</code> if no security
      * information is to be added to IORs.  Otherwise it returns the
      * CSIv2SSL <code>org.omg.IOP.TaggedComponent</code> that will be
@@ -72,17 +69,14 @@ public interface CSIv2SSLTaggedComponentHandler
     public TaggedComponent insert(IORInfo iorInfo, 
 				  List<ClusterInstanceInfo> clusterInstanceInfo);
 
-    /**
-     * @param <code>IOR</code>
-     * <code>extract</code> is called on each invocation
-     * of the given <code>IOR</code>.
-     *
-     * @return <code>null</code> or <code>List</code>
-     * If the given <code>IOR</code> contains CSIv2SSL host/port
+    /** Extract is called on each invocation of the IOR, so that the security code can
+     * run properly.
+     * If the given IOR contains CSIv2SSL host/port
      * info that should be used for this invocation then
-     * <code>extract</code> should return a <code>List</code>
-     * of <code>SocketInfo</code>. 
-     * Otherwise it should return <code>null</code>.
+     * extract should return a List of SocketInfo. 
+     * Otherwise it should return null.
+     * @param ior The target ior of the current invocation.
+     * @return List of all SocketInfos found in the IOR.
      */
     public List<SocketInfo> extract(IOR ior); 
 }

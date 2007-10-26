@@ -41,9 +41,9 @@ import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
-/** This annotation defines a Managed Object.   An interface or class annotated as @ManagedObject
- * has a corresponding open MBean constructed according to the @ManagedAttribute and
- * @ManagedOperation annotations on its methods.
+/** This annotation defines a Managed Object.   An interface or class annotated as ManagedObject
+ * has a corresponding open MBean constructed according to the ManagedAttribute and
+ * ManagedOperation annotations on its methods.
  */
 @Documented 
 @Target(ElementType.TYPE) 

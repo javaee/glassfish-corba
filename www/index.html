@@ -1,4 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
@@ -34,17 +36,21 @@
   only if the new code is made subject to such option by the copyright
   holder.
 -->
-<html>
-<head>
 
 
+  
+  
   <title>Project Home Page</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 
+
+
 <body bgcolor="#ffffff" text="#000000">
 
+
 <h1>GlassFish-Corba&nbsp; </h1>
+
 
 <p>This project contains the source code, documentation, and tests for
 the CORBA ORB that is used in the GlassFish application server project.
@@ -54,86 +60,156 @@ Portable Interceptors. It includes both IDL and RMI-IIOP support. The
 GlassFish ORB has an open, extensible architecture that supports
 flexible configuration and extension through an open SPI. This ORB is
 written completely in Java.</p>
+
 <h2>Special Features of the GlassFish ORB</h2>
+
 <p>This ORB has a number of special features specifically for GlassFish:</p>
+
 <ol>
+
   <li>An optimized, streaming transport for GIOP 1.2 that uses NIO select for scalability.</li>
+
   <li>An implementation of RMI-IIOP that uses runtime bytecode generation to avoid the need for the 
   rmic compiler for either stubs or skeletons</li>
+
   <li>An optimized fast object copier to speed up co-located RMI-IIOP calls that require pass-by-value semantics for argument passing</li>
+
   <li>Highly optimized colocated RMI-IIOP calls that short circuit most of the ORB object adapter and transport code for speed.</li>
+
   <li>The ORB architecture is based in part on the <a href="http://haroldcarr.net/computerScience/pept/indexPept.html">PEPt</a>
 work by Harold Carr (a former member of the ORB team), that provides
 clean separation between protocol, encoding, presentation, and
 transport without impacting performance.</li>
+
   <li>The ORB includes a code generation library (codegen) that
 supports runtime generation of classes from a high-level java-like API.
 This is currently used to generate the classes needed to support the
 remote view for EJB 3.</li>
+
   <li>Support is included for dynamic failover and load balancing of IIOP requests. </li>
+
 </ol>
+
 <h2>Documentation</h2>
+
 <p>The ORB documentation is available <a href="contents.html">here</a>.</p>
+<h2>Getting the source code</h2>
+The ORB source code is now managed using <a href="http://www.selenic.com/mercurial">Mercurial</a>. The source code is available <a href="http://mercurial2.foundry.sun.com/corba/corba-gfv2-master">here</a> (for the GlassFish v2 version) and <a href="http://mercurial2.foundry.sun.com/corba/corba-master">here</a>
+(for GlassFish v3). The CVS repository contains only the documents in
+the www directory, so that the docs can be displayed automatically from
+the glassfish-corba project. &nbsp;The CVS repository also contains the
+JavaDocs, which are generated in the build process when synchronizing
+the internal and external repositories.
 <h2>Building the Project</h2>
+
 <p>The simplest thing to do is to use NetBeans:</p>
+
 <ol>
-  <li>Set the CVSROOT to :pserver:&lt;yourname&gt;@cvs.dev.java.net:/cvs. You must have a java.net account to do this.</li>
-  <li>Everything is in the glassfish-corba module, so checkout the entire module (about 6400 files).</li>
-  <li>NetBeans should automatically recognize the project, so just open the project.</li>
-  <li>Use NetBeans to&nbsp;build and run tests as desired.</li>
+
+  <li>Make sure you have NetBeans 6 beta 2 installed.</li>
+  <li>Go to modules and install the mercurial support.</li>
+  <li>Select versioning-&gt;mercurial-&gt;clone other.</li>
+  <li>Type in the URL for the master repository (e.g. http://mercurial2.foundry.sun.com/corba/corba/master).</li>
+  <li>Pick a location to create the local clone.</li>
+  <li>Create a project from the clone (this is also doing the hg clone, which takes a little while).</li>
+  <li>Open the cloned project as the main project.</li>
+  <li>Use NetBeans to&nbsp;build and run tests as desired. Use the
+right-click menu on the project to get to the CORBA-specific targets,
+such as all of the different test-related targets.</li>
+
 </ol>
+
 <p>More details (and other options) are described <a href="design/orb_notes.html">here</a> 
 (<a href="design/orb_notes.pdf">pdf</a>) in the ORB documentation.</p>
+
 <h2>Obtaining ORB builds</h2>
-<P>All of the ORB files are contained in the GlassFish appserv-rt.jar
+
+<p>All of the ORB files are contained in the GlassFish appserv-rt.jar
 file. You can get this from GlassFish. We also maintain copies of the
-ORB builds in the maven repostitory (TBD).</P>
+ORB builds in the maven repository (TBD). Eventually we will use&nbsp;<a href="http://hudson.dev.java.net">Hudson</a> to manage building and testing the ORB.</p>
+
 <h2>Planned Work</h2>
+
 <p>There are a number of efforts underway right now to improve the ORB:</p>
+
 <ol>
+
     <li>Replace the current ORB monitoring framework with JMX, and expand its coverage.
     The intent here is to make it easy to add monitoring to any interesting state in the
     ORB, and make the monitored data available to any standard MBean client like jconsole.
     We will also work to get the additional data integrated with the app server's administration
     GUI.</li>
-    <li>Improve the transport and low-level encoding performance.  This includes fixing some
-    problems with reading and writing non-blocking SocketChannels, as well as some issues with
-    how the ORB uses direct ByteBuffers.</li>
+
+    <li>Replace most of the ORB transport with&nbsp;<a href="http://grizzly.dev.java.net">Grizzly</a>,
+which will include improved CSIv2 (SSL) scalability and improved ORB
+connection caching. Most of the Grizzly performance features are
+already in the current ORB transport, but moving to a single transport
+has many benefits for code quality, integration, and further
+optimizations.</li>
+  <li>The encoding performance has been improved for the GlassFish v3
+version of the ORB. This is still in progress, and more details will
+appear first in the CORBA <a href="http://blogs.sun.com/ejcorba">blog</a>.</li>
+
     <li>Improve the internal code generation library (codegen).  Codegen provides a java-level API
     for generating classes at runtime.  This is used for things like generating the EJB 3 remote view 
     from a EJB 3 POJO business interface.  Planned improvements include:
+    
     <ul>
+
         <li>Extend codegen with more language constructs (e.g. break, continue, switch)</li>
+
         <li>Add line number table and local variable table generation for debugging 
         dynamically generated classes.</li>
+
         <li>Complete method overload resolution support.</li>
+
         <li>Make the code generator API extensible (e.g. scheme-like macros).</li>
+
         <li>Make more extensive use of codegen in the ORB to improve performance.</li>
+
+    
     </ul>
-    Note that the most current version of codegen is not yet in this project.  The
-    current documentation is limited to the javadocs (see the 
-    com.sun.corba.se.spi.codegen.Wrapper class in the optional branch of the project).</li>
+  </li>
+  <li>FindBugs has been integrated into the workspace. The <a href="http://glassfish.dev.java.net">GlassFish</a> project runs a regular findbugs report on everything in GlassFish, which includes the ORB. The <a href="https://glassfish.dev.java.net/quality/fancyreport.html">results</a>
+show around 60 or so bugs in the com.sun.corba.* packages. Around half
+of these are in the renamed copy of BCEL, which has since been removed.</li>
+  <li>Ant can now handle renaming for the GlassFish integration of the ORB.</li>
+  <li>Support for Java 5 enums and java.lang.reflect.Proxy has been added.</li>
+
 </ol>
+
 <p>Here are some additional items that we plan to work on (some will only take a few days,
 some may take several months):</p>
+
 <ol>
+
     <li>Integrate CheckStyle into the project and fix style problems.</li>
-    <li>Integrate FindBugs and fix any issues it finds.</li>
-    <li>Replace the current rmic -iiop backend with code that takes advantage
-    of the dynamic RMI-IIOP implementation and the codegen library.</li>
+
+    
+    <li>Replace the current rmic -iiop backend with one that uses
+the doclet API and remove the current dependency on ancient JDK 1.2
+compiler internals.</li>
+
     <li>Use TestNG to drive the CORBA test framework, so that we can use TestNG's
     parameterization and grouping capabilities to improve our test coverage.</li>
+
     <li>Fix redundant IDL and RMIC compilation problems with the tests.</li>
-    <li>Improve the documentation coverage, particularly in the <A HREF="design/orb_notes.html">
-        ORB Notes</A> Document.</li>
-    <li>Move the makefile-based rename to ant.</li>
+
+    <li>Improve the documentation coverage, particularly in the <a href="design/orb_notes.html">
+        ORB Notes</a> Document.</li>
+
+    
     <li>Develop a secure bootstrap protocol to supplement the Interoperable Name Service.</li>
+
     <li>Make more extensive use of the internal ORB timer library (take a look at the
     com.sun.corba.se.spi.orbutil.newtimer package in the main branch) to support ORB
     microbenchmarks as regression tests.</li>
-    <li>Support Java 5 enums in RMI-IIOP.</li>
-    <li>Explore how we can speed up marshalling of complex data types.</li>
+
+    
+    
     <li>As always, fix bugs.</li>
+
 </ol>
+
 </body>
 </html>

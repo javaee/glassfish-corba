@@ -645,7 +645,7 @@ public class ObjectStreamClass implements java.io.Serializable {
 	superclass = null;
     }
 
-    private static synchronized ObjectStreamField[] translateFields(
+    public static synchronized ObjectStreamField[] translateFields(
 	java.io.ObjectStreamField fields[]) {
 
 	ObjectStreamField[] translation = null;

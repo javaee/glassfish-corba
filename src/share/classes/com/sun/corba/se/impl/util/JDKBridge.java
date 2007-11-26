@@ -44,22 +44,10 @@
 
 package com.sun.corba.se.impl.util;
 
-import java.rmi.Remote;
-import java.rmi.NoSuchObjectException;
 
 import java.rmi.server.RMIClassLoader;
-import java.rmi.server.UnicastRemoteObject;
-
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.CompletionStatus;
-
-import java.util.Properties;
-
-import java.io.File;
-import java.io.FileInputStream;
 
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import java.net.MalformedURLException;
 
@@ -129,7 +117,8 @@ public class JDKBridge {
 		this.loader = loader ;
 	    }
 
-	    public void clear() {
+	    @Override
+            public void clear() {
 		codeBase = null ;
 		loader = null ;
 	    }
@@ -137,10 +126,11 @@ public class JDKBridge {
  
 	private static void checkQueue() {
 	    while (true) {
-		Entry entry = (Entry)queue.poll() ;
-		if (entry == null) {
+		Object obj = queue.poll() ;
+		if (obj == null) {
 		    return ;
 		} else {
+                    Entry entry = (Entry)obj ;
 		    String className = entry.get().getName() ;
 		    if (entry.loader == null) {
 			Map<String,Entry> mse = nullLoaderMap.get( entry.codeBase ) ;

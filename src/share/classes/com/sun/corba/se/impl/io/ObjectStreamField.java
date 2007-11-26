@@ -73,7 +73,7 @@ public class ObjectStreamField implements Comparable
 	) ;
 
     // Create a named field with the specified type.
-    ObjectStreamField(String n, Class clazz) {
+    public ObjectStreamField(String n, Class clazz) {
     	name = n;
     	this.clazz = clazz;
 	cinfo = ClassInfoCache.get( clazz ) ;
@@ -112,7 +112,7 @@ public class ObjectStreamField implements Comparable
 
     }
 
-    ObjectStreamField(Field field) {
+    public ObjectStreamField(Field field) {
 	this(field.getName(), field.getType());
 	setField( field ) ;
     }

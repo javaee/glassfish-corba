@@ -1,5 +1,7 @@
 package corba.tbbc ;
 
+import java.lang.reflect.Method ;
+
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import static java.lang.reflect.Modifier.* ;
@@ -47,10 +49,10 @@ public class Sample {
 	    }
 
 	    _method( PUBLIC|STATIC, Type._void(), "main" ) ; {
-		final Expression args = _arg( StringArray, "args" ) ;
+		final Expression margs = _arg( StringArray, "args" ) ;
 		_body() ;
 		    Expression sout = _field( System, "out" ) ;
-		    Expression fooArgs0 = _call( _thisClass(), "foo", _index( args, _const( 0 ) ) ) ;
+		    Expression fooArgs0 = _call( _thisClass(), "foo", _index( margs, _const( 0 ) ) ) ;
 		    _call( sout, "println", _call(  fooArgs0, "getList" ) ) ;
 		_end() ; // of method
 	    }
@@ -59,13 +61,13 @@ public class Sample {
 	}
 
 	Class genClass = Sample.class ;
-	Class cls = _generate( genClass.getClassLoader(), genClass.getProtectionDomain() ) ;
+	Class cls = _generate( genClass.getClassLoader(), genClass.getProtectionDomain(), null ) ;
 	
 	try {
-	    Method m = cls.getDeclaredMethod( cls, "main", String[].class ) ;
-	    m.invoke( null, args ) ;
+	    Method m = cls.getDeclaredMethod( "main", String[].class ) ;
+	    m.invoke( null, (Object[])args ) ;
 	} catch (Exception exc) {
-	    System.out.println( "Exception: " + exc ) ;
+	    java.lang.System.out.println( "Exception: " + exc ) ;
 	    exc.printStackTrace() ;
 	}
     }

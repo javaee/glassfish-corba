@@ -1507,10 +1507,10 @@ public class ObjectStreamClass implements java.io.Serializable {
 	    String s1 = o1.getName();
 	    String s2 = o2.getName();
 
-	    if (o1 instanceof Method) {
+	    if ((o1 instanceof Method) && (o2 instanceof Method)) {
 		s1 += getSignature((Method)o1);
 		s2 += getSignature((Method)o2);
-	    } else if (o1 instanceof Constructor) {
+	    } else if ((o1 instanceof Constructor) && (o2 instanceof Constructor)) {
 		s1 += getSignature((Constructor)o1);
 		s2 += getSignature((Constructor)o2);
 	    }

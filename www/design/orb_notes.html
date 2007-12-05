@@ -24,7 +24,7 @@ BLOCKQUOTE{margin-left:4ex;margin-right:4ex;text-align:left;}
 </HEAD>
 
 <BODY >
-<!--HEVEA command line is: /usr/bin/hevea orb_notes.tex -->
+<!--HEVEA command line is: /usr/bin/hevea -s /tmp/lyx_tmpdir8354fpSyDz/lyx_tmpbuf0/orb_notes.tex -->
 <!--HTMLHEAD-->
 <!--ENDHTML-->
 <!--PREFIX <ARG ></ARG>-->
@@ -971,8 +971,7 @@ What about short vs. very long messages?
 <DT CLASS="dt-description"><B>Throughput.</B><DD CLASS="dd-description">How many request per second can be sent through the
 system? This often conflicts with latency. For example, a front end
 concentrator can help to pump more data through, at the cost of increased
-latency due to any extra hop (e.g. NTTWest's use of a hardware load
-balancer).
+latency due to an extra hop.
 <DT CLASS="dt-description"><B>Creating&nbsp;Endpoints.</B><DD CLASS="dd-description">Object-Oriented remoting systems like CORBA
 create, marshal, and unmarshal endpoints (IORs in CORBA) constantly,
 and the performance of such operations is quite significant.

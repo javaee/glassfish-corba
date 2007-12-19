@@ -293,6 +293,8 @@
 	     35 FINE "Received {0}, in a non-blocking read on connection, {1}, because an 'end of stream' was detected")
 	    (IOEXCEPTION_IN_ACCEPT_FINE
 	     36 FINE "IOException in accept")
+	    (BUFFER_READ_MANAGER_TIMEOUT
+	     37 WARNING "Timeout while reading data in buffer manager")
 	    )
 	(DATA_CONVERSION
 	    (BAD_STRINGIFIED_IOR_LEN 

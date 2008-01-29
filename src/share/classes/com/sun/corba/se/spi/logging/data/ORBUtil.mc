@@ -785,7 +785,7 @@
 	)
 	(TRANSIENT
 	    (REQUEST_CANCELED
-	     1 WARNING "Request cancelled by exception"))
+	     1 FINE "Request cancelled by exception"))
 	(UNKNOWN 
 	    (UNKNOWN_CORBA_EXC
 	     1  WARNING "Unknown user exception while unmarshalling")

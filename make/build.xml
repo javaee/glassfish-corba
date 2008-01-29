@@ -80,6 +80,7 @@
 
     <!-- The core src and test files. -->
     <property environment="env"/>
+    <property name="rt.jar"			value="${env.JAVA_HOME}/jre/lib/rt.jar"/>
     <property name="findbugs.home"		value="${env.FINDBUGS_HOME}"/>
     <property name="boot.dir"			value="${env.ALT_BOOTDIR}"/>
     <property name="test.output"		value="test/make/gen"/>
@@ -88,6 +89,7 @@
     <property name="javac.debug"		value="true"/>
     <property name="src.dir"			value="src/share/classes"/>
     <property name="test.src.dir"		value="test/src/share/classes"/>
+    <property name="build.sysclasspath"		value="ignore"/>
 
     <!-- Conditional properties used in test targets -->
     <!-- <condition property="use.dynamic.stub" value="false">
@@ -270,32 +272,151 @@
 
     <!-- ========================= DELETE-JAVA-SOURCE ===================== -->
     <target name="delete-java-sources">
-	<!-- Delete duplicate files -->
+	<!-- Delete duplicate files and unwanted files. -->
 	<delete>
 	    <fileset dir="${gensrc.dir}">
 		<include name="org/omg/CORBA/OctetSeqHolder.java"/>
 		<include name="org/omg/CORBA/OctetSeqHelper.java"/>
 		<include name="org/omg/CORBA/RepositoryIdHelper.java"/>
 		<include name="org/omg/CORBA/PolicyError.java"/>
+
+		<include name="org/omg/Dynamic/ContextListHelper.java"/>
+		<include name="org/omg/Dynamic/ExceptionListHelper.java"/>
+		<include name="org/omg/Dynamic/ExceptionListHolder.java"/>
+		<include name="org/omg/Dynamic/ParameterHelper.java"/>
+		<include name="org/omg/Dynamic/ParameterHolder.java"/>
+		<include name="org/omg/Dynamic/ParameterListHelper.java"/>
+		<include name="org/omg/Dynamic/ParameterListHolder.java"/>
+		<include name="org/omg/Dynamic/RequestContextHelper.java"/>
+		<include name="org/omg/DynamicAny/DynAnyFactoryPOA.java"/>
+		<include name="org/omg/DynamicAny/DynAnyFactoryPackage/InconsistentTypeCodeHolder.java"/>
+		<include name="org/omg/DynamicAny/DynAnyPOA.java"/>
+		<include name="org/omg/DynamicAny/DynAnyPackage/InvalidValueHolder.java"/>
+		<include name="org/omg/DynamicAny/DynAnyPackage/TypeMismatchHolder.java"/>
+		<include name="org/omg/DynamicAny/DynArrayPOA.java"/>
+		<include name="org/omg/DynamicAny/DynEnumPOA.java"/>
+		<include name="org/omg/DynamicAny/DynFixedPOA.java"/>
+		<include name="org/omg/DynamicAny/DynSequencePOA.java"/>
+		<include name="org/omg/DynamicAny/DynStructPOA.java"/>
+		<include name="org/omg/DynamicAny/DynUnionPOA.java"/>
+		<include name="org/omg/DynamicAny/DynValueBox.java"/>
+		<include name="org/omg/DynamicAny/DynValueBoxHelper.java"/>
+		<include name="org/omg/DynamicAny/DynValueBoxHolder.java"/>
+		<include name="org/omg/DynamicAny/DynValueBoxOperations.java"/>
+		<include name="org/omg/DynamicAny/DynValueBoxPOA.java"/>
+		<include name="org/omg/DynamicAny/DynValueCommon.java"/>
+		<include name="org/omg/DynamicAny/DynValueCommonHelper.java"/>
+		<include name="org/omg/DynamicAny/DynValueCommonHolder.java"/>
+		<include name="org/omg/DynamicAny/DynValueCommonOperations.java"/>
+		<include name="org/omg/DynamicAny/DynValueCommonPOA.java"/>
+		<include name="org/omg/DynamicAny/DynValuePOA.java"/>
+		<include name="org/omg/DynamicAny/_DynAnyFactoryStub.java"/>
+		<include name="org/omg/DynamicAny/_DynAnyStub.java"/>
+		<include name="org/omg/DynamicAny/_DynArrayStub.java"/>
+		<include name="org/omg/DynamicAny/_DynEnumStub.java"/>
+		<include name="org/omg/DynamicAny/_DynFixedStub.java"/>
+		<include name="org/omg/DynamicAny/_DynSequenceStub.java"/>
+		<include name="org/omg/DynamicAny/_DynStructStub.java"/>
+		<include name="org/omg/DynamicAny/_DynUnionStub.java"/>
+		<include name="org/omg/DynamicAny/_DynValueBoxStub.java"/>
+		<include name="org/omg/DynamicAny/_DynValueCommonStub.java"/>
+		<include name="org/omg/DynamicAny/_DynValueStub.java"/>
+		<include name="org/omg/IOP/BI_DIR_IIOP.java"/>
+		<include name="org/omg/IOP/ChainBypassCheck.java"/>
+		<include name="org/omg/IOP/ChainBypassInfo.java"/>
+		<include name="org/omg/IOP/CodecFactoryHolder.java"/>
+		<include name="org/omg/IOP/CodecFactoryPackage/UnknownEncodingHolder.java"/>
+		<include name="org/omg/IOP/CodecHelper.java"/>
+		<include name="org/omg/IOP/CodecHolder.java"/>
+		<include name="org/omg/IOP/CodecPackage/FormatMismatchHolder.java"/>
+		<include name="org/omg/IOP/CodecPackage/InvalidTypeForEncodingHolder.java"/>
+		<include name="org/omg/IOP/CodecPackage/TypeMismatchHolder.java"/>
+		<include name="org/omg/IOP/EncodingFormatHelper.java"/>
+		<include name="org/omg/IOP/EncodingHelper.java"/>
+		<include name="org/omg/IOP/EncodingHolder.java"/>
+		<include name="org/omg/IOP/FORWARDED_IDENTITY.java"/>
+		<include name="org/omg/IOP/INVOCATION_POLICIES.java"/>
+		<include name="org/omg/IOP/LogicalThreadId.java"/>
+		<include name="org/omg/IOP/SendingContextRunTime.java"/>
+		<include name="org/omg/IOP/TaggedComponentSeqHelper.java"/>
+		<include name="org/omg/IOP/TaggedComponentSeqHolder.java"/>
+		<include name="org/omg/IOP/UnknownExceptionInfo.java"/>
+		<include name="org/omg/PortableInterceptor/ClientRequestInfoHelper.java"/>
+		<include name="org/omg/PortableInterceptor/ClientRequestInfoHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ClientRequestInterceptorHelper.java"/>
+		<include name="org/omg/PortableInterceptor/ClientRequestInterceptorHolder.java"/>
+		<include name="org/omg/PortableInterceptor/CurrentHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ForwardRequestHolder.java"/>
+		<include name="org/omg/PortableInterceptor/IORInfoHelper.java"/>
+		<include name="org/omg/PortableInterceptor/IORInfoHolder.java"/>
+		<include name="org/omg/PortableInterceptor/IORInterceptorHelper.java"/>
+		<include name="org/omg/PortableInterceptor/IORInterceptorHolder.java"/>
+		<include name="org/omg/PortableInterceptor/InterceptorHelper.java"/>
+		<include name="org/omg/PortableInterceptor/InterceptorHolder.java"/>
+		<include name="org/omg/PortableInterceptor/InvalidSlotHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ORBInitInfoHelper.java"/>
+		<include name="org/omg/PortableInterceptor/ORBInitInfoHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ORBInitInfoPackage/DuplicateNameHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ORBInitInfoPackage/InvalidNameHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ORBInitializerHelper.java"/>
+		<include name="org/omg/PortableInterceptor/ORBInitializerHolder.java"/>
+		<include name="org/omg/PortableInterceptor/PolicyFactoryHelper.java"/>
+		<include name="org/omg/PortableInterceptor/PolicyFactoryHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ReplyStatusHelper.java"/>
+		<include name="org/omg/PortableInterceptor/RequestInfoHelper.java"/>
+		<include name="org/omg/PortableInterceptor/RequestInfoHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ServerRequestInfoHelper.java"/>
+		<include name="org/omg/PortableInterceptor/ServerRequestInfoHolder.java"/>
+		<include name="org/omg/PortableInterceptor/ServerRequestInterceptorHelper.java"/>
+		<include name="org/omg/PortableInterceptor/ServerRequestInterceptorHolder.java"/>
+		<include name="org/omg/PortableInterceptor/SlotIdHelper.java"/>
+		<include name="org/omg/PortableServer/CurrentPackage/NoContextHolder.java"/>
+		<include name="org/omg/PortableServer/ForwardRequestHolder.java"/>
+		<include name="org/omg/PortableServer/IdAssignmentPolicyValueHelper.java"/>
+		<include name="org/omg/PortableServer/IdAssignmentPolicyValueHolder.java"/>
+		<include name="org/omg/PortableServer/IdUniquenessPolicyValueHelper.java"/>
+		<include name="org/omg/PortableServer/IdUniquenessPolicyValueHolder.java"/>
+		<include name="org/omg/PortableServer/ImplicitActivationPolicyValueHelper.java"/>
+		<include name="org/omg/PortableServer/ImplicitActivationPolicyValueHolder.java"/>
+		<include name="org/omg/PortableServer/LifespanPolicyValueHelper.java"/>
+		<include name="org/omg/PortableServer/LifespanPolicyValueHolder.java"/>
+		<include name="org/omg/PortableServer/ObjectIdHelper.java"/>
+		<include name="org/omg/PortableServer/ObjectIdHolder.java"/>
+		<include name="org/omg/PortableServer/POAListHelper.java"/>
+		<include name="org/omg/PortableServer/POAListHolder.java"/>
+		<include name="org/omg/PortableServer/POAManagerPackage/AdapterInactiveHolder.java"/>
+		<include name="org/omg/PortableServer/POAManagerPackage/StateHelper.java"/>
+		<include name="org/omg/PortableServer/POAManagerPackage/StateHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/AdapterAlreadyExistsHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/AdapterNonExistentHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/InvalidPolicyHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/NoServantHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/ObjectAlreadyActiveHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/ObjectNotActiveHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/ServantAlreadyActiveHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/ServantNotActiveHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/WrongAdapterHolder.java"/>
+		<include name="org/omg/PortableServer/POAPackage/WrongPolicyHolder.java"/>
+		<include name="org/omg/PortableServer/RequestProcessingPolicyValueHelper.java"/>
+		<include name="org/omg/PortableServer/RequestProcessingPolicyValueHolder.java"/>
+		<include name="org/omg/PortableServer/ServantActivatorHolder.java"/>
+		<include name="org/omg/PortableServer/ServantLocatorHolder.java"/>
+		<include name="org/omg/PortableServer/ServantRetentionPolicyValueHelper.java"/>
+		<include name="org/omg/PortableServer/ServantRetentionPolicyValueHolder.java"/>
+		<include name="org/omg/PortableServer/ThreadPolicyValueHelper.java"/>
+		<include name="org/omg/PortableServer/ThreadPolicyValueHolder.java"/>
 	    </fileset>
 	</delete>
-	<!-- Delete unwanted files -->
-	<java classname="com.sun.tools.corba.se.jmk.DeleteFiles" classpathref="classpath.master" fork="true" failonerror="true">
-	    <arg value="-dir"/>
-	    <arg value="${gensrc.dir}"/>
-	    <arg value="-file"/>
-	    <arg value="make/deleted-files.list"/>
-	</java>
     </target>
 
     <!-- ========================= COMPILE-IDL-COMPILER ================== -->
-    <!-- Compile the IDL compiler sources and the jmk tool -->
+    <!-- Compile the IDL compiler -->
     <target name="compile-idl-compiler" depends="init">
 	<echo message="Copying .prp files"/>
 	<copy todir="${classes.dir}" overwrite="false">
 	    <fileset dir="${src.dir}" includes="com/sun/tools/corba/se/idl/**/*.prp"/>
 	</copy>
-	<echo message="Compiling idl compiler and jmk tool sources"/>
+	<echo message="Compiling idl compiler"/>
 	<javac srcdir="${src.dir}" destdir="${classes.dir}" 
 		classpathref="classpath.master" 
 		deprecation="${deprecation}"
@@ -303,7 +424,6 @@
 		optimize="${javac.optimize}"
 		failonerror="true">
 	    <include name="com/sun/tools/corba/se/idl/**"/>
-	    <include name="com/sun/tools/corba/se/jmk/**"/>
 	</javac>
 	<echo message="Copying .idl files"/>
 	<copy todir="${lib.dir}" flatten="yes" overwrite="false">
@@ -466,7 +586,7 @@
 	    <src path="${orblib.src.dir}"/>
 	    <include name="**"/>
 	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${orblib.classes.dir}"/>
 	</javac>
     </target>
 
@@ -527,6 +647,10 @@
 	-->
 	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor" fork="true"
 	    dir="${root.dir}">
+	    <bootclasspath>
+		<pathelement location="${releaselib.dir}/orblib.jar"/>
+		<pathelement location="${rt.jar}"/>
+	    </bootclasspath>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>
@@ -555,6 +679,10 @@
 	-->
 	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor" fork="true"
 	    dir="${root.dir}">
+	    <bootclasspath>
+		<pathelement location="${releaselib.dir}/orblib.jar"/>
+		<pathelement location="${rt.jar}"/>
+	    </bootclasspath>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>
@@ -593,6 +721,10 @@
 	<property name="tp-src-dir" value="${src.dir}/com/sun/tools/corba/se/timer"/>
 	<java classname="com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator" fork="true"
 	    dir="${tp-src-dir}">
+	    <bootclasspath>
+		<pathelement location="${releaselib.dir}/orblib.jar"/>
+		<pathelement location="${rt.jar}"/>
+	    </bootclasspath>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>
@@ -798,6 +930,10 @@
 	<mkdir dir="build/rename/ee"/>
 	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
 	    dir="${root.dir}">
+	    <bootclasspath>
+		<pathelement location="${releaselib.dir}/orblib.jar"/>
+		<pathelement location="${rt.jar}"/>
+	    </bootclasspath>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>

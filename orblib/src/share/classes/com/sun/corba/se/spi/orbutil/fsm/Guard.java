@@ -36,59 +36,15 @@
 
 package com.sun.corba.se.spi.orbutil.fsm;
 
+import com.sun.corba.se.spi.orbutil.generic.BinaryBooleanFunction ;
+import com.sun.corba.se.spi.orbutil.generic.BinaryIntFunction ;
+
 /**
  *
  * @author Ken Cavanaugh
  */
-public interface Guard
-{
-    public static final class Complement extends GuardBase {
-	private Guard guard ;
-
-	public Complement( GuardBase guard ) 
-	{
-	    super( "not(" + guard.getName() + ")" ) ;
-	    this.guard = guard ;
-	}
-
-	public Result evaluate( FSM fsm, Input in )
-	{
-	    return guard.evaluate( fsm, in ).complement() ;
-	}
-    }
-
-    public static final class Result {
-	private String name ;
-
-	private Result( String name ) 
-	{
-	    this.name = name ;
-	}
-
-	public static Result convert( boolean res ) 
-	{
-	    return res ? ENABLED : DISABLED ;
-	}
-
-	public Result complement() 
-	{
-	    if (this == ENABLED)
-		return DISABLED ;
-	    else if (this == DISABLED)
-		return ENABLED ;
-	    else 
-		return DEFERED ;
-	}
-	
-	public String toString()
-	{
-	    return "Guard.Result[" + name + "]" ;
-	}
-
-	public static final Result ENABLED = new Result( "ENABLED" ) ;
-	public static final Result DISABLED = new Result( "DISABLED" ) ;
-	public static final Result DEFERED = new Result( "DEFERED" ) ;
-    }
+public interface Guard {
+    enum Result { ENABLED, DISABLED, DEFERRED } ;
 
     /** Called by the state engine to determine whether a
     * transition is enabled, defered, or disabled.
@@ -108,6 +64,158 @@ public interface Guard
     * @param in is the input that caused the transition.
     */
     public Result evaluate( FSM fsm, Input in ) ;
+
+    public abstract class Base extends NameBase implements Guard {
+	public static abstract class SimpleName {
+	    private String name ;
+
+	    public SimpleName( String name ) {
+		this.name = name ;
+	    }
+
+	    public String toString() {
+		return name ;
+	    }
+	}
+
+	public static abstract class Predicate extends SimpleName 
+	    implements BinaryBooleanFunction<FSM,Input> {
+
+	    public Predicate( String name ) {
+		super( name ) ;
+	    }
+	}
+
+	public static abstract class IntFunc extends SimpleName 
+	    implements BinaryIntFunction<FSM,Input> {
+
+	    public IntFunc( String name ) {
+		super( name ) ;
+	    }
+	}
+
+	public static Guard makeGuard( final Predicate pred ) {
+	    return new Guard.Base( pred.toString() ) {
+		public Guard.Result evaluate( FSM fsm, Input in ) {
+		    return pred.evaluate( fsm, in ) ?
+			Result.ENABLED : Result.DISABLED ;
+		}
+	    } ;
+	}
+
+	public static Predicate not( final Predicate pred ) {
+	    return new Predicate( "!" + pred.toString() ) {
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    return !pred.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public static Predicate and( final Predicate arg1, final Predicate arg2 ) {
+	    return new Predicate( "(" + arg1.toString() + "&&" + arg2.toString() + ")" ) {
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    if (!arg1.evaluate( fsm, in ))
+			return false ;
+		    else 
+			return arg2.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public static Predicate or( final Predicate arg1, final Predicate arg2 ) {
+	    return new Predicate( "(" + arg1.toString() + "||" + arg2.toString() + ")" ) {
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    if (arg1.evaluate( fsm, in ))
+			return true ;
+		    else 
+			return arg2.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public static IntFunc constant( final int val ) {
+	    return new IntFunc( "constant(" + val + ")" ) {
+		public int evaluate( final FSM fsm, final Input input ) {
+		    return val ;
+		}
+	    } ;
+	}
+
+	/* This does not seem to be worthwhile
+	public static IntFunc field( final Class cls, final String fieldName ) {
+	    final Field fld = cls.getField( fieldName ) ;
+
+	    return new IntFunc( cls + "." + fieldName ) {
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    // check that fsm is an instance of cls
+		    return fld.getInt( fsm ) ;
+		}
+	    }
+	}
+	*/
+
+	public static Predicate lt( final IntFunc arg1, final IntFunc arg2 ) {
+	    return new Predicate( "(" + arg1.toString()
+		+ "<" + arg2.toString() + ")" ) {
+
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    return arg1.evaluate( fsm, in ) < arg2.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public static Predicate le( final IntFunc arg1, final IntFunc arg2 ) {
+	    return new Predicate( "(" + arg1.toString()
+		+ "<=" + arg2.toString() + ")" ) {
+		
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    return arg1.evaluate( fsm, in ) <= arg2.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public static Predicate gt( final IntFunc arg1, final IntFunc arg2 ) {
+	    return new Predicate( "(" + arg1.toString()
+		+ ">" + arg2.toString() + ")" ) {
+		
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    return arg1.evaluate( fsm, in ) > arg2.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public static Predicate ge( final IntFunc arg1, final IntFunc arg2 ) {
+	    return new Predicate( "(" + arg1.toString() 
+		+ ">=" + arg2.toString() + ")" ) {
+
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    return arg1.evaluate( fsm, in ) >= arg2.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public static Predicate eq( final IntFunc arg1, final IntFunc arg2 ) {
+	    return new Predicate( "(" + arg1.toString() 
+		+ "==" + arg2.toString() + ")" ) {
+
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    return arg1.evaluate( fsm, in ) == arg2.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public static Predicate ne( final IntFunc arg1, final IntFunc arg2 ) {
+	    return new Predicate( "(" + arg1.toString() 
+		+ "!=" + arg2.toString() + ")") {
+
+		public boolean evaluate( final FSM fsm, final Input in ) {
+		    return arg1.evaluate( fsm, in ) != arg2.evaluate( fsm, in ) ;
+		}
+	    } ;
+	}
+
+	public Base( String name ) { super( name ) ; } 
+    }
 }
 
 // end of Action.java

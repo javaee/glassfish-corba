@@ -34,12 +34,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orbutil.fsm ;
-
-import com.sun.corba.se.spi.orbutil.fsm.Action ;
-import com.sun.corba.se.spi.orbutil.fsm.State ;
-import com.sun.corba.se.spi.orbutil.fsm.Guard ;
-import com.sun.corba.se.spi.orbutil.fsm.Input ;
+package com.sun.corba.se.spi.orbutil.fsm ;
 
 import java.util.StringTokenizer ;
 

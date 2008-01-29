@@ -44,6 +44,12 @@ import com.sun.corba.se.spi.orbutil.fsm.StateImpl ;
 import com.sun.corba.se.spi.orbutil.fsm.StateEngineFactory ;
 import com.sun.corba.se.spi.orbutil.fsm.FSM ;
 
+
+import test.Test;
+import corba.framework.*;
+import java.util.*;
+
+
 class TestInput {
     TestInput( Input value, String msg )
     {
@@ -234,4 +240,29 @@ public class FSMTest {
 	fsm.doIt( in11.getInput() ) ;
 	fsm.doIt( in11.getInput() ) ;
     }
+public class TimerTest extends CORBATest
+{
+    private static String[] javaFiles = { "Client.java",
+	"ActivationSuite.java", "ControllableBaseSuite.java",
+	"NamedBaseSuite.java", "TimerFactorySuite.java", "TimerTest.java" };
+
+    protected void doTest() throws Throwable
+    {
+	Options.setJavaFiles( javaFiles ) ;
+
+        compileJavaFiles();
+
+	Controller client = createClient( "corba.timer.Client" ) ;
+
+	client.start();
+
+	// Wait for the client to finish for up to 2 minutes, then
+	// throw an exception.
+	client.waitFor(120000);
+
+	// Make sure all the processes are shut down.
+	client.stop();
+    }
+}
+
 }

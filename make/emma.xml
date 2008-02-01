@@ -143,7 +143,7 @@
              depth="method"
              columns="name,class,method,block,line"
         />
-	<xml outfile="../${ema.dir}/coverage.xml"
+	<xml outfile="../${emma.dir}/coverage.xml"
 	    depth="method"
 	    columns="name,class,method,block,line"
 	/>

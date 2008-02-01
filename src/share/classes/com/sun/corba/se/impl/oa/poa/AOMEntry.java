@@ -74,7 +74,7 @@ public class AOMEntry extends FSMImpl {
 
     final POAImpl poa ;
 
-    public static final State INVALID = new State( "Invalid" ) ;
+    public static final State INVALID = new State( "Invalid", State.Kind.INITIAL ) ;
     public static final State INCARN  = new State( "Incarnating" ) {
 	public void postAction( FSM fsm ) {
 	    AOMEntry entry = (AOMEntry)fsm ;

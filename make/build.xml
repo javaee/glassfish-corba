@@ -925,6 +925,25 @@
 	</exec>
     </target>
 
+    <target name="findbugs-xml" depends="init"> 
+	<mkdir dir="${test.output}"/>
+	<exec executable="findbugs">
+	    <arg value="-textui"/>
+	    <arg value="-xml"/>
+	    <arg value="-outputFile"/>
+	    <arg file="${test.output}/orb-fb.xml"/>
+	    <arg value="-exclude"/>
+	    <arg file="${findbugs.exclude.file}"/>
+	    <arg value="-sourcepath"/>
+	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
+	    <arg file="${releaselib.dir}/omgapi.jar"/>
+	    <!-- <arg file="${releaselib.dir}/idlj.jar"/> -->
+	    <arg file="${releaselib.dir}/orblib.jar"/>
+	    <arg file="${releaselib.dir}/peorb.jar"/>
+	    <!-- <arg file="${test-classes.dir}"/> -->
+	</exec>
+    </target>
+
     <!-- also depends on orb-library, but we need to prevent the recompilation -->
     <target name="rename" depends="init">
 	<mkdir dir="build/rename/ee"/>

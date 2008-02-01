@@ -334,7 +334,7 @@ public final class Wrapper {
     // Note that the state objects must extend State, so we cannot
     // use enum here.
     private static final State S_INIT = new State( "S_INIT", State.Kind.INITIAL ) ;
-    private static final State S_DONE = new State( "S_DONE" ) ;
+    private static final State S_DONE = new State( "S_DONE", State.Kind.FINAL ) ;
     private static final State S_PACKAGE = new State( "S_PACKAGE" ) ;
     private static final State S_CLASS = new State( "S_CLASS", State.Kind.INITIAL ) ;
     private static final State S_INITIALIZER = new State( "S_INITIALIZER" ) ;

@@ -888,7 +888,7 @@ public abstract class Test implements java.lang.Runnable
         }
     }
 
-    public static boolean run (String args[])
+    public static boolean run( String args[])
     {
         Hashtable flags = createFromConsolePairs(args);
 

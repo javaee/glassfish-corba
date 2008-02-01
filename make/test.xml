@@ -87,6 +87,14 @@
 
 <target name="test-all" depends="init, clean-test-output, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
 
+<target name="archive-test-results" depends="init">
+    <jar jarfile="${releaselib.dir}/test-results.jar">
+	<fileset dir="${test.output}">
+	    <include name="*"/>
+	</fileset>
+    </jar>
+</target>
+
 <target name="test" depends="init, build-tests, test-all"/>
 
 <target name="clean-test-output">

@@ -1,0 +1,184 @@
+-test corba.connectioncache.ConnectionCacheTest
+-test corba.timer.TimerTest
+// MixedOrbTest passes when run outside of the framework,
+// but fails in the framework.  It is commented out
+// until that problem is fixed.
+// -test corba.mixedorb.MixedOrbTest
+-test corba.resolve_deadlock.ResolveDeadlockTest
+
+// These two tests are for the special HW LB plugin code
+-test corba.lb.LBTest -ifpresent
+-test corba.retryplugin.RetryPluginTest -ifpresent
+
+-test corba.giopgen.GIOPGenTest
+-test corba.rfm.TestRFM
+-test corba.codegen.CodegenTest -ifpresent	// JUNIT
+-test corba.messagetrace.MessageTraceTest
+-test corba.misc.MiscTest					    // JUNIT
+-test corba.requestpartitioning.RequestPartitioningTest
+-test corba.rogueclient.RogueClientTest
+// Commented out until we get the ORB retry logic fixed.
+// -test corba.folb.FolbTest -ifpresent
+-test corba.folb_8_1.FolbTest
+-test corba.fwddecl.ForwardDeclTest
+-test corba.security.PermissionTest
+-test corba.unarrow.UncheckedNarrowTest
+-test corba.legacyorbclasses.LegacyORBClassesTest
+-test corba.legacybootstrapserver.LegacyBootstrapServerTest
+-test corba.stubserialization.StubSerializationTest		    // JUNIT
+-test corba.dynamicrmiiiop.DynamicRmiIIOPTest			    // JUNIT
+-test corba.threadpoolmonitoring.ThreadPoolMonitoringTests
+-test corba.adapteractivator.AdapterActivator
+-test corba.monitoring.MonitoringTests
+-test corba.exceptiondetailsc.ExceptionDetailSCTest
+-test corba.preinvokepostinvoke.PreInvokePostInvokeTest
+-test corba.poacallback.POACallbackTest
+-test corba.islocal.IsLocalTest
+//-test corba.pept.PEPTTest
+-test corba.strm2.Strm2Test
+-test corba.orbconfig.NewORBTests
+//-test corba.orbconfigappserv.ORBConfigAppServTest
+-test corba.iorintsockfact.IorIntSockFactTest
+-test corba.connectintercept_1_4.ConnectIntercept_1_4Test
+// connections is commented out until we fix the connection management
+// failure on J2SE 5.
+// -test corba.connections.ConnectionsTest
+-test corba.cdrext.CDRExtTest
+-test corba.serialization.zerolengthstring.ZeroLengthStringTest
+// Commented out until we update to more recent XML tools
+// -test corba.genericRPCMSGFramework.GenericRPCMSGFrameworkTest
+-test corba.purgecalls.PurgecallsTest
+-test corba.codeset.CodeSetTest
+-test corba.codebase.CodeBaseTest
+-test corba.hcks.HcksTest
+-test corba.ior.IORTests
+-test corba.ortremote.ORTRemoteTest
+-test corba.poamanager.POAManagerTest
+-test corba.example.Example
+-test corba.oneway.OneWayTest
+-test corba.poatest.OneWayTest
+-test corba.rmipoacounter.RMIPOACounterTest -separateprocess
+-test corba.poapolicies.POAPoliciesTest
+-test corba.poaandequals.POAAndEquals -separateprocess
+-test corba.multiorb.MultiORBTest
+-test corba.serialization.good.GoodRepIdTest
+-test corba.cdrstreams.CDRTests
+-test corba.giopheaderpadding.GIOPHeaderPaddingTest
+-test corba.systemexceptions.SystemExceptionsTest
+-test corba.rmic.RmicTest
+-test corba.jsg.JSGTest
+-test corba.repid.RepIdTest
+-test corba.invocation.InvocationTest
+-test corba.custom.CustomTest
+-test corba.evolve.EvolveTest
+
+// Leave these last four at the end. 
+// They go through long combinations of fragments sizes or GIOP combinations.
+-test corba.cmvt.CMVTTest
+-test corba.fragment2.FragmentTest
+-test corba.fragment.FragmentTest 
+-test corba.msgtypes.MsgTypesTest 
+
+// If JSG is ON, the following tests internally skip all tests,
+// because they have been excluded programmatically.
+//
+// corba.messagetrace.MessageTraceTest		    // JUNIT
+// corba.strm2.Strm2Test
+// corba.ortremote.ORTRemoteTest
+// corba.codebase.CodeBaseTest
+// corba.cdrstreams.CDRTests
+// corba.giopheaderpadding.GIOPHeaderPaddingTest
+
+-test corba.copyobjectpolicy.CopyObjectPolicyTest
+
+-test corba.copyobject.CopyObjectTest			// JUNIT
+
+// Fixed 4670827: INS does not recognize IPV6 URLs
+// Warning: This test can only be run on Jano. The address is hard coded, will
+// be made general test when time permits. This is only for SQE to test.
+// -test hopper.h4670827.INSTest
+
+// Fixed 4486041: ORB.init() could provide better failure diagnostics
+-test hopper.h4486041.ORBInitErrorTest
+
+// Fixed 4549085: ORB locked into Latin-1 char set for request messages
+-test hopper.h4549085.LockedCodeSetTest
+
+// Fixed 4515953: RMIC doesn't compile Interfaces whose method has IDLEntity as
+// return values or parameters
+// Commented out temporarily. For now, run the stand alone test case attached
+// in the bug traq
+//-test hopper.h4515953.RMICIDLEntityTest
+
+// Not required to be run as part of Hopper, it is a fix for the package rename.
+//-test hopper.h4645953.ValidateIdlModules
+
+// Fixed 4647746: POA does not work when ORB.init is called for an Applet
+-test hopper.h4647746.POAAppletTest
+
+// Fixed 4655388: POA.the_children() method throws ClassCastException
+-test hopper.h4655388.POAHierarchyTest
+
+// Fixed 4620926: ServantActivator.incarnate() being invoked more than once
+-test hopper.h4620926.ConcurrentServantActivatorTest
+
+// Fixed 4661596: Bad TypeCode from org.omg.CORBA.WStringValueHelper
+-test hopper.h4661596.WStringValueHelperTest
+
+
+// Fixed 4764130: ClientDelegate.addServiceContexts() records connections prematurely
+-test mantis.m4764130.SendingContextTest
+
+// The following tests are not run if JSG is ON. This is done programmatically.
+// mantis.m4764130.SendingContextTest
+
+-test naming.instest.INSTest
+-test naming.rinameservice.RINameServiceTest
+-test naming.cosnaming.Test
+
+-test naming.pcosnaming.PCOSNamingTest -separateprocess
+
+-test performance.simpleperf.SimplePerfTest
+-test performance.simpleperf2.SimplePerfTest
+
+// This is an important test, but it does not
+// currently run: it seems to be missing the ArbitraryObjectServiceImpl class.
+// -test pi.serviceexample.ServiceExampleTest
+
+-test pi.ort.ORTTest
+-test pi.iorinterceptor.IORInterceptorTest
+-test pi.codec.CodecTest
+-test pi.orbinit.ORBInitTest
+
+-test pi.clientinterceptor.ClientInterceptorTest
+-test pi.clientrequestinfo.ClientRequestInfoTest
+-test pi.serverinterceptor.ServerInterceptorTest
+-test pi.serverrequestinfo.ServerRequestInfoTest
+-test pi.policyfactory.PolicyFactoryTest
+
+-test javax.rmi.CORBA.serialization.SerializationTest
+-test test12.SerializationTest -vm 1.2
+-test anytest.AnyTest
+
+// This has to be run in a separate process because it
+// clobbers environment variables like java.rmi.server.codebase
+-test javax.rmi.ClassLoadTest -separateprocess
+-test rmic.ParseTest
+
+// Test FullValueDescription 
+// DO NOT MOVE THIS TEST TO RUN AFTER rmic.HelloTest, It hangs at times on
+// Windows.
+-test javax.rmi.fvd.TheTest -separateprocess
+
+-test rmic.HelloTest
+-test rmic.HelloTest -localservants -normic
+-test rmic.InnerTest
+-test rmic.StaticStringsHashTest
+-test rmic.StubReferenceTest
+-test javax.rmi.download.TheTest
+-test javax.rmi.test1.TheTest
+-test rmic.LocalStubTest
+-test javax.rmi.PROTest
+-test javax.rmi.PROTest -jrmp -separateprocess
+-test ibmspace.spacetest.SpaceTest -separateprocess
+-test ibmspace.spacetest.SpaceTest -jrmp -separateprocess

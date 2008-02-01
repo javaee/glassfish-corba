@@ -741,6 +741,7 @@ public class Client {
 
     public static void main( String[] args ) {
 	TestNG tng = new TestNG() ;
+	tng.setOutputDirectory( "gen/corba/connectioncache/test-output" ) ;
 
 	Class[] tngClasses = new Class[] {
 	    Client.class 

@@ -154,6 +154,7 @@
 
 	<property name="build.dir" location="build"/>
 	<property name="emma.dir" value="build/coverage"/>
+	<property name="findbugs.dir" location="build/findbugs"/>
 	<property name="gensrc.dir" location="${build.dir}/gensrc"/>
 	<property name="lib.dir" location="${build.dir}/lib"/>
 	<property name="classes.dir" location="${build.dir}/classes"/>
@@ -739,6 +740,7 @@
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
 	<delete dir="${test-build.dir}"/>
+	<delete dir="www/javadoc"/>
     </target>
 
     <target name="clean-emma" depends="init">
@@ -907,12 +909,12 @@
     <!-- <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/> -->
     
     <target name="findbugs" depends="init"> 
-	<mkdir dir="${test.output}"/>
+	<mkdir dir="${findbugs.dir}"/>
 	<exec executable="findbugs">
 	    <arg value="-textui"/>
 	    <arg value="-html"/>
 	    <arg value="-outputFile"/>
-	    <arg file="${test.output}/orb-fb.html"/>
+	    <arg file="${findbugs.dir}/orb-fb.html"/>
 	    <arg value="-exclude"/>
 	    <arg file="${findbugs.exclude.file}"/>
 	    <arg value="-sourcepath"/>
@@ -926,12 +928,12 @@
     </target>
 
     <target name="findbugs-xml" depends="init"> 
-	<mkdir dir="${test.output}"/>
+	<mkdir dir="${findbugs.dir}"/>
 	<exec executable="findbugs">
 	    <arg value="-textui"/>
 	    <arg value="-xml"/>
 	    <arg value="-outputFile"/>
-	    <arg file="${test.output}/orb-fb.xml"/>
+	    <arg file="${findbugs.dir}/orb-fb.xml"/>
 	    <arg value="-exclude"/>
 	    <arg file="${findbugs.exclude.file}"/>
 	    <arg value="-sourcepath"/>

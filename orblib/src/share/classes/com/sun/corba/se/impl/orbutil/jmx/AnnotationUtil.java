@@ -202,6 +202,7 @@ public abstract class AnnotationUtil {
     //	    boolean isId() ;
     //	    Boolean isId() ;
 
+    // Tested by testIsSetterIsGetter
     public static boolean isSetter( final Method m, final String id ) {
 	Class<?> rt = m.getReturnType() ;
 	if (rt != void.class) 
@@ -221,6 +222,7 @@ public abstract class AnnotationUtil {
 	return false ;
     }
 
+    // Tested by testIsSetterIsGetter
     public static boolean isGetter( final Method m, final String id ) {
 	Class<?> rt = m.getReturnType() ;
 	if (rt == void.class) 

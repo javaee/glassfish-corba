@@ -56,6 +56,8 @@ import java.util.HashSet ;
 
 import java.io.PrintWriter ;
 
+import javax.management.openmbean.SimpleType ;
+
 import org.testng.TestNG ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
@@ -71,6 +73,8 @@ import com.sun.corba.se.impl.orbutil.newtimer.VersionedHashSet ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 
 import com.sun.corba.se.impl.orbutil.jmx.AnnotationUtil ;
+import com.sun.corba.se.impl.orbutil.jmx.TypeConverter ;
+import com.sun.corba.se.impl.orbutil.jmx.ManagedObjectManagerImpl ;
 
 import static java.util.Arrays.asList ;
 
@@ -398,6 +402,53 @@ public class Client {
     }
 
     // @ExpectedExceptions( { IllegalArgumentException.class } )
+
+    //==============================================================================================
+    // Tests for TypeConverter class
+    //==============================================================================================
+    
+    // For each kind of type, test:
+    // getDataType
+    // getManagedType
+    // toManagedEntity
+    // fromManagedEntity
+    // isIdentity
+    //
+    // to/from round trip should result in equal objects (java -> managed -> java -> managed)
+    //
+    // Types to test:
+    //
+    // primitives 
+    // Data, ObjectName, String, BigDecimal, BigInteger
+    // enum
+    // ManagedObject
+    // ManagedData
+    // C<X> for a subtype of Collection
+    // M<K,V> for a subtype of map (map, sorted map)
+    // X[]
+    // Main cases of interest for collections, maps, and arrays are ManagedObject, ManagedData, and something 
+    // simple like String
+    // Defer testing of TypeVariable and WildCardType
+    // Also test an arbitrary class not of the above (uses toString, may or may not have a <init>( String )
+    // constructor
+
+    @Test
+    public void testBooleanTypeConverter() {
+	ManagedObjectManagerImpl mom = new ManagedObjectManagerImpl( "ORBTest" ) ;
+	TypeConverter tc = TypeConverter.makeTypeConverter( boolean.class, mom ) ;
+
+	Assert.assertTrue( tc.getDataType() == boolean.class ) ;
+	Assert.assertTrue( tc.getManagedType() == SimpleType.BOOLEAN ) ;
+	Assert.assertTrue( tc.isIdentity() ) ;
+
+	Boolean value = Boolean.TRUE ;
+	Object managed = tc.toManagedEntity( value ) ;
+	Object value2 = tc.fromManagedEntity( managed ) ;
+	Assert.assertEquals( value, value2 ) ;
+
+	Object managed2 = tc.toManagedEntity( value2 ) ;
+	Assert.assertEquals( managed, managed2 ) ;
+    }
 
     public static void main( String[] args ) {
 	TestNG tng = new TestNG() ;

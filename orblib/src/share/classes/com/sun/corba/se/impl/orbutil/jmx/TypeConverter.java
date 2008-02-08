@@ -82,7 +82,7 @@ import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
 /** A ManagedEntity is one of the pre-defined Open MBean types: SimpleType, ObjectName, 
  * TabularData, or CompositeData.
  */
-abstract class TypeConverter {
+public abstract class TypeConverter {
     private static Map<Type,OpenType> simpleTypeMap = new HashMap<Type,OpenType>() ;
     private static Map<OpenType,Type> simpleOpenTypeMap = new HashMap<OpenType,Type>() ;
 
@@ -296,19 +296,19 @@ abstract class TypeConverter {
 	final ManagedObjectManagerImpl mom, ManagedObject mo ) {
 
 	return new TypeConverter() {
-	    Type getDataType() {
+	    public Type getDataType() {
 		return type ;
 	    }
 
-	    OpenType getManagedType() {
+	    public OpenType getManagedType() {
 		return SimpleType.OBJECTNAME ;
 	    }
 
-	    Object toManagedEntity( Object obj ) {
+	    public Object toManagedEntity( Object obj ) {
 		return mom.getObjectName( obj ) ;
 	    }
 
-	    Object fromManagedEntity( Object entity ) {
+	    public Object fromManagedEntity( Object entity ) {
 		if (!(entity instanceof ObjectName))
 		    throw new IllegalArgumentException( 
 			"Management entity " + entity + " is not an ObjectName" ) ;
@@ -317,7 +317,7 @@ abstract class TypeConverter {
 		return mom.getObject( oname ) ;
 	    }
 
-	    boolean isIdentity() {
+	    public boolean isIdentity() {
 		return false ; 
 	    }
 	} ;
@@ -340,15 +340,15 @@ abstract class TypeConverter {
 	final OpenType myManagedType = ot ;
 
 	return new TypeConverter() {
-	    Type getDataType() {
+	    public Type getDataType() {
 		return type ;
 	    }
 
-	    OpenType getManagedType() {
+	    public OpenType getManagedType() {
 		return myManagedType ;
 	    }
 
-	    Object toManagedEntity( Object obj ) {
+	    public Object toManagedEntity( Object obj ) {
 		if (isIdentity()) {
 		    return obj ;
 		} else {
@@ -365,7 +365,7 @@ abstract class TypeConverter {
 		}
 	    }
 
-	    Object fromManagedEntity( Object entity ) {
+	    public Object fromManagedEntity( Object entity ) {
 		if (isIdentity()) {
 		    return entity ;
 		} else {
@@ -383,7 +383,7 @@ abstract class TypeConverter {
 		}
 	    }
 
-	    boolean isIdentity() {
+	    public boolean isIdentity() {
 		return ctypeTc.isIdentity() ; 
 	    }
 	} ;
@@ -403,19 +403,19 @@ abstract class TypeConverter {
 	final Constructor cons = cs ;
 
 	return new TypeConverter() {
-	    Type getDataType() {
+	    public Type getDataType() {
 		return cls ;
 	    }
 
-	    OpenType getManagedType() {
+	    public OpenType getManagedType() {
 		return SimpleType.STRING ;
 	    }
 
-	    Object toManagedEntity( Object obj ) {
+	    public Object toManagedEntity( Object obj ) {
 		return obj.toString() ;
 	    }
 
-	    Object fromManagedEntity( Object entity ) {
+	    public Object fromManagedEntity( Object entity ) {
 		if (cons != null) {
 		    try {
 			String str = (String)entity ;
@@ -432,7 +432,7 @@ abstract class TypeConverter {
 		}
 	    }
 
-	    boolean isIdentity() {
+	    public boolean isIdentity() {
 		return false ; 
 	    }
 	} ;
@@ -442,29 +442,29 @@ abstract class TypeConverter {
 	final ManagedObjectManagerImpl mom, final OpenType stype ) {
 
 	return new TypeConverter() {
-	    Type getDataType() {
+	    public Type getDataType() {
 		return cls ;
 	    }
 
-	    OpenType getManagedType() {
+	    public OpenType getManagedType() {
 		return stype ;
 	    }
 
-	    Object toManagedEntity( Object obj ) {
+	    public Object toManagedEntity( Object obj ) {
 		return obj ;
 	    }
 
-	    Object fromManagedEntity( Object entity ) {
+	    public Object fromManagedEntity( Object entity ) {
 		return entity ;
 	    }
 
-	    boolean isIdentity() {
+	    public boolean isIdentity() {
 		return true ; 
 	    }
 	} ;
     }
     
-    public static List<AnnotationUtil.MethodInfo> analyzeManagedData( final Class<?> cls, 
+    private static List<AnnotationUtil.MethodInfo> analyzeManagedData( final Class<?> cls, 
 	final ManagedObjectManagerImpl mom ) {
 	
 	List<AnnotationUtil.MethodInfo> minfos = new ArrayList<AnnotationUtil.MethodInfo>() ;
@@ -553,15 +553,15 @@ abstract class TypeConverter {
 	final CompositeType myType = ot ;
 
 	return new TypeConverter() {
-	    Type getDataType() {
+	    public Type getDataType() {
 		return cls ;
 	    }
 
-	    OpenType getManagedType() {
+	    public OpenType getManagedType() {
 		return myType ;
 	    }
 
-	    Object toManagedEntity( Object obj ) {
+	    public Object toManagedEntity( Object obj ) {
 		Map<String,Object> data = new HashMap<String,Object>() ;
 		for (AnnotationUtil.MethodInfo minfo : minfos ) {
 		    Method method = minfo.method() ;
@@ -584,12 +584,12 @@ abstract class TypeConverter {
 		}
 	    }
 
-	    Object fromManagedEntity( Object entity ) {
+	    public Object fromManagedEntity( Object entity ) {
 		throw new UnsupportedOperationException(
 		    "We do not support converting CompositeData back into Java objects" ) ;
 	    }
 
-	    boolean isIdentity() {
+	    public boolean isIdentity() {
 		return false ; 
 	    }
 	} ;
@@ -599,26 +599,26 @@ abstract class TypeConverter {
 	final ManagedObjectManagerImpl mom ) {
 
 	return new TypeConverter() {
-	    Type getDataType() {
+	    public Type getDataType() {
 		return type ;
 	    }
 
-	    OpenType getManagedType() {
+	    public OpenType getManagedType() {
 		// XXX implement me
 		return null ;
 	    }
 
-	    Object toManagedEntity( Object obj ) {
+	    public Object toManagedEntity( Object obj ) {
 		// XXX implement me
 		return null ;
 	    }
 
-	    Object fromManagedEntity( Object entity ) {
+	    public Object fromManagedEntity( Object entity ) {
 		throw new UnsupportedOperationException(
 		    "We do not support converting TabularData back into Java objects" ) ;
 	    }
 
-	    boolean isIdentity() {
+	    public boolean isIdentity() {
 		return false ; 
 	    }
 	} ;
@@ -626,22 +626,22 @@ abstract class TypeConverter {
 
     /** Java generic type of attribute in problem-domain Object.
      */
-    abstract Type getDataType() ;
+    public abstract Type getDataType() ;
 
     /** Open MBeans Open Type for management domain object.
      */
-    abstract OpenType getManagedType() ;
+    public abstract OpenType getManagedType() ;
 
     /** Convert from a problem-domain Object obj to a ManagedEntity.
      */
-    abstract Object toManagedEntity( Object obj ) ;
+    public abstract Object toManagedEntity( Object obj ) ;
 
     /** Convert from a ManagedEntity to a problem-domain Object.
      */
-    abstract Object fromManagedEntity( Object entity ) ;
+    public abstract Object fromManagedEntity( Object entity ) ;
 
     /** Returns true if this TypeConverter is an identity transformation.
      */
-    abstract boolean isIdentity() ;
+    public abstract boolean isIdentity() ;
 }
 

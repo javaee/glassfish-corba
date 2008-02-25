@@ -44,6 +44,10 @@ public interface Echo extends Remote {
     Echo say( Echo obj ) throws RemoteException ;
 
     String name() throws RemoteException ;
+
+    /** Can send enough data to force fragmentation
+     */
+    int[] echo( int[] arg ) throws RemoteException ;
 }
 
 

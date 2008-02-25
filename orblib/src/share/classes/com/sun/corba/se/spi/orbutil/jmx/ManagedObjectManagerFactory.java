@@ -40,11 +40,13 @@ import com.sun.corba.se.impl.orbutil.jmx.ManagedObjectManagerImpl ;
 
 /** Factory used to create ManagedObjectManager instances.
  */
-public class ManagedObjectManagerFactory {
+public final class ManagedObjectManagerFactory {
+    private ManagedObjectManagerFactory() {}
+
     /** Create a new ManagedObjectManager.  All objectnames created will share the
      * domain value passed on this call.
      */
-    public ManagedObjectManager create( String domain ) {
+    public static ManagedObjectManager create( String domain ) {
 	return new ManagedObjectManagerImpl( domain ) ;
     }
 
@@ -53,7 +55,7 @@ public class ManagedObjectManagerFactory {
      * This allows creating a ManagedObjectManager for managed objects that share
      * a set of properties in their ObjectNames.
      */
-    public ManagedObjectManager create( ManagedObjectManager mom, String... props ) {
+    public static ManagedObjectManager create( ManagedObjectManager mom, String... props ) {
 	return ManagedObjectManagerImpl.makeDelegate( mom, props ) ;
     }
 }

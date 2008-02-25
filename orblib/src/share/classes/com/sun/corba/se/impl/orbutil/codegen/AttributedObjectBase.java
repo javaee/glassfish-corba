@@ -48,6 +48,22 @@ import com.sun.corba.se.spi.orbutil.copyobject.CopyType ;
  * supports lazy copying of AttributedObject instances.
  */
 public class AttributedObjectBase implements AttributedObject, CopyInterceptor {
+    // Copying AttributedObjectBase is complicated, because we want to make
+    // sure that after the copy, source and dest have the same attributes,
+    // but whenever an attribute is set either in the source or the dest, it
+    // is not visible to the other node.  We do this by making both the
+    // source and the dest point to the same delegate, which carries the 
+    // attributes originally present in the source.  This happens in 3 parts:
+    // 1. The preCopy method is invoked, which introduces a new delegate in the
+    //    source object, which carries the sources old delegate and attributes.
+    // 2. During the copy, the destination object's delegate points to the source object.
+    // 3. After the copy, the destination object's delegate is moved to the source 
+    //    object's delegate in the postCopy method.
+    // At this point, the source and dest share the same delegate, which contains the
+    // original attributes of the source object.  Any set calls on either the 
+    // source or dest will allocate a new attributes objects, which will be used for
+    // all attribute setting.
+
     // This method is invoked on the source before the copy.  If the 
     // source has attributes, this causes the source to delegate to a new
     // AttributedObjectBase object which has the attributes that the source
@@ -65,7 +81,7 @@ public class AttributedObjectBase implements AttributedObject, CopyInterceptor {
     }
 
     // This method is invoked on the result of the copy after all fields have been
-    // copied.  If the result has a delegate, the delegate poinst to the source,
+    // copied.  If the result has a delegate, the delegate points to the source,
     // but we really want to point to the source's delegate, thus avoiding any conflict
     // between the source and the result setting attribute values.
     public void postCopy() {
@@ -107,9 +123,13 @@ public class AttributedObjectBase implements AttributedObject, CopyInterceptor {
 
     public final Object get( int index ) {
 	ensure( index ) ;
-	Object result = attributes.get(index) ;
+	Object result = null ;
+	if (attributes != null)
+	    result = attributes.get(index) ;
+
 	if ((result == null) && (delegate != null))
 	    result = delegate.get( index ) ;
+
 	return result ;
     }
 

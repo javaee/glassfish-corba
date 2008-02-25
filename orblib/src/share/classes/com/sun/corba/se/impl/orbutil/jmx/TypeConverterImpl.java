@@ -78,11 +78,12 @@ import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
+import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
 /** A ManagedEntity is one of the pre-defined Open MBean types: SimpleType, ObjectName, 
  * TabularData, or CompositeData.
  */
-public abstract class TypeConverter {
+public abstract class TypeConverterImpl implements TypeConverter {
     private static Map<Type,OpenType> simpleTypeMap = new HashMap<Type,OpenType>() ;
     private static Map<OpenType,Type> simpleOpenTypeMap = new HashMap<OpenType,Type>() ;
 
@@ -92,7 +93,6 @@ public abstract class TypeConverter {
     }
 
     static {
-	// XXX maps are not 1-1: is this a problem?
 	initMaps( boolean.class, SimpleType.BOOLEAN ) ;
 	initMaps( Boolean.class, SimpleType.BOOLEAN ) ;
 
@@ -206,6 +206,8 @@ public abstract class TypeConverter {
      *					The inherited table is mapped to TabularData.  
      *					The InheritTable annotation specifies a class X, which must
      *					be part of the Type C<X>, where C is a subclass of Collection.  
+     *					Since the row type of TabularData is CompositeData, X
+     *					must map to a CompositeData type.
      *					The TabularData contains elements of type OT(X).
      *					JT -> OT: invoke attribute methods, collect results, 
      *					    construct CompositeDataSupport
@@ -234,7 +236,7 @@ public abstract class TypeConverter {
      *					subclasses identified by @IncludeSubclass should be used when 
      *					mapping the actual data to a CompositeData instance.
      *					Not supported: lower bounds (what would that mean?  Do I need it?)
-     *						       multiple upper bounds (I don't think I need this?
+     *						       multiple upper bounds (I don't think I need this?)
      *					Multiple upper bounds PROBABLY means the intersection of the 
      *					included subclasses for all of the bounds
      *
@@ -249,7 +251,7 @@ public abstract class TypeConverter {
      * For now, we will ignore this, because I think all CompositeData types in the ORB will be read only.
      * If this is NOT the case, we can adopt a solution similar to the MXBean @ConstructorProperties.
      */
-    public static TypeConverter makeTypeConverter( Type type, ManagedObjectManagerImpl mom ) {
+    public static TypeConverter makeTypeConverter( Type type, ManagedObjectManager mom ) {
 	OpenType stype = simpleTypeMap.get( type ) ;
 	if (stype != null) {
 	    return handleSimpleType( (Class)type, mom, stype ) ;
@@ -264,12 +266,12 @@ public abstract class TypeConverter {
 		return handleManagedObject( cls, mom, mo ) ;
 	    } else if (md != null) {
 		return handleManagedData( cls, mom, md ) ;
+	    } else if (cls.isEnum()) {
+		return handleEnum( cls, mom ) ;
 	    } else {
 		// map to string
 		return handleAsString( cls, mom ) ;
 	    }
-
-	    // XXX still need to handle enums
 	} 
 	
 	if (type instanceof ParameterizedType) {
@@ -293,9 +295,9 @@ public abstract class TypeConverter {
     }
 
     private static TypeConverter handleManagedObject( final Class type, 
-	final ManagedObjectManagerImpl mom, ManagedObject mo ) {
+	final ManagedObjectManager mom, ManagedObject mo ) {
 
-	return new TypeConverter() {
+	return new TypeConverterImpl() {
 	    public Type getDataType() {
 		return type ;
 	    }
@@ -324,7 +326,7 @@ public abstract class TypeConverter {
     }
 
     private static TypeConverter handleArrayType( final GenericArrayType type, 
-	final ManagedObjectManagerImpl mom ) {
+	final ManagedObjectManager mom ) {
 
 	final Type ctype = type.getGenericComponentType() ;
 	final TypeConverter ctypeTc = mom.getTypeConverter( ctype ) ;
@@ -339,7 +341,7 @@ public abstract class TypeConverter {
 
 	final OpenType myManagedType = ot ;
 
-	return new TypeConverter() {
+	return new TypeConverterImpl() {
 	    public Type getDataType() {
 		return type ;
 	    }
@@ -389,8 +391,37 @@ public abstract class TypeConverter {
 	} ;
     }
 
+    private static TypeConverter handleEnum( final Class cls, 
+	final ManagedObjectManager mom ) {
+
+	return new TypeConverterImpl() {
+	    public Type getDataType() {
+		return cls ;
+	    }
+
+	    public OpenType getManagedType() {
+		return SimpleType.STRING ;
+	    }
+
+	    public Object toManagedEntity( Object obj ) {
+		return obj.toString() ;
+	    }
+
+	    public Object fromManagedEntity( Object entity ) {
+		if (!(entity instanceof String))
+		    throw new IllegalArgumentException( entity + " is not a String" ) ;
+
+		return Enum.valueOf( cls, (String)entity ) ;
+	    }
+
+	    public boolean isIdentity() {
+		return false ; 
+	    }
+	} ;
+    }
+
     private static TypeConverter handleAsString( final Class cls, 
-	final ManagedObjectManagerImpl mom ) {
+	final ManagedObjectManager mom ) {
 
 	Constructor cs = null ;
 	try {
@@ -402,7 +433,7 @@ public abstract class TypeConverter {
 	}
 	final Constructor cons = cs ;
 
-	return new TypeConverter() {
+	return new TypeConverterImpl() {
 	    public Type getDataType() {
 		return cls ;
 	    }
@@ -439,9 +470,9 @@ public abstract class TypeConverter {
     }
 
     private static TypeConverter handleSimpleType( final Class cls, 
-	final ManagedObjectManagerImpl mom, final OpenType stype ) {
+	final ManagedObjectManager mom, final OpenType stype ) {
 
-	return new TypeConverter() {
+	return new TypeConverterImpl() {
 	    public Type getDataType() {
 		return cls ;
 	    }
@@ -465,7 +496,7 @@ public abstract class TypeConverter {
     }
     
     private static List<AnnotationUtil.MethodInfo> analyzeManagedData( final Class<?> cls, 
-	final ManagedObjectManagerImpl mom ) {
+	final ManagedObjectManager mom ) {
 	
 	List<AnnotationUtil.MethodInfo> minfos = new ArrayList<AnnotationUtil.MethodInfo>() ;
 
@@ -519,7 +550,7 @@ public abstract class TypeConverter {
     }
 
     private static TypeConverter handleManagedData( final Class cls, 
-	final ManagedObjectManagerImpl mom, final ManagedData md ) {
+	final ManagedObjectManager mom, final ManagedData md ) {
 
 	final List<AnnotationUtil.MethodInfo> minfos = analyzeManagedData(
 	    cls, mom ) ;
@@ -552,7 +583,7 @@ public abstract class TypeConverter {
 	}
 	final CompositeType myType = ot ;
 
-	return new TypeConverter() {
+	return new TypeConverterImpl() {
 	    public Type getDataType() {
 		return cls ;
 	    }
@@ -596,7 +627,7 @@ public abstract class TypeConverter {
     }
 
     private static TypeConverter handleParameterizedType( final ParameterizedType type, 
-	final ManagedObjectManagerImpl mom ) {
+	final ManagedObjectManager mom ) {
 
 	return new TypeConverter() {
 	    public Type getDataType() {

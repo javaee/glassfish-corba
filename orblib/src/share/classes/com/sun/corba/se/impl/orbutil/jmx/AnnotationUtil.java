@@ -68,6 +68,7 @@ import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
+import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
     
 public abstract class AnnotationUtil {
     // General purpose class analyzer
@@ -179,8 +180,10 @@ public abstract class AnnotationUtil {
         UnaryFunction<Class<?>,Pair<Class<?>,T>> func = 
 	    new UnaryFunction<Class<?>,Pair<Class<?>,T>>() {
 		public Pair<Class<?>,T> evaluate( final Class<?> cls ) {
-                    return new Pair<Class<?>,T>( cls,
-                        cls.getAnnotation(annotation) ) ; 
+		    T aval = cls.getAnnotation(annotation) ;
+		    return (aval == null) ? 
+			null :
+			new Pair<Class<?>,T>( cls, aval ) ;
                 }
             } ;
         
@@ -193,7 +196,6 @@ public abstract class AnnotationUtil {
     // patterns:
     //	Setter:
     //	    void setId( T arg ) ;
-    //
     //
     //	    void id( T arg ) ;
     //	Getter:
@@ -270,6 +272,20 @@ public abstract class AnnotationUtil {
 
     public enum AttributeType { SETTER, GETTER } ;
 
+    private static boolean startsWithNotEquals( String str, String prefix ) {
+	return str.startsWith( str ) && !str.equals( prefix ) ;
+    }
+
+    private static String stripPrefix( String str, String prefix ) {
+	int prefixLength = prefix.length() ;
+	String first = str.substring( prefixLength, prefixLength+1 ).toLowerCase() ;
+	if (str.length() == prefixLength + 1) {
+	    return first ;
+	} else {
+	    return first + str.substring( prefixLength + 1 ) ;
+	}
+    }
+
     public static final class MethodInfo {
 	private Method method ;
 	private String id ;
@@ -286,16 +302,16 @@ public abstract class AnnotationUtil {
 	public final TypeConverter tc() { return tc ; }
 
 	// Handle a method that is NOT annotated with @ManagedAttribute
-	public MethodInfo( ManagedObjectManagerImpl mom, Method m, String extId, String description ) {
+	public MethodInfo( ManagedObjectManager mom, Method m, String extId, String description ) {
 	    this.method = m ;
 	    this.id = extId ;
 	    this.description = description ;
 
 	    final String name = m.getName() ;
-	    if (name.startsWith( "get" )) {
+	    if (startsWithNotEquals( name, "get" )) {
 		if (extId.equals( "" )) {
-		    id = name.substring( 3,1 ).toLowerCase() + name.substring( 4 ) ;
-		} 
+		    id = stripPrefix( name, "get" ) ;
+		}
 
 		this.atype = AttributeType.GETTER ;
 
@@ -304,9 +320,9 @@ public abstract class AnnotationUtil {
 		if (m.getGenericParameterTypes().length != 0)
 		    throw new IllegalArgumentException( m + " is an illegal getter method" ) ;
 		this.type = m.getGenericReturnType() ;
-	    } else if (name.startsWith( "set" )) {
+	    } else if (startsWithNotEquals( name, "set" )) {
 		if (extId.equals( "" )) {
-		    id = name.substring( 3,1 ).toLowerCase() + name.substring( 4 ) ;
+		    id = stripPrefix( name, "set" ) ;
 		}
 
 		this.atype = AttributeType.SETTER ;
@@ -316,9 +332,9 @@ public abstract class AnnotationUtil {
 		if (m.getGenericParameterTypes().length != 1 ) 
 		    throw new IllegalArgumentException( m + " is an illegal setter method" ) ;
 		this.type = m.getGenericParameterTypes()[0] ;
-	    } else if (name.startsWith( "is" )) {
+	    } else if (startsWithNotEquals( name, "is" )) {
 		if (extId.equals( "" )) {
-		    id = name.substring( 2,1 ).toLowerCase() + name.substring( 3 ) ;
+		    id = stripPrefix( name, "is" ) ;
 		}
 
 		this.atype = AttributeType.GETTER ;
@@ -350,7 +366,7 @@ public abstract class AnnotationUtil {
 	}
 
 	// Handle a method with an @ManagedAttribute annotation
-	public MethodInfo( ManagedObjectManagerImpl mom, Method m ) {
+	public MethodInfo( ManagedObjectManager mom, Method m ) {
 	    this( mom, m,
 		m.getAnnotation( ManagedAttribute.class ).id(),
 		m.getAnnotation( ManagedAttribute.class ).description() ) ;

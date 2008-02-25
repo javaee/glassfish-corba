@@ -48,6 +48,7 @@ import java.util.Iterator ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Arrays ;
+import java.util.ArrayList ;
 import java.util.Properties ;
 
 import java.lang.reflect.Method ;
@@ -233,19 +234,33 @@ public class Client extends TestCase {
 	private static final Attribute<Integer> bar = 
 	    new Attribute<Integer>( Integer.class, "bar", 1 ) ;
 
-	private static final NullaryFunction<List<String>> rgbl =
-	    new NullaryFunction<List<String>>() {
-		public List<String> evaluate() {
-		    return Arrays.asList( 
-			"red", "blue", "green" ) ;
+	private interface StringList extends List<String> { } 
+
+	private static class StringArrayList extends ArrayList<String> 
+	    implements StringList {
+
+	    public StringArrayList() {
+		super() ;
+	    }
+
+	    public StringArrayList( List<String> list ) {
+		super( list ) ;
+	    }
+	}
+
+	private static final NullaryFunction<StringList> rgbl =
+	    new NullaryFunction<StringList>() {
+		public StringList evaluate() {
+		    return new StringArrayList( Arrays.asList( 
+			"red", "blue", "green" ) ) ;
 		} 
 	    };
 
 	private static final Attribute<Integer> notUsed = 
 	    new Attribute<Integer>( Integer.class, "notUsed", 0 ) ;
 
-	private static final Attribute<List<String>> baz = 
-	    new Attribute<List<String>>( List.class, "baz", rgbl ) ;
+	private static final Attribute<StringList> baz = 
+	    new Attribute<StringList>( StringList.class, "baz", rgbl ) ;
 
 	// Create a single node, set/get the attributes
 	public void testSimpleNode() {
@@ -260,8 +275,8 @@ public class Client extends TestCase {
 	    bar.set(node, 42) ;
 	    assertEquals( bar.get(node), new Integer(42) ) ;
 
-	    List<String> tval = Arrays.asList( 
-		"yellow", "orange" ) ;
+	    StringList tval = new StringArrayList( Arrays.asList( 
+		"yellow", "orange" ) ) ;
 	    baz.set(node, tval) ;
 	    assertEquals( baz.get(node), tval ) ;
 
@@ -287,8 +302,8 @@ public class Client extends TestCase {
 	    // Copy node1 and then set some more attributes
 	    NodeBase node2 = DefaultCopier.copy( node1, NodeBase.class ) ;
 	    bar.set(node2, 13) ;
-	    List<String> tval = Arrays.asList( 
-		"yellow", "orange" ) ;
+	    StringList tval = new StringArrayList( Arrays.asList( 
+		"yellow", "orange" ) ) ;
 	    baz.set(node2, tval) ;
 
 	    // make sure that we get the correct value for bar

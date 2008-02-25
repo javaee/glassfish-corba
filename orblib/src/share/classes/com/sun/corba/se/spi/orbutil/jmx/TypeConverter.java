@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,32 +33,35 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.simpledynamic;
 
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
-import javax.rmi.PortableRemoteObject ;
+package com.sun.corba.se.spi.orbutil.jmx ;
 
-public class EchoImpl extends PortableRemoteObject implements Echo {
-    private String name ;
+import java.lang.reflect.Type ;
 
-    public EchoImpl( String name ) throws RemoteException {
-	this.name = name ;
-    }
+import javax.management.openmbean.OpenType ;
 
-    public String sayHello( Object obj ) throws RemoteException {
-	return "Hello " + obj ;
-    }
+/** A ManagedEntity is one of the pre-defined Open MBean types: SimpleType, ObjectName, 
+ * TabularData, or CompositeData.
+ */
+public interface TypeConverter {
+    /** Java generic type of attribute in problem-domain Object.
+     */
+    Type getDataType() ;
 
-    public Echo say( Echo echo ) {
-	return echo ;
-    }
+    /** Open MBeans Open Type for management domain object.
+     */
+    OpenType getManagedType() ;
 
-    public String name() {
-	return name ;
-    }
+    /** Convert from a problem-domain Object obj to a ManagedEntity.
+     */
+    Object toManagedEntity( Object obj ) ;
 
-    public int[] echo( int[] arg ) {
-	return arg ;
-    }
+    /** Convert from a ManagedEntity to a problem-domain Object.
+     */
+    Object fromManagedEntity( Object entity ) ;
+
+    /** Returns true if this TypeConverter is an identity transformation.
+     */
+    boolean isIdentity() ;
 }
+

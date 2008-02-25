@@ -55,7 +55,8 @@ public @interface ManagedObject {
     String description() default "" ;
 
     /** The type value stored in the ObjectName for an open MBean corresponding
-     * to the annotated class.  Defaults to the class name.
+     * to the annotated class.  Defaults to the class name.  This is used in
+     * creating ObjectNames for mbeans with this annotation.
      */
     String type() default "" ;
 

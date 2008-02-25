@@ -47,16 +47,27 @@ import java.util.Iterator ;
 import java.util.Properties ;
 import java.util.Map ;
 import java.util.HashMap ;
+import java.util.Hashtable ;
 import java.util.List ;
 import java.util.ArrayList ;
 import java.util.Arrays ;
 import java.util.List ;
 import java.util.Set ;
 import java.util.HashSet ;
+import java.util.Date ;
 
 import java.io.PrintWriter ;
 
+import java.math.BigInteger ;
+import java.math.BigDecimal ;
+
+import javax.management.MalformedObjectNameException ;
+import javax.management.ObjectName ;
+import javax.management.MBeanServer ;
 import javax.management.openmbean.SimpleType ;
+import javax.management.openmbean.OpenType ;
+import javax.management.openmbean.CompositeData ;
+import javax.management.openmbean.CompositeType ;
 
 import org.testng.TestNG ;
 import org.testng.Assert ;
@@ -69,12 +80,18 @@ import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
 import com.sun.corba.se.spi.orbutil.generic.Algorithms ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
+import com.sun.corba.se.spi.orbutil.jmx.ManagedData ;
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
+import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
+import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManagerFactory ;
+import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
+
 import com.sun.corba.se.impl.orbutil.newtimer.VersionedHashSet ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 
 import com.sun.corba.se.impl.orbutil.jmx.AnnotationUtil ;
-import com.sun.corba.se.impl.orbutil.jmx.TypeConverter ;
-import com.sun.corba.se.impl.orbutil.jmx.ManagedObjectManagerImpl ;
 
 import static java.util.Arrays.asList ;
 
@@ -219,8 +236,8 @@ public class Client {
     @Test() 
     public void testGetInheritanceChain() {
 	List<Class<?>> res = AnnotationUtil.getInheritanceChain( I.class ) ;
-	System.out.println( "Inheritance chain for class " + I.class.getName() 
-	    + " is " + res ) ;
+	// System.out.println( "Inheritance chain for class " + I.class.getName() 
+	    // + " is " + res ) ;
 
 	Map<Class,Integer> positions = new HashMap<Class,Integer>() ;
 	int position = 0 ;
@@ -301,7 +318,7 @@ public class Client {
 	int getFooC() ;
     }
 
-    private interface DD extends AA, BB {
+    private interface DD extends CC, BB {
 	@Test2
 	void setFooD( int arg ) ;
     }
@@ -418,36 +435,251 @@ public class Client {
     //
     // Types to test:
     //
-    // primitives 
-    // Data, ObjectName, String, BigDecimal, BigInteger
+    // primitives (DONE)
+    // Date, ObjectName, String, BigDecimal, BigInteger (DONE)
     // enum
     // ManagedObject
-    // ManagedData
+    // ManagedData, simple case (DONE)
+    // ManagedData, @IncludeSubclass
+    // ManagedData, @InheritTable
     // C<X> for a subtype of Collection
     // M<K,V> for a subtype of map (map, sorted map)
     // X[]
     // Main cases of interest for collections, maps, and arrays are ManagedObject, ManagedData, and something 
-    // simple like String
+    //	    simple like String
     // Defer testing of TypeVariable and WildCardType
     // Also test an arbitrary class not of the above (uses toString, may or may not have a <init>( String )
     // constructor
 
+    private static ObjectName makeObjectName( String str ) {
+	try {
+	    return new ObjectName( str ) ;
+	} catch (MalformedObjectNameException exc) {
+	    throw new RuntimeException( exc ) ;
+	}
+    }
+
+    private static final Object[][] primitiveTCTestData = new Object[][] {
+	{ BigDecimal.class, SimpleType.BIGDECIMAL, new BigDecimal( "1.234556677888" ) },
+	{ BigInteger.class, SimpleType.BIGINTEGER, new BigInteger( "1234566789012334566576790" ) },
+	{ boolean.class, SimpleType.BOOLEAN, Boolean.TRUE },
+	{ Boolean.class, SimpleType.BOOLEAN, Boolean.TRUE },
+	{ byte.class, SimpleType.BYTE, 5 },
+	{ Byte.class, SimpleType.BYTE, -23 },
+	{ char.class, SimpleType.CHARACTER, 'a' },
+	{ Character.class, SimpleType.CHARACTER, 'A' },
+	{ Date.class, SimpleType.DATE, new Date() },
+	{ double.class, SimpleType.DOUBLE, Double.valueOf( 1.2345D ) },
+	{ Double.class, SimpleType.DOUBLE, Double.valueOf( 1.2345D ) },
+	{ float.class, SimpleType.FLOAT, Float.valueOf( 1.2345F ) },
+	{ Float.class, SimpleType.FLOAT, Float.valueOf( 1.2345F ) },
+	{ short.class, SimpleType.SHORT, Short.valueOf( (short)24 ) },
+	{ Short.class, SimpleType.SHORT, Short.valueOf( (short)26 ) },
+	{ int.class, SimpleType.INTEGER, Integer.valueOf( 2345323 ) },
+	{ Integer.class, SimpleType.INTEGER, Integer.valueOf( 2345323 ) },
+	{ long.class, SimpleType.LONG, Long.valueOf( 743743743743743743L ) },
+	{ Long.class, SimpleType.LONG, Long.valueOf( 743743743743743743L ) },
+	{ ObjectName.class, SimpleType.OBJECTNAME, makeObjectName( "foo: bar1=red, bar2=blue" ) },
+	{ String.class, SimpleType.STRING, "foo" } 
+    } ;
+
     @Test
-    public void testBooleanTypeConverter() {
-	ManagedObjectManagerImpl mom = new ManagedObjectManagerImpl( "ORBTest" ) ;
-	TypeConverter tc = TypeConverter.makeTypeConverter( boolean.class, mom ) ;
+    public void testPrimitiveTypeConverter() {
+	ManagedObjectManager mom = ManagedObjectManagerFactory.create( "ORBTest" ) ;
 
-	Assert.assertTrue( tc.getDataType() == boolean.class ) ;
-	Assert.assertTrue( tc.getManagedType() == SimpleType.BOOLEAN ) ;
-	Assert.assertTrue( tc.isIdentity() ) ;
+	for (Object[] data : primitiveTCTestData) {
+	    Class cls = (Class)data[0] ;
+	    SimpleType st = (SimpleType)data[1] ;
+	    Object value = data[2] ;
 
-	Boolean value = Boolean.TRUE ;
+	    TypeConverter tc = mom.getTypeConverter( cls ) ;
+
+	    Assert.assertTrue( tc.getDataType() == cls ) ;
+	    Assert.assertTrue( tc.getManagedType() == st ) ;
+	    Assert.assertTrue( tc.isIdentity() ) ;
+
+	    Object managed = tc.toManagedEntity( value ) ;
+	    Object value2 = tc.fromManagedEntity( managed ) ;
+	    Assert.assertEquals( value, value2 ) ;
+
+	    Object managed2 = tc.toManagedEntity( value2 ) ;
+	    Assert.assertEquals( managed, managed2 ) ;
+	}
+    }
+
+    public static final String MDE_DESCRIPTION = "Description of ManagedDataExample" ;
+    public static final String MDE_ATTR_DESC_NAME = "Description of ManagedDataExample name attribute" ;
+    public static final String MDE_ATTR_DESC_DATE = "Description of ManagedDataExample date attribute" ;
+    public static final String MDE_ATTR_ID_NAME = "name" ;
+    public static final String MDE_ATTR_ID_DATE = "currentDate" ;
+
+    @ManagedData( description=MDE_DESCRIPTION )
+    public class ManagedDataExample {
+	private String name ;
+	private Date date ;
+
+	public ManagedDataExample( String name ) {
+	    this.name = name ;
+	    date = new Date() ;
+	}
+
+	@ManagedAttribute( description=MDE_ATTR_DESC_NAME, id=MDE_ATTR_ID_NAME )
+	public String name() {
+	    return name ;
+	}
+
+	@ManagedAttribute( description=MDE_ATTR_DESC_DATE, id=MDE_ATTR_ID_DATE )
+	public Date date() {
+	    return date ;
+	}
+
+	public boolean equals( Object obj ) {
+	    if (this.equals( obj ))
+		return true ;
+
+	    if (!(obj instanceof ManagedDataExample))
+		return false ;
+
+	    ManagedDataExample mde = (ManagedDataExample)obj ;
+	    return mde.name.equals( name ) && mde.date.equals( date ) ;
+	}
+
+	public int hashCode() {
+	    return name.hashCode() ^ date.hashCode() ;
+	}
+    }
+
+    public static final String MOE_DESCRIPTION = "Description of ManagedObject" ;
+    public static final String MOE_ATTR_DESC_NAME = "Description of ManagedAttribute name" ;
+    public static final String MOE_ATTR_DESC_NUM = "Description of ManagedAttribute num" ;
+    public static final String MOE_ATTR_DESC_MDE = "Description of ManagedAttribute mde" ;
+    public static final String MOE_OP_DESC_INCREMENT = "Description of ManagedOperation increment" ;
+    public static final String MOE_OP_DESC_DECREMENT = "Description of ManagedOperation decrement" ;
+
+    @ManagedObject( description=MOE_DESCRIPTION ) 
+    public class ManagedObjectExample {
+	private int num ;
+	private String name ;
+	private ManagedDataExample mde ;
+
+	public ManagedObjectExample( int num, String name ) {
+	    this.num = num ;
+	    this.name = name ;
+	    this.mde = new ManagedDataExample( name ) ;
+	}
+
+	@ManagedAttribute( description=MOE_ATTR_DESC_NAME )
+	public String getName() {
+	    return name ;
+	}
+
+	@ManagedAttribute( description=MOE_ATTR_DESC_NUM ) 
+	public int getNum() {
+	    return num ;
+	}
+
+	@ManagedAttribute( description=MOE_ATTR_DESC_MDE )
+	public ManagedDataExample getMde() {
+	    return mde ;
+	}
+
+	@ManagedOperation( description=MOE_OP_DESC_INCREMENT ) 
+	public int increment( int value ) {
+	    return num+=value ;
+	}
+
+	@ManagedOperation( description=MOE_OP_DESC_DECREMENT ) 
+	public int decrement( int value ) {
+	    return num-=value ;
+	}
+
+	public void nop() {
+	    // This is not a managed operation.
+	}
+    }
+
+    @Test
+    public void testManagedObjectExample() {
+	final String domain = "ORBTest" ;
+	final int num = 12 ;
+	final String name = "Liskov" ;
+	final ManagedObjectExample moe = new ManagedObjectExample( num, name ) ;
+	final String propName = "ObjectNumber" ;
+	final int onum = 1 ;
+
+	final ManagedObjectManager mom = ManagedObjectManagerFactory.create( domain ) ;
+
+	try {
+	    mom.register( moe, propName + "=" + onum ) ;
+
+	    ObjectName moeName = mom.getObjectName( moe ) ;
+	    Assert.assertEquals( domain, moeName.getDomain() ) ;
+	    
+	    Hashtable expectedProperties = new Hashtable() ;
+	    expectedProperties.put( propName, "" + onum ) ;
+	    expectedProperties.put( "type", ManagedObjectExample.class.getName() ) ;
+	    
+	    Assert.assertEquals( expectedProperties, moeName.getKeyPropertyList() ) ;
+
+	    MBeanServer mbs = mom.getMBeanServer() ;
+
+	    // Validate attributes
+	    Assert.assertEquals( mbs.getAttribute( moeName, "num" ), Integer.valueOf( num ) ) ;
+	    Assert.assertEquals( mbs.getAttribute( moeName, "name" ), name ) ;
+	    Object obj = mbs.getAttribute( moeName, "mde" ) ;
+	    Assert.assertTrue( obj instanceof CompositeData ) ;
+	    CompositeData cdata = (CompositeData)obj ;
+	    Assert.assertEquals( moe.getMde().name(), cdata.get( MDE_ATTR_ID_NAME ) ) ;
+	    Assert.assertEquals( moe.getMde().date(), cdata.get( MDE_ATTR_ID_DATE ) ) ;
+
+	    // Validate operations
+	} catch (Exception exc) {
+	    exc.printStackTrace() ;
+	    Assert.fail( "Caught exception on register " + exc ) ;
+	} finally {
+	    try {
+		mom.unregister( moe ) ;
+	    } catch (Exception exc) {
+		exc.printStackTrace() ;
+		Assert.fail( "Caught exception on unregister " + exc ) ;
+	    }
+	}
+
+	// make sure object is really gone
+    }
+
+    @Test
+    public void testManagedDataTypeConverter() {
+	ManagedObjectManager mom = ManagedObjectManagerFactory.create( "ORBTest" ) ;
+    
+	TypeConverter tc = mom.getTypeConverter( ManagedDataExample.class ) ;
+	Assert.assertTrue( tc.getDataType() == ManagedDataExample.class ) ;
+
+	OpenType otype = tc.getManagedType() ;
+	Assert.assertTrue( otype instanceof CompositeType ) ;
+	CompositeType ctype = (CompositeType)otype ;
+	Assert.assertEquals( MDE_DESCRIPTION, ctype.getDescription() ) ;
+	Assert.assertEquals( MDE_ATTR_DESC_NAME, ctype.getDescription( MDE_ATTR_ID_NAME ) ) ;
+	Assert.assertEquals( MDE_ATTR_DESC_DATE, ctype.getDescription( MDE_ATTR_ID_DATE ) ) ;
+	Assert.assertEquals( SimpleType.STRING, ctype.getType( MDE_ATTR_ID_NAME ) ) ;
+	Assert.assertEquals( SimpleType.DATE, ctype.getType( MDE_ATTR_ID_DATE ) ) ;
+
+	Set keys = new HashSet() ;
+	keys.add( MDE_ATTR_ID_NAME ) ;
+	keys.add( MDE_ATTR_ID_DATE ) ;
+	Assert.assertEquals( keys, ctype.keySet() ) ;
+
+	Assert.assertFalse( tc.isIdentity() ) ;
+
+	ManagedDataExample value = new ManagedDataExample( "test" ) ;
+
 	Object managed = tc.toManagedEntity( value ) ;
-	Object value2 = tc.fromManagedEntity( managed ) ;
-	Assert.assertEquals( value, value2 ) ;
 
-	Object managed2 = tc.toManagedEntity( value2 ) ;
-	Assert.assertEquals( managed, managed2 ) ;
+	Assert.assertTrue( managed instanceof CompositeData ) ;
+	CompositeData cdata = (CompositeData)managed ;
+	Assert.assertEquals( cdata.getCompositeType(), ctype ) ;
+	Assert.assertEquals( value.name(), (String)cdata.get( MDE_ATTR_ID_NAME ) ) ;
+	Assert.assertEquals( value.date(), (Date)cdata.get( MDE_ATTR_ID_DATE ) ) ;
     }
 
     public static void main( String[] args ) {

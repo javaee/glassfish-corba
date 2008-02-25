@@ -87,22 +87,16 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         // Set the fragment's moreFragments field to true
         MessageBase.setFlag(bbwi.getByteBuffer(), Message.MORE_FRAGMENTS_BIT);
 
-	try
-	{
+	try {
             sendFragment(false);
-	}
-	catch (SystemException se)
-	{
+	} catch (SystemException se) {
 	    // REVISIT: this part similar to 
 	    // CorbaClientRequestDispatchImpl.beginRequest() 
 	    // and CorbaClientRequestDelegate.request()
 	    CorbaContactInfoListIterator itr;
-	    try
-	    {
+	    try {
 		itr = getContactInfoListIterator();
-	    }
-	    catch (EmptyStackException ese)
-	    {
+	    } catch (EmptyStackException ese) {
 		// server side, don't reportException
 		throw se;
 	    }
@@ -110,9 +104,9 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 	    if (retry) {
 	        Bridge bridge = Bridge.get();
 	        bridge.throwException(new RemarshalException());
-	    }
-	    else
-	    { // re-throw the SystemException
+	    } else { // re-throw the SystemException
+		// XXX This exception is lost, and not reported correctly to PI.
+		// Do we need to call the client PI end method?
 	        throw se;
 	    }
 	}

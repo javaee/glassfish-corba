@@ -60,6 +60,7 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
+import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
 public class ManagedObjectManagerImpl implements ManagedObjectManager {
     private String domain ;
@@ -70,7 +71,8 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
     private Map<Type,TypeConverter> typeConverterMap ;
 
     // XXX This is not correct: we also need to look up superclass and superinterfaces
-    // until we find a skeleton.
+    // until we find a skeleton.  For example, we could have a subclass of a class annotated
+    // with @IncludeSubclass, or an interface with an implementation class.
     public synchronized DynamicMBeanSkeleton getSkeleton( Class<?> cls ) {
 	List<Pair<Class<?>,ManagedObject>> mos = AnnotationUtil.getClassAnnotations(
 	    cls, ManagedObject.class ) ;
@@ -90,7 +92,7 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
     public synchronized TypeConverter getTypeConverter( Type type ) {
 	TypeConverter result = typeConverterMap.get( type ) ;	
 	if (result == null) {
-	    result = TypeConverter.makeTypeConverter( type, this ) ;
+	    result = TypeConverterImpl.makeTypeConverter( type, this ) ;
 	    typeConverterMap.put( type, result ) ;
 	}
 	return result ;
@@ -115,17 +117,13 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
 	return new ManagedObjectManager() {
 	    final Properties savedProps = makeProps( props ) ;
 
-	    public void register( Object obj, String... mprops )  throws InstanceAlreadyExistsException,
-		MBeanRegistrationException, NotCompliantMBeanException {
-
+	    public void register( Object obj, String... mprops )  {
 		Properties lprops = new Properties( savedProps ) ;
 		addToProperties( lprops, mprops ) ;
 		mom.register( obj, lprops ) ;
 	    }
 
-	    public void register( Object obj, Properties mprops )  throws InstanceAlreadyExistsException,
-		MBeanRegistrationException, NotCompliantMBeanException {
-
+	    public void register( Object obj, Properties mprops ) {
 		Properties lprops = new Properties( savedProps ) ;
 		Enumeration<?> names = mprops.propertyNames() ;
 		while (names.hasMoreElements()) {
@@ -153,12 +151,20 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
 		return mom.getDomain() ;
 	    }
 
-	    /** Set the MBeanServer to which all MBeans using this interface
-	     * are published.  The default value is 
-	     * java.lang.management.ManagementFactory.getPlatformMBeanServer().
-	     */
+	    public Object getObject( ObjectName oname ) {
+		return mom.getObject( oname ) ;
+	    }
+
+	    public TypeConverter getTypeConverter( Type type ) {
+		return mom.getTypeConverter( type ) ;
+	    }
+
 	    public void setMBeanServer( MBeanServer server ) {
 		mom.setMBeanServer( server ) ;
+	    }
+
+	    public MBeanServer getMBeanServer() {
+		return mom.getMBeanServer() ;
 	    }
 	} ;
     }
@@ -181,8 +187,7 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
 	}
     }
 
-    public void register( Object obj, String... props )  throws InstanceAlreadyExistsException,
-	MBeanRegistrationException, NotCompliantMBeanException {
+    public void register( Object obj, String... props ) {
 	register( obj, makeProps(props) ) ;
     }
 
@@ -202,8 +207,7 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
     }
 
     public synchronized void register( final Object obj, 
-	final Properties props )  throws InstanceAlreadyExistsException,
-	MBeanRegistrationException, NotCompliantMBeanException {
+	final Properties props ) {
 
 	final Class<?> cls = obj.getClass() ;
 	final DynamicMBeanSkeleton skel = getSkeleton( cls ) ;
@@ -217,24 +221,28 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
 	ObjectName oname = null ;
 	try {
 	    oname = new ObjectName( domain, onProps ) ;
+	    server.registerMBean( mbean, oname ) ;
+
+	    objectMap.put( obj, oname ) ;
+	    objectNameMap.put( oname, obj ) ;
 	} catch (Exception exc) {
 	    throw new IllegalArgumentException( exc ) ;
 	}
-
-	objectMap.put( obj, oname ) ;
-	objectNameMap.put( oname, obj ) ;
-	server.registerMBean( obj, oname ) ;
     }
 
     public synchronized void unregister( Object obj ) {
 	ObjectName oname = objectMap.get( obj ) ;
-	try {
-	    server.unregisterMBean( oname ) ;
-	} catch (Exception exc) {
-	    throw new IllegalArgumentException( exc ) ;
+	if (oname != null) {
+	    try {
+		server.unregisterMBean( oname ) ;
+	    } catch (Exception exc) {
+		throw new IllegalArgumentException( exc ) ;
+	    } finally {
+		// Make sure obj is removed even if unregisterMBean fails
+		objectMap.remove( obj ) ;
+		objectNameMap.remove( oname ) ;
+	    }
 	}
-	objectMap.remove( obj ) ;
-	objectNameMap.remove( oname ) ;
     }
 
     public ObjectName getObjectName( Object obj ) {
@@ -251,6 +259,10 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
 
     public void setMBeanServer( MBeanServer server ) {
 	this.server = server ;
+    }
+
+    public MBeanServer getMBeanServer() {
+	return server ;
     }
 }
 

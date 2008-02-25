@@ -37,6 +37,7 @@
 package corba.simpledynamic;
 
 import java.util.Vector ;
+import java.util.Properties ;
 
 import java.rmi.Remote ;
 import java.rmi.RemoteException ;
@@ -48,15 +49,26 @@ import javax.rmi.CORBA.Tie ;
 import javax.naming.InitialContext ;
 
 import org.testng.Assert ;
-
+import org.testng.annotations.Test ;
+import org.testng.annotations.BeforeGroups ;
+import org.testng.annotations.AfterGroups ;
+   
 import org.omg.CORBA.ORB ;
+
+import corba.nortel.NortelSocketFactory ;
+
+import com.sun.corba.se.impl.orbutil.ORBConstants ;
 
 import static corba.framework.PRO.* ;
 
 public class FrameworkClient extends Framework {
+    private static final boolean RUN_FRAGMENT_TEST = false ;
+
     private static final String SERVER_NAME = "fromServer" ;
     private static final String CLIENT_NAME = "fromClient" ;
     private static final String TEST_REF_NAME = "testref" ;
+
+    private static final String TESTREF_GROUP = "testref_group" ;
 
     private Echo makeServant( String name ) {
 	try {
@@ -67,37 +79,34 @@ public class FrameworkClient extends Framework {
 	}
     }
 
-    public void doServer( ORB orb, InitialContext ic ) {
-	try {
-	    Echo servant = makeServant( SERVER_NAME ) ;
-	    Tie tie = Util.getTie( servant ) ;
-	    tie.orb( orb ) ;
-
-	    Echo ref = toStub( servant, Echo.class ) ;
-	    ic.bind( TEST_REF_NAME, ref ) ;
-	} catch (Exception exc) {
-	    System.out.println( "Caught exception " + exc ) ;
-	    exc.printStackTrace() ;
-	    System.exit( 1 ) ;
-	}
+    private void msg( String msg ) {
+	System.out.println( msg ) ;
     }
 
-    public void doClient( ORB orb, InitialContext ic ) {
+    @BeforeGroups( { TESTREF_GROUP } ) 
+    public void initTestRef() {
+	bindServant( makeServant( SERVER_NAME ), Echo.class, TEST_REF_NAME ) ;
+    }
+
+    @Test( groups = { TESTREF_GROUP } ) 
+    public void firstTest() {
 	try {
+	    InterceptorTester.theTester.clear() ;
 	    Echo servant = makeServant( CLIENT_NAME ) ;
-	    Tie tie = Util.getTie( servant ) ;
-	    tie.orb( orb ) ;
+	    connectServant( servant, Echo.class, getClientORB() ) ;
 
 	    System.out.println( "Creating first echoref" ) ;
 	    Echo ref = toStub( servant, Echo.class ) ;
 
 	    System.out.println( "Hello?" ) ;
 	    System.out.println( "Looking up second echoref" ) ;
-	    Echo sref = narrow( ic.lookup( TEST_REF_NAME ), Echo.class ) ;
+	    Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
 	    Assert.assertEquals( sref.name(), SERVER_NAME ) ;
 
-	    System.out.println( "Running test for bug 6578707" ) ;
-	    testFragmentation( sref ) ;
+	    if (RUN_FRAGMENT_TEST) {
+		System.out.println( "Running test for bug 6578707" ) ;
+		testFragmentation( sref ) ;
+	    }
 
 	    System.out.println( "Echoing first echoref" ) ;
 	    Echo rref = sref.say( ref ) ;
@@ -115,6 +124,24 @@ public class FrameworkClient extends Framework {
 	    exc.printStackTrace() ;
 	    System.exit( 1 ) ;
 	}
+    }
+
+    @Override
+    protected Properties extraClientProperties() {
+	Properties result = new Properties() ;
+	
+	// register nortel socket factory
+	result.setProperty( ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY, 
+	    NortelSocketFactory.class.getName() ) ;
+	
+	// register ORBInitializer
+	result.setProperty( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX + 
+	    InterceptorTester.class.getName(), "true" ) ;
+
+	result.setProperty( ORBConstants.DEBUG_PROPERTY, 
+	    "transport" ) ;
+
+	return result ;
     }
 
     private static class Fragment implements java.io.Serializable {
@@ -135,7 +162,6 @@ public class FrameworkClient extends Framework {
 	public Wrapper(int len, Vector vec){
 	    this.vec = vec;
 	    f = new Fragment(len);
-
 	}
 
 	private void readObject(java.io.ObjectInputStream is
@@ -166,6 +192,40 @@ public class FrameworkClient extends Framework {
 		System.exit( 1 ) ;
 	    }
 	}
+    }
+
+    private int[] makeIntArray( int size ) {
+	int[] result = new int[size] ;
+	for (int ctr=0; ctr<size; ctr++)
+	    result[ctr] = ctr ;
+	return result ;
+    }
+
+    private void testWriteFailure( int[] arg ) {
+	try {
+	    msg( "testWriteFailure with " + arg.length + " ints" ) ;
+	    InterceptorTester.theTester.clear() ;
+	    Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
+	    sref.echo( arg ) ;
+
+	    NortelSocketFactory.disconnectSocket() ;
+	    InterceptorTester.theTester.setExceptionExpected() ;
+	    sref.echo( arg ) ;
+	    Assert.assertEquals( InterceptorTester.theTester.getErrors(), 0 ) ;
+	} catch (Exception exc) {
+	    exc.printStackTrace() ;
+	    Assert.fail( "Unexpected exception " + exc ) ;
+	}
+    }
+
+    @Test( groups = { TESTREF_GROUP } ) 
+    public void testWriteFailureFragment() {
+	testWriteFailure( makeIntArray( 50000 ) ) ;
+    }
+
+    @Test( groups = { TESTREF_GROUP } ) 
+    public void testWriteFailureNoFragment() {
+	testWriteFailure( makeIntArray( 50 ) ) ;
     }
 
     public static void main( String[] args ) {

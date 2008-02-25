@@ -94,8 +94,8 @@ public abstract class Framework {
     // We need to set up the client and server ORBs, and start a transient
     // name server that runs on the server ORB, with the client ORB referring
     // to the server ORB's name service.
-    private ORB makeORB( boolean isServer) {
-	Properties props = new Properties() ;
+    private ORB makeORB( boolean isServer, Properties extra ) {
+	Properties props = new Properties( extra ) ;
 	props.setProperty( "org.omg.CORBA.ORBClass", BASE + "impl.orb.ORBImpl" ) ;
 	props.setProperty( ORBConstants.INITIAL_HOST_PROPERTY, "localhost" ) ;
 	props.setProperty( ORBConstants.INITIAL_PORT_PROPERTY, PORT_NUM ) ;
@@ -127,15 +127,72 @@ public abstract class Framework {
 	return ic ;
     }
 
-    public abstract void doServer( ORB orb, InitialContext ic ) ;
+    protected ORB getClientORB() {
+	return clientORB ;
+    }
 
-    public abstract void doClient( ORB orb, InitialContext ic ) ;
+    protected ORB getServerORB() {
+	return serverORB ;
+    }
+
+    protected InitialContext getClientIC() {
+	return clientIC ;
+    }
+
+    protected InitialContext getServerIC() {
+	return serverIC ;
+    }
+
+    protected Properties extraServerProperties() {
+	return new Properties() ;
+    }
+
+    protected Properties extraClientProperties() {
+	return new Properties() ;
+    }
+    
+    /** Connect a servant of type cls to the orb.  
+    */
+    protected <T extends Remote> void connectServant( T servant, Class<T> cls,
+	ORB orb ) {
+
+	try {
+	    Tie tie = Util.getTie( servant ) ;
+	    tie.orb( getServerORB() ) ;
+	} catch (Exception exc) {
+	    throw new RuntimeException( exc ) ;
+	}
+    }
+
+    /** Connect a servant to the server ORB, and register it with the
+     * server InitialContext under name.
+     */
+    protected <T extends Remote> void bindServant( T servant, Class<T> cls, 
+	String name ) {
+
+	connectServant( servant, cls, getServerORB() ) ;
+
+	try {
+	    T stub = toStub( servant, cls ) ;
+	    getServerIC().bind( name, stub ) ;
+	} catch (Exception exc) {
+	    throw new RuntimeException( exc ) ;
+	}
+    }
+
+    protected <T extends Remote> T findStub( Class<T> cls, String name ) {
+	try {
+	    return narrow( getClientIC().lookup( name ), cls ) ;
+	} catch (Exception exc) {
+	    throw new RuntimeException( exc ) ;
+	}
+    }
 
     @Configuration( beforeTest = true ) 
     public void setUp() {
 	setSystemProperties() ;
-	serverORB = makeORB( true ) ;
-	clientORB = makeORB( false ) ;
+	serverORB = makeORB( true, extraServerProperties() ) ;
+	clientORB = makeORB( false, extraClientProperties() ) ;
 
 	try {
 	    serverORB.resolve_initial_references( "NameService" ) ;
@@ -153,12 +210,6 @@ public abstract class Framework {
 	} catch (Exception exc) {
 	    throw new RuntimeException( exc ) ;
 	}
-    }
-
-    @Test()
-    public void run() {
-	doServer( serverORB, serverIC ) ;
-	doClient( clientORB, clientIC ) ;
     }
 
     @Configuration( afterTest = true )

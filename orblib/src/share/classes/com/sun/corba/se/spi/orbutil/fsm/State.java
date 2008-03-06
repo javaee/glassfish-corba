@@ -72,9 +72,16 @@ public class State extends NameBase {
 	this( name, Kind.NORMAL ) ;
     }
 
-    public State( String name, Kind kind ) 
+    public State( String name, Kind kind ) {
+	this( null, name, kind ) ;
+    }
+
+    public State( Set<State> states, String name, Kind kind ) 
     { 
 	super( name ) ; 
+	if (states != null)
+	    states.add( this ) ;
+
 	this.kind = kind ;
 	defaultAction = null ;
 	inputMap = new HashMap<Input,Set<Transition>>() ;

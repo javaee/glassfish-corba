@@ -36,8 +36,6 @@
 
 package com.sun.corba.se.spi.orbutil.fsm ;
 
-import java.util.Stack ;
-
 /**
  * This is the main class that represents an instance of a state machine
  * using a state engine.  It may be used as a base class, in which case

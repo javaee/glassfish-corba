@@ -99,7 +99,7 @@
 	<equals arg1="${env.DYNAMIC_STUB}" arg2="1"/>
     </condition> -->
     <property name="use.dynamic.stub" value="true"/>
-    <property name="use.codegen.copyobject" value="true"/>
+    <property name="use.codegen.copyobject" value="false"/>
     <!-- <condition property="use.codegen.copyobject" value="true" else="false">
 	<equals arg1="${env.CODEGEN_COPYOBJECT}" arg2="1"/>
     </condition>
@@ -196,6 +196,10 @@
 	    <pathelement location="test/make/gen"/>
 	    <pathelement location="${test-values1.dir}"/>
 	    <pathelement location="${test.src.dir}"/>
+	    <pathelement location="${root.dir}/lib/trove.jar"/>
+	    <pathelement location="${root.dir}/lib/log4j.jar"/>
+	    <pathelement location="${root.dir}/lib/jboss-serialization.jar"/>
+	    <pathelement location="${root.dir}/lib/log4j.xml"/>
 	</path>
 	<pathconvert property="test.source.path">
 	    <path>

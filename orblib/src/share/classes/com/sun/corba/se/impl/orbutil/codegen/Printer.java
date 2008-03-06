@@ -65,6 +65,7 @@ public class Printer{
     private int indent ;
     private char[] pad ;
     private StringBuilder bld ;
+    private int rightJustificationSize ;
 
     public Printer( PrintStream ps ) {
 	this( ps, DEFAULT_INCREMENT, ' ' ) ;
@@ -78,13 +79,41 @@ public class Printer{
 	this.indent = 0 ;
 	this.bld = new StringBuilder() ;
 	fill() ;
+	this.rightJustificationSize = 0 ;
     }
 
     public int lineNumber() {
 	return lineNumber ;
     }
 
+    /** Right-Justify the next call to p so that the total number of characters
+     * is at least size.  Use leading spaces if necessary to ensure this.
+     */
+    public Printer rj( int size ) {
+	rightJustificationSize = size ;
+	return this ;
+    }
+
+    private Printer rightJustify( String str ) {
+	if (str.length() < rightJustificationSize) {
+	    for (int ctr=0; ctr<(rightJustificationSize-str.length()); ctr++) {
+		bld.append( ' ' ) ;
+	    }
+	}
+
+	rightJustificationSize = 0 ;
+	return this ;
+    }
+
     public Printer p( String str ) {
+	rightJustify( str ) ;
+	bld.append( str ) ;
+	return this ;
+    }
+
+    public Printer p( Object obj ) {
+	String str = obj.toString() ;
+	rightJustify( str ) ;
 	bld.append( str ) ;
 	return this ;
     }
@@ -103,6 +132,10 @@ public class Printer{
 	indent -= increment ;
 	fill() ;
 	return this ;
+    }
+
+    public int indent() {
+	return indent ;
     }
 
     private void fill() {

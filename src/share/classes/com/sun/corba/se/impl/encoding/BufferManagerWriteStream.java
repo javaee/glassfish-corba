@@ -57,6 +57,7 @@ import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 
 /**
  * Streaming buffer manager.
@@ -100,6 +101,10 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 		// server side, don't reportException
 		throw se;
 	    }
+	    
+	    // bug 6328377: must not lose exception in PI
+	    orb.getPIHandler().invokeClientPIEndingPoint( ReplyMessage.SYSTEM_EXCEPTION, se ) ;
+
 	    boolean retry = itr.reportException(null, se);
 	    if (retry) {
 	        Bridge bridge = Bridge.get();

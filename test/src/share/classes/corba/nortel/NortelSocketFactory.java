@@ -47,9 +47,15 @@ import java.lang.String;
 
 public class NortelSocketFactory extends DefaultSocketFactoryImpl {
     private static Socket savedSocket = null ;
+    private static boolean transportDown = false ;
     public static boolean useNio = true ;
 
     public ServerSocket createServerSocket(String type, InetSocketAddress in) throws IOException {
+	if (transportDown) {
+	    System.out.println( "Simulating transport failure..." ) ;
+	    throw new IOException( "Transport simulated down" ) ;
+	}
+
 	System.out.println("In method createServerSocket, type:" + type + ", InetSocketAddress:" + in );
 	ServerSocket serverSocket = new ServerSocket();
 	serverSocket.bind(in);
@@ -59,6 +65,11 @@ public class NortelSocketFactory extends DefaultSocketFactoryImpl {
 
     public Socket createSocket(String type, InetSocketAddress in) throws IOException {
 	System.out.println("In method createSocket, type:" + type + ", InetSocketAddress:" + in );
+	if (transportDown) {
+	    System.out.println( "Simulating transport failure..." ) ;
+	    throw new IOException( "Transport simulated down" ) ;
+	}
+
 	Socket socket = null;
 	if (useNio) {
 	    socket = super.createSocket(type, in); 
@@ -79,6 +90,15 @@ public class NortelSocketFactory extends DefaultSocketFactoryImpl {
 
 	    System.out.println("Exception " + e);
 	}
+    }
+
+    // Simulate the failure of the destination: ensure that all connection attempts fail
+    public static void simulateConnectionDown() {
+	transportDown = true ;
+    }
+
+    public static void simulateConnectionUp() {
+	transportDown = false ;
     }
 }
 

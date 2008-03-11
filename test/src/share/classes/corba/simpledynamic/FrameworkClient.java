@@ -36,6 +36,8 @@
 
 package corba.simpledynamic;
 
+import java.rmi.MarshalException ;
+
 import java.util.Vector ;
 import java.util.Properties ;
 
@@ -80,7 +82,7 @@ public class FrameworkClient extends Framework {
     }
 
     private void msg( String msg ) {
-	System.out.println( msg ) ;
+	System.out.println( "+++FrameworkClient: " + msg ) ;
     }
 
     @BeforeGroups( { TESTREF_GROUP } ) 
@@ -138,8 +140,8 @@ public class FrameworkClient extends Framework {
 	result.setProperty( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX + 
 	    InterceptorTester.class.getName(), "true" ) ;
 
-	result.setProperty( ORBConstants.DEBUG_PROPERTY, 
-	    "transport" ) ;
+	// result.setProperty( ORBConstants.DEBUG_PROPERTY, 
+	    // "transport" ) ;
 
 	return result ;
     }
@@ -209,12 +211,22 @@ public class FrameworkClient extends Framework {
 	    sref.echo( arg ) ;
 
 	    NortelSocketFactory.disconnectSocket() ;
+	    NortelSocketFactory.simulateConnectionDown() ;
 	    InterceptorTester.theTester.setExceptionExpected() ;
+
+	    msg( "******* Start Test with disconnected connection *******" ) ; 
+	    ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).transportDebugFlag = true;
 	    sref.echo( arg ) ;
-	    Assert.assertEquals( InterceptorTester.theTester.getErrors(), 0 ) ;
+	    ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).transportDebugFlag = false;
+	    msg( "******* End test with disconnected connection *******" ) ; 
+	} catch (MarshalException exc) {
+	    msg( "Caught expected MarshalException" ) ;
 	} catch (Exception exc) {
 	    exc.printStackTrace() ;
 	    Assert.fail( "Unexpected exception " + exc ) ;
+	} finally {
+	    NortelSocketFactory.simulateConnectionUp() ;
+	    Assert.assertEquals( InterceptorTester.theTester.getErrors(), 0 ) ;
 	}
     }
 

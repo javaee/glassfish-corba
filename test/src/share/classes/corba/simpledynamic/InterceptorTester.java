@@ -79,7 +79,7 @@ public class InterceptorTester extends LocalObject implements
     }
     
     private void msg( String msg ) {
-	System.out.println( msg ) ;
+	System.out.println( "+++InterceptorTester: " + msg ) ;
     }
 
     private void error( String msg ) {

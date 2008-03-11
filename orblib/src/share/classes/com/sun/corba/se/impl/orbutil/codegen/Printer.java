@@ -47,6 +47,10 @@ public class Printer extends com.sun.corba.se.spi.orbutil.file.Printer {
 
     private int lineNumber ;
 
+    public Printer( PrintStream ps ) {
+	this( ps, DEFAULT_INCREMENT, ' ' ) ;
+    }
+
     public Printer( PrintStream ps, int increment, char padChar ) {
 	super( ps, increment, padChar ) ;
 	this.lineNumber = 1 ;
@@ -56,8 +60,34 @@ public class Printer extends com.sun.corba.se.spi.orbutil.file.Printer {
 	return lineNumber ;
     }
 
+    @Override
+    public Printer p( String str ) {
+	super.p( str ) ;
+	return this ;
+    }
+
+    @Override
+    public Printer p( Object obj ) {
+	super.p( obj ) ;
+	return this ;
+    }
+
+    @Override
+    public Printer in() {
+	super.in() ;
+	return this ;
+    }
+
+    @Override
+    public Printer out() {
+	super.out() ;
+	return this ;
+    }
+
+    @Override
     public Printer nl() {
-	return nl( null ) ;
+	super.nl() ;
+	return this ;
     }
 
     public Printer nl( Node node ) {

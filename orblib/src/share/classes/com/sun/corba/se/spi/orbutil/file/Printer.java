@@ -52,7 +52,7 @@ import java.io.PrintStream ;
  * nl().p( "stmt" ).out() ;
  */
 public class Printer{
-    private static final int DEFAULT_INCREMENT = 4 ;
+    public static final int DEFAULT_INCREMENT = 4 ;
 
     private PrintStream ps ;
     private int increment ;

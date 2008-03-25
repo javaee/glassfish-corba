@@ -102,7 +102,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 		throw se;
 	    }
 	    
-	    // bug 6328377: must not lose exception in PI
+	    // bug 6382377: must not lose exception in PI
 	    orb.getPIHandler().invokeClientPIEndingPoint( ReplyMessage.SYSTEM_EXCEPTION, se ) ;
 
 	    boolean retry = itr.reportException(null, se);

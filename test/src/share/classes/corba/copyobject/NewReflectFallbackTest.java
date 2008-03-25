@@ -60,6 +60,11 @@ public class NewReflectFallbackTest extends Client
 	Client.doMain( args, root ) ; 
     }
 
+    public static Test suite() {
+	Client root = new NewReflectFallbackTest() ;
+	return root.makeSuite() ;
+    }
+
     public ObjectCopierFactory getCopierFactory( ORB orb )
     {
 	ObjectCopierFactory reflect = 

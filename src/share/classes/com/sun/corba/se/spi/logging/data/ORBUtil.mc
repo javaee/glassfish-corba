@@ -198,7 +198,7 @@
 	    (BAD_TIMEOUT_STRING_DATA
 	     30 WARNING "{0} is not a valid positive decimal integer for {1}")
 	    (BAD_TIMEOUT_DATA_LENGTH
-	     31 WARNING "Timeout data must be 3 positive decimal integers separated by :")
+	     31 WARNING "Timeout data must be 3 or 4 positive decimal integers separated by :")
 	    )
 	(BAD_INV_ORDER 
 	    (DSIMETHOD_NOTCALLED 
@@ -224,7 +224,7 @@
 	     2 WARNING "Invoked operation on unresolved recursive TypeCode"))
 	(COMM_FAILURE 
 	    (CONNECT_FAILURE
-	     1  WARNING "Connection failure: socketType: {0}; hostname: {1}; port: {2}")
+	     1  FINE "Connection failure: socketType: {0}; hostname: {1}; port: {2}")
 	    (WRITE_ERROR_SEND
 	     3  FINE "Write error sent")
 	    (GET_PROPERTIES_ERROR

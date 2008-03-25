@@ -36,6 +36,11 @@
 
 package corba.simpledynamic;
 
+import java.io.IOException ;
+import java.io.ObjectInputStream ;
+import java.io.ObjectOutputStream ;
+import java.io.Serializable ;
+
 import java.rmi.MarshalException ;
 
 import java.util.Vector ;
@@ -95,7 +100,7 @@ public class FrameworkClient extends Framework {
 	try {
 	    InterceptorTester.theTester.clear() ;
 	    Echo servant = makeServant( CLIENT_NAME ) ;
-	    connectServant( servant, Echo.class, getClientORB() ) ;
+	    connectServant( servant, getClientORB() ) ;
 
 	    System.out.println( "Creating first echoref" ) ;
 	    Echo ref = toStub( servant, Echo.class ) ;
@@ -124,7 +129,6 @@ public class FrameworkClient extends Framework {
 	} catch (Exception exc) {
 	    System.out.println( "Caught exception " + exc ) ;
 	    exc.printStackTrace() ;
-	    System.exit( 1 ) ;
 	}
     }
 
@@ -142,6 +146,9 @@ public class FrameworkClient extends Framework {
 
 	// result.setProperty( ORBConstants.DEBUG_PROPERTY, 
 	    // "transport" ) ;
+	
+	result.setProperty( ORBConstants.TRANSPORT_TCP_CONNECT_TIMEOUTS_PROPERTY,
+	    "100:2000:100" ) ;
 
 	return result ;
     }
@@ -191,7 +198,6 @@ public class FrameworkClient extends Framework {
 	    } catch (Exception exc) {
 		System.out.println( "Caught exception " + exc ) ;
 		exc.printStackTrace() ;
-		System.exit( 1 ) ;
 	    }
 	}
     }
@@ -215,9 +221,9 @@ public class FrameworkClient extends Framework {
 	    InterceptorTester.theTester.setExceptionExpected() ;
 
 	    msg( "******* Start Test with disconnected connection *******" ) ; 
-	    ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).transportDebugFlag = true;
+	    // ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).transportDebugFlag = true;
 	    sref.echo( arg ) ;
-	    ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).transportDebugFlag = false;
+	    // ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).transportDebugFlag = false;
 	    msg( "******* End test with disconnected connection *******" ) ; 
 	} catch (MarshalException exc) {
 	    msg( "Caught expected MarshalException" ) ;
@@ -238,6 +244,76 @@ public class FrameworkClient extends Framework {
     @Test( groups = { TESTREF_GROUP } ) 
     public void testWriteFailureNoFragment() {
 	testWriteFailure( makeIntArray( 50 ) ) ;
+    }
+
+    private static class RCTest implements Serializable {
+	byte[] front ;
+	Throwable thr ;
+
+	void setPrefixSize( int size ) {
+	    front = new byte[size] ;
+	    for (int ctr=0; ctr<size; ctr++ ) {
+		front[ctr] = (byte)(ctr & 255) ;
+	    }
+	}
+
+	RCTest( Throwable thr ) {
+	    setPrefixSize( 0 ) ;
+	    this.thr = thr ;
+	}
+
+	private void readObject( ObjectInputStream is ) throws IOException, ClassNotFoundException {
+	    is.defaultReadObject() ;
+	}
+
+	private void writeObject( ObjectOutputStream os ) throws IOException {
+	    os.defaultWriteObject() ;
+	}
+    }
+
+    @Test()
+    public void testRecursiveTypeCode() {
+	int ctr=0 ;
+	try {
+	    msg( "Start recursive TypeCode test" ) ;
+	    Throwable thr = new Throwable( "Top level" ) ;
+	    Throwable cause = new Throwable( "The cause" ) ;
+	    thr.initCause( cause ) ;
+	    RCTest rct = new RCTest( thr ) ;
+	    Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
+
+	    // ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).giopDebugFlag = true;
+	    for (ctr=0; ctr<4096; ctr+=256) {
+		rct.setPrefixSize( ctr ) ;
+		sref.echo( rct ) ;
+	    }
+	    // ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).giopDebugFlag = false;
+
+	} catch (Exception exc) {
+	    exc.printStackTrace() ;
+	    Assert.fail( "Unexpected exception in testRecursiveTypeCode for ctr = " + ctr + " :" + exc ) ;
+	}
+    }
+
+    @Test()
+    public void testCorbalocRir() {
+	msg( "corbaloc:rir URL test" ) ;
+	String name = "UseThisName" ;
+	String url = "corbaloc:rir:/" + name ;
+	ORB orb = getClientORB() ;
+	try {
+	    Echo serv = makeServant( "purple" ) ;
+	    connectServant( serv, getClientORB() ) ;
+	    Echo stub = toStub( serv, Echo.class ) ;
+	    ((com.sun.corba.se.org.omg.CORBA.ORB)getClientORB())
+		.register_initial_reference( name, (org.omg.CORBA.Object)stub ) ;
+
+	    Echo echo = narrow( orb.string_to_object( url ), Echo.class ) ;
+	    Assert.assertFalse( echo == null ) ;
+	} catch (Exception exc) {
+	    exc.printStackTrace() ;
+	    Assert.fail( "Unexpected exception in testCorbalocRir: " + exc ) ;
+	}
     }
 
     public static void main( String[] args ) {

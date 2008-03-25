@@ -57,6 +57,7 @@ public class InterceptorTester extends LocalObject implements
     ORBInitializer, ClientRequestInterceptor {
 
     public static InterceptorTester theTester = null ;
+    public static boolean verbose = false ;
 
     private int errors = 0 ;
     private boolean exceptionExpected = false ;
@@ -79,7 +80,9 @@ public class InterceptorTester extends LocalObject implements
     }
     
     private void msg( String msg ) {
-	System.out.println( "+++InterceptorTester: " + msg ) ;
+	if (verbose) {
+	    System.out.println( "+++InterceptorTester: " + msg ) ;
+	}
     }
 
     private void error( String msg ) {

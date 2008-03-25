@@ -72,6 +72,11 @@ public class NewReflectTest extends Client
 	Client.doMain( args, root ) ; 
     }
 
+    public static Test suite() {
+	Client root = new NewReflectTest() ;
+	return root.makeSuite() ;
+    }
+
     public boolean isTestExcluded()
     {
 	return findInArray( getName(), EXCLUDE_LIST ) ;

@@ -102,7 +102,7 @@
 </target>
 
 <target name="make-output-directory" depends="init">
-    <mkdir dir="${test.output}"/>
+    <mkdir dir="${test.output}/junitreports"/>
 </target>
 
 <target name="test-rmi-iiop" depends="make-output-directory">
@@ -115,7 +115,47 @@
 </target>
 
 <target name="test-copyobject" depends="make-output-directory">
-    <run-test args="-file ../src/share/classes/corba/CopyObjectTests.tdesc -verbose"/>
+    <!-- <run-test args="-file ../src/share/classes/corba/CopyObjectTests.tdesc -verbose"/> 
+    <run-test args="-test corba.copyobjectpolicy.CopyObjectPolicyTest -verbose"/> -->
+    <junit printsummary="on" fork="on" forkmode="perTest" newenvironment="true" clonevm="false" maxmemory="200M" showoutput="true">
+	<sysproperty key="javax.rmi.CORBA.UtilClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
+	<sysproperty key="javax.rmi.CORBA.StubClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
+	<sysproperty key="javax.rmi.CORBA.PortableRemoteObjectClass" value="com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
+	<sysproperty key="corba.test.orb.classpath" value="${classes.dir}:${orblib.classes.dir}"/>
+	<sysproperty key="http.server.port" value="9090"/>
+	<sysproperty key="java.rmi.server.codebase" value="http://localhost:9090/"/>
+	<sysproperty key="http.server.root.directory" value="../build/values2/classes"/>
+	<sysproperty key="java.security.policy" value="../src/share/classes/test.policy"/>
+	<sysproperty key="java.security.debug" value="debug"/>
+	<sysproperty key="org.omg.CORBA.ORBClass" value="com.sun.corba.se.impl.orb.ORBImpl"/>
+	<sysproperty key="org.omg.CORBA.ORBSingletonClass" value="com.sun.corba.se.impl.orb.ORBSingleton"/>
+	<sysproperty key="com.sun.corba.se.POA.ORBServerId" value="1"/>
+	<sysproperty key="com.sun.corba.se.ORBBase" value="${basedir}"/>
+	<sysproperty key="com.sun.corba.se.test.sourcepath" value="${test.source.path}"/>
+	<sysproperty key="com.sun.corba.se.ORBUseDynamicStub" value="${use.dynamic.stub}"/>
+	<sysproperty key="com.sun.corba.se.ORBUseCodegenReflectiveCopyobject" value="${use.codegen.copyobject}"/>
+	<sysproperty key="com.sun.corba.se.encoding.ORBEnableJavaSerialization" value="${use.java.serialization}"/>
+	<sysproperty key="com.sun.corba.se.ORBDebugForkedProcess" value="${debug.forked.process}"/>
+	<sysproperty key="com.sun.corba.se.ORBDebugStubGeneration" value="false"/>
+	<sysproperty key="emma.coverage.out.file" value="../../${emma.dir}/orb_coverage.ec"/>
+	<sysproperty key="emma.coverage.out.merge" value="true"/>
+	<sysproperty key="emma.rt.control" value="false"/>
+	<classpath>
+	    <pathelement location="${emma.classes.dir}"/>
+	    <pathelement location="${classes.dir}"/>
+	    <pathelement location="${orblib.classes.dir}"/>
+	    <pathelement location="${boot.dir}/lib/tools.jar"/>
+	    <pathelement location="${emma-jar}"/>
+	</classpath> 
+	<jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/> 
+	<jvmarg line="${debug.args}"/>
+	<formatter type="xml"/>
+	<test name="corba.copyobject.NewReflectTest" todir="${test.output}/junitreports"/>
+	<test name="corba.copyobject.NewReflectFallbackTest" todir="${test.output}/junitreports"/>
+	<test name="corba.copyobject.OldReflectTest" todir="${test.output}/junitreports"/>
+	<test name="corba.copyobject.JavaStreamTest" todir="${test.output}/junitreports"/>
+	<test name="corba.copyobject.ORBStreamTest" todir="${test.output}/junitreports"/>
+    </junit>
 </target>
 
 <target name="test-pi" depends="make-output-directory">

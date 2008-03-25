@@ -89,6 +89,11 @@ public class ORBStreamTest extends Client
 	Client root = new ORBStreamTest() ;
 	Client.doMain( args, root ) ; 
     }
+
+    public static Test suite() {
+	Client root = new ORBStreamTest() ;
+	return root.makeSuite() ;
+    }
     
     public ObjectCopierFactory getCopierFactory( ORB orb )
     {

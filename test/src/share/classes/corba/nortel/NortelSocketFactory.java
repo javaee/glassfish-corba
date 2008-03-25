@@ -49,14 +49,21 @@ public class NortelSocketFactory extends DefaultSocketFactoryImpl {
     private static Socket savedSocket = null ;
     private static boolean transportDown = false ;
     public static boolean useNio = true ;
+    public static boolean verbose = false ;
+
+    private static void msg( String str ) {
+	if (verbose) {
+	    System.out.println( "+++NortelSocketFactory: " + str ) ;
+	}
+    }
 
     public ServerSocket createServerSocket(String type, InetSocketAddress in) throws IOException {
 	if (transportDown) {
-	    System.out.println( "Simulating transport failure..." ) ;
+	    msg( "Simulating transport failure..." ) ;
 	    throw new IOException( "Transport simulated down" ) ;
 	}
 
-	System.out.println("In method createServerSocket, type:" + type + ", InetSocketAddress:" + in );
+	msg("In method createServerSocket, type:" + type + ", InetSocketAddress:" + in );
 	ServerSocket serverSocket = new ServerSocket();
 	serverSocket.bind(in);
 
@@ -64,9 +71,9 @@ public class NortelSocketFactory extends DefaultSocketFactoryImpl {
     }
 
     public Socket createSocket(String type, InetSocketAddress in) throws IOException {
-	System.out.println("In method createSocket, type:" + type + ", InetSocketAddress:" + in );
+	msg("In method createSocket, type:" + type + ", InetSocketAddress:" + in );
 	if (transportDown) {
-	    System.out.println( "Simulating transport failure..." ) ;
+	    msg( "Simulating transport failure..." ) ;
 	    throw new IOException( "Transport simulated down" ) ;
 	}
 
@@ -83,12 +90,12 @@ public class NortelSocketFactory extends DefaultSocketFactoryImpl {
     }
 
     public static void disconnectSocket(){
-	System.out.println( "Disconnecting socket" ) ;
+	msg( "Disconnecting socket" ) ;
 	try  {
 	    savedSocket.close();
 	} catch (Exception e) {
 
-	    System.out.println("Exception " + e);
+	    msg("Exception " + e);
 	}
     }
 

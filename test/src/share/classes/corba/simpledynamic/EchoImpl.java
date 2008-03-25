@@ -61,4 +61,8 @@ public class EchoImpl extends PortableRemoteObject implements Echo {
     public int[] echo( int[] arg ) {
 	return arg ;
     }
+
+    public Object echo( Object arg ) {
+	return arg ;
+    }
 }

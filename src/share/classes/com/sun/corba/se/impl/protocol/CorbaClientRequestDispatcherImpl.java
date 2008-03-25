@@ -399,7 +399,7 @@ public class CorbaClientRequestDispatcherImpl
 		getContactInfoListIterator(orb)
 	            .reportException(messageMediator.getContactInfo(), e);
 
-	    // Bug 6328377: must not lose exception in PI
+	    // Bug 6382377: must not lose exception in PI
 	    // Must run interceptor end point before retrying.
 	    Exception newException = 
 		orb.getPIHandler().invokeClientPIEndingPoint(

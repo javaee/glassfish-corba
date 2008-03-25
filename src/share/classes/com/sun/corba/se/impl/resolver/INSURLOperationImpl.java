@@ -46,6 +46,7 @@ import java.util.Collections ;
 
 import org.omg.CosNaming.NamingContextExt ;
 import org.omg.CosNaming.NamingContextExtHelper ;
+import org.omg.CORBA.ORBPackage.InvalidName ;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORTemplate;
@@ -166,8 +167,19 @@ public class INSURLOperationImpl implements Operation
     {
         org.omg.CORBA.Object result = null;
         // If RIR flag is true use the Bootstrap protocol
+	// Bug 6670615 noticed that this is incorrect: rir means use resolve_initial_references
+	// on the local ORB!
         if( theCorbaLocObject.getRIRFlag( ) )  {
-            result = bootstrapResolver.resolve(theCorbaLocObject.getKeyString());
+            // result = bootstrapResolver.resolve(theCorbaLocObject.getKeyString());
+	    String keyString = theCorbaLocObject.getKeyString() ;
+	    if (keyString.equals( "" ))
+		keyString = "NameService" ;
+
+	    try {
+		result = orb.resolve_initial_references( keyString ) ;
+	    } catch (InvalidName exc) {
+		throw omgWrapper.soBadSchemaSpecific( exc ) ;
+	    }
 	} else {
 	    result = getIORUsingCorbaloc( theCorbaLocObject );
 	}

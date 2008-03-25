@@ -107,10 +107,18 @@ public abstract class Client extends TestCase
     private List timedTests ;
 
     static {
-	Properties props = System.getProperties() ;
-	props.setProperty( ORBConstants.TIMING_POINTS_ENABLED, "true" ) ;
-	String[] args = null ;
-	orb = (ORB)ORB.init( args, props ) ;
+	try {
+	    System.out.println( "START static init" ) ;
+	    Properties props = System.getProperties() ;
+	    props.setProperty( ORBConstants.TIMING_POINTS_ENABLED, "true" ) ;
+	    System.out.println( props.getProperty( "org.omg.CORBA.ORBClass" ) ) ;
+	    String[] args = null ;
+	    orb = (ORB)ORB.init( args, props ) ;
+	} catch (Throwable t) {
+	    t.printStackTrace() ;
+	} finally {
+	    System.out.println( "END static init" ) ;
+	}
     }
  
     protected boolean usesCDR() {
@@ -195,7 +203,7 @@ public abstract class Client extends TestCase
 
     public static void doMain( String[] args, Client root ) 
     {
-	TestResult result = junit.textui.TestRunner.run(root.suite()) ;
+	TestResult result = junit.textui.TestRunner.run(root.makeSuite()) ;
 
 	TestCaseTools.reportTiming( REP_COUNT, System.out, root.timedTests ) ;
 
@@ -243,19 +251,25 @@ public abstract class Client extends TestCase
 	return ts ;
     }
 
-    public Test suite()
+    public Test makeSuite()
     {
-	conditionTimingTests() ;
+	TestSuite ts = null ;
 
-	System.out.println( 
-	    "================================================================\n" +
-	    "Testing copyObject with the " + this.getClass().getName() + 
-	    " implementation\n" +
-	    "================================================================\n" ) ;
+	try {
+	    conditionTimingTests() ;
 
-	TestSuite ts = makeTestSuite( "main", new Test[] { makeCopyObject(),
-	    makeCopyObjects()
-        } ) ;
+	    System.out.println( 
+		"================================================================\n" +
+		"Testing copyObject with the " + this.getClass().getName() + 
+		" implementation\n" +
+		"================================================================\n" ) ;
+
+	    ts = makeTestSuite( "main", new Test[] { makeCopyObject(),
+		makeCopyObjects()
+	    } ) ;
+	} catch (Throwable t) {
+	    t.printStackTrace() ;
+	} 
 
 	return ts ;
     }

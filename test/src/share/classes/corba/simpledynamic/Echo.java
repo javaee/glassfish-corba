@@ -48,6 +48,8 @@ public interface Echo extends Remote {
     /** Can send enough data to force fragmentation
      */
     int[] echo( int[] arg ) throws RemoteException ;
+
+    Object echo( Object obj ) throws RemoteException ;
 }
 
 

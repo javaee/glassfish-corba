@@ -153,8 +153,7 @@ public abstract class Framework {
     
     /** Connect a servant of type cls to the orb.  
     */
-    protected <T extends Remote> void connectServant( T servant, Class<T> cls,
-	ORB orb ) {
+    protected <T extends Remote> void connectServant( T servant, ORB orb ) {
 
 	try {
 	    Tie tie = Util.getTie( servant ) ;
@@ -170,7 +169,7 @@ public abstract class Framework {
     protected <T extends Remote> void bindServant( T servant, Class<T> cls, 
 	String name ) {
 
-	connectServant( servant, cls, getServerORB() ) ;
+	connectServant( servant, getServerORB() ) ;
 
 	try {
 	    T stub = toStub( servant, cls ) ;

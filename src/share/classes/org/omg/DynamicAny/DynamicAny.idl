@@ -873,7 +873,7 @@ module DynamicAny {
         * (has_no_active_member returns false and component_count returns 2 in this case).
         *
         * @exception TypeMismatch if the TypeCode of the parameter is not equivalent to the TypeCode
-        *            of the union�s discriminator
+        *            of the union???s discriminator
         */
         void set_discriminator(in DynAny d)
             raises(TypeMismatch);

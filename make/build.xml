@@ -89,6 +89,7 @@
     <property name="javac.debug"		value="true"/>
     <property name="src.dir"			value="src/share/classes"/>
     <property name="test.src.dir"		value="test/src/share/classes"/>
+    <property name="javadoc.dir"		value="www/javadoc"/>
     <property name="build.sysclasspath"		value="ignore"/>
 
     <!-- Conditional properties used in test targets -->
@@ -196,10 +197,6 @@
 	    <pathelement location="test/make/gen"/>
 	    <pathelement location="${test-values1.dir}"/>
 	    <pathelement location="${test.src.dir}"/>
-	    <pathelement location="${root.dir}/lib/trove.jar"/>
-	    <pathelement location="${root.dir}/lib/log4j.jar"/>
-	    <pathelement location="${root.dir}/lib/jboss-serialization.jar"/>
-	    <pathelement location="${root.dir}/lib/log4j.xml"/>
 	</path>
 	<pathconvert property="test.source.path">
 	    <path>
@@ -744,7 +741,7 @@
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
 	<delete dir="${test-build.dir}"/>
-	<delete dir="www/javadoc"/>
+	<delete dir="${javadoc.dir}"/>
     </target>
 
     <target name="clean-emma" depends="init">
@@ -807,7 +804,7 @@
     <target name="javadoc" depends="init">
 	<javadoc packagenames="com.sun.corba.se.spi.*,com.sun.corba.se.pept.*"
 	         sourcepath="${src.dir}:${orblib.src.dir}"
-		 destdir="www/javadoc"
+		 destdir="${javadoc.dir}"
 		 author="true"
 		 version="true"
 		 use="true"

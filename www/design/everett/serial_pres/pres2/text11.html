@@ -44,7 +44,7 @@
 <center>
 <a href="text0.html">First page</a> <a href="text10.html">Back</a> <a href="text12.html">Continue</a> <a href="text15.html">Last page</a> <a href="serial2pres.html">Overview</a> <a href="img11.html">Graphics</a></center><br>
 <h1>Chunking and Fragmentation 2</h1>
-<ul><li><h2>Before “special” writes (arrays of primitives, string/wstring data, indirections), call handleSpecialChunkBegin with the total size in bytes of desired data</h2></li>
+<ul><li><h2>Before ???special??? writes (arrays of primitives, string/wstring data, indirections), call handleSpecialChunkBegin with the total size in bytes of desired data</h2></li>
 <li><h2>Afterwards, call handleSpecialChunkEnd</h2></li>
 <li><h2>Primitives are overridden in 1_2 to call checkPrimitiveAcrossFragmentedChunk after writing, but don't use handleSpecialChunk methods (ABLE TO REUSE?)</h2></li>
 </ul></body>

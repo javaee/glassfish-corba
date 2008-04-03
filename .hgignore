@@ -14,8 +14,7 @@ test-output/**
 experimental/**
 build/**
 test/build/**
-test/make/gen/**
-test/make/test-output/**
+test/run/**
 optional/build/**
 optional/test/build/**
 deleted_files/**

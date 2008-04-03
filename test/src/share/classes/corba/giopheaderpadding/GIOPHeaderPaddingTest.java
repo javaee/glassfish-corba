@@ -64,7 +64,7 @@ public class GIOPHeaderPaddingTest extends CORBATest {
 	Controller orbd = createORBD();
 	orbd.start();
 
-	Properties clientProps = Options.getExtraClientProperties();
+	Properties clientProps = Options.getClientProperties();
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
 			"corba.giopheaderpadding.Client", "true");
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
@@ -72,7 +72,7 @@ public class GIOPHeaderPaddingTest extends CORBATest {
         clientProps.put(ORBConstants.GIOP_VERSION, "1.2");
         clientProps.put(ORBConstants.GIOP_12_BUFFMGR, "0"); // GROW
 
-	Properties serverProps = Options.getExtraServerProperties();
+	Properties serverProps = Options.getServerProperties();
         serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
 			"corba.giopheaderpadding.Server", "true");
         serverProps.put(ORBConstants.GIOP_VERSION, "1.2");

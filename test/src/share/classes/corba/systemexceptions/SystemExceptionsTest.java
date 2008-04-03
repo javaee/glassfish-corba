@@ -56,7 +56,7 @@ public class SystemExceptionsTest extends CORBATest {
 	Controller orbd = createORBD();
 	orbd.start();
 
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
 			"corba.systemexceptions.Client", "true");
 

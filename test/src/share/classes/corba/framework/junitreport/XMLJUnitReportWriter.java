@@ -1,22 +1,4 @@
 /*
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
-
-/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2000-2007 Sun Microsystems, Inc. All rights reserved.
@@ -50,6 +32,24 @@
  * and therefore, elected the GPL Version 2 license, then the option applies
  * only if the new code is made subject to such option by the copyright
  * holder.
+ */
+
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
 
 package corba.framework.junitreport;
@@ -87,9 +87,6 @@ import java.net.UnknownHostException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.Test;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -124,15 +121,15 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
     /**
      * Element for the current test.
      */
-    private Map<Test,Element> testElements = new HashMap<Test,Element>();
+    private Map<TestDescription,Element> testElements = new HashMap<TestDescription,Element>();
     /**
      * tests that failed.
      */
-    private Set<Test> failedTests = new HashSet<Test>() ;
+    private Set<TestDescription> failedTests = new HashSet<TestDescription>() ;
     /**
      * Timing helper.
      */
-    private Map<Test,Long> testStarts = new HashMap<Test,Long>();
+    private Map<TestDescription,Long> testStarts = new HashMap<TestDescription,Long>();
     /**
      * Where to write the log to.
      */
@@ -141,6 +138,11 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
      * Whether or not we should filter stack traces in the report.
      */
     private boolean filterTrace ;
+
+    private int runCount ;
+    private int failureCount ;
+    private int errorCount ;
+    private long startTime ;
 
     /** No arg constructor. */
     public XMLJUnitReportWriter() {
@@ -164,6 +166,11 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
     }
 
     public void startTestSuite(String name, Properties props ) {
+        runCount = 0 ;
+        failureCount = 0 ;
+        errorCount = 0 ;
+        startTime = System.currentTimeMillis() ;
+
         doc = getDocumentBuilder().newDocument();
         rootElement = doc.createElement(TESTSUITE);
         rootElement.setAttribute(ATTR_NAME, name == null ? UNKNOWN : name);
@@ -202,7 +209,8 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         }
     }
 
-    public void endTestSuite( int runCount, int failureCount, int errorCount, long runTime ) {
+    public void endTestSuite( ) {
+        long runTime = System.currentTimeMillis() - startTime ;
         rootElement.setAttribute(ATTR_TESTS, "" + runCount);
         rootElement.setAttribute(ATTR_FAILURES, "" + failureCount);
         rootElement.setAttribute(ATTR_ERRORS, "" + errorCount);
@@ -232,11 +240,13 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         }
     }
 
-    public void startTest(Test t) {
+    public void startTest(TestDescription t) {
         testStarts.put(t, new Long(System.currentTimeMillis()));
     }
 
-    public void endTest(Test test) {
+    public void endTest(TestDescription test) {
+        runCount++ ;
+
         // Fix for bug #5637 - if a junit.extensions.TestSetup is
         // used and throws an exception during setUp then startTest
         // would never have been called
@@ -266,15 +276,17 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
 	    "" + ((System.currentTimeMillis() - l) / 1000.0));
     }
 
-    public void addFailure(Test test, Throwable t) {
+    public void addFailure(TestDescription test, Throwable t) {
+        failureCount++ ;
         formatError(FAILURE, test, t);
     }
 
-    public void addError(Test test, Throwable t) {
+    public void addError(TestDescription test, Throwable t) {
+        errorCount++ ;
         formatError(ERROR, test, t);
     }
 
-    private void formatError(String type, Test test, Throwable t) {
+    private void formatError(String type, TestDescription test, Throwable t) {
         if (test != null) {
             endTest(test);
             failedTests.add(test);

@@ -75,7 +75,7 @@ public class CMVTTest extends CORBATest {
     }
 
     private void setClient(int version, int strategy){
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
 
         int fragmentSize = 1024;
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
@@ -86,7 +86,7 @@ public class CMVTTest extends CORBATest {
     }
 
     private void setServer(int version, int strategy){
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
 
         serverProps.put(ORBConstants.GIOP_VERSION, GIOP_version[version]);
         serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + GIOP_strategy[strategy]);

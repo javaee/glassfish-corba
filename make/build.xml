@@ -83,7 +83,9 @@
     <property name="rt.jar"			value="${env.JAVA_HOME}/jre/lib/rt.jar"/>
     <property name="findbugs.home"		value="${env.FINDBUGS_HOME}"/>
     <property name="boot.dir"			value="${env.ALT_BOOTDIR}"/>
-    <property name="test.output"		value="test/make/gen"/>
+    <property name="test.run.base"              value="test/run"/>
+    <property name="test.output"		value="${test.run.base}/gen"/>
+    <property name="junit.reports"		value="${test.run.base}/junitreports"/>
     <property name="javac.optimize"		value="false"/>
     <!-- property name="javac.debug"		value="${env.DEBUG_CLASSFILES}"/ -->
     <property name="javac.debug"		value="true"/>
@@ -194,7 +196,7 @@
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${test-classes.dir}"/>
 	    <pathelement location="${test-gensrc.dir}"/>
-	    <pathelement location="test/make/gen"/>
+	    <pathelement location="${test.output}"/>
 	    <pathelement location="${test-values1.dir}"/>
 	    <pathelement location="${test.src.dir}"/>
 	</path>
@@ -202,7 +204,7 @@
 	    <path>
 		<pathelement location="${src.dir}"/>
 		<pathelement location="${test.src.dir}"/>
-		<pathelement location="test/make/gen"/>
+		<pathelement location="${test.output}"/>
 	    </path>
 	</pathconvert>
     </target>
@@ -749,8 +751,7 @@
     </target>
 
     <target name="clean-tests" depends="init">
-	<delete dir="${test.output}"/>
-	<delete dir="test/make/test-output"/>
+	<delete dir="${test.run.base}"/>
     </target>
 
     <!-- ========================= CREATE-JARS ========================= -->

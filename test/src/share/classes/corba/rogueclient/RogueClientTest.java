@@ -63,18 +63,18 @@ public class RogueClientTest
     {
 	Controller orbd = createORBD();
 	orbd.start();
-//        Properties serverProps = Options.getExtraServerProperties();
+//        Properties serverProps = Options.getServerProperties();
 //        serverProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
 	Controller server = createServer(thisPackage + ".Server","Server");
 	server.start();
 
-//        Properties rogueClientProps = Options.getExtraClientProperties();
+//        Properties rogueClientProps = Options.getClientProperties();
 //        rogueClientProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
 	Controller rogueClient = createClient(thisPackage + ".RogueClient","RogueClient");
 
         // put some tougher than defaults settings on well behaved client
 	// so command line property for read timeouts gets executed
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.setProperty(ORBConstants.TRANSPORT_TCP_TIMEOUTS_PROPERTY,
                                 "150:2500:25");
 	Controller client = createClient(thisPackage + ".Client","Client");

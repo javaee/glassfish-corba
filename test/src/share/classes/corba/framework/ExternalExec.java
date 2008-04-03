@@ -139,6 +139,7 @@ public class ExternalExec extends ControllerAdapter
      */
     protected String[] buildCommand()
     {
+        List<String> cmd = new ArrayList<String>() ; 
         // Command line array:
 
         // [java executable]
@@ -150,44 +151,34 @@ public class ExternalExec extends ControllerAdapter
 
 	String[] debugArgs = getDebugVMArgs() ;
 
-        int size = 2 + debugArgs.length + VMArgs.length + 
-	    environment.size() + programArgs.length;
-      
-        String cmd [] = new String [size];
-
-        int idx = 0;
         // Java executable
-        cmd[idx++] = Options.getJavaExec();
+        cmd.add( Options.getJavaExec() ) ;
 	
         // Arguments to the java executable
-        for(int i = 0; i < VMArgs.length; i++)
-            cmd[idx++] = VMArgs[i];
+        for(String str : VMArgs) 
+            cmd.add( str ) ;
       
         // -D environment variables
         Enumeration names = environment.propertyNames();
         while(names.hasMoreElements()) {
-            String name =(String) names.nextElement();
-            cmd[idx++] = "-D" + name + "=" 
-                + environment.getProperty(name);
+            String name = (String) names.nextElement();
+            cmd.add( "-D" + name + "=" + environment.getProperty(name) ) ;
         }
 
-	// Debugging arguments, if any
-	for(int i = 0; i < debugArgs.length; i++ ) 
-	    cmd[idx++] = debugArgs[i];
+        for (String str : debugArgs)
+	    cmd.add( str ) ;
 
-        // Class name
-        cmd[idx++] = className;
+        cmd.add( className ) ;
 
-        // Arguments to the program
-        for(int i = 0; i < programArgs.length; i++)
-            cmd[idx++] = programArgs[i];
+        for (String str : programArgs) 
+            cmd.add( str ) ;
 
         Test.dprint("--------");
-        for(int i = 0; i < cmd.length; i++)
-            Test.dprint("" + i + ": " + cmd[i]);
+        for(String str : cmd) 
+            Test.dprint(str);
         Test.dprint("--------");
 
-        return cmd;
+        return cmd.toArray( new String[cmd.size()] ) ;
     }
 
     /**

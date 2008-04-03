@@ -100,8 +100,8 @@ public class CodeBaseTest extends CORBATest
         // Add the special RMI property for code downloading.
         // NOTE: Unless it ends in a slash, the RMI code assumes
         // it is a jar file!
-        Properties serverProps = Options.getExtraServerProperties();
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties serverProps = Options.getServerProperties();
+        Properties clientProps = Options.getClientProperties();
 
         String baseURL = "http://localhost:"
             + webServerPort
@@ -141,7 +141,7 @@ public class CodeBaseTest extends CORBATest
     {
         Controller server, client;
 
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         if (serverDownloading) {
             clientProps.put(Tester.SERVER_DOWNLOADING_FLAG, "true");
             Options.setClasspath(shortClasspath);
@@ -187,8 +187,7 @@ public class CodeBaseTest extends CORBATest
         else
             executionStrategy = new ExternalExec();
 
-        Properties props = new Properties();
-        Options.addSpecialProperties(props);
+        Properties props = Options.getServerProperties() ;
 	int emmaPort = EmmaControl.setCoverageProperties( props ) ;
 
         String args[] = new String[] { 

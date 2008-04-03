@@ -55,7 +55,7 @@ public class RMIPOACounterTest extends CORBATest
 
         Controller orbd = createORBD();
 
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
 
         serverProps.setProperty(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                                 Options.getUnusedPort().toString());

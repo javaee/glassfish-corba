@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2000-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,45 +33,25 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.poapolicies;
 
-import java.util.*;
-import test.Test;
-import corba.framework.*;
+package corba.lb ;
 
-public class POAPoliciesTest extends CORBATest
+import java.util.Properties ;
+
+import corba.framework.CORBATest ;
+import corba.framework.Options ;
+import corba.framework.Controller ;
+
+public class TestngRunnerTest extends CORBATest
 {
-    private void testWithFactory(String poaFactory) throws Throwable
+    protected void doTest() throws Exception
     {
-        Test.dprint("Using POA Factory: " 
-                    + (poaFactory == null ? "(Default)" : poaFactory));
+	String thisPackage = this.getClass().getPackage().getName() ;
+	
+	Controller client = createClient(thisPackage+"."+"Client", "Client");
 
-        if (poaFactory != null) {
-            Properties serverProps = Options.getServerProperties();
-            serverProps.setProperty("POAFactory", poaFactory);
-        }
-        
-        Controller server = createServer("corba.poapolicies.HelloServer");
-
-        Controller client = createClient("corba.poapolicies.HelloClient");
-
-        server.start();
-
-        client.start();
-
-        client.waitFor();
-
-        client.stop();
-
-        server.stop();
-    }
-
-    protected void doTest() throws Throwable
-    {
-        String prefix = "corba.poapolicies.";
-        testWithFactory(prefix + "FactoryForRetainAndUseActiveMapOnly");
-        testWithFactory(prefix + "FactoryForRetainAndUseServantManager");
+	client.start();
+	client.waitFor(1000 * 60 * 2);
+	client.stop();
     }
 }
-
-    

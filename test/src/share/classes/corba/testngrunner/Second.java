@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2000-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,45 +33,71 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.poapolicies;
 
-import java.util.*;
-import test.Test;
-import corba.framework.*;
+package corba.testngrunner ;
 
-public class POAPoliciesTest extends CORBATest
-{
-    private void testWithFactory(String poaFactory) throws Throwable
-    {
-        Test.dprint("Using POA Factory: " 
-                    + (poaFactory == null ? "(Default)" : poaFactory));
+import java.util.Iterator ;
+import java.util.Properties ;
+import java.util.Map ;
+import java.util.List ;
+import java.util.ArrayList ;
 
-        if (poaFactory != null) {
-            Properties serverProps = Options.getServerProperties();
-            serverProps.setProperty("POAFactory", poaFactory);
-        }
-        
-        Controller server = createServer("corba.poapolicies.HelloServer");
+import java.io.PrintWriter ;
 
-        Controller client = createClient("corba.poapolicies.HelloClient");
+import org.testng.Assert ;
+import org.testng.annotations.BeforeSuite ;
+import org.testng.annotations.AfterSuite ;
+import org.testng.annotations.Test ;
+import org.testng.annotations.Configuration ;
+import org.testng.annotations.ExpectedExceptions ;
 
-        server.start();
+import corba.framework.TestngRunner ;
 
-        client.start();
-
-        client.waitFor();
-
-        client.stop();
-
-        server.stop();
+public class Second {
+    private void msg( String str ) {
+        System.out.println( "TestngRunner.Second: " + str ) ;
     }
 
-    protected void doTest() throws Throwable
-    {
-        String prefix = "corba.poapolicies.";
-        testWithFactory(prefix + "FactoryForRetainAndUseActiveMapOnly");
-        testWithFactory(prefix + "FactoryForRetainAndUseServantManager");
+    @BeforeSuite
+    public void setup() {
+        msg( "setup called" ) ;
+    }
+
+    @Test
+    public void test1() {
+        msg( "test1 called" ) ;
+    }
+
+    @Test
+    public void test2() {
+        msg( "test2 called" ) ;
+    }
+
+    @Test
+    public void test3() {
+        msg( "test3 called" ) ;
+        throw new RuntimeException( "Exception in test3" ) ;
+    }
+
+    @Test
+    public void test4() {
+        msg( "test4 called" ) ;
+    }
+
+    @Test
+    public void test5() {
+        msg( "test5 called" ) ;
+        Assert.fail( "test5 failed" ) ;
+    }
+
+    @Test
+    public void anotherTest() {
+        msg( "anotherTest called" ) ;
+    }
+    
+    @AfterSuite
+    public void shutdown() {
+        msg( "shutdown called" ) ;
     }
 }
 
-    

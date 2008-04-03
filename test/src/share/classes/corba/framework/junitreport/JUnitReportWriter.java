@@ -1,22 +1,4 @@
 /*
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- */
-
-/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2000-2007 Sun Microsystems, Inc. All rights reserved.
@@ -52,11 +34,31 @@
  * holder.
  */
 
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package corba.framework.junitreport;
 
 import java.io.OutputStream;
 
 import java.util.Properties ;
+
+import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 /**
  * This Interface describes classes that format the results of a JUnit
@@ -64,52 +66,25 @@ import java.util.Properties ;
  *
  */
 public interface JUnitReportWriter {
-    public class Test {
-	private String name ;
-	private String className ;
-
-	public Test( String name, String className ) {
-	    this.name = name ;
-	    this.className = className ;
+    public class TestDescription extends Pair<String,String> {
+	public TestDescription( String name, String className ) {
+            super( name, className ) ;
 	}
 
 	String getName() {
-	    return name ;
+	    return first() ;
 	}
 
 	String getClassName() {
-	    return className ;
+	    return second() ;
 	}
     }
-
-    /**
-     * An error occurred.
-     */
-    public void addError(Test test, Throwable t);
-    /**
-     * A failure occurred.
-     */
-    public void addFailure(Test test, Throwable t);  
-    /**
-     * A test ended.
-     */
-    public void endTest(Test test); 
-    /**
-     * A test started.
-     */
-    public void startTest(Test test);
 
     /**
      * The whole testsuite started.
      * @param suite the suite.
      */
     void startTestSuite(String name, Properties props ) ;
-
-    /**
-     * The whole testsuite ended.
-     * @param suite the suite.
-     */
-    void endTestSuite( int runCount, int failureCount, int errorCount, long runTime ) ;
 
     /**
      * Sets the stream the formatter is supposed to write its results to.
@@ -128,4 +103,31 @@ public interface JUnitReportWriter {
      * @param err the string to write.
      */
     void setSystemError(String err);
+
+    /**
+     * A test started.
+     */
+    public void startTest(TestDescription test);
+
+    /**
+     * An error occurred.
+     */
+    public void addError(TestDescription test, Throwable t);
+
+    /**
+     * A failure occurred.
+     */
+    public void addFailure(TestDescription test, Throwable t);  
+
+    /**
+     * A test ended.
+     */
+    public void endTest(TestDescription test); 
+
+    /**
+     * The whole testsuite ended.
+     * @param suite the suite.
+     */
+    void endTestSuite() ;
+
 }

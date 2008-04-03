@@ -122,7 +122,7 @@ public class MsgTypesTest extends CORBATest {
 
         for (int client_strategy = GROW, i = 0; i < GIOP_version.length; i++) {
 
-            Properties clientProps = Options.getExtraClientProperties();
+            Properties clientProps = Options.getClientProperties();
 
             clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
             clientProps.put(ORBConstants.GIOP_VERSION, GIOP_version[i]);
@@ -133,7 +133,7 @@ public class MsgTypesTest extends CORBATest {
 
                 printBeginTest(i, client_strategy, j, server_strategy);
 
-                Properties serverProps = Options.getExtraServerProperties();
+                Properties serverProps = Options.getServerProperties();
                 serverProps.put(ORBConstants.GIOP_VERSION, GIOP_version[i]);
                 serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + server_strategy);
                 serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + server_strategy);
@@ -183,7 +183,7 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("EarlyReply");
 
         int fragmentSize = 1024;
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
         Controller server = createServer("corba.msgtypes.Server");
@@ -216,7 +216,7 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("SimpleCancelRequest");
 
         int fragmentSize = 32;
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
         Controller server = createServer("corba.msgtypes.Server");
@@ -249,7 +249,7 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("AbortiveCancelRequest1");
 
         int fragmentSize = 1024;
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
         Controller server = createServer("corba.msgtypes.Server");
@@ -282,10 +282,10 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("AbortiveCancelRequest2");
 
         int fragmentSize = 1024;
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         serverProps.put("org.omg.CORBA.ORBClass",
                         "com.sun.corba.se.impl.orb.ORBImpl");
         serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
@@ -321,7 +321,7 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("TargetAddrDisposition");
 
         int fragmentSize = 1024;
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
         clientProps.put(ORBConstants.GIOP_TARGET_ADDRESSING,
                   "" + ORBConstants.ADDR_DISP_IOR);
@@ -330,7 +330,7 @@ public class MsgTypesTest extends CORBATest {
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
                   "corba.msgtypes.Client", "true");
                   
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         serverProps.put("org.omg.CORBA.ORBClass",
                         "com.sun.corba.se.impl.orb.ORBImpl");
         serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
@@ -367,7 +367,7 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("CloseConnection");
 
         int fragmentSize = 32;
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
         Controller server = createServer("corba.msgtypes.Server");
@@ -400,7 +400,7 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("MessageError");
 
         int fragmentSize = 32;
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
         Controller server = createServer("corba.msgtypes.Server");
@@ -433,7 +433,7 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("GIOPInterop");
 
         int fragmentSize = 32;
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
         Controller server = createServer("corba.msgtypes.Server");
@@ -466,7 +466,7 @@ public class MsgTypesTest extends CORBATest {
         Options.addClientArg("FragmentedReply");
 
         int fragmentSize = 32;
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         serverProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
         Controller server = createServer("corba.msgtypes.Server");
@@ -498,7 +498,7 @@ public class MsgTypesTest extends CORBATest {
         Options.getClientArgs().clear();
         Options.addClientArg("HeaderPaddingTest");
 
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_VERSION, GIOP_version[2]);
         clientProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + GROW);
 

@@ -102,7 +102,7 @@ public class ServerInterceptorTest
 
 	try {
 
-            Properties clientProps = Options.getExtraClientProperties();
+            Properties clientProps = Options.getClientProperties();
 
             clientProps.setProperty(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                                     Options.getUnusedPort().toString());
@@ -131,7 +131,7 @@ public class ServerInterceptorTest
 
 	try {
 
-            Properties serverProps = Options.getExtraServerProperties();
+            Properties serverProps = Options.getServerProperties();
 
             serverProps.setProperty(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                                     Options.getUnusedPort().toString());

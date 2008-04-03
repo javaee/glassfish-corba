@@ -66,7 +66,7 @@ public class LockedCodeSetTest extends CORBATest
         // client to select it.  The server will still use ISO8859-1 to
         // unmarshal the operation name, but should be able to handle
         // multibyte chars after the service context is unmarshaled.
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
 
         serverProps.setProperty(ORBConstants.CHAR_CODESETS,
                                 "83951617,83951617");

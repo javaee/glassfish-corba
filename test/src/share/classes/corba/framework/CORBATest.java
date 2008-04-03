@@ -132,10 +132,8 @@ public abstract class CORBATest extends test.RemoteTest
      * Subclasses shouldn't need to modify this since they can handle
      * all their settings at the beginning of doTest with Options.
      */
-    public void setup()
-    {
+    public void setup() {
         try {
-
             if (usesOldFramework())
                 super.setup();
 
@@ -143,7 +141,6 @@ public abstract class CORBATest extends test.RemoteTest
 
             parseDebugExecFlags();
 	    parseTraceFlag() ;
-
         } catch (ThreadDeath death) {
             throw death;
         } catch (Throwable e) {
@@ -175,8 +172,7 @@ public abstract class CORBATest extends test.RemoteTest
      *@see         test.ServantContext
      *@see         test.RemoteTestExample
      */
-    protected void doTest(ServantContext context) throws Throwable
-    {
+    protected void doTest(ServantContext context) throws Throwable {
         doTest();
     }
 
@@ -189,8 +185,7 @@ public abstract class CORBATest extends test.RemoteTest
      *         servant management, false for the newer framework's
      *         system.
      */
-    protected boolean usesOldFramework()
-    {
+    protected boolean usesOldFramework() {
         return false;
     }
 
@@ -202,8 +197,7 @@ public abstract class CORBATest extends test.RemoteTest
      *
      *@exception   Throwable  Any errors which signal that this test failed
      */
-    protected void doTest() throws Throwable
-    {
+    protected void doTest() throws Throwable {
         // Subclasses should override one of the doTest methods
     }
 
@@ -220,12 +214,10 @@ public abstract class CORBATest extends test.RemoteTest
         boolean errorOccured = false;
 
         try {
-
             if (usesOldFramework())
                 super.run();
             else
                 doTest(null);
-
         } catch (ThreadDeath death) {
             errorOccured = true;
             throw death;
@@ -432,27 +424,68 @@ public abstract class CORBATest extends test.RemoteTest
                       Options.getReportDirectory());
     }
 
+    private enum ControllerKind { CLIENT, SERVER, ORBD } ;
+
+    private Controller createProcess( String className, ControllerKind kind, String name,
+        Properties props, Vector args, Hashtable extra ) throws Exception {
+
+        Controller executionStrategy;
+	if (odebugProcessNames.contains(name)) {
+            executionStrategy = new ODebugExec();
+        } else if (rdebugProcessNames.contains(name)) {
+            executionStrategy = new RDebugExec();
+        } else if (debugProcessNames.contains(name)) {
+            executionStrategy = new DebugExec();
+        } else {
+            switch (kind) {
+                case CLIENT :
+                    executionStrategy = newClientController() ;
+                    break ;
+                case SERVER :
+                    executionStrategy = newServerController() ;
+                    break ;
+                default :
+                    executionStrategy = new ExternalExec() ;
+                    break ;
+            }
+        }
+
+        FileOutputDecorator exec = new FileOutputDecorator(executionStrategy);
+
+        // The props, args, and extra values are all shared, so make copies to
+        // avoid unpleasant surprises!
+        String argArray[] = CORBAUtil.toArray(args);
+
+        Properties copy = new Properties() ;
+        Enumeration en = props.propertyNames() ;
+        while (en.hasMoreElements()) {
+            String key = (String)en.nextElement() ;
+            copy.setProperty( key,
+                props.getProperty( key ) ) ;
+        }
+
+	String traceFlags = (String)traceMap.get( name ) ;
+	if (traceFlags != null)
+	    copy.setProperty( ORBConstants.DEBUG_PROPERTY,
+		traceFlags ) ;
+
+	int emmaPort = EmmaControl.setCoverageProperties( copy ) ;
+
+        Hashtable hash = new Hashtable( extra ) ;
+
+        exec.initialize(className, name, copy, null, argArray, 
+            Options.getReportDirectory() + name + ".out.txt", 
+            Options.getReportDirectory() + name + ".err.txt", hash, emmaPort); 
+
+        controllers.add(exec);
+
+        return exec;
+    }
+
     /**
      * Create and initialize the Controller for the ORBD.  This initializes
      * and returns a Controller wrapped in a FileOutputDecorator.  Most of the
      * arguments to the Controller can be set in the Options class.
-     *
-     * The following properties are provided, but can be set or overriden
-     * by using the Options class:
-     * <PRE>
-     * output.dir
-     * com.sun.corba.se.JavaIDLHome
-     * org.omg.CORBA.ORBClass
-     * org.omg.CORBA.ORBSingletonClass
-     * com.sun.corba.se.impl.activation.DbDir
-     * org.omg.CORBA.ORBInitialPort
-     * LD_LIBRARY_PATH (if available)
-     * persistentServerId
-     * com.sun.corba.se.impl.activation.Port
-     * javax.rmi.CORBA.UtilClass (if available)
-     * javax.rmi.CORBA.StubClass (if available)
-     * javax.rmi.CORBA.PortableRemoteObjectClass (if available)
-     * </PRE>
      *
      *@return   Controller object representing the ORBD process, but
      *          not yet started.
@@ -461,120 +494,23 @@ public abstract class CORBATest extends test.RemoteTest
      *                        Controller
      *
      *@see Controller
-     *@see CORBATest#newORBDController
      */
     public Controller createORBD() throws Exception
     {
         String javaIDLHome = Options.getJavaIDLHome();
-
         CORBAUtil.mkdir(javaIDLHome);
-
-        Properties props = new Properties();
-
-	String traceFlags = (String)traceMap.get( "ORBD" ) ;
-	if (traceFlags != null)
-	    props.setProperty( ORBConstants.DEBUG_PROPERTY,
-		traceFlags ) ;
-
-        props.setProperty("output.dir",
-                          Options.getOutputDirectory());
-        props.setProperty("com.sun.corba.se.JavaIDLHome",
-                          javaIDLHome);
-        props.setProperty("org.omg.CORBA.ORBClass",
-                          Options.getORBClass());
-        props.setProperty("org.omg.CORBA.ORBSingletonClass",
-                          Options.getORBSingleton());
-        props.setProperty( ORBConstants.DB_DIR_PROPERTY,
-                          javaIDLHome
-                          + File.separator
-                          + Options.getActivationDbDirName());
-        props.setProperty( ORBConstants.INITIAL_PORT_PROPERTY,
-                          Options.getORBInitialPort());
-	int emmaPort = EmmaControl.setCoverageProperties( props ) ;
-
-        String ioser = Options.getioserPath();
-        if (ioser != null)
-            props.setProperty("LD_LIBRARY_PATH",
-                              ioser);
-
-        Options.addSpecialProperties(props);
-
-        props.setProperty(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
-                          Options.getActivationPort());
-
-        String persistentServerID = Options.getPersistentServerID();
-        if (persistentServerID != null)
-            props.setProperty(ORBConstants.ORB_SERVER_ID_PROPERTY, persistentServerID);
 
         Test.dprint("ORB initial port: " + Options.getORBInitialPort());
         Test.dprint("Activation port: " + Options.getActivationPort());
 
-        // Allows user to override these or set new ones
-        props.putAll(Options.getExtraORBDProperties());
-
-        Controller delegate;
-        if (odebugProcessNames.contains("ORBD"))
-	    delegate = new ODebugExec() ;
-	else if (rdebugProcessNames.contains("ORBD"))
-	    delegate = new RDebugExec() ;
-        else if (debugProcessNames.contains("ORBD"))
-            delegate = new DebugExec();
-        else
-            delegate = newORBDController();
-
-        FileOutputDecorator exec = new FileOutputDecorator(delegate);
-
-        exec.initialize(Options.getORBDMainClass(),
-                        "ORBD",
-                        props,
-                        null,
-                        CORBAUtil.toArray(Options.getORBDArgs()),
-                        Options.getReportDirectory()
-                        + "ORBD.out.txt",
-                        Options.getReportDirectory()
-                        + "ORBD.err.txt",
-                        Options.getORBDExtra(),
-			emmaPort );
-
-        // Kept around for cleaning up at the end, not for users
-        controllers.add(exec);
-
-        return exec;
+        return createProcess( "com.sun.corba.se.impl.activation.ORBD", ControllerKind.ORBD,
+            "ORBD", Options.getORBDProperties(), Options.getORBDArgs(),
+            Options.getORBDExtra() ) ;
     }
 
     /**
-     * Creates a new Controller of the appropriate type for the ORBD.
-     *
-     *@return Controller  A new Controller object
-     *@see ExternalExec
-     *@see Options#getORBDExtra
-     */
-    protected Controller newORBDController()
-    {
-        return new ExternalExec();
-    }
-
-    /**
-     * Create and initialize the Controller for the/a server.  This
+     * Create and initialize the Controller for a server.  This
      * initializes and wraps it in a FileOutputDecorator.
-     * <P>
-     * The following things are provided to client and server
-     * processes and can be augmented/changed with the Options class:
-     * <PRE>
-     * Properties:
-     *   output.dir
-     *   org.omg.CORBA.ORBClass
-     *   org.omg.CORBA.ORBSingletonClass
-     *   LD_LIBRARY_PATH (if available)
-     *   java.naming.factory.initial
-     *   java.naming.provider.url
-     *   javax.rmi.CORBA.UtilClass (if available)
-     *   javax.rmi.CORBA.StubClass (if available)
-     *   javax.rmi.CORBA.PortableRemoteObjectClass (if available)
-     *
-     * Command line parameters:
-     *   -ORBInitialPort
-     * </PRE>
      *
      *@param       className   Fully qualified class name of the server
      *@param       serverName  Name used to identify this server for
@@ -591,35 +527,8 @@ public abstract class CORBATest extends test.RemoteTest
         throws Exception
     {
         Test.dprint("Creating server object...");
-
-        Controller executionStrategy;
-	if (odebugProcessNames.contains(serverName))
-            executionStrategy = new ODebugExec();
-        else if (rdebugProcessNames.contains(serverName))
-            executionStrategy = new RDebugExec();
-        else if (debugProcessNames.contains(serverName))
-            executionStrategy = new DebugExec();
-        else
-            executionStrategy = newServerController();
-
-	Properties props = Options.getExtraServerProperties() ;
-	int emmaPort = EmmaControl.setCoverageProperties( props ) ;
-
-        // Keep the reference for clean-up
-        Controller server
-            = initServerOrClient(className,
-                                 serverName,
-                                 Options.getServerArgs(),
-                                 serverName + ".out.txt",
-                                 serverName + ".err.txt",
-				 props,
-                                 Options.getServerExtra(),
-                                 executionStrategy,
-				 emmaPort);
-
-        controllers.add(server);
-
-        return server;
+        return createProcess( className, ControllerKind.SERVER, serverName, 
+            Options.getServerProperties(), Options.getServerArgs(), Options.getServerExtra() ) ;
     }
 
     /**
@@ -630,7 +539,6 @@ public abstract class CORBATest extends test.RemoteTest
     {
         return createServer(className, "server");
     }
-
 
     /**
      * Creates a new Controller of the appropriate type for the server.
@@ -646,24 +554,6 @@ public abstract class CORBATest extends test.RemoteTest
     /**
      * Create and initialize the Controller for the client.  This
      * initializes and wraps it in a FileOutputDecorator;
-     * <P>
-     * The following things are provided to client and server
-     * processes and can be augmented/changed with the Options class:
-     * <PRE>
-     * Properties:
-     *   output.dir
-     *   org.omg.CORBA.ORBClass
-     *   org.omg.CORBA.ORBSingletonClass
-     *   LD_LIBRARY_PATH (if available)
-     *   java.naming.factory.initial
-     *   java.naming.provider.url
-     *   javax.rmi.CORBA.UtilClass (if available)
-     *   javax.rmi.CORBA.StubClass (if available)
-     *   javax.rmi.CORBA.PortableRemoteObjectClass (if available)
-     *
-     * Command line parameters:
-     *   -ORBInitialPort
-     * </PRE>
      *
      *@param       className    Fully qualified class name of the client
      *@param       clientName   Name used to identify this client for
@@ -676,37 +566,11 @@ public abstract class CORBATest extends test.RemoteTest
      *@see Options
      */
     public Controller createClient(String className, String clientName)
-        throws Exception
-    {
+        throws Exception {
+
         Test.dprint("Creating client object...");
-
-        Controller executionStrategy;
-	if (odebugProcessNames.contains(clientName))
-            executionStrategy = new ODebugExec();
-        if (rdebugProcessNames.contains(clientName))
-            executionStrategy = new RDebugExec();
-        else if (debugProcessNames.contains(clientName))
-            executionStrategy = new DebugExec();
-        else
-            executionStrategy = newClientController();
-
-	Properties props = Options.getExtraClientProperties() ;
-	int emmaPort = EmmaControl.setCoverageProperties( props ) ;
-
-        Controller client
-            = initServerOrClient(className,
-                                 clientName,
-                                 Options.getClientArgs(),
-                                 clientName + ".out.txt",
-                                 clientName + ".err.txt",
-				 props,
-                                 Options.getClientExtra(),
-                                 executionStrategy,
-				 emmaPort);
-
-        controllers.add(client);
-
-        return client;
+        return createProcess( className, ControllerKind.CLIENT, clientName, 
+            Options.getClientProperties(), Options.getClientArgs(), Options.getClientExtra() ) ;
     }
 
     /**
@@ -730,86 +594,6 @@ public abstract class CORBATest extends test.RemoteTest
     protected Controller newClientController()
     {
         return new ExternalExec();
-    }
-
-    /**
-     * Initializes the Controller with the given parameters, and wraps a
-     * FileOutputDecorator around it.
-     *
-     *@param className    Fully qualified name of the class to execute
-     *@param processName  Name used to identify this client or server
-     *@param args         Arguments to the class
-     *@param outFileName  Name of the file to direct stdout to
-     *@param errFileName  Name of the file to direct stderr to
-     *@param extraProps   Extra properties to set when running
-     *@param extra        Extra initializer (if any)
-     *@param delegate     Controller used to execute the class
-     *
-     *@return Controller which has initialized the delegate's streams and
-     *        started the class appropriately
-     *
-     *@exception  Exception  Any problem generated by starting, such as
-     *            abnormal termination
-     */
-    private Controller initServerOrClient(String className,
-                                          String processName,
-                                          Vector args,
-                                          String outFileName,
-                                          String errFileName,
-                                          Properties extraProps,
-                                          Hashtable extra,
-                                          Controller delegate,
-					  int emmaPort )
-        throws Exception
-    {
-        Properties props = new Properties();
-
-	String traceFlags = (String)traceMap.get( processName ) ;
-	if (traceFlags != null)
-	    props.setProperty( ORBConstants.DEBUG_PROPERTY,
-		traceFlags ) ;
-
-        props.setProperty("output.dir",
-                          Options.getOutputDirectory());
-        props.setProperty("org.omg.CORBA.ORBClass",
-                          Options.getORBClass());
-        props.setProperty("org.omg.CORBA.ORBSingletonClass",
-                          Options.getORBSingleton());
-
-        String ioser = Options.getioserPath();
-        if (ioser != null)
-            props.setProperty("LD_LIBRARY_PATH",
-                              ioser);
-
-	props.setProperty("java.naming.factory.initial",
-			  Options.getNamingFactory());
-
-	props.setProperty("java.naming.provider.url",
-			  Options.getNamingProviderURL());
-
-        Options.addSpecialProperties(props);
-
-        props.putAll(extraProps);
-
-        args.add("-ORBInitialPort");
-        args.add(Options.getORBInitialPort());
-
-        String argArray[] = CORBAUtil.toArray(args);
-
-        FileOutputDecorator exec =
-            new FileOutputDecorator(delegate);
-
-        exec.initialize(className,
-                        processName,
-                        props,
-                        null,
-                        argArray,
-                        Options.getReportDirectory() + outFileName,
-                        Options.getReportDirectory() + errFileName,
-                        extra,
-			emmaPort);
-
-        return exec;
     }
 
     /**

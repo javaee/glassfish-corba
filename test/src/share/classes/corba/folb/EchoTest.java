@@ -35,65 +35,25 @@
  */
 //
 // Created       : 2005 Jun 09 (Thu) 14:44:09 by Harold Carr.
-// Last Modified : 2005 Sep 29 (Thu) 23:00:33 by Harold Carr.
+// Last Modified : 2005 Sep 29 (Thu) 22:15:12 by Harold Carr.
 //
 
 package corba.folb;
 
 import java.util.List;
 
-import java.rmi.RemoteException;
-import javax.rmi.PortableRemoteObject;
+import java.rmi.Remote; 
+import java.rmi.RemoteException; 
 
-import com.sun.corba.se.spi.orb.ORB;
-
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-
-public class TestServant
-    extends PortableRemoteObject
-    implements Test
-{
-    public static final String baseMsg = TestServant.class.getName();
-
-    private ORB orb;
-
-    public TestServant(ORB orb)
-	throws RemoteException
-    {
-	this.orb = orb;
-    }
-
+/**
+ * @author Harold Carr
+ */
+public interface EchoTest extends Remote {
     public String echo(String x)
-	throws RemoteException
-    {
-	String result = "TestServant echoes: " + x;
-	dprint(".echo: " + result);
-        return result;
-    }
+	throws RemoteException;
 
     public void neverReturns()
-	throws RemoteException
-    {
-	try {
-	    dprint(".neverReturns");
-	    Object o = new Object();
-	    try { 
-		synchronized (o) {
-		    o.wait(); 
-		} 
-	    } catch (InterruptedException e) {
-		;
-	    }
-	} catch (Exception e) {
-	    dprint(".neverReturns: !!! Unexpected Exception");
-	    e.printStackTrace(System.out);
-	}
-    }
-
-    private void dprint(String msg)
-    {
-	ORBUtility.dprint("Server", msg);
-    }
+	throws RemoteException;
 }
 
 // End of file.

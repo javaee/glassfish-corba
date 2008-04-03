@@ -56,177 +56,70 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import corba.framework.Controller;
 import corba.hcks.U;
 
+import org.testng.annotations.BeforeSuite ;
+import org.testng.annotations.Test ;
+
+import org.testng.Assert ;
+
 /**
  * @author Harold Carr
  */
-public class ClientCircular
-{
-    public static boolean showStack = false;
+public class ClientCircular extends ClientBase {
 
-    public static ORBUtilSystemException wrapper ;
+    public ORBUtilSystemException wrapper ;
 
-    public static void setup()
-	throws Exception
-    {
-	dprint("--------------------------------------------------");
-	dprint("BEGIN SETUP");
-	dprint("--------------------------------------------------");
+    @BeforeSuite
+    public void clientSetup() throws Exception {
+        Properties props = getDefaultProperties() ;
+            
+        // Set retry timeout to 5 seconds.
+        props.setProperty(ORBConstants.TRANSPORT_TCP_CONNECT_TIMEOUTS_PROPERTY, 
+            "250:5000:100");
+        // props.setProperty(ORBConstants.DEBUG_PROPERTY,
+                          // "transport,subcontract");
 
-	wrapper = 
-	    Client.orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
-	
-	dprint("--------------------------------------------------");
-	dprint("Remove W acceptor/connections");
-	dprint("--------------------------------------------------");
-	Client.gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
-            corba.folb_8_1.Common.W);
+        setup( props ) ;
+        circularSetup() ;
+    }
 
-	dprint("--------------------------------------------------");
-	dprint("Remove X acceptor/connections");
-	dprint("--------------------------------------------------");
-	Client.gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
+    @Test
+    public void test() throws Exception {
+        dprint("--------------------------------------------------");
+        dprint("Circular failover without update (send label, no IORUpdate)");
+        dprint("--------------------------------------------------");
+
+        makeCall(testRfmWithAddressesWithLabel,
+                        Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                        "Circular failover without update (send label, no IORUpdate)",
+                        corba.folb_8_1.Common.X,
+                        SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
+
+        dprint("--------------------------------------------------");
+        dprint("Remove last Acceptor");
+        dprint("--------------------------------------------------");
+        gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
             corba.folb_8_1.Common.X);
+        Thread.sleep(5000);
 
-	dprint("--------------------------------------------------");
-	dprint("Remove Y acceptor/connections");
-	dprint("--------------------------------------------------");
-	Client.gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
-            corba.folb_8_1.Common.Y);
-	Thread.sleep(2000);
+        dprint("--------------------------------------------------");
+        dprint("Circular timeout reached.");
+        dprint("--------------------------------------------------");
+        try {
+            makeCall(testRfmWithAddressesWithLabel,
+                            Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                            "Circular timeout reached.",
+                            "DUMMY",
+                            SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
 
-	dprint("--------------------------------------------------");
-	dprint("Failover without update (send label, no IORUpdate)");
-	dprint("--------------------------------------------------");
-
-	Client.makeCall(Client.testRfmWithAddressesWithLabel,
-			Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-			"Failover without update (send label, no IORUpdate)",
-			corba.folb_8_1.Common.Z,
-			Client.SEND_MEMBERSHIP_LABEL, Client.NO_IOR_UPDATE);	    
-
-	dprint("--------------------------------------------------");
-	dprint("Restart X Acceptor");
-	dprint("--------------------------------------------------");
-	Client.gisPoaWithAddressesWithLabels.addAcceptor(
-            corba.folb_8_1.Common.X);
-	Thread.sleep(2000);
-
-	dprint("--------------------------------------------------");
-	dprint("Remove Z Acceptor");
-	dprint("--------------------------------------------------");
-	Client.gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
-            corba.folb_8_1.Common.Z);
-	Thread.sleep(2000);
-
-	dprint("--------------------------------------------------");
-	dprint("END SETUP");
-	dprint("--------------------------------------------------");
+            Assert.fail( "Circular timeout failed: call incorrectly succeeded" ) ;
+        } catch (Exception e) {
+            SystemException cf = wrapper.connectFailure("dummy", "dummy", "dummy");
+            checkMarshalException("Circular timeout", e, cf);
+        }
     }
 
-    public static void main(String[] av)
-    {
-	try {
-
-	    Properties props = new Properties();
-	    Client.setProperties(props);
-	    // Set retry timeout to 5 seconds.
-	    props.setProperty(ORBConstants.TRANSPORT_TCP_CONNECT_TIMEOUTS_PROPERTY, "250:5000:100");
-	    props.setProperty(ORBConstants.DEBUG_PROPERTY,
-			      "transport,subcontract");
-
-	    Client.setup(props);
-	    setup();
-
-	    //
-	    // TEST
-	    //
-
-	    dprint("--------------------------------------------------");
-	    dprint("Circular failover without update (send label, no IORUpdate)");
-	    dprint("--------------------------------------------------");
-
-	    Client.makeCall(Client.testRfmWithAddressesWithLabel,
-			    Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-			    "Circular failover without update (send label, no IORUpdate)",
-			    corba.folb_8_1.Common.X,
-			    Client.SEND_MEMBERSHIP_LABEL, Client.NO_IOR_UPDATE);
-
-	    dprint("--------------------------------------------------");
-	    dprint("Remove last Acceptor");
-	    dprint("--------------------------------------------------");
-	    Client.gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
-                corba.folb_8_1.Common.X);
-	    Thread.sleep(5000);
-
-
-	    dprint("--------------------------------------------------");
-	    dprint("Circular timeout reached.");
-	    dprint("--------------------------------------------------");
-	    try {
-		Client.makeCall(Client.testRfmWithAddressesWithLabel,
-				Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-				"Circular timeout reached.",
-				"DUMMY",
-				Client.SEND_MEMBERSHIP_LABEL, Client.NO_IOR_UPDATE);
-		dprint("--------------------------------------------------");
-		dprint("!!! circular timeout FAILED.");
-		dprint("!!! Call incorrectly succeeded.");
-		dprint("--------------------------------------------------");
-		Client.numberOfFailures++;
-	    } catch (java.rmi.MarshalException e) {
-		SystemException cf = wrapper.connectFailure("dummy", "dummy", "dummy");
-		checkMarshalException("Circular timeout", e, cf);
-	    }
-
-	    //
-	    // Check final results
-	    //
-
-	    if (Client.numberOfFailures > 0) {
-		throw new Exception("Failures: " 
-				    + new Integer(Client.numberOfFailures).toString());
-	    }
-
-	    dprint("--------------------------------------------------");
-	    dprint("ClientCircular SUCCESS");
-	    dprint("--------------------------------------------------");
-	    System.exit(Controller.SUCCESS);
-
-	} catch (Exception e) {
-	    e.printStackTrace(System.out);
-	    dprint("--------------------------------------------------");
-	    dprint("ClientCircular FAILURE");
-	    dprint("--------------------------------------------------");
-	    System.exit(1);
-	}
-    }
-
-    public static void checkMarshalException(String msg, 
-					     java.rmi.MarshalException got,
-					     SystemException expected)
-    {
-	if (got.detail.getClass().isInstance(expected)
-	    && ((SystemException)got.detail).minor == expected.minor 
-	    && ((SystemException)got.detail).completed == expected.completed) 
-	{
-	    dprint("--------------------------------------------------");
-	    dprint(msg + ": SUCCEEDED");
-	    dprint("--------------------------------------------------");
-	} else {
-	    dprint("--------------------------------------------------");
-	    dprint("!!! " + msg + " FAILED.");
-	    dprint("!!! Expected MarshalException / " + expected);
-	    dprint("!!! Got   : " + got);
-	    dprint("!!! detail: " + got.detail);
-	    dprint("--------------------------------------------------");
-	    got.printStackTrace(System.out);
-	    Client.numberOfFailures++;
-	}
-    }
-
-    public static void dprint(String msg)
-    {
-	ORBUtility.dprint("ClientCircular", msg);
+    public static void main(String[] av) {
+        doMain( ClientCircular.class ) ;
     }
 }
 

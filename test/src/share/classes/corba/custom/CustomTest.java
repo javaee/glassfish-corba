@@ -67,8 +67,8 @@ public class CustomTest extends CORBATest
             System.out.print("  Fragment size " + fragmentSize + ": ");
 
             // Specify the fragment size property
-            Properties clientProps = Options.getExtraClientProperties();
-            Properties serverProps = Options.getExtraServerProperties();
+            Properties clientProps = Options.getClientProperties();
+            Properties serverProps = Options.getServerProperties();
 
             clientProps.setProperty(ORBConstants.GIOP_FRAGMENT_SIZE,
                                     "" + fragmentSize);

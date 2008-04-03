@@ -46,7 +46,7 @@ public class StubSerializationTest extends CORBATest {
         Options.addServerArg("-debug");
         Controller orbd = createORBD();
  
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
  
         Controller server = createServer(
             "corba.stubserialization.Server");

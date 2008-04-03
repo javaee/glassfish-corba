@@ -84,7 +84,7 @@ public class FragmentTest extends CORBATest {
 
         for (int client_strategy = GROW, i = 0; i < GIOP_version.length; i++) {
 
-            Properties clientProps = Options.getExtraClientProperties();
+            Properties clientProps = Options.getClientProperties();
 
             clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
             clientProps.put("array.length", "" + (fragmentSize * 2));
@@ -96,7 +96,7 @@ public class FragmentTest extends CORBATest {
 
                 printBeginTest(i, client_strategy, j, server_strategy);
 
-                Properties serverProps = Options.getExtraServerProperties();
+                Properties serverProps = Options.getServerProperties();
                 serverProps.put(ORBConstants.GIOP_VERSION, GIOP_version[i]);
                 serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + server_strategy);
                 serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + server_strategy);

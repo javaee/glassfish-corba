@@ -187,7 +187,7 @@ public class Server
 	    // repo id, object id  and locator managed by ReferenceFactory.
 	    //
 
-	    Servant s = (Servant) javax.rmi.CORBA.Util.getTie(new TestServant(orb));
+	    Servant s = (Servant) javax.rmi.CORBA.Util.getTie(new EchoTestServant(orb));
 	    String repositoryId = s._all_interfaces(null, null)[0];
 	    // objectId is used to make a reference but it is
 	    // never used in the dispatch.
@@ -357,7 +357,7 @@ public class Server
 	    throws ForwardRequest
 	{
 	    try {
-		return (Servant) javax.rmi.CORBA.Util.getTie(new TestServant(orb));
+		return (Servant) javax.rmi.CORBA.Util.getTie(new EchoTestServant(orb));
 	    } catch (RemoteException e) {
 		e.printStackTrace(System.out);
 	    }

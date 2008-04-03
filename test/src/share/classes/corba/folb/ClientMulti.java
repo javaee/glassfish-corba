@@ -51,104 +51,75 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import corba.framework.Controller;
 import corba.hcks.U;
 
+import org.testng.annotations.BeforeSuite ;
+import org.testng.annotations.Test ;
+
+import org.testng.Assert ;
+
 /**
  * @author Harold Carr
  */
-public class ClientMulti
-{
-    public static void main(String[] av)
-    {
-	try {
+public class ClientMulti extends ClientBase {
 
-	    Properties props = new Properties();
-	    Client.setProperties(props);
-	    
-	    //
-	    // Setup
-	    //
-
-	    Client.setup(props);
-
-	    //
-	    // Test
-	    //
-
-	    CallThread a =
-		new CallThread(1000, Client.testRfmWithAddressesWithLabel);
-	    CallThread b =
-		new CallThread(1000, Client.testRfmWithAddressesWithLabel);
-	    CallThread c =
-		new CallThread(1000, Client.testRfmWithAddressesWithLabel);
-	    a.start();
-	    b.start();
-	    c.start();
-
-
-	    do {
-		Client.gisPoaWithAddressesWithLabels.removeInstance(
-                    corba.folb_8_1.Common.Z);
-		Thread.sleep(1000);
-		Client.gisPoaWithAddressesWithLabels.addInstance(
-                    corba.folb_8_1.Common.Z);
-		Thread.sleep(1000);
-	    } while (!a.done || !b.done || !c.done);
-
-	    if (Client.numberOfFailures > 0) {
-		throw new Exception("Failures: " 
-				    + new Integer(Client.numberOfFailures).toString());
-	    }
-
-	    dprint("--------------------------------------------------");
-	    dprint("ClientMulti SUCCESS");
-	    dprint("--------------------------------------------------");
-	    System.exit(Controller.SUCCESS);
-
-	} catch (Exception e) {
-	    e.printStackTrace(System.out);
-	    haveServerDoThreadDump();
-	    dprint("--------------------------------------------------");
-	    dprint("ClientMulti FAILURE");
-	    dprint("--------------------------------------------------");
-	    System.exit(1);
-	}
+    @BeforeSuite 
+    public void clientSetup() {
+        setup( getDefaultProperties() ) ;
     }
 
-    public static void haveServerDoThreadDump()
+    @Test
+    public void test() throws Exception
     {
-	try {
-	    Client.gisPoaWithAddressesWithLabels.doThreadDump();
-	} catch (Exception ex) {
-	    dprint("Cannot doThreadDump on server.");
-	}
+        CallThread a =
+            new CallThread(1000, testRfmWithAddressesWithLabel);
+        CallThread b =
+            new CallThread(1000, testRfmWithAddressesWithLabel);
+        CallThread c =
+            new CallThread(1000, testRfmWithAddressesWithLabel);
+        a.start();
+        b.start();
+        c.start();
+
+        do {
+            gisPoaWithAddressesWithLabels.removeInstance(
+                corba.folb_8_1.Common.Z);
+            Thread.sleep(1000);
+            gisPoaWithAddressesWithLabels.addInstance(
+                corba.folb_8_1.Common.Z);
+            Thread.sleep(1000);
+        } while (!a.done || !b.done || !c.done);
+
+        Assert.assertTrue( (a.failures + b.failures + c.failures) == 0 ) ;
     }
 
-    public static void dprint(String msg)
-    {
-	ORBUtility.dprint("ClientMulti", msg);
+    public static void main(String[] av) {
+        doMain( ClientCircular.class ) ;
     }
 }
 
 class CallThread extends Thread
 {
     int iterations;
-    Test ref;
+    int failures;
+    EchoTest ref;
     boolean done;
 
-    CallThread(int iterations, Test ref)
+    CallThread(int iterations, EchoTest ref)
     { 
+        this.failures = 0 ;
 	this.iterations = iterations;
 	this.ref = ref;
 	done = false;
     }
+
     public void run()
     {
 	for (int i = 0; i < iterations; ++i) {
 	    try {
 		ref.echo("FOO");
 	    } catch (java.rmi.RemoteException e) {
-		Client.dprint("CallThread.run FAILURE !!!!!");
+                failures++ ;
+		System.out.println("CallThread.run FAILURE !!!!!");
 		e.printStackTrace(System.out);
-		Client.numberOfFailures++;
 	    }
 	}
 	done = true;

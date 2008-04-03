@@ -126,35 +126,33 @@ import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 import com.sun.corba.se.impl.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
+import org.testng.annotations.Test ;
+import org.testng.Assert ;
+
+import corba.framework.TestngRunner ;
+
 public class Client 
 {
-    private PrintStream out ;
-    private PrintStream err ;
+    private PrintStream out = System.out ;
+    private PrintStream err = System.err ;
     private ORB orb ;
 
     public static void main(String args[])
     {
 	System.out.println( "Starting IOR test" ) ;
-        try{
-	    Properties props = new Properties( System.getProperties() ) ;
-	    props.put( "org.omg.CORBA.ORBClass", 
-		"com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	    new Client( props, args, System.out, System.err ) ;
-        } catch (Exception e) {
-            System.out.println("ERROR : " + e) ;
-            e.printStackTrace(System.out);
-            System.exit (1);
-        }
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
+        runner.systemExit() ;
     }
 
-    public Client( Properties props, String args[], PrintStream out,
-	PrintStream err )
-    {
-	this.orb = (ORB)ORB.init( args, props ) ;
-	this.out = System.out ;
-	this.err = System.err ;
+    public Client() {
+        String[] args = null ;
+        Properties props = new Properties( System.getProperties() ) ;
+        props.put( "org.omg.CORBA.ORBClass", 
+            "com.sun.corba.se.impl.orb.ORBImpl" ) ;
 
-	runTests() ;
+	this.orb = (ORB)ORB.init( args, props ) ;
     }
 
 // *************************************************
@@ -163,8 +161,7 @@ public class Client
 
     private void error( String msg )
     {
-	RuntimeException exc = new RuntimeException( msg ) ;
-	throw exc ;
+        Assert.fail( msg ) ;
     }
     
     private void info( String msg )
@@ -240,36 +237,6 @@ public class Client
 // ***************   TESTS   ***********************
 // *************************************************
 
-    private void runTests()
-    {
-	testResolve() ;
-	testORBVersion() ;
-	testORBVersionFactory() ;
-	testFreeezableList() ;
-	testGenericTaggedComponent() ;
-	testIIOPAddress() ;
-	testObjectId() ;
-	testTaggedComponents() ;
-	testJIDLObjectKeyTemplate() ;
-	testOldJIDLObjectKeyTemplate() ;
-	testPOAObjectKeyTemplate() ;
-	testOldPOAObjectKeyTemplate() ;
-	testWireObjectTemplate() ;
-	testObjectKey() ;
-	testObjectKeyFactory() ;
-	testIdentifiableContainerBase1() ;
-	testIdentifiableContainerBase2() ;
-	testIIOPProfileTemplate() ;
-	testTaggedProfileFactoryFinder() ;
-	testIOR() ;
-	testIORTemplate() ;
-	testIORTemplateList() ;
-	testObjectAdapterId() ;
-	testObjectReferenceTemplateImpl() ;
-	testZeroPortPolicy() ;
-	testCorbalocIOR();
-    }
-
     class IdentifiableImpl implements Identifiable {
 	private int value ;
 	private int id ;
@@ -328,7 +295,8 @@ public class Client
 		")" ) ; 
     }
 
-    private void testResolve()
+    @Test
+    public void testResolve()
     {
 	try {
 	    org.omg.CORBA.Object obj = orb.resolve_initial_references(
@@ -339,7 +307,8 @@ public class Client
 	}
     }
 
-    private void testCorbalocIOR() {
+    @Test
+    public void testCorbalocIOR() {
 
 	out.println( "Testing Corbaloc URL" ) ;
 
@@ -437,7 +406,8 @@ public class Client
 	    error( "The 2 IORs are different for the complex case" ) ;
     }
 
-    private void testZeroPortPolicy()
+    @Test
+    public void testZeroPortPolicy()
     {
 	out.println( "Testing ZeroPortPolicy" ) ;
 
@@ -483,7 +453,8 @@ public class Client
 	}
     }
 
-    private void testORBVersion() 
+    @Test
+    public void testORBVersion() 
     {
 	out.println( "Testing ORBVersion" ) ;
 	if (ORBVersionFactory.getFOREIGN().getORBType() != ORBVersion.FOREIGN)
@@ -510,7 +481,8 @@ public class Client
 	    error( "\tNEW != NEW!" ) ;
     }
 
-    private void testORBVersionFactory() 
+    @Test
+    public void testORBVersionFactory() 
     {
 	out.println( "Testing ORBVersionFactory" ) ;
 	byte[] test = { 0x00 } ;
@@ -545,7 +517,8 @@ public class Client
 	    error( "\tDefault ORB version is not NEWER" ) ;
     }
 
-    private void testIdentifiableContainerBase1() 
+    @Test
+    public void testIdentifiableContainerBase1() 
     {
 	out.println( "Testing IdentifiableContainerBase" ) ;
 
@@ -580,7 +553,8 @@ public class Client
 	    checkIdentifiableIterator( iters[ctr], results[ctr], ctr ) ;
     }
 
-    private void testIdentifiableContainerBase2() 
+    @Test
+    public void testIdentifiableContainerBase2() 
     {
 	// This also indirectly tests equals on GenericIdentifiable and all tagged components
 	out.println( "Testing IdentifiableContainerBase and TaggedComponentFactoryFinder" ) ;
@@ -637,7 +611,8 @@ public class Client
 	    error( "Iterator returned too few components for IdentifiableContainerBase" ) ;
     }
 
-    private void testGenericTaggedComponent() 
+    @Test
+    public void testGenericTaggedComponent() 
     {
 	out.println( "Testing GenericTaggedComponent" ) ;
 
@@ -663,7 +638,8 @@ public class Client
 	    error( "bad data read back" ) ;
     }
 
-    private void testIIOPAddress() 
+    @Test
+    public void testIIOPAddress() 
     {
 	out.println( "Testing IIOPAddress" ) ;
 
@@ -743,7 +719,8 @@ public class Client
 	}
     }
 
-    private void testIIOPProfileTemplate() 
+    @Test
+    public void testIIOPProfileTemplate() 
     {
 	out.println( "Testing IIOPProfileTemplate and IIOPProfile" ) ;
 
@@ -805,19 +782,41 @@ public class Client
 	    error( "Profile and unmarshalled copy fail isEquivalent test" ) ;
 
 	// test that testProf has correct components in its template
+        // Note: if the java.rmi.server.codebase property is set, we
+        // will have a JavaCodebaseComponent here as well as the ORBTypeComponent.
 	try {
-	    Iterator iter = testProf.getTaggedProfileTemplate().iterator() ;
+            TaggedComponent tc1 = null ;
+            TaggedComponent tc2 = null ;
+
+	    Iterator<TaggedComponent> iter = testProf.getTaggedProfileTemplate().iterator() ;
 
 	    if (!iter.hasNext())
 		error( "No components in testProf" ) ;
 
-	    ORBTypeComponent testComp = (ORBTypeComponent)(iter.next()) ;
+            tc1 = iter.next() ;
 
-	    if (!comp.equals( testComp ))
-		error( "Component in testProf does not match original" ) ;
+            if (iter.hasNext()) {
+                tc2 = iter.next() ;
 
-	    if (iter.hasNext())
-		error( "too many components in testProf" ) ;
+                if (iter.hasNext())
+                    error( "too many components in testProf" ) ;
+
+                // Don't depend on iteration order
+                if (tc1 instanceof ORBTypeComponent) {
+                    if (!tc1.equals( comp )) 
+                        error( "ORBTypeComponent in testProf does not match original" ) ;
+                    if (!(tc2 instanceof JavaCodebaseComponent)) 
+                        error( "Other component is not JavaCodebaseComponent" ) ;
+                } else {
+                    if (!tc2.equals( comp )) 
+                        error( "ORBTypeComponent in testProf does not match original" ) ;
+                    if (!(tc1 instanceof JavaCodebaseComponent))
+                        error( "Other component is not JavaCodebaseComponent" ) ;
+                }
+            } else {
+                if (!comp.equals( comp ))
+                    error( "ORBTypeComponent in testProf does not match original" ) ;
+            }
 	} catch (Throwable thr) {
 	    error( "unexpected exception in examining testProf" ) ;
 	}
@@ -862,7 +861,8 @@ public class Client
 	return ptemp ;
     }
 
-    private void testIOR() 
+    @Test
+    public void testIOR() 
     {
 	out.println( "Testing IOR" ) ;
 
@@ -880,6 +880,9 @@ public class Client
 	ObjectAdapterId poaid = new ObjectAdapterIdArray( ss ) ;
 	POAObjectKeyTemplate poktemp1 = makePOAObjectKeyTemplate( poaid ) ;
 	IIOPProfileTemplate ptemp1 = makeIIOPProfileTemplate( 45671 ) ;
+	String URL = "htp://foo.sun.com:9999" ;
+	JavaCodebaseComponent jcomp = 
+	    IIOPFactories.makeJavaCodebaseComponent( URL ) ;
 	ORBTypeComponent comp1 = IIOPFactories.makeORBTypeComponent( 
 	    0x34567ABF ) ;
 	IIOPAddress addr = IIOPFactories.makeIIOPAddress( orb, "FOO", 32451 ) ;
@@ -888,6 +891,7 @@ public class Client
 
 	ptemp1.add( comp1) ;
 	ptemp1.add( comp2 ) ;
+        ptemp1.add( jcomp ) ;
 
 	IORTemplate iortemp = IORFactories.makeIORTemplate( poktemp1 ) ;
 	iortemp.add( ptemp1 ) ;
@@ -920,6 +924,7 @@ public class Client
 	ObjectAdapterId poaid2 = new ObjectAdapterIdArray( ss2 ) ;
 	POAObjectKeyTemplate poktemp2 = makePOAObjectKeyTemplate( poaid2 ) ;
 	IIOPProfileTemplate ptemp2 = makeIIOPProfileTemplate( 36123 ) ;
+        ptemp2.add( jcomp ) ;
 	ptemp2.add( comp2 ) ;
 	
 	IIOPProfile iprof2 = (IIOPProfile)(ptemp2.create( poktemp2, oid )) ;
@@ -1016,7 +1021,8 @@ public class Client
 	return result ;
     }
 
-    private void testIORTemplateList() 
+    @Test
+    public void testIORTemplateList() 
     {
 	out.println( "Testing IORTemplateList" ) ;
 
@@ -1054,7 +1060,8 @@ public class Client
 	testIORFactory( iortl1, iortl4, false, false ) ;
     }
 
-    private void testIORTemplate() 
+    @Test
+    public void testIORTemplate() 
     {
 	out.println( "Testing IORTemplate" ) ;
 
@@ -1159,7 +1166,8 @@ public class Client
 	return result ;
     }
 
-    private void testOldJIDLObjectKeyTemplate() 
+    @Test
+    public void testOldJIDLObjectKeyTemplate() 
     {
 	out.println( "Testing OldJIDLObjectKeyTemplate" ) ;
 
@@ -1203,7 +1211,8 @@ public class Client
 	    error( "getORBVersion returns bad value" ) ;
     }
 
-    private void testJIDLObjectKeyTemplate() 
+    @Test
+    public void testJIDLObjectKeyTemplate() 
     {
 	out.println( "Testing JIDLObjectKeyTemplate" ) ;
 
@@ -1276,7 +1285,8 @@ public class Client
 	    error( msg + ": too many elements" ) ;
     }
 
-    private void testFreeezableList() 
+    @Test
+    public void testFreeezableList() 
     {
 	out.println( "Testing FreezableList" ) ;
 
@@ -1342,7 +1352,8 @@ public class Client
 	// - Test that freezing list freezes all active iterators
     }
 
-    private void testObjectKey() 
+    @Test
+    public void testObjectKey() 
     {
 	out.println( "Testing ObjectKey" ) ;
 
@@ -1393,7 +1404,8 @@ public class Client
 	    error( "Failure in getBytes" ) ;
     }
 
-    private void testObjectId() 
+    @Test
+    public void testObjectId() 
     {
 	out.println( "Testing ObjectId" ) ;
 
@@ -1440,7 +1452,8 @@ public class Client
 	    error( "equals test with a different oid failed" ) ;
     }
 
-    private void testObjectKeyFactory() 
+    @Test
+    public void testObjectKeyFactory() 
     {
 	out.println( "Testing ObjectKeyFactory" ) ;
 
@@ -1580,7 +1593,8 @@ public class Client
 	}
     } 
 
-    private void testObjectKeyFactory_JIDL() 
+    @Test
+    public void testObjectKeyFactory_JIDL() 
     {
 	JIDLKeyGenerator generator = new JIDLKeyGenerator() ;
 
@@ -1669,7 +1683,8 @@ public class Client
 	}
     } 
 
-    private void testObjectKeyFactory_POA() 
+    @Test
+    public void testObjectKeyFactory_POA() 
     {
 	out.println( "Testing ObjectKeyFactory_POA" ) ;
 
@@ -1689,7 +1704,8 @@ public class Client
 	generator.checkObjectKey( okey ) ;
     }
 
-    private void testObjectKeyFactory_Wire() 
+    @Test
+    public void testObjectKeyFactory_Wire() 
     {
 	out.println( "Testing ObjectKeyFactory_Wire" ) ;
 
@@ -1709,7 +1725,8 @@ public class Client
 	    error( "Did not fetch correct id from object key" ) ;
     }
 
-    private void testOldPOAObjectKeyTemplate() 
+    @Test
+    public void testOldPOAObjectKeyTemplate() 
     {
 	out.println( "Testing OldPOAObjectKeyTemplate" ) ;
 
@@ -1763,7 +1780,8 @@ public class Client
 	    error( "getORBVersion returns bad value" ) ;
     }
 
-    private void testPOAObjectKeyTemplate() 
+    @Test
+    public void testPOAObjectKeyTemplate() 
     {
 	out.println( "Testing POAObjectKeyTemplate" ) ;
 
@@ -1821,7 +1839,8 @@ public class Client
 	    error( "Error in writing out object key template" ) ;
     }
 
-    private void testTaggedProfileFactoryFinder() 
+    @Test
+    public void testTaggedProfileFactoryFinder() 
     {
 	out.println( "Testing TaggedProfileFactoryFinder" ) ;
 
@@ -1849,6 +1868,12 @@ public class Client
 	
 	IIOPProfileTemplate ptemp = IIOPFactories.makeIIOPProfileTemplate( orb,
 	    GIOPVersion.V1_2, primary ) ;
+
+	String URL = "htp://foo.sun.com:9999" ;
+
+	JavaCodebaseComponent jcomp = 
+	    IIOPFactories.makeJavaCodebaseComponent( URL ) ;
+        ptemp.add( jcomp ) ;
 
 	ORBTypeComponent comp = IIOPFactories.makeORBTypeComponent( 
 	    0x34567ABF ) ;
@@ -1889,7 +1914,8 @@ public class Client
 	    error( "Too many elements in iterator" ) ;
     }
 
-    private void testWireObjectTemplate() 
+    @Test
+    public void testWireObjectTemplate() 
     {
 	out.println( "Testing WireObjectTemplate" ) ;
 
@@ -1915,7 +1941,8 @@ public class Client
 	    error( "Error in writing out object key" ) ;
     }
 
-    private void testTaggedComponents() 
+    @Test
+    public void testTaggedComponents() 
     {
 	out.println( "Testing TaggedComponents" ) ;
 
@@ -1926,7 +1953,8 @@ public class Client
 	// testPoliciesComponent() ;
     }
 
-    private void testAlternateIIOPAddressComponent() 
+    @Test
+    public void testAlternateIIOPAddressComponent() 
     {
 	out.println( "\tAlternateIIOPAddressComponent" ) ;
 
@@ -1940,7 +1968,8 @@ public class Client
 	    error( "AlternateIIOPAddressComponent returns bad ID" ) ;
     }
 
-    private void testCodeSetsComponent() 
+    @Test
+    public void testCodeSetsComponent() 
     {
 	out.println( "\tCodeSetsComponent" ) ;
 
@@ -1953,7 +1982,8 @@ public class Client
 	    error( "CodeSetsComponet returns bad ID" ) ;
     }
 
-    private void testJavaCodebaseComponent() 
+    @Test
+    public void testJavaCodebaseComponent() 
     {
 	out.println( "\tJavaCodebaseComponent" ) ;
 
@@ -1961,6 +1991,7 @@ public class Client
 
 	JavaCodebaseComponent comp = 
 	    IIOPFactories.makeJavaCodebaseComponent( URL ) ;
+
 	if (!URL.equals( comp.getURLs() ))
 	    error( "JavaCodebaseComponent returns bad URL" ) ;
 
@@ -1968,7 +1999,8 @@ public class Client
 	    error( "JavaCodebaseComponent returns bad ID" ) ;
     }
 
-    private void testORBTypeComponent() 
+    @Test
+    public void testORBTypeComponent() 
     {
 	out.println( "\tORBTypeComponent" ) ;
 
@@ -2044,7 +2076,8 @@ public class Client
 	    error( "Failure in ObjectAdapterId write test" ) ;
     }
 
-    private void testObjectAdapterId()
+    @Test
+    public void testObjectAdapterId()
     {
 	System.out.println( "Testing ObjectAdapterId" ) ;
 	String[] data = { "first", "second", "third", "fourth", "fifth", 
@@ -2069,7 +2102,8 @@ public class Client
 	testObjectAdapterIdWrite( p1 ) ;
     }
 
-    private void testObjectReferenceTemplateImpl()
+    @Test
+    public void testObjectReferenceTemplateImpl()
     {
 	System.out.println( "Testing ObjectReferenceTemplateImpl" ) ;
 	

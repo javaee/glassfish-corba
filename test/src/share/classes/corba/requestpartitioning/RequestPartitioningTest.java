@@ -69,13 +69,13 @@ public class RequestPartitioningTest
 	Controller orbd = createORBD();
 	orbd.start();
 
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         serverProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "true");
 //        serverProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
 	Controller server = createServer(thisPackage + ".Server","Server");
 	server.start();
 
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "true");
 //        clientProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
 	Controller client = createClient(thisPackage + ".Client", "Client");

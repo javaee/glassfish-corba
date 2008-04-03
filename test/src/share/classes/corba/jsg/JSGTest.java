@@ -82,11 +82,11 @@ public class JSGTest extends CORBATest {
 			      String clientMainClass, String clientTestName)
         throws Throwable {
       
-	Properties clientProps = Options.getExtraClientProperties();
+	Properties clientProps = Options.getClientProperties();
 	clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
 			"corba.jsg.Client", "true");
 
-	Properties serverProps = Options.getExtraServerProperties();
+	Properties serverProps = Options.getServerProperties();
 	serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
                       "corba.jsg.Server", "true");
 

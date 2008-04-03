@@ -54,8 +54,8 @@ public class CodeSetTest extends CORBATest
         Controller orbd = createORBD();
 
         // Specify the GIOP version property
-        Properties clientProps = Options.getExtraClientProperties();
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties clientProps = Options.getClientProperties();
+        Properties serverProps = Options.getServerProperties();
 
         clientProps.setProperty(ORBConstants.GIOP_VERSION, "1.1");
         serverProps.setProperty(ORBConstants.GIOP_VERSION, "1.2");

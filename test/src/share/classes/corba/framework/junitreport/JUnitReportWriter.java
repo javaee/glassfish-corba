@@ -59,6 +59,7 @@ import java.io.OutputStream;
 import java.util.Properties ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import com.sun.corba.se.spi.orbutil.generic.Triple ;
 
 /**
  * This Interface describes classes that format the results of a JUnit
@@ -71,13 +72,31 @@ public interface JUnitReportWriter {
             super( name, className ) ;
 	}
 
-	String getName() {
+	public String getName() {
 	    return first() ;
 	}
 
-	String getClassName() {
+	public String getClassName() {
 	    return second() ;
 	}
+    }
+    
+    public class TestCounts extends Triple<Integer,Integer,Integer> {
+        public TestCounts( int pass, int fail, int error ) {
+            super( pass, fail, error ) ;
+        }
+
+        public int pass() {
+            return first() ;
+        }
+
+        public int fail() {
+            return second() ;
+        }
+
+        public int error() {
+            return third() ;
+        }
     }
 
     /**
@@ -107,27 +126,26 @@ public interface JUnitReportWriter {
     /**
      * A test started.
      */
-    public void startTest(TestDescription test);
+    void startTest(TestDescription test);
 
     /**
      * An error occurred.
      */
-    public void addError(TestDescription test, Throwable t);
+    void addError(TestDescription test, Throwable t);
 
     /**
      * A failure occurred.
      */
-    public void addFailure(TestDescription test, Throwable t);  
+    void addFailure(TestDescription test, Throwable t);  
 
     /**
      * A test ended.
      */
-    public void endTest(TestDescription test); 
+    void endTest(TestDescription test); 
 
     /**
      * The whole testsuite ended.
      * @param suite the suite.
      */
-    void endTestSuite() ;
-
+    TestCounts endTestSuite() ;
 }

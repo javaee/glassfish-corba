@@ -173,7 +173,7 @@ public class TestngRunner {
             // msg( "  context: name=" + context.getName() ) ;
             try {
                 File dir = new File( outdirName ) ;
-                File file = new File( dir, name + ".xml" ) ;
+                File file = new File( dir, "TEST-" + name + ".xml" ) ;
                 OutputStream os = new FileOutputStream( file ) ;
                 writer.setOutput( os ) ;
             } catch (IOException exc) {

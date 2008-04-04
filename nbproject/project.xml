@@ -39,7 +39,7 @@
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
             <!--Do not use Project Properties customizer when editing this file manually.-->
-            <name>Java CORBA performance work</name>
+            <name>Java CORBA test improvements for Hudson integration</name>
             <properties>
                 <property name="ant.script">make/build.xml</property>
             </properties>

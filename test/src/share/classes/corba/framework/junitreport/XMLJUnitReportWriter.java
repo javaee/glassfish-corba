@@ -209,7 +209,7 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         }
     }
 
-    public void endTestSuite( ) {
+    public TestCounts endTestSuite( ) {
         long runTime = System.currentTimeMillis() - startTime ;
         rootElement.setAttribute(ATTR_TESTS, "" + runCount);
         rootElement.setAttribute(ATTR_FAILURES, "" + failureCount);
@@ -238,6 +238,10 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
                 }
             }
         }
+
+        int pass = runCount - failureCount - errorCount ;
+
+        return new TestCounts( pass, failureCount, errorCount ) ;
     }
 
     public void startTest(TestDescription t) {

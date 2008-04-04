@@ -49,6 +49,7 @@ public class CustomTest extends CORBATest
 
     protected void doTest() throws Throwable
     {
+        JUnitReportHelper helper = new JUnitReportHelper( CustomTest.class.getName() ) ;
         Options.setRMICClasses(rmicClasses);
         Options.addRMICArgs("-poa -nolocalstubs -iiop -keep -g");
 
@@ -60,11 +61,10 @@ public class CustomTest extends CORBATest
 
         System.out.println();
 
-        int failures = 0;
-
         for (int fragmentSize = 32; fragmentSize <= 512; fragmentSize+=16) {
 
             System.out.print("  Fragment size " + fragmentSize + ": ");
+            helper.start( "FragmentSize_" + fragmentSize ) ;
 
             // Specify the fragment size property
             Properties clientProps = Options.getClientProperties();
@@ -90,14 +90,15 @@ public class CustomTest extends CORBATest
             try {
                 if (client.waitFor(60000) == Controller.SUCCESS) {
                     System.out.println("PASSED");
+                    helper.pass() ;
                 } else {
-                    System.out.println("FAILED (" + client.exitValue() + ')');
-                    failures++;
+                    String msg = "FAILED (" + client.exitValue() + ")" ;
+                    System.out.println( msg ) ;
+                    helper.fail( msg ) ;
                 }
             } catch (Exception e) {
                 // Timed out waiting for the client
                 System.out.println("HUNG");
-                failures++;
             } finally {
                 client.stop();
                 server.stop();
@@ -107,7 +108,11 @@ public class CustomTest extends CORBATest
         orbd.stop();
 
         System.out.println();
-        System.out.println("  Total failures: " + failures);
+
+        JUnitReportHelper.Counts counts = helper.done() ;
+
+        int failures = counts.numFail() ;
+        System.out.println("  Total failures: " + failures );
         if (failures > 0)
             throw new Error("Failures detected: " + failures);
     }

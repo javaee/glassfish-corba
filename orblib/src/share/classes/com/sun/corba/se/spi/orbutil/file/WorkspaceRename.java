@@ -127,6 +127,10 @@ public class WorkspaceRename {
 	@Help( "If true, copy all files without renaming anything" )
 	@DefaultValue( "false" )
 	boolean copyonly() ;
+
+        @Help( "If true, expand all tabs into spaces on files that are renamed (all text file)" ) 
+        @DefaultValue ( "true" ) 
+        boolean expandtabs() ;
     }
 
     // Extract these from args so that the methods in Arguments are not
@@ -141,6 +145,7 @@ public class WorkspaceRename {
     private final File destination ;
     private final String version ;
     private final boolean copyonly ;
+    private final boolean expandtabs ;
 
     private void trace( String msg ) {
 	System.out.println( msg ) ;
@@ -184,6 +189,7 @@ public class WorkspaceRename {
 	verbose = args.verbose() ;
 	dryrun = args.dryrun() ;
 	copyonly = args.copyonly() ;
+        expandtabs = args.expandtabs() ;
 
 	if (verbose > 0) {
 	    trace( "Main: args:\n" + args ) ;
@@ -251,6 +257,9 @@ public class WorkspaceRename {
 
 			    Block sourceBlock = BlockParser.getBlock( fw ) ;
 			    Block targetBlock = sourceBlock.substitute( substitutions ) ;
+                            if (expandtabs) {
+                                targetBlock = targetBlock.expandTabs() ;
+                            }
 
 			    target.delete() ;
 			    target.open( FileWrapper.OpenMode.WRITE ) ;

@@ -68,6 +68,8 @@ import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 
 import com.sun.corba.se.impl.orbutil.ORBConstants ;
 
+import corba.framework.TestngRunner ;
+
 // import corba.framework.TimerUtils ;
 
 import static java.util.Arrays.asList ;
@@ -245,35 +247,16 @@ public class Client {
     }
 
     public static void main( String[] args ) {
-	TestNG tng = new TestNG() ;
-	tng.setOutputDirectory( "gen/corba/timer/test-output" ) ;
-
-	Class<?> cls = null ;
-	try {
-	    cls = Class.forName( "corba.timer.TimerPointsSuite" ) ;
-	} catch (Exception exc) {
-	    System.out.println( "Caught exception: " + exc ) ;
-	    exc.printStackTrace() ;
-	}
-
-	List<Class<?>> classes = new ArrayList<Class<?>>( asList( 
-	    Client.class, 
-	    NamedBaseSuite.class, 
-	    ControllableBaseSuite.class,
-	    TimerFactorySuite.class,
-	    StatsEventHandlerSuite.class,
-	    LogEventHandlerSuite.class,
-	    ActivationSuite.class ) ) ;
-
-	if (cls != null)
-	    classes.add( cls ) ;
-
-	Class[] tngClasses = classes.toArray( new Class<?>[ classes.size() ] ) ;
-
-	tng.setTestClasses( tngClasses ) ;
-
-	tng.run() ;
-
-	System.exit( tng.hasFailure() ? 1 : 0 ) ;
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( TimerPointsSuite.class ) ;
+        runner.registerClass( Client.class ) ;
+        runner.registerClass( NamedBaseSuite.class ) ;
+        runner.registerClass( ControllableBaseSuite.class) ;
+        runner.registerClass( TimerFactorySuite.class) ;
+        runner.registerClass( StatsEventHandlerSuite.class) ;
+        runner.registerClass( LogEventHandlerSuite.class) ;
+        runner.registerClass( ActivationSuite.class ) ;
+        runner.run() ;
+        runner.systemExit() ;
     }
 }

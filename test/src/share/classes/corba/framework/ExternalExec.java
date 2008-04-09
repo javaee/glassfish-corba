@@ -165,6 +165,8 @@ public class ExternalExec extends ControllerAdapter
             cmd.add( "-D" + name + "=" + environment.getProperty(name) ) ;
         }
 
+        cmd.add( "-Dcorba.test.process.name=" + getProcessName() ) ;
+
         for (String str : debugArgs)
 	    cmd.add( str ) ;
 
@@ -185,33 +187,43 @@ public class ExternalExec extends ControllerAdapter
      * Starts the class in a separate process, redirecting output
      * appropriately.  This method returns when the process starts.
      */
-    public void start() throws Exception
-    {
-	String[] cmd = buildCommand() ;
+    public void start( JUnitReportHelper helper ) throws Exception {
+        if (helper != null) {
+            this.helper = helper ;
+            helper.start( getProcessName() ) ;
+        }
 
-	if (Test.forkDebugLevel >= Test.DISPLAY) {
-	    System.out.println( 
-		"-----------------------------------------------------------------" ) ;
-	    System.out.println( "Current working directory: " +
-	    System.getProperty( "user.dir" ) ) ;
-	    System.out.println( "ExternalExec.start: Command to be executed:" ) ;
-	    for (String str : cmd)
-		System.out.println( "\t" + str ) ;
-	    System.out.println( 
-		"-----------------------------------------------------------------" ) ;
-	}
+        try {
+            String[] cmd = buildCommand() ;
 
-        process = Runtime.getRuntime().exec(cmd) ;
+            if (Test.forkDebugLevel >= Test.DISPLAY) {
+                System.out.println( 
+                    "-----------------------------------------------------------------" ) ;
+                System.out.println( "Current working directory: " +
+                System.getProperty( "user.dir" ) ) ;
+                System.out.println( "ExternalExec.start: Command to be executed:" ) ;
+                for (String str : cmd)
+                    System.out.println( "\t" + str ) ;
+                System.out.println( 
+                    "-----------------------------------------------------------------" ) ;
+            }
 
-	if (handshake == null)
-	    monitor = new ProcessMonitor(process, out, err);
-	else
-	    monitor = new ProcessMonitor(process, out, err, handshake, null ) ;
+            process = Runtime.getRuntime().exec(cmd) ;
 
-        monitor.start();
+            if (handshake == null)
+                monitor = new ProcessMonitor(process, out, err);
+            else
+                monitor = new ProcessMonitor(process, out, err, handshake, null ) ;
 
-	if (handshake != null)
-	    monitor.waitForHandshake( getMaximumTimeout() ) ;
+            monitor.start();
+
+            if (handshake != null)
+                monitor.waitForHandshake( getMaximumTimeout() ) ;
+        } catch (Exception exc) {
+            if (helper != null)
+                helper.fail( "Caught exception on controller start: " + exc ) ;
+            throw exc ;
+        }
     }
 
     /**
@@ -228,7 +240,9 @@ public class ExternalExec extends ControllerAdapter
                 process.destroy();
                 exitValue = STOPPED;
             }
+
             process = null;
+
             try {
                 monitor.finishWriting();
             } catch (InterruptedException e) {}
@@ -245,11 +259,26 @@ public class ExternalExec extends ControllerAdapter
 	terminate() ;
     }
 
+    private int handleExitValue() {
+        if (helper != null) {
+            if (exitValue == Controller.SUCCESS) 
+                helper.pass() ;
+            else 
+                helper.fail( "Test failed with return code " + exitValue ) ;
+        }
+        return exitValue ;
+    }
+
     public int waitFor() throws InterruptedException
     {
-        exitValue = process.waitFor();
-
-        return exitValue;
+        try {
+            exitValue = process.waitFor() ;
+            return handleExitValue() ;
+        } catch (InterruptedException exc) {
+            if (helper != null)
+                helper.fail( "Test " + getProcessName() + " failed because waiting thread was interrupted" ) ;
+            throw exc ;    
+        }
     }
 
     public int waitFor(long timeout) throws Exception
@@ -260,16 +289,19 @@ public class ExternalExec extends ControllerAdapter
             if (finished())
                 break;
             else
-                Thread.sleep(500);
+                Thread.sleep(100);
 
         } while (System.currentTimeMillis() < stop);
 
-        if (!finished())
+        if (finished()) {
+            exitValue = process.exitValue() ;
+            return handleExitValue() ;
+        } else {
+            if (helper != null)
+                helper.fail( "Test " + getProcessName() + " failed with a timeout after " + timeout 
+                    + " milliseconds" ) ;
             throw new Exception("waitFor timed out for " + getProcessName());
-
-        exitValue = process.exitValue();
-
-        return exitValue;
+        }
     }
 
     public int exitValue() throws IllegalThreadStateException
@@ -282,8 +314,7 @@ public class ExternalExec extends ControllerAdapter
             process.destroy();
             process = null;
             return exitValue;
-        } else
-        if (exitValue == INVALID_STATE) {
+        } else if (exitValue == INVALID_STATE) {
             // Occurs when the process hasn't been started yet
             throw new IllegalThreadStateException("process hasn't started");
         } else
@@ -294,10 +325,9 @@ public class ExternalExec extends ControllerAdapter
     {
         if (process != null)
             return CORBAUtil.processFinished(process);
-        else
-        if (exitValue == INVALID_STATE)
-            throw new IllegalThreadStateException(processName 
-                                                  + " was never started");
+        else if (exitValue == INVALID_STATE)
+            throw new IllegalThreadStateException(
+                processName + " was never started");
         else
             return true;
     }

@@ -70,7 +70,9 @@ public class MainTest {
 	System.out.println("Server is ready.");
 	if ( runTest( args ) )
 	    System.out.println("Test PASSED");
-        else
+        else {
 	    System.out.println("Test FAILED");
+            System.exit(1) ;
+        }
     }
 }

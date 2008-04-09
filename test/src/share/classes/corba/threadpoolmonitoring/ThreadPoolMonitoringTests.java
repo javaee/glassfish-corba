@@ -48,13 +48,14 @@ public class ThreadPoolMonitoringTests extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-       // Create client controller using the given
+        JUnitReportHelper helper = getHelper() ;
+        // Create client controller using the given
         // class.  You can also specify names for these (for instance,
         // you may want to distinguish between many clients) by using
         // the equivalent methods that take two Strings.
         Controller client = createClient("corba.threadpoolmonitoring.Client");
 
-        client.start();
+        client.start( helper );
 
         // Wait for the client to finish for up to 2 minutes, then
         // throw an exception.

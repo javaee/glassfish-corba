@@ -81,8 +81,11 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
+import corba.framework.JUnitReportHelper ;
+
 public class Client 
 {
+    private JUnitReportHelper helper ;
     private PrintStream out ;
     private TestSession session ;
 
@@ -104,9 +107,14 @@ public class Client
     public Client( Properties props, String args[], PrintStream out )
     {
 	this.out = System.out ;
-	this.session = new TestSession( out ) ;
+        helper = new JUnitReportHelper( Client.class.getName() ) ;
+	this.session = new TestSession( out, helper ) ;
 
-	runTests() ;
+        try {
+            runTests() ;
+        } finally {
+            helper.done() ;
+        }
     }
 
 // *************************************************
@@ -1100,7 +1108,7 @@ public class Client
 	session.end() ;
     }
 
-     private void testUserConfigurator()
+    private void testUserConfigurator()
     {
 	session.start( "UserConfigurator" ) ;
 

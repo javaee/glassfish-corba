@@ -42,10 +42,16 @@ import java.io.*;
 import java.util.*;
 import javax.rmi.CORBA.*;
 
-public class Client 
-{
-    /**
-     * Using a byte array in front and behind the main
+import org.testng.annotations.Test ;
+import org.testng.annotations.BeforeSuite ;
+import org.testng.Assert ;
+
+import corba.framework.TestngRunner ;
+
+public class Client { 
+    private Tester tester ;
+
+    /* Using a byte array in front and behind the main
      * payload parameter, this should allow us to break
      * the MarshalTester's data across just about all
      * possible fragment points.  This exercises code for
@@ -57,13 +63,11 @@ public class Client
      * across boundaries, or indirections interacting with
      * chunks.
      */
-    public static void testFragmentation(Tester tester,
-                                         MarshalTester payload)
-        throws Exception {
+    private void testFragmentation(Tester tester, 
+        MarshalTester payload) throws Exception {
 
-        System.out.println("Testing fragmentation with a "
-                           + payload.getClass().getName()
-                           + "...");
+        System.out.println("Testing fragmentation with a " + payload.getClass().getName() 
+            + "...");
 
         for (int i = 0; i < 2048; i++) {
             byte[] predata = new byte[i];
@@ -73,9 +77,7 @@ public class Client
                 predata[y] = postdata[y] = (byte)(y % 128);
             }
 
-            MarshalTester result = tester.verify(predata,
-                                                 payload,
-                                                 postdata);
+            MarshalTester result = tester.verify(predata, payload, postdata);
 
             if (!payload.equals(result))
                 throw new Exception("Payloads not equal at predata size "
@@ -85,10 +87,30 @@ public class Client
         System.out.println("PASSED");
     }
 
+    @Test
+    public void testFragmentationMarshalTester() throws Exception {
+        MarshalTester mt = new MarshalTester();
+        mt.init(tester);
+        testFragmentation(tester, mt);
+    }
+
+    @Test
+    public void testFragmentationCustomMarshalTester() throws Exception {
+        CustomMarshalTester cmt = new CustomMarshalTester();
+        cmt.init(tester);
+        Hashtable extra = new Hashtable();
+        extra.put("pkg1", tester);
+        extra.put("pkg2", tester);
+        cmt.add(extra);
+        cmt.add(tester);
+        testFragmentation(tester, cmt);
+    }
+
     /**
      * Verify that checked exceptions work.
      */
-    public static void testCheckedException(Tester tester) throws Exception {
+    @Test
+    public void testCheckedException() throws Exception {
         try {
             System.out.println("Testing CheckedException...");
 
@@ -109,7 +131,8 @@ public class Client
      * exceptions.  Unfortunately, unless used in multi-JVM
      * scenarios, this test still can't catch it.
      */
-    public static void testRemoteException(Tester tester) throws Exception {
+    @Test
+    public void testRemoteException() throws Exception {
         try {
             System.out.println("Testing RemoteException...");
 
@@ -124,7 +147,8 @@ public class Client
         }
     }
 
-    public static void testRuntimeException(Tester tester) throws Exception {
+    @Test
+    public void testRuntimeException() throws Exception {
         try {
             System.out.println("Testing RuntimeException...");
 
@@ -144,7 +168,8 @@ public class Client
      * this should work since the Server's getAbsTester
      * method returns a Tester (subinterface of AbsTester).
      */
-    public static void testAbstractInterface(Tester tester) 
+    @Test
+    public void testAbstractInterface() 
         throws RemoteException, DataCorruptedException
     {
         System.out.println("Testing abstract interface...");
@@ -168,7 +193,8 @@ public class Client
      * use our type codes to unmarshal, so this won't
      * be a real test unless in an interop scenario.
      */
-    public static void testIncorrectCharTC(Tester tester)
+    @Test
+    public void testIncorrectCharTC()
         throws DataCorruptedException, RemoteException {
         
         System.out.println("Testing for incorrect char TC...");
@@ -183,7 +209,8 @@ public class Client
     /**
      * Simply passes an object which uses PutField/GetField.
      */    
-    public static void testPutFieldsGetFields(Tester tester)
+    @Test
+    public void testPutFieldsGetFields()
         throws DataCorruptedException, RemoteException {
 
         System.out.println("Testing PutFields/GetFields...");
@@ -199,7 +226,8 @@ public class Client
     /**
      * Makes sure that superclass data is unmarshaled properly.
      */
-    public static void testSuperClasses(Tester tester)
+    @Test
+    public void testSuperClasses()
         throws DataCorruptedException, RemoteException {
 
         System.out.println("Testing superclass constructor call with RMI-IIOP...");
@@ -230,7 +258,8 @@ public class Client
      * and this test is invalid.  Note that it used to work
      * with the previous native implementation.
      */
-    public static void testStaticNestedInner(Tester tester)
+    @Test
+    public void testStaticNestedInner()
         throws DataCorruptedException, RemoteException {
 
         TestClass data = new TestClass();
@@ -253,7 +282,8 @@ public class Client
      * values works.  This was more important as an interop
      * test in the Connectathon.
      */
-    public static void testRecursiveReferences(Tester tester)
+    @Test
+    public void testRecursiveReferences()
         throws DataCorruptedException, RemoteException {
 
         System.out.println("Testing recursive references...");
@@ -304,7 +334,8 @@ public class Client
      * java.lang.Object, Serializable, or Externalizable), this
      * will test all the basic type codes.
      */
-    public static void testTypeCodeCompatibility(Tester tester)
+    @Test
+    public void testTypeCodeCompatibility()
         throws DataCorruptedException, RemoteException
     {
         System.out.println("Testing TypeCode compatibility...");
@@ -324,7 +355,8 @@ public class Client
      * Occassionally people have filed bugs saying that SQL Date
      * is broken in RMI-IIOP, but the problem usually clears up.
      */
-    public static void testSQLDate(Tester tester)
+    @Test
+    public void testSQLDate()
         throws DataCorruptedException, RemoteException
     {
         System.out.println("Testing SQL Date...");
@@ -343,7 +375,8 @@ public class Client
      * Occassionally people have filed bugs saying that Properties
      * is broken in RMI-IIOP, but the problem usually clears up.
      */
-    public static void testProperties(Tester tester) 
+    @Test
+    public void testProperties() 
         throws RemoteException,
                DataCorruptedException 
     {
@@ -375,7 +408,8 @@ public class Client
      * (like ArrayList) used to break often, but we seem to
      * have it fixed, now.
      */
-    public static void testArrayList(Tester tester)
+    @Test
+    public void testArrayList()
         throws RemoteException,
                DataCorruptedException
     {
@@ -410,7 +444,8 @@ public class Client
      * that will only occur when 1.4.x is talking to 1.3.x,
      * which we currently can't test within the framework.
      */
-    public static void testCalendar(Tester tester)
+    @Test
+    public void testCalendar()
         throws RemoteException, DataCorruptedException
     {
         System.out.println("Testing Calendar...");
@@ -429,7 +464,8 @@ public class Client
      * Makes sure that the protected superclass writeReplace/
      * readResolve methods are called.
      */
-    public static void testWriteReplaceReadResolve(Tester tester)
+    @Test
+    public void testWriteReplaceReadResolve()
         throws DataCorruptedException, RemoteException {
 
         System.out.println("Testing writeReplace/readResolve...");
@@ -454,61 +490,24 @@ public class Client
         System.out.println("PASSED");
     }
 
-    public static void main(String args[])
-    {
-	try {
+    @BeforeSuite
+    public void setup() throws Exception {
+        System.out.println("Finding tester...");
+        InitialContext rootContext = new InitialContext();
 
-            System.out.println("Finding tester...");
+        System.out.println("Looking up tester...");
+        java.lang.Object tst = rootContext.lookup("Tester");
 
-            InitialContext rootContext = new InitialContext();
+        System.out.println("Narrowing...");
+        tester = (Tester)PortableRemoteObject.narrow(tst, 
+            Tester.class);
+    }
 
-            System.out.println("Looking up tester...");
-
-            java.lang.Object tst = rootContext.lookup("Tester");
-
-            System.out.println("Narrowing...");
-
-            Tester tester 
-                = (Tester)PortableRemoteObject.narrow(tst,
-                                                      Tester.class);
-
-            System.out.println("Beginning tests...");
-
-            testCheckedException(tester);
-            testRemoteException(tester);
-            testRuntimeException(tester);
-            testAbstractInterface(tester); 
-            testIncorrectCharTC(tester);
-            testPutFieldsGetFields(tester);
-            testSuperClasses(tester);
-            testRecursiveReferences(tester);
-            testTypeCodeCompatibility(tester);
-            testSQLDate(tester);
-            testProperties(tester); 
-            testArrayList(tester);
-            testCalendar(tester);
-            // This test is invalid: testStaticNestedInner(tester);
-            testWriteReplaceReadResolve(tester);
-
-            MarshalTester mt = new MarshalTester();
-            mt.init(tester);
-            testFragmentation(tester, mt);
-
-            CustomMarshalTester cmt = new CustomMarshalTester();
-            cmt.init(tester);
-            Hashtable extra = new Hashtable();
-            extra.put("pkg1", tester);
-            extra.put("pkg2", tester);
-            cmt.add(extra);
-            cmt.add(tester);
-            testFragmentation(tester, cmt);
-
-            System.out.println("All tests passed");
-            
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.exit(1);
-        }
+    public static void main(String args[]) {
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
+        runner.systemExit() ;
     }
 }
 

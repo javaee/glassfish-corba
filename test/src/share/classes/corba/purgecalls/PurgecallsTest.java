@@ -42,6 +42,7 @@ package corba.purgecalls;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
+import corba.framework.JUnitReportHelper;
 
 public class PurgecallsTest
     extends
@@ -54,21 +55,23 @@ public class PurgecallsTest
 	throws
 	    Throwable
     {
-	Controller orbd   = createORBD();
-	orbd.start();
+        JUnitReportHelper helper = getHelper() ;
 
-	Controller server =
-	    createServer(thisPackage + "." + "Server", "Server");
-	Controller client = 
-	    createClient(thisPackage + "." + "Client", "Client");
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	server.start();
-	client.start();
-	// When this test fails - it hangs, so do not wait forever.
-	client.waitFor(60000);
-	client.stop();
-	server.stop();
-	orbd.stop();
+        Controller server =
+            createServer(thisPackage + "." + "Server", "Server");
+        Controller client = 
+            createClient(thisPackage + "." + "Client", "Client");
+
+        server.start();
+        client.start( helper );
+        // When this test fails - it hangs, so do not wait forever.
+        client.waitFor(60000);
+        client.stop();
+        server.stop();
+        orbd.stop();
     }
 
 }

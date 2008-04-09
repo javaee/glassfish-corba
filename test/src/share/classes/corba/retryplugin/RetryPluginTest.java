@@ -45,6 +45,7 @@ import java.util.Properties;
 import corba.framework.CORBATest;
 import corba.framework.Controller;
 import corba.framework.Options;
+import corba.framework.JUnitReportHelper;
 
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 
@@ -58,25 +59,27 @@ public class RetryPluginTest
     protected void doTest()
 	throws Exception
     {
-	String thisPackage = RetryPluginTest.class.getPackage().getName();
+        JUnitReportHelper helper = getHelper() ;
 
-	Controller orbd = createORBD();
-	Controller server;
-	Controller client;
+        String thisPackage = RetryPluginTest.class.getPackage().getName();
 
-	orbd.start();
+        Controller orbd = createORBD();
+        Controller server;
+        Controller client;
 
-	server = createServer(thisPackage+"."+"Server", "Server");
-	client = createClient(thisPackage+"."+"Client", "Client");
+        orbd.start();
 
-	server.start();
-	client.start();
+        server = createServer(thisPackage+"."+"Server", "Server");
+        client = createClient(thisPackage+"."+"Client", "Client");
 
-	client.waitFor(1000 * 60 * 5);
+        server.start();
+        client.start( helper );
 
-	client.stop();
-	server.stop();
-	orbd.stop();
+        client.waitFor(1000 * 60 * 5);
+
+        client.stop();
+        server.stop();
+        orbd.stop();
     }
 }
 

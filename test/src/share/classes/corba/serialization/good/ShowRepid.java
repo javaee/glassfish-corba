@@ -109,8 +109,10 @@ public class ShowRepid implements Serializable {
 	if (args.length == 0) {
 	    if (runTest() == 0)
 		System.out.println("Test PASSED");
-	    else
+	    else {
 		System.out.println("Test FAILED");
+                System.exit(1) ;
+            }
 	} else {
 	    try {
 		Class clz = Class.forName(args[0]);

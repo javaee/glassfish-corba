@@ -64,7 +64,7 @@ public class POAHierarchyTest extends CORBATest
         // the equivalent methods that take two Strings.
         Controller client = createClient("hopper.h4655388.Client");
 
-        client.start();
+        client.start( getHelper() );
 
         // Wait for the client to finish for up to 2 minutes, then
         // throw an exception.

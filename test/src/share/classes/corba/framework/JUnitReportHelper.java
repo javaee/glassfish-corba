@@ -71,12 +71,16 @@ public class JUnitReportHelper {
     private JUnitReportWriter.TestDescription current ;
 
     /** Prepare to generate a JUnitReport in the file named
-     * ${junit.report.dir}/TEST-${name}.xml.  junit.report.dir is obtained from
+     * ${junit.report.dir}/${name}.xml.  junit.report.dir is obtained from
      * the environment variable which is passed to all CTF controllers.
      * @param name The class name of the class for this test
      */
     public JUnitReportHelper( String className ) {
-        this.className = className ;
+        String processName = System.getProperty( "corba.test.process.name" ) ;
+        if (processName != null) 
+            this.className = className + "." + processName ;
+        else
+            this.className = className ;
 
         String outdirName = System.getProperty( "junit.report.dir" ) ; 
         if (outdirName == null)
@@ -92,7 +96,7 @@ public class JUnitReportHelper {
         OutputStream os = null ;
 
         try {
-            File file = new File( outdir, "TEST-" + className + ".xml" ) ;
+            File file = new File( outdir, className + ".xml" ) ;
             os = new FileOutputStream( file ) ;
         } catch (Exception exc) {
             throw new RuntimeException( exc ) ;
@@ -134,12 +138,19 @@ public class JUnitReportHelper {
         writer.endTest( current ) ;
     }
 
+    private Counts counts = null ;
+
     /** Testing is complete.  Calls to start, pass, or fail after
      * this call will result in an IllegalStateException.
+     * This method may be called multiple times, but only the first
+     * call will write a report.
      */
     public Counts done() {
-        JUnitReportWriter.TestCounts tc = writer.endTestSuite() ;
+        if (counts == null) {
+            JUnitReportWriter.TestCounts tc = writer.endTestSuite() ;
+            counts = new Counts( tc.pass(), tc.fail() + tc.error() ) ;
+        }
 
-        return new Counts( tc.pass(), tc.fail() + tc.error() ) ;
+        return counts ;
     }
 }

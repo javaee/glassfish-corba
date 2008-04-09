@@ -81,54 +81,65 @@ public class WombatServer implements InternalProcess
     {
         this.out = out;
         this.err = err;
-
-        Controller client = (Controller)extra.get("client");
-        orb = (ORB)extra.get("orb");
-
-        out.println("Running server");
-
-        POA poa = null;
-        try {
-            poa = (POA) orb.resolve_initial_references(root);
-        } catch (InvalidName name) {
-            err.println(root + " is an invalid name");
-            throw name;
-        }
-
-        out.println("Activating servant...");
-
-        WombatImpl w = new WombatImpl("BooBoo");
-        byte[] id = null;
-        try {
-            id = poa.activate_object(w);
-            writeObjref(poa.create_reference_with_id(id,
-                                                     WombatHelper.id()),
-                        "WombatObjRef",
-                        environment.getProperty("output.dir"));
-            poa.the_POAManager().activate();
-        } catch (Exception ex) {
-            err.println(root+" threw "+ex+" after activate_object");
-            throw ex;
-        }
-
-        out.println("Activated object, starting client");
-    
-        client.start();
-        client.waitFor();
-
-        out.println("Client finished, deactivating object");
+        JUnitReportHelper helper = new JUnitReportHelper( WombatServer.class.getName() ) ;
 
         try {
-            poa.deactivate_object(id);
-        } catch (Exception ex) {
-            err.println(root+" threw "+ex+" in deactivate_object");
-            throw ex;
-        }
+            Controller client = (Controller)extra.get("client");
+            orb = (ORB)extra.get("orb");
 
-        out.println("Destroying poa");
+            out.println("Running server");
+
+            POA poa = null;
+            try {
+                poa = (POA) orb.resolve_initial_references(root);
+            } catch (InvalidName name) {
+                err.println(root + " is an invalid name");
+                throw name;
+            }
+
+            out.println("Activating servant...");
+
+            WombatImpl w = new WombatImpl("BooBoo");
+            byte[] id = null;
+            try {
+                helper.start( "ActivationTest" ) ;
+                id = poa.activate_object(w);
+                writeObjref(poa.create_reference_with_id(id,
+                                                         WombatHelper.id()),
+                            "WombatObjRef",
+                            environment.getProperty("output.dir"));
+                poa.the_POAManager().activate();
+                helper.pass() ;
+            } catch (Exception ex) {
+                err.println(root+" threw "+ex+" after activate_object");
+                helper.fail( ex ) ;
+                throw ex;
+            }
+
+            out.println("Activated object, starting client");
         
-        poa.destroy(true, false);
+            client.start( helper );
+            client.waitFor();
 
-        out.println("Finished");
+            out.println("Client finished, deactivating object");
+
+            try {
+                helper.start( "DeacitvationTest" ) ;
+                poa.deactivate_object(id);
+                helper.pass() ;
+            } catch (Exception ex) {
+                err.println(root+" threw "+ex+" in deactivate_object");
+                helper.fail( ex ) ;
+                throw ex;
+            }
+
+            out.println("Destroying poa");
+            
+            poa.destroy(true, false);
+
+            out.println("Finished");
+        } finally {
+            helper.done() ;
+        }
     }
 }

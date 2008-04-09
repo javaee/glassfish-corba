@@ -42,6 +42,7 @@ package corba.legacyorbclasses;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
+import corba.framework.JUnitReportHelper ;
 
 public class LegacyORBClassesTest
     extends
@@ -50,20 +51,18 @@ public class LegacyORBClassesTest
     public static final String thisPackage =
 	LegacyORBClassesTest.class.getPackage().getName();
 
-    protected void doTest()
-	throws
-	    Throwable
-    {
-	Controller orbd   = createORBD();
-	orbd.start();
+    protected void doTest() throws Throwable {
+        JUnitReportHelper helper = getHelper() ;
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	Controller client = createClient(thisPackage + ".Client");
+        Controller client = createClient(thisPackage + ".Client");
 
-	client.start();
-	client.waitFor(120000);
-	client.stop();
+        client.start( helper );
+        client.waitFor(120000);
+        client.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 }
 

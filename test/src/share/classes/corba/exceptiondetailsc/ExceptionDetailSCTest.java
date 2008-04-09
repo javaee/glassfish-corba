@@ -42,6 +42,7 @@ package corba.exceptiondetailsc;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
+import corba.framework.JUnitReportHelper;
 
 public class ExceptionDetailSCTest
     extends
@@ -50,38 +51,36 @@ public class ExceptionDetailSCTest
     public static final String thisPackage =
 	ExceptionDetailSCTest.class.getPackage().getName();
 
-    protected void doTest()
-	throws
-	    Throwable
-    {
-	Controller orbd   = createORBD();
-	orbd.start();
+    private JUnitReportHelper helper = getHelper() ;
 
-	doTestType("Server", "Server",
-		   "Client", "Client");
+    protected void doTest() throws Throwable {
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	Controller colocatedClientServer = 
-	    createClient(thisPackage + ".ColocatedClientServer",
-			 "colocatedClientServer");
-	colocatedClientServer.start();
-	colocatedClientServer.waitFor();
-	colocatedClientServer.stop();
+        doTestType("Server", "Server",
+                   "Client", "Client");
 
-	orbd.stop();
+        Controller colocatedClientServer = 
+            createClient(thisPackage + ".ColocatedClientServer",
+                         "colocatedClientServer");
+        colocatedClientServer.start( helper );
+        colocatedClientServer.waitFor();
+        colocatedClientServer.stop();
+
+        orbd.stop();
     }
 
-    protected void doTestType(String serverMainClass, String serverTestName,
-			      String clientMainClass, String clientTestName)
-	throws
-	    Throwable
-    {
+    protected void doTestType(
+        String serverMainClass, String serverTestName, 
+        String clientMainClass, String clientTestName) throws Throwable {
+
 	Controller server = createServer(thisPackage + "." + serverMainClass,
 					 serverTestName);
 	server.start();
 
 	Controller client = createClient(thisPackage + "." + clientMainClass,
 					 clientTestName);
-	client.start();
+	client.start( helper );
 	client.waitFor();
 	client.stop();
 

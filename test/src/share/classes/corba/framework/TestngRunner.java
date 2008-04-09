@@ -173,7 +173,7 @@ public class TestngRunner {
             // msg( "  context: name=" + context.getName() ) ;
             try {
                 File dir = new File( outdirName ) ;
-                File file = new File( dir, "TEST-" + name + ".xml" ) ;
+                File file = new File( dir, name + ".xml" ) ;
                 OutputStream os = new FileOutputStream( file ) ;
                 writer.setOutput( os ) ;
             } catch (IOException exc) {
@@ -344,7 +344,7 @@ public class TestngRunner {
     }
 
     /** Register a class container TestNG annotations on test methods.
-     * The test report is generated in outdir under the name TEST-<classname>.xml.
+     * The test report is generated in outdir under the name <classname>.xml.
      * Note that we assume that each suite is represented by a unique class.
      */
     public void registerClass( Class<?> cls ) {
@@ -356,13 +356,13 @@ public class TestngRunner {
     public void run() {
         for (Class<?> cls : suiteClasses ) {
             testng = new TestNG() ;
-            // testng.setDefaultSuiteName( "TEST-" + cls.getName() + ".xml" ) ;
+            // testng.setDefaultSuiteName( cls.getName() + ".xml" ) ;
             testng.setTestClasses( new Class<?>[] { cls } ) ;
             testng.setOutputDirectory( outdirName )  ;
 
             //testng.addListener( new JUnitXMLReporter() ) ;
             //testng.addListener( new SuiteListener() ) ;
-            testng.addListener( new JUnitReportTestListener( "TEST-" + cls.getName() ) ) ;
+            testng.addListener( new JUnitReportTestListener( cls.getName() ) ) ;
             //testng.addListener( new TestListener() ) ;
 
             testng.run() ;

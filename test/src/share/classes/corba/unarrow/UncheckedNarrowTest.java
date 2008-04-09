@@ -48,13 +48,15 @@ public class UncheckedNarrowTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
+        JUnitReportHelper helper = getHelper() ;
+
         Controller orbd = createORBD();
         Controller server = createServer("corba.unarrow.Server");
         Controller client = createClient("corba.unarrow.Client");
 
         orbd.start();
         server.start();
-        client.start();
+        client.start( helper );
 
         client.waitFor(120000);
 

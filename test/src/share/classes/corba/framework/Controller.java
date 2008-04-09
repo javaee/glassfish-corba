@@ -98,6 +98,10 @@ public interface Controller
      *@exception  Exception  Any fatal error that occured
      */
     void start() throws Exception;
+
+    /** Start a process, with a JUnitReportHelper to collect the result.
+     */
+    void start( JUnitReportHelper helper ) throws Exception ;
   
     /**
      * Stop the process.  This may request the termination of the process in some

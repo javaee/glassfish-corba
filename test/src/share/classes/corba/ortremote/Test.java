@@ -124,7 +124,7 @@ public class Test
 
     public static void main( String[] args )
     {
-	TestSession session = new TestSession( System.out ) ;
+	TestSession session = new TestSession( System.out, Test.class ) ;
 
 	ORB clientORB = makeORB() ;
 	ORB serverORB = makeORB() ;
@@ -153,7 +153,7 @@ public class Test
 
 	session.start( "ORT marshalling test over RMI-IIOP" ) ;
 
-	session.testForPass( "Checking ObjectReferenceFactory",
+	session.testForPass( "ObjectReferenceFactory",
 	    new Closure() {
 		public Object evaluate() {
 		    try {
@@ -168,7 +168,7 @@ public class Test
 	    },
 	    orf ) ;
 	
-	session.testForPass( "Checking ObjectReferenceTemplate",
+	session.testForPass( "ObjectReferenceTemplate",
 	    new Closure() {
 		public Object evaluate() {
 		    try {
@@ -183,8 +183,8 @@ public class Test
 	    },
 	    ort ) ;
 
-	session.end() ;
 	clientORB.destroy() ;
 	serverORB.destroy() ;
+	session.end() ;
     }
 }

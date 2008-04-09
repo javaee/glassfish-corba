@@ -38,6 +38,7 @@ package corba.preinvokepostinvoke;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
+import corba.framework.JUnitReportHelper;
 
 public class PreInvokePostInvokeTest
     extends
@@ -45,12 +46,13 @@ public class PreInvokePostInvokeTest
 {
     protected void doTest() throws Throwable
     {
+        JUnitReportHelper helper = getHelper() ;
         Controller orbd = createORBD();
         Controller server = createServer("corba.preinvokepostinvoke.Server" );
 
         orbd.start();
 
-        server.start();
+        server.start( helper );
 
         server.stop();
 

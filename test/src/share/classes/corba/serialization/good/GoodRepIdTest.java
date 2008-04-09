@@ -42,9 +42,11 @@ public class GoodRepIdTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
+        JUnitReportHelper helper = getHelper() ;
+
         Controller server = createServer("corba.serialization.good.ShowRepid");
 
-        server.start();
+        server.start( helper );
 
         server.stop();
     }

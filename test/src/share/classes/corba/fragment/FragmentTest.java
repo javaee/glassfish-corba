@@ -47,6 +47,8 @@ public class FragmentTest extends CORBATest {
     static String[] GIOP_version = { "1.0", "1.1", "1.2" };
     static String[] GIOP_strategy = { "GROW", "CLCT", "STRM" };
 
+    JUnitReportHelper helper = getHelper() ;
+
     private void printBeginTest(int clientVersion,
                                 int clientStrategy,
                                 int serverVersion,
@@ -67,6 +69,23 @@ public class FragmentTest extends CORBATest {
         output.append(" server: ");
 
         System.out.print(output.toString());
+    }
+
+    private String testName(int clientVersion, int clientStrategy, int 
+        serverVersion, int serverStrategy) {
+
+        StringBuffer output = new StringBuffer(80);
+
+        output.append(GIOP_version[clientVersion]);
+        output.append("_");
+        output.append(GIOP_strategy[clientStrategy]);
+        output.append("_client_to_");
+        output.append(GIOP_version[serverVersion]);
+        output.append("_");
+        output.append(GIOP_strategy[serverStrategy]);
+        output.append("_server");
+
+        return output.toString() ;
     }
 
     private void printEndTest(String result)
@@ -95,17 +114,18 @@ public class FragmentTest extends CORBATest {
             for (int server_strategy = GROW, j = 0; j < GIOP_version.length; j++) {
 
                 printBeginTest(i, client_strategy, j, server_strategy);
-
+                String name = testName(i, client_strategy, j, server_strategy);
+                
                 Properties serverProps = Options.getServerProperties();
                 serverProps.put(ORBConstants.GIOP_VERSION, GIOP_version[i]);
                 serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + server_strategy);
                 serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + server_strategy);
 
                 Controller server = createServer("corba.fragment.Server");
-                Controller client = createClient("corba.fragment.Client");
+                Controller client = createClient("corba.fragment.Client", name );
 
                 server.start();
-                client.start();
+                client.start( helper );
 
                 client.waitFor(60000);
 
@@ -143,7 +163,6 @@ public class FragmentTest extends CORBATest {
         
         if (errors > 0)
             throw new Exception("Errors detected");
-
     }
 }
 

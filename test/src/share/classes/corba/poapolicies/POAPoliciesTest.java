@@ -41,6 +41,8 @@ import corba.framework.*;
 
 public class POAPoliciesTest extends CORBATest
 {
+    JUnitReportHelper helper = getHelper() ;
+
     private void testWithFactory(String poaFactory) throws Throwable
     {
         Test.dprint("Using POA Factory: " 
@@ -53,9 +55,9 @@ public class POAPoliciesTest extends CORBATest
         
         Controller server = createServer("corba.poapolicies.HelloServer");
 
-        Controller client = createClient("corba.poapolicies.HelloClient");
+        Controller client = createClient("corba.poapolicies.HelloClient", poaFactory );
 
-        server.start();
+        server.start( helper );
 
         client.start();
 

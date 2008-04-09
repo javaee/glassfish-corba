@@ -67,28 +67,28 @@ public class Options {
     private static String orbClass;                     // key org.omg.CORBA.ORBClass
 
     private static Vector orbdArgs ; 
-    private static Vector serverArgs = new Vector(10);
-    private static Vector clientArgs = new Vector(10);
+    private static Vector serverArgs ;
+    private static Vector clientArgs ;
 
     // Extra execution strategy arguments
-    private static Hashtable orbdExtra = new Hashtable(10);
-    private static Hashtable serverExtra = new Hashtable(10);
-    private static Hashtable clientExtra = new Hashtable(10);
+    private static Hashtable orbdExtra ;
+    private static Hashtable serverExtra ;
+    private static Hashtable clientExtra ;
 
     // Extra arguments to compilers
-    private static Vector rmicArgs = new Vector(10);
-    private static Vector idlCompilerArgs = new Vector(10);
-    private static Vector javacArgs = new Vector(10);
+    private static Vector rmicArgs ;
+    private static Vector idlCompilerArgs ;
+    private static Vector javacArgs ;
 
     // environment properties
-    private static Properties defaultProperties = new Properties() ;
-    private static Properties ORBDProps = new Properties();
-    private static Properties serverProps = new Properties();
-    private static Properties clientProps = new Properties();
+    private static Properties defaultProperties ;
+    private static Properties ORBDProps ;
+    private static Properties serverProps ;
+    private static Properties clientProps ;
 
     private static String emmaFile;
 
-    // Note:  Directories must have the file separator already appeneded 
+    // Note:  Directories must have the file separator already appended 
     //        to the end
     private static String testDirectory;
     private static String reportDirectory;
@@ -157,10 +157,25 @@ public class Options {
      */
     public static void init(CORBATest parent) throws IOException
     {
-        // Set up default handshakes in extra hashtables.
+        serverArgs = new Vector(10);
+        clientArgs = new Vector(10);
+
+        orbdExtra = new Hashtable(10);
+        serverExtra = new Hashtable(10);
+        clientExtra = new Hashtable(10);
+
 	orbdExtra.put(ExternalExec.HANDSHAKE_KEY, defORBDHandshake);
 	serverExtra.put(ExternalExec.HANDSHAKE_KEY, defServerHandshake);
         
+        rmicArgs = new Vector(10);
+        idlCompilerArgs = new Vector(10);
+        javacArgs = new Vector(10);
+        
+        javaFiles = null ;
+        idlFiles = null ;
+        rmicFiles = null ;
+
+        defaultProperties = new Properties() ;
         initializeDefaults( defaultProperties ) ;
 
         setORBDArgs( "-ORBDebug orbd" ) ;

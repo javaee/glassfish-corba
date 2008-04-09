@@ -49,7 +49,7 @@ public class CustomTest extends CORBATest
 
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = new JUnitReportHelper( CustomTest.class.getName() ) ;
+        JUnitReportHelper helper = getHelper() ;
         Options.setRMICClasses(rmicClasses);
         Options.addRMICArgs("-poa -nolocalstubs -iiop -keep -g");
 
@@ -64,7 +64,6 @@ public class CustomTest extends CORBATest
         for (int fragmentSize = 32; fragmentSize <= 512; fragmentSize+=16) {
 
             System.out.print("  Fragment size " + fragmentSize + ": ");
-            helper.start( "FragmentSize_" + fragmentSize ) ;
 
             // Specify the fragment size property
             Properties clientProps = Options.getClientProperties();
@@ -85,16 +84,14 @@ public class CustomTest extends CORBATest
             // Go ahead and restart both server and client each time to
             // make sure we test all fragment sizes for replies, too.
             server.start();
-            client.start();
+            client.start( helper );
 
             try {
                 if (client.waitFor(60000) == Controller.SUCCESS) {
                     System.out.println("PASSED");
-                    helper.pass() ;
                 } else {
                     String msg = "FAILED (" + client.exitValue() + ")" ;
                     System.out.println( msg ) ;
-                    helper.fail( msg ) ;
                 }
             } catch (Exception e) {
                 // Timed out waiting for the client

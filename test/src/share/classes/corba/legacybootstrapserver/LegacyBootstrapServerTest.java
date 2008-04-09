@@ -43,6 +43,7 @@ package corba.legacybootstrapserver;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
+import corba.framework.JUnitReportHelper;
 
 public class LegacyBootstrapServerTest
     extends
@@ -60,16 +61,19 @@ public class LegacyBootstrapServerTest
 	// The ORBD is NOT used.
 	// However, when it wasn't here then createServer below complained
 	// Caught java.io.FileNotFoundException: gen/corba/legacybootstrapserver/server.out.txt (No such file or directory)
-	Controller orbd   = createORBD();
+        
+        JUnitReportHelper helper = getHelper() ;
 
-	Controller server = createServer(thisPackage + ".Server");
-	Controller client = createClient(thisPackage + ".Client");
+        Controller orbd   = createORBD();
 
-	server.start();
-	client.start();
-	client.waitFor(60000);
-	client.stop();
-	server.stop();
+        Controller server = createServer(thisPackage + ".Server");
+        Controller client = createClient(thisPackage + ".Client");
+
+        server.start();
+        client.start( helper );
+        client.waitFor(60000);
+        client.stop();
+        server.stop();
     }
 }
 

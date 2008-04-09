@@ -42,6 +42,7 @@ package corba.islocal;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
+import corba.framework.JUnitReportHelper;
 
 public class IsLocalTest
     extends
@@ -50,6 +51,8 @@ public class IsLocalTest
     public static final String thisPackage =
 	IsLocalTest.class.getPackage().getName();
 
+    private JUnitReportHelper helper = getHelper() ;
+
     protected void doTest()
 	throws
 	    Throwable
@@ -57,17 +60,17 @@ public class IsLocalTest
 	Controller orbd   = createORBD();
 	orbd.start();
 
-	doTestType("Server", "Server",
-		   "Client", "Client");
+        doTestType("Server", "Server",
+                   "Client", "Client");
 
-	Controller colocatedClientServer = 
-	    createClient(thisPackage + ".ColocatedClientServer",
-			 "colocatedClientServer");
-	colocatedClientServer.start();
-	colocatedClientServer.waitFor();
-	colocatedClientServer.stop();
+        Controller colocatedClientServer = 
+            createClient(thisPackage + ".ColocatedClientServer",
+                         "colocatedClientServer");
+        colocatedClientServer.start( helper );
+        colocatedClientServer.waitFor();
+        colocatedClientServer.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 
     protected void doTestType(String serverMainClass, String serverTestName,
@@ -81,7 +84,7 @@ public class IsLocalTest
 
 	Controller client = createClient(thisPackage + "." + clientMainClass,
 					 clientTestName);
-	client.start();
+	client.start( helper );
 	client.waitFor();
 	client.stop();
 

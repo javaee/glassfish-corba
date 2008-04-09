@@ -58,7 +58,7 @@ public class ORBInitErrorTest
 
 
         Controller client = createClient("hopper.h4486041.Client");
-        client.start();
+        client.start( getHelper() );
 	client.waitFor(120000);
 	client.stop();
 	orbd.stop();

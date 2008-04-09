@@ -91,7 +91,8 @@ public class Strm2Test extends CORBATest
     }
 
     protected void doTest() throws Throwable {
-        
+        JUnitReportHelper helper = getHelper() ;
+
         if (test.Test.useJavaSerialization()) {
             return;
         }
@@ -115,11 +116,11 @@ public class Strm2Test extends CORBATest
         Controller clients[] = new Controller[Versions.testableVersions.length];
 
         // Add these for debugging:
-//         Properties clientProps = Options.getExtraClientProperties();
-//         clientProps.setProperty("com.sun.corba.se.ORBDebug", "transport,subcontract,giop");
+        // Properties clientProps = Options.getExtraClientProperties();
+        // clientProps.setProperty("com.sun.corba.se.ORBDebug", "transport,subcontract,giop");
 
-//         Properties serverProps = Options.getExtraServerProperties();
-//         serverProps.setProperty("com.sun.corba.se.ORBDebug", "transport,subcontract,giop");
+        // Properties serverProps = Options.getExtraServerProperties();
+        // serverProps.setProperty("com.sun.corba.se.ORBDebug", "transport,subcontract,giop");
 
         String oldClasspath = Options.getClasspath();
         for (int i = 0; i < Versions.testableVersions.length; i++) {
@@ -145,12 +146,13 @@ public class Strm2Test extends CORBATest
         // Run through the clients
 
         for (int i = 0; i < clients.length; i++) {
+            String version = Versions.testableVersions[i] ;
+            System.out.println("      Running client version " + version ) ;
 
-            System.out.println("      Running client version "
-                               + Versions.testableVersions[i]);
+            clients[i].start( helper );
 
-            clients[i].start();
             clients[i].waitFor(360000);
+
             clients[i].stop();
         }
 

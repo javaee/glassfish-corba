@@ -47,8 +47,13 @@ import java.io.*;
  */
 public class InternalExec extends ControllerAdapter
 {
-    public void start() throws Exception
+    public void start( JUnitReportHelper helper ) throws Exception
     {
+        if (helper != null) {
+            this.helper = helper ;
+            helper.start( getProcessName() ) ;
+        }
+
         Loader loader = new Loader();
         loader.addPath(Options.getOutputDirectory());
 
@@ -104,12 +109,16 @@ public class InternalExec extends ControllerAdapter
         PrintStream errors = new PrintStream(err, true);
 
         try {
-
             process.run(environment, programArgs, output, errors, extra);
-            
+           
+            if (helper != null)
+                helper.pass() ;
         } catch (Exception ex) {
             ex.printStackTrace(errors);
             exitValue = 1;
+
+            if (helper != null) 
+                helper.fail( ex ) ;
         }
     }
                  

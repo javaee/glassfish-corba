@@ -48,6 +48,7 @@ import corba.framework.CORBATest;
 import corba.framework.*;
 
 public class SystemExceptionsTest extends CORBATest {
+    private JUnitReportHelper helper = getHelper() ;
 
     public static final String thisPackage =
 	SystemExceptionsTest.class.getPackage().getName();
@@ -66,7 +67,7 @@ public class SystemExceptionsTest extends CORBATest {
 	Controller colocatedClientServer = 
 	    createClient(thisPackage + ".ColocatedClientServer",
 			 "colocatedClientServer");
-	colocatedClientServer.start();
+	colocatedClientServer.start( helper );
 	colocatedClientServer.waitFor();
 	colocatedClientServer.stop();
 
@@ -83,7 +84,7 @@ public class SystemExceptionsTest extends CORBATest {
 
 	Controller client = createClient(thisPackage + "." + clientMainClass,
 					 clientTestName);
-	client.start();
+	client.start( helper );
 	client.waitFor();
 	client.stop();
 

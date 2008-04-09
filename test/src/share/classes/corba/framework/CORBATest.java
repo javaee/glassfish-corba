@@ -551,6 +551,14 @@ public abstract class CORBATest extends test.RemoteTest
         return new ExternalExec();
     }
 
+    private JUnitReportHelper helper = null ;
+
+    public JUnitReportHelper getHelper() {
+        if (helper == null)
+            helper = new JUnitReportHelper( this.getClass().getName() ) ;
+        return helper ;
+    }
+
     /**
      * Create and initialize the Controller for the client.  This
      * initializes and wraps it in a FileOutputDecorator;
@@ -668,6 +676,9 @@ public abstract class CORBATest extends test.RemoteTest
             cleanUpHelp((Controller)ctrls.nextElement());
 
 	EmmaControl.resetPortAllocator() ;
+
+        if (helper != null)
+            helper.done() ;
     }
 
 

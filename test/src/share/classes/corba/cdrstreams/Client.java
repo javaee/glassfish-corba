@@ -43,10 +43,17 @@ import java.rmi.RemoteException;
 import java.io.*;
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 
+import org.testng.annotations.Test ;
+import org.testng.annotations.BeforeSuite ;
+
+import corba.framework.TestngRunner ;
+
 public class Client
 {
-    public static void testIndirection1(GraphProcessor processor)
-        throws RemoteException, InvalidGraphException
+    GraphProcessor processor ;
+
+    @Test
+    public void testIndirection1() throws RemoteException, InvalidGraphException
     {
         System.out.println("---- testIndirection1 ----");
 
@@ -64,9 +71,7 @@ public class Client
         processor.process(start);
     }
 
-    public static void testObjectArray(GraphProcessor processor,
-                                       java.lang.Object array[])
-        throws RemoteException, Exception
+    private void testObjectArray( java.lang.Object array[]) throws RemoteException, Exception
     {
         for (int i = 0; i < array.length; i++) {
             if (!array[i].equals(processor.verifyTransmission(array[i])))
@@ -75,8 +80,8 @@ public class Client
         }
     }
 
-    public static void complexHashtableTest(GraphProcessor processor)
-        throws RemoteException, Exception
+    @Test
+    public void testComplexHashtableTest() throws RemoteException, Exception
     {
         System.out.println("---- complex Hashtable Test ----");
 
@@ -134,7 +139,7 @@ public class Client
         System.out.println("PASSED");
     }
 
-    public static void simpleHashtableTest(GraphProcessor processor)
+    public void simpleHashtableTest()
         throws RemoteException, Exception
     {
         System.out.println("---- simple Hashtable Test ----");
@@ -174,8 +179,8 @@ public class Client
         System.out.println("PASSED");
     }
 
-    public static void testCustomMarshalers(GraphProcessor processor)
-        throws RemoteException, Exception
+    @Test
+    public void testCustomMarshalers() throws RemoteException, Exception
     {
         System.out.println("---- testCustomMarshalers ----");
 
@@ -187,7 +192,7 @@ public class Client
         java.lang.Object good[] = new java.lang.Object[100];
         for (int i = 0; i < good.length; i++)
             good[i] = new CustomMarshaled(i, i + 100, true);
-        testObjectArray(processor, good);
+        testObjectArray(good);
 
         System.out.println("Testing buggy ones that leave bytes when reading...");
 
@@ -201,7 +206,7 @@ public class Client
                 buggy[i] = new CustomMarshaled(i, i + 100, true);
         }
 
-        testObjectArray(processor, buggy);
+        testObjectArray(buggy);
 
         System.out.println("Testing a buggy one that tries to read too much...");
 
@@ -234,7 +239,8 @@ public class Client
         }
     }
 
-    public static void testLargeArray(GraphProcessor processor)
+    @Test
+    public void testLargeArray()
         throws RemoteException, Exception
     {
         System.out.println("---- testLargeArray ----");
@@ -257,7 +263,7 @@ public class Client
         System.out.println("PASSED");
     }
 
-    public static Node createNode(int valueSize, char filler)
+    public Node createNode(int valueSize, char filler)
     {
         char valueBuf[] = new char[valueSize];
 
@@ -267,7 +273,8 @@ public class Client
         return new Node(new String(valueBuf), new Vector());
     }
 
-    public static void testIndirectionAndOffset(GraphProcessor processor)
+    @Test
+    public void testIndirectionAndOffset()
         throws RemoteException, InvalidGraphException, Exception
     {
         System.out.println("---- testIndirectionAndOffset ----");
@@ -326,8 +333,8 @@ public class Client
         System.out.println("Success!");
     } 
 
-    public static void testUserException(GraphProcessor processor)
-        throws RemoteException, Exception
+    @Test
+    public void testUserException() throws RemoteException, Exception
     {
         System.out.println("---- testExceptionsAndReset ----");
 
@@ -349,8 +356,8 @@ public class Client
     }
 
 
-    public static void testMarkReset(String args[])
-        throws RemoteException, Exception
+    @Test
+    public void testMarkReset(String args[]) throws RemoteException, Exception
     {
         System.out.println("---- Testing mark and reset ----");
 
@@ -370,7 +377,7 @@ public class Client
         
         org.omg.CORBA.Object obj = ncRef.resolve(path);
         
-        GraphProcessor processor = 
+        processor = 
             (GraphProcessor) PortableRemoteObject.narrow(obj, 
                                                          GraphProcessor.class);
         
@@ -381,39 +388,32 @@ public class Client
 
         System.out.println("PASSED");
     }
+    
+    private static String[] args ;
+
+    @BeforeSuite
+    public void setup() throws Exception {
+        ORB orb = ORB.init(args, System.getProperties());
+
+        org.omg.CORBA.Object objRef = 
+            orb.resolve_initial_references("NameService");
+        NamingContext ncRef = NamingContextHelper.narrow(objRef);
+
+        NameComponent nc = new NameComponent("GraphProcessor", "");
+        NameComponent path[] = {nc};
+
+        org.omg.CORBA.Object obj = ncRef.resolve(path);
+
+        GraphProcessor processor = (GraphProcessor) PortableRemoteObject.narrow(obj, 
+            GraphProcessor.class);
+    }
 
     public static void main(String args[])
     {
-        try{
-
-            ORB orb = ORB.init(args, System.getProperties());
-
-            org.omg.CORBA.Object objRef = 
-                orb.resolve_initial_references("NameService");
-            NamingContext ncRef = NamingContextHelper.narrow(objRef);
- 
-            NameComponent nc = new NameComponent("GraphProcessor", "");
-            NameComponent path[] = {nc};
-
-            org.omg.CORBA.Object obj = ncRef.resolve(path);
-
-	    GraphProcessor processor = 
-                (GraphProcessor) PortableRemoteObject.narrow(obj, 
-                                                             GraphProcessor.class);
-
-            testIndirection1(processor);
-            testIndirectionAndOffset(processor);
-            testUserException(processor);
-            simpleHashtableTest(processor);
-            complexHashtableTest(processor);
-            testCustomMarshalers(processor);
-            testLargeArray(processor);
-            testMarkReset(args);
-
-        } catch (Throwable t) {
-            System.out.println("ERROR : " + t) ;
-            t.printStackTrace(System.out);
-            System.exit (1);
-        }
+        Client.args = args ;
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
+        runner.systemExit() ;
     }
 }

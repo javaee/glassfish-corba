@@ -36,6 +36,7 @@
 package hopper.h4661596;
 
 import corba.framework.CORBATest;
+import corba.framework.JUnitReportHelper;
 import java.util.*;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
@@ -51,12 +52,14 @@ import org.omg.CORBA.WStringValueHelper;
  */
 public class WStringValueHelperTest extends CORBATest
 {
+    JUnitReportHelper helper = getHelper() ;
+
     public static final String INDENT = "      ";
 
     // The actual test:
 
     public void checkWStringValueHelper() throws Exception {
-
+        helper.start( "checkWStringValueHelper" ) ;
         System.out.print(INDENT
                          + "  Checking WStringValueHelper from JDK...");
 
@@ -66,12 +69,16 @@ public class WStringValueHelperTest extends CORBATest
             tc = tc.content_type();
 
         if (!tc.kind().equals(TCKind.tk_value_box) ||
-            !tc.content_type().kind().equals(TCKind.tk_wstring))
-            throw new Exception("Bad TypeCode from WStringValueHelper: "
+            !tc.content_type().kind().equals(TCKind.tk_wstring)) {
+            Exception exc = new Exception("Bad TypeCode from WStringValueHelper: "
                                 + " kind: " 
                                 + tc.content_type().kind().value());
+            helper.fail( exc ) ;
+            throw exc ;
+        }
 
         System.out.println("PASSED");
+        helper.pass() ;
     }
 
 

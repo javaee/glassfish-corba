@@ -49,13 +49,14 @@ public class ResolveDeadlockTest extends CORBATest
     // should have this.
     protected void doTest() throws Throwable
     {
+        JUnitReportHelper helper = getHelper() ;
 	Options.setJavaFiles( javaFiles ) ;
 
         compileJavaFiles();
 
 	Controller client = createClient( "corba.resolve_deadlock.ResolveDeadlock" ) ;
 
-	client.start();
+	client.start( helper );
 
 	// Wait for the client to finish for up to 1 minute, then
 	// throw an exception.

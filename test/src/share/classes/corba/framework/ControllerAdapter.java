@@ -53,6 +53,7 @@ public abstract class ControllerAdapter implements Controller
     protected OutputStream out;
     protected OutputStream err;
     protected Hashtable extra;
+    protected JUnitReportHelper helper;
     
     public void initialize(String className,
                            String processName,
@@ -99,5 +100,10 @@ public abstract class ControllerAdapter implements Controller
     public String getClassName()
     {
         return className;
+    }
+
+    public void start() throws Exception
+    {
+        start( null ) ;
     }
 }

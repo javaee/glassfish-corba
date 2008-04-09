@@ -161,7 +161,8 @@ public class CodeBaseTest extends CORBATest
                     + (serverDownloading ? "server" : "client"));
 
         server.start();
-        client.start();
+        JUnitReportHelper helper = getHelper() ;
+        client.start( helper );
 
         // Note that the test framework will handle reporting if the overall
         // test failed since it will check the exit codes of the client and

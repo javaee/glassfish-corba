@@ -180,7 +180,7 @@ public class Client
     public static void main(String[] av)
     {
         try {
-
+            U.initialize( Client.class ) ;
 	    U.setDisplayErrorsWhenTheyHappen(true);
 	    ea = new ErrorAccumulator();
 
@@ -206,7 +206,7 @@ public class Client
 
 	    ea.reportErrors(false, false);
 
-	    HEADER("Test complete.");
+	    // HEADER("Test complete.");
 
 	    if (ea.getNumberOfErrors() > 0) {
 		// Signal corba.framework
@@ -216,6 +216,8 @@ public class Client
         } catch (Exception e) {
             U.sopUnexpectedException(main + " : ", e);
 	    System.exit(1);
+        } finally {
+            U.done() ;
         }
 	System.exit(Controller.SUCCESS);
     }
@@ -336,208 +338,205 @@ public class Client
 	    Exception
     {
 	HEADER("testMisc");
+        
+        // --------------------------------------------------
 
-	// --------------------------------------------------
+        org.omg.CORBA.Object o =ridlStaticPOA.getAndSaveUnknownORBVersionIOR();
+        boolean result = ridlStaticPOA.isIdenticalWithSavedIOR(o);
+        if (! result) {
+            throw new RuntimeException(C.isIdenticalWithSavedIOR);
+        }
+        /* 
+         * Gets NoSuchMethodException isIdenticalWithSavedIOR
+        U.expect(U.result, Boolean.valueOf(true),
+                 ridlStaticPOA, C.isIdenticalWithSavedIOR, o);
+        */
 
-	org.omg.CORBA.Object o =ridlStaticPOA.getAndSaveUnknownORBVersionIOR();
-	boolean result = ridlStaticPOA.isIdenticalWithSavedIOR(o);
-	if (! result) {
-	    throw new RuntimeException(C.isIdenticalWithSavedIOR);
-	}
-	/* 
-	 * Gets NoSuchMethodException isIdenticalWithSavedIOR
-	U.expect(ea, U.result, Boolean.valueOf(true),
-		 ridlStaticPOA, C.isIdenticalWithSavedIOR, o);
-	*/
+        // --------------------------------------------------
+        // I know I have fragments set to 32 bytes.
+        // So try to identify the fragments on the wire by their
+        // contents.
 
-	// --------------------------------------------------
-	// I know I have fragments set to 32 bytes.
-	// So try to identify the fragments on the wire by their
-	// contents.
+        int size = 10000;
+        byte[] bigBytes = new byte[size];
+        byte j = 0x41; // 'A'
+        // 32 == fragment size
+        // 12 == GIOP header
+        for (int i = 0; i < size; i+= 32 - 15) {
+            bigBytes[i] = j++;
+            if (j == 0x5a) {  // A-Z
+                j = 0x61; // 'a'
+            } else if (j == 0x7a) { // a-z
+                j = 0x41; // 'A'
+            }
+        }
+        rrmiiI1.sendBytes(bigBytes);
 
-	int size = 10000;
-	byte[] bigBytes = new byte[size];
-	byte j = 0x41; // 'A'
-	// 32 == fragment size
-	// 12 == GIOP header
-	for (int i = 0; i < size; i+= 32 - 15) {
-	    bigBytes[i] = j++;
-	    if (j == 0x5a) {  // A-Z
-		j = 0x61; // 'a'
-	    } else if (j == 0x7a) { // a-z
-		j = 0x41; // 'A'
-	    }
-	}
-	rrmiiI1.sendBytes(bigBytes);
+        // --------------------------------------------------
 
-	// --------------------------------------------------
+        // --------------------------------------------------
 
-	// --------------------------------------------------
-
-	// Direct marshaling works, but not through Any.
-	recursiveType rType = 
-	    new recursiveType("a","b", new recursiveType[0]); 
-	rsendRecursiveType.sendAsType(rType);
-	Any rTypeAny = orb.create_any(); 
-	recursiveTypeHelper.insert(rTypeAny, rType); 
-	// Getting exception when marshaling Any.
-	//***** rsendRecursiveType.sendAsAny(rTypeAny);
-
-
-	// This used to throw a class cast exception.
-	DynAnyFactory dynAnyFactory =
-	    DynAnyFactoryHelper.narrow(
-	        orb.resolve_initial_references("DynAnyFactory"));
-	DynAny dynAny = dynAnyFactory.create_dyn_any(orb.create_any());
-	try {
-	    orb.object_to_string(dynAny);
-	    U.sopShouldNotSeeThis("object_to_string did not throw exception");
-	} catch (MARSHAL t) {
-	    // Expected.
-	    U.sop(t);
-	} catch (Throwable t) {
-	    U.sopShouldNotSeeThis("object_to_string threw wrong exception: "
-				  + t);
-	}
-	/* REVISIT
-	  This does not find object_to_string (NoSuchMethodException).
-	U.expect(ea, U.exception, new MARSHAL(),
-		 orb, C.object_to_string, dynAny);
-	*/
-
-	// --------------------------------------------------
-	// disconnect then do non_existent.
-	// This caused null pointer at one time.
-
-	ridlControllerStatic.action(C.disconnectRidlStaticServant);
-	U.sop(ridlStaticForDisconnect._non_existent());
-	U.expect(ea, U.result, Boolean.valueOf(true),
-		 ridlStaticForDisconnect, C._non_existent);
-
-	try {
-	    ridlStaticForDisconnect.syncOK(C.idlStaticForDisconnect);
-	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new OBJECT_NOT_EXIST(),
-		 ridlStaticForDisconnect, C.syncOK, C.idlStaticForDisconnect);
-
-	// --------------------------------------------------
-	// Similar to above disconnect case, but poa-based.
-	// This caused null pointer at one time.
-	// Then later it was changed to throw an adapter exception
-	// since the default servant is not set.
-
-	try {
-	    ridlNonExistentDefaultServant._non_existent();
-	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new OBJ_ADAPTER(),
-		 ridlNonExistentDefaultServant, C._non_existent);
-
-	// --------------------------------------------------
-	// Kill server then step through following lines
-	// to observe bad connection caching.
-
-	try { ridlStaticPOA.syncOK(C.idlStaticPOA); } catch (Throwable t) {}
-	try { ridlStaticPOA.syncOK(C.idlStaticPOA); } catch (Throwable t) {}
-	try { ridlStaticPOA.syncOK(C.idlStaticPOA); } catch (Throwable t) {}
-	try { ridlStaticPOA.syncOK(C.idlStaticPOA); } catch (Throwable t) {}
+        // Direct marshaling works, but not through Any.
+        recursiveType rType = 
+            new recursiveType("a","b", new recursiveType[0]); 
+        rsendRecursiveType.sendAsType(rType);
+        Any rTypeAny = orb.create_any(); 
+        recursiveTypeHelper.insert(rTypeAny, rType); 
+        // Getting exception when marshaling Any.
+        //***** rsendRecursiveType.sendAsAny(rTypeAny);
 
 
-	// --------------------------------------------------
-	// XXX replace this with a test that does not use the old POA hooks.
-	// Cause a runtime exception to happen and be handled
-	// by PI in stub's _releaseReply
-	// KMC: I have removed this test since I have removed the
-	//      old inheritance-based interceptor facility.
-	//MyPOAORB.throwRuntimeExceptionInSendingRequestServiceContexts = true;
-	//try {
-	    //ridlStaticPOA.syncOK(C.idlStaticPOA);
-	//} catch (Throwable t) {}
-	//U.expect(ea, U.exception, new RuntimeException(),
-		 //ridlStaticPOA, C.syncOK,
-		 //C.idlStaticPOA);
-	//MyPOAORB.throwRuntimeExceptionInSendingRequestServiceContexts = false;
+        // This used to throw a class cast exception.
+        DynAnyFactory dynAnyFactory =
+            DynAnyFactoryHelper.narrow(
+                orb.resolve_initial_references("DynAnyFactory"));
+        DynAny dynAny = dynAnyFactory.create_dyn_any(orb.create_any());
+        try {
+            orb.object_to_string(dynAny);
+            U.sopShouldNotSeeThis("object_to_string did not throw exception");
+        } catch (MARSHAL t) {
+            // Expected.
+            U.sop(t);
+        } catch (Throwable t) {
+            U.sopShouldNotSeeThis("object_to_string threw wrong exception: "
+                                  + t);
+        }
+        /* REVISIT
+          This does not find object_to_string (NoSuchMethodException).
+        U.expect(U.exception, new MARSHAL(),
+                 orb, C.object_to_string, dynAny);
+        */
+
+        // --------------------------------------------------
+        // disconnect then do non_existent.
+        // This caused null pointer at one time.
+
+        ridlControllerStatic.action(C.disconnectRidlStaticServant);
+        U.sop(ridlStaticForDisconnect._non_existent());
+        U.expect(U.result, Boolean.valueOf(true),
+                 ridlStaticForDisconnect, C._non_existent);
+
+        try {
+            ridlStaticForDisconnect.syncOK(C.idlStaticForDisconnect);
+        } catch (Throwable t) {}
+        U.expect(U.exception, new OBJECT_NOT_EXIST(),
+                 ridlStaticForDisconnect, C.syncOK, C.idlStaticForDisconnect);
+
+        // --------------------------------------------------
+        // Similar to above disconnect case, but poa-based.
+        // This caused null pointer at one time.
+        // Then later it was changed to throw an adapter exception
+        // since the default servant is not set.
+
+        try {
+            ridlNonExistentDefaultServant._non_existent();
+        } catch (Throwable t) {}
+        U.expect(U.exception, new OBJ_ADAPTER(),
+                 ridlNonExistentDefaultServant, C._non_existent);
+
+        // --------------------------------------------------
+        // Kill server then step through following lines
+        // to observe bad connection caching.
+
+        try { ridlStaticPOA.syncOK(C.idlStaticPOA); } catch (Throwable t) {}
+        try { ridlStaticPOA.syncOK(C.idlStaticPOA); } catch (Throwable t) {}
+        try { ridlStaticPOA.syncOK(C.idlStaticPOA); } catch (Throwable t) {}
+        try { ridlStaticPOA.syncOK(C.idlStaticPOA); } catch (Throwable t) {}
 
 
-	// --------------------------------------------------
-	// On server side, _is_a can be any arbitrary user code.
-	// Therefore, client interceptors, if present, should execute
-	// to make sure proper transactions and security.
+        // --------------------------------------------------
+        // XXX replace this with a test that does not use the old POA hooks.
+        // Cause a runtime exception to happen and be handled
+        // by PI in stub's _releaseReply
+        // KMC: I have removed this test since I have removed the
+        //      old inheritance-based interceptor facility.
+        //MyPOAORB.throwRuntimeExceptionInSendingRequestServiceContexts = true;
+        //try {
+            //ridlStaticPOA.syncOK(C.idlStaticPOA);
+        //} catch (Throwable t) {}
+        //U.expect(U.exception, new RuntimeException(),
+                 //ridlStaticPOA, C.syncOK,
+                 //C.idlStaticPOA);
+        //MyPOAORB.throwRuntimeExceptionInSendingRequestServiceContexts = false;
 
-	ridlDynamicPOA._is_a("foo");
+
+        // --------------------------------------------------
+        // On server side, _is_a can be any arbitrary user code.
+        // Therefore, client interceptors, if present, should execute
+        // to make sure proper transactions and security.
+
+        ridlDynamicPOA._is_a("foo");
 
 
-	// --------------------------------------------------
-	// Uses the ORBSingleton's internal ORB to handle
-	// embedded object references.
+        // --------------------------------------------------
+        // Uses the ORBSingleton's internal ORB to handle
+        // embedded object references.
 
-	CodecFactory codecFactory =
-	    CodecFactoryHelper.narrow(
+        CodecFactory codecFactory =
+            CodecFactoryHelper.narrow(
                 orb.resolve_initial_references("CodecFactory"));
-	Encoding encoding = new Encoding((short)0, (byte)1, (byte)2);
-	Codec codec = codecFactory.create_codec(encoding);
-	ORB orbSingleton = ORB.init();
-	Any any = orbSingleton.create_any();
-	ForwardRequest fr =  
-	    new ForwardRequest(orb.resolve_initial_references("NameService"));
-	ForwardRequestHelper.insert(any, fr);
-	byte[] encoded = codec.encode(any);
-	any = codec.decode(encoded);
-	fr = ForwardRequestHelper.extract(any);
-	NamingContext nc = NamingContextHelper.narrow(fr.forward);
-	U.sop(nc.resolve(U.makeNameComponent(C.idlStaticPOA)));
+        Encoding encoding = new Encoding((short)0, (byte)1, (byte)2);
+        Codec codec = codecFactory.create_codec(encoding);
+        ORB orbSingleton = ORB.init();
+        Any any = orbSingleton.create_any();
+        ForwardRequest fr =  
+            new ForwardRequest(orb.resolve_initial_references("NameService"));
+        ForwardRequestHelper.insert(any, fr);
+        byte[] encoded = codec.encode(any);
+        any = codec.decode(encoded);
+        fr = ForwardRequestHelper.extract(any);
+        NamingContext nc = NamingContextHelper.narrow(fr.forward);
+        U.sop(nc.resolve(U.makeNameComponent(C.idlStaticPOA)));
 
-	// --------------------------------------------------
+        // --------------------------------------------------
 
-	for (int i = 0; i < 3; ++i) {
-	    // This caused a client hang at one time in the rmi-iiop/poa cases
-	    // only.
-	    try { 
-		// debugOn( "rrmiiSA.returnObjectFromServer" ) ;
-		rrmiiSA.returnObjectFromServer(false); 
-		// debugOff() ;
-		// Workaround for expect not working.
-		System.exit(-1);
-	    } catch (Throwable t) {
-		U.sop(t); 
-		// Workaround for expect not working.
-		checkRmiMarshalException(
+        for (int i = 0; i < 3; ++i) {
+            // This caused a client hang at one time in the rmi-iiop/poa cases only.
+            try { 
+                // debugOn( "rrmiiSA.returnObjectFromServer" ) ;
+                rrmiiSA.returnObjectFromServer(false); 
+                // debugOff() ;
+                // Workaround for expect not working.
+                System.exit(-1);
+            } catch (Throwable t) {
+                U.sop(t); 
+                // Workaround for expect not working.
+                checkRmiMarshalException(
                     new NotSerializableException(),
-		    // This happens when server side is fragmenting.
-		    // The server just ends the fragment so the client
-		    // side orb raises this exception.
-		    new MARSHAL(ORBUtilSystemException.END_OF_STREAM,
-				CompletionStatus.COMPLETED_NO),
-		    t);
-	    }
-	    /*
-	    REVISIT - says no such method.
-	    U.expect(ea, U.exception, new BAD_PARAM(),
-	             rrmiiSA, C.returnObjectFromServer, Boolean.valueOf(false));
-	    */
+                    // This happens when server side is fragmenting.
+                    // The server just ends the fragment so the client
+                    // side orb raises this exception.
+                    new MARSHAL(ORBUtilSystemException.END_OF_STREAM,
+                                CompletionStatus.COMPLETED_NO), t);
+            }
 
-	    // This caused server threads to wait forever for input when
-	    // streaming.
-	    try {
-		rrmiiSA.sendOneObject(new NonSerializableObject()); 
-		System.exit(-1);
-	    } catch (Throwable t) {
-		U.sop(t); 
-		checkRmiMarshalException(new NotSerializableException(),
-					 null,
-					 t);
-	    }
-	    try { 
-		rrmiiSA.sendTwoObjects(new SerializableObject(),
-				       new NonSerializableObject()); 
-		System.exit(-1);
-	    }
-	    catch (Throwable t) { 
-		U.sop(t); 
-		checkRmiMarshalException(new NotSerializableException(),
-					 null,
-					 t);
-	    }
-	}
+            /*
+            REVISIT - says no such method.
+            U.expect(U.exception, new BAD_PARAM(),
+                     rrmiiSA, C.returnObjectFromServer, Boolean.valueOf(false));
+            */
+
+            // This caused server threads to wait forever for input when streaming.
+            try {
+                rrmiiSA.sendOneObject(new NonSerializableObject()); 
+                System.exit(-1);
+            } catch (Throwable t) {
+                U.sop(t); 
+                checkRmiMarshalException(new NotSerializableException(),
+                                         null,
+                                         t);
+            }
+
+            try { 
+                rrmiiSA.sendTwoObjects(new SerializableObject(),
+                                       new NonSerializableObject()); 
+                System.exit(-1);
+            } catch (Throwable t) { 
+                U.sop(t); 
+                checkRmiMarshalException(new NotSerializableException(), 
+                    null, t);
+            }
+        }
     }
 
     //
@@ -620,7 +619,7 @@ public class Client
 	try {
 	    ridlStaticPOA.raiseSystemExceptionInSendReply();
 	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new IMP_LIMIT(),
+	U.expect(U.exception, new IMP_LIMIT(),
 		 ridlStaticPOA, C.raiseSystemExceptionInSendReply);
 
 	//
@@ -636,7 +635,7 @@ public class Client
 	any.insert_long(0);
 	piCurrent.set_slot(SsPicInterceptor.sPic1BSlotId, any);
 	// debugOn( "null,ridlSLI1" ) ;
-	U.expect(ea, U.result, null, // REVISIT: really expecting Void.TYPE
+	U.expect(U.result, null, // REVISIT: really expecting Void.TYPE
 		 ridlSLI1, C.sPic1);
 	// debugOff() ;
 	// The server's sets to these same slot ids should not
@@ -665,14 +664,14 @@ public class Client
 	
 	
 	U.sop(rrmiiSA.sayHello());
-	U.expect(ea, U.result, C.helloWorld,
+	U.expect(U.result, C.helloWorld,
 		 rrmiiSA, C.sayHello);
 	
 
 
 
 	U.sop(ridlSAI1.raiseForwardRequestInIncarnate(C.raiseForwardRequestInIncarnate));
-	U.expect(ea, U.result, C.raiseForwardRequestInIncarnate,
+	U.expect(U.result, C.raiseForwardRequestInIncarnate,
 		 ridlSAI1, C.raiseForwardRequestInIncarnate,
 		 C.raiseForwardRequestInIncarnate);
 
@@ -682,7 +681,7 @@ public class Client
 	    ridlSAIRaiseObjectNotExistInIncarnate
 		.raiseObjectNotExistInIncarnate("");
 	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new OBJECT_NOT_EXIST(),
+	U.expect(U.exception, new OBJECT_NOT_EXIST(),
 		 ridlSAIRaiseObjectNotExistInIncarnate,
 		 C.raiseObjectNotExistInIncarnate,
 		 "");
@@ -692,7 +691,7 @@ public class Client
 	    ridlSAIRaiseSystemExceptionInIncarnate
 		.raiseSystemExceptionInIncarnate("");
 	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new IMP_LIMIT(),
+	U.expect(U.exception, new IMP_LIMIT(),
 		 ridlSAIRaiseSystemExceptionInIncarnate,
 		 C.raiseSystemExceptionInIncarnate,
 		 "");
@@ -700,7 +699,7 @@ public class Client
 
 	U.sop(rrmiiSA.makeColocatedCallFromServant());
 	// debugOn( "rmiiColocatedCallResult,makeColocatedCallFromServant" ) ;
-	U.expect(ea, U.result, C.rmiiColocatedCallResult,
+	U.expect(U.result, C.rmiiColocatedCallResult,
 		 rrmiiSA, C.makeColocatedCallFromServant);
 	// debugOff() ;
 
@@ -711,7 +710,7 @@ public class Client
 	U.sop(ridlSAI2.makeColocatedCallFromServant());
 	// debugOff() ;
 	// debugOn( "idlSaIlColcatedCallResut,makeColocatedCallFromServant" ) ;
-	U.expect(ea, U.result, C.idlSAI1ColocatedCallResult,
+	U.expect(U.result, C.idlSAI1ColocatedCallResult,
 		 ridlSAI2,
 		 C.makeColocatedCallFromServant);
 	// debugOff() ;
@@ -728,13 +727,13 @@ public class Client
 	HEADER(C.ServantLocator);
 	
 	U.sop(rrmiiSL.sayHello());
-	U.expect(ea, U.result, C.helloWorld,
+	U.expect(U.result, C.helloWorld,
 		 rrmiiSL, C.sayHello);
 
 
 
 	U.sop(ridlSLI1.raiseForwardRequestInPreinvoke(C.raiseForwardRequestInPreinvoke));
-	U.expect(ea, U.result, C.raiseForwardRequestInPreinvoke,
+	U.expect(U.result, C.raiseForwardRequestInPreinvoke,
 		 ridlSLI1, C.raiseForwardRequestInPreinvoke,
 		 C.raiseForwardRequestInPreinvoke);
 
@@ -742,7 +741,7 @@ public class Client
 	try {
 	    ridlSLI1.raiseObjectNotExistInPreinvoke("");
 	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new OBJECT_NOT_EXIST(),
+	U.expect(U.exception, new OBJECT_NOT_EXIST(),
 		 ridlSLI1, C.raiseObjectNotExistInPreinvoke, "");
 
 
@@ -750,7 +749,7 @@ public class Client
 	try {
 	    ridlSLI1.raiseSystemExceptionInPreinvoke("");
 	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new IMP_LIMIT(),
+	U.expect(U.exception, new IMP_LIMIT(),
 		 ridlSLI1, C.raiseSystemExceptionInPreinvoke, "");
 
 
@@ -758,7 +757,7 @@ public class Client
 	    ridlSLI1.raiseSystemExceptionInPostinvoke(
                 C.raiseSystemExceptionInPostinvoke);
 	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new IMP_LIMIT(),
+	U.expect(U.exception, new IMP_LIMIT(),
 		 ridlSLI1, C.raiseSystemExceptionInPostinvoke,
 		 C.raiseSystemExceptionInPostinvoke);
 
@@ -767,7 +766,7 @@ public class Client
 	try {
 	    ridlSLI1.raiseSystemInServantThenPOThenSE();
 	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new PERSIST_STORE(),
+	U.expect(U.exception, new PERSIST_STORE(),
 		 ridlSLI1, C.raiseSystemInServantThenPOThenSE);
 
 
@@ -775,7 +774,7 @@ public class Client
 	try {
 	    ridlSLI1.raiseUserInServantThenSystemInPOThenSE();
 	} catch (Throwable t) {}
-	U.expect(ea, U.exception, new PERSIST_STORE(),
+	U.expect(U.exception, new PERSIST_STORE(),
 		 ridlSLI1, C.raiseUserInServantThenSystemInPOThenSE);
 
 
@@ -784,14 +783,14 @@ public class Client
 	// debugOn( "rrmiiSL.makeColocatedCallFromServant" ) ;
 	U.sop(rrmiiSL.makeColocatedCallFromServant());
 	// debugOff() ;
-	U.expect(ea, U.result, C.rmiiColocatedCallResult,
+	U.expect(U.result, C.rmiiColocatedCallResult,
 		 rrmiiSL, C.makeColocatedCallFromServant);
 
 
 
 
 	U.sop(ridlSLI1.makeColocatedCallFromServant());
-	U.expect(ea, U.result, C.idlSLI1ColocatedResult,
+	U.expect(U.result, C.idlSLI1ColocatedResult,
 		 ridlSLI1, C.makeColocatedCallFromServant);
     }
 
@@ -806,17 +805,17 @@ public class Client
 	HEADER("RMI-IIOP");
 
 	U.sop(rrmiiI1.sayHello());
-	U.expect(ea, U.result, C.helloWorld,
+	U.expect(U.result, C.helloWorld,
 		 rrmiiI1, C.sayHello);
 
 	U.sop(rrmiiI2.sayHello());
-	U.expect(ea, U.result, C.helloWorld,
+	U.expect(U.result, C.helloWorld,
 		 rrmiiI2, C.sayHello);
 	
 
 	byte[] bytes = new byte[100];
 	U.sop(Integer.valueOf(rrmiiI1.sendBytes(bytes)));
-	U.expect(ea, U.result, Integer.valueOf(100),
+	U.expect(U.result, Integer.valueOf(100),
 		 rrmiiI1, C.sendBytes, bytes);
 
 	U.sop(rrmiiI1.sendOneObject(new java.util.Hashtable()));
@@ -824,7 +823,7 @@ public class Client
 	// REVISIT:
 	// Reflection code in U cannot find the method when given Hashtable.
 	Object object = new Object();
-	U.expect(ea, U.result, object,
+	U.expect(U.result, object,
 		 rrmiiI1, C.sendOneObject, object);
 	*/
 
@@ -849,7 +848,7 @@ public class Client
 
 	U.sop(ridlStaticPOA.syncOK(C.idlStaticPOA));
 	U.sop(doDynInvOfSyncOK(ridlStaticPOA, U.DII(C.idlStaticPOA)));
-	U.expect(ea, U.result, idlPOAServant.baseMsg + " " + C.idlStaticPOA,
+	U.expect(U.result, idlPOAServant.baseMsg + " " + C.idlStaticPOA,
 		 ridlStaticPOA, C.syncOK, C.idlStaticPOA);
 	// REVISIT - test DII
 	// REVISIT - add static method invocation to U.expect.
@@ -858,7 +857,7 @@ public class Client
 
 	U.sop(ridlDynamicPOA.syncOK(C.idlDynamicPOA));
 	U.sop(doDynInvOfSyncOK(ridlDynamicPOA, U.DII(C.idlDynamicPOA)));
-	U.expect(ea, U.result, U.DSI(C.idlDynamicPOA),
+	U.expect(U.result, U.DSI(C.idlDynamicPOA),
 		 ridlDynamicPOA, C.syncOK, C.idlDynamicPOA);
 	// REVISIT - test DII
 
@@ -866,28 +865,28 @@ public class Client
 
 	U.sop(ridlStatic.syncOK(C.idlStatic));
 	U.sop(doDynInvOfSyncOK(ridlStatic, U.DII(C.idlStatic)));
-	U.expect(ea, U.result, idlStaticServant.baseMsg + " " + C.idlStatic,
+	U.expect(U.result, idlStaticServant.baseMsg + " " + C.idlStatic,
 		 ridlStatic, C.syncOK, C.idlStatic);
 	// REVISIT - test DII
 
 	
 
 	U.sop(ridlStaticTie.syncOK(C.idlStaticTie));
-	U.expect(ea, U.result, idlStaticServant.baseMsg + " " + C.idlStaticTie,
+	U.expect(U.result, idlStaticServant.baseMsg + " " + C.idlStaticTie,
 		 ridlStaticTie, C.syncOK, C.idlStaticTie);
 	
 
 
 	U.sop(ridlDynamic.syncOK(C.idlDynamic));
 	U.sop(doDynInvOfSyncOK(ridlDynamic, U.DII(C.idlDynamic)));
-	U.expect(ea, U.result, U.DSI(C.idlDynamic),
+	U.expect(U.result, U.DSI(C.idlDynamic),
 		 ridlDynamic, C.syncOK, C.idlDynamic);
 	// REVISIT - test DII
 
 	
 
 	U.sop(ridlStaticStringified.syncOK(C.idlStaticStringified));
-	U.expect(ea, U.result, 
+	U.expect(U.result, 
 		 idlStaticServant.baseMsg + " " + C.idlStaticStringified,
 		 ridlStaticStringified, C.syncOK, C.idlStaticStringified);
 
@@ -922,17 +921,17 @@ public class Client
 
 	U.sop( StubAdapter.isLocal(ridlStaticPOA) ) ;
 	StubWrapper sw = new StubWrapper( ridlStaticPOA ) ;
-	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
+	U.expect(U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 
 	U.sop( StubAdapter.isLocal(ridlStatic) ) ;
 	sw = new StubWrapper( ridlStatic ) ;
-	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
+	U.expect(U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 
 	U.sop( StubAdapter.isLocal(rrmiiI1) ) ;
 	sw = new StubWrapper( (org.omg.CORBA.Object)rrmiiI1 ) ;
-	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
+	U.expect(U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 	//if (StubAdapter.isLocal((Stub)rrmiiI1) != false) {
 	    //throw new Exception("should be false");
@@ -940,7 +939,7 @@ public class Client
 
 	U.sop( StubAdapter.isLocal(rrmiiSA) ) ;
 	sw = new StubWrapper( (org.omg.CORBA.Object)rrmiiSA ) ;
-	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
+	U.expect(U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 	//if (StubAdapter.isLocal((Stub)rrmiiSA) != false) {
 	    //throw new Exception("should be false");
@@ -948,7 +947,7 @@ public class Client
 
 	U.sop( StubAdapter.isLocal(rrmiiSL) ) ;
 	sw = new StubWrapper( (org.omg.CORBA.Object)rrmiiSL ) ;
-	U.expect(ea, U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
+	U.expect(U.result, Boolean.valueOf(allowLocalOptimization && isColocated),
 		 sw, "isLocal" ) ;
 	//if (StubAdapter.isLocal((Stub)rrmiiSL) != false) {
 	    //throw new Exception("should be false");
@@ -994,18 +993,18 @@ public class Client
 	refreshIdlAlwaysForward();
 	U.sop(ridlAlwaysForward._is_a(C.idlAlwaysForward));
 
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlStaticPOA, C._is_a, C.idlDynamic);
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlDynamicPOA, C._is_a, C.idlDynamicPOA);
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlStatic, C._is_a, C.idlStatic);
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlStaticTie, C._is_a, C.idlStaticTie);
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlDynamic, C._is_a, C.idlDynamic);
 	refreshIdlAlwaysForward();
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlAlwaysForward, C._is_a, C.idlAlwaysForward);
     }
 
@@ -1027,18 +1026,18 @@ public class Client
 	refreshIdlAlwaysForward();
 	U.sop(ridlAlwaysForward._non_existent());
 
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlStaticPOA, C._non_existent);
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlDynamicPOA, C._non_existent);
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlStatic, C._non_existent);
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlStaticTie, C._non_existent);
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlDynamic, C._non_existent);
 	refreshIdlAlwaysForward();
-	U.expect(ea, U.result, Boolean.valueOf(false),
+	U.expect(U.result, Boolean.valueOf(false),
 		 ridlAlwaysForward, C._non_existent);
     }
 
@@ -1058,27 +1057,27 @@ public class Client
 	    
 	    data = new String(C.idlStaticPOA + " " + (i+1)).getBytes(C.UTF8);
 	    ridlStaticPOA.asyncOK(data);
-	    U.expect(ea, U.result, null,
+	    U.expect(U.result, null,
 		     ridlStaticPOA, C.asyncOK, data);
 	    
 	    data = new String(C.idlDynamicPOA + " " + (i+1)).getBytes(C.UTF8);
 	    ridlDynamicPOA.asyncOK(data);
-	    U.expect(ea, U.result, null,
+	    U.expect(U.result, null,
 		     ridlDynamicPOA, C.asyncOK, data);
 	    
 	    data = new String(C.idlStatic + " " + (i+1)).getBytes(C.UTF8);
 	    ridlStatic.asyncOK(data);
-	    U.expect(ea, U.result, null,
+	    U.expect(U.result, null,
 		     ridlStatic, C.asyncOK, data);
 	    
 	    data = new String(C.idlStaticTie + " " + (i+1)).getBytes(C.UTF8);
 	    ridlStaticTie.asyncOK(data);
-	    U.expect(ea, U.result, null,
+	    U.expect(U.result, null,
 		     ridlStaticTie, C.asyncOK, data);
 	    
 	    data = new String(C.idlDynamic + " " + (i+1)).getBytes(C.UTF8);
 	    ridlDynamic.asyncOK(data);
-	    U.expect(ea, U.result, null,
+	    U.expect(U.result, null,
 		     ridlDynamic, C.asyncOK, data);
 	}
     }
@@ -1297,7 +1296,7 @@ public class Client
 	} catch (Exception e) {
 	    U.sopOK(msg + " " + e);
 	}
-	U.expect(ea, U.exception, new NO_IMPLEMENT(),
+	U.expect(U.exception, new NO_IMPLEMENT(),
 		 ref, C._get_interface_def);
     }
 
@@ -1332,7 +1331,7 @@ public class Client
 	    switch (kind) {
 	    case USER :
 
-		U.expect(ea, U.exception, new idlExampleException(),
+		U.expect(U.exception, new idlExampleException(),
 			 ref, C.throwUserException);
 
 		msg = msg + "." + C.throwUserException + " - ";
@@ -1341,7 +1340,7 @@ public class Client
 
 	    case SYSTEM :
 
-		U.expect(ea, U.exception, new IMP_LIMIT(),
+		U.expect(U.exception, new IMP_LIMIT(),
 			 ref, C.throwSystemException);
 
 		msg = msg + "." + C.throwSystemException + " - ";
@@ -1353,7 +1352,7 @@ public class Client
 		/* REVISIT - need to better understand how 
 		   UnknownException is used.
 
-		U.expect(ea, U.exception,
+		U.expect(U.exception,
 			 new UnknownException(new Throwable()),
 			 ref, C.throwUnknownException);
 		*/
@@ -1367,7 +1366,7 @@ public class Client
 		/* REVISIT - need to better understand how 
 		   UNKNOWN is used.
 
-		U.expect(ea, U.exception, new UNKNOWN(),
+		U.expect(U.exception, new UNKNOWN(),
 			 ref, C.throwUnknownException);
 		*/
 
@@ -1415,25 +1414,25 @@ public class Client
 	if (testExpect) {
 
 	    // _result, _result
-	    U.expect(ea, U.result,
+	    U.expect(U.result,
 		     "bad on purpose",
 		     rrmiiSA, C.sayHello);
 
 	    // _result _exception
-	    U.expect(ea, U.result,
+	    U.expect(U.result,
 		     "phony result",
 		     ridlSAIRaiseObjectNotExistInIncarnate,
 		     C.raiseObjectNotExistInIncarnate,
 		     "");
 
 	    // _exception _result
-	    U.expect(ea, U.exception,
+	    U.expect(U.exception,
 		     new OBJECT_NOT_EXIST(),
 		     ridlSAI1, C.raiseForwardRequestInIncarnate,
 		     C.raiseForwardRequestInIncarnate);
 
 	    // _exception _exception
-	    U.expect(ea, U.exception,
+	    U.expect(U.exception,
 		     new IMP_LIMIT(),
 		     ridlSAIRaiseObjectNotExistInIncarnate,
 		     C.raiseObjectNotExistInIncarnate,

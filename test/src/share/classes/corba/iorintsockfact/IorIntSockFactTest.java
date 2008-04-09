@@ -42,34 +42,31 @@ package corba.iorintsockfact;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
+import corba.framework.JUnitReportHelper ;
 
 /**
  * @author Harold Carr
  */
-public class IorIntSockFactTest
-    extends
-	CORBATest
-{
+public class IorIntSockFactTest extends CORBATest {
     public static final String thisPackage =
 	IorIntSockFactTest.class.getPackage().getName();
 
-    protected void doTest()
-	throws
-	    Throwable
-    {
-	Controller orbd   = createORBD();
-	orbd.start();
+    protected void doTest() throws Throwable {
+        JUnitReportHelper helper = getHelper() ;
 
-	Controller server = createServer(thisPackage + "." + "Server",
-					 "Server");
-	Controller client = createClient(thisPackage + "." + "Client",
-					 "Client");
-	server.start();
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
-	orbd.stop();
+        Controller orbd   = createORBD();
+        orbd.start();
+
+        Controller server = createServer(thisPackage + "." + "Server",
+                                         "Server");
+        Controller client = createClient(thisPackage + "." + "Client",
+                                         "Client");
+        server.start();
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
+        orbd.stop();
     }
 }
 

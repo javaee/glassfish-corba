@@ -42,6 +42,8 @@ import com.sun.corba.se.impl.orbutil.ORBConstants;
 
 public class FragmentTest extends CORBATest
 {
+    JUnitReportHelper helper = getHelper() ;
+
     protected void doTest() throws Throwable
     {
         Properties clientProps = Options.getClientProperties();
@@ -62,7 +64,7 @@ public class FragmentTest extends CORBATest
 
         //        orbd.start();
         server.start();
-        client.start();
+        client.start( helper );
 
         client.waitFor(2000000);
 

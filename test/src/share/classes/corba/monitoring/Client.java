@@ -51,8 +51,11 @@ import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
+import corba.framework.JUnitReportHelper ;
+
 public class Client 
 {
+    private JUnitReportHelper helper = new JUnitReportHelper( Client.class.getName() ) ;
     private PrintStream out ;
     private PrintStream err ;
     private ORB orb ;
@@ -94,7 +97,11 @@ public class Client
 	this.out = System.out ;
 	this.err = System.err ;
 
-	runTests() ;
+        try {
+            runTests() ;
+        } finally {
+            helper.done() ;
+        }
     }
 
 // *************************************************
@@ -104,6 +111,7 @@ public class Client
     private void error( String msg )
     {
 	RuntimeException exc = new RuntimeException( msg ) ;
+        helper.fail( exc ) ;
 	throw exc ;
     }
     
@@ -241,6 +249,7 @@ public class Client
      */
     private void testPopulateMonitoredObject( ) {
         System.out.println( "Starting TestPopulateMonitoredObject" );
+        helper.start( "TestPopulateMonitoredObject" ) ;
         MonitoredObject root = 
             orb.getMonitoringManager().getRootMonitoredObject( );
         MonitoredObjectFactory f = 
@@ -299,6 +308,7 @@ public class Client
                 "In The Monitored Object Hierarchy" );
         }
         System.out.println( "TestPopulateMonitoredObject: PASSED" );
+        helper.pass() ;
     }
 
     private static final String STRINGATTRIBUTE1_LEVEL1_NAME = 
@@ -351,6 +361,7 @@ public class Client
      */ 
     private void testPopulateMonitoredAttribute( ) {
         System.out.println( "Starting testPopulateMonitoredAttribute( )" );
+        helper.start( "testPopulateMonitoredAttribute" ) ;
         MonitoredObject level1MonitoredObject =
             orb.getMonitoringManager().getRootMonitoredObject().getChild(
                 CHILD_LEVEL1_NAME );
@@ -403,6 +414,7 @@ public class Client
 
         validatePopulatedMonitoredAttributes( );
         System.out.println("testPopulateMonitoredAttribute(): PASSED" );
+        helper.pass() ;
     }
 
 
@@ -412,6 +424,7 @@ public class Client
      */ 
     private void validatePopulatedMonitoredAttributes( ) {
         System.out.println("Starting validatePopulatedMonitoredAttributes()" );
+        helper.start( "validatePopulatedMonitoredAttributes" ) ;
         MonitoredObject level1MonitoredObject =
             orb.getMonitoringManager().getRootMonitoredObject().getChild(
                 CHILD_LEVEL1_NAME );
@@ -452,6 +465,8 @@ public class Client
             level2MonitoredObject.getAttribute(STATISTICATTRIBUTE1_LEVEL2_NAME),
             new String("").getClass(), STATISTICATTRIBUTE1_LEVEL2_DESCRIPTION,
             null );
+
+        helper.pass() ;
     }
 
 
@@ -461,6 +476,7 @@ public class Client
      */
     private void testClearState( ) {
         System.out.println("Starting testClearState()" ); 
+        helper.start( "testClearState" ) ;
         orb.getMonitoringManager().clearState( );
 
         System.out.println("Validating Level 1 Child1 clear State..." );
@@ -486,6 +502,7 @@ public class Client
 
         validateForClearedState( attributesIterator );
         System.out.println("Starting testClearState(): PASSED" ); 
+        helper.pass() ;
     }
 
     /**
@@ -506,6 +523,7 @@ public class Client
      */
     private void testStatisticsAccumulator( ) {
         System.out.println( "Starting testStatisticsAccumulator()" );
+        helper.start( "testStatisticsAccumulator" ) ;
         StatisticMonitoredAttribute  sma = (StatisticMonitoredAttribute)
             orb.getMonitoringManager().getRootMonitoredObject().getChild(
                 CHILD_LEVEL1_NAME ).getChild(
@@ -554,10 +572,12 @@ public class Client
         System.out.println( sa.getValue() );
         System.out.println( "**************************" );
         System.out.println( "testStatisticsAccumulator(): PASSED" );
+        helper.pass() ;
     }
 
     private void testRootName()
     {
+        helper.start( "testRootName" ) ;
 	// Make sure that the internal ORBSingleton full ORB has been
 	// created.
 	RequestDispatcherRegistry rdr = 
@@ -584,8 +604,8 @@ public class Client
 
 	    MonitoringManagerFactory mmf = 
 		MonitoringFactories.getMonitoringManagerFactory() ;
-	    
-
 	}
+
+        helper.pass() ;
     }
 }

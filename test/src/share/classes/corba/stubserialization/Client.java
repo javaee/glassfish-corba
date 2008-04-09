@@ -74,23 +74,14 @@ import javax.naming.Context;
 import javax.rmi.PortableRemoteObject;
 import javax.rmi.CORBA.Util;
 
-import junit.framework.AssertionFailedError ;
-import junit.framework.TestCase ;
-import junit.framework.Test ;
-import junit.framework.TestResult ;
-import junit.framework.TestSuite ;
-import junit.framework.TestListener ;
-import junit.extensions.RepeatedTest ;
-import junit.extensions.RepeatedTest ;
-import junit.textui.TestRunner ;
-
-import corba.framework.TestCaseTools ;
-
 import corba.framework.*;
 import java.util.*;
 import java.io.*;
 
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+
+import org.testng.Assert ;
+import org.testng.annotations.Test ;
 
 /**
  * This tests that Stub serialization and deserialization to and from the
@@ -107,70 +98,39 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 public class Client
 {
     private PrintStream out ;
-
     private PrintStream err ;
+    private NamingContextExt nctx = null;
+    private Hello hello = null;
+    private ORB orb;
 
-    private static NamingContextExt nctx = null;
- 
-    private static Hello hello = null;
+    private static String[] args;
 
-    private static ORB orb;
- 
     public static void main( String[] args ) 
     {
-        try {
-            orb = ORB.init( args, null );
-
-            org.omg.CORBA.Object objRef =
-                orb.resolve_initial_references("NameService");
-
-            NamingContext ncRef = NamingContextHelper.narrow(objRef);
-            NameComponent nc = new NameComponent(Constants.HELLO_SERVICE, "");
-            NameComponent[] path = {nc};
-                                                                                
-            hello = (Hello)PortableRemoteObject.narrow(ncRef.resolve(path),
-                                                       Hello.class);
-
-            new Client( System.getProperties(), args, System.out, 
-                System.err, null );
-
-	    orb.destroy() ;
-        } catch( Exception e ) {
-            System.err.println( e );
-            e.printStackTrace( );
-            System.exit( 1 );
-        } 
+        Client.args = args ;
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
     }
 
-
-    public Client (Properties environment,
-                    String args[],
-                    PrintStream out,
-                    PrintStream err,
-                    Hashtable extra) throws Exception
-    {
+    public Client() throws Exception {
 	this.out = System.out;
 	this.err = System.err;
 
-	// 1. Test normal invocation
-	testNormalInvocation( );
+        orb = ORB.init( args, null );
 
-	// 2. Test invocation on deserialized stub
-	serializeStub( Constants.SERIALIZED_STUB_FILE_NAME, hello );
-	deserializeStubandInvoke( Constants.SERIALIZED_STUB_FILE_NAME );
+        org.omg.CORBA.Object objRef =
+            orb.resolve_initial_references("NameService");
 
-	// 3. Create stub for object served by this client, 
-	//    serialize to a file, send file name to server,
-	//    have server deserialize stub and invoke on it,
-	//    and then return result here, which is checked.
-	//    Here the type serialized must be different than
-	//    Hello.
-	testRemoteSerializedInvocation() ; 
-
-	// Test for bug 4781934
-	// testAppReturnValue() ;
+        NamingContext ncRef = NamingContextHelper.narrow(objRef);
+        NameComponent nc = new NameComponent(Constants.HELLO_SERVICE, "");
+        NameComponent[] path = {nc};
+                                                                            
+        hello = (Hello)PortableRemoteObject.narrow(ncRef.resolve(path),
+                                                   Hello.class);
     }
 
+    @Test
     private void testRemoteSerializedInvocation()
     {
 	try {
@@ -192,6 +152,7 @@ public class Client
 	}
     }
 
+    @Test
     private void testNormalInvocation( ) {
        try {
            System.out.println( "Testing Normal Invocation Start : " );
@@ -216,6 +177,7 @@ public class Client
 	return file ;
     }
 
+    @Test
     private void serializeStub( String fname, Remote stub ) 
     {
 	FileOutputStream fos = null ;
@@ -247,6 +209,7 @@ public class Client
 	}
     }
 
+    @Test
     private void deserializeStubandInvoke( String fname ) 
     {
 	FileInputStream fis = null ;
@@ -290,6 +253,7 @@ public class Client
     }
 
     /*
+    @Test
     public void testAppReturnValue() 
     {
 	try {

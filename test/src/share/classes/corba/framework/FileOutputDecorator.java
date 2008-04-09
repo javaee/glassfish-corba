@@ -119,6 +119,11 @@ public class FileOutputDecorator implements Controller
         delegate.start();
     }
     
+    public void start( JUnitReportHelper helper ) throws Exception
+    {
+        delegate.start( helper );
+    }
+    
     public void stop()
     {
         try {

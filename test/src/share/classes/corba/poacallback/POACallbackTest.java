@@ -38,11 +38,14 @@ package corba.poacallback;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
+import corba.framework.JUnitReportHelper ;
 
 public class POACallbackTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
+        JUnitReportHelper helper = getHelper() ;
+
         Controller orbd = createORBD();
         Controller server = createServer("corba.poacallback.Server" );
         Controller client = createClient("corba.poacallback.Client" );
@@ -51,7 +54,7 @@ public class POACallbackTest extends CORBATest
 
         server.start();
 
-        client.start();
+        client.start( helper );
 
         client.waitFor( );
 

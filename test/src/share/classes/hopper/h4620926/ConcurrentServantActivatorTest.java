@@ -69,7 +69,7 @@ public class ConcurrentServantActivatorTest extends CORBATest
 	server.start() ;
 
         Controller client = createClient("hopper.h4620926.Client");
-        client.start();
+        client.start( getHelper() );
 
         // Wait for the client to finish for up to 2 minutes, then
         // throw an exception.

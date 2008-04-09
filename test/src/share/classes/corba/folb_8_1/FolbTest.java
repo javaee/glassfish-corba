@@ -42,6 +42,7 @@ package corba.folb_8_1;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
+import corba.framework.JUnitReportHelper ;
 
 /**
  * @author Harold Carr
@@ -57,138 +58,138 @@ public class FolbTest
 	throws
 	    Throwable
     {
-	Controller orbd;
-	Controller server;
-	Controller client;
+        JUnitReportHelper helper = getHelper() ;
 
-	////////////////////////////////////////////////////
+        Controller orbd;
+        Controller server;
+        Controller client;
 
-	orbd   = createORBD();
-	orbd.start();
+        ////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////
+        orbd   = createORBD();
+        orbd.start();
 
-	server = createServer(thisPackage + "." + "Server", "Server");
-	client = createClient(thisPackage + "." + "Client", "Client");
-	server.start();
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        ////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////
+        server = createServer(thisPackage + "." + "Server", "Server");
+        client = createClient(thisPackage + "." + "Client", "Client");
+        server.start();
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
 
-	server = createServer(thisPackage + "." + "Server",
-			      "ServerForSticky");
-	client = createClient(thisPackage + "." + "ClientWithSticky",
-			      "ClientWithSticky");
-	server.start();
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        ////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////
+        server = createServer(thisPackage + "." + "Server",
+                              "ServerForSticky");
+        client = createClient(thisPackage + "." + "ClientWithSticky",
+                              "ClientWithSticky");
+        server.start();
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
 
-	Controller colocated = createClient(thisPackage + "." + "ColocatedCS",
-					    "ColocatedCS");
-	colocated.start();
-	colocated.waitFor();
-	colocated.stop();
+        ////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////
+        Controller colocated = createClient(thisPackage + "." + "ColocatedCS",
+                                            "ColocatedCS");
+        colocated.start( helper );
+        colocated.waitFor();
+        colocated.stop();
 
-	colocated = createClient(thisPackage + "." + "ColocatedCSWithSticky",
-				 "ColocatedCSWithSticky");
-	colocated.start();
-	colocated.waitFor();
-	colocated.stop();
+        ////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////
+        colocated = createClient(thisPackage + "." + "ColocatedCSWithSticky",
+                                 "ColocatedCSWithSticky");
+        colocated.start( helper );
+        colocated.waitFor();
+        colocated.stop();
 
-	server = createServer(thisPackage + "." + "Server",
-			      "ServerForSticky");
-	client = createClient(thisPackage + "." + "ClientTwoRefs",
-			      "ClientTwoRefs");
-	server.start();
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        ////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////
+        server = createServer(thisPackage + "." + "Server",
+                              "ServerForSticky");
+        client = createClient(thisPackage + "." + "ClientTwoRefs",
+                              "ClientTwoRefs");
+        server.start();
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
 
-	colocated = createClient(thisPackage + "." + "ColocatedClientTwoRefs",
-				 "ColocatedClientTwoRefs");
-	colocated.start();
-	colocated.waitFor();
-	colocated.stop();
+        ////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////
+        colocated = createClient(thisPackage + "." + "ColocatedClientTwoRefs",
+                                 "ColocatedClientTwoRefs");
+        colocated.start( helper );
+        colocated.waitFor();
+        colocated.stop();
 
-	server = createServer(thisPackage + "." + "Server",
-			      "ServerForTiming");
-	server.start();
-	client = createClient(thisPackage + "." + "ClientForTiming_NoFs_NoF_NoC",
-			      "ClientForTiming_NoFs_NoF_NoC");
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        ////////////////////////////////////////////////////
 
-	//-------------------------
+        server = createServer(thisPackage + "." + "Server",
+                              "ServerForTiming");
+        server.start();
+        client = createClient(thisPackage + "." + "ClientForTiming_NoFs_NoF_NoC",
+                              "ClientForTiming_NoFs_NoF_NoC");
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
 
-	server = createServer(thisPackage + "." + "Server",
-			      "ServerForTiming");
-	server.start();
-	client = createClient(thisPackage + "." + "ClientForTiming_Fs_NoF_NoC",
-			      "ClientForTiming_Fs_NoF_NoC");
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        //-------------------------
 
-	//-------------------------
+        server = createServer(thisPackage + "." + "Server",
+                              "ServerForTiming");
+        server.start();
+        client = createClient(thisPackage + "." + "ClientForTiming_Fs_NoF_NoC",
+                              "ClientForTiming_Fs_NoF_NoC");
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
 
-	server = createServer(thisPackage + "." + "Server",
-			      "ServerForTiming");
-	server.start();
-	client = createClient(thisPackage + "." + "ClientForTiming_Fs_NoF_C",
-			      "ClientForTiming_Fs_NoF_C");
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        //-------------------------
 
-	//-------------------------
+        server = createServer(thisPackage + "." + "Server",
+                              "ServerForTiming");
+        server.start();
+        client = createClient(thisPackage + "." + "ClientForTiming_Fs_NoF_C",
+                              "ClientForTiming_Fs_NoF_C");
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
 
-	server = createServer(thisPackage + "." + "Server",
-			      "ServerForTiming");
-	server.start();
-	client = createClient(thisPackage + "." + "ClientForTiming_Fs_F_NoC",
-			      "ClientForTiming_Fs_F_NoC");
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        //-------------------------
 
-	//-------------------------
+        server = createServer(thisPackage + "." + "Server",
+                              "ServerForTiming");
+        server.start();
+        client = createClient(thisPackage + "." + "ClientForTiming_Fs_F_NoC",
+                              "ClientForTiming_Fs_F_NoC");
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
 
-	server = createServer(thisPackage + "." + "Server",
-			      "ServerForTiming");
-	server.start();
-	client = createClient(thisPackage + "." + "ClientForTiming_Fs_F_C",
-			      "ClientForTiming_Fs_F_C");
-	client.start();
-	client.waitFor();
-	client.stop();
-	server.stop();
+        //-------------------------
 
-	////////////////////////////////////////////////////
+        server = createServer(thisPackage + "." + "Server",
+                              "ServerForTiming");
+        server.start();
+        client = createClient(thisPackage + "." + "ClientForTiming_Fs_F_C",
+                              "ClientForTiming_Fs_F_C");
+        client.start( helper );
+        client.waitFor();
+        client.stop();
+        server.stop();
 
-	orbd.stop();
+        ////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////
+        orbd.stop();
     }
 }
 

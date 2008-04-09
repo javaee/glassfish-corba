@@ -258,7 +258,6 @@ public class Client {
      * and this test is invalid.  Note that it used to work
      * with the previous native implementation.
      */
-    @Test
     public void testStaticNestedInner()
         throws DataCorruptedException, RemoteException {
 

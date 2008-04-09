@@ -51,7 +51,7 @@ public class Test extends CORBATest
 
         Controller client = createClient("naming.cosnaming.naming_client");
         
-        client.start();
+        client.start( getHelper() );
 
         client.waitFor(60000);
 

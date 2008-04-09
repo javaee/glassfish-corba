@@ -404,7 +404,7 @@ public class Client
 
         org.omg.CORBA.Object obj = ncRef.resolve(path);
 
-        GraphProcessor processor = (GraphProcessor) PortableRemoteObject.narrow(obj, 
+        processor = (GraphProcessor) PortableRemoteObject.narrow(obj, 
             GraphProcessor.class);
     }
 

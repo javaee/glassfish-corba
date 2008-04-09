@@ -146,12 +146,12 @@ public class AdapterActivatorClient {
 			       "child of RootPoa, RootPoa is registered with AdapterActivator "+
 			       "implementation which creates Poa1 otherwise returns false");
 	    System.out.println(helloRef2.sayHello());
-            helper.pass() ;
+            helper.fail( "Unexpected success: should see OBJECT_NOT_EXIST exception" ) ;
 	} catch (org.omg.CORBA.OBJECT_NOT_EXIST ex) {
             status.addStatus(subTestName, RTMConstants.PASS, "Operation on "+
                              "HelloServant threw the expected OBJECT_NOT_EXIST"+
                              " exception");
-            helper.fail( ex ) ;
+            helper.pass() ;
 	} catch(Exception ex) {
             ex.printStackTrace();
             status.addStatus(subTestName, RTMConstants.FAIL,

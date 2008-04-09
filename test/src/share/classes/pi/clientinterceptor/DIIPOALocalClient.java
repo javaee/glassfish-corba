@@ -128,12 +128,15 @@ public class DIIPOALocalClient
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
+        try {
+            // Test ClientInterceptor
+            testClientInterceptor();
 
-	// Test ClientInterceptor
-	testClientInterceptor();
-
-	// Test POA Special operations
-	testSpecialOperations();
+            // Test POA Special operations
+            testSpecialOperations();
+        } finally { 
+            finish() ;
+        }
     }
 
     /**

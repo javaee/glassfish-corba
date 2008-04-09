@@ -155,7 +155,6 @@ public class Client
     public static idlControllerI ridlControllerStatic;
 
     public static boolean testExpect = false;
-    public static ErrorAccumulator ea;
     public static boolean allowLocalOptimization ;
 
     // debugOn/Off were added for debugging a ServiceContext scMap aliasing bug.
@@ -182,7 +181,6 @@ public class Client
         try {
             U.initialize( Client.class ) ;
 	    U.setDisplayErrorsWhenTheyHappen(true);
-	    ea = new ErrorAccumulator();
 
 	    if (ColocatedClientServer.isColocated) {
 		isColocated = true;
@@ -203,23 +201,17 @@ public class Client
 	    lookupReferences();
 
 	    runTests();
-
-	    ea.reportErrors(false, false);
-
-	    // HEADER("Test complete.");
-
-	    if (ea.getNumberOfErrors() > 0) {
-		// Signal corba.framework
-		System.exit(1);
-	    }
-
         } catch (Exception e) {
             U.sopUnexpectedException(main + " : ", e);
-	    System.exit(1);
         } finally {
             U.done() ;
         }
-	System.exit(Controller.SUCCESS);
+
+        if (U.hasError()) {
+            System.exit(1);
+        } else {
+            System.exit(Controller.SUCCESS);
+        }
     }
 
     public static void runTests()
@@ -1403,7 +1395,7 @@ public class Client
     public static void HEADER(java.lang.Object x)
     {
 	U.HEADER(x);
-	ridlHEADERI.HEADER((String)x);
+	// ridlHEADERI.HEADER((String)x);
     }
 
     public static void testExpect()

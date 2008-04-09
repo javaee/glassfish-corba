@@ -101,8 +101,12 @@ public class RMIClient
 	env.put( "java.naming.corba.orb", orb );
 	initialNamingContext = new InitialContext( env );
 
-	// Test ClientInterceptor
-	testClientRequestInfo();
+        try {
+            // Test ClientInterceptor
+            testClientRequestInfo();
+        } finally {
+            finish() ;
+        }
     }
 
     /**

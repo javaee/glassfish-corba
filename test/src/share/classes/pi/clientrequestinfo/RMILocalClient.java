@@ -141,9 +141,12 @@ public class RMILocalClient
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-
-	// Test ClientInterceptor
-	testClientRequestInfo();
+        try {
+            // Test ClientInterceptor
+            testClientRequestInfo();
+        } finally {
+            finish() ;
+        }
     }
 
     /**

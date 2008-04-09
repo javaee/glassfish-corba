@@ -95,7 +95,12 @@ public class U
     private static JUnitReportHelper helper = null ;
     private static ErrorAccumulator ea ;
     private static String testName ;
+    private static boolean hasError = false ;
     
+    public static boolean hasError() {
+        return hasError ;
+    }
+
     // KMC: initialize the helper and ErrorAccumulator
     public static void initialize( Class cls ) {
         helper = new JUnitReportHelper( cls.getName() ) ;
@@ -516,6 +521,7 @@ public class U
     {
 	sop(unexpectedException(msg, t));
 	t.printStackTrace(System.out);
+        hasError = true ;
     }
 
     public static String OK(String msg)
@@ -532,6 +538,7 @@ public class U
     {
 	sop(SHOULD_NOT_SEE_THIS);
         ea.add( SHOULD_NOT_SEE_THIS, new RuntimeException() ) ;
+        hasError = true ;
 	throw new RuntimeException(SHOULD_NOT_SEE_THIS);
     }
 
@@ -539,6 +546,7 @@ public class U
     {
 	sop(msg + " " + SHOULD_NOT_SEE_THIS);
         ea.add( msg, new RuntimeException( SHOULD_NOT_SEE_THIS ) ) ;
+        hasError = true ;
 	throw new RuntimeException(msg + " " + SHOULD_NOT_SEE_THIS);
     }
 
@@ -788,6 +796,7 @@ public class U
 				   Throwable t)
     {
 	ea.add(msg, t);
+        hasError = true ;
 
 	if (displayErrorsWhenTheyHappen) {
 	    reportError(printStackTrace, msg, t);
@@ -799,6 +808,7 @@ public class U
 				   Throwable t)
     {
         ea.add( msg, t ) ;
+        hasError = true ;
 
 	sop("--------------------------------------------------");
 	sop(msg);

@@ -155,13 +155,17 @@ public class TestngRunner {
 */
 
     private class JUnitReportTestListener implements ITestListener {
-        private final JUnitReportWriter writer ;
-        private JUnitReportWriter.TestDescription current ;
-        private String name ;
+        // private final JUnitReportWriter writer ;
+        // private JUnitReportWriter.TestDescription current ;
+        // private String name ;
+
+        private JUnitReportHelper helper ;
 
         JUnitReportTestListener( String name ) {
-            writer = new XMLJUnitReportWriter() ;
-            this.name = name ;
+            // writer = new XMLJUnitReportWriter() ;
+            // this.name = name ;
+
+            helper = new JUnitReportHelper( name ) ;
         }
 
         private void msg( String str ) {
@@ -171,61 +175,67 @@ public class TestngRunner {
         public void onStart( ITestContext context ) {
             // msg( "TestListener: onStart" ) ;
             // msg( "  context: name=" + context.getName() ) ;
-            try {
-                File dir = new File( outdirName ) ;
-                File file = new File( dir, name + ".xml" ) ;
-                OutputStream os = new FileOutputStream( file ) ;
-                writer.setOutput( os ) ;
-            } catch (IOException exc) {
-                throw new RuntimeException( exc ) ;
-            }
+            // try {
+                // File dir = new File( outdirName ) ;
+                // File file = new File( dir, name + ".xml" ) ;
+                // OutputStream os = new FileOutputStream( file ) ;
+                // writer.setOutput( os ) ;
+            // } catch (IOException exc) {
+                // throw new RuntimeException( exc ) ;
+            // }
 
-            Properties props = System.getProperties() ;
+            // Properties props = System.getProperties() ;
 
-            writer.startTestSuite( name, props ) ;
+            // writer.startTestSuite( name, props ) ;
         }
 
         public void onFinish( ITestContext context ) {
             // msg( "TestListener: onStart" ) ;
             // msg( "  context: name=" + context.getName() ) ;
-            writer.endTestSuite() ;
+            // writer.endTestSuite() ;
+            //
+            helper.done() ;
         }
 
         public void onTestStart( ITestResult result ) {
             // msg( "TestListener: onTestStart" ) ;
-            current= new JUnitReportWriter.TestDescription( 
-                result.getName(), result.getTestClass().getName() ) ;
-            writer.startTest( current ) ;
+            // current= new JUnitReportWriter.TestDescription( 
+                // result.getName(), result.getTestClass().getName() ) ;
+            // writer.startTest( current ) ;
+            helper.start( result.getName() ) ;
         }
 
         public void onTestSkipped( ITestResult result ) {
             // msg( "TestListener: onTestSkiiped" ) ;
-
-            writer.addError( current, new RuntimeException( "Test was skipped" ) ) ;
-
-            writer.endTest( current ) ;
+            // writer.addError( current, new RuntimeException( "Test was skipped" ) ) ;
+            // writer.endTest( current ) ;
+            helper.fail( "Test was skipped" ) ;
         }
 
         public void onTestFailure( ITestResult result ) {
             // msg( "TestListener: onTestFailure" ) ;
             Throwable err = result.getThrowable() ;
 
-            if (err instanceof AssertionError)
-                writer.addFailure( current, err ) ; 
-            else
-                writer.addError( current, err ) ; 
+            // if (err instanceof AssertionError)
+                // writer.addFailure( current, err ) ; 
+            // else
+                // writer.addError( current, err ) ; 
 
-            writer.endTest( current ) ;
+            // writer.endTest( current ) ;
+
+            helper.fail( err ) ;
         }
 
         public void onTestSuccess( ITestResult result ) {
             // msg( "TestListener: onTestSuccess" ) ;
-            writer.endTest( current ) ;
+            // writer.endTest( current ) ;
+            helper.pass() ;
         }
 
         public void onTestFailedButWithinSuccessPercentage( ITestResult result ) {
             // msg( "TestListener: onTestFailedButWithinSuccessPercentage" ) ;
-            writer.endTest( current ) ;
+            // writer.endTest( current ) ;
+            helper.pass() ;
         }
     }
 

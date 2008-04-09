@@ -88,8 +88,12 @@ public class POAClient
         out.println( "+ Creating ORB..." );
 	createORB( args );
 
-	// Test ClientInterceptor
-	testClientRequestInfo();
+        try {
+            // Test ClientInterceptor
+            testClientRequestInfo();
+        } finally {
+            finish() ;
+        }
     }
 
     /**

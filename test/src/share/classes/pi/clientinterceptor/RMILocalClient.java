@@ -141,9 +141,12 @@ public class RMILocalClient
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-
-	// Test ClientInterceptor
-	testClientInterceptor();
+        try {
+            // Test ClientInterceptor
+            testClientInterceptor();
+        } finally {
+            finish() ;
+        }
     }
 
     /**
@@ -245,7 +248,7 @@ public class RMILocalClient
     /**
      * Overridden from ClientCommon.  Oneway calls are not supported.
      */
-    protected void testInvocation( int mode,
+    protected void testInvocation( String name, int mode,
                                    String correctOrder,
                                    String methodName,
                                    boolean shouldInvokeTarget,
@@ -254,7 +257,7 @@ public class RMILocalClient
         throws Exception
     {
         if( !methodName.equals( "sayOneway" ) ) {
-            super.testInvocation( mode, correctOrder, methodName,
+            super.testInvocation( name, mode, correctOrder, methodName,
                                   shouldInvokeTarget,
                                   exceptionExpected,
                                   forwardExpected );

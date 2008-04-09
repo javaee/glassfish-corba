@@ -95,6 +95,8 @@ import com.sun.corba.se.impl.orbutil.jmx.AnnotationUtil ;
 
 import static java.util.Arrays.asList ;
 
+import corba.framework.TestngRunner ;
+
 public class Client {
     //==============================================================================================
     // Tests for Algorithms class
@@ -683,15 +685,9 @@ public class Client {
     }
 
     public static void main( String[] args ) {
-	TestNG tng = new TestNG() ;
-	tng.setOutputDirectory( "gen/corba/jmx/test-output" ) ;
-
-	Class[] tngClasses = new Class[] { Client.class } ;
-
-	tng.setTestClasses( tngClasses ) ;
-
-	tng.run() ;
-
-	System.exit( tng.hasFailure() ? 1 : 0 ) ;
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
+        runner.systemExit() ;
     }
 }

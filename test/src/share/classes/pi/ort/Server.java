@@ -63,12 +63,13 @@ public class Server
     private PrintStream err;
     private ORB orb;
 
+    private JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
+
     public static void main(String args[]) {
 	try {
 	    (new Server()).run( System.getProperties(),
 	                	args, System.out, System.err, null );
-	}
-	catch( Exception e ) {
+	} catch( Exception e ) {
 	    e.printStackTrace( System.err );
 	    System.exit( 1 );
 	}
@@ -78,51 +79,54 @@ public class Server
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-	this.out = out;
-	this.err = err;
+        try {
+            this.out = out;
+            this.err = err;
 
-	out.println( "Instantiating ORB" );
-	out.println( "=================" );
+            out.println( "Instantiating ORB" );
+            out.println( "=================" );
 
-	// Initializer class
-	String testInitializer = "pi.ort.ServerTestInitializer";
-	ServerTestInitializer.out = out;
+            // Initializer class
+            String testInitializer = "pi.ort.ServerTestInitializer";
+            ServerTestInitializer.out = out;
 
-	// create and initialize the ORB
-	Properties props = new Properties() ;
-	props.put( "org.omg.CORBA.ORBClass", 
-                   System.getProperty("org.omg.CORBA.ORBClass"));
-	props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
-		   testInitializer, "" );
-        props.put( ORBConstants.ORB_ID_PROPERTY, Constants.ORB_ID );
-        props.put( ORBConstants.ORB_SERVER_ID_PROPERTY, 
-            Constants.ORB_SERVER_ID );
-	orb = ORB.init(args, props);
-	ServerTestInitializer.orb = orb;
+            // create and initialize the ORB
+            Properties props = new Properties() ;
+            props.put( "org.omg.CORBA.ORBClass", 
+                       System.getProperty("org.omg.CORBA.ORBClass"));
+            props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
+                       testInitializer, "" );
+            props.put( ORBConstants.ORB_ID_PROPERTY, Constants.ORB_ID );
+            props.put( ORBConstants.ORB_SERVER_ID_PROPERTY, 
+                Constants.ORB_SERVER_ID );
+            orb = ORB.init(args, props);
+            ServerTestInitializer.orb = orb;
 
-	// Get root POA:
-	out.println( "Server retrieving root POA:" );
-	rootPOA = (POA)orb.resolve_initial_references( "RootPOA" );
-	rootPOA.the_POAManager().activate();
+            // Get root POA:
+            out.println( "Server retrieving root POA:" );
+            rootPOA = (POA)orb.resolve_initial_references( "RootPOA" );
+            rootPOA.the_POAManager().activate();
 
-        // Check to make sure that POA state changes are notified
-        // in the IOR Interceptor. 
-        checkAdapterStateChangesTest1();
+            // Check to make sure that POA state changes are notified
+            // in the IOR Interceptor. 
+            checkAdapterStateChangesTest1();
 
-        //handshake:
-        out.println("Server is ready.");
-        out.flush();
+            //handshake:
+            out.println("Server is ready.");
+            out.flush();
 
-        checkAdapterStateChangesTest2();
+            checkAdapterStateChangesTest2();
 
-        checkAdapterStateChangesTest3();
+            checkAdapterStateChangesTest3();
 
-        // NOTE: THIS TEST SHOULD ALWAYS BE THE LAST ONE. IT DESTROYS
-        // THE POAMANAGER
-        // Check to make sure that POAManager state changes are notified
-        // in the IOR Interceptor. 
-        checkAdapterManagerStateChanges();
-
+            // NOTE: THIS TEST SHOULD ALWAYS BE THE LAST ONE. IT DESTROYS
+            // THE POAMANAGER
+            // Check to make sure that POAManager state changes are notified
+            // in the IOR Interceptor. 
+            checkAdapterManagerStateChanges();
+        } finally {
+            helper.done() ;
+        }
     }
 
     /**
@@ -131,26 +135,33 @@ public class Server
      * ACTIVE -> HOLD -> DISCARD -> DEACTIVATE
      */
     private void checkAdapterManagerStateChanges() {
+        helper.start( "checkAdapterManagerStateChanges" ) ;
         out.println( 
             "Checking if AdapterManagerStateChanges are registered..." );
         try {
-            ORTStateChangeEvaluator stateChangeEvaluator =
-                ORTStateChangeEvaluator.getInstance( );
-            stateChangeEvaluator.resetAllStates( );
-            POAManager manager = rootPOA.the_POAManager( ); 
-            manager.hold_requests( true );
-            evaluateAdapterManagerStateChange( );
-            manager.discard_requests( true );
-            evaluateAdapterManagerStateChange( );
-            manager.deactivate( false, true );
-            evaluateAdapterManagerStateChange( );
-        } catch( org.omg.PortableServer.POAManagerPackage.AdapterInactive e ) {
-            err.println( "Unexpected AdapterInactive Exception in " +
-                " checkAdapterManagerStateChanges " );
-            throw new RuntimeException(
-                "checkAdapterManagerStateChanges FAILED!");
+            try {
+                ORTStateChangeEvaluator stateChangeEvaluator =
+                    ORTStateChangeEvaluator.getInstance( );
+                stateChangeEvaluator.resetAllStates( );
+                POAManager manager = rootPOA.the_POAManager( ); 
+                manager.hold_requests( true );
+                evaluateAdapterManagerStateChange( );
+                manager.discard_requests( true );
+                evaluateAdapterManagerStateChange( );
+                manager.deactivate( false, true );
+                evaluateAdapterManagerStateChange( );
+            } catch( org.omg.PortableServer.POAManagerPackage.AdapterInactive e ) {
+                err.println( "Unexpected AdapterInactive Exception in " +
+                    " checkAdapterManagerStateChanges " );
+                throw new RuntimeException(
+                    "checkAdapterManagerStateChanges FAILED!");
+            }
+            out.println( "checkAdapterManagerStateChanges PASSED.." ); 
+            helper.pass() ;
+        } catch (RuntimeException exc) {
+            helper.fail( exc ) ;
+            throw exc ;
         }
-        out.println( "checkAdapterManagerStateChanges PASSED.." ); 
     }
 
    
@@ -182,35 +193,44 @@ public class Server
      *          are obtained as a group.
      */
     private void checkAdapterStateChangesTest1( ) {
+        helper.start( "checkAdapterStateChangesTest1" ) ;
+
         System.out.println( "checkAdapterStateChangesTest1 BEGIN.." );
         try {
-            ORTStateChangeEvaluator stateChangeEvaluator =
-                ORTStateChangeEvaluator.getInstance( );
-            stateChangeEvaluator.resetAllStates( );
+            try {
+                ORTStateChangeEvaluator stateChangeEvaluator =
+                    ORTStateChangeEvaluator.getInstance( );
+                stateChangeEvaluator.resetAllStates( );
 
-            String[] poaGroup1 = { "POA1", "POA11", "POA12" };
+                String[] poaGroup1 = { "POA1", "POA11", "POA12" };
 
-            String[] poaGroup2 = { "POA2", "POA21", "POA22" }; 
+                String[] poaGroup2 = { "POA2", "POA21", "POA22" }; 
 
-            POA[] poaList1 = createPOAs( poaGroup1 );
+                POA[] poaList1 = createPOAs( poaGroup1 );
 
-            POA[] poaList2 = createPOAs( poaGroup2 );
-     
-            poaList1[0].destroy( false, true ); 
-            evaluateAdapterStateChange( poaGroup1, null );
+                POA[] poaList2 = createPOAs( poaGroup2 );
+         
+                poaList1[0].destroy( false, true ); 
+                evaluateAdapterStateChange( poaGroup1, null );
 
-            stateChangeEvaluator.resetAllStates( );
+                stateChangeEvaluator.resetAllStates( );
 
-            poaList2[0].destroy( false, true ); 
-            evaluateAdapterStateChange( poaGroup2, null);
+                poaList2[0].destroy( false, true ); 
+                evaluateAdapterStateChange( poaGroup2, null);
 
-            System.out.println( "checkAdapterStateChanges Test1 PASSED.." );
+                System.out.println( "checkAdapterStateChanges Test1 PASSED.." );
 
-        } catch( Exception e ) {
-            err.println( "EXCEPTION : In checkAdapterStateChangeTest1 " + e );
-            e.printStackTrace( );
-            throw new RuntimeException( 
-                "checkAdapterStateChanges Test1 FAILED!");
+            } catch( Exception e ) {
+                err.println( "EXCEPTION : In checkAdapterStateChangeTest1 " + e );
+                e.printStackTrace( );
+                throw new RuntimeException( 
+                    "checkAdapterStateChanges Test1 FAILED!");
+            }
+
+            helper.pass() ;
+        } catch (RuntimeException exc) {
+            helper.fail( exc ) ;
+            throw exc ;
         }
     }
 
@@ -224,44 +244,52 @@ public class Server
      *          DelayServant.
      */   
     private void checkAdapterStateChangesTest2( ) {
-        System.out.println( "checkAdapterStateChangesTest2 BEGIN.." );
+        helper.start( "checkAdapterStateChangesTest2" ) ;
+
         try {
-            ORTStateChangeEvaluator stateChangeEvaluator =
-                ORTStateChangeEvaluator.getInstance( );
-            stateChangeEvaluator.resetAllStates( );
+            System.out.println( "checkAdapterStateChangesTest2 BEGIN.." );
+            try {
+                ORTStateChangeEvaluator stateChangeEvaluator =
+                    ORTStateChangeEvaluator.getInstance( );
+                stateChangeEvaluator.resetAllStates( );
 
-            final String NOTIFICATION_TOKEN = "POA12INVOCATION_COMPLETE";
-            String[] poasUnderTest = {"POA1", "POA11", "POA12" };
-            POA[] poaList = createPOAs( poasUnderTest );
+                final String NOTIFICATION_TOKEN = "POA12INVOCATION_COMPLETE";
+                String[] poasUnderTest = {"POA1", "POA11", "POA12" };
+                POA[] poaList = createPOAs( poasUnderTest );
 
-            org.omg.CORBA.Object object = createDelayServant( poaList[2] );
-            final delay aDelay = delayHelper.narrow( object );
-            new Thread( ) {
-                public void run() {
-                    try {
-                        aDelay.forInMillis(30000, NOTIFICATION_TOKEN ); 
-                    } catch( Exception e ) {
-                        System.err.println( "Failed to invoke on aDelay " +
-                            " servant..." + e  );
-                        e.printStackTrace( );
-                        System.exit( 1 );
-                    } 
-                }
-            }.start( );
-            // This sleep is to make sure that the Thread in the previous
-            // statement is started for sure before calling POA.destroy
-            Thread.sleep( 5000 );
-            poaList[0].destroy( false, true ); 
-            evaluateAdapterStateChange( poasUnderTest, NOTIFICATION_TOKEN );
-            System.out.println( "checkAdapterStateChangesTest2 PASSED.." );
+                org.omg.CORBA.Object object = createDelayServant( poaList[2] );
+                final delay aDelay = delayHelper.narrow( object );
+                new Thread( ) {
+                    public void run() {
+                        try {
+                            aDelay.forInMillis(30000, NOTIFICATION_TOKEN ); 
+                        } catch( Exception e ) {
+                            System.err.println( "Failed to invoke on aDelay " +
+                                " servant..." + e  );
+                            e.printStackTrace( );
+                            System.exit( 1 );
+                        } 
+                    }
+                }.start( );
+                
+                // This sleep is to make sure that the Thread in the previous
+                // statement is started for sure before calling POA.destroy
+                Thread.sleep( 5000 );
+                poaList[0].destroy( false, true ); 
+                evaluateAdapterStateChange( poasUnderTest, NOTIFICATION_TOKEN );
+                System.out.println( "checkAdapterStateChangesTest2 PASSED.." );
+            } catch( Exception e ) {
+                err.println( "EXCEPTION : In checkAdapterStateChangeTest2 " + e );
+                e.printStackTrace( );
+                throw new RuntimeException( 
+                    "checkAdapterStateChanges Test2 FAILED!");
+            }
 
-        } catch( Exception e ) {
-            err.println( "EXCEPTION : In checkAdapterStateChangeTest2 " + e );
-            e.printStackTrace( );
-            throw new RuntimeException( 
-                "checkAdapterStateChanges Test2 FAILED!");
+            helper.pass() ;
+        } catch (RuntimeException exc) {
+            helper.fail( exc ) ;
+            throw exc ;
         }
-
     }
 
     /**
@@ -278,76 +306,83 @@ public class Server
      *  notification happens only after the invoke on DelayServant is complete.
      */  
     private void checkAdapterStateChangesTest3( ) {
+        helper.start( "checkAdapterStateChangesTest2" ) ;
+
         System.out.println( "checkAdapterStateChangesTest3 BEGIN.." );
+
         try {
-            ORTStateChangeEvaluator stateChangeEvaluator =
-                ORTStateChangeEvaluator.getInstance( );
-            stateChangeEvaluator.resetAllStates( );
-
-            final String NOTIFICATION_TOKEN = "POA11INVOCATION_COMPLETE";
-            String[] poasUnderTest = {"POA1", "POA11", "POA12" };
-            POA[] poaList = createPOAs( poasUnderTest );
-
-            org.omg.CORBA.Object object = createDelayServant( poaList[1] );
-            final delay aDelay = delayHelper.narrow( object );
-            new Thread( ) {
-                public void run() {
-                    try {
-                        aDelay.forInMillis(30000,NOTIFICATION_TOKEN );
-                    } catch( Exception e ) {
-                        System.err.println( "Failed to invoke on aDelay " +
-                            " servant..." + e  );
-                        e.printStackTrace( );
-                        System.exit( 1 );
-                    }
-                }
-            }.start( );
-            // This sleep is to make sure that the Thread in the previous
-            // statement is started for sure before calling POA.destroy
-            Thread.sleep( 5000 );
-
-            poaList[0].destroy( false, false );
-
-            Thread.sleep( 5000 );
-
-            boolean testStatus = true;
-
-            //  Negative test to make sure that the destroy notification has
-            //  not happened before completing DelayServant method.
             try {
-                evaluateAdapterStateChange( poasUnderTest, NOTIFICATION_TOKEN );
-                // If evaluation passed, then this test failed.  
-                testStatus = false;
-            } catch( RuntimeException re ) {
-                // This is the expected result
-            }
+                ORTStateChangeEvaluator stateChangeEvaluator =
+                    ORTStateChangeEvaluator.getInstance( );
+                stateChangeEvaluator.resetAllStates( );
 
-            //  Positive test to make sure that the destroy notification
-            //  happened after completing DelaySerant method
-            if( testStatus ) {
-                // Wait for a while to finish the invocation on the DelayServant
-               int i = 0;
-                while(!stateChangeEvaluator.registerAdapterStateChangeCalled){
-                    System.out.println( "..Wait Loop.." + i++ );
-                    Thread.sleep( 5000 );
+                final String NOTIFICATION_TOKEN = "POA11INVOCATION_COMPLETE";
+                String[] poasUnderTest = {"POA1", "POA11", "POA12" };
+                POA[] poaList = createPOAs( poasUnderTest );
+
+                org.omg.CORBA.Object object = createDelayServant( poaList[1] );
+                final delay aDelay = delayHelper.narrow( object );
+                new Thread( ) {
+                    public void run() {
+                        try {
+                            aDelay.forInMillis(30000,NOTIFICATION_TOKEN );
+                        } catch( Exception e ) {
+                            System.err.println( "Failed to invoke on aDelay " +
+                                " servant..." + e  );
+                            e.printStackTrace( );
+                            System.exit( 1 );
+                        }
+                    }
+                }.start( );
+                // This sleep is to make sure that the Thread in the previous
+                // statement is started for sure before calling POA.destroy
+                Thread.sleep( 5000 );
+
+                poaList[0].destroy( false, false );
+
+                Thread.sleep( 5000 );
+
+                boolean testStatus = true;
+
+                //  Negative test to make sure that the destroy notification has
+                //  not happened before completing DelayServant method.
+                try {
+                    evaluateAdapterStateChange( poasUnderTest, NOTIFICATION_TOKEN );
+                    // If evaluation passed, then this test failed.  
+                    testStatus = false;
+                } catch( RuntimeException re ) {
+                    // This is the expected result
                 }
-                // Now check to see if the notifications have happened 
-                // correctly
-                evaluateAdapterStateChange( poasUnderTest, NOTIFICATION_TOKEN );
-                System.out.println( "checkAdapterStateChangesTest3 PASSED.." );
-                return;
+
+                //  Positive test to make sure that the destroy notification
+                //  happened after completing DelaySerant method
+                if (testStatus) {
+                    // Wait for a while to finish the invocation on the DelayServant
+                   int i = 0;
+                    while(!stateChangeEvaluator.registerAdapterStateChangeCalled){
+                        System.out.println( "..Wait Loop.." + i++ );
+                        Thread.sleep( 5000 );
+                    }
+                    // Now check to see if the notifications have happened 
+                    // correctly
+                    evaluateAdapterStateChange( poasUnderTest, NOTIFICATION_TOKEN );
+                    System.out.println( "checkAdapterStateChangesTest3 PASSED.." );
+                } else {
+                    // If we are here then the test failed
+                    throw new RuntimeException(  "TEST FAILED..." );
+                }
+            } catch( Exception e ) {
+                err.println( "EXCEPTION : In checkAdapterStateChangeTest3 " + e );
+                e.printStackTrace( );
+                throw new RuntimeException(
+                    "checkAdapterStateChanges Test3 FAILED!");
             }
-            // If we are here then the test failed
-            throw new RuntimeException(  "TEST FAILED..." );
-         
 
-        } catch( Exception e ) {
-            err.println( "EXCEPTION : In checkAdapterStateChangeTest3 " + e );
-            e.printStackTrace( );
-            throw new RuntimeException(
-                "checkAdapterStateChanges Test3 FAILED!");
+            helper.pass() ;
+        } catch (RuntimeException exc) {
+            helper.fail( exc ) ;
+            throw exc ;
         }
-
     }
 
 

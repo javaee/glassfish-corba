@@ -88,11 +88,15 @@ public class POAClient
         out.println( "+ Creating ORB..." );
 	createORB( args );
 
-	// Test ClientInterceptor
-	testClientInterceptor();
+        try {
+            // Test ClientInterceptor
+            testClientInterceptor();
 
-	// Test POA Special operations
-	testSpecialOperations();
+            // Test POA Special operations
+            testSpecialOperations();
+        } finally {
+            finish() ;
+        }
     }
 
     /**

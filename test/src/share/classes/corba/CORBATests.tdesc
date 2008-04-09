@@ -43,6 +43,7 @@
 // clients or servers within the test process will be run
 // with the -separateprocess flag. 
 
+-test corba.jmx.JmxTest
 -test corba.copyobjectpolicy.CopyObjectPolicyTest
 -test corba.connectioncache.ConnectionCacheTest
 -test corba.timer.TimerTest

@@ -68,7 +68,9 @@ public class JUnitReportHelper {
 
     private JUnitReportWriter writer ;
     private String className ;
+    private String fileName ;
     private JUnitReportWriter.TestDescription current ;
+    private boolean testComplete ;
 
     /** Prepare to generate a JUnitReport in the file named
      * ${junit.report.dir}/${name}.xml.  junit.report.dir is obtained from
@@ -76,11 +78,13 @@ public class JUnitReportHelper {
      * @param name The class name of the class for this test
      */
     public JUnitReportHelper( String className ) {
+        current = null ;
+        testComplete = false ;
         String processName = System.getProperty( "corba.test.process.name" ) ;
         if (processName != null) 
-            this.className = className + "." + processName ;
+            this.fileName = className + "." + processName ;
         else
-            this.className = className ;
+            this.fileName = className ;
 
         String outdirName = System.getProperty( "junit.report.dir" ) ; 
         if (outdirName == null)
@@ -96,7 +100,7 @@ public class JUnitReportHelper {
         OutputStream os = null ;
 
         try {
-            File file = new File( outdir, className + ".xml" ) ;
+            File file = new File( outdir, this.fileName + ".xml" ) ;
             os = new FileOutputStream( file ) ;
         } catch (Exception exc) {
             throw new RuntimeException( exc ) ;
@@ -107,11 +111,30 @@ public class JUnitReportHelper {
         writer.startTestSuite( className, System.getProperties() ) ;
     }
 
+    // current must be non-null, and the test must not have been completed.
+    // Reporting the completion of a test multiple times results in multiple
+    // entries in the report, and double-counting of test case results.
+    private void checkCurrent() {
+        if (current == null)
+            throw new RuntimeException( "No current test set!" ) ;
+
+        if (testComplete) 
+            throw new RuntimeException( "Test " + current + " has already been completed!" ) ;
+
+        testComplete = true ;
+    }
+
     /** Start executing a test case with the given name.
      * All names MUST be unique for an instance of JUnitReportHelper.
      * @param The name of the test case
      */
     public void start( String name ) {
+        if ((current != null) && !testComplete)
+            throw new RuntimeException( "Trying to start test named " + name 
+                + " before current test " + current + " has completed!" ) ;
+
+        testComplete = false ;
+
         current = new JUnitReportWriter.TestDescription( name, className ) ;
         writer.startTest( current ) ;
     }
@@ -119,6 +142,8 @@ public class JUnitReportHelper {
     /** Report that the current test passed.
      */
     public void pass() {
+        checkCurrent() ;
+
         writer.endTest( current ) ;
     }
 
@@ -130,6 +155,8 @@ public class JUnitReportHelper {
      * as cause.
      */
     public void fail( Throwable thr ) {
+        checkCurrent() ;
+
         if (thr instanceof AssertionError)
             writer.addFailure( current, thr ) ; 
         else
@@ -146,6 +173,10 @@ public class JUnitReportHelper {
      * call will write a report.
      */
     public Counts done() {
+        if ((current != null) && !testComplete)
+            throw new RuntimeException( "Trying to terminate test suite before current test " 
+                + current + " has completed!" ) ;
+
         if (counts == null) {
             JUnitReportWriter.TestCounts tc = writer.endTestSuite() ;
             counts = new Counts( tc.pass(), tc.fail() + tc.error() ) ;

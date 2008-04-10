@@ -87,7 +87,7 @@
     <sequential>
 	<!-- <run-test args="-file ../src/share/classes/corba/CopyObjectTests.tdesc -verbose"/> 
 	<run-test args="-test corba.copyobjectpolicy.CopyObjectPolicyTest -verbose"/> -->
-	<junit printsummary="on" fork="on" forkmode="perTest" newenvironment="true" clonevm="false" maxmemory="200M" showoutput="true" dir="${test.run.base}">
+	<junit printsummary="on" fork="on" forkmode="perTest" newenvironment="true" maxmemory="200M" showoutput="true" dir="${test.run.base}">
 	    <sysproperty key="javax.rmi.CORBA.UtilClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
 	    <sysproperty key="javax.rmi.CORBA.StubClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
 	    <sysproperty key="javax.rmi.CORBA.PortableRemoteObjectClass" value="com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>

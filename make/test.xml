@@ -73,8 +73,9 @@
 
 	    <arg line="@{args}"/>
 
-	    <!-- Uncomment this to dump information about arguments to forked processes. -->
+	    <!-- Uncomment this to dump information about arguments to forked processes. 
 	    <arg line="-forkdebuglevel 1"/>
+            -->
 	    <arg line="-output gen"/>
 	</java>
     </sequential>

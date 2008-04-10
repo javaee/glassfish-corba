@@ -67,7 +67,7 @@ import java.net.InetAddress;
 
 public class Util {
 
-    static private boolean debug = true ;
+    static private boolean debug = false ;
 
     static public void trace( String msg )
     {

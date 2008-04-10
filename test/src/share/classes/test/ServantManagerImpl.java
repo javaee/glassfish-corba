@@ -171,8 +171,7 @@ public class ServantManagerImpl implements ServantManager {
 	    return result;
         	
         } catch (Exception e) {
-            RemoteException rexc = new RemoteException (e.toString());
-	    rexc.initCause(e) ;
+            RemoteException rexc = new RemoteException (e.toString(), e );
 	    throw rexc ;
         }
     }

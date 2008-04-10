@@ -108,7 +108,7 @@ public class JUnitReportHelper {
 
         writer = new XMLJUnitReportWriter() ;
         writer.setOutput( os ) ;
-        writer.startTestSuite( className, System.getProperties() ) ;
+        writer.startTestSuite( fileName, System.getProperties() ) ;
     }
 
     // current must be non-null, and the test must not have been completed.

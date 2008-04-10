@@ -42,6 +42,7 @@ package pi.serviceexample;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
+import corba.framework.JUnitReportHelper ;
 
 public class ServiceExampleTest
     extends
@@ -71,7 +72,10 @@ public class ServiceExampleTest
 
 	Controller client = createClient(thisPackage + ".Client",
 					 "client");
-	client.start();
+
+        JUnitReportHelper helper = getHelper() ;
+
+	client.start( helper );
 	client.waitFor();
 	client.stop();
 	arbitraryObjectServer.stop();
@@ -83,12 +87,14 @@ public class ServiceExampleTest
 	    createServer(thisPackage + ".ColocatedServers",
 			 "colocatedClientServer");
 	colocatedServers.start();
-	client.start();
+	client.start( helper );
 	client.waitFor();
 	client.stop();
 	colocatedServers.stop();
 
 	orbd.stop();
+
+        helper.done() ;
     }
 }
 

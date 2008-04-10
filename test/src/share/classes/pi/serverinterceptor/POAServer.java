@@ -73,52 +73,56 @@ public abstract class POAServer
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-        // Get the root POA:
-        rootPOA = null;
-        out.println( "+ Obtaining handle to root POA and activating..." );
         try {
-            rootPOA = (POA)orb.resolve_initial_references( ROOT_POA );
+            // Get the root POA:
+            rootPOA = null;
+            out.println( "+ Obtaining handle to root POA and activating..." );
+            try {
+                rootPOA = (POA)orb.resolve_initial_references( ROOT_POA );
+            }
+            catch( InvalidName e ) {
+                err.println( ROOT_POA + " is an invalid name." );
+                throw e;
+            }
+            rootPOA.the_POAManager().activate();
+            
+            // Set up hello object:
+            out.println( "+ Creating and binding Hello1 object..." );
+            TestInitializer.helloRef = createAndBind( rootPOA, "Hello1", 
+                                                      "[Hello1]" );
+
+            out.println( "+ Creating and binding Hello1Forward object..." );
+            TestInitializer.helloRefForward = createAndBind( rootPOA, 
+                                                             "Hello1Forward",
+                                                             "[Hello1Forward]" ); 
+
+            // Create a persistent, non-retaining POA with a ServantLocator:
+            out.println( "+ Creating persistent POA with ServantLocator..." );
+            persistentPOA = createPersistentPOA();
+
+            out.println( "+ Creating and binding Hello2 reference..." );
+            hello2IOR = createReference( persistentPOA, "Hello2", 
+                                         hello2Id.getBytes() );
+
+            handshake();
+            
+            // Test ServerInterceptor
+            testServerInterceptor();
+
+            // Test ServantManager throwing a ForwardRequest.
+            testServantManager();
+
+            // Test POA special operations
+            testSpecialOps();
+
+            // Notify client it's time to exit.
+            exitClient();
+
+            // wait for invocations from clients
+            waitForClients();
+        } finally {
+            finish() ;
         }
-        catch( InvalidName e ) {
-            err.println( ROOT_POA + " is an invalid name." );
-            throw e;
-        }
-        rootPOA.the_POAManager().activate();
-        
-        // Set up hello object:
-        out.println( "+ Creating and binding Hello1 object..." );
-        TestInitializer.helloRef = createAndBind( rootPOA, "Hello1", 
-						  "[Hello1]" );
-
-        out.println( "+ Creating and binding Hello1Forward object..." );
-        TestInitializer.helloRefForward = createAndBind( rootPOA, 
-							 "Hello1Forward",
-							 "[Hello1Forward]" ); 
-
-	// Create a persistent, non-retaining POA with a ServantLocator:
-	out.println( "+ Creating persistent POA with ServantLocator..." );
-	persistentPOA = createPersistentPOA();
-
-	out.println( "+ Creating and binding Hello2 reference..." );
-	hello2IOR = createReference( persistentPOA, "Hello2", 
-				     hello2Id.getBytes() );
-
-	handshake();
-        
-	// Test ServerInterceptor
-	testServerInterceptor();
-
-	// Test ServantManager throwing a ForwardRequest.
-	testServantManager();
-
-	// Test POA special operations
-	testSpecialOps();
-
-	// Notify client it's time to exit.
-	exitClient();
-
-	// wait for invocations from clients
-	waitForClients();
     }
 
     // Output handshake or wake up main.
@@ -140,7 +144,7 @@ public abstract class POAServer
 
 	out.println( "+ Testing standard invocation where ServantLocator " +
 	    "redirects..." );
-	testInvocation(
+	testInvocation( "testInvocationServantLocatorRedirect",
 	    SampleServerRequestInterceptor.MODE_NORMAL,
 	    "rs1rs2rs3so3so2so1rs1rs2rs3rr1rr2rr3sr3sr2sr1", 
 	    "sayHello2@" + hello2IOR, "[Hello1]", false );
@@ -150,7 +154,7 @@ public abstract class POAServer
 	out.println( "+ Testing invocation where ServantLocator redirects " +
 	    "and send_other throws SystemException..." );
 	servantLocator.resetFirstTime();
-	testInvocation(
+	testInvocation( "testInvocationServantLocatorRedirectSendOtherSystemException",
 	    SampleServerRequestInterceptor.MODE_SO_SYSTEM_EXCEPTION,
 	    "rs1rs2rs3so3so2se1", 
 	    "sayHello2@" + hello2IOR, "", true );
@@ -160,7 +164,7 @@ public abstract class POAServer
 	out.println( "+ Testing invocation where ServantLocator redirects " +
 	    "and send_other further redirects..." );
 	servantLocator.resetFirstTime();
-	testInvocation(
+	testInvocation( "testInvocationServantLocatorRedirectSendOtherRedirect",
 	    SampleServerRequestInterceptor.MODE_SO_FORWARD_REQUEST,
 	    "rs1rs2rs3so3so2so1rs1rs2rs3rr1rr2rr3sr3sr2sr1", 
 	    "sayHello2@" + hello2IOR, "[Hello1Forward]", false );
@@ -179,7 +183,7 @@ public abstract class POAServer
 
 	out.println( "+ Testing _is_a..." );
 	SampleServerRequestInterceptor.dontIgnoreIsA = true;
-	testInvocation(
+	testInvocation( "testInvocationIsA",
 	    SampleServerRequestInterceptor.MODE_NORMAL,
 	    "rs1rs2rs3rr1rr2rr3sr3sr2sr1",
 	    "_is_a", "", false );
@@ -188,13 +192,13 @@ public abstract class POAServer
 	// Thus, the send_exception.  We pass in false for exception
 	// expected because this is not the exception we normally look for.
 	out.println( "+ Testing _get_interface_def..." );
-	testInvocation(
+	testInvocation( "testInvocationGetInterfaceDef",
 	    SampleServerRequestInterceptor.MODE_NORMAL,
 	    "rs1rs2rs3rr1rr2rr3se3se2se1",
 	    "_get_interface_def", "", false );
 
 	out.println( "+ Testing _non_existent..." );
-	testInvocation(
+	testInvocation( "testInvocationNonExistent",
 	    SampleServerRequestInterceptor.MODE_NORMAL,
 	    "rs1rs2rs3rr1rr2rr3sr3sr2sr1",
 	    "_non_existent", "", false );

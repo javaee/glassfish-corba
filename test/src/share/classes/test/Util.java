@@ -67,7 +67,7 @@ import java.net.InetAddress;
 
 public class Util {
 
-    static private boolean debug = false ;
+    static private boolean debug = true ;
 
     static public void trace( String msg )
     {
@@ -576,7 +576,7 @@ public class Util {
 	    trace( "Util.rmicInternal called" ) ;
 	    trace( "\tgeneratorArg = " + generatorArg ) ;
 	    trace( "\tadditionalArgs = " + Test.display(additionalArgs)) ;
-	    trace( "/tclasses = " + Test.display(classes)) ;
+	    trace( "\tclasses = " + Test.display(classes)) ;
 
 	    if (classes != null && classes.length > 0) {
 		int commandCount = classes.length+2;

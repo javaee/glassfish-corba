@@ -66,41 +66,45 @@ public abstract class DSIPOAServer
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-        // Get the root POA:
-        rootPOA = null;
-        out.println( "+ Obtaining handle to root POA and activating..." );
         try {
-            rootPOA = (POA)orb.resolve_initial_references( ROOT_POA );
+            // Get the root POA:
+            rootPOA = null;
+            out.println( "+ Obtaining handle to root POA and activating..." );
+            try {
+                rootPOA = (POA)orb.resolve_initial_references( ROOT_POA );
+            }
+            catch( InvalidName e ) {
+                err.println( ROOT_POA + " is an invalid name." );
+                throw e;
+            }
+            rootPOA.the_POAManager().activate();
+            
+            // Set up hello object:
+            out.println( "+ Creating and binding Hello1 object..." );
+            TestInitializer.helloRef = createAndBind( rootPOA, "Hello1", 
+                                                      "[Hello1]" );
+
+            out.println( "+ Creating and binding Hello1Forward object..." );
+            TestInitializer.helloRefForward = createAndBind( rootPOA, 
+                                                             "Hello1Forward",
+                                                             "[Hello1Forward]" ); 
+
+            handshake();
+            
+            // Test ServerInterceptor
+            testServerInterceptor();
+
+            // Test POA special operations
+            testSpecialOps();
+
+            // Notify client it's time to exit.
+            exitClient();
+
+            // wait for invocations from clients
+            waitForClients();
+        } finally {
+            finish() ;
         }
-        catch( InvalidName e ) {
-            err.println( ROOT_POA + " is an invalid name." );
-            throw e;
-        }
-        rootPOA.the_POAManager().activate();
-        
-        // Set up hello object:
-        out.println( "+ Creating and binding Hello1 object..." );
-        TestInitializer.helloRef = createAndBind( rootPOA, "Hello1", 
-						  "[Hello1]" );
-
-        out.println( "+ Creating and binding Hello1Forward object..." );
-        TestInitializer.helloRefForward = createAndBind( rootPOA, 
-							 "Hello1Forward",
-							 "[Hello1Forward]" ); 
-
-	handshake();
-        
-	// Test ServerInterceptor
-	testServerInterceptor();
-
-	// Test POA special operations
-	testSpecialOps();
-
-	// Notify client it's time to exit.
-	exitClient();
-
-	// wait for invocations from clients
-	waitForClients();
     }
 
     // Output handshake or wake up main.
@@ -122,7 +126,7 @@ public abstract class DSIPOAServer
 
 	out.println( "+ Testing _is_a..." );
 	SampleServerRequestInterceptor.dontIgnoreIsA = true;
-	testInvocation(
+	testInvocation( "testInvocationIsA",
 	    SampleServerRequestInterceptor.MODE_NORMAL,
 	    "rs1rs2rs3rr1rr2rr3sr3sr2sr1",
 	    "_is_a", "", false );
@@ -131,13 +135,13 @@ public abstract class DSIPOAServer
 	// Thus, the send_exception.  We pass in false for exception
 	// expected because this is not the exception we normally look for.
 	out.println( "+ Testing _get_interface_def..." );
-	testInvocation(
+	testInvocation( "testInvocationGetInterfaceDef",
 	    SampleServerRequestInterceptor.MODE_NORMAL,
 	    "rs1rs2rs3rr1rr2rr3se3se2se1",
 	    "_get_interface_def", "", false );
 
 	out.println( "+ Testing _non_existent..." );
-	testInvocation(
+	testInvocation( "testInvocationNonExistent",
 	    SampleServerRequestInterceptor.MODE_NORMAL,
 	    "rs1rs2rs3rr1rr2rr3sr3sr2sr1",
 	    "_non_existent", "", false );

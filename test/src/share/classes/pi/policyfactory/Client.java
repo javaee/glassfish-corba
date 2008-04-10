@@ -54,6 +54,8 @@ import org.omg.CORBA.Context;
 import org.omg.CORBA.Object;
 import java.util.Properties;
 
+import corba.framework.JUnitReportHelper ;
+
 public class Client implements Runnable
 {
 
@@ -66,6 +68,7 @@ public class Client implements Runnable
 
     private static boolean FAILURE = false;
 
+    private String msg = null ;
 
     public void signalError () {
         synchronized (Client.lock) {
@@ -80,6 +83,7 @@ public class Client implements Runnable
 
     public void run()
     {
+        JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
         try {
             // create and initialize the ORB
             Properties props = new Properties() ;
@@ -91,32 +95,37 @@ public class Client implements Runnable
 
             boolean testStatus = SUCCESS;
             // Test ClientRequestInfo.arguments() method.
+            helper.start( "positiveTest" ) ;
             testStatus = positiveTest();
             if( testStatus == SUCCESS ) {
                 System.out.println( "PolicyFactory positive tests Success" );
                 System.out.flush();
-            }
-            else {
+                helper.pass() ;
+            } else {
                 System.err.println( "PolicyFactory positive tests Failure" );
                 System.err.flush();
                 signalError (); 
+                helper.fail( msg ) ;
             }
 
+            helper.start( "negativeTest" ) ;
             testStatus = negativeTest();
             if( testStatus == SUCCESS ) {
                 System.out.println( "PolicyFactory negative tests Success" );
                 System.out.flush();
-            }
-            else {
+                helper.pass() ;
+            } else {
                 System.err.println( "PolicyFactory negative tests Failure" );
                 System.err.flush();
                 signalError (); 
+                helper.fail( msg ) ;
             }
-        }
-        catch( Exception e ) {
+        } catch( Exception e ) {
             System.err.println( "PolicyFactory test Failed with exception" + e);
             System.err.flush();
             signalError (); 
+        } finally {
+            helper.done() ;
         }
     }
 
@@ -135,43 +144,47 @@ public class Client implements Runnable
             policy = orb.create_policy( 100, any );
         }
         catch( Exception e) {
-            System.err.println( "PolicyFactoryTest.positiveTest failed with " +
-                " an Exception " + e );
+            msg = "PolicyFactoryTest.positiveTest failed with " + " an Exception " + e ;
+            System.err.println( msg ) ;
             System.err.flush( );
             e.printStackTrace();
             return FAILURE;
         }
         if( policy == null ) {
-            System.err.println( "PolicyFactoryTest.positiveTest failed because"+
-                " policy is not created as expected " );
+            msg = "PolicyFactoryTest.positiveTest failed because"+
+                " policy is not created as expected " ;
+            System.err.println( msg ) ;
             System.err.flush( );
             return FAILURE;
         }
         if( policy.policy_type() != 100 ) {
-            System.err.println( "PolicyFactoryTest.positiveTest failed because"+
-                " policy.policy_type() != 100 " );
+            msg = "PolicyFactoryTest.positiveTest failed because"+
+                " policy.policy_type() != 100 " ;
+            System.err.println( msg ) ;
             System.err.flush( );
             return FAILURE;
         }   
         try {
             policy = orb.create_policy( 10000, any );
-        }
-        catch( Exception e ) {  
-            System.err.println( "PolicyFactoryTest.positiveTest failed with " +
-                " an Exception " + e );
+        } catch( Exception e ) {  
+            msg = "PolicyFactoryTest.positiveTest failed with " +
+                " an Exception " + e ;
+            System.err.println( msg ) ;
             System.err.flush( );
             e.printStackTrace();
             return FAILURE;
         }
         if( policy == null ) {
-            System.err.println( "PolicyFactoryTest.positiveTest failed because"+
-                " policy is not created as expected " );
+            msg = "PolicyFactoryTest.positiveTest failed because"+
+                " policy is not created as expected " ;
+            System.err.println( msg ) ;
             System.err.flush( );
             return FAILURE;
         }
         if( policy.policy_type() != 10000 ) {
-            System.err.println( "PolicyFactoryTest.positiveTest failed because"+
-                " policy.policy_type() != 10000 " );
+            msg = "PolicyFactoryTest.positiveTest failed because"+
+                " policy.policy_type() != 10000 " ;
+            System.err.println( msg ) ;
             System.err.flush( );
             return FAILURE;
         }   
@@ -191,8 +204,9 @@ public class Client implements Runnable
             org.omg.CORBA.Policy policy = orb.create_policy( 100000, any );
         } 
         catch( org.omg.CORBA.PolicyError e ) {
-            System.out.println( "Caught org.omg.CORBA.PolicyError in " +
-                "PolicyFactory.negativeTest() as expected..." );
+            msg = "Caught org.omg.CORBA.PolicyError in " +
+                "PolicyFactory.negativeTest() as expected..." ;
+            System.out.println( msg ) ;
             System.out.flush( );
             if( e.reason != BAD_POLICY.value ) {
                 return FAILURE;

@@ -115,6 +115,12 @@ public abstract class ServerCommon
     // The currently executing server.
     static ServerCommon server;
 
+    private JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
+
+    protected void finish() {
+        helper.done() ;
+    }
+
     /**
      * Creates a com.sun.corba.se.spi.orb.ORB and notifies the TestInitializer of its presence
      */
@@ -242,16 +248,24 @@ public abstract class ServerCommon
     protected void runTestCase( String testName )
         throws Exception
     {
-        out.println( "  - Executing test " + testName + "." );
-        SampleServerRequestInterceptor.strategy = interceptorStrategy;
-        SampleServerRequestInterceptor.intercepted = false;
-        invokeStrategy.invoke();
-        if( interceptorStrategy.failed ) {
-            throw new RuntimeException( interceptorStrategy.failReason );
+        helper.start( testName ) ;
+
+        try {
+            out.println( "  - Executing test " + testName + "." );
+            SampleServerRequestInterceptor.strategy = interceptorStrategy;
+            SampleServerRequestInterceptor.intercepted = false;
+            invokeStrategy.invoke();
+            if( interceptorStrategy.failed ) {
+                throw new RuntimeException( interceptorStrategy.failReason );
+            }
+            if( !SampleServerRequestInterceptor.intercepted ) {
+                throw new RuntimeException( "No interceptors were invoked!" );
+            }
+
+            helper.pass() ;
+        } catch (Exception exc) {
+            helper.fail( exc ) ;
         }
-	if( !SampleServerRequestInterceptor.intercepted ) {
-	    throw new RuntimeException( "No interceptors were invoked!" );
-	}
     }
 
     /*

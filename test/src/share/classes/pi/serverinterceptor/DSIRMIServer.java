@@ -69,31 +69,35 @@ public abstract class DSIRMIServer
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-	out.println( "+ Creating Initial naming context..." );
-	// Inform the JNDI provider of the ORB to use and create
-	// initial naming context:
-	Hashtable env = new Hashtable();
-	env.put( "java.naming.corba.orb", orb );
-	initialNamingContext = new InitialContext( env );
+        try {
+            out.println( "+ Creating Initial naming context..." );
+            // Inform the JNDI provider of the ORB to use and create
+            // initial naming context:
+            Hashtable env = new Hashtable();
+            env.put( "java.naming.corba.orb", orb );
+            initialNamingContext = new InitialContext( env );
 
-        // Set up hello object:
-        out.println( "+ Creating and binding Hello1 object..." );
-        TestInitializer.helloRef = createAndBind( "Hello1", 
-						  "[Hello1]" );
+            // Set up hello object:
+            out.println( "+ Creating and binding Hello1 object..." );
+            TestInitializer.helloRef = createAndBind( "Hello1", 
+                                                      "[Hello1]" );
 
-        out.println( "+ Creating and binding Hello1Forward object..." );
-        TestInitializer.helloRefForward = createAndBind( "Hello1Forward",
-							 "[Hello1Forward]" ); 
+            out.println( "+ Creating and binding Hello1Forward object..." );
+            TestInitializer.helloRefForward = createAndBind( "Hello1Forward",
+                                                             "[Hello1Forward]" ); 
 
-	handshake();
+            handshake();
 
-	// Test ServerInterceptor
-	testServerInterceptor();
+            // Test ServerInterceptor
+            testServerInterceptor();
 
-	// Notify client it's time to exit.
-	exitClient();
+            // Notify client it's time to exit.
+            exitClient();
 
-	waitForClients();
+            waitForClients();
+        } finally {
+            finish() ;
+        }
     }
 
     abstract void handshake();
@@ -121,7 +125,8 @@ public abstract class DSIRMIServer
     /** 
      * Overridden from ServerCommon.  Oneway calls are not supported in RMI.
      */
-    void testInvocation( int mode, 
+    void testInvocation( String name, 
+                         int mode, 
                          String correctOrder,
                          String methodName,
                          String correctMethodOrder,
@@ -144,7 +149,7 @@ public abstract class DSIRMIServer
 
 
 	if( !methodName.equals( "sayOneway" ) ) {
-	    super.testInvocation( mode, correctOrder, methodName,
+	    super.testInvocation( name, mode, correctOrder, methodName,
 				  correctMethodOrder, exceptionExpected );
 	}
     }

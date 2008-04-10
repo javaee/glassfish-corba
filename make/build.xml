@@ -147,7 +147,7 @@
 	<property name="findbugs.exclude.file" value="${root.dir}/make/findbugs-filter.xml"/>
 	<property name="copyright.file" value="${root.dir}/make/copyright-information/copyright.txt"/>
 	<property name="copyright.roots" value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/> 
-	<property name="copyright.skip" value="SCCS,.hg,.cvs,Codemgr_wsdata,deleted_files,copyright-information,freezepoint,apache,objectweb,build,webrev,test-output,gen"/>
+	<property name="copyright.skip" value="SCCS,.hg,.cvs,Codemgr_wsdata,deleted_files,copyright-information,freezepoint,apache,objectweb,build,webrev,test-output,gen,lib"/>
         <!-- properties needed for pushing jar to maven repository -->
         <property name="release.dir" value="build/release"/>
         <property name="release.orb.jar" 

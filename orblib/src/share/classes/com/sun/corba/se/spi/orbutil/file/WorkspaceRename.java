@@ -75,7 +75,8 @@ public class WorkspaceRename {
     private static final String[] COPY_SUFFIXES = {
 	"sxc", "sxi", "sxw", "odp", "gif", "png", "jar", "zip", "jpg", "pom",
 	"pdf", "doc", "mif", "fm", "book", "zargo", "zuml", "cvsignore", 
-	"hgignore", "list", "old", "orig", "rej", "hgtags" 
+	"hgignore", "list", "old", "orig", "rej", "hgtags", "xsl", "bat", "css",
+        "icns"
     } ;
 
     private static final String[] IGNORE_SUFFIXES = {

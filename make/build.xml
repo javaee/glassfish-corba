@@ -81,7 +81,7 @@
     <!-- The core src and test files. -->
     <property environment="env"/>
     <property name="rt.jar"			value="${env.JAVA_HOME}/jre/lib/rt.jar"/>
-    <property name="findbugs.home"		value="${env.FINDBUGS_HOME}"/>
+    <property name="findbugs.home"		value="lib/findbugs-1.3.3"/>
     <property name="boot.dir"			value="${env.ALT_BOOTDIR}"/>
     <property name="test.run.base"              value="test/run"/>
     <property name="test.output"		value="${test.run.base}/gen"/>
@@ -912,7 +912,7 @@
     
     <target name="findbugs" depends="init"> 
 	<mkdir dir="${findbugs.dir}"/>
-	<exec executable="findbugs">
+	<exec executable="${findbugs.home}/bin/findbugs">
 	    <arg value="-textui"/>
 	    <arg value="-html"/>
 	    <arg value="-outputFile"/>
@@ -931,7 +931,7 @@
 
     <target name="findbugs-xml" depends="init"> 
 	<mkdir dir="${findbugs.dir}"/>
-	<exec executable="findbugs">
+	<exec executable="${findbugs.home}/bin/findbugs">
 	    <arg value="-textui"/>
 	    <arg value="-xml"/>
 	    <arg value="-outputFile"/>

@@ -129,7 +129,8 @@
     <property name="jschemelogutil-jar"		value="${root.dir}/lib/jschemelogutil.jar"/>
     <property name="javatest-jar"		value="${root.dir}/lib/javatest.jar"/>
     <property name="ejb-jar"			value="${root.dir}/lib/ejb-2_1-api.jar"/>
-    <property name="junit-jar"			value="${root.dir}/lib/junit.jar"/>
+    <property name="junit-jar"			value="${root.dir}/lib/ant-junit.jar"/>
+    <property name="ant-junit-jar"		value="${root.dir}/lib/junit.jar"/>
     <property name="jmxri-jar"			value="${root.dir}/lib/jmxri.jar"/>
     <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
     <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
@@ -185,6 +186,7 @@
 	<path id="test-classpath.master">
 	    <pathelement location="${jscheme-jar}"/>
 	    <pathelement location="${jschemelogutil-jar}"/>
+	    <pathelement location="${ant-junit-jar}"/>
 	    <pathelement location="${junit-jar}"/>
 	    <pathelement location="${ejb-jar}"/>
 	    <pathelement location="${testng-jar}"/>

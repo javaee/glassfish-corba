@@ -79,6 +79,10 @@ public interface JUnitReportWriter {
 	public String getClassName() {
 	    return second() ;
 	}
+
+        public String toString() {
+            return getClassName() + "." + getName() ;
+        }
     }
     
     public class TestCounts extends Triple<Integer,Integer,Integer> {

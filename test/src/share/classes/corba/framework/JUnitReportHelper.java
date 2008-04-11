@@ -52,6 +52,13 @@ import java.io.OutputStream ;
  * we can just bracket test case execution with start/(pass|fail) calls.
  */
 public class JUnitReportHelper {
+    private static final boolean DEBUG = true ;
+
+    private static void msg( String str ) {
+        if (DEBUG)
+            System.out.println( "JUnitReportHelper: " + str ) ;
+    }
+
     public class Counts extends Pair<Integer,Integer> {
         Counts( int numPass, int numFail ) {
             super( numPass, numFail ) ;
@@ -77,14 +84,18 @@ public class JUnitReportHelper {
      * the environment variable which is passed to all CTF controllers.
      * @param name The class name of the class for this test
      */
-    public JUnitReportHelper( String className ) {
+    public JUnitReportHelper( String cname ) {
         current = null ;
         testComplete = false ;
         String processName = System.getProperty( "corba.test.process.name" ) ;
+        className = cname ;
         if (processName != null) 
-            this.fileName = className + "." + processName ;
+            this.fileName = cname + "." + processName ;
         else
-            this.fileName = className ;
+            this.fileName = cname ;
+
+        msg( "<init>: className = " 
+            + this.className + " fileName = " + this.fileName ) ;
 
         String outdirName = System.getProperty( "junit.report.dir" ) ; 
         if (outdirName == null)
@@ -129,6 +140,7 @@ public class JUnitReportHelper {
      * @param The name of the test case
      */
     public void start( String name ) {
+        msg( "Starting test " + name ) ;
         if ((current != null) && !testComplete)
             throw new RuntimeException( "Trying to start test named " + name 
                 + " before current test " + current + " has completed!" ) ;
@@ -142,6 +154,7 @@ public class JUnitReportHelper {
     /** Report that the current test passed.
      */
     public void pass() {
+        msg( "Test " + current + " passed" ) ;
         checkCurrent() ;
 
         writer.endTest( current ) ;
@@ -155,6 +168,7 @@ public class JUnitReportHelper {
      * as cause.
      */
     public void fail( Throwable thr ) {
+        msg( "Test " + current + " failed with exception " + thr ) ;
         checkCurrent() ;
 
         if (thr instanceof AssertionError)
@@ -173,14 +187,21 @@ public class JUnitReportHelper {
      * call will write a report.
      */
     public Counts done() {
-        if ((current != null) && !testComplete)
-            throw new RuntimeException( "Trying to terminate test suite before current test " 
-                + current + " has completed!" ) ;
+        msg( "Done called" ) ;
+        boolean error = ((current != null) && !testComplete) ;
+
+        if (error) {
+            fail( "Test suite terminating without terminating test " + current ) ;
+        }
 
         if (counts == null) {
             JUnitReportWriter.TestCounts tc = writer.endTestSuite() ;
             counts = new Counts( tc.pass(), tc.fail() + tc.error() ) ;
         }
+
+        if (error) 
+            throw new RuntimeException( "Trying to terminate test suite before current test " 
+                + current + " has completed!" ) ;
 
         return counts ;
     }

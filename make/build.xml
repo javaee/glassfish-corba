@@ -806,7 +806,8 @@
     <!-- ========================= JAVADOC ========================= -->
     <target name="javadoc" depends="init">
 	<javadoc packagenames="com.sun.corba.se.spi.*,com.sun.corba.se.pept.*"
-	         sourcepath="${src.dir}:${orblib.src.dir}"
+	         sourcepath="${src.dir}:${orblib.src.dir}:${gensrc.dir}"
+		 classpathref="classpath.master"
 		 destdir="${javadoc.dir}"
 		 author="true"
 		 version="true"

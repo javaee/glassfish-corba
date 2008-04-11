@@ -159,7 +159,8 @@ public class GenerationTestSuiteBase extends TestCase {
 	try {
 	    return gen.generate( loader ) ;
 	} finally {
-	    gen.reportTimes() ;
+            if (debug)
+                gen.reportTimes() ;
 	}
     }
 

@@ -861,15 +861,19 @@ public class Client extends TestCase
 	    cili.disable() ;
 
 	} catch (Exception exc) {
-	    System.out.println( "Received exception: " ) ;
-	    exc.printStackTrace() ;
+            if (debug) {
+                System.out.println( "Received exception: " ) ;
+                exc.printStackTrace() ;
+            }
 	} finally {
 	    // XXX Analyze the event stream to determine if the test passed or not.
-	    System.out.println( "Contents of timer event log:" ) ;
-	    displayLogEvents( leh ) ;
-	    validateLogEvents( orb, leh, expectedInitialTimeout, expectedMaxWait,
-		expectedBackoff+100 ) ;
-	    orb.destroy() ;
+            if (debug) {
+                System.out.println( "Contents of timer event log:" ) ;
+                displayLogEvents( leh ) ;
+                validateLogEvents( orb, leh, expectedInitialTimeout, expectedMaxWait,
+                    expectedBackoff+100 ) ;
+                orb.destroy() ;
+            }
 	}
     }
 

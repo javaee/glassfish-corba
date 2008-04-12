@@ -85,7 +85,6 @@ public class MsgTypesTest extends CORBATest {
         output.append(GIOP_version[serverVersion]);
         output.append("_");
         output.append(GIOP_strategy[serverStrategy]);
-        output.append(" server: ");
 
         return output.toString() ;
     }

@@ -11,6 +11,18 @@
     <Match>
 	<Package name="~com.sun.corba.se.org.objectweb.*"/>
     </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.org.omg.*"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.org.omg.*"/>
+    </Match>
+    <Match>
+	<Package name="~org.omg.*"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.spi.activation.*"/>
+    </Match>
 </FindBugsFilter>
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.

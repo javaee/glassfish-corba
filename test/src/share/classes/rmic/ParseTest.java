@@ -130,23 +130,12 @@ public class ParseTest extends Test implements Constants {
         myAssert(type != null,"rmic.ReturnVector failed");
     }
     
-    private void testAppletServer() throws Throwable {
-        ImplementationType type = (ImplementationType) MapType.getType("rmic.AppletServer",stack);
-        myAssert(type != null,"rmic.AppletServer failed");
-    }
-    
     private void testThrowNCIOException() throws Throwable {
         testFailure("rmic.ThrowNCIOException", "not a valid class", "rmic.NCIOException");
     }
     
     private void testThrowNCException() throws Throwable {
         testFailure("rmic.ThrowNCException", "not a valid class", "rmic.NCRemoteException");
-    }
-
-    private void testClassNameCaseCollision() throws Throwable {
-        String [] classes = {"javax.rmi.PortableRemoteObject",
-                             "javax.rmi.PortableREmoteOBject"};
-        testFailure(classes, "not a valid type", "differ only in case");
     }
 
     private void testPassIDLEntityException() throws Throwable {
@@ -349,11 +338,13 @@ public class ParseTest extends Test implements Constants {
             boolean isAttribute = methods[i].isAttribute();
             if (name.equals("getSize")) {
                 if (!isAttribute) {
-                    throw new Error("alpha.bravo.Bear method " + methods[i] + " is not an attribute " + methods[i].getAttributeName());
+                    throw new Error("alpha.bravo.Bear method " + methods[i] + " is not an attribute " 
+                        + methods[i].getAttributeName());
                 }
             } else {
                 if (isAttribute) {
-                    throw new Error("alpha.bravo.Bear method " + methods[i] + " is an attribute " + methods[i].getAttributeName());
+                    throw new Error("alpha.bravo.Bear method " + methods[i] + " is an attribute " 
+                        + methods[i].getAttributeName());
                 }
             }
         }
@@ -369,11 +360,13 @@ public class ParseTest extends Test implements Constants {
             boolean isAttribute = methods[i].isAttribute();
             if (name.equals("getCodeBase") || name.equals("getValue")) {
                 if (!isAttribute) {
-                    throw new Error("rmic.AbstractObject method " + methods[i] + " is not an attribute " + methods[i].getAttributeName());
+                    throw new Error("rmic.AbstractObject method " + methods[i] + " is not an attribute "    
+                        + methods[i].getAttributeName());
                 }
             } else {
                 if (isAttribute) {
-                    throw new Error("rmic.AbstractObject method " + methods[i] + " is an attribute " + methods[i].getAttributeName());
+                    throw new Error("rmic.AbstractObject method " + methods[i] + " is an attribute " 
+                        + methods[i].getAttributeName());
                 }
             }
         }
@@ -509,16 +502,6 @@ public class ParseTest extends Test implements Constants {
             stack = new ContextStack(env);
 
             // Do the tests...
-
-	    /*
-	      boolean parseNC = true;
-	      Runtime r = Runtime.getRuntime();
-	      r.gc();
-	      long startMem = r.freeMemory();
-	      long startTime = System.currentTimeMillis();
-	      System.out.println();
-	      env.setParseNonConforming(parseNC);
-	    */
             testAbstract();
             testMangleMethods();
             testMangleMethodsFail();
@@ -532,17 +515,11 @@ public class ParseTest extends Test implements Constants {
             testHiServant();
             testOnlyRemote();
             testPassIDLEntityException();
-	    //            testClassNameCaseCollision();
-	    //            testAppletServer();
             testReturnVector();
             testThrowNCException();
             testThrowNCIOException();
-	    /*
-	      long endMem = r.freeMemory();
-	      long endTime = System.currentTimeMillis();
-	      System.out.println("ParseNC = "+parseNC+", Memory = "+(endMem-startMem)+", Time = "+(endTime-startTime)+", Classes = "+MapType.getCount());
-	    */          
-            if (!env.getParseNonConforming()) {
+
+	    if (!env.getParseNonConforming()) {
                 env.setParseNonConforming(true);
                 
                 testInvalidNC();
@@ -561,7 +538,6 @@ public class ParseTest extends Test implements Constants {
             // Make sure we toss out any cached types...
             
             env.shutdown();
-
         } catch (ThreadDeath death) {
             throw death;
         } catch (Throwable e) {

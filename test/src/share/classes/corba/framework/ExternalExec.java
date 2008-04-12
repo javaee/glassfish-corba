@@ -234,6 +234,7 @@ public class ExternalExec extends ControllerAdapter
         if (process != null) {
             try {
                 exitValue = exitValue();
+                handleExitValue() ;
             } catch (IllegalThreadStateException badState) {
                 // Happens when the process hasn't finished
                 // or was never started

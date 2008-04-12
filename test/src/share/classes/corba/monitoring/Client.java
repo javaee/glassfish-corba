@@ -424,7 +424,6 @@ public class Client
      */ 
     private void validatePopulatedMonitoredAttributes( ) {
         System.out.println("Starting validatePopulatedMonitoredAttributes()" );
-        helper.start( "validatePopulatedMonitoredAttributes" ) ;
         MonitoredObject level1MonitoredObject =
             orb.getMonitoringManager().getRootMonitoredObject().getChild(
                 CHILD_LEVEL1_NAME );
@@ -465,8 +464,6 @@ public class Client
             level2MonitoredObject.getAttribute(STATISTICATTRIBUTE1_LEVEL2_NAME),
             new String("").getClass(), STATISTICATTRIBUTE1_LEVEL2_DESCRIPTION,
             null );
-
-        helper.pass() ;
     }
 
 

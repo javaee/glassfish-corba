@@ -266,6 +266,9 @@ public class ExternalExec extends ControllerAdapter
                 helper.pass() ;
             else 
                 helper.fail( "Test failed with return code " + exitValue ) ;
+
+            // Only call pass/fail once per controller if there is a helper.
+            helper = null ;
         }
         return exitValue ;
     }

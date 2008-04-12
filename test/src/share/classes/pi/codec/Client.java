@@ -436,8 +436,8 @@ public class Client
 			  (byte)2 ) );
 
 	// Test decode()
-        checkInvalid( codec, false, "decode()", invalidForDecode, typeCodes );
-        checkInvalid( codec, true, "decode_value()", invalidForDecodeValue,
+        checkInvalid( codec, false, "decode", invalidForDecode, typeCodes );
+        checkInvalid( codec, true, "decode_value", invalidForDecodeValue,
 	              typeCodes );
 
     }
@@ -446,11 +446,11 @@ public class Client
                                byte[][] cases, TypeCode[] typeCodes ) 
 	throws Exception
     {
-        helper.start( "formatMismatch_" + type ) ;
-
 	out.println( "Testing FormatMismatch for " + type );
 
 	for( int i = 0; i < cases.length; i++ ) {
+            helper.start( "formatMismatch_" + type + "_" + i ) ;
+
 	    out.print( "  - Case #" + i + ": " );
 	    byte[] data = cases[i];
 	    boolean pass = false;

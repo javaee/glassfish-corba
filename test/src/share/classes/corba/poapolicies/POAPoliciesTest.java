@@ -57,9 +57,9 @@ public class POAPoliciesTest extends CORBATest
 
         Controller client = createClient("corba.poapolicies.HelloClient", poaFactory );
 
-        server.start( helper );
+        server.start();
 
-        client.start();
+        client.start( helper );
 
         client.waitFor();
 

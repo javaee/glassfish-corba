@@ -357,7 +357,7 @@ public class Client
 
 
     @Test
-    public void testMarkReset(String args[]) throws RemoteException, Exception
+    public void testMarkReset() throws RemoteException, Exception
     {
         System.out.println("---- Testing mark and reset ----");
 

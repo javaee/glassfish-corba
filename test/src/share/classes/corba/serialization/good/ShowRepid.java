@@ -70,7 +70,7 @@ public class ShowRepid implements Serializable {
 	String r1 = "RMI:javax.rmi.CORBA.ClassDesc:2BABDA04587ADCCC:CFBF02CF5294176B";
 	String r2 = "RMI:java.util.GregorianCalendar:450042FBA7A923B1:8F3DD7D6E5B0D0C1";
 	String r3 = "RMI:java.io.ObjectStreamClass:071DA8BE7F971128:AB0E6F1AEEFE7B88";
-	String r4 = "RMI:ShowRepid:AC117E28FE36587A:0000000000001234";
+	String r4 = "RMI:corba.serialization.good.ShowRepid:AC117E28FE36587A:0000000000001234";
 	String r5 = "RMI:java.util.Hashtable:86573568A211C011:13BB0F25214AE4B8";
 
 	String s1 = RepositoryId.createForAnyType(java.lang.Class.class);

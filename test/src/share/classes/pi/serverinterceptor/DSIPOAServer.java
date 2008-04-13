@@ -96,14 +96,14 @@ public abstract class DSIPOAServer
 
             // Test POA special operations
             testSpecialOps();
+        } finally {
+            finish() ;
 
             // Notify client it's time to exit.
             exitClient();
 
             // wait for invocations from clients
             waitForClients();
-        } finally {
-            finish() ;
         }
     }
 

@@ -90,13 +90,13 @@ public abstract class RMIServer
 
             // Test ServerInterceptor
             testServerInterceptor();
+        } finally {
+            finish() ;
 
             // Notify client it's time to exit.
             exitClient();
 
             waitForClients();
-        } finally {
-            finish() ;
         }
     }
 

@@ -152,7 +152,9 @@ public class Server
             
             // Check to make sure tagged components are inserted into IORs.
             checkTaggedComponentsPresent();
-            
+        } finally {
+            helper.done() ;
+                   
             //handshake:
             out.println("Server is ready.");
             out.flush();
@@ -162,8 +164,6 @@ public class Server
             synchronized (sync) {
                 sync.wait();
             }
-        } finally {
-            helper.done() ;
         }
     }
 

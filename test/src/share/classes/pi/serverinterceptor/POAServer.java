@@ -114,14 +114,14 @@ public abstract class POAServer
 
             // Test POA special operations
             testSpecialOps();
+        } finally {
+            finish() ;
 
             // Notify client it's time to exit.
             exitClient();
 
             // wait for invocations from clients
             waitForClients();
-        } finally {
-            finish() ;
         }
     }
 

@@ -127,14 +127,14 @@ public abstract class POAServer
 
             // Test get_server_policy
             testGetServerPolicy();
+        } finally {
+            finish() ;
 
             // Notify client it's time to exit.
             exitClient();
 
             // wait for invocations from clients
             waitForClients();
-        } finally {
-            finish() ;
         }
     }
 

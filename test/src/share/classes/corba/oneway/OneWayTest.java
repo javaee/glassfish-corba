@@ -42,8 +42,6 @@ public class OneWayTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
-
         Controller orbd = createORBD();
 
         orbd.start();
@@ -54,7 +52,7 @@ public class OneWayTest extends CORBATest
 
         Controller client = createClient("corba.oneway.helloClient");
     
-        client.start( helper );
+        client.start();
 
         client.waitFor();
 

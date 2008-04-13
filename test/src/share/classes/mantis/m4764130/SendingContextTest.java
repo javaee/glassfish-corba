@@ -61,7 +61,7 @@ public class SendingContextTest extends CORBATest {
         server.start();
 
         Controller client = createClient("mantis.m4764130.Client");
-        client.start( getHelper() );
+        client.start();
 
         client.waitFor();
 

@@ -85,7 +85,7 @@ public class INSTest extends CORBATest
 
         Controller client = createClient("naming.instest.Client");
  
-        client.start( getHelper() );
+        client.start();
 
         client.waitFor(60000);
 

@@ -66,7 +66,7 @@ import org.testng.Assert ;
  */
 public class ClientCircular extends ClientBase {
 
-    public ORBUtilSystemException wrapper ;
+    public ORBUtilSystemException wrapper = ORB.getStaticLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 
     @BeforeSuite
     public void clientSetup() throws Exception {

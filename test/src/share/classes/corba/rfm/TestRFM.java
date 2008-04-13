@@ -43,14 +43,12 @@ public class TestRFM extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
-
         // Controller orbd = createORBD() ;
         // orbd.start() ;
 
         Controller client = createClient("corba.rfm.TestClient");
 
-        client.start( helper );
+        client.start();
 
         // Wait for the client to finish for up to 2 minutes, then
         // throw an exception.

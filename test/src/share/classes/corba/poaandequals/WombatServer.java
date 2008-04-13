@@ -118,7 +118,7 @@ public class WombatServer implements InternalProcess
 
             out.println("Activated object, starting client");
         
-            client.start( helper );
+            client.start();
             client.waitFor();
 
             out.println("Client finished, deactivating object");

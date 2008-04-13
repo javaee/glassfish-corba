@@ -147,6 +147,12 @@ public interface JUnitReportWriter {
      */
     void endTest(TestDescription test); 
 
+    /** 
+     * A test ended.  Here we supply the duration, in case the duration is not
+     * determined by the [ startTest, endTest ] interval.
+     */
+    void endTest(TestDescription test, long duration ); 
+
     /**
      * The whole testsuite ended.
      * @param suite the suite.

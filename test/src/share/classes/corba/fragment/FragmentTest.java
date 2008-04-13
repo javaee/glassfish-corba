@@ -47,8 +47,6 @@ public class FragmentTest extends CORBATest {
     static String[] GIOP_version = { "1.0", "1.1", "1.2" };
     static String[] GIOP_strategy = { "GROW", "CLCT", "STRM" };
 
-    JUnitReportHelper helper = getHelper() ;
-
     private void printBeginTest(int clientVersion,
                                 int clientStrategy,
                                 int serverVersion,
@@ -125,7 +123,7 @@ public class FragmentTest extends CORBATest {
                 Controller client = createClient("corba.fragment.Client", name );
 
                 server.start();
-                client.start( helper );
+                client.start();
 
                 client.waitFor(60000);
 

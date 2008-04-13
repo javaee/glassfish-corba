@@ -51,7 +51,6 @@ import com.sun.corba.se.spi.orb.ORB;
 import corba.framework.*;
 
 public class GIOPHeaderPaddingTest extends CORBATest {
-    JUnitReportHelper helper = getHelper() ;
 
     public static final String thisPackage =
 	GIOPHeaderPaddingTest.class.getPackage().getName();
@@ -84,7 +83,7 @@ public class GIOPHeaderPaddingTest extends CORBATest {
         Controller colocatedClientServer = 
             createClient(thisPackage + ".ColocatedClientServer",
                          "colocatedClientServer");
-        colocatedClientServer.start( helper );
+        colocatedClientServer.start();
         colocatedClientServer.waitFor();
         colocatedClientServer.stop();
 
@@ -101,7 +100,7 @@ public class GIOPHeaderPaddingTest extends CORBATest {
 
 	Controller client = createClient(thisPackage + "." + clientMainClass,
 					 clientTestName);
-	client.start( helper );
+	client.start();
 	client.waitFor();
 	client.stop();
 

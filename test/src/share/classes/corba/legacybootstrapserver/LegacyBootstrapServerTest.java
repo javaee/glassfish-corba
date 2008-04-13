@@ -62,15 +62,13 @@ public class LegacyBootstrapServerTest
 	// However, when it wasn't here then createServer below complained
 	// Caught java.io.FileNotFoundException: gen/corba/legacybootstrapserver/server.out.txt (No such file or directory)
         
-        JUnitReportHelper helper = getHelper() ;
-
         Controller orbd   = createORBD();
 
         Controller server = createServer(thisPackage + ".Server");
         Controller client = createClient(thisPackage + ".Client");
 
         server.start();
-        client.start( helper );
+        client.start();
         client.waitFor(60000);
         client.stop();
         server.stop();

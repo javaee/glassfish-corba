@@ -55,8 +55,6 @@ public class PurgecallsTest
 	throws
 	    Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
-
         Controller orbd   = createORBD();
         orbd.start();
 
@@ -66,7 +64,7 @@ public class PurgecallsTest
             createClient(thisPackage + "." + "Client", "Client");
 
         server.start();
-        client.start( helper );
+        client.start();
         // When this test fails - it hangs, so do not wait forever.
         client.waitFor(60000);
         client.stop();

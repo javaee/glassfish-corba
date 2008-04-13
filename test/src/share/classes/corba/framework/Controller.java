@@ -92,6 +92,13 @@ public interface Controller
                     OutputStream err,
                     Hashtable extra) throws Exception;
   
+    /** Time between calls to start() and either waitFor completes, or
+     * the controller is terminated by a call to stop or kill.
+     * @throws IllegalStateException if the process has not been started,
+     * or has not yet completed.
+     */
+    long duration() ;
+
     /**
      * Start the process(may block).
      *
@@ -99,10 +106,6 @@ public interface Controller
      */
     void start() throws Exception;
 
-    /** Start a process, with a JUnitReportHelper to collect the result.
-     */
-    void start( JUnitReportHelper helper ) throws Exception ;
-  
     /**
      * Stop the process.  This may request the termination of the process in some
      * modes, which may fail.

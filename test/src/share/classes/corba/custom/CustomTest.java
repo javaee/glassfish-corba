@@ -49,9 +49,9 @@ public class CustomTest extends CORBATest
 
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
         Options.setRMICClasses(rmicClasses);
         Options.addRMICArgs("-poa -nolocalstubs -iiop -keep -g");
+        boolean failed = false ;
 
         compileRMICFiles();
         compileJavaFiles();
@@ -84,7 +84,7 @@ public class CustomTest extends CORBATest
             // Go ahead and restart both server and client each time to
             // make sure we test all fragment sizes for replies, too.
             server.start();
-            client.start( helper );
+            client.start() ; 
 
             try {
                 if (client.waitFor(60000) == Controller.SUCCESS) {
@@ -92,10 +92,12 @@ public class CustomTest extends CORBATest
                 } else {
                     String msg = "FAILED (" + client.exitValue() + ")" ;
                     System.out.println( msg ) ;
+                    failed = true;
                 }
             } catch (Exception e) {
                 // Timed out waiting for the client
                 System.out.println("HUNG");
+                failed = true ;
             } finally {
                 client.stop();
                 server.stop();
@@ -106,11 +108,7 @@ public class CustomTest extends CORBATest
 
         System.out.println();
 
-        JUnitReportHelper.Counts counts = helper.done() ;
-
-        int failures = counts.numFail() ;
-        System.out.println("  Total failures: " + failures );
-        if (failures > 0)
-            throw new Error("Failures detected: " + failures);
+        if (failed)
+            throw new Error("Failures detected" );
     }
 }

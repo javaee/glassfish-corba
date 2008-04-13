@@ -50,8 +50,6 @@ import corba.framework.*;
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 
 public class JSGTest extends CORBATest {
-    private JUnitReportHelper helper = getHelper() ;
-
     public static final String thisPackage =
 	JSGTest.class.getPackage().getName();
     
@@ -72,7 +70,7 @@ public class JSGTest extends CORBATest {
 	Controller colocatedClientServer = 
 	    createClient(thisPackage + ".ColocatedClientServer",
 			 "colocatedClientServer");
-	colocatedClientServer.start( helper );
+	colocatedClientServer.start();
 	colocatedClientServer.waitFor();
 	colocatedClientServer.stop();
 
@@ -97,7 +95,7 @@ public class JSGTest extends CORBATest {
 
 	Controller client = createClient(thisPackage + "." + clientMainClass,
 					 clientTestName);
-	client.start( helper );
+	client.start();
 	client.waitFor();
 	client.stop();
 

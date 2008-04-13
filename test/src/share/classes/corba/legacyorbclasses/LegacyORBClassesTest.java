@@ -52,13 +52,12 @@ public class LegacyORBClassesTest
 	LegacyORBClassesTest.class.getPackage().getName();
 
     protected void doTest() throws Throwable {
-        JUnitReportHelper helper = getHelper() ;
         Controller orbd   = createORBD();
         orbd.start();
 
         Controller client = createClient(thisPackage + ".Client");
 
-        client.start( helper );
+        client.start();
         client.waitFor(120000);
         client.stop();
 

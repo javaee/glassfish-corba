@@ -46,15 +46,13 @@ import corba.framework.CORBATest;
 import corba.framework.*;
 
 public class RepIdTest extends CORBATest {
-    private JUnitReportHelper helper = getHelper() ;
-
     public static final String thisPackage =
 	RepIdTest.class.getPackage().getName();
 
     protected void doTest() throws Throwable {
         Controller client = createClient("corba.repid.Client");
 
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 

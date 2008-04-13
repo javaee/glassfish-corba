@@ -42,8 +42,6 @@ public class MultiORBTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
-
         Controller orbd = createORBD();
         orbd.start();
 
@@ -51,7 +49,7 @@ public class MultiORBTest extends CORBATest
         server.start();
 
         Controller client = createClient("corba.multiorb.policy2Client");
-        client.start( helper );
+        client.start();
         client.waitFor();
 
         client.stop();

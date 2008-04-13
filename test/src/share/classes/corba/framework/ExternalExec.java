@@ -46,6 +46,19 @@ import test.*;
  */
 public class ExternalExec extends ControllerAdapter
 {
+    private long startTime = 0 ;
+    private long duration = 0 ;
+
+    public long duration() {
+        if (startTime == 0) 
+            throw new IllegalStateException( "Process has not yet started" ) ;
+
+        if (duration == 0)
+            throw new IllegalStateException( "Process has not yet completed" ) ;
+
+        return duration ;
+    }
+
     public static final String HANDSHAKE_KEY = "handshake" ;
     protected String handshake = null ;
     private boolean addOrbToXbootClasspath ;
@@ -187,13 +200,9 @@ public class ExternalExec extends ControllerAdapter
      * Starts the class in a separate process, redirecting output
      * appropriately.  This method returns when the process starts.
      */
-    public void start( JUnitReportHelper helper ) throws Exception {
-        if (helper != null) {
-            this.helper = helper ;
-            helper.start( getProcessName() ) ;
-        }
-
+    public void start() throws Exception {
         try {
+            startTime = System.currentTimeMillis() ;
             String[] cmd = buildCommand() ;
 
             if (Test.forkDebugLevel >= Test.DISPLAY) {
@@ -220,8 +229,7 @@ public class ExternalExec extends ControllerAdapter
             if (handshake != null)
                 monitor.waitForHandshake( getMaximumTimeout() ) ;
         } catch (Exception exc) {
-            if (helper != null)
-                helper.fail( "Caught exception on controller start: " + exc ) ;
+            duration = System.currentTimeMillis() - startTime ;
             throw exc ;
         }
     }
@@ -234,7 +242,6 @@ public class ExternalExec extends ControllerAdapter
         if (process != null) {
             try {
                 exitValue = exitValue();
-                handleExitValue() ;
             } catch (IllegalThreadStateException badState) {
                 // Happens when the process hasn't finished
                 // or was never started
@@ -246,7 +253,10 @@ public class ExternalExec extends ControllerAdapter
 
             try {
                 monitor.finishWriting();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
+
+            duration = System.currentTimeMillis() - startTime ;
         }
     }
 
@@ -260,28 +270,15 @@ public class ExternalExec extends ControllerAdapter
 	terminate() ;
     }
 
-    private int handleExitValue() {
-        if (helper != null) {
-            if (exitValue == Controller.SUCCESS) 
-                helper.pass() ;
-            else 
-                helper.fail( "Test failed with return code " + exitValue ) ;
-
-            // Only call pass/fail once per controller if there is a helper.
-            helper = null ;
-        }
-        return exitValue ;
-    }
-
     public int waitFor() throws InterruptedException
     {
         try {
             exitValue = process.waitFor() ;
-            return handleExitValue() ;
+            return exitValue ;
         } catch (InterruptedException exc) {
-            if (helper != null)
-                helper.fail( "Test " + getProcessName() + " failed because waiting thread was interrupted" ) ;
             throw exc ;    
+        } finally {
+            duration = System.currentTimeMillis() - startTime ;
         }
     }
 
@@ -297,13 +294,12 @@ public class ExternalExec extends ControllerAdapter
 
         } while (System.currentTimeMillis() < stop);
 
+        duration = System.currentTimeMillis() - startTime ;
+
         if (finished()) {
             exitValue = process.exitValue() ;
-            return handleExitValue() ;
+            return exitValue ;
         } else {
-            if (helper != null)
-                helper.fail( "Test " + getProcessName() + " failed with a timeout after " + timeout 
-                    + " milliseconds" ) ;
             throw new Exception("waitFor timed out for " + getProcessName());
         }
     }

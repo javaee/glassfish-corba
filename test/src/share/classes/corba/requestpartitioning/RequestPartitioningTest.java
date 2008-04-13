@@ -65,8 +65,6 @@ public class RequestPartitioningTest
 	throws
 	    Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
-
         // Run test with DirectByteBuffers
         Controller orbd = createORBD();
         orbd.start();
@@ -81,7 +79,7 @@ public class RequestPartitioningTest
         clientProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "true");
 //        clientProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
         Controller client = createClient(thisPackage + ".Client", "Client");
-        client.start( helper );
+        client.start();
 
         client.waitFor(CLIENT_TIMEOUT);
 

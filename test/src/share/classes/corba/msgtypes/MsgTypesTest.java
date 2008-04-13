@@ -47,8 +47,6 @@ public class MsgTypesTest extends CORBATest {
     static String[] GIOP_version = { "1.0", "1.1", "1.2" };
     static String[] GIOP_strategy = { "GROW", "CLCT", "STRM" };
 
-    JUnitReportHelper helper = getHelper() ;
-
     private int errors = 0; // keeps the error count
 
     private void printBeginTest(int clientVersion,
@@ -160,7 +158,7 @@ public class MsgTypesTest extends CORBATest {
                 Controller client = createClient("corba.msgtypes.Client", name );
 
                 server.start();
-                client.start( helper );
+                client.start();
 
                 client.waitFor(60000);
 
@@ -208,7 +206,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runEarlyReply" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -241,7 +239,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runSimpleCancelRequest" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -274,7 +272,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runAbortiveCancelRequest1" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -313,7 +311,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runAbortiveCancelRequest2" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -359,7 +357,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runTargetAddressDisp" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -392,7 +390,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runCloseConnection" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -425,7 +423,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runMessageError" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -458,7 +456,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runGIOPInterop" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -491,7 +489,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runFragmentedReply" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 
@@ -524,7 +522,7 @@ public class MsgTypesTest extends CORBATest {
         Controller client = createClient("corba.msgtypes.Client", "runHeaderPaddingTest" );
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(60000);
 

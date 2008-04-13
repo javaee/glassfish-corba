@@ -59,9 +59,6 @@ public class Example extends CORBATest
     // should have this.
     protected void doTest() throws Throwable
     {
-        // Get setup to generate a JUnit report for the results of running the client (pass or fail)
-        JUnitReportHelper helper = getHelper() ;
-
         // Add some command line arguments for the IDL compiler.
         Options.addIDLCompilerArgs("-fall");
 
@@ -92,7 +89,7 @@ public class Example extends CORBATest
         // allow something to run in the test process.
         orbd.start();
         server.start();
-        client.start( helper );
+        client.start();
 
         // Wait for the client to finish for up to 2 minutes, then
         // throw an exception.

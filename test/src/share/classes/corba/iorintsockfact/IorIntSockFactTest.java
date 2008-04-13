@@ -52,8 +52,6 @@ public class IorIntSockFactTest extends CORBATest {
 	IorIntSockFactTest.class.getPackage().getName();
 
     protected void doTest() throws Throwable {
-        JUnitReportHelper helper = getHelper() ;
-
         Controller orbd   = createORBD();
         orbd.start();
 
@@ -62,7 +60,7 @@ public class IorIntSockFactTest extends CORBATest {
         Controller client = createClient(thisPackage + "." + "Client",
                                          "Client");
         server.start();
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();

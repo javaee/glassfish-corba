@@ -62,8 +62,6 @@ public class LBTest
     protected void doTest()
 	throws Exception
     {
-        JUnitReportHelper helper = getHelper() ;
-
 	String thisPackage = this.getClass().getPackage().getName() ;
 	String pluginPackage = "com.sun.corba.se.impl.plugin.hwlb" ;
 
@@ -118,7 +116,7 @@ public class LBTest
 
 	Thread.sleep( 1000 ) ;
 
-	client.start( helper );
+	client.start();
 
 	// Wait for client to get started before stopping server1.
 	Thread.sleep( 4000 ) ;

@@ -73,9 +73,7 @@ public class ServiceExampleTest
 	Controller client = createClient(thisPackage + ".Client",
 					 "client");
 
-        JUnitReportHelper helper = getHelper() ;
-
-	client.start( helper );
+	client.start();
 	client.waitFor();
 	client.stop();
 	arbitraryObjectServer.stop();
@@ -87,14 +85,12 @@ public class ServiceExampleTest
 	    createServer(thisPackage + ".ColocatedServers",
 			 "colocatedClientServer");
 	colocatedServers.start();
-	client.start( helper );
+	client.start();
 	client.waitFor();
 	client.stop();
 	colocatedServers.stop();
 
 	orbd.stop();
-
-        helper.done() ;
     }
 }
 

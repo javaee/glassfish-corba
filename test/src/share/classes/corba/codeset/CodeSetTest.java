@@ -48,8 +48,6 @@ public class CodeSetTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
-
         // Now GIOP 1.1.
         Controller orbd = createORBD();
 
@@ -69,7 +67,7 @@ public class CodeSetTest extends CORBATest
 
         orbd.start();
         server.start();
-        client.start( helper );
+        client.start();
 
         // Wait for the client to finish for up to 2 minutes, then
         // throw an exception.
@@ -82,7 +80,7 @@ public class CodeSetTest extends CORBATest
         client = createClient("corba.codeset.Client",
                               "client1_2");
 
-        client.start( helper );
+        client.start();
         client.waitFor(120000);
         client.stop();
 

@@ -160,6 +160,8 @@ public class JUnitReportHelper {
         writer.endTest( current ) ;
     }
 
+    /** Report that the current test failed with an error message.
+     */
     public void fail( String msg ) {
         fail( new AssertionError( msg ) ) ;
     }
@@ -177,6 +179,36 @@ public class JUnitReportHelper {
             writer.addError( current, thr ) ; 
 
         writer.endTest( current ) ;
+    }
+
+    /** Report that the current test passed.
+     */
+    public void pass( long duration ) {
+        msg( "Test " + current + " passed" ) ;
+        checkCurrent() ;
+
+        writer.endTest( current, duration ) ;
+    }
+
+    /** Report that the current test failed with an error message.
+     */
+    public void fail( String msg, long duration ) {
+        fail( new AssertionError( msg ), duration ) ;
+    }
+
+    /** Report that the current test failed with the given exception
+     * as cause.
+     */
+    public void fail( Throwable thr, long duration ) {
+        msg( "Test " + current + " failed with exception " + thr ) ;
+        checkCurrent() ;
+
+        if (thr instanceof AssertionError)
+            writer.addFailure( current, thr ) ; 
+        else
+            writer.addError( current, thr ) ; 
+
+        writer.endTest( current, duration ) ;
     }
 
     private Counts counts = null ;

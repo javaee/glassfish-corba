@@ -58,8 +58,6 @@ public class FolbTest
 	throws
 	    Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
-
         Controller orbd;
         Controller server;
         Controller client;
@@ -74,7 +72,7 @@ public class FolbTest
         server = createServer(thisPackage + "." + "Server", "Server");
         client = createClient(thisPackage + "." + "Client", "Client");
         server.start();
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();
@@ -86,7 +84,7 @@ public class FolbTest
         client = createClient(thisPackage + "." + "ClientWithSticky",
                               "ClientWithSticky");
         server.start();
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();
@@ -95,7 +93,7 @@ public class FolbTest
 
         Controller colocated = createClient(thisPackage + "." + "ColocatedCS",
                                             "ColocatedCS");
-        colocated.start( helper );
+        colocated.start();
         colocated.waitFor();
         colocated.stop();
 
@@ -103,7 +101,7 @@ public class FolbTest
 
         colocated = createClient(thisPackage + "." + "ColocatedCSWithSticky",
                                  "ColocatedCSWithSticky");
-        colocated.start( helper );
+        colocated.start();
         colocated.waitFor();
         colocated.stop();
 
@@ -114,7 +112,7 @@ public class FolbTest
         client = createClient(thisPackage + "." + "ClientTwoRefs",
                               "ClientTwoRefs");
         server.start();
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();
@@ -123,7 +121,7 @@ public class FolbTest
 
         colocated = createClient(thisPackage + "." + "ColocatedClientTwoRefs",
                                  "ColocatedClientTwoRefs");
-        colocated.start( helper );
+        colocated.start();
         colocated.waitFor();
         colocated.stop();
 
@@ -134,7 +132,7 @@ public class FolbTest
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_NoFs_NoF_NoC",
                               "ClientForTiming_NoFs_NoF_NoC");
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();
@@ -146,7 +144,7 @@ public class FolbTest
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_Fs_NoF_NoC",
                               "ClientForTiming_Fs_NoF_NoC");
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();
@@ -158,7 +156,7 @@ public class FolbTest
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_Fs_NoF_C",
                               "ClientForTiming_Fs_NoF_C");
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();
@@ -170,7 +168,7 @@ public class FolbTest
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_Fs_F_NoC",
                               "ClientForTiming_Fs_F_NoC");
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();
@@ -182,7 +180,7 @@ public class FolbTest
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_Fs_F_C",
                               "ClientForTiming_Fs_F_C");
-        client.start( helper );
+        client.start();
         client.waitFor();
         client.stop();
         server.stop();

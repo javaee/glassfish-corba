@@ -91,8 +91,6 @@ public class Strm2Test extends CORBATest
     }
 
     protected void doTest() throws Throwable {
-        JUnitReportHelper helper = getHelper() ;
-
         if (test.Test.useJavaSerialization()) {
             return;
         }
@@ -149,7 +147,7 @@ public class Strm2Test extends CORBATest
             String version = Versions.testableVersions[i] ;
             System.out.println("      Running client version " + version ) ;
 
-            clients[i].start( helper );
+            clients[i].start();
 
             clients[i].waitFor(360000);
 

@@ -52,14 +52,11 @@ import org.omg.CORBA.WStringValueHelper;
  */
 public class WStringValueHelperTest extends CORBATest
 {
-    JUnitReportHelper helper = getHelper() ;
-
     public static final String INDENT = "      ";
 
     // The actual test:
 
     public void checkWStringValueHelper() throws Exception {
-        helper.start( "checkWStringValueHelper" ) ;
         System.out.print(INDENT
                          + "  Checking WStringValueHelper from JDK...");
 
@@ -73,12 +70,10 @@ public class WStringValueHelperTest extends CORBATest
             Exception exc = new Exception("Bad TypeCode from WStringValueHelper: "
                                 + " kind: " 
                                 + tc.content_type().kind().value());
-            helper.fail( exc ) ;
             throw exc ;
         }
 
         System.out.println("PASSED");
-        helper.pass() ;
     }
 
 

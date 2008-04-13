@@ -64,7 +64,7 @@ public class POAAppletTest extends CORBATest
         // the equivalent methods that take two Strings.
         Controller client = createClient("hopper.h4647746.Client");
 
-        client.start( getHelper() );
+        client.start();
 
         // Wait for the client to finish for up to 2 minutes, then
         // throw an exception.

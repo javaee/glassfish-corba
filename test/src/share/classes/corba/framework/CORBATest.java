@@ -551,13 +551,7 @@ public abstract class CORBATest extends test.RemoteTest
         return new ExternalExec();
     }
 
-    private JUnitReportHelper helper = null ;
-
-    public JUnitReportHelper getHelper() {
-        if (helper == null)
-            helper = new JUnitReportHelper( this.getClass().getName() ) ;
-        return helper ;
-    }
+    private JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
 
     /**
      * Create and initialize the Controller for the client.  This
@@ -617,6 +611,14 @@ public abstract class CORBATest extends test.RemoteTest
 
         Test.dprint("Cleaning up " + name + "...");
 
+        helper.start( "Controller:" + name ) ;
+
+        int exitValue = process.exitValue() ;
+        if (exitValue == 0) 
+            helper.pass() ;
+        else
+            helper.fail( "Controller terminated with exit value " + exitValue ) ;
+
         try {
             process.kill();
         } catch (Throwable t) {
@@ -635,7 +637,6 @@ public abstract class CORBATest extends test.RemoteTest
             return;
 
         if (out != null && out != System.out) {
-
             try {
                 out.flush();
             } catch (IOException e) {
@@ -650,7 +651,6 @@ public abstract class CORBATest extends test.RemoteTest
         }
 
         if (err != null && err != System.err) {
-
             try {
                 err.flush();
             } catch (IOException e) {
@@ -670,15 +670,11 @@ public abstract class CORBATest extends test.RemoteTest
      */
     private void cleanUp()
     {
-        Enumeration ctrls = controllers.elements();
-
-        while (ctrls.hasMoreElements())
-            cleanUpHelp((Controller)ctrls.nextElement());
+        for (Controller ctrl : controllers) 
+            cleanUpHelp( ctrl ) ;
 
 	EmmaControl.resetPortAllocator() ;
-
-        if (helper != null)
-            helper.done() ;
+        helper.done() ;
     }
 
 
@@ -694,11 +690,7 @@ public abstract class CORBATest extends test.RemoteTest
         StringBuffer failedMsg = new StringBuffer("Bad exit value(s):"
                                                   + lineSeparator);
 
-        Enumeration ctrls = controllers.elements();
-
-        while (ctrls.hasMoreElements()) {
-            Controller controller = (Controller)ctrls.nextElement();
-
+        for (Controller controller : controllers) {
             try {
                 controller.kill();
             } catch (IllegalThreadStateException ex) {}
@@ -824,5 +816,5 @@ public abstract class CORBATest extends test.RemoteTest
      */
     protected Map traceMap = new HashMap() ;
 
-    protected Vector controllers = new Vector();
+    protected List<Controller> controllers = new ArrayList<Controller>();
 }

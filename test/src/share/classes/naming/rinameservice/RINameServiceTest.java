@@ -62,7 +62,7 @@ public class RINameServiceTest extends CORBATest
 
         server.start();
         Thread.sleep( 10000 );
-        client.start( getHelper() );
+        client.start();
         Thread.sleep( 10000 );
         
         server.stop();

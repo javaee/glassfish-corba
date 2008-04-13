@@ -51,8 +51,6 @@ public class ExceptionDetailSCTest
     public static final String thisPackage =
 	ExceptionDetailSCTest.class.getPackage().getName();
 
-    private JUnitReportHelper helper = getHelper() ;
-
     protected void doTest() throws Throwable {
         Controller orbd   = createORBD();
         orbd.start();
@@ -63,7 +61,7 @@ public class ExceptionDetailSCTest
         Controller colocatedClientServer = 
             createClient(thisPackage + ".ColocatedClientServer",
                          "colocatedClientServer");
-        colocatedClientServer.start( helper );
+        colocatedClientServer.start();
         colocatedClientServer.waitFor();
         colocatedClientServer.stop();
 
@@ -80,7 +78,7 @@ public class ExceptionDetailSCTest
 
 	Controller client = createClient(thisPackage + "." + clientMainClass,
 					 clientTestName);
-	client.start( helper );
+	client.start();
 	client.waitFor();
 	client.stop();
 

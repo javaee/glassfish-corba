@@ -51,8 +51,6 @@ public class IsLocalTest
     public static final String thisPackage =
 	IsLocalTest.class.getPackage().getName();
 
-    private JUnitReportHelper helper = getHelper() ;
-
     protected void doTest()
 	throws
 	    Throwable
@@ -66,7 +64,7 @@ public class IsLocalTest
         Controller colocatedClientServer = 
             createClient(thisPackage + ".ColocatedClientServer",
                          "colocatedClientServer");
-        colocatedClientServer.start( helper );
+        colocatedClientServer.start();
         colocatedClientServer.waitFor();
         colocatedClientServer.stop();
 
@@ -84,7 +82,7 @@ public class IsLocalTest
 
 	Controller client = createClient(thisPackage + "." + clientMainClass,
 					 clientTestName);
-	client.start( helper );
+	client.start();
 	client.waitFor();
 	client.stop();
 

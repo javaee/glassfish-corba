@@ -49,8 +49,6 @@ public class RMIPOACounterTest extends CORBATest
 
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
-
         // try this one. the report dir was already set to gen/corba/rmipoacounter
         Options.setOutputDirectory((String)getArgs().get(test.Test.OUTPUT_DIRECTORY));
         Options.addServerArg("-debug");
@@ -81,7 +79,7 @@ public class RMIPOACounterTest extends CORBATest
 
         Controller client = createClient("corba.rmipoacounter.counterClient");
 
-        client.start( helper );
+        client.start();
 
         client.waitFor();
 

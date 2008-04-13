@@ -53,7 +53,7 @@ public class CopyObjectPolicyTest extends CORBATest
 
         Controller client = createClient("corba.copyobjectpolicy.Client");
 
-        client.start( getHelper() );
+        client.start();
 
         client.waitFor();
 

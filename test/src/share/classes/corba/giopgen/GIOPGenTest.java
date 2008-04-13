@@ -54,7 +54,6 @@ import com.sun.corba.se.impl.orbutil.ORBConstants;
  */
 public class GIOPGenTest extends CORBATest {
     protected void doTest() throws Exception {
-        JUnitReportHelper helper = getHelper() ;
 	String thisPackage = GIOPGenTest.class.getPackage().getName();
 
 	Controller orbd = createORBD();
@@ -67,7 +66,7 @@ public class GIOPGenTest extends CORBATest {
 	client = createClient(thisPackage+"."+"Client", "Client");
 
 	server.start();
-	client.start( helper );
+	client.start();
 
 	client.waitFor(1000 * 60 * 5);
 

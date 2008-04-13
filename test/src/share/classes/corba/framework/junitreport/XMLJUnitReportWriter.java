@@ -248,7 +248,16 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         testStarts.put(t, new Long(System.currentTimeMillis()));
     }
 
+    public void endTest(TestDescription test, long duration ) {
+        Element elem = endTestHelper( test ) ;
+        elem.setAttribute(ATTR_TIME, "" + duration ) ;
+    }
+
     public void endTest(TestDescription test) {
+        endTestHelper( test ) ;
+    }
+
+    public Element endTestHelper(TestDescription test) {
         runCount++ ;
 
         // Fix for bug #5637 - if a junit.extensions.TestSetup is
@@ -278,6 +287,8 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         long l = testStarts.get(test);
         currentTest.setAttribute(ATTR_TIME, 
 	    "" + ((System.currentTimeMillis() - l) / 1000.0));
+
+        return currentTest ;
     }
 
     public void addFailure(TestDescription test, Throwable t) {

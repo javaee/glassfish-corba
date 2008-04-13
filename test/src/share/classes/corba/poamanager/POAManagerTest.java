@@ -43,14 +43,13 @@ public class POAManagerTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
         Controller orbd = createORBD();
         Controller server = createServer("corba.poamanager.HelloServer");
         Controller client = createClient("corba.poamanager.HelloClient");
 
         orbd.start();
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(1000 * 60 * 5);
 

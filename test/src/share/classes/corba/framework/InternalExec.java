@@ -47,21 +47,29 @@ import java.io.*;
  */
 public class InternalExec extends ControllerAdapter
 {
-    public void start( JUnitReportHelper helper ) throws Exception
+    private long startTime ;
+    private long duration ;
+
+    public void start( ) throws Exception
     {
-        if (helper != null) {
-            this.helper = helper ;
-            helper.start( getProcessName() ) ;
+        startTime = System.currentTimeMillis() ;
+
+        try {
+            Loader loader = new Loader();
+            loader.addPath(Options.getOutputDirectory());
+
+            Object obj = (loader.loadClass(className)).newInstance();
+
+            activateObject(obj);
+        } finally {
+            duration = System.currentTimeMillis() - startTime ;
         }
-
-        Loader loader = new Loader();
-        loader.addPath(Options.getOutputDirectory());
-
-        Object obj = (loader.loadClass(className)).newInstance();
-
-        activateObject(obj);
     }
-    
+   
+    public long duration() {
+        return duration ;
+    }
+
     public void stop()
     {
 	// Can't be stopped
@@ -110,15 +118,9 @@ public class InternalExec extends ControllerAdapter
 
         try {
             process.run(environment, programArgs, output, errors, extra);
-           
-            if (helper != null)
-                helper.pass() ;
         } catch (Exception ex) {
             ex.printStackTrace(errors);
             exitValue = 1;
-
-            if (helper != null) 
-                helper.fail( ex ) ;
         }
     }
                  

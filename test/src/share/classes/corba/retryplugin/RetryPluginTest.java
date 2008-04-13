@@ -59,8 +59,6 @@ public class RetryPluginTest
     protected void doTest()
 	throws Exception
     {
-        JUnitReportHelper helper = getHelper() ;
-
         String thisPackage = RetryPluginTest.class.getPackage().getName();
 
         Controller orbd = createORBD();
@@ -73,7 +71,7 @@ public class RetryPluginTest
         client = createClient(thisPackage+"."+"Client", "Client");
 
         server.start();
-        client.start( helper );
+        client.start();
 
         client.waitFor(1000 * 60 * 5);
 

@@ -54,6 +54,10 @@ public class FileOutputDecorator implements Controller
         this.delegate = delegate;
     }
 
+    public long duration() {
+        return delegate.duration() ;
+    }
+
     /**
      * Setup everything necessary to execute the given class.
      *
@@ -117,11 +121,6 @@ public class FileOutputDecorator implements Controller
     public void start() throws Exception
     {
         delegate.start();
-    }
-    
-    public void start( JUnitReportHelper helper ) throws Exception
-    {
-        delegate.start( helper );
     }
     
     public void stop()

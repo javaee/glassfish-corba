@@ -46,13 +46,12 @@ public class PreInvokePostInvokeTest
 {
     protected void doTest() throws Throwable
     {
-        JUnitReportHelper helper = getHelper() ;
         Controller orbd = createORBD();
         Controller server = createServer("corba.preinvokepostinvoke.Server" );
 
         orbd.start();
 
-        server.start( helper );
+        server.start();
 
         server.stop();
 

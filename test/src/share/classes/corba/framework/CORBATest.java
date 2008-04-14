@@ -551,7 +551,7 @@ public abstract class CORBATest extends test.RemoteTest
         return new ExternalExec();
     }
 
-    private JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
+    private JUnitReportHelper helper = new JUnitReportHelper( "Controller:" + this.getClass().getName() ) ;
 
     /**
      * Create and initialize the Controller for the client.  This
@@ -611,10 +611,10 @@ public abstract class CORBATest extends test.RemoteTest
 
         Test.dprint("Cleaning up " + name + "...");
 
-        helper.start( "Controller:" + name ) ;
+        helper.start( name ) ;
 
         int exitValue = process.exitValue() ;
-        if (exitValue == 0) 
+        if (exitValue <= 0) 
             helper.pass() ;
         else
             helper.fail( "Controller terminated with exit value " + exitValue ) ;

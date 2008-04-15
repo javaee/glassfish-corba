@@ -616,9 +616,9 @@ public abstract class CORBATest extends test.RemoteTest
         int exitValue = process.exitValue() ;
         long duration = process.duration() ;
         if (exitValue <= 0) 
-            helper.pass( duration ) ;
+            helper.pass( duration/1000 ) ;
         else
-            helper.fail( "Controller terminated with exit value " + exitValue, duration ) ;
+            helper.fail( "Controller terminated with exit value " + exitValue, duration/1000 ) ;
 
         try {
             process.kill();

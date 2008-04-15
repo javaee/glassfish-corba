@@ -1,4 +1,4 @@
-/*
+    /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 1999-2007 Sun Microsystems, Inc. All rights reserved.
@@ -60,152 +60,242 @@ import rmic.ObjectByValue;
 import java.io.*;
 import java.util.*;
 
+import corba.framework.JUnitReportHelper ;
+
 public class AnyTest extends test.Test
 {
+    JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
 
-    public void run()
-    {
-        try
-	    {
-		org.omg.CORBA.ORB orb = org.omg.CORBA.ORB.init(getArgsAsArgs(),null);
-	        Any any1 = orb.create_any();
-	        Any any2 = orb.create_any();
+    public void run() {
+        try {
+            helper.start( "nullEqual" ) ;
+            org.omg.CORBA.ORB orb = org.omg.CORBA.ORB.init(getArgsAsArgs(),null);
+            Any any1 = orb.create_any();
+            Any any2 = orb.create_any();
 
-		//
-		// Equality tests
-		//
+            //
+            // Equality tests
+            //
 
-		// null
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed null equality test!");
+            // null
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed null equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ; 
+            }
 
-		// short
-	        short shortData = Short.MAX_VALUE;
-	        any1.insert_short(shortData);
-	        any2.insert_short(shortData);
+            // short
+            helper.start( "shortEqual" ) ;
+            short shortData = Short.MAX_VALUE;
+            any1.insert_short(shortData);
+            any2.insert_short(shortData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed short equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed short equality test!" ;
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ; 
+            }
 
-		// ushort
-	        short ushortData = (short) -1;
-	        any1.insert_ushort(ushortData);
-	        any2.insert_ushort(ushortData);
+            // ushort
+            helper.start( "ushortEqual" ) ;
+            short ushortData = (short) -1;
+            any1.insert_ushort(ushortData);
+            any2.insert_ushort(ushortData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed ushort equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed ushort equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// long
-	        int longData = Integer.MAX_VALUE;
-	        any1.insert_long(longData);
-	        any2.insert_long(longData);
+            // long
+            helper.start( "longEqual" ) ;
+            int longData = Integer.MAX_VALUE;
+            any1.insert_long(longData);
+            any2.insert_long(longData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed long equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed long equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// ulong
-	        int ulongData = -1;
-	        any1.insert_ulong(ulongData);
-	        any2.insert_ulong(ulongData);
+            // ulong
+            helper.start( "ulongEqual" ) ;
+            int ulongData = -1;
+            any1.insert_ulong(ulongData);
+            any2.insert_ulong(ulongData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed ulong equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed ulong equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// longlong
-	        long longlongData = Long.MAX_VALUE;
-	        any1.insert_longlong(longlongData);
-	        any2.insert_longlong(longlongData);
+            // longlong
+            helper.start( "longlongEqual" ) ;
+            long longlongData = Long.MAX_VALUE;
+            any1.insert_longlong(longlongData);
+            any2.insert_longlong(longlongData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed longlong equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed longlong equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// ulonglong
-	        long ulonglongData = -1L;
-	        any1.insert_ulonglong(ulonglongData);
-	        any2.insert_ulonglong(ulonglongData);
+            // ulonglong
+            helper.start( "ulongEqual" ) ;
+            long ulonglongData = -1L;
+            any1.insert_ulonglong(ulonglongData);
+            any2.insert_ulonglong(ulonglongData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed ulonglong equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed ulonglong equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// float
-	        float floatData = Float.MAX_VALUE;
-	        any1.insert_float(floatData);
-	        any2.insert_float(floatData);
+            // float
+            helper.start( "floatEqual" ) ;
+            float floatData = Float.MAX_VALUE;
+            any1.insert_float(floatData);
+            any2.insert_float(floatData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed float equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed float equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// double
-	        double doubleData = Double.MAX_VALUE;
-	        any1.insert_double(doubleData);
-	        any2.insert_double(doubleData);
+            // double
+            helper.start( "doubleEqual" ) ;
+            double doubleData = Double.MAX_VALUE;
+            any1.insert_double(doubleData);
+            any2.insert_double(doubleData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed double equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed double equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// char
-	        char charData = Character.MAX_VALUE;
-	        any1.insert_char(charData);
-	        any2.insert_char(charData);
+            // char
+            helper.start( "charEqual" ) ;
+            char charData = Character.MAX_VALUE;
+            any1.insert_char(charData);
+            any2.insert_char(charData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed char equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed char equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// octet
-	        byte octetData = Byte.MAX_VALUE;
-	        any1.insert_octet(octetData);
-	        any2.insert_octet(octetData);
+            // octet
+            helper.start( "octetEqual" ) ;
+            byte octetData = Byte.MAX_VALUE;
+            any1.insert_octet(octetData);
+            any2.insert_octet(octetData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed octet equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed octet equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// any
-	        Any anyData =  orb.create_any();
-	        anyData.insert_octet(octetData);
-	        any1.insert_any(anyData);
-	        any2.insert_any(anyData);
-          
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed any equality test!");
+            // any
+            helper.start( "anyEqual" ) ;
+            Any anyData =  orb.create_any();
+            anyData.insert_octet(octetData);
+            any1.insert_any(anyData);
+            any2.insert_any(anyData);
+      
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed any equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// TypeCode
-	        TypeCode typeCodeData = anyData.type();
-	        any1.insert_TypeCode(typeCodeData);
-	        any2.insert_TypeCode(typeCodeData);
+            // TypeCode
+            helper.start( "typecodeEqual" ) ;
+            TypeCode typeCodeData = anyData.type();
+            any1.insert_TypeCode(typeCodeData);
+            any2.insert_TypeCode(typeCodeData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed TypeCode equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed TypeCode equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		// string
-	        String stringData = "stringData";
-	        any1.insert_string(stringData);
-	        any2.insert_string(stringData);
+            // string
+            helper.start( "stringEqual" ) ;
+            String stringData = "stringData";
+            any1.insert_string(stringData);
+            any2.insert_string(stringData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed string equality test!");
+            if (any1.equal(any2)) {
+                helper.pass() ;
+            } else {
+                String msg = "Failed string equality test!";
+                helper.fail( msg ) ;
+                throw new Error ( msg ) ;
+            }
 
-		/*
-		  org.omg.CORBA.Object objrefData = anyObj;
-		  any1.insert_Object(objrefData);
-		  any2.insert_Object(objrefData);
+            /*
+              helper.start( "objrefEqual" ) ;
+              org.omg.CORBA.Object objrefData = anyObj;
+              any1.insert_Object(objrefData);
+              any2.insert_Object(objrefData);
 
-		  if (!any1.equal(any2))
-		  throw new Error ("Failed objref equality test!");
-		*/
+              if (any1.equal(any2)) {
+                  helper.pass() ;
+              } else {
+                  String msg = "Failed objref equality test!";
+                  helper.fail( msg ) ;
+                  throw new Error ( msg ) ;
+              }
+            */
 
-	        enum1 enumData = enum1.zeroth;
-	        enum1Helper.insert(any1, enumData);
-	        enum1Helper.insert(any2, enumData);
+            enum1 enumData = enum1.zeroth;
+            enum1Helper.insert(any1, enumData);
+            enum1Helper.insert(any2, enumData);
 
-	        if (!any1.equal(any2))
-		    throw new Error ("Failed enum equality test!");
+            if (!any1.equal(any2))
+                throw new Error ("Failed enum equality test!");
 
-	    }
-        catch(Throwable e)
-	    {
-		status = new Error(e.getMessage());
-		e.printStackTrace();
-	    }
+        } catch(Throwable e) {
+            status = new Error(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            helper.done() ;
+        }
     }
-
 }

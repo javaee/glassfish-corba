@@ -154,7 +154,7 @@ public class MsgTypesTest extends CORBATest {
                 serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + server_strategy);
                 serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + server_strategy);
 
-                Controller server = createServer("corba.msgtypes.Server");
+                Controller server = createServer("corba.msgtypes.Server", name );
                 Controller client = createClient("corba.msgtypes.Client", name );
 
                 server.start();
@@ -202,7 +202,7 @@ public class MsgTypesTest extends CORBATest {
         Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runEarlyReply" );
         Controller client = createClient("corba.msgtypes.Client", "runEarlyReply" );
 
         server.start();
@@ -235,7 +235,7 @@ public class MsgTypesTest extends CORBATest {
         Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runSimpleCancelRequest" );
         Controller client = createClient("corba.msgtypes.Client", "runSimpleCancelRequest" );
 
         server.start();
@@ -268,7 +268,7 @@ public class MsgTypesTest extends CORBATest {
         Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runAbortiveCancelRequest1" );
         Controller client = createClient("corba.msgtypes.Client", "runAbortiveCancelRequest1" );
 
         server.start();
@@ -307,7 +307,7 @@ public class MsgTypesTest extends CORBATest {
         serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
                   "corba.msgtypes.Server", "true");
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runAbortiveCancelRequest2" );
         Controller client = createClient("corba.msgtypes.Client", "runAbortiveCancelRequest2" );
 
         server.start();
@@ -353,7 +353,7 @@ public class MsgTypesTest extends CORBATest {
                   "corba.msgtypes.Server", "true");
         serverProps.put(ORBConstants.GIOP_TARGET_ADDRESSING,
                   "" + ORBConstants.ADDR_DISP_OBJKEY);              
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runTargetAddressDisp" );
         Controller client = createClient("corba.msgtypes.Client", "runTargetAddressDisp" );
 
         server.start();
@@ -386,7 +386,7 @@ public class MsgTypesTest extends CORBATest {
         Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runCloseConnection" );
         Controller client = createClient("corba.msgtypes.Client", "runCloseConnection" );
 
         server.start();
@@ -419,7 +419,7 @@ public class MsgTypesTest extends CORBATest {
         Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runMessageError" );
         Controller client = createClient("corba.msgtypes.Client", "runMessageError" );
 
         server.start();
@@ -452,7 +452,7 @@ public class MsgTypesTest extends CORBATest {
         Properties clientProps = Options.getClientProperties();
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runGIOPInterop" );
         Controller client = createClient("corba.msgtypes.Client", "runGIOPInterop" );
 
         server.start();
@@ -485,7 +485,7 @@ public class MsgTypesTest extends CORBATest {
         Properties serverProps = Options.getServerProperties();
         serverProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runFragmentedReply" );
         Controller client = createClient("corba.msgtypes.Client", "runFragmentedReply" );
 
         server.start();
@@ -518,7 +518,7 @@ public class MsgTypesTest extends CORBATest {
         clientProps.put(ORBConstants.GIOP_VERSION, GIOP_version[2]);
         clientProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + GROW);
 
-        Controller server = createServer("corba.msgtypes.Server");
+        Controller server = createServer("corba.msgtypes.Server", "runHeaderPaddingTest" );
         Controller client = createClient("corba.msgtypes.Client", "runHeaderPaddingTest" );
 
         server.start();

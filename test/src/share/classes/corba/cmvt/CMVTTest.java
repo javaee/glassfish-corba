@@ -93,9 +93,9 @@ public class CMVTTest extends CORBATest {
         serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + GIOP_strategy[strategy]);
     }
 
-    private void runTest() throws Throwable{
-        Controller server = createServer("corba.cmvt.Server");
-        Controller client = createClient("corba.cmvt.Client");
+    private void runTest( String name ) throws Throwable{
+        Controller server = createServer("corba.cmvt.Server", name);
+        Controller client = createClient("corba.cmvt.Client", name);
 
         server.start();
         client.start();
@@ -125,20 +125,19 @@ public class CMVTTest extends CORBATest {
         setClient(0,0);
         setServer(0,0);
         printBeginTest(0,0,0,0);
-        runTest();
+        runTest( "1_0_grow" );
 
         //1.2 + grow
         setClient(2,0);
         setServer(2,0);
         printBeginTest(2,0,2,0);
-        runTest();
+        runTest( "1_2_grow" );
 
         //1.2 + stream
         setClient(2,2);
         setServer(2,2);
         printBeginTest(2,2,2,2);
-        runTest();
-
+        runTest( "1_2_stream" );
 
         System.out.print("      Test result : " );
         

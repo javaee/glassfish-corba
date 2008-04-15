@@ -119,7 +119,7 @@ public class FragmentTest extends CORBATest {
                 serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + server_strategy);
                 serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + server_strategy);
 
-                Controller server = createServer("corba.fragment.Server");
+                Controller server = createServer("corba.fragment.Server", name );
                 Controller client = createClient("corba.fragment.Client", name );
 
                 server.start();

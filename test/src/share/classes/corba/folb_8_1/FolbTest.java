@@ -128,7 +128,7 @@ public class FolbTest
         ////////////////////////////////////////////////////
 
         server = createServer(thisPackage + "." + "Server",
-                              "ServerForTiming");
+                              "ServerForTiming1");
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_NoFs_NoF_NoC",
                               "ClientForTiming_NoFs_NoF_NoC");
@@ -140,7 +140,7 @@ public class FolbTest
         //-------------------------
 
         server = createServer(thisPackage + "." + "Server",
-                              "ServerForTiming");
+                              "ServerForTiming2");
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_Fs_NoF_NoC",
                               "ClientForTiming_Fs_NoF_NoC");
@@ -152,7 +152,7 @@ public class FolbTest
         //-------------------------
 
         server = createServer(thisPackage + "." + "Server",
-                              "ServerForTiming");
+                              "ServerForTiming3");
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_Fs_NoF_C",
                               "ClientForTiming_Fs_NoF_C");
@@ -164,7 +164,7 @@ public class FolbTest
         //-------------------------
 
         server = createServer(thisPackage + "." + "Server",
-                              "ServerForTiming");
+                              "ServerForTiming4");
         server.start();
         client = createClient(thisPackage + "." + "ClientForTiming_Fs_F_NoC",
                               "ClientForTiming_Fs_F_NoC");

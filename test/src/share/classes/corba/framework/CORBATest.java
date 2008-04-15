@@ -607,17 +607,18 @@ public abstract class CORBATest extends test.RemoteTest
         if (process == null)
             return;
 
-        String name = process.getProcessName();
+        String name = process.getClassName() + "." + process.getProcessName();
 
         Test.dprint("Cleaning up " + name + "...");
 
         helper.start( name ) ;
 
         int exitValue = process.exitValue() ;
+        long duration = process.duration() ;
         if (exitValue <= 0) 
-            helper.pass() ;
+            helper.pass( duration ) ;
         else
-            helper.fail( "Controller terminated with exit value " + exitValue ) ;
+            helper.fail( "Controller terminated with exit value " + exitValue, duration ) ;
 
         try {
             process.kill();

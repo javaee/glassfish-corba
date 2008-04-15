@@ -72,13 +72,13 @@ public class RequestPartitioningTest
         Properties serverProps = Options.getServerProperties();
         serverProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "true");
 //        serverProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
-        Controller server = createServer(thisPackage + ".Server","Server");
+        Controller server = createServer(thisPackage + ".Server","Server1");
         server.start();
 
         Properties clientProps = Options.getClientProperties();
         clientProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "true");
 //        clientProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
-        Controller client = createClient(thisPackage + ".Client", "Client");
+        Controller client = createClient(thisPackage + ".Client", "Client1");
         client.start();
 
         client.waitFor(CLIENT_TIMEOUT);
@@ -86,20 +86,14 @@ public class RequestPartitioningTest
         client.stop();
         server.stop();
 
-        orbd.stop();
-
-        // Run the test with HeapByteBuffers
-        orbd = createORBD();
-        orbd.start();
-
         serverProps.setProperty(ORBConstants.DISABLE_DIRECT_BYTE_BUFFER_USE_PROPERTY, "true");
         serverProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "false");
-        server = createServer(thisPackage + ".Server","Server");
+        server = createServer(thisPackage + ".Server","Server2");
         server.start();
 
         clientProps.setProperty(ORBConstants.DISABLE_DIRECT_BYTE_BUFFER_USE_PROPERTY, "true");
         clientProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "false");
-        client = createClient(thisPackage + ".Client", "Client");
+        client = createClient(thisPackage + ".Client", "Client2");
         client.start();
 
         client.waitFor(CLIENT_TIMEOUT);

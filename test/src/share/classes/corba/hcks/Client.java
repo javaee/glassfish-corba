@@ -116,6 +116,8 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 public class Client 
 {
+    public static String testName = "corba.hcks.Client" ;
+
     public static final String baseMsg = Client.class.getName();
     public static final String main = baseMsg + ".main";
 
@@ -179,7 +181,7 @@ public class Client
     public static void main(String[] av)
     {
         try {
-            U.initialize( Client.class ) ;
+            U.initialize( testName ) ;
 	    U.setDisplayErrorsWhenTheyHappen(true);
 
 	    if (ColocatedClientServer.isColocated) {

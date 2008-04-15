@@ -1,4 +1,4 @@
-//  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+make//  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 // 
 //  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
 // 
@@ -53,9 +53,10 @@
 // -test corba.mixedorb.MixedOrbTest
 -test corba.resolve_deadlock.ResolveDeadlockTest
 
-// These two tests are for the special HW LB plugin code
 -test corba.lb.LBTest -ifpresent
--test corba.retryplugin.RetryPluginTest -ifpresent
+
+// I don't think this is needed, and it takes 4.5 minutes to run, so comment it out for now
+// -test corba.retryplugin.RetryPluginTest -ifpresent
 
 -test corba.giopgen.GIOPGenTest
 -test corba.rfm.TestRFM

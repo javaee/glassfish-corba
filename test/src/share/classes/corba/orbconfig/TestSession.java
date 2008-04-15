@@ -79,6 +79,7 @@ public class TestSession
     public TestSession( PrintStream out, JUnitReportHelper helper )
     {
 	this.out = System.out ;
+        this.helper = helper ;
     }
 
     /** Print a message indicating the start of the session.

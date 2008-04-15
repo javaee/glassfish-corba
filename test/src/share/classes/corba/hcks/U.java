@@ -102,8 +102,8 @@ public class U
     }
 
     // KMC: initialize the helper and ErrorAccumulator
-    public static void initialize( Class cls ) {
-        helper = new JUnitReportHelper( cls.getName() ) ;
+    public static void initialize( String name ) {
+        helper = new JUnitReportHelper( name ) ;
         ea = new ErrorAccumulator() ;
         testName = null ;
     }

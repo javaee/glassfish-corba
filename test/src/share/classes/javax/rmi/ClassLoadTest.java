@@ -253,7 +253,10 @@ public class ClassLoadTest extends Test {
             helper.fail( msg ) ;
             throw new Error( msg ) ;
         } catch (NullPointerException e) {
-            if (shouldFail == FAIL_NULL_PTR) return null;
+            if (shouldFail == FAIL_NULL_PTR)  {
+                helper.pass() ;
+                return null;
+            }
             e.printStackTrace();
             String msg = className+": Expected "+failure[shouldFail]+", got "+e.toString();
             helper.fail( msg ) ;
@@ -317,6 +320,7 @@ public class ClassLoadTest extends Test {
             }
         }
         
+        helper.pass() ;
         return result;
     }
     

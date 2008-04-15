@@ -44,6 +44,7 @@ public class Client_1_1
 {
     public static void main (String av[])
     {
+        Client.testName = "corba.hcks.Client_1_1" ;
 	Client.giopVersion = C.GIOP_VERSION_1_1;
 	Client.buffMgrStategy = C.BUFFMGR_STRATEGY_GROW;
 	Client.main(av);

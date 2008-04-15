@@ -383,9 +383,7 @@ public class RogueClient extends Thread
 		handleException(ioex);
                 throw ioex ;
 	    }
-            handleException( ioe ) ;
 	    createConnectionToServer();
-            throw ioe ;
 	} catch (Exception ex) {
 	    handleException(ex);
             throw ex ;

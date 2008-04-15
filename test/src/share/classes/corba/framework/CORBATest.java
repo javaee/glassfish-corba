@@ -551,7 +551,7 @@ public abstract class CORBATest extends test.RemoteTest
         return new ExternalExec();
     }
 
-    private JUnitReportHelper helper = new JUnitReportHelper( "Controller:" + this.getClass().getName() ) ;
+    private JUnitReportHelper helper = new JUnitReportHelper( "Controller_" + this.getClass().getName() ) ;
 
     /**
      * Create and initialize the Controller for the client.  This

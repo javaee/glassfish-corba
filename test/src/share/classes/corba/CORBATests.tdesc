@@ -64,8 +64,8 @@
 // now run directly from ant junit task: -test corba.misc.MiscTest
 -test corba.requestpartitioning.RequestPartitioningTest
 -test corba.rogueclient.RogueClientTest
-// Is the ORB retry logic fixed?
--test corba.folb.FolbTest -ifpresent
+// XXX Is the ORB retry logic fixed?
+// -test corba.folb.FolbTest -ifpresent
 -test corba.folb_8_1.FolbTest
 -test corba.fwddecl.ForwardDeclTest
 -test corba.security.PermissionTest

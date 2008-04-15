@@ -50,10 +50,8 @@ import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
 
-public class RogueClientTest
-    extends
-	CORBATest
-{
+public class RogueClientTest extends CORBATest {
+
     public static final String thisPackage =
 	RogueClientTest.class.getPackage().getName();
 

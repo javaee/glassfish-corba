@@ -87,7 +87,7 @@ public class RogueClient extends Thread
     private int itsPort = 0;
     private SocketChannel itsSocketChannel = null;
     private Socket itsSocket = null;
-    private static JUnitReportHelper helper = new JUnitReportHelper( RogueClient.class.getName() ) ;
+    private JUnitReportHelper helper = new JUnitReportHelper( RogueClient.class.getName() ) ;
     private int createConnectionToServerCallCounter = 0 ;
     private static AtomicInteger numFailures = new AtomicInteger() ;
 
@@ -342,6 +342,7 @@ public class RogueClient extends Thread
 		itsSocketChannel.close();
 	    } catch (IOException ioex) {
 		handleException(ioex);
+                throw ioex ;
 	    }
 
             handleException( ioe ) ;
@@ -498,16 +499,17 @@ public class RogueClient extends Thread
         } catch (Throwable t) {
     	    U.sop("Unexpected throwable!!!");
             t.printStackTrace();
-            System.exit(1);
+            helper.done() ;
+            System.exit(1) ;
+        } finally {
+            helper.done() ;
         }
     }
 
-    public static void main(String args[])
-    {
-         U.sop("Beginning test...");
+    public static void main(String args[]) {
+        U.sop("Beginning test...");
 
-	if (dprint)
-	{
+	if (dprint) {
 	    Properties props = new Properties();
 	    props.put(ORBConstants.DEBUG_PROPERTY, "transport,giop");
 	}
@@ -525,11 +527,13 @@ public class RogueClient extends Thread
 
 	} catch (Exception ex) {
             ex.printStackTrace() ;
-	} finally {
-            helper.done() ;
-        }
+	} 
 
-        U.sop("Test finished successfully...");
+        int failures = numFailures.get() ;
+        if (failures == 0) 
+            U.sop("Test finished successfully...");
+
+        System.exit( numFailures.get() ) ;
     }
 }
 

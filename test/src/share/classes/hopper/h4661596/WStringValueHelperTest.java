@@ -36,7 +36,6 @@
 package hopper.h4661596;
 
 import corba.framework.CORBATest;
-import corba.framework.JUnitReportHelper;
 import java.util.*;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;

@@ -43,7 +43,6 @@ package corba.legacybootstrapserver;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
-import corba.framework.JUnitReportHelper;
 
 public class LegacyBootstrapServerTest extends CORBATest {
 

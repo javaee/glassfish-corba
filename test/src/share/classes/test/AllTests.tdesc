@@ -35,22 +35,35 @@
 // Batch tests
 // Run 'java test.Test' for syntax.
 
+// JUnitReport
 -test javax.rmi.CORBA.serialization.SerializationTest
+
+// JUnitReport
 -test test12.SerializationTest -vm 1.2
+
+// JUnitReport
 -test anytest.AnyTest
 
 // This has to be run in a separate process because it
 // clobbers environment variables like java.rmi.server.codebase
+// JUnitReport
 -test javax.rmi.ClassLoadTest -separateprocess
+
+// JUnitReport
 -test rmic.ParseTest
 
 // Test FullValueDescription 
 // DO NOT MOVE THIS TEST TO RUN AFTER rmic.HelloTest, It hangs at times on
 // Windows.
+// JUnitReport
 -test javax.rmi.fvd.TheTest -separateprocess
 
+// JUnitReport
 -test rmic.HelloTest
+
+// JUnitReport
 -test rmic.HelloTest -localservants -normic
+
 -test rmic.InnerTest
 -test rmic.StaticStringsHashTest
 -test rmic.StubReferenceTest

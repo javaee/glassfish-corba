@@ -42,7 +42,6 @@ package corba.iorintsockfact;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
-import corba.framework.JUnitReportHelper ;
 
 /**
  * @author Harold Carr

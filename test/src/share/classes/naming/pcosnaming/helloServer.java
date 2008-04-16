@@ -146,7 +146,7 @@ public class helloServer implements InternalProcess
         output.println("Starting client...");
         
         // Not very intuitive, but start the client in a separate process.
-        client.start( new JUnitReportHelper( helloServer.class.getName() ) );
+        client.start();
         client.waitFor();
         
         output.println("Client finished, exiting...");

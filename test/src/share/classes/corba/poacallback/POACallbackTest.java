@@ -38,7 +38,6 @@ package corba.poacallback;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
-import corba.framework.JUnitReportHelper ;
 
 public class POACallbackTest extends CORBATest
 {

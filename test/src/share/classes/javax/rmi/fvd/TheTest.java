@@ -60,55 +60,44 @@ import test.Test;
 import java.util.Hashtable;
 import java.util.Vector;
 
-/*
- * @test
- */
-public class TheTest extends test.Test {
+import corba.framework.JUnitReportHelper ;
 
+public class TheTest extends test.Test {
     // This test runs the NameServer on port 1050.
     
     private static  String[] myArgs = new String[]{"-ORBInitialPort" , "1050" };
     static Process nameServer  = null;
     static Process server      = null;
     static Process client      = null;
-    public void setup()
-    {
-	try{
+
+    public void setup() {
+	try {
     	    // Now we need to start the NameServer and
     	    // our test server. The test server will register
     	    // with the NameServer.
     	    
             nameServer  = Util.startNameServer("1050",true);
 	    compileClasses();
+	} catch(Throwable t) { 
+            System.out.println("Compiling classes failed : "+t.toString());
 	}
-	catch(Throwable t){
-	    System.out.println("Compiling classes failed : "+t.toString());
-	}
-	//LogImpl.open();
-	//com.sun.corba.se.impl.io.ValueUtility.log("TheClient","Initializing...");
-
     }
 
     public  void run() {
-
         String testName     = new TheTest().getClass().getName();
+        JUnitReportHelper helper = new JUnitReportHelper( testName ) ;
+        helper.start( "test1" ) ;
         boolean testPassed  = true;
 
     	try {
-    	    
 	    // The RMIClassLoader requires a security manager to be set
 	    //System.setSecurityManager(new javax.rmi.download.SecurityManager());
 	    //System.setSecurityManager(new java.rmi.RMISecurityManager());
-
 
     	    // First Compile the classes to generate the Stub and Tie 
     	    // files that are needed.  NOTE: This requires the latest
     	    // RMIC compiler that supports IIOP.
 
-	    //            if (!getArgs().containsKey("-normic")) {
-            //    compileClasses();
-            //}
-    	    
 	    // Create user.dir property (this is how the server knows
 	    // where the test value is but we (this client) does not).
 	    Vector properties = new Vector();
@@ -123,7 +112,6 @@ public class TheTest extends test.Test {
             
     	    // Lets setup some properties that we are using
     	    // for this test and then create the ORB Object...
-
     	    Properties props = System.getProperties();
             
             props.put(  "java.naming.factory.initial",
@@ -151,30 +139,29 @@ public class TheTest extends test.Test {
             // This test is designed to verify PortableRemoteObject.narrow
 
 	    try{
-				
-				// Now try from separate client that has not codebase of it's own
+                // Now try from separate client that has no codebase of its own
 
 		Vector properties2 = new Vector();
 		properties.addElement("-Djava.security.policy="+testPolicy);
 
-				// Start it
+                // Start it
 		client = Util.startServer("javax.rmi.fvd.TheClient", 
-					  properties, getClassesDirectory("values2"));
+                    properties, getClassesDirectory("values2"));
 
+                helper.pass() ;
     	    } catch (Throwable ex) {
                 System.out.println(testName + " FAILED.");
 		ex.printStackTrace();
 		testPassed = false;
+                helper.fail( ex ) ;
             }
-
     	} catch (Exception ex) {
             System.out.println(testName + " FAILED.");
     	    ex.printStackTrace();
     	    testPassed = false;
-    	}
-
-        finally {
-
+            helper.fail( ex ) ;
+    	} finally {
+            helper.done() ;
 	    // Kill the client
 	    if (client != null) {
 		client.destroy();
@@ -196,41 +183,31 @@ public class TheTest extends test.Test {
 
         if ( testPassed == true ) {
             status = null;
-        }
-        else {
+        } else {
             status = new Error("FullValueDescription Test Failed");
         }
-
     }
 
     public static void shutdown(){
-	// Kill the client
 	if (client != null) {
 	    client.destroy();
 	    client = null;
 	}
-
-	// Make sure we kill the test server...
 
 	if (server != null) {
 	    server.destroy();
 	    server = null;
 	}
   
-	// Make sure we kill the NameServer...
-            
 	if (nameServer != null) {
 	    nameServer.destroy();
 	    nameServer = null;
 	}
-
     }
 
-    // Compiling ComboInterface cause the compiler to compile
+    // Compiling ComboInterface causes the compiler to compile
     // all the other classes that need to be compiled.
-    
-    private  void compileClasses () throws Exception
-    {
+    private  void compileClasses () throws Exception {
         String arg = "-iiop";
         String[] additionalArgs = null;
         String[] classes = {"javax.rmi.fvd.ServantImpl", "javax.rmi.fvd.LogImpl"};

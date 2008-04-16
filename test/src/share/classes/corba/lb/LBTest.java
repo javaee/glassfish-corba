@@ -38,7 +38,6 @@ package corba.lb ;
 
 import java.util.Properties ;
 
-import corba.framework.JUnitReportHelper ;
 import corba.framework.CORBATest ;
 import corba.framework.Options ;
 import corba.framework.Controller ;

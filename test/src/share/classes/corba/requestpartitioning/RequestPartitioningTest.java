@@ -49,7 +49,6 @@ import com.sun.corba.se.impl.orbutil.ORBConstants;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
-import corba.framework.JUnitReportHelper;
 import java.util.Properties;
 
 public class RequestPartitioningTest

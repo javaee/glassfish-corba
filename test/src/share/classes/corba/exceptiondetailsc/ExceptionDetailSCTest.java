@@ -42,7 +42,6 @@ package corba.exceptiondetailsc;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
-import corba.framework.JUnitReportHelper;
 
 public class ExceptionDetailSCTest
     extends

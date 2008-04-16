@@ -42,7 +42,6 @@ package corba.legacyorbclasses;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
-import corba.framework.JUnitReportHelper ;
 
 public class LegacyORBClassesTest
     extends

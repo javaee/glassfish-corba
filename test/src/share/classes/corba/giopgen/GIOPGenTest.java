@@ -45,7 +45,6 @@ import java.util.Properties;
 import corba.framework.CORBATest;
 import corba.framework.Controller;
 import corba.framework.Options;
-import corba.framework.JUnitReportHelper;
 
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 

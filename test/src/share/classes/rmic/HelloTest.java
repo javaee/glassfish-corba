@@ -67,6 +67,8 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBData ;
 
+import corba.framework.JUnitReportHelper ;
+
 /*
  * @test
  */
@@ -79,13 +81,25 @@ public class HelloTest extends RemoteTest {
 	"rmic.RemoteObjectServer",
     };
 
-    /*
-      private static final int ITERATIONS = 100;
-      private static int methodCount = 5;
-      private static String[] methodNames = new String[methodCount];
-      private static long[][] methodTimes = new long[methodCount][];
-    */
-   
+    private final boolean useLocalServants ;
+    private final JUnitReportHelper helper ;
+    private boolean firstTest = false ;
+
+    HelloTest() {
+        useLocalServants = getArgs().get(LOCAL_SERVANTS_FLAG) != null ;
+        helper = new JUnitReportHelper( this.getClass().getName() 
+            + ( useLocalServants ? "_local" : "" ) ) ;
+    }
+
+    private void nextTest( String name ) {
+        if (firstTest)
+            firstTest = false ;
+        else
+            helper.pass() ;
+
+        helper.start( name ) ;
+    }
+
     /**
      * Return an array of fully qualified remote servant class
      * names for which ties/skels need to be generated. Return
@@ -129,7 +143,6 @@ public class HelloTest extends RemoteTest {
      * @param context The context returned by getServantContext().
      */
     public void doTest (ServantContext context) throws Throwable {
-
         WebServer webServer = null;
         
         try {
@@ -146,6 +159,7 @@ public class HelloTest extends RemoteTest {
             File rmicDir = new File(rootDir,"rmic");
             
 	    if (!usesDynamicStubs) {
+                nextTest( "setup" ) ;
 		// Rename _RemoteObject_Stub.class so can only be loaded by
 		// WebServer...
       
@@ -165,35 +179,21 @@ public class HelloTest extends RemoteTest {
 		    throw new Exception ("_RemoteObject_Stub rename failed.");
 		}
 
-	       // Create our aliases and start up the WebServer...
-	       
+	        // Create our aliases and start up the WebServer...
 		Properties aliases = new Properties();
 		aliases.put("/rmic/" + origName,"/rmic/" + newName);
 		int port = Util.getHttpServerPort();
 		webServer = new WebServer(port,rootDir,1,aliases,null);
 		webServer.start();
-
-		/* 
-		   String[] command = new String[] {   "java",
-		   "-classpath", System.getProperty("java.class.path"),
-		   "test.WebServer",
-		   "-port", "8080",
-		   "-docroot", outputDirPath,
-		   "-alias", "/rmic/" + origName + "=/rmic/" + newName
-		   };
-						
-		   webServer = Util.startProcess(command,Util.HANDSHAKE);
-		*/
 	    }
 
- 
-            // Get the stubKind...
-            
+            nextTest( "getStubs" ) ;
+
             int stubKind; // 0 = remote, 1 = localremote (i.e. non-optimized), 2 = local
 
             boolean mustBeRemote;
 
-            if (getArgs().get(LOCAL_SERVANTS_FLAG) != null) {
+            if (useLocalServants) {
                 if (getArgs().get(NO_LOCAL_STUBS_FLAG) != null) {
                     stubKind = 1; // localremote (i.e. non-optimized)
                     mustBeRemote = true;
@@ -234,7 +234,7 @@ public class HelloTest extends RemoteTest {
             // Make sure stub downloading works (if not local)...
             
             if (stubKind != 2) {
-     
+                nextTest( "testStubDownloading" ) ; 
                 // Ask objref to publish an instance of RemoteObject...
                 
                 objref.publishRemoteObject("stubDownloadTest");
@@ -287,38 +287,43 @@ public class HelloTest extends RemoteTest {
 		}
             }
 
-    	    // Assert that all is well...
-
+            nextTest( "testHelloString" ) ;
     	    if (!objref.sayHello().equals("hello")) {
     	        throw new Exception("HelloTest: sayHello() failed");
     	    }
 
+            nextTest( "testIntSum" ) ;
     	    if (objref.sum(10,10) != 20) {
     	        throw new Exception("HelloTest: sum(10,10) failed");
     	    }
 
+            nextTest( "testStringConcat" ) ;
     	    if (!objref.concatenate("Here"," This").equals("Here This")) {
     	        throw new Exception("HelloTest: concatenate(\"Here\",\" This\") failed");
     	    }
 
+            nextTest( "testObjectByValue" ) ;
             ObjectByValue value = new ObjectByValue(5,7," It's ","Me!");
 
     	    if (!objref.checkOBV(value).equals("The Results are: 12 It's Me!")) {
     	        throw new Exception("HelloTest: checkOBV(value) failed");
     	    }
 
+            nextTest( "testObjectByValue2" ) ;
     	    ObjectByValue result = objref.getOBV();
 
             if (!result.equals(value)) {
     	        throw new Exception("HelloTest: getOBV() failed");
             }
 
+            nextTest( "testRemoteObject" ) ;
     	    Hello remoteObject = objref.getHello ();
 
     	    if (!remoteObject.sayHello().equals("hello")) {
     	        throw new Exception("HelloTest: remoteObject.sayHello() failed");
     	    }
 
+            nextTest( "testRemoteClassName" ) ;
             String remoteClassName = remoteObject.getClass().getName();
             String matchName = "rmic._Hello_Stub";
             if (stubKind == 2) matchName = "rmic._Hello_Stub";
@@ -328,18 +333,17 @@ public class HelloTest extends RemoteTest {
     	        throw new Exception("HelloTest: remoteObject.getClass() failed: " + remoteClassName);
     	    }
 
-            // Check passing null object reference and abstract objects...
-            
+            nextTest( "testNullObjref" ) ; 
             if (objref.echoRemote(null) != null) {
     	        throw new Exception("HelloTest: null object reference failed.");
             }
             
+            nextTest( "testNullAbstract" ) ;
             if (objref.echoAbstract(null) != null) {
     	        throw new Exception("HelloTest: null abstract object failed.");
             }
 
-            // Check single dimensional primitive array...
-
+            nextTest( "testSingleArray" ) ;
             int[] array1 = {0,5,7,9,11,13};
             int[] array1Echo = remoteObject.echoArray(array1);
 
@@ -349,8 +353,7 @@ public class HelloTest extends RemoteTest {
                 }
             }
 
-            // Check 2 dimensional primitive array...
-
+            nextTest( "test2DArray" ) ;
             long[][] array2 =   {
 		{9,8,7,6,1},
 		{18,4,6},
@@ -367,8 +370,7 @@ public class HelloTest extends RemoteTest {
                 }
             }
 
-            // Check 3 dimensional primitive array...
-
+            nextTest( "test3DArray" ) ;
             short[][][] dim3 = {
 		{
 		    {0,8,7,6,1},
@@ -399,8 +401,7 @@ public class HelloTest extends RemoteTest {
                 }
             }
 
-            // Check single dimensional object array...
-
+            nextTest( "testSingleObjectArray" ) ;
             ObjectByValue[] array3 =    {
 		new ObjectByValue(5,10,"a","f"),
 		new ObjectByValue(6,11,"b","g"),
@@ -416,8 +417,7 @@ public class HelloTest extends RemoteTest {
                 }
             }
 
-            // Check multi dimensional object array...
-
+            nextTest( "test2DObjectArray" ) ;
             ObjectByValue[][] array4 =   {   {
 		new ObjectByValue(0,10,"a","g"),
 		new ObjectByValue(0,11,"b","h"),
@@ -442,8 +442,7 @@ public class HelloTest extends RemoteTest {
                 }
             }
 
-            // Check read/write abstract...
-
+            nextTest( "testReadWriteAbstract" ) ;
             AbstractObject[] remotes = remoteObject.getRemoteAbstract();
             AbstractObject[] array5 =    {
 		new ValueObject(111),
@@ -467,8 +466,7 @@ public class HelloTest extends RemoteTest {
                 }
             }
 
-            // Check application exception...
-
+            nextTest( "testApplicationException" ) ;
             boolean caughtExpected = false;
 
             try {
@@ -485,9 +483,7 @@ public class HelloTest extends RemoteTest {
 		throw new Exception("HelloTest: throwHello failed");
             }
 
-
-            // Check system exception...
-
+            nextTest( "testSystemException" ) ;
             caughtExpected = false;
 
             try {
@@ -503,8 +499,7 @@ public class HelloTest extends RemoteTest {
 		throw new Exception("HelloTest: throwSystem failed");
             }
 
-            // Check Error...
-
+            nextTest( "testError" ) ;
             caughtExpected = false;
 
             try {
@@ -520,8 +515,7 @@ public class HelloTest extends RemoteTest {
 		throw new Exception("HelloTest: throwError failed");
             }
 
-            // Check RemoteException...
-
+            nextTest( "testRemoteException" ) ;
             caughtExpected = false;
 
             try {
@@ -537,9 +531,7 @@ public class HelloTest extends RemoteTest {
 		throw new Exception("HelloTest: throwRemoteException failed");
             }
 
-
-            // Check RuntimeException...
-
+            nextTest( "testRuntimeException" ) ;
             caughtExpected = false;
             
             try {
@@ -563,9 +555,7 @@ public class HelloTest extends RemoteTest {
 		throw new Exception("HelloTest: throwRuntimeException failed");
             }
 
-
-            // Check CharValue...
-
+            nextTest( "testCharValue" ) ;
             CharValue v1 = remoteObject.echoCharValue(new CharValue('%'));
             if (v1.getValue() != '%') {
                 throw new Exception("HelloTest: echoCharValue failed.");
@@ -576,14 +566,14 @@ public class HelloTest extends RemoteTest {
                 throw new Exception("HelloTest: echoCharValue failed.");
             }
 
-            // Check Object...
-
+            nextTest( "testObject" ) ;
             String o1 = new String("An Object");
             Object o2 = remoteObject.echoObject(o1);
             if (!o1.equals(o2)) {
                 throw new Exception("HelloTest: echoObject failed.");
             }
 
+            nextTest( "testProperties" ) ;
             Properties props1 = new Properties();
             props1.put("one", v1);
             props1.put("two", v2);
@@ -593,21 +583,25 @@ public class HelloTest extends RemoteTest {
                 throw new Exception("HelloTest: echoObject failed.");
             }
 
-            // Check Serializable...
-
+            nextTest( "testSerializable" ) ;
             Serializable s1 = remoteObject.echoSerializable(o1);
             if (!s1.equals(o1)) {
                 throw new Exception("HelloTest: echoSerializable failed.");
             }
 
+            nextTest( "testPropsSerializable" ) ;
             Properties props3 = (Properties) remoteObject.echoSerializable(props1);
             if (!equals(props1,props3)) {
                 throw new Exception("HelloTest: echoSerializable failed.");
             }
 
-	    // Clean up so that another run can reset it...
-
+            if (!firstTest)
+                helper.pass() ;
+        } catch (Exception exc) {
+            helper.fail( exc ) ;
+            throw exc ;
         } finally {
+            helper.done() ;
             if (context != null) {
                 context.destroy();
             }

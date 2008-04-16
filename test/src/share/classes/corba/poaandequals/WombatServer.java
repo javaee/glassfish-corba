@@ -124,7 +124,7 @@ public class WombatServer implements InternalProcess
             out.println("Client finished, deactivating object");
 
             try {
-                helper.start( "DeacitvationTest" ) ;
+                helper.start( "DeactivationTest" ) ;
                 poa.deactivate_object(id);
                 helper.pass() ;
             } catch (Exception ex) {

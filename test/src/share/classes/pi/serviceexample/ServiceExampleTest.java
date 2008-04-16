@@ -42,7 +42,6 @@ package pi.serviceexample;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
-import corba.framework.JUnitReportHelper ;
 
 public class ServiceExampleTest
     extends

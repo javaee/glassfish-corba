@@ -42,12 +42,8 @@ package corba.islocal;
 
 import corba.framework.Controller;
 import corba.framework.CORBATest;
-import corba.framework.JUnitReportHelper;
 
-public class IsLocalTest
-    extends
-	CORBATest
-{
+public class IsLocalTest extends CORBATest {
     public static final String thisPackage =
 	IsLocalTest.class.getPackage().getName();
 

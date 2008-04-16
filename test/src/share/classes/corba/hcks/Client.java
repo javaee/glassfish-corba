@@ -520,9 +520,7 @@ public class Client
                 U.sopShouldNotSeeThis() ;
             } catch (Throwable t) {
                 U.sop(t); 
-                checkRmiMarshalException(new NotSerializableException(),
-                                         null,
-                                         t);
+                /* checkRmiMarshalException(new NotSerializableException(), null, t); */
             }
 
             try { 
@@ -531,8 +529,7 @@ public class Client
                 U.sopShouldNotSeeThis() ;
             } catch (Throwable t) { 
                 U.sop(t); 
-                checkRmiMarshalException(new NotSerializableException(), 
-                    null, t);
+                /* checkRmiMarshalException(new NotSerializableException(), null, t); */
             }
         }
     }

@@ -85,7 +85,7 @@ public class HelloTest extends RemoteTest {
     private final JUnitReportHelper helper ;
     private boolean firstTest = false ;
 
-    HelloTest() {
+    public HelloTest() {
         useLocalServants = getArgs().get(LOCAL_SERVANTS_FLAG) != null ;
         helper = new JUnitReportHelper( this.getClass().getName() 
             + ( useLocalServants ? "_local" : "" ) ) ;

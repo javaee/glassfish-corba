@@ -67,10 +67,8 @@ import java.lang.reflect.Array;
 import ibmspace.common.*;
 import ibmspace.server.*;
 
+import corba.framework.JUnitReportHelper ;
 
-/*
- * @test
- */
 public class SpaceTest extends RemoteTest {
 
     private static final String servantClass = "ibmspace.server.SpaceConquestServer";
@@ -113,38 +111,52 @@ public class SpaceTest extends RemoteTest {
      */
      
     public void doTest (ServantContext context) throws Throwable {
-
-        // First ensure that the caches are cleared out so
-        // that we can switch between IIOP and JRMP...
+        JUnitReportHelper helper = new JUnitReportHelper( 
+            this.getClass().getName() 
+            + ( iiop ? "_iiop" : "_jrmp" ) ) ;
         
-        //Utility.clearCaches();
+        helper.start( "spaceTest" ) ;
 
-	Remote remote = context.startServant(servantClass,"SpaceConquest",true,iiop);
+        try {
+            // First ensure that the caches are cleared out so
+            // that we can switch between IIOP and JRMP...
+            
+            //Utility.clearCaches();
 
-        if (remote == null) {
-            throw new Exception ("startServant() failed");
-        }
+            Remote remote = context.startServant(servantClass,"SpaceConquest",true,iiop);
 
-        // Try narrow...
+            if (remote == null) {
+                throw new Exception ("startServant() failed");
+            }
 
-        SpaceConquest game = (SpaceConquest)PortableRemoteObject.narrow(remote,SpaceConquest.class);
+            // Try narrow...
 
-        if (game == null) {
-            throw new Exception ("narrow() failed for remote");
-        }
+            SpaceConquest game = (SpaceConquest)PortableRemoteObject.narrow(remote,SpaceConquest.class);
 
-        GameView gameView = game.joinGame ("Test");
+            if (game == null) {
+                throw new Exception ("narrow() failed for remote");
+            }
 
-        Planet[] planets = game.getGalaxyMap ();
+            GameView gameView = game.joinGame ("Test");
 
-        int numPlanets = Array.getLength (planets);
-        PlanetView[] planetViews = new PlanetView [numPlanets];
-        BudgetSummary[] planetBudgets = new BudgetSummary [numPlanets];
+            Planet[] planets = game.getGalaxyMap ();
 
-        for (int i=0; i<numPlanets; i++) {
-	    planetViews[i] = gameView.getPlanet (planets[i].getID());
-	    String name = planetViews[i].getName ();
-	    planetBudgets[i] = gameView.getPlanetBudget (planets[i].getID());
+            int numPlanets = Array.getLength (planets);
+            PlanetView[] planetViews = new PlanetView [numPlanets];
+            BudgetSummary[] planetBudgets = new BudgetSummary [numPlanets];
+
+            for (int i=0; i<numPlanets; i++) {
+                planetViews[i] = gameView.getPlanet (planets[i].getID());
+                String name = planetViews[i].getName ();
+                planetBudgets[i] = gameView.getPlanetBudget (planets[i].getID());
+            }
+
+            helper.pass() ;
+        } catch (Throwable thr) {
+            helper.fail( thr ) ;
+            throw thr ;
+        } finally {
+            helper.done() ;
         }
     }
 }

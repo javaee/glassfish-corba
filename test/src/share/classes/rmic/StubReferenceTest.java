@@ -48,6 +48,8 @@ package rmic;
 import java.io.ByteArrayOutputStream;
 import java.util.StringTokenizer;
 
+import corba.framework.JUnitReportHelper ;
+
 /*
  * @test
  */
@@ -75,52 +77,73 @@ public class StubReferenceTest extends StubTest {
      * Perform the test.
      */
     protected void doTest () throws Throwable {
-
-        // Those classes that should compile have been compiled. Check to
-        // ensure that they match there reference files...
+        JUnitReportHelper helper = new JUnitReportHelper( 
+            this.getClass().getName() ) ;
         
-        for (int i = 0; i < targets.length; i++) {
-            if (targets[i].shouldCompile) {    
-                String[] output = targets[i].output;
-                
-                for (int j = 0; j < output.length; j++) {
-                    compareResources(output[j],FILE_EXT,FILE_REF_EXT);
-                }
-            }
-        }
-        
-        // Now ensure that those classes which should NOT compile, do in
-        // fact fail as expected...
-        
-        for (int i = 0; i < targets.length; i++) {
-            if (targets[i].shouldCompile == false) {
-                Target target = targets[i];
-                boolean failed = false;
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                try {
-                    generate(target.inputClass,out);               
-                } catch (Exception e) {
-                    failed = true;
-                }
-                
-                if (failed) {
+        try {
+            // Those classes that should compile have been compiled. Check to
+            // ensure that they match there reference files...
+            
+            for (int i = 0; i < targets.length; i++) {
+                if (targets[i].shouldCompile) {    
+                    helper.start( "test_" + i ) ;
+                    String[] output = targets[i].output;
                     
-                    // Make sure that the error output contains all the errorStrings in the
-                    // output array...
-                    
-                    String[] errors = target.output;
-                    String errorText = out.toString();
-                    
-                    for (int j = 1; j < errors.length; j++) {
-                        if (errorText.indexOf(errors[j]) < 0) {
-                            throw new Error(target.inputClass + " error message did not contain '" +
-					    errors[j] + "'. Got " + errorText);
+                    try {
+                        for (int j = 0; j < output.length; j++) {
+                            compareResources(output[j],FILE_EXT,FILE_REF_EXT);
                         }
+                    
+                        helper.pass() ;
+                    } catch (Throwable thr) {
+                        helper.fail( thr ) ;
+                        throw thr ;
                     }
-                } else {
-                    throw new Error(target.inputClass + " should FAIL to compile but did not.");
                 }
             }
+            
+            // Now ensure that those classes which should NOT compile, do in
+            // fact fail as expected...
+            
+            for (int i = 0; i < targets.length; i++) {
+                if (!targets[i].shouldCompile) {
+                    helper.start( "test_" + i ) ;
+                    Target target = targets[i];
+                    boolean failed = false;
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    try {
+                        generate(target.inputClass,out);               
+                    } catch (Exception e) {
+                        failed = true;
+                    }
+                    
+                    if (failed) {
+                        // Make sure that the error output contains all the errorStrings in the
+                        // output array...
+                        
+                        String[] errors = target.output;
+                        String errorText = out.toString();
+                        
+                        for (int j = 1; j < errors.length; j++) {
+                            if (errorText.indexOf(errors[j]) < 0) {
+                                String msg = target.inputClass 
+                                    + " error message did not contain '" 
+                                    + errors[j] + "'. Got " + errorText ;
+
+                                helper.fail( msg ) ;
+                                throw new Error( msg ) ;
+                            }
+                        }
+                        helper.pass() ;
+                    } else {
+                        String msg = target.inputClass + " should FAIL to compile but did not." ;
+                        helper.fail( msg ) ;
+                        throw new Error( msg ) ;
+                    }
+                }
+            }
+        } finally {
+            helper.done() ;
         }
     }
 

@@ -50,6 +50,8 @@ import sun.rmi.rmic.iiop.StaticStringsHash;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import corba.framework.JUnitReportHelper ;
+
 /*
  * @test
  */
@@ -315,9 +317,14 @@ public class StaticStringsHashTest extends Test {
     }
 
     public void run () {
+        JUnitReportHelper helper = new JUnitReportHelper(
+            this.getClass().getName() ) ;
+
         try {
             for (int i = 0; i < TEST_CASES.length; i++) {
+                helper.start( "test_" + i ) ;
                 check(TEST_CASES[i]);   
+                helper.pass() ;
             }
         } catch (ThreadDeath death) {
             throw death;
@@ -325,6 +332,9 @@ public class StaticStringsHashTest extends Test {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             e.printStackTrace(new PrintStream(out));
             status = new Error("Caught " + out.toString());
+            helper.fail( e ) ;
+        } finally {
+            helper.done() ;
         }
     }
 }

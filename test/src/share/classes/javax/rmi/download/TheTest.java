@@ -61,17 +61,18 @@ import java.util.Hashtable;
 import java.util.Vector;
 import test.WebServer;
 
+import corba.framework.JUnitReportHelper ;
+
 /*
  * @test
  */
 public class TheTest extends test.Test {
-
     // This test runs the NameServer on port 1050.
-    
     private static  String[] myArgs = new String[]{"-ORBInitialPort" , "1050" };
 
     public  void run() {
-	//public static void main(String[] args) throws Exception {
+        JUnitReportHelper helper = new JUnitReportHelper( 
+            this.getClass().getName() ) ;
 
         String testName     = new TheTest().getClass().getName();
         Process nameServer  = null;
@@ -81,7 +82,6 @@ public class TheTest extends test.Test {
 	WebServer webServer = null;
 
     	try {
-    	    
 	    // The RMIClassLoader requires a security manager to be set
 	    //	System.setSecurityManager(new javax.rmi.download.SecurityManager());
 	    //System.setSecurityManager(new java.rmi.RMISecurityManager());
@@ -147,13 +147,12 @@ public class TheTest extends test.Test {
     	    Context ic = new InitialContext(env);
     	    
     	    // Let the test begin...
+            helper.start( "test1" ) ;
             // Resolve the Object Reference using JNDI/CosNaming
             java.lang.Object objref  = ic.lookup("TheDownloadTestServer");
 
             // This test is designed to verify PortableRemoteObject.narrow
-
 	    try{
-				
 		Servant narrowTo = null;
 		if ( (narrowTo = (Servant)
 		      PortableRemoteObject.narrow(objref,Servant.class)) != null ) {
@@ -173,59 +172,47 @@ public class TheTest extends test.Test {
 			System.err.println(mssg);
             	        throw new Exception("javax.rmi.download.TheTest: Reverse pass failed");
             	    }	
-					
 		}
 					
-				// Now try from separate client that has not codebase of it's own
-
+                // Now try from separate client that has no codebase of its own
 		Vector properties2 = new Vector();
 		properties.addElement("-Djava.security.policy="+testPolicy);
-
-				// Start it
 		client = Util.startServer("javax.rmi.download.TheClient", 
 					  properties);
-
+                helper.pass() ;
     	    } catch (Throwable ex) {
                 System.out.println(testName + " FAILED.");
 		ex.printStackTrace();
 		testPassed = false;
+                helper.fail( ex ) ;
             }
-
     	} catch (Exception ex) {
             System.out.println(testName + " FAILED.");
     	    ex.printStackTrace();
     	    testPassed = false;
-    	}
+            helper.fail( ex ) ;
+    	} finally {
+            helper.done() ;
 
-        finally {
-
-	    // Kill the client
 	    if (client != null) {
 		client.destroy();
 	    }
-
-            // Make sure we kill the test server...
 
             if (server != null) {
                 server.destroy();
             }
   
-            // Make sure we kill the NameServer...
-            
             if (nameServer != null) {
                 nameServer.destroy();
             }
 			
-	    // Kill the HTTP server
 	    if (webServer != null)
 		webServer.quit();
-
         }
 
         if ( testPassed == true ) {
             status = null;
-        }
-        else {
+        } else {
             status = new Error("PortableRemoteObject.narrow Test Failed");
         }
 

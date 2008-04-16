@@ -52,9 +52,10 @@ import java.io.OutputStream ;
  * we can just bracket test case execution with start/(pass|fail) calls.
  */
 public class JUnitReportHelper {
-    private static final boolean DEBUG = true ;
+    private final boolean DEBUG = 
+        Boolean.valueOf( System.getProperty( "corba.test.junit.helper.debug" ) ) ;
 
-    private static void msg( String str ) {
+    private void msg( String str ) {
         if (DEBUG)
             System.out.println( "JUnitReportHelper: " + str ) ;
     }

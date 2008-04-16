@@ -45,6 +45,9 @@
 	    <jvmarg value="-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
 	    <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}"/>
+            <!-- add this to debug use of JUnitReportHelper:
+            <jvmarg value="-Dcorba.test.junit.helper.debug=true"/>
+            -->
 	    <jvmarg value="-Dhttp.server.port=9090"/>
 	    <jvmarg value="-Djava.rmi.server.codebase=http://localhost:9090/"/>
 	    <jvmarg value="-Dhttp.server.root.directory=../build/values2/classes"/>

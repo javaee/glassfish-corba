@@ -45,17 +45,9 @@ import corba.framework.CORBATest;
 import corba.framework.Options;
 import corba.framework.JUnitReportHelper;
 
-public class LegacyBootstrapServerTest
-    extends
-	CORBATest
-{
-    public static final String thisPackage =
-        LegacyBootstrapServerTest.class.getPackage().getName();
+public class LegacyBootstrapServerTest extends CORBATest {
 
-    protected void doTest()
-	throws
-	    Throwable
-    {
+    protected void doTest() throws Throwable {
 	//        Options.setOutputDirectory((String)getArgs().get(test.Test.OUTPUT_DIRECTORY));
 
 	// The ORBD is NOT used.
@@ -64,17 +56,17 @@ public class LegacyBootstrapServerTest
         
         Controller orbd   = createORBD();
 
-        Controller server = createServer(thisPackage + ".Server");
-        Controller client = createClient(thisPackage + ".Client");
+        Controller server = createServer(Server.class.getName());
+        Controller client = createClient(Client.class.getName());
 
+        orbd.start() ;
         server.start();
         client.start();
         client.waitFor(60000);
         client.stop();
         server.stop();
+        orbd.stop();
     }
 }
 
 // End of file.
-
-

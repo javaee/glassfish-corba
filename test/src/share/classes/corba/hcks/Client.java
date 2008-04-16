@@ -116,7 +116,7 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 public class Client 
 {
-    public static String testName = "corba.hcks.Client" ;
+    public static String testName = Client.class.getName() ;
 
     public static final String baseMsg = Client.class.getName();
     public static final String main = baseMsg + ".main";

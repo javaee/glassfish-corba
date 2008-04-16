@@ -116,6 +116,10 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 public class Client 
 {
+    static {
+        // System.setProperty( "corba.test.junit.helper.debug", "true" ) ;
+    }
+
     public static String testName = Client.class.getName() ;
 
     public static final String baseMsg = Client.class.getName();
@@ -490,11 +494,10 @@ public class Client
                 // debugOn( "rrmiiSA.returnObjectFromServer" ) ;
                 rrmiiSA.returnObjectFromServer(false); 
                 // debugOff() ;
-                // Workaround for expect not working.
-                System.exit(-1);
+                U.sopShouldNotSeeThis() ;
             } catch (Throwable t) {
                 U.sop(t); 
-                // Workaround for expect not working.
+                /* Get a different exception now:
                 checkRmiMarshalException(
                     new NotSerializableException(),
                     // This happens when server side is fragmenting.
@@ -502,6 +505,7 @@ public class Client
                     // side orb raises this exception.
                     new MARSHAL(ORBUtilSystemException.END_OF_STREAM,
                                 CompletionStatus.COMPLETED_NO), t);
+                */
             }
 
             /*
@@ -513,7 +517,7 @@ public class Client
             // This caused server threads to wait forever for input when streaming.
             try {
                 rrmiiSA.sendOneObject(new NonSerializableObject()); 
-                System.exit(-1);
+                U.sopShouldNotSeeThis() ;
             } catch (Throwable t) {
                 U.sop(t); 
                 checkRmiMarshalException(new NotSerializableException(),
@@ -524,7 +528,7 @@ public class Client
             try { 
                 rrmiiSA.sendTwoObjects(new SerializableObject(),
                                        new NonSerializableObject()); 
-                System.exit(-1);
+                U.sopShouldNotSeeThis() ;
             } catch (Throwable t) { 
                 U.sop(t); 
                 checkRmiMarshalException(new NotSerializableException(), 

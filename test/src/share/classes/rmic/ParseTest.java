@@ -76,6 +76,24 @@ import corba.framework.TestngRunner ;
  * @test
  */
 public class ParseTest extends test.Test implements Constants {
+
+    public static ClassPath createClassPath() {
+            
+        String path = System.getProperty("java.class.path");
+
+        // Use reflection to call sun.rmi.rmic.BatchEnvironment.createClassPath(path)
+        // so that we can leave classes.zip at the front of the classpath for
+        // the build environment. Don't ask.
+
+        try {
+            Class env = sun.rmi.rmic.BatchEnvironment.class;
+            Method method = env.getMethod("createClassPath",new Class[]{java.lang.String.class});
+            return (ClassPath) method.invoke(null,new Object[]{path});
+        } catch (Throwable e) {
+            if (e instanceof ThreadDeath) throw (ThreadDeath)e;
+            throw new Error("ParseTest.createClassPath() caught "+e);
+        }
+    }
     
     private static class TestExecutor {
         private ByteArrayOutputStream out = null;
@@ -511,24 +529,6 @@ public class ParseTest extends test.Test implements Constants {
             throw new Error("Invalid assertKind: " + assertKind);        
         }
         
-        public static ClassPath createClassPath() {
-                
-            String path = System.getProperty("java.class.path");
-
-            // Use reflection to call sun.rmi.rmic.BatchEnvironment.createClassPath(path)
-            // so that we can leave classes.zip at the front of the classpath for
-            // the build environment. Don't ask.
-
-            try {
-                Class env = sun.rmi.rmic.BatchEnvironment.class;
-                Method method = env.getMethod("createClassPath",new Class[]{java.lang.String.class});
-                return (ClassPath) method.invoke(null,new Object[]{path});
-            } catch (Throwable e) {
-                if (e instanceof ThreadDeath) throw (ThreadDeath)e;
-                throw new Error("ParseTest.createClassPath() caught "+e);
-            }
-        }
-
         @BeforeSuite() 
         public void setup() {
             out = new ByteArrayOutputStream();

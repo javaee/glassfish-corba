@@ -145,7 +145,7 @@ public class InnerTest extends Test implements Constants {
         try {
     
             out = new ByteArrayOutputStream();
-            env = new TestEnv(ParseTest.createClassPath(),out);
+            env = new TestEnv(rmic.ParseTest.createClassPath(),out);
             stack = new ContextStack(env);
 
             // Do the tests...

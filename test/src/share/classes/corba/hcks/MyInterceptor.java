@@ -239,6 +239,7 @@ public class MyInterceptor
 	} else if (operation.equals(C.throwThreadDeathInServantThenSysInPostThenSysInSendException))
         {
 	    throw new PERSIST_STORE();
+/* KMC: Can't find any test affected by this code in HCKS, which causes problems in testMisc            
 	} else if (operation.equals(C.sendTwoObjects)) {
 	    SystemException sex =
 		ORBUtility.extractSystemException(ri.sending_exception());
@@ -257,6 +258,7 @@ public class MyInterceptor
 		// REVISIT: Not complete.  What if ending point never called?
 		// What if wrong ending point called?
 	    }
+*/
 	}
 
     }

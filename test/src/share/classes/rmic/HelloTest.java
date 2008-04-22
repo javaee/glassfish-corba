@@ -81,15 +81,8 @@ public class HelloTest extends RemoteTest {
 	"rmic.RemoteObjectServer",
     };
 
-    private final boolean useLocalServants ;
-    private final JUnitReportHelper helper ;
-    private boolean firstTest = false ;
-
-    public HelloTest() {
-        useLocalServants = getArgs().get(LOCAL_SERVANTS_FLAG) != null ;
-        helper = new JUnitReportHelper( this.getClass().getName() 
-            + ( useLocalServants ? "_local" : "" ) ) ;
-    }
+    private JUnitReportHelper helper = null ;
+    private boolean firstTest = true ;
 
     private void nextTest( String name ) {
         if (firstTest)
@@ -145,6 +138,11 @@ public class HelloTest extends RemoteTest {
     public void doTest (ServantContext context) throws Throwable {
         WebServer webServer = null;
         
+        final boolean useLocalServants ;
+        useLocalServants = getArgs().get(LOCAL_SERVANTS_FLAG) != null ;
+        helper = new JUnitReportHelper( this.getClass().getName() 
+            + ( useLocalServants ? "_local" : "" ) ) ;
+
         try {
 	    ORB orb = (ORB)(context.getORB()) ;
 	    ORBData odata = orb.getORBData() ;
@@ -598,6 +596,8 @@ public class HelloTest extends RemoteTest {
             if (!firstTest)
                 helper.pass() ;
         } catch (Exception exc) {
+            System.out.println( "Test failed with exception " + exc ) ;
+            exc.printStackTrace() ;
             helper.fail( exc ) ;
             throw exc ;
         } finally {

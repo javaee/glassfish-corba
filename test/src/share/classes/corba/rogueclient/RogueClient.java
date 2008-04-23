@@ -62,7 +62,7 @@ import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.rmi.PortableRemoteObject;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 import java.util.concurrent.atomic.AtomicInteger ;
 

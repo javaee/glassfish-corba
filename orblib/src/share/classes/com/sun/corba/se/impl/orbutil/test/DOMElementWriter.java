@@ -52,7 +52,7 @@
  *
  */
 
-package corba.framework.junitreport;
+package com.sun.corba.se.impl.orbutil.test;
 
 import java.io.IOException;
 import java.io.OutputStream;

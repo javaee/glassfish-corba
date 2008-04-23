@@ -57,8 +57,7 @@ import org.testng.ITestListener ;
 import org.testng.ITestContext ;
 import org.testng.IResultMap ;
 
-import corba.framework.junitreport.JUnitReportWriter ;
-import corba.framework.junitreport.XMLJUnitReportWriter ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /** Used to set up an appropriate instance of TestNG for running a test.
  * Used inside the CORBA test framework in order to generate useful reports
@@ -70,101 +69,10 @@ public class TestngRunner {
     private String outdirName ;
     private boolean hasFailure ;
 
-/*
-    static String statusString( int status ) {
-        switch (status) {
-            case ITestResult.SUCCESS : 
-                return "SUCCESS" ;
-            case ITestResult.FAILURE : 
-                return "FAILURE" ;
-            case ITestResult.SKIP : 
-                return "SKIP" ;
-            case ITestResult.SUCCESS_PERCENTAGE_FAILURE : 
-                return "SUCCESS_PERCENTAGE_FAILURE" ;
-            case ITestResult.STARTED : 
-                return "STARTED" ;
-            default :
-                return "*UNKNOWN*" ;
-        }
-    }
-
-    private class JUnitReportSuiteListener implements ISuiteListener {
-        private final JUnitReportWriter writer ;
-
-        JUnitReportSuiteListener() {
-            writer = new XMLJUnitReportWriter() ;
-        }
-
-        private void msg( String str ) {
-            System.out.println( str ) ;
-        }
-
-        public void onStart( ISuite suite ) {
-            msg( "JUnitReportSuiteListener: onStart" ) ;
-            String name = suite.getName() ;
-
-            try {
-                File dir = new File( outdirName ) ;
-                File file = new File( dir, name + ".xml" ) ;
-                OutputStream os = new FileOutputStream( file ) ;
-                writer.setOutput( os ) ;
-            } catch (IOException exc) {
-                throw new RuntimeException( exc ) ;
-            }
-
-            Properties props = System.getProperties() ;
-
-            writer.startTestSuite( name, props ) ;
-        }
-
-        public void onFinish( ISuite suite ) {
-            msg( "JUnitReportSuiteListener: onFinish" ) ;
-
-            for (Map.Entry<String,ISuiteResult> entry : suite.getResults().entrySet()) {
-                ITestContext tc = entry.getValue().getTestContext() ;
-                for (ITestResult result : tc.getFailedTests().getAllResults()) {
-                    Throwable err = result.getThrowable() ;
-
-                    JUnitReportWriter.TestDescription td = new JUnitReportWriter.TestDescription( 
-                        result.getName(), result.getTestClass().getName() ) ;
-                
-                    writer.startTest( td ) ;
-
-                    if (err instanceof AssertionError)
-                        writer.addFailure( td, err ) ; 
-                    else
-                        writer.addError( td, err ) ; 
-
-                    writer.endTest( td ) ;
-                }
-                    
-                for (ITestResult result : tc.getPassedTests().getAllResults()) {
-                    JUnitReportWriter.TestDescription td = new JUnitReportWriter.TestDescription( 
-                        result.getName(), result.getTestClass().getName() ) ;
-                
-                    writer.startTest( td ) ;
-                    writer.endTest( td ) ;
-                }
-                
-                // XXX What about skipped tests?
-            }
-                    
-            writer.endTestSuite() ;
-        }
-    }
-*/
-
     private class JUnitReportTestListener implements ITestListener {
-        // private final JUnitReportWriter writer ;
-        // private JUnitReportWriter.TestDescription current ;
-        // private String name ;
-
         private JUnitReportHelper helper ;
 
         JUnitReportTestListener( String name ) {
-            // writer = new XMLJUnitReportWriter() ;
-            // this.name = name ;
-
             helper = new JUnitReportHelper( name ) ;
         }
 
@@ -173,166 +81,34 @@ public class TestngRunner {
         }
 
         public void onStart( ITestContext context ) {
-            // msg( "TestListener: onStart" ) ;
-            // msg( "  context: name=" + context.getName() ) ;
-            // try {
-                // File dir = new File( outdirName ) ;
-                // File file = new File( dir, name + ".xml" ) ;
-                // OutputStream os = new FileOutputStream( file ) ;
-                // writer.setOutput( os ) ;
-            // } catch (IOException exc) {
-                // throw new RuntimeException( exc ) ;
-            // }
-
-            // Properties props = System.getProperties() ;
-
-            // writer.startTestSuite( name, props ) ;
         }
 
         public void onFinish( ITestContext context ) {
-            // msg( "TestListener: onStart" ) ;
-            // msg( "  context: name=" + context.getName() ) ;
-            // writer.endTestSuite() ;
-            //
             helper.done() ;
         }
 
         public void onTestStart( ITestResult result ) {
-            // msg( "TestListener: onTestStart" ) ;
-            // current= new JUnitReportWriter.TestDescription( 
-                // result.getName(), result.getTestClass().getName() ) ;
-            // writer.startTest( current ) ;
             helper.start( result.getName() ) ;
         }
 
         public void onTestSkipped( ITestResult result ) {
-            // msg( "TestListener: onTestSkiiped" ) ;
-            // writer.addError( current, new RuntimeException( "Test was skipped" ) ) ;
-            // writer.endTest( current ) ;
             helper.fail( "Test was skipped" ) ;
         }
 
         public void onTestFailure( ITestResult result ) {
-            // msg( "TestListener: onTestFailure" ) ;
             Throwable err = result.getThrowable() ;
-
-            // if (err instanceof AssertionError)
-                // writer.addFailure( current, err ) ; 
-            // else
-                // writer.addError( current, err ) ; 
-
-            // writer.endTest( current ) ;
 
             helper.fail( err ) ;
         }
 
         public void onTestSuccess( ITestResult result ) {
-            // msg( "TestListener: onTestSuccess" ) ;
-            // writer.endTest( current ) ;
             helper.pass() ;
         }
 
         public void onTestFailedButWithinSuccessPercentage( ITestResult result ) {
-            // msg( "TestListener: onTestFailedButWithinSuccessPercentage" ) ;
-            // writer.endTest( current ) ;
             helper.pass() ;
         }
     }
-
-/*
-    // Temporary listeners to understand how TestNG works
-    private class SuiteListener implements ISuiteListener {
-        private void msg( String str ) {
-            System.out.println( str ) ;
-        }
-
-        private void displayIResultMap( IResultMap map ) {
-            for (ITestResult result : map.getAllResults() ) {
-                long duration = result.getEndMillis() - result.getStartMillis() ;
-                msg( "        name=" + result.getName()  
-                    + " status=" + statusString( result.getStatus() )
-                    + " " + duration + " (msec) " ) ;
-            }
-        }
-
-        private void displaySuite( ISuite suite ) {
-            msg( "  name = " + suite.getName() ) ;
-            msg( "  output directory = " + suite.getOutputDirectory() ) ;
-            msg( "  results:" ) ;
-            for (Map.Entry<String,ISuiteResult> entry : suite.getResults().entrySet()) {
-                msg( "    " + entry.getKey() + ":" ) ;
-                ITestContext tc = entry.getValue().getTestContext() ;
-
-                msg( "      Failed tests:" ) ;
-                displayIResultMap( tc.getFailedTests() ) ;
-
-                msg( "      Passed tests:" ) ;
-                displayIResultMap( tc.getPassedTests() ) ;
-
-                msg( "      Skipped tests:" ) ;
-                displayIResultMap( tc.getSkippedTests() ) ;
-            }
-        }
-
-        public void onStart( ISuite suite ) {
-            msg( "SuiteListener: onStart" ) ;
-            displaySuite( suite ) ;
-        }
-
-        public void onFinish( ISuite suite ) {
-            msg( "SuiteListener: onFinish" ) ;
-            displaySuite( suite ) ;
-        }
-    }
-
-    private class TestListener implements ITestListener {
-        private void msg( String str ) {
-            System.out.println( str ) ;
-        }
-
-        public void onStart( ITestContext context ) {
-            msg( "TestListener: onStart" ) ;
-            msg( "  context: name=" + context.getName() ) ;
-        }
-
-        public void onFinish( ITestContext context ) {
-            msg( "TestListener: onStart" ) ;
-            msg( "  context: name=" + context.getName() ) ;
-        }
-
-        private void displayTestResult( ITestResult result ) {
-            long duration = result.getEndMillis() - result.getStartMillis() ;
-            msg( "  name=" + result.getName()  
-                + " status=" + statusString( result.getStatus() )
-                + " " + duration + " (msec) " ) ;
-        }
-
-        public void onTestStart( ITestResult result ) {
-            msg( "TestListener: onTestStart" ) ;
-            displayTestResult( result ) ;
-        }
-
-        public void onTestSkipped( ITestResult result ) {
-            msg( "TestListener: onTestSkiiped" ) ;
-            displayTestResult( result ) ;
-        }
-
-        public void onTestFailure( ITestResult result ) {
-            msg( "TestListener: onTestFailure" ) ;
-            displayTestResult( result ) ;
-        }
-
-        public void onTestSuccess( ITestResult result ) {
-            msg( "TestListener: onTestSuccess" ) ;
-            displayTestResult( result ) ;
-        }
-
-        public void onTestFailedButWithinSuccessPercentage( ITestResult result ) {
-            msg( "TestListener: onTestFailedButWithinSuccessPercentage" ) ;
-            displayTestResult( result ) ;
-        }
-    }
-*/
 
     /** Create a new TestngRunner.
      * @param outdir The directory in which the test reports should be placed.
@@ -366,15 +142,9 @@ public class TestngRunner {
     public void run() {
         for (Class<?> cls : suiteClasses ) {
             testng = new TestNG() ;
-            // testng.setDefaultSuiteName( cls.getName() + ".xml" ) ;
             testng.setTestClasses( new Class<?>[] { cls } ) ;
             testng.setOutputDirectory( outdirName )  ;
-
-            //testng.addListener( new JUnitXMLReporter() ) ;
-            //testng.addListener( new SuiteListener() ) ;
             testng.addListener( new JUnitReportTestListener( cls.getName() ) ) ;
-            //testng.addListener( new TestListener() ) ;
-
             testng.run() ;
             if (testng.hasFailure())
                 hasFailure = true ;

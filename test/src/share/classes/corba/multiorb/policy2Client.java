@@ -40,7 +40,7 @@ import org.omg.CosNaming.NamingContextPackage.*;
 import org.omg.CORBA.*;
 import java.util.*;
 import examples.*;
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class policy2Client {
     private static final String msgPassed = "policy_2: **PASSED**";

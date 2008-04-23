@@ -50,6 +50,8 @@ import java.io.*;
 
 import IORInterceptorTest.*;    // for IDL
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public class Server 
     implements InternalProcess 
 {

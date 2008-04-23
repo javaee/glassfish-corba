@@ -38,7 +38,7 @@ package hopper.h4670827;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Object;
 import java.util.*;
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class Client implements Runnable {
     private JUnitReportHelper helper ;

@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class Client 
 {

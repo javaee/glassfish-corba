@@ -60,7 +60,7 @@ import rmic.ObjectByValue;
 import java.io.*;
 import java.util.*;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class AnyTest extends test.Test
 {

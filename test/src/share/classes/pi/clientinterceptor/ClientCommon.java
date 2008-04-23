@@ -49,6 +49,8 @@ import java.io.*;
 
 import ClientRequestInterceptor.*;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 /**
  * Common methods for Client implementations in this test to use
  */

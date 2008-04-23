@@ -41,6 +41,8 @@ import test.*;
 
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 /**
  * Main CORBA Technologies test class which should be extended
  * for each individual test.  It provides an easy way to run

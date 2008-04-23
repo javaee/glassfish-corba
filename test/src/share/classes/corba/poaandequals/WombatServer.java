@@ -53,6 +53,8 @@ import corba.framework.*;
 import java.io.*;
 import java.util.*;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public class WombatServer implements InternalProcess 
 {
     PrintStream out;

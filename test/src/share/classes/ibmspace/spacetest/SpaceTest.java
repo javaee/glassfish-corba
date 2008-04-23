@@ -67,7 +67,7 @@ import java.lang.reflect.Array;
 import ibmspace.common.*;
 import ibmspace.server.*;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class SpaceTest extends RemoteTest {
 

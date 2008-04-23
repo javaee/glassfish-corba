@@ -53,7 +53,7 @@ import com.sun.corba.se.spi.orbutil.closure.Closure ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /** TestSession manages running of tests and checking results within
 * a test session.  If the session fails any test, the whole session 

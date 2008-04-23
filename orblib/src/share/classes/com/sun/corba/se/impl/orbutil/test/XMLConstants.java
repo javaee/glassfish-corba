@@ -52,7 +52,7 @@
  *
  */
 
-package corba.framework.junitreport ;
+package com.sun.corba.se.impl.orbutil.test;
 
 /**
  * <p> Interface groups XML constants.

@@ -63,7 +63,7 @@ import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.MARSHAL;
 import java.io.*;
 import java.util.*;
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class SerializationTest extends test.Test
 {

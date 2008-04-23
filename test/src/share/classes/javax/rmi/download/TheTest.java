@@ -61,7 +61,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 import test.WebServer;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /*
  * @test

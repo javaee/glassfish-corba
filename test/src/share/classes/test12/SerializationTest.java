@@ -49,7 +49,7 @@ import javax.rmi.CORBA.*;
 
 import java.io.*;
 import java.util.Properties ;
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class SerializationTest extends test.Test {
     public void run() {

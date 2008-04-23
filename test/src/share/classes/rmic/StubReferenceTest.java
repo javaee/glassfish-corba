@@ -48,7 +48,7 @@ package rmic;
 import java.io.ByteArrayOutputStream;
 import java.util.StringTokenizer;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /*
  * @test

@@ -54,7 +54,7 @@ import org.omg.CORBA.Context;
 import org.omg.CORBA.Object;
 import java.util.Properties;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class Client implements Runnable
 {

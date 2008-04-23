@@ -88,7 +88,7 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class U
 {

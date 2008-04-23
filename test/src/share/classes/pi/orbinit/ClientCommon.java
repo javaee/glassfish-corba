@@ -48,6 +48,8 @@ import corba.framework.*;
 import java.util.*;
 import java.io.*;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public abstract class ClientCommon
     implements InternalProcess 
 {

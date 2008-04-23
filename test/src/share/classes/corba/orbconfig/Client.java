@@ -81,7 +81,7 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class Client 
 {

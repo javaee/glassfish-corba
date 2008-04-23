@@ -50,6 +50,8 @@ import java.io.*;
 
 import ServerRequestInterceptor.*;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 /**
  * Common methods for Server implementations in this test to use
  */

@@ -34,12 +34,12 @@
  * holder.
  */
 
-package corba.framework ;
+package com.sun.corba.se.spi.orbutil.test ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
-import corba.framework.junitreport.JUnitReportWriter ;
-import corba.framework.junitreport.XMLJUnitReportWriter ;
+import com.sun.corba.se.impl.orbutil.test.JUnitReportWriter ;
+import com.sun.corba.se.impl.orbutil.test.XMLJUnitReportWriter ;
 
 import java.io.File ;
 import java.io.FileOutputStream ;

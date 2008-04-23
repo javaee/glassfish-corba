@@ -50,6 +50,8 @@ import java.io.*;
 
 import ServerRequestInfo.*;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 /**
  * This test works similar to the way the serverinterceptor test works.
  * The server controls the client by waitinf for a syncWithServer call

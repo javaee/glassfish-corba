@@ -47,6 +47,8 @@ import CodecTest.*; // for IDL struct definitions
 import java.util.*;
 import java.io.*;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public class Client 
     implements InternalProcess 
 {

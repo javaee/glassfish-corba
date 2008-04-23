@@ -43,7 +43,7 @@ import org.omg.CosNaming.NamingContextPackage.*;
 import corba.framework.statusU;
 import corba.framework.RTMConstants;
 import corba.framework.GetID;
-import corba.framework.JUnitReportHelper;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper;
 
 /**
 * Purpose			: To verify that AdapterActivator implementation registered, recreates

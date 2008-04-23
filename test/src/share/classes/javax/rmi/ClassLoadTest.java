@@ -52,7 +52,7 @@ import com.sun.corba.se.impl.util.JDKBridge;
 import javax.rmi.CORBA.Util;
 import java.rmi.server.RMIClassLoader;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class ClassLoadTest extends Test {
     private static int SUCCEED = 0;

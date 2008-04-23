@@ -60,7 +60,7 @@ import test.Test;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class TheTest extends test.Test {
     // This test runs the NameServer on port 1050.

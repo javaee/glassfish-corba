@@ -67,7 +67,7 @@ import com.sun.corba.se.impl.util.Utility;
 import java.rmi.MarshalException;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /*
  * @test

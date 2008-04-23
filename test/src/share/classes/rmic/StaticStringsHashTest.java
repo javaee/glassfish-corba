@@ -50,7 +50,7 @@ import sun.rmi.rmic.iiop.StaticStringsHash;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import corba.framework.JUnitReportHelper ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /*
  * @test

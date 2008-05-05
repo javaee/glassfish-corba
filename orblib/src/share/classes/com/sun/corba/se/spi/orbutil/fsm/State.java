@@ -76,6 +76,10 @@ public class State extends NameBase {
 	this( null, name, kind ) ;
     }
 
+    public State( Set<State> states, String name )  {
+	this( states, name, Kind.NORMAL ) ;
+    }
+
     public State( Set<State> states, String name, Kind kind ) 
     { 
 	super( name ) ; 

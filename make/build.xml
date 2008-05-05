@@ -120,6 +120,13 @@
     </condition> 
     <property name="debug.args" value=""/>
 
+    <!-- experimental files -->
+    <property name="experimentalsrc.dir"		value="experimental/src/share/classes"/>
+    <property name="experimentalgensrc.dir"		value="experimental/build/gensrc"/>
+    <property name="experimentaltest.src.dir"	value="experimental/test/src/share/classes"/>
+    <property name="experimentalclasses.dir"	value="experimental/build/classes"/>
+    <property name="experimentaltestclasses.dir"	value="experimental/test/build/classes"/>
+
     <!-- jar files -->
     <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
     <property name="root.dir"			value="${basedir}"/>
@@ -202,6 +209,7 @@
 	    <pathelement location="${test.output}"/>
 	    <pathelement location="${test-values1.dir}"/>
 	    <pathelement location="${test.src.dir}"/>
+	    <pathelement location="${experimentalclasses.dir}"/>
 	</path>
 	<pathconvert property="test.source.path">
 	    <path>
@@ -453,7 +461,7 @@
 		optimize="${javac.optimize}"
 		fork="true"
 		memoryMaximumSize="512m"> 
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
 	    <src path="${test.src.dir}"/>
 	    <src path="${test-gensrc.dir}"/>
 	    <include name="**"/>
@@ -494,7 +502,6 @@
 
             <!--exclude name="corba/dynamicrmiiiop/testclasses/**"/-->
 	</javac>
-	<!-- add this after we have some experimental tests
 	<mkdir dir="${experimentaltestclasses.dir}"/>
 	<javac destdir="${experimentaltestclasses.dir}" 
 		classpathref="test-classpath.master"
@@ -504,9 +511,8 @@
 		failonerror="true">
 	    <src path="${experimentaltest.src.dir}"/>
 	    <include name="**"/>
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
 	</javac>
-	-->
     </target>
 
     <target name="compile-tests-values" depends="init, prepare-dirs">
@@ -521,7 +527,7 @@
 		debug="${javac.debug}" 
 		optimize="${javac.optimize}"
 		failonerror="true">
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
 	    <src path="${test.src.dir}/values1"/>
 	    <include name="**"/>
 	</javac>
@@ -531,7 +537,7 @@
 		debug="${javac.debug}" 
 		optimize="${javac.optimize}"
 		failonerror="true">
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
 	    <src path="${test.src.dir}/values2"/>
 	    <include name="**"/>
 	</javac>
@@ -540,11 +546,6 @@
     <!-- ========================= EXPERIMENTAL ========================= -->
     <target name="compile-experimental" 
             depends="init">
-	<property name="experimentalsrc.dir"		value="experimental/src/share/classes"/>
-	<property name="experimentalgensrc.dir"		value="experimental/build/gensrc"/>
-	<property name="experimentaltest.src.dir"	value="experimental/test/src/share/classes"/>
-	<property name="experimentalclasses.dir"	value="experimental/build/classes"/>
-	<property name="experimentaltestclasses.dir"	value="experimental/test/build/classes"/>
 	<echo message="Compiling experimental ORB components"/>
 	<mkdir dir="${experimentalclasses.dir}"/>
 	<javac destdir="${experimentalclasses.dir}" 
@@ -558,7 +559,7 @@
 	    </classpath>
 	    <src path="${experimentalsrc.dir}"/>
 	    <include name="**"/> 
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
 	</javac>
     </target>
 
@@ -593,7 +594,7 @@
 	    <src path="${orblib.src.dir}"/>
 	    <include name="**"/>
 	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${orblib.classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
 	</javac>
     </target>
 

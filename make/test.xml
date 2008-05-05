@@ -62,7 +62,7 @@
 	    <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
 	    <jvmarg value="-Demma.coverage.out.merge=true"/>
 	    <jvmarg value="-Demma.rt.control=false"/>
-	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/>
+	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/>
 	    <jvmarg line="${debug.args}"/>
 	    <!-- was:
 	    <arg line="-file ../src/share/classes/@{testfile}"/>

@@ -144,6 +144,8 @@ public class TestngRunner {
             testng = new TestNG() ;
             testng.setTestClasses( new Class<?>[] { cls } ) ;
             testng.setOutputDirectory( outdirName )  ;
+            testng.setDefaultSuiteName( cls.getName() ) ;
+            testng.setDefaultTestName( cls.getName() ) ;
             testng.addListener( new JUnitReportTestListener( cls.getName() ) ) ;
             testng.run() ;
             if (testng.hasFailure())

@@ -36,8 +36,6 @@
 
 package com.sun.corba.se.impl.orbutil.codegen ;
 
-import java.lang.reflect.Modifier ;
-
 import java.util.BitSet ;
 import java.util.List ;
 import java.util.ArrayList ;

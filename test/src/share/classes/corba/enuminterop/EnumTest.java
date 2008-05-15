@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,30 +34,36 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orbutil.codegen;
+package corba.enuminterop;
 
-import org.objectweb.asm.Label ;
+import test.Test;
+import corba.framework.*;
+import java.util.Properties;
 
-/** This trivial class exists only to give a slightly
- *  more readable toString method for ASM labels.
- *  The ASM version simply uses the identity hashcode,
- *  which is a bit hard to read.
- */
-public class MyLabel extends Label {
-    private static int next = 0 ;
-    private int current = next++ ;
-    private boolean emitted = false ;
+public class EnumTest extends CORBATest {
+    protected void doTest() throws Throwable
+    {
+        Options.addServerArg("-debug");
+        Controller orbd = createORBD();
+ 
+        Properties serverProps = Options.getServerProperties();
+ 
+        Controller server = createServer( Server.class.getName() ) ;
+ 
+        orbd.start();
+ 
+        server.start();
+ 
+        Controller client = createClient( Client.class.getName() ) ;
+ 
+        client.start();
+ 
+        client.waitFor(120000);
+ 
+        client.stop();
+ 
+        server.stop();
 
-    public boolean emitted() {
-	return emitted ;
-    }
-
-    public void emitted( boolean flag ) {
-	emitted = flag ;
-    }
-
-    @Override
-    public String toString() {
-	return "ML" + current ;
+        orbd.stop();
     }
 }

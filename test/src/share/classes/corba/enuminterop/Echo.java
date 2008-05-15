@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,30 +34,17 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orbutil.codegen;
+package corba.enuminterop ;
 
-import org.objectweb.asm.Label ;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+                                                                                
+public interface Echo extends Remote
+{
+    enum Day { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday } 
 
-/** This trivial class exists only to give a slightly
- *  more readable toString method for ASM labels.
- *  The ASM version simply uses the identity hashcode,
- *  which is a bit hard to read.
- */
-public class MyLabel extends Label {
-    private static int next = 0 ;
-    private int current = next++ ;
-    private boolean emitted = false ;
+    Object echo( Object arg ) throws RemoteException ;
 
-    public boolean emitted() {
-	return emitted ;
-    }
-
-    public void emitted( boolean flag ) {
-	emitted = flag ;
-    }
-
-    @Override
-    public String toString() {
-	return "ML" + current ;
-    }
+    Day echoDay( Day arg ) throws RemoteException ;
 }
+

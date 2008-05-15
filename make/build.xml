@@ -204,12 +204,13 @@
 	    <pathelement location="${emma.classes.dir}"/>
 	    <pathelement location="${orblib.classes.dir}"/>
 	    <pathelement location="${classes.dir}"/>
+	    <pathelement location="${experimentalclasses.dir}"/>
 	    <pathelement location="${test-classes.dir}"/>
 	    <pathelement location="${test-gensrc.dir}"/>
 	    <pathelement location="${test.output}"/>
 	    <pathelement location="${test-values1.dir}"/>
 	    <pathelement location="${test.src.dir}"/>
-	    <pathelement location="${experimentalclasses.dir}"/>
+	    <pathelement location="${experimentaltestclasses.dir}"/>
 	</path>
 	<pathconvert property="test.source.path">
 	    <path>
@@ -236,7 +237,7 @@
     </target>
 
     <!-- ========================= COMPILE ========================= -->
-    <target name="compile" depends="init, prepare-dirs, orb-library, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
+    <target name="compile" depends="init, prepare-dirs, orb-library, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources, compile-experimental">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"

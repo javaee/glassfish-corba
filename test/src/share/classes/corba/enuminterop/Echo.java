@@ -43,8 +43,8 @@ public interface Echo extends Remote
 {
     enum Day { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday } 
 
-    Object echo( Object arg ) throws RemoteException ;
+    Object echoObject( String arg ) throws RemoteException ;
 
-    Day echoDay( Day arg ) throws RemoteException ;
+    Day echoDay( String arg ) throws RemoteException ;
 }
 

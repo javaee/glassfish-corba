@@ -744,7 +744,7 @@
     </target>
     
     <!-- ========================= CLEAN ========================= -->
-    <target name="clean" depends="init,clean-emma,clean-tests">
+    <target name="clean" depends="init,clean-emma,clean-tests,clean-experimental">
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
 	<delete dir="${test-build.dir}"/>
@@ -757,6 +757,11 @@
 
     <target name="clean-tests" depends="init">
 	<delete dir="${test.run.base}"/>
+        <delete dir="${experimentaltestclasses.dir}"/>
+    </target>
+
+    <target name="clean-experimental">
+        <delete dir="experimental/build"/>
     </target>
 
     <!-- ========================= CREATE-JARS ========================= -->

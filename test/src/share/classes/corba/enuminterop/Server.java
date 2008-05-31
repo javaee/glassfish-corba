@@ -59,11 +59,33 @@ import com.sun.corba.se.impl.orbutil.ORBConstants ;
  */
 public class Server {
     public final static String REF_NAME = "EchoService" ;
+    
+    private static final String PKG_PREFIX = "com.sun.corba." + "se." ;
 
     public static void main(String[] args ) {
         try {
-            // XXX set this to the JDK ORB
-            ORB orb = ORB.init( args, null );
+            System.out.println( "Arguments:" ) ;
+            for (String str : args) 
+                System.out.println( "\t" + str ) ;
+
+            // Use the JDK ORB for this test
+            System.setProperty( "org.omg.CORBA.ORBClass", 
+                PKG_PREFIX + "impl.orb.ORBImpl" ) ;
+            System.setProperty( "org.omg.CORBA.ORBSingletonClass", 
+                PKG_PREFIX + "impl.orb.ORBSingleton" ) ;
+
+            System.setProperty( "javax.rmi.CORBA.PortableRemoteObjectClass",
+                PKG_PREFIX + "impl.javax.rmi.PortableRemoteObject" ) ; 
+            System.setProperty( "javax.rmi.CORBA.StubClass",
+                PKG_PREFIX + "impl.javax.rmi.CORBA.StubDelegateImpl" ) ; 
+            System.setProperty( "javax.rmi.CORBA.UtilClass",
+                PKG_PREFIX + "impl.javax.rmi.CORBA.Util" ) ; 
+
+            System.setProperty( "com.sun.CORBA.ORBDebug", "subcontract" ) ;
+
+            System.out.println( ORB.init() ) ;
+
+            ORB orb = ORB.init( (String[])null, null );
 
             org.omg.CORBA.Object objRef =
                 orb.resolve_initial_references("NameService");
@@ -77,7 +99,7 @@ public class Server {
             
             byte[] id = REF_NAME.getBytes();
             rootPOA.activate_object_with_id(id, 
-                (Servant)makeEchoServant((com.sun.corba.se.spi.orb.ORB)orb));
+                (Servant)makeEchoServant(orb));
             org.omg.CORBA.Object obj = rootPOA.id_to_reference( id );
                                                                                 
             ncRef.rebind(path, obj);
@@ -94,11 +116,12 @@ public class Server {
         }
     }
 
-    static Tie makeEchoServant( com.sun.corba.se.spi.orb.ORB orb ) {
+    static Tie makeEchoServant( ORB orb ) {
         try {
             EchoServant servant = new EchoServant();
 
-            Tie tie = orb.getPresentationManager().getTie();
+            Tie tie = javax.rmi.CORBA.Util.getTie( servant ) ;
+            // Tie tie = orb.getPresentationManager().getTie();
 	    tie.orb( orb ) ;
             tie.setTarget( (java.rmi.Remote)servant );
             return tie;

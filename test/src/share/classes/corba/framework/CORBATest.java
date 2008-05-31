@@ -615,6 +615,7 @@ public abstract class CORBATest extends test.RemoteTest
 
         helper.start( name ) ;
 
+        process.kill() ;
         int exitValue = process.exitValue() ;
         long duration = process.duration() ;
         if (exitValue <= 0) 

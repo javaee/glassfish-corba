@@ -167,7 +167,7 @@ public class INSURLOperationImpl implements Operation
     {
         org.omg.CORBA.Object result = null;
         // If RIR flag is true use the Bootstrap protocol
-	// Bug 6670615 noticed that this is incorrect: rir means use resolve_initial_references
+	// Bug 6678177 noticed that this is incorrect: rir means use resolve_initial_references
 	// on the local ORB!
         if( theCorbaLocObject.getRIRFlag( ) )  {
             // result = bootstrapResolver.resolve(theCorbaLocObject.getKeyString());

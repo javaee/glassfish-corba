@@ -46,11 +46,19 @@ public class EchoServant extends PortableRemoteObject implements Echo
 	super() ;
     }
 
-    public Object echo( Object arg ) {
-	return arg ;
+    public Object echoObject( String arg ) throws RemoteException {
+	return getDay( arg ) ;
     }
 
-    public Day echoDay( Day day ) {
-        return day ;
+    public Day echoDay( String arg ) throws RemoteException {
+        return getDay( arg ) ;
+    }
+
+    private Day getDay( String arg ) throws RemoteException {
+        try {
+            return Enum.valueOf( Day.class, arg ) ;
+        } catch (Exception exc) {
+            throw new RemoteException( "Bad enum name", exc ) ;
+        }
     }
 }

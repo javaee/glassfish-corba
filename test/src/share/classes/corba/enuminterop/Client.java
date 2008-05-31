@@ -127,14 +127,14 @@ public class Client
     }
 
     @Test
-    private void testEcho() throws RemoteException {
-        Echo.Day result = (Echo.Day)echo.echo( Echo.Day.Sunday ) ;
+    public void testEcho() throws RemoteException {
+        Echo.Day result = (Echo.Day)echo.echoObject( "Sunday" ) ;
         Assert.assertSame( result, Echo.Day.Sunday ) ;
     }
 
     @Test
-    private void testEchoDay() throws RemoteException {
-        Echo.Day result = echo.echoDay( Echo.Day.Tuesday ) ;
+    public void testEchoDay() throws RemoteException {
+        Echo.Day result = echo.echoDay( "Tuesday" ) ;
         Assert.assertSame( result, Echo.Day.Tuesday ) ;
     }
 }

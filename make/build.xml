@@ -237,7 +237,7 @@
     </target>
 
     <!-- ========================= COMPILE ========================= -->
-    <target name="compile" depends="init, prepare-dirs, orb-library, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources, compile-experimental">
+    <target name="compile" depends="init, prepare-dirs, orb-library, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"
@@ -578,6 +578,200 @@
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
 		<include name="**"/>
+	    </fileset>
+	</jar>
+    </target>
+    
+    <target name="orb-split" depends="init">
+	<jar jarfile="${releaselib.dir}/orb.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="com/sun/corba/se/internal/**"/>
+                <include name="com/sun/corba/se/pept/**"/>
+                <include name="com/sun/corba/se/spi/ior/**"/>
+                <include name="com/sun/corba/se/spi/resolver/**"/>
+                <include name="com/sun/corba/se/spi/encoding/**"/>
+                <include name="com/sun/corba/se/spi/orb/**"/>
+                <include name="com/sun/corba/se/spi/legacy/**"/>
+                <include name="com/sun/corba/se/spi/copyobject/**"/>
+                <include name="com/sun/corba/se/spi/oa/**"/>
+                <include name="com/sun/corba/se/spi/orbutil/**"/>
+                <include name="com/sun/corba/se/spi/protocol/**"/>
+                <include name="com/sun/corba/se/spi/monitoring/**"/>
+                <include name="com/sun/corba/se/spi/transport/**"/>
+                <include name="com/sun/corba/se/spi/folb/**"/>
+                <include name="com/sun/corba/se/spi/presentation/**"/>
+                <include name="com/sun/corba/se/spi/logging/**"/>
+                <include name="com/sun/corba/se/spi/servicecontext/**"/>
+                <include name="com/sun/corba/se/spi/extension/**"/>
+                <include name="com/sun/corba/se/spi/**"/>
+                <include name="com/sun/corba/se/impl/logging/**"/>
+                <include name="com/sun/corba/se/impl/monitoring/**"/>
+                <include name="com/sun/corba/se/impl/corba/**"/>
+                <include name="com/sun/corba/se/impl/copyobject/**"/>
+                <include name="com/sun/corba/se/impl/protocol/**"/>
+                <include name="com/sun/corba/se/impl/orbutil/**"/>
+                <include name="com/sun/corba/se/impl/interceptors/**"/>
+                <include name="com/sun/corba/se/impl/presentation/**"/>
+                <include name="com/sun/corba/se/impl/orb/**"/>
+                <include name="com/sun/corba/se/impl/folb/**"/>
+                <include name="com/sun/corba/se/impl/transport/**"/>
+                <include name="com/sun/corba/se/impl/io/**"/>
+                <include name="com/sun/corba/se/impl/plugin/**"/>
+                <include name="com/sun/corba/se/impl/javax/**"/>
+                <include name="com/sun/corba/se/impl/oa/**"/>
+                <include name="com/sun/corba/se/impl/ior/**"/>
+                <include name="com/sun/corba/se/impl/legacy/**"/>
+                <include name="com/sun/corba/se/impl/servicecontext/**"/>
+                <include name="com/sun/corba/se/impl/encoding/**"/>
+                <include name="com/sun/corba/se/impl/util/**"/>
+                <include name="com/sun/corba/se/impl/resolver/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/omgapi.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+		<include name="org/omg/CORBA/ORB*.class"/>
+		<include name="org/omg/CORBA/portable/ValueInputStream.class"/>
+		<include name="org/omg/CORBA/portable/ValueOutputStream.class"/>
+		<include name="javax/rmi/PortableRemoteObject.class"/>
+		<include name="javax/rmi/CORBA/Stub.class"/>
+		<include name="javax/rmi/CORBA/Util.class"/>
+		<include name="javax/rmi/CORBA/EnumDesc.class"/>
+		<include name="javax/rmi/CORBA/ProxyDesc.class"/>
+		<include name="javax/rmi/CORBA/ValueHandlerMultiFormat.class"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/transactions.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+		<include name="org/omg/CORBA/TSIdentification.class"/>
+		<include name="org/omg/CORBA/TRANSACTION_UNAVAILABLE.class"/>
+		<include name="org/omg/CORBA/TSIdentificationPackage/AlreadyIdentified.class"/>
+		<include name="org/omg/CORBA/TSIdentificationPackage/NotAvailable.class"/>
+		<include name="org/omg/CosTransactions/*.class"/>
+		<include name="org/omg/CosTSPortability/*.class"/>
+		<include name="org/omg/CosTSInteroperation/*.class"/>
+                <include name="com/sun/corba/se/impl/txpoa/**"/>
+                <include name="com/sun/corba/se/spi/costransactions/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/rmic-iiop.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="sun/rmi/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/csiv2-idl.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="com/sun/corba/se/org/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/activation.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="com/sun/corba/se/spi/activation/**"/>
+                <include name="com/sun/corba/se/impl/activation/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/naming.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="com/sun/corba/se/impl/naming/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/dynamicany.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="com/sun/corba/se/impl/dynamicany/**"/>
+	    </fileset>
+	</jar>
+    </target>
+
+    <target name="orb-library-split" depends="init">
+	<jar jarfile="${releaselib.dir}/newtimer.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/newtimer/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/newtimer/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/transport.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/transport/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/transport/**"/>
+		<include name="com/sun/corba/se/spi/orbutil/concurrent/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/concurrent/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/copyobject.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/copyobject/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/copyobject/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/codegen.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/codegen/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/codegen/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/jmx.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/jmx/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/jmx/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/generic.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/generic/**"/>
+		<include name="com/sun/corba/se/spi/orbutil/closure/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/closure/**"/>
+		<include name="com/sun/corba/se/spi/orbutil/proxy/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/graph/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/test.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/test/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/test/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/file.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/file/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/fsm.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/fsm/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/misc.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/misc/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/argparser.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/argparser/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/asm.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="org/objectweb/**"/>
 	    </fileset>
 	</jar>
     </target>

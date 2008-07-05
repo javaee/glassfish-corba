@@ -38,6 +38,9 @@ package corba.simpledynamic;
 import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 
+import corba.misc.BuckPasserAL  ;
+import corba.misc.BuckPasserV  ;
+
 public interface Echo extends Remote {
     String sayHello( Object obj ) throws RemoteException ;
 
@@ -50,6 +53,12 @@ public interface Echo extends Remote {
     int[] echo( int[] arg ) throws RemoteException ;
 
     Object echo( Object obj ) throws RemoteException ;
+
+    BuckPasserAL echo( BuckPasserAL arg ) throws RemoteException ;
+    BuckPasserV echo( BuckPasserV arg ) throws RemoteException ;
+    BuckPasserVectorOriginal echo( BuckPasserVectorOriginal arg ) throws RemoteException ;
+    BuckPasserVectorSimple echo( BuckPasserVectorSimple arg ) throws RemoteException ;
+    BuckPasserVectorReadObject echo( BuckPasserVectorReadObject arg ) throws RemoteException ;
 }
 
 

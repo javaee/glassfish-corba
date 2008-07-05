@@ -177,7 +177,10 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean invocationTimingDebugFlag = false ;
     public boolean interceptorDebugFlag = false ;
     public boolean cdrCacheDebugFlag = false ;
-
+    public boolean cdrDebugFlag = false ;
+    public boolean streamFormatVersionDebugFlag = false ;
+    public boolean valueHandlerDebugFlag = false ;
+    
     private LogWrapperTable logWrapperTable ;
 
     private static LogWrapperTable staticLogWrapperTable = 

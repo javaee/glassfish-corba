@@ -96,67 +96,96 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     // message, there is no need to pad the header, in the unfragmented case.
     private boolean headerPadding;
     
-    protected void handleSpecialChunkBegin(int requiredSize)
-    {
-        // If we're chunking and the item won't fit in the buffer
-        if (inBlock && requiredSize + bbwi.position() > bbwi.getLength()) {
+    protected void handleSpecialChunkBegin(int requiredSize) {
+        if (orb.cdrDebugFlag)
+            dputil.enter( "handleSpecialChunkBegin", "requiredSize", requiredSize ) ;
 
-            // Duplicating some code from end_block.  Compute
-            // and write the total chunk length.
+        try {
+            // If we're chunking and the item won't fit in the buffer
+            if (inBlock && requiredSize + bbwi.position() > bbwi.getLength()) {
+                if (orb.cdrDebugFlag)
+                    dputil.info( "special chunk case" ) ;
 
-            int oldSize = bbwi.position();
-            bbwi.position(blockSizeIndex - 4);
+                // Duplicating some code from end_block.  Compute
+                // and write the total chunk length.
 
-            //write_long(oldSize - blockSizeIndex);
-            writeLongWithoutAlign((oldSize - blockSizeIndex) + requiredSize);
-            bbwi.position(oldSize);
-    
-            // Set the special flag so we don't end the chunk when
-            // we fragment
-            specialChunk = true;
+                int oldSize = bbwi.position();
+                bbwi.position(blockSizeIndex - 4);
+
+                //write_long(oldSize - blockSizeIndex);
+                writeLongWithoutAlign((oldSize - blockSizeIndex) + requiredSize);
+                bbwi.position(oldSize);
+        
+                // Set the special flag so we don't end the chunk when
+                // we fragment
+                specialChunk = true;
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
         }
     }
 
     protected void handleSpecialChunkEnd()
     {
-        // If we're in a chunk and the item spanned fragments
-        if (inBlock && specialChunk) {
+        if (orb.cdrDebugFlag)
+            dputil.enter( "handleSpecialChunkEnd" ) ;
+        
+        try {
+            // If we're in a chunk and the item spanned fragments
+            if (inBlock && specialChunk) {
+                if (orb.cdrDebugFlag)
+                    dputil.info( "special chunk case" ) ;
 
-            // This is unnecessary, but I just want to show that
-            // we're done with the current chunk.  (the end_block
-            // call is inappropriate here)
-            inBlock = false;
-            blockSizeIndex = -1;
-            blockSizePosition = -1;
-            
-            // Start a new chunk since we fragmented during the item.
-            // Thus, no one can go back to add more to the chunk length
-            start_block();
+                // This is unnecessary, but I just want to show that
+                // we're done with the current chunk.  (the end_block
+                // call is inappropriate here)
+                inBlock = false;
+                blockSizeIndex = -1;
+                blockSizePosition = -1;
+                
+                // Start a new chunk since we fragmented during the item.
+                // Thus, no one can go back to add more to the chunk length
+                start_block();
 
-            // Now turn off the flag so we go back to the normal
-            // behavior of closing a chunk when we fragment and
-            // reopening afterwards.
-            specialChunk = false;
+                // Now turn off the flag so we go back to the normal
+                // behavior of closing a chunk when we fragment and
+                // reopening afterwards.
+                specialChunk = false;
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
         }
     }
     
     // Called after writing primitives
     private void checkPrimitiveAcrossFragmentedChunk()
     {
-        if (primitiveAcrossFragmentedChunk) {
-            primitiveAcrossFragmentedChunk = false;
+        //if (orb.cdrDebugFlag)
+            //dputil.enter( "checkPrimitiveAcrossFragmentedChunk" ) ;
 
-            inBlock = false;
+        try {
+            if (primitiveAcrossFragmentedChunk) {
+                //if (orb.cdrDebugFlag)
+                    //dputil.info( "primitive across fragmented chunk case" ) ;
+                primitiveAcrossFragmentedChunk = false;
 
-            // It would be nice to have a StreamPosition
-            // abstraction if we could avoid allocation
-            // overhead.
-            blockSizeIndex = -1;
-            blockSizePosition = -1;
+                inBlock = false;
 
-            // Start a new chunk
-            start_block();
-        }        
+                // It would be nice to have a StreamPosition
+                // abstraction if we could avoid allocation
+                // overhead.
+                blockSizeIndex = -1;
+                blockSizePosition = -1;
+
+                // Start a new chunk
+                start_block();
+            }        
+        } finally {
+            //if (orb.cdrDebugFlag)
+                //dputil.exit() ;
+        }
     }
 
 
@@ -237,51 +266,65 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     }
 
     protected void grow44() {
-        // Save the current size for possible post-fragmentation calculation
-        int oldSize = bbwi.position();
+        if (orb.cdrDebugFlag) 
+            dputil.enter( "grow44" ) ;
 
-        // See notes where specialChunk is defined, as well as the
-        // above notes for primitiveAcrossFragmentedChunk.
-        //
-        // If we're writing a primitive and chunking, we need to update
-        // the chunk length to include the length of the primitive (unless
-        // this complexity is handled by specialChunk).
-        //
-        // Note that this is wasted processing in the grow case, but that
-        // we don't actually close the chunk in that case.
-        boolean handleChunk = (inBlock && !specialChunk);
-        if (handleChunk) {
-            int oldIndex = bbwi.position();
+        try {
+            // Save the current size for possible post-fragmentation calculation
+            int oldSize = bbwi.position();
 
-            bbwi.position(blockSizeIndex - 4);
+            // See notes where specialChunk is defined, as well as the
+            // above notes for primitiveAcrossFragmentedChunk.
+            //
+            // If we're writing a primitive and chunking, we need to update
+            // the chunk length to include the length of the primitive (unless
+            // this complexity is handled by specialChunk).
+            //
+            // Note that this is wasted processing in the grow case, but that
+            // we don't actually close the chunk in that case.
+            boolean handleChunk = (inBlock && !specialChunk);
+            if (handleChunk) {
+                if (orb.cdrDebugFlag) 
+                    dputil.info( "Handling chunk: out of sequence write!" ) ;
 
-            writeLongWithoutAlign((oldIndex - blockSizeIndex) + 4);
+                int oldIndex = bbwi.position();
 
-            bbwi.position(oldIndex);
-        }
+                bbwi.position(blockSizeIndex - 4);
 
-        bbwi.setNumberOfBytesNeeded(4);
-        bufferManagerWrite.overflow(bbwi);
+                writeLongWithoutAlign((oldIndex - blockSizeIndex) + 4);
 
-        // At this point, if we fragmented, we should have a ByteBufferWithInfo
-        // with the fragment header already marshalled.  The buflen and position
-        // should be updated accordingly, and the fragmented flag should be set.
+                bbwi.position(oldIndex);
+            }
 
-        // Note that fragmented is only true in the streaming and collect cases.
-        if (bbwi.isFragmented()) {
-            // Clear the flag
-            bbwi.setFragmented(false);
+            bbwi.setNumberOfBytesNeeded(4);
+            bufferManagerWrite.overflow(bbwi);
 
-            // Update fragmentOffset so indirections work properly.
-            // At this point, oldSize is the entire length of the
-            // previous buffer.  bbwi.position() is the length of the
-            // fragment header of this buffer.
-            fragmentOffset += (oldSize - bbwi.position());
+            // At this point, if we fragmented, we should have a ByteBufferWithInfo
+            // with the fragment header already marshalled.  The buflen and position
+            // should be updated accordingly, and the fragmented flag should be set.
 
-            // We just fragmented, and need to signal that we should
-            // start a new chunk after writing the primitive.
-            if (handleChunk)
-                primitiveAcrossFragmentedChunk = true;
+            // Note that fragmented is only true in the streaming and collect cases.
+            if (bbwi.isFragmented()) {
+                if (orb.cdrDebugFlag) 
+                    dputil.info( "handling fragment case" ) ;
+
+                // Clear the flag
+                bbwi.setFragmented(false);
+
+                // Update fragmentOffset so indirections work properly.
+                // At this point, oldSize is the entire length of the
+                // previous buffer.  bbwi.position() is the length of the
+                // fragment header of this buffer.
+                fragmentOffset += (oldSize - bbwi.position());
+
+                // We just fragmented, and need to signal that we should
+                // start a new chunk after writing the primitive.
+                if (handleChunk)
+                    primitiveAcrossFragmentedChunk = true;
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
         }
     }
 

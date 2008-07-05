@@ -78,41 +78,48 @@ public class CDRInputStream_1_2 extends CDRInputStream_1_1
     }
     
     protected void alignAndCheck(int align, int n) {
+        if (orb.cdrDebugFlag)
+            dputil.enter( "alignAndCheck", "align", align, "n", n ) ;
 
-        // headerPadding bit is set by read method of the RequestMessage_1_2
-        // or ReplyMessage_1_2 classes. When set, the very first body read
-        // operation (from the stub code) would trigger an alignAndCheck 
-        // method call, that would in turn skip the header padding that was
-        // inserted during the earlier write operation by the sender. The
-        // padding ensures that the body is aligned on an 8-octet boundary,
-        // for GIOP versions 1.2 and beyond.
-        if (headerPadding == true) {
-            headerPadding = false;
-            alignOnBoundary(ORBConstants.GIOP_12_MSG_BODY_ALIGNMENT);           
-        }
+        try {
+            // headerPadding bit is set by read method of the RequestMessage_1_2
+            // or ReplyMessage_1_2 classes. When set, the very first body read
+            // operation (from the stub code) would trigger an alignAndCheck 
+            // method call, that would in turn skip the header padding that was
+            // inserted during the earlier write operation by the sender. The
+            // padding ensures that the body is aligned on an 8-octet boundary,
+            // for GIOP versions 1.2 and beyond.
+            if (headerPadding == true) {
+                headerPadding = false;
+                alignOnBoundary(ORBConstants.GIOP_12_MSG_BODY_ALIGNMENT);           
+            }
+          
+            checkBlockLength(align, n);
+
+            // WARNING: Must compute real alignment after calling
+            // checkBlockLength since it may move the position
+
+            // In GIOP 1.2, a fragment may end with some alignment
+            // padding (which leads to all fragments ending perfectly
+            // on evenly divisible 8 byte boundaries).  A new fragment
+            // never requires alignment with the header since it ends
+            // on an 8 byte boundary.
+            // NOTE: Change underlying ByteBuffer's position only if 
+            //       alignIncr is less than or equal to underlying
+            //       ByteBuffer's limit.
+            int savedPosition = bbwi.position();
+            int alignIncr = computeAlignment(savedPosition,align);
+            int bytesNeeded = alignIncr + n;
+            if (savedPosition + alignIncr <= bbwi.getLength()) {
+                bbwi.position(savedPosition + alignIncr);
+            }
       
-        checkBlockLength(align, n);
-
-        // WARNING: Must compute real alignment after calling
-        // checkBlockLength since it may move the position
-
-        // In GIOP 1.2, a fragment may end with some alignment
-        // padding (which leads to all fragments ending perfectly
-        // on evenly divisible 8 byte boundaries).  A new fragment
-        // never requires alignment with the header since it ends
-        // on an 8 byte boundary.
-	// NOTE: Change underlying ByteBuffer's position only if 
-        //       alignIncr is less than or equal to underlying
-        //       ByteBuffer's limit.
-        int savedPosition = bbwi.position();
-        int alignIncr = computeAlignment(savedPosition,align);
-	int bytesNeeded = alignIncr + n;
-	if (savedPosition + alignIncr <= bbwi.getLength()) {
-	    bbwi.position(savedPosition + alignIncr);
-	}
-  
-        if (savedPosition + bytesNeeded > bbwi.getLength()) {
-	    grow(1, n);
+            if (savedPosition + bytesNeeded > bbwi.getLength()) {
+                grow(1, n);
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
         }
     }
 

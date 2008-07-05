@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,29 +33,19 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.corba.se.spi.btrace ;
 
-package com.sun.corba.se.spi.orbutil.newtimer ;
+import java.lang.annotation.Target ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-import java.io.PrintStream ;
-
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
-
-import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
-
-/** A TimerEventHandler that stores all events that is receives.  It can
- * be used in the JDK 5 for loop.
+/** This annotation is applied to a class or interface to indicate
+ * that its methods are classified as part of the CDR unmarshaling 
+ * implementation in the ORB for use in btrace scripts.
  */
-@ManagedObject( description="TimerEventHandler that records all TimerEvents in a log" ) 
-@InheritedTable( cls=TimerEvent.class, 
-    description="TimerEvents contained in this log in order of occurrence" )
-public interface LogEventHandler extends TimerEventHandler, Iterable<TimerEvent> {
-    /** Discard the contents of the log.
-     */
-    @ManagedOperation( description="Discard all recorded timer events" )
-    void clear() ;
-
-    /** Display the contents of this log in formatted form to the PrintStream.
-     */
-    void display( PrintStream arg, String msg ) ;
+@Target({ElementType.METHOD,ElementType.CONSTRUCTOR}) 
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CDRWrite {
 }
+

@@ -72,6 +72,8 @@ import java.security.PrivilegedAction;
 import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
+
+import com.sun.corba.se.spi.btrace.* ;
  
 import com.sun.corba.se.impl.io.IIOPInputStream.ActiveRecursionManager;
 
@@ -81,8 +83,19 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
-public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat {
+import com.sun.corba.se.impl.orbutil.DprintUtil ;
 
+@Traceable
+public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat {
+    private DprintUtil dputil = new DprintUtil( this ) ;
+
+    private boolean valueHandlerDebug( org.omg.CORBA.ORB orb ) {
+        if (!(orb instanceof ORB))
+            return false ;
+
+        return ((ORB)orb).valueHandlerDebugFlag ;
+    }
+    
     // Property to override our maximum stream format version
     public static final String FORMAT_VERSION_PROPERTY
         = "com.sun.corba.se.MaxStreamFormatVersion";
@@ -164,6 +177,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
     }
 
     // See javax.rmi.CORBA.ValueHandlerMultiFormat
+    @TraceValueHandler
+    @ValueHandlerWrite
     public void writeValue(org.omg.CORBA.portable.OutputStream out,
                            java.io.Serializable value,
                            byte streamFormatVersion) {
@@ -178,7 +193,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 		Integer.valueOf(streamFormatVersion) ) ;
         }
 
-        writeValueWithVersion(out, value, streamFormatVersion);
+        writeValueWithVersion( out, value, streamFormatVersion);
     }
 
     public ValueHandlerImpl(){}
@@ -188,53 +203,76 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * @param out The stream to write the value to
      * @param value The value to be written to the stream
      **/
+    @TraceValueHandler
+    @ValueHandlerWrite
     public void writeValue(org.omg.CORBA.portable.OutputStream _out, 
                            java.io.Serializable value) {
 
-        writeValueWithVersion(_out, value, STREAM_FORMAT_VERSION_1);
+        writeValueWithVersion( _out, value, STREAM_FORMAT_VERSION_1);
     }
 
-    private void writeValueWithVersion(
-	org.omg.CORBA.portable.OutputStream _out, java.io.Serializable value, 
-	byte streamFormatVersion) {
+    @TraceValueHandler
+    @ValueHandlerWrite
+    private void writeValueWithVersion( org.omg.CORBA.portable.OutputStream _out, 
+        java.io.Serializable value, byte streamFormatVersion) {
 
-	org.omg.CORBA_2_3.portable.OutputStream out =
-	    (org.omg.CORBA_2_3.portable.OutputStream) _out;
-
-        IIOPOutputStream jdkToOrbOutputStreamBridge = null;
-
-	if (outputStreamPairs == null)
-	    outputStreamPairs = Collections.synchronizedMap( 
-		new HashMap<org.omg.CORBA.portable.OutputStream,IIOPOutputStream>());
-		
-        jdkToOrbOutputStreamBridge = outputStreamPairs.get(_out);
-
-        if (jdkToOrbOutputStreamBridge == null) {
-            jdkToOrbOutputStreamBridge = createOutputStream();
-            jdkToOrbOutputStreamBridge.setOrbStream(out);
-            outputStreamPairs.put(_out, jdkToOrbOutputStreamBridge);
-        }
+        if (valueHandlerDebug(_out.orb()))
+            dputil.enter( "writeValueWithVersion", "value", value, 
+                "streamFormatVersion", streamFormatVersion ) ;
 
         try {
-	    jdkToOrbOutputStreamBridge.increaseRecursionDepth();
-	    writeValueInternal(jdkToOrbOutputStreamBridge, out, value, streamFormatVersion);
+            org.omg.CORBA_2_3.portable.OutputStream out =
+                (org.omg.CORBA_2_3.portable.OutputStream) _out;
+
+            IIOPOutputStream jdkToOrbOutputStreamBridge = null;
+
+            if (outputStreamPairs == null)
+                outputStreamPairs = Collections.synchronizedMap( 
+                    new HashMap<org.omg.CORBA.portable.OutputStream,IIOPOutputStream>());
+                    
+            jdkToOrbOutputStreamBridge = outputStreamPairs.get(_out);
+
+            if (jdkToOrbOutputStreamBridge == null) {
+                jdkToOrbOutputStreamBridge = createOutputStream();
+                jdkToOrbOutputStreamBridge.setOrbStream(out);
+                outputStreamPairs.put(_out, jdkToOrbOutputStreamBridge);
+            }
+
+            try {
+                jdkToOrbOutputStreamBridge.increaseRecursionDepth();
+                writeValueInternal(jdkToOrbOutputStreamBridge, out, 
+                    value, streamFormatVersion);
+            } finally {
+                if (jdkToOrbOutputStreamBridge.decreaseRecursionDepth() == 0) {
+                    outputStreamPairs.remove(_out);
+                }
+            }
         } finally {
-            if (jdkToOrbOutputStreamBridge.decreaseRecursionDepth() == 0) {
-                outputStreamPairs.remove(_out);
-	    }
+            if (valueHandlerDebug(_out.orb()))
+                dputil.exit() ; 
         }
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     private void writeValueInternal( IIOPOutputStream bridge, 
 	org.omg.CORBA_2_3.portable.OutputStream out, 
 	java.io.Serializable value, byte streamFormatVersion) {
 
-	Class clazz = value.getClass();
-	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-        if (cinfo.isArray())
-            write_Array(out, value, clazz.getComponentType());
-        else
-            bridge.simpleWriteObject(value, streamFormatVersion);
+        if (valueHandlerDebug(out.orb()))
+            dputil.enter( "writeValueInternal", "value", value, 
+                "streamFormatVersion", streamFormatVersion ) ;
+        try {
+            Class clazz = value.getClass();
+            ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
+            if (cinfo.isArray())
+                write_Array(out, value, clazz.getComponentType());
+            else
+                bridge.simpleWriteObject(value, streamFormatVersion);
+        } finally {
+            if (valueHandlerDebug(out.orb()))
+                dputil.exit() ; 
+        }
     }
 
     /**
@@ -243,76 +281,98 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * @param clazz The type of the value to be read in
      * @param sender The sending context runtime
      **/
+    @TraceValueHandler
+    @ValueHandlerRead
     public java.io.Serializable readValue(org.omg.CORBA.portable.InputStream _in, 
 	int offset, java.lang.Class clazz, String repositoryID, 
 	org.omg.SendingContext.RunTime _sender) {
 
-        // Must use narrow rather than a direct cast to a com.sun
-        // class.  Fix for bug 4379539.
-	CodeBase sender = CodeBaseHelper.narrow(_sender);
+        java.io.Serializable result = null;
 
-	org.omg.CORBA_2_3.portable.InputStream in = 
-	    (org.omg.CORBA_2_3.portable.InputStream) _in;
+        try {
+            if (valueHandlerDebug(_in.orb()))
+                dputil.enter( "readValue", "offset", offset, "clazz", clazz, 
+                    "repositoryID", repositoryID ) ;
 
-        IIOPInputStream jdkToOrbInputStreamBridge = null;
-        if (inputStreamPairs == null)
-            inputStreamPairs = Collections.synchronizedMap( 
-		new HashMap<org.omg.CORBA.portable.InputStream,IIOPInputStream>());
-		
-        jdkToOrbInputStreamBridge = inputStreamPairs.get(_in);
+            // Must use narrow rather than a direct cast to a com.sun
+            // class.  Fix for bug 4379539.
+            CodeBase sender = CodeBaseHelper.narrow(_sender);
 
-        if (jdkToOrbInputStreamBridge == null) {
+            org.omg.CORBA_2_3.portable.InputStream in = 
+                (org.omg.CORBA_2_3.portable.InputStream) _in;
 
-            jdkToOrbInputStreamBridge = createInputStream();
-            jdkToOrbInputStreamBridge.setOrbStream(in);
-            jdkToOrbInputStreamBridge.setSender(sender); 
-            // backward compatability 4365188
-            jdkToOrbInputStreamBridge.setValueHandler(this); 
-            inputStreamPairs.put(_in, jdkToOrbInputStreamBridge);
-        }
+            IIOPInputStream jdkToOrbInputStreamBridge = null;
+            if (inputStreamPairs == null)
+                inputStreamPairs = Collections.synchronizedMap( 
+                    new HashMap<org.omg.CORBA.portable.InputStream,IIOPInputStream>());
+                    
+            jdkToOrbInputStreamBridge = inputStreamPairs.get(_in);
 
-	java.io.Serializable result = null;
-		
-    	try {
-	    jdkToOrbInputStreamBridge.increaseRecursionDepth();
-	    result = (java.io.Serializable) readValueInternal(
-		jdkToOrbInputStreamBridge, in, offset, clazz, repositoryID, sender);
-        } finally {
-            if (jdkToOrbInputStreamBridge.decreaseRecursionDepth() == 0) {
-                inputStreamPairs.remove(_in);
+            if (jdkToOrbInputStreamBridge == null) {
+
+                jdkToOrbInputStreamBridge = createInputStream();
+                jdkToOrbInputStreamBridge.setOrbStream(in);
+                jdkToOrbInputStreamBridge.setSender(sender); 
+                // backward compatability 4365188
+                jdkToOrbInputStreamBridge.setValueHandler(this); 
+                inputStreamPairs.put(_in, jdkToOrbInputStreamBridge);
             }
-        }
 
-        return result;
+            try {
+                jdkToOrbInputStreamBridge.increaseRecursionDepth();
+                result = (java.io.Serializable) readValueInternal( 
+                    jdkToOrbInputStreamBridge, in, offset, clazz, repositoryID, sender);
+            } finally {
+                if (jdkToOrbInputStreamBridge.decreaseRecursionDepth() == 0) {
+                    inputStreamPairs.remove(_in);
+                }
+            }
+
+            return result;
+        } finally {
+            if (valueHandlerDebug(_in.orb()))
+                dputil.exit(result ) ; 
+        }
     }
 
+    @TraceValueHandler
+    @ValueHandlerRead
     private java.io.Serializable readValueInternal(IIOPInputStream bridge, 
 	org.omg.CORBA_2_3.portable.InputStream in, int offset, 
 	java.lang.Class clazz, String repositoryID, 
 	com.sun.org.omg.SendingContext.CodeBase sender) {
 
 	java.io.Serializable result = null;
-		
-	if (clazz == null) {
-	    // clazz == null indicates an FVD situation for a nonexistant class
-	    if (isArray(repositoryID)){
-		read_Array(bridge, in, null, sender, offset);
-	    } else {
-		bridge.simpleSkipObject(repositoryID, sender);
-	    }
-	    return result;
-	}
-		
-	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-        if (cinfo.isArray()) {
-            result = (java.io.Serializable)read_Array(
-		bridge, in, clazz, sender, offset);
-        } else {
-            result = (java.io.Serializable)bridge.simpleReadObject(
-		clazz, cinfo, repositoryID, sender, offset);
-        }
 
-	return result;
+        if (valueHandlerDebug(in.orb()))
+            dputil.enter( "readValueInternal", "offset", offset, "clazz", clazz, 
+                "repositoryID", repositoryID ) ;
+		
+        try {
+            if (clazz == null) {
+                // clazz == null indicates an FVD situation for a nonexistant class
+                if (isArray(repositoryID)){
+                    read_Array( bridge, in, null, sender, offset);
+                } else {
+                    bridge.simpleSkipObject( repositoryID, sender);
+                }
+                return result;
+            }
+                    
+            ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
+            if (cinfo.isArray()) {
+                result = (java.io.Serializable)read_Array( 
+                    bridge, in, clazz, sender, offset);
+            } else {
+                result = (java.io.Serializable)bridge.simpleReadObject( 
+                    clazz, cinfo, repositoryID, sender, offset);
+            }
+
+            return result;
+        } finally {
+            if (valueHandlerDebug(in.orb()))
+                dputil.exit( result ) ; 
+        }
     }
 
     /**
@@ -423,6 +483,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * is returned.  Otherwise, the value itself is returned.
      * @return the true value to marshal on the wire.
      **/
+    @TraceValueHandler
+    @ValueHandlerWrite
     public java.io.Serializable writeReplace(java.io.Serializable value) {
 	return ObjectStreamClass.lookup(value.getClass()).writeReplace(value);
     }
@@ -432,6 +494,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * can override it without exposing internals across packages.  This
      * is a fix for bug 4367783.
      */
+    @TraceValueHandler
+    @ValueHandlerWrite
     protected void writeCharArray(org.omg.CORBA_2_3.portable.OutputStream out,
                                 char[] array,
                                 int offset,
@@ -440,6 +504,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         out.write_wchar_array(array, offset, length);
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     private void write_Array(org.omg.CORBA_2_3.portable.OutputStream out, 
 	java.io.Serializable obj, Class type) {
 
@@ -552,6 +618,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * can override it without exposing internals across packages.  This
      * is a fix for bug 4367783.
      */
+    @TraceValueHandler
+    @ValueHandlerRead
     protected void readCharArray(org.omg.CORBA_2_3.portable.InputStream in,
                                  char[] array,
                                  int offset,
@@ -560,7 +628,9 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         in.read_wchar_array(array, offset, length);
     }
 
-    private java.lang.Object read_Array(IIOPInputStream bridge, 
+    @TraceValueHandler
+    @ValueHandlerRead
+    private java.lang.Object read_Array( IIOPInputStream bridge, 
 	org.omg.CORBA_2_3.portable.InputStream in, 
 	Class sequence, com.sun.org.omg.SendingContext.CodeBase sender, 
 	int offset) 

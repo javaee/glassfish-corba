@@ -110,6 +110,7 @@ import com.sun.corba.se.impl.encoding.CodeSetConversion;
 import com.sun.corba.se.impl.corba.TypeCodeImpl;
 import com.sun.corba.se.impl.orbutil.CacheTable;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.orbutil.DprintUtil ;
 import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
 import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
 import com.sun.corba.se.impl.orbutil.RepositoryIdFactory;
@@ -120,10 +121,14 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
+import com.sun.corba.se.spi.btrace.* ;
+
+@Traceable
 public class CDROutputStream_1_0 extends CDROutputStreamBase
 {
     private static final int INDIRECTION_TAG = 0xffffffff;
 
+    protected final DprintUtil dputil = new DprintUtil( this ) ;
     protected boolean littleEndian;
     protected BufferManagerWrite bufferManagerWrite;
     ByteBufferWithInfo bbwi;
@@ -132,8 +137,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     protected TimingPoints tp;
     protected ORBUtilSystemException wrapper ;
 
-    protected boolean debug = false;
-	
     // XXX These appear to always contain the same value: remove one
     protected int blockSizeIndex = -1;
     protected int blockSizePosition = 0;
@@ -203,7 +206,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         this.orb = (ORB)orb;
 	tp = this.orb.getTimerManager().points() ;
 	this.wrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-	debug = this.orb.transportDebugFlag;
 
         this.littleEndian = littleEndian;
         this.bufferManagerWrite = bufferManager;
@@ -263,11 +265,13 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         throw wrapper.giopVersionError();
     }
 
+    @CDR
     protected void handleSpecialChunkBegin(int requiredSize)
     {
         // No-op for GIOP 1.0
     }
 
+    @CDR
     protected void handleSpecialChunkEnd()
     {
         // No-op for GIOP 1.0
@@ -351,17 +355,25 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	    CompletionStatus.COMPLETED_MAYBE ) ;
     }
 
+    @PrimitiveWrite
     public void write_octet(byte x) 
     {
-        // The 'if' stmt is commented out since we need the alignAndReserve to
-        // be called, particularly when the first body byte is written,
-        // to induce header padding to align the body on a 8-octet boundary,
-	// for GIOP versions 1.2 and above. Refer to internalWriteOctetArray()
-	// method that also has a similar change.
-        //if (bbwi.position() + 1 > bbwi.buflen)
+        if (orb.cdrDebugFlag)
+            dputil.enter( "write_octet", x ) ;
+
+        try {
+            // The 'if' stmt is commented out since we need the alignAndReserve to
+            // be called, particularly when the first body byte is written,
+            // to induce header padding to align the body on a 8-octet boundary,
+            // for GIOP versions 1.2 and above. Refer to internalWriteOctetArray()
+            // method that also has a similar change.
             alignAndReserve(1, 1);
 
-        bbwi.getByteBuffer().put(x);
+            bbwi.getByteBuffer().put(x);
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
+        }
     }
 
     public final void write_boolean(boolean x)
@@ -384,8 +396,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         write_octet(converter.getBytes()[0]);
     }
 
-    // These wchar methods are only used when talking to
-    // legacy ORBs, now.
     private final void writeLittleEndianWchar(char x) {
         bbwi.getByteBuffer().put((byte)(x & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
@@ -442,33 +452,51 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     	bbwi.getByteBuffer().put((byte)(x & 0xFF));
     }
 
+    @PrimitiveWrite
     public void write_wchar(char x)
     {
-        // Don't allow transmission of wchar/wstring data with
-        // foreign ORBs since it's against the spec.
-        if (ORBUtility.isForeignORB(orb)) {
-	    throw wrapper.wcharDataInGiop10(CompletionStatus.COMPLETED_MAYBE);
-        }
+        if (orb.cdrDebugFlag)
+            dputil.enter( "write_wchar", x ) ;
 
-        // If it's one of our legacy ORBs, do what they did:
-    	alignAndReserve(2, 2);
-	
-    	if (littleEndian) {
-    	    writeLittleEndianWchar(x);
-    	} else {
-    	    writeBigEndianWchar(x);
-    	}
+        try {
+            // Don't allow transmission of wchar/wstring data with
+            // foreign ORBs since it's against the spec.
+            if (ORBUtility.isForeignORB(orb)) {
+                throw wrapper.wcharDataInGiop10(CompletionStatus.COMPLETED_MAYBE);
+            }
+
+            // If it's one of our legacy ORBs, do what they did:
+            alignAndReserve(2, 2);
+            
+            if (littleEndian) {
+                writeLittleEndianWchar(x);
+            } else {
+                writeBigEndianWchar(x);
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
+        }
     }
 
+    @PrimitiveWrite
     public void write_short(short x) 
     {
-    	alignAndReserve(2, 2);
-    	
-    	if (littleEndian) {
-    	    writeLittleEndianShort(x);
-    	} else {
-    	    writeBigEndianShort(x);
-    	}
+        if (orb.cdrDebugFlag)
+            dputil.enter( "write_short", x ) ;
+
+        try {
+            alignAndReserve(2, 2);
+            
+            if (littleEndian) {
+                writeLittleEndianShort(x);
+            } else {
+                writeBigEndianShort(x);
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
+        }
     }
 
     public final void write_ushort(short x)
@@ -476,15 +504,24 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	write_short(x);
     }
 
+    @PrimitiveWrite
     public void write_long(int x) 
     {
-	alignAndReserve44() ;
+        if (orb.cdrDebugFlag)
+            dputil.enter( "write_long", x ) ;
 
-    	if (littleEndian) {
-    	    writeLittleEndianLong(x);
-    	} else {
-    	    writeBigEndianLong(x);
-    	}
+        try {
+            alignAndReserve44() ;
+
+            if (littleEndian) {
+                writeLittleEndianLong(x);
+            } else {
+                writeBigEndianLong(x);
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
+        }
     }
 
     public final void write_ulong(int x)
@@ -492,15 +529,24 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	write_long(x);
     }
 
+    @PrimitiveWrite
     public void write_longlong(long x) 
     {
-    	alignAndReserve(8, 8);
+        if (orb.cdrDebugFlag)
+            dputil.enter( "write_longlong", x ) ;
 
-    	if (littleEndian) {
-    	    writeLittleEndianLongLong(x);
-    	} else {
-    	    writeBigEndianLongLong(x);
-    	}
+        try {
+            alignAndReserve(8, 8);
+
+            if (littleEndian) {
+                writeLittleEndianLongLong(x);
+            } else {
+                writeBigEndianLongLong(x);
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
+        }
     }
 
     public final void write_ulonglong(long x)
@@ -523,33 +569,42 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
       writeString(value);
     }
 
+    @PrimitiveWrite
     protected int writeString(String value)
     {
-        if (value == null) {
-	    throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+        if (orb.cdrDebugFlag)
+            dputil.enter( "writeString", value ) ;
+
+        try {
+            if (value == null) {
+                throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            }
+
+            CodeSetConversion.CTBConverter converter = getCharConverter();
+
+            converter.convert(value);
+
+            // A string is encoded as an unsigned CORBA long for the
+            // number of bytes to follow (including a terminating null).
+            // There is only one octet per character in the string.
+            int len = converter.getNumBytes() + 1;
+
+            handleSpecialChunkBegin(computeAlignment(4) + 4 + len);
+
+            write_long(len);
+            int indirection = get_offset() - 4;
+
+            internalWriteOctetArray(converter.getBytes(), 0, converter.getNumBytes());
+
+            // Write the null ending
+            write_octet((byte)0);
+
+            handleSpecialChunkEnd();
+            return indirection;
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
         }
-
-        CodeSetConversion.CTBConverter converter = getCharConverter();
-
-        converter.convert(value);
-
-        // A string is encoded as an unsigned CORBA long for the
-        // number of bytes to follow (including a terminating null).
-        // There is only one octet per character in the string.
-    	int len = converter.getNumBytes() + 1;
-
-        handleSpecialChunkBegin(computeAlignment(4) + 4 + len);
-
-        write_long(len);
-        int indirection = get_offset() - 4;
-
-        internalWriteOctetArray(converter.getBytes(), 0, converter.getNumBytes());
-
-        // Write the null ending
-        write_octet((byte)0);
-
-        handleSpecialChunkEnd();
-        return indirection;
     }
 
     public void write_wstring(String value)
@@ -632,36 +687,58 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     	write_octet_array(p.name(), 0, p.name().length);
     }
 
+    @CDR
+    @CDRWrite
     public void write_any(Any any) 
     {
-	tp.enter_writeAny() ;
-	try {
-	    if ( any == null )
-		throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
-
-	    write_TypeCode(any.type());
-	    any.write_value(parent);
-	} finally {
-	    tp.exit_writeAny() ;
+        tp.enter_writeAny() ;
+        if (orb.cdrDebugFlag) {
+            dputil.enter("write_Any", "any", any );
 	}
+
+        try {
+            if ( any == null )
+                throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+
+            write_TypeCode(any.type());
+            any.write_value(parent);
+        } finally {
+            tp.exit_writeAny() ;
+            if (orb.cdrDebugFlag) {
+                dputil.exit();
+            }
+        }
     }
 
+    @CDR
+    @CDRWrite
     public void write_TypeCode(TypeCode tc)
     {
-        if ( tc == null ) {
-	    throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
-	}
-        TypeCodeImpl tci;
-        if (tc instanceof TypeCodeImpl) {
-	    tci = (TypeCodeImpl)tc;
-	}
-        else {
-	    tci = new TypeCodeImpl(orb, tc);
+        if (orb.cdrDebugFlag) {
+            dputil.enter("write_TypeCode", "tc", tc );
 	}
 
-        tci.write_value((org.omg.CORBA_2_3.portable.OutputStream)parent);
+        try {
+            if ( tc == null ) {
+                throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            }
+            TypeCodeImpl tci;
+            if (tc instanceof TypeCodeImpl) {
+                tci = (TypeCodeImpl)tc;
+            } else {
+                tci = new TypeCodeImpl(orb, tc);
+            }
+
+            tci.write_value((org.omg.CORBA_2_3.portable.OutputStream)parent);
+        } finally {
+            if (orb.cdrDebugFlag) {
+                dputil.exit();
+            }
+        }
     }
  
+    @CDR
+    @CDRWrite
     public void write_Object(org.omg.CORBA.Object ref)
     {
         if (ref == null) {
@@ -681,6 +758,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     // ------------ RMI related methods --------------------------
 
+    @CDR
+    @CDRWrite
     public void write_abstract_interface(java.lang.Object obj) {
 	boolean corbaObject = false; // Assume value type.
 	org.omg.CORBA.Object theObject = null;
@@ -715,11 +794,15 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	}
     }
 
+    @CDR
+    @CDRWrite
     public void write_value(Serializable object, Class clz) {
 
 	write_value(object); 
     }
 
+    @CDR
+    @CDRWrite
     private void startValueChunk( boolean useChunking ) {
         if (useChunking) {
             start_block();
@@ -729,6 +812,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	end_flag--;
     }
 
+    @CDR
+    @CDRWrite
     private void endValueChunk( boolean useChunking ) {
         if (useChunking) {
             end_block();
@@ -750,6 +835,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	endValueChunk(mustChunk) ; 
     }
 
+    @CDR
+    @CDRWrite
     private void writeArray(Serializable array, Class clazz) {
         if (valueHandler == null)
             valueHandler = ORBUtility.createValueHandler(orb); 
@@ -764,16 +851,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // Add indirection for object to indirection table
         updateIndirectionTable(indirection, array);
 				
-	boolean currentMustChunk = mustChunk ;
-	startValueChunk(currentMustChunk) ;
-        if (valueHandler instanceof ValueHandlerMultiFormat) {
-            ValueHandlerMultiFormat vh = (ValueHandlerMultiFormat)valueHandler;
-            vh.writeValue(parent, array, streamFormatVersion);
-        } else
-            valueHandler.writeValue(parent, array);
-	endValueChunk(currentMustChunk) ;
+        callWriteValue( parent, array, streamFormatVersion ) ;
     }
 
+    @CDR
+    @CDRWrite
     private void writeValueBase(org.omg.CORBA.portable.ValueBase object,
                                 Class clazz) {
         // _REVISIT_ could check to see whether chunking really needed 
@@ -794,6 +876,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     // We know that object is not null, because that was checked in 
     // write_value( Serializable, String )
+    @CDR
+    @CDRWrite
     private void writeRMIIIOPValueType(Serializable object, Class clazz, 
 	ClassInfoCache.ClassInfo cinfo) {
 
@@ -804,7 +888,12 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
         // Allow the ValueHandler to call writeReplace on
         // the Serializable (if the method is present)
-        object = valueHandler.writeReplace(key);
+        tp.enter_callValueHandlerWriteReplaceFromCDRStream() ;
+        try {
+            object = valueHandler.writeReplace(key);
+        } finally {
+            tp.exit_callValueHandlerWriteReplaceFromCDRStream() ;
+        }
 		
         if (object != key) {
 	    if (object == null) {
@@ -821,7 +910,12 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             clazz = object.getClass();
         }
 
-	mustChunk = valueHandler.isCustomMarshaled(clazz) ;
+        tp.enter_callValueHandlerIsCustomMarshaledFromCDRStream() ;
+        try {
+            mustChunk = valueHandler.isCustomMarshaled(clazz) ;
+        } finally {
+            tp.exit_callValueHandlerIsCustomMarshaledFromCDRStream() ;
+        }
 				
         // Write value_tag
         int indirection = writeValueTag(mustChunk, true, 
@@ -838,17 +932,32 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	if (object != key)
 	    updateIndirectionTable(indirection, object);
 
+        callWriteValue( parent, object, streamFormatVersion ) ;
+    }
+    
+    @CDR
+    @CDRWrite
+    private void callWriteValue( org.omg.CORBA.portable.OutputStream parent, 
+        java.io.Serializable object, byte streamFormatVersion ) {
+
 	boolean currentMustChunk = mustChunk ;
 	startValueChunk(currentMustChunk) ;
-        if (valueHandler instanceof ValueHandlerMultiFormat) {
-            ValueHandlerMultiFormat vh = (ValueHandlerMultiFormat)valueHandler;
-            vh.writeValue(parent, object, streamFormatVersion);
-        } else {
-            valueHandler.writeValue(parent, object);
-	}
+
+        tp.enter_callValueHandlerWriteValueFromCDRStream() ;
+        try {
+            if (valueHandler instanceof ValueHandlerMultiFormat) {
+                ValueHandlerMultiFormat vh = (ValueHandlerMultiFormat)valueHandler;
+                vh.writeValue(parent, object, streamFormatVersion);
+            } else {
+                valueHandler.writeValue(parent, object);
+            }
+        } finally {
+            tp.exit_callValueHandlerWriteValueFromCDRStream() ;
+        }
+
 	endValueChunk(currentMustChunk) ;
     }
-   
+
     private EnumDesc getEnumDesc( String className, String enumValue ) {
 	EnumDesc result = null ;
 	Map<String,EnumDesc> map = null ;
@@ -877,6 +986,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	return result ;
     }
 
+    @CDR
+    @CDRWrite
     public void write_value(Serializable object, String repository_id) {
 	// Handle null references
 	if (object == null) {
@@ -952,6 +1063,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @SuppressWarnings({"deprecation"})
+    @CDR
+    @CDRWrite
     public void write_value(Serializable object, 
 	org.omg.CORBA.portable.BoxedValueHelper factory)
     {
@@ -1025,27 +1138,31 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	return bbwi.position();
     }
 
+    @CDR
+    @CDRWrite
     public void start_block() {
-        if (debug) {
-            dprint("CDROutputStream_1_0 start_block, position" + bbwi.position());
+        if (orb.cdrDebugFlag) {
+            dputil.enter("start_block", "position", bbwi.position());
 	}
 
-	// Save space in the buffer for block size
-	write_long(0);
+        try {
+            // Save space in the buffer for block size
+            write_long(0);
 
-        // Has to happen after write_long since write_long could
-        // trigger grow which is overridden by subclasses to 
-        // depend on inBlock.
-        inBlock = true; 
+            // Has to happen after write_long since write_long could
+            // trigger grow which is overridden by subclasses to 
+            // depend on inBlock.
+            inBlock = true; 
 
-	// Note that get_offset is overridden in subclasses to handle fragmentation!
-	// Thus blockSizePosition and blockSizeIndex are not always the same!
-        blockSizePosition = get_offset();
-	blockSizeIndex = bbwi.position() ;
-
-        if (debug) {
-            dprint("CDROutputStream_1_0 start_block, blockSizeIndex " 
-		   + blockSizeIndex);
+            // Note that get_offset is overridden in subclasses to handle fragmentation!
+            // Thus blockSizePosition and blockSizeIndex are not always the same!
+            blockSizePosition = get_offset();
+            blockSizeIndex = bbwi.position() ;
+        } finally {
+            if (orb.cdrDebugFlag) {
+                dputil.info( "blockSizeIndex", blockSizeIndex ) ; 
+                dputil.exit() ;
+            }
 	}
     }
 
@@ -1054,50 +1171,68 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     // calling alignAndReserve.  Otherwise, it's possible to get into
     // recursive scenarios which lose the chunking state.
     protected void writeLongWithoutAlign(int x) {
-    	if (littleEndian) {
-    	    writeLittleEndianLong(x);
-    	} else {
-    	    writeBigEndianLong(x);
+        if (orb.cdrDebugFlag) 
+            dputil.enter( "writeLongWithoutAlign", x ) ;
+
+        try {
+            if (littleEndian) {
+                writeLittleEndianLong(x);
+            } else {
+                writeBigEndianLong(x);
+            }
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
         }
     }
 
+    @CDR
+    @CDRWrite
     public void end_block() {
-        if (debug) {
-            dprint("CDROutputStream_1_0.java end_block");
+        if (orb.cdrDebugFlag) {
+            dputil.enter("end_block");
 	}
 
-	if (!inBlock)
-	    return;
+        try {
+            if (!inBlock)
+                return;
 
-        if (debug) {
-            dprint("CDROutputStream_1_0.java end_block, in a block");
-	}
+            if (orb.cdrDebugFlag) {
+                dputil.info("in a block");
+            }
 
-	inBlock = false;
+            inBlock = false;
 
-	// Test to see if the block was of zero length
-	// If so, remove the block instead of ending it
-	// (This can happen if the last field written 
-	//  in a value was another value)
-	if (get_offset() == blockSizePosition) {
-            // Need to assert that blockSizeIndex == bbwi.position()?  REVISIT
+            // Test to see if the block was of zero length
+            // If so, remove the block instead of ending it
+            // (This can happen if the last field written 
+            //  in a value was another value)
+            if (orb.cdrDebugFlag)
+                dputil.info( "blockSizePosition=" + blockSizePosition ) ;
 
-            bbwi.position(bbwi.position() - 4);
-	    blockSizeIndex = -1;
+            if (get_offset() == blockSizePosition) {
+                if (orb.cdrDebugFlag)
+                    dputil.info( "removing 0 length block" ) ;
+                // Need to assert that blockSizeIndex == bbwi.position()?  REVISIT
+
+                bbwi.position(bbwi.position() - 4);
+                blockSizeIndex = -1;
+                blockSizePosition = -1;
+                return;
+            }
+
+            int oldSize = bbwi.position();
+            bbwi.position(blockSizeIndex - 4);
+
+            writeLongWithoutAlign(oldSize - blockSizeIndex);
+
+            bbwi.position(oldSize);
+            blockSizeIndex = -1;
             blockSizePosition = -1;
-	    return;
-	}
-
-	int oldSize = bbwi.position();
-	bbwi.position(blockSizeIndex - 4);
-
-        writeLongWithoutAlign(oldSize - blockSizeIndex);
-
-	bbwi.position(oldSize);
-	blockSizeIndex = -1;
-        blockSizePosition = -1;
-
-        // System.out.println("      post end_block: " + get_offset() + " " + bbwi.position());
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
+        }
     }
     
     public org.omg.CORBA.ORB orb() {
@@ -1333,6 +1468,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	return false ;
     }
 
+    @CDR
+    @CDRWrite
     private final void write_repositoryId(String id) {
         // Use an indirection if available
 	if (repositoryIdCache != null) {
@@ -1357,6 +1494,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         repositoryIdCache.put(id, indirection);
     }
 
+    @CDR
+    @CDRWrite
     private void write_codebase(String str, int pos) {
 	Integer value = null ;
 	if (codebaseCache != null) {
@@ -1379,6 +1518,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
     }
 
+    @CDR
+    @CDRWrite
     private final int writeValueTag(boolean chunkIt, boolean useRepId, 
 				    String codebase) {
 	int indirection = 0;
@@ -1423,6 +1564,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @SuppressWarnings({"deprecation"})
+    @CDR
+    @CDRWrite
     private void writeIDLValue(Serializable object, String repID) {
     	if (object instanceof StreamableValue) {
 	    ((StreamableValue)object)._write(parent);
@@ -1452,36 +1595,45 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     // Handles end tag compaction...
+    @CDR
+    @CDRWrite
     private void writeEndTag(boolean chunked){
-		
-	if (chunked) {
-	    if (get_offset() == end_flag_position) {
-                if (bbwi.position() == end_flag_index) {
-                    // We are exactly at the same position and index as the
-                    // end of the last end tag.  Thus, we can back up over it
-                    // and compact the tags.
-                    bbwi.position(bbwi.position() - 4);
-                } else {
-                    // Special case in which we're at the beginning of a new
-                    // fragment, but the position is the same.  We can't back up,
-                    // so we just write the new end tag without compaction.  This
-                    // occurs when a value ends and calls start_block to open a
-                    // continuation chunk, but it's called at the very end of
-                    // a fragment.
+	if (orb.cdrDebugFlag) 
+            dputil.enter( "writeEndTag", "chunked", chunked ) ;
+
+        try {
+            if (chunked) {
+                if (get_offset() == end_flag_position) {
+                    if (bbwi.position() == end_flag_index) {
+                        // We are exactly at the same position and index as the
+                        // end of the last end tag.  Thus, we can back up over it
+                        // and compact the tags.
+                        bbwi.position(bbwi.position() - 4);
+                    } else {
+                        // Special case in which we're at the beginning of a new
+                        // fragment, but the position is the same.  We can't back up,
+                        // so we just write the new end tag without compaction.  This
+                        // occurs when a value ends and calls start_block to open a
+                        // continuation chunk, but it's called at the very end of
+                        // a fragment.
+                    }
                 }
+
+                writeNestingLevel();
+
+                // Remember the last index and position.  These are only used when chunking.
+                end_flag_index = bbwi.position();
+                end_flag_position = get_offset();
+
+                chunkedValueNestingLevel++;
             }
 
-            writeNestingLevel();
-
-            // Remember the last index and position.  These are only used when chunking.
-            end_flag_index = bbwi.position();
-            end_flag_position = get_offset();
-
-            chunkedValueNestingLevel++;
+            // Increment the nesting level
+            end_flag++;
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
         }
-
-        // Increment the nesting level
-	end_flag++;
     }
 
     /**
@@ -1496,6 +1648,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
      * instance is null, write the end flag that only takes
      * into account the enclosing chunked valuetypes.
      */
+    @CDR
     private void writeNestingLevel() {
         if (orb == null ||
             ORBVersionFactory.getFOREIGN().equals(orb.getORBVersion()) ||
@@ -1507,6 +1660,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
     }
 
+    @CDR
+    @CDRWrite
     private void writeClass(String repository_id, Class clz, 
 	ClassInfoCache.ClassInfo cinfo ) {
 
@@ -1527,6 +1682,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     // Pre-Merlin/J2EE 1.3 ORBs wrote the repository ID
     // and codebase strings in the wrong order.  This handles
     // backwards compatibility.
+    @CDR
+    @CDRWrite
     private void writeClassBody(Class clz, ClassInfoCache.ClassInfo cinfo ) {
         if (orb == null ||
             ORBVersionFactory.getFOREIGN().equals(orb.getORBVersion()) ||
@@ -1540,6 +1697,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
     }
 
+    @CDR
+    @CDRWrite
     private void writeIDLEntity(IDLEntity object) {
 	// _REVISIT_ could check to see whether chunking really needed 
 	mustChunk = true;
@@ -1587,10 +1746,14 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     
     /* DataOutputStream methods */
 
+    @CDR
+    @CDRWrite
     public void write_Abstract (java.lang.Object value) {
         write_abstract_interface(value);
     }
 
+    @CDR
+    @CDRWrite
     public void write_Value (java.io.Serializable value) {
         write_value(value);
     }
@@ -1747,7 +1910,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     protected void dprint(String msg) {
-        if (debug)
+        if (orb.cdrDebugFlag)
             ORBUtility.dprint(this, msg);
     }
 
@@ -1755,62 +1918,70 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         alignAndReserve(octetBoundary, 0);
     }
 
+    @CDR
+    @CDRWrite
     public void start_value(String rep_id) {
+        if (orb.cdrDebugFlag) 
+            dputil.enter( "start_value", "rep_id", rep_id,
+                "called at position", get_offset(), "position", bbwi.position() ) ;
 
-        if (debug) {
-            dprint("start_value w/ rep id " + rep_id
-		   + " called at pos " + get_offset() 
-		   + " position " + bbwi.position());
-	}
+        try {
+            if (inBlock)
+                end_block();
+            
+            // Write value_tag
+            writeValueTag(true, true, null);
+                                    
+            // Write rep. id
+            write_repositoryId(rep_id);
+                                    
+            // Write Value chunk
+            end_flag--;
+            chunkedValueNestingLevel--;
 
-	if (inBlock)
-	    end_block();
-        
-        // Write value_tag
-        writeValueTag(true, true, null);
-				
-        // Write rep. id
-        write_repositoryId(rep_id);
-				
-        // Write Value chunk
-        end_flag--;
-        chunkedValueNestingLevel--;
-
-        // Make sure to chunk the custom data
-        start_block();
+            // Make sure to chunk the custom data
+            start_block();
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
+        }
     }
 
+    @CDR
+    @CDRWrite
     public void end_value() {
-
-        if (debug) {
-            dprint("end_value called at pos "
-		   + get_offset()
-		   + " position "
-		   + bbwi.position());
+        if (orb.cdrDebugFlag) {
+            dputil.enter("end_value", "called as position", get_offset(),
+                "position", bbwi.position() ) ;
 	}
 
-        end_block();
+        try {
+            end_block();
 
-        writeEndTag(true);
+            writeEndTag(true);
 
-	// Check to see if we need to start another block for a
-	// possible outer value.  Since we're in the stream
-        // format 2 custom type contained by another custom
-        // type, mustChunk should always be true.
-        //
-        // Here's why we need to open a continuation chunk:
-        //
-        // We need to enclose the default data of the
-        // next subclass down in chunks.  There won't be
-        // an end tag separating the superclass optional
-        // data and the subclass's default data.
+            // Check to see if we need to start another block for a
+            // possible outer value.  Since we're in the stream
+            // format 2 custom type contained by another custom
+            // type, mustChunk should always be true.
+            //
+            // Here's why we need to open a continuation chunk:
+            //
+            // We need to enclose the default data of the
+            // next subclass down in chunks.  There won't be
+            // an end tag separating the superclass optional
+            // data and the subclass's default data.
 
-        if (debug) {
-            dprint("mustChunk is " + mustChunk);
-	}
+            if (orb.cdrDebugFlag) {
+                dprint("mustChunk is " + mustChunk);
+            }
 
-	if (mustChunk) {
-	    start_block();
+            if (mustChunk) {
+                start_block();
+            }
+        } finally {
+            if (orb.cdrDebugFlag) 
+                dputil.exit() ;
         }
     }
 
@@ -1847,7 +2018,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();
-            if (debug)
+            if (orb.cdrDebugFlag)
             {
                 // print address of ByteBuffer being released
                 int bbAddress = System.identityHashCode(bbwi.getByteBuffer());

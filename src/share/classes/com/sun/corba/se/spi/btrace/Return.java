@@ -33,59 +33,101 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.simpledynamic;
+package com.sun.corba.se.spi.btrace ;
 
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
-import javax.rmi.PortableRemoteObject ;
+/** Static utility methods that can be targeted by btrace to report on results of method
+ * calls.  This is a simple workaround for an annoying btrace problem: while btrace can
+ * intercept arguments, it cannot see results.  So, to make a result visible, simple 
+ * change
+ * <p>
+ * return x ;
+ * <p>
+ * to
+ * <p>
+ * return value(x) ;
+ * <p>
+ * and then make sure that the btrace script prints out the arguments passed into a value call
+ * in the Return class.
+ * <p>
+ * This can also be used to report values in the middle of a method.  Here it's
+ * useful to know which local variable is being reported, so we can just call
+ * <p>
+ * Return.value( "foo", foo ) ;
+ * <p>
+ * to report the value of variable foo at some point in a method.
+ */
+public class Return {
+    private Return() {} 
 
-import corba.misc.BuckPasserAL  ;
-import corba.misc.BuckPasserV  ;
-
-public class EchoImpl extends PortableRemoteObject implements Echo {
-    private String name ;
-
-    public EchoImpl( String name ) throws RemoteException {
-	this.name = name ;
-    }
-
-    public String sayHello( Object obj ) throws RemoteException {
-	return "Hello " + obj ;
-    }
-
-    public Echo say( Echo echo ) {
-	return echo ;
-    }
-
-    public String name() {
-	return name ;
-    }
-
-    public int[] echo( int[] arg ) {
-	return arg ;
-    }
-
-    public Object echo( Object arg ) {
-	return arg ;
-    }
-
-    public BuckPasserAL echo( BuckPasserAL arg ) {
+    public static boolean value( boolean arg ) {
         return arg ;
     }
 
-    public BuckPasserV echo( BuckPasserV arg ) {
+    public static byte value( byte arg ) {
         return arg ;
     }
 
-    public BuckPasserVectorOriginal echo( BuckPasserVectorOriginal arg ) throws RemoteException {
+    public static char value( char arg ) {
         return arg ;
     }
 
-    public BuckPasserVectorSimple echo( BuckPasserVectorSimple arg ) throws RemoteException {
+    public static short value( short arg ) {
         return arg ;
     }
 
-    public BuckPasserVectorReadObject echo( BuckPasserVectorReadObject arg ) throws RemoteException {
+    public static int value( int arg ) {
+        return arg ;
+    }
+
+    public static long value( long arg ) {
+        return arg ;
+    }
+
+    public static float value( float arg ) {
+        return arg ;
+    }
+
+    public static double value( double arg ) {
+        return arg ;
+    }
+
+    public static <T> T value( T arg ) {
+        return arg ;
+    }
+
+    public static boolean value( String msg, boolean arg ) {
+        return arg ;
+    }
+
+    public static byte value( String msg, byte arg ) {
+        return arg ;
+    }
+
+    public static char value( String msg, char arg ) {
+        return arg ;
+    }
+
+    public static short value( String msg, short arg ) {
+        return arg ;
+    }
+
+    public static int value( String msg, int arg ) {
+        return arg ;
+    }
+
+    public static long value( String msg, long arg ) {
+        return arg ;
+    }
+
+    public static float value( String msg, float arg ) {
+        return arg ;
+    }
+
+    public static double value( String msg, double arg ) {
+        return arg ;
+    }
+
+    public static <T> T value( String msg, T arg ) {
         return arg ;
     }
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,28 +34,38 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.newtimer ;
+package corba.misc ;
 
-import java.io.PrintStream ;
+import java.io.ObjectInput ;
+import java.io.ObjectOutput ;
+import java.io.IOException ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
+public class Buck implements java.io.Externalizable {
+    String name = "";
 
-import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
+    public Buck(){}
+     
+    public Buck(String name) { this.name = name; }
 
-/** A TimerEventHandler that stores all events that is receives.  It can
- * be used in the JDK 5 for loop.
- */
-@ManagedObject( description="TimerEventHandler that records all TimerEvents in a log" ) 
-@InheritedTable( cls=TimerEvent.class, 
-    description="TimerEvents contained in this log in order of occurrence" )
-public interface LogEventHandler extends TimerEventHandler, Iterable<TimerEvent> {
-    /** Discard the contents of the log.
-     */
-    @ManagedOperation( description="Discard all recorded timer events" )
-    void clear() ;
+    public String toString() { return "Buck[" + name + "]" ; } 
 
-    /** Display the contents of this log in formatted form to the PrintStream.
-     */
-    void display( PrintStream arg, String msg ) ;
+    public boolean equals( Object obj ) {
+        if (!(obj instanceof Buck))
+            return false ;
+
+        if (obj == this)
+            return true ;
+
+        Buck other = (Buck)obj ;
+
+        return other.name.equals( name ) ;
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException { 
+        name = (String) in.readObject(); 
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+      out.writeObject(name);
+    }
 }

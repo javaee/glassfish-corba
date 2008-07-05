@@ -43,7 +43,6 @@ import java.io.Serializable ;
 
 import java.rmi.MarshalException ;
 
-import java.util.Vector ;
 import java.util.Properties ;
 
 import java.rmi.Remote ;
@@ -59,12 +58,28 @@ import org.testng.Assert ;
 import org.testng.annotations.Test ;
 import org.testng.annotations.BeforeGroups ;
 import org.testng.annotations.AfterGroups ;
-   
-import org.omg.CORBA.ORB ;
-
+  
 import corba.nortel.NortelSocketFactory ;
 
 import com.sun.corba.se.impl.orbutil.ORBConstants ;
+
+import com.sun.corba.se.spi.orb.ORB ;
+
+import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
+import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
+import com.sun.corba.se.spi.orbutil.newtimer.LogEventHandler ;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
+
+import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
+
+import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
+
+import corba.misc.Buck ;
+import corba.misc.BuckPasserAL ;
+import corba.misc.BuckPasserV ;
 
 import static corba.framework.PRO.* ;
 
@@ -76,6 +91,7 @@ public class FrameworkClient extends Framework {
     private static final String TEST_REF_NAME = "testref" ;
 
     private static final String TESTREF_GROUP = "testref_group" ;
+    private static final String GROUP_5161 = "5161_group" ;
 
     private Echo makeServant( String name ) {
 	try {
@@ -95,7 +111,7 @@ public class FrameworkClient extends Framework {
 	bindServant( makeServant( SERVER_NAME ), Echo.class, TEST_REF_NAME ) ;
     }
 
-    @Test( groups = { TESTREF_GROUP } ) 
+    // DONTRUN @Test( groups = { TESTREF_GROUP } ) 
     public void firstTest() {
 	try {
 	    InterceptorTester.theTester.clear() ;
@@ -133,8 +149,22 @@ public class FrameworkClient extends Framework {
     }
 
     @Override
+    protected Properties extraServerProperties() {
+	Properties result = new Properties() ;
+        result.setProperty( ORBConstants.TIMING_POINTS_ENABLED, "true" ) ;
+
+        result.setProperty( ORBConstants.DEBUG_PROPERTY, "valueHandler,streamFormatVersion,cdr" ) ;
+
+        return result ;
+    }
+
+    @Override
     protected Properties extraClientProperties() {
 	Properties result = new Properties() ;
+
+        result.setProperty( ORBConstants.TIMING_POINTS_ENABLED, "true" ) ;
+
+        result.setProperty( ORBConstants.DEBUG_PROPERTY, "valueHandler,streamFormatVersion,cdr" ) ;
 	
 	// register nortel socket factory
 	result.setProperty( ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY, 
@@ -166,9 +196,9 @@ public class FrameworkClient extends Framework {
 
     private static class Wrapper implements java.io.Serializable{
 	Fragment f = null;
-	Vector vec = null;
+	java.util.Vector vec = null;
 
-	public Wrapper(int len, Vector vec){
+	public Wrapper(int len, java.util.Vector vec){
 	    this.vec = vec;
 	    f = new Fragment(len);
 	}
@@ -188,7 +218,7 @@ public class FrameworkClient extends Framework {
 
     public void testFragmentation( Echo sref ) {
 	Throwable t = new Throwable();
-	Vector v = new Vector();
+	java.util.Vector v = new java.util.Vector();
 	v.add(t);
 	for (int i = 0; i < 1024; i++){
 	    try {
@@ -236,12 +266,12 @@ public class FrameworkClient extends Framework {
 	}
     }
 
-    @Test( groups = { TESTREF_GROUP } ) 
+    // DONTRUN @Test( groups = { TESTREF_GROUP } ) 
     public void testWriteFailureFragment() {
 	testWriteFailure( makeIntArray( 50000 ) ) ;
     }
 
-    @Test( groups = { TESTREF_GROUP } ) 
+    // DONTRUN @Test( groups = { TESTREF_GROUP } ) 
     public void testWriteFailureNoFragment() {
 	testWriteFailure( makeIntArray( 50 ) ) ;
     }
@@ -271,7 +301,7 @@ public class FrameworkClient extends Framework {
 	}
     }
 
-    @Test()
+    // DONTRUN @Test()
     public void testRecursiveTypeCode() {
 	int ctr=0 ;
 	try {
@@ -295,7 +325,7 @@ public class FrameworkClient extends Framework {
 	}
     }
 
-    @Test()
+    // DONTRUN @Test()
     public void testCorbalocRir() {
 	msg( "corbaloc:rir URL test" ) ;
 	String name = "UseThisName" ;
@@ -314,6 +344,184 @@ public class FrameworkClient extends Framework {
 	    exc.printStackTrace() ;
 	    Assert.fail( "Unexpected exception in testCorbalocRir: " + exc ) ;
 	}
+    }
+
+    private static class CDRTimerContext {
+        private LogEventHandler clientLEH ;
+        private LogEventHandler serverLEH ;
+        private TimerGroup clientCDR ;
+        private TimerGroup serverCDR ;
+
+        public CDRTimerContext( ORB clientORB, ORB serverORB ) {
+            final TimerManager<TimingPoints> clientTM = clientORB.getTimerManager() ;
+            clientLEH = clientTM.factory().makeLogEventHandler( "Client_CDR_LEH" ) ;
+            clientTM.controller().register( clientLEH ) ;
+            clientCDR = clientTM.points().CDR() ;
+
+            final TimerManager<TimingPoints> serverTM = serverORB.getTimerManager() ;
+            serverLEH = serverTM.factory().makeLogEventHandler( "Server_CDR_LEH" ) ;
+            serverTM.controller().register( serverLEH ) ;
+            serverCDR = serverTM.points().CDR() ;
+        }
+
+        public void enable() {
+            clientCDR.enable() ;
+            serverCDR.enable() ;
+        }
+
+        public void disable() {
+            clientCDR.disable() ;
+            serverCDR.disable() ;
+        }
+
+        public void display( String msg ) {
+            System.out.println( "Displaying CDR events for: " + msg ) ;
+            clientLEH.display( System.out, "Client-side events" ) ;
+            serverLEH.display( System.out, "Server-side events" ) ;
+        }
+
+        public void clear() {
+            clientLEH.clear() ;
+            serverLEH.clear() ;
+        }
+    }
+
+    private static final boolean DEBUG_5161 = false ;
+
+    private Echo clientRef5161 = null ;
+    private CDRTimerContext timerContext = null ;
+
+    private void doOperation( String msg, NullaryFunction func ) {
+        System.out.println( msg ) ;
+        try {
+            if (DEBUG_5161) {
+                timerContext.enable() ;
+            }
+
+            func.evaluate() ;
+        // } catch (Exception exc) {
+            // System.out.println( msg + ": caught exception " + exc ) ;
+            // exc.printStackTrace() ;
+            // Assert.fail( "Failed with exception " + exc ) ;
+        } finally {
+            if (DEBUG_5161) {
+                timerContext.disable() ;
+                timerContext.display( msg ) ;
+                timerContext.clear() ;
+            }
+        }
+    }
+
+    @BeforeGroups( { GROUP_5161 } )
+    public void init5161() {
+        // Make sure that echo is implemented in server, but the reference
+        // is bound in client for the test: we want this to test marshaling,
+        // not local optimization copying.
+        final Echo servant = makeServant( "echotest" ) ;
+        bindServant( servant, Echo.class, "BuckPasser" ) ;
+        clientRef5161 = findStub( Echo.class, "BuckPasser" ) ;
+
+        if (DEBUG_5161)
+            // Prepare timing for client and server ORBs
+            timerContext = new CDRTimerContext( getClientORB(), getServerORB() ) ;
+    }
+
+    // btrace hooks
+    private void stop() {}
+    private void start() {}
+
+    @Test( groups = { GROUP_5161 } )
+    public void test5161VectorOriginal() {
+        doOperation( "Testing VectorOriginal", new NullaryFunction() {
+            public Object evaluate() {
+                try {
+                    BuckPasserVectorOriginal bpvo = new BuckPasserVectorOriginal() ;
+                    bpvo.add( new Buck( "The Buck" ) ) ;
+                    start() ;
+                    BuckPasserVectorOriginal bpvo2 = null ;
+                    try {
+                        bpvo2 = clientRef5161.echo( bpvo ) ;
+                    } finally {
+                        stop() ;
+                    }
+                    Assert.assertTrue( bpvo2.equals( bpvo ) ) ;
+                    return null ;
+                } catch (RemoteException exc) {
+                    throw new RuntimeException( exc ) ;
+                }
+            }
+        } ) ;
+    }
+
+    @Test( groups = { GROUP_5161 } )
+    public void test5161VectorSimple() {
+        doOperation( "Testing VectorSimple", new NullaryFunction() {
+            public Object evaluate() {
+                try {
+                    BuckPasserVectorSimple bps = new BuckPasserVectorSimple() ;
+                    bps.add( new Buck( "The Buck" ) ) ;
+                    BuckPasserVectorSimple bps2 = clientRef5161.echo( bps ) ;
+                    Assert.assertTrue( bps2.equals( bps ) ) ;
+                    return null ;
+                } catch (RemoteException exc) {
+                    throw new RuntimeException( exc ) ;
+                }
+            }
+        } ) ;
+    }
+
+    @Test( groups = { GROUP_5161 } )
+    public void test5161VectorReadObject() {
+        doOperation( "Testing VectorReadObject", new NullaryFunction() {
+            public Object evaluate() {
+                try {
+                    BuckPasserVectorReadObject bpvro = new BuckPasserVectorReadObject() ;
+                    bpvro.add( new Buck( "The Buck" ) ) ;
+                    BuckPasserVectorReadObject bpvro2 = clientRef5161.echo( bpvro ) ;
+                    Assert.assertTrue( bpvro2.equals( bpvro ) ) ;
+                    return null ;
+                } catch (RemoteException exc) {
+                    throw new RuntimeException( exc ) ;
+                }
+            }
+        } ) ;
+    }
+
+    // @Test( groups = { GROUP_5161 } )
+    public void test5161() throws RemoteException {
+        // System.out.println( "Running test for issue 5161" ) ;
+
+        /* This does not reproduce the problem
+        final BuckPasserAL bpal = new BuckPasserAL() ;
+        bpal.add( new Buck( "The Buck" ) ) ;
+
+        final BuckPasserV bpv = new BuckPasserV() ;
+        bpv.add( new Buck( "The Buck" ) ) ;
+
+        OutputStream out = (OutputStream)orb.create_output_stream();
+
+	out.write_value(bpal) ;
+	out.write_value(bpv) ;
+
+	InputStream in = (InputStream)out.create_input_stream();
+
+        BuckPasserAL bpal2 = (BuckPasserAL)in.read_value() ;
+        BuckPasserV bpv2 = (BuckPasserV)in.read_value() ;
+        */
+
+        /** This case passes, so comment out for now
+        doOperation( "Testing ArrayList", new NullaryFunction() {
+            public Object evaluate() {
+                try {
+                    BuckPasserAL bpal2 = clientRef5161.echo( bpal ) ;
+                    Assert.assertTrue( bpal2.equals( bpal ) ) ;
+                    return null ;
+                } catch (RemoteException exc) {
+                    throw new RuntimeException( exc ) ;
+                }
+            }
+        } ) ;
+        */
     }
 
     public static void main( String[] args ) {

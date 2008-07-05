@@ -572,10 +572,12 @@ public class ObjectStreamClass implements java.io.Serializable {
 	    // This call depends on a lot of information computed above!
 	    actualSuid = ObjectStreamClass.computeStructuralUID(this, cl);
 
+            // Part of GlassFish issue 5161: also need the repo id if the
+            // class is Externalizable.
 	    // If we have a write object method, precompute the
 	    // RMI-IIOP stream format version 2 optional data
 	    // repository ID.  
-	    if (hasWriteObject())
+	    if (hasWriteObject() || isExternalizable())
 		rmiiiopOptionalDataRepId = computeRMIIIOPOptionalDataRepId();
 
 	    // This must be done last.

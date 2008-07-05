@@ -71,6 +71,8 @@ import sun.corba.Bridge ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import com.sun.corba.se.spi.btrace.* ;
+
 import com.sun.corba.se.impl.io.ObjectStreamClass;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.RepositoryId;
@@ -80,6 +82,8 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
+import com.sun.corba.se.impl.orbutil.ORBUtility ;
+
 /**
  * IIOPOutputStream is ...
  *
@@ -88,6 +92,7 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
  * @since   JDK1.1.6
  */
 
+@Traceable
 public class IIOPOutputStream
     extends com.sun.corba.se.impl.io.OutputStreamHook
 {
@@ -128,19 +133,29 @@ public class IIOPOutputStream
     // the ORB stream (which must be a ValueOutputStream) to
     // begin a new valuetype to contain the optional data
     // of the writeObject method.
+    @TraceValueHandler
+    @ValueHandlerWrite
     protected void beginOptionalCustomData() {
+        if (valueHandlerDebug()) 
+            dputil.enter( "beginOptionalCustomData" ) ;
 
-        if (streamFormatVersion == 2) {
-                
-            org.omg.CORBA.portable.ValueOutputStream vout
-                = (org.omg.CORBA.portable.ValueOutputStream)orbStream;
-                
-            vout.start_value(currentClassDesc.getRMIIIOPOptionalDataRepId());
+        try {
+            if (streamFormatVersion == 2) {
+                    
+                org.omg.CORBA.portable.ValueOutputStream vout
+                    = (org.omg.CORBA.portable.ValueOutputStream)orbStream;
+                    
+                vout.start_value(currentClassDesc.getRMIIIOPOptionalDataRepId());
+            }
+        } finally {
+            if (valueHandlerDebug())
+                dputil.exit() ;
         }
     }
 
     public final void setOrbStream(org.omg.CORBA_2_3.portable.OutputStream os) {
     	orbStream = os;
+        setORB( os.orb() ) ;
     }
 
     public final org.omg.CORBA_2_3.portable.OutputStream getOrbStream() {
@@ -149,10 +164,27 @@ public class IIOPOutputStream
 
     public final void increaseRecursionDepth(){
 	recursionDepth++;
+        if (valueHandlerDebug())
+            dputil.dprint( "Incrementing recursion depth to " + recursionDepth ) ;
     }
 
     public final int decreaseRecursionDepth(){
-	return --recursionDepth;
+	--recursionDepth;
+        if (valueHandlerDebug())
+            dputil.dprint( "Decrementing recursion depth to " + recursionDepth ) ;
+        return recursionDepth ;
+    }
+
+    private void writeFormatVersion() {
+        if (valueHandlerDebug())
+            dputil.enter( "writeFormatVersion" ) ;
+
+        try {
+            orbStream.write_octet(streamFormatVersion);
+        } finally {
+            if (valueHandlerDebug())
+                dputil.exit() ;
+        }
     }
 
     /**
@@ -160,12 +192,21 @@ public class IIOPOutputStream
      * in ObjectOutputStream.
      * @since     JDK1.1.6
      */
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeObjectOverride(Object obj)
 	throws IOException
     {
-        writeObjectState.writeData(this);
+        if (valueHandlerDebug())
+            dputil.enter("writeObjectOverride") ;
+        try {
+            writeObjectState.writeData(this);
 
-	Util.getInstance().writeAbstractObject((OutputStream)orbStream, obj);
+            Util.getInstance().writeAbstractObject((OutputStream)orbStream, obj);
+        } finally {
+            if (valueHandlerDebug())
+                dputil.exit() ;
+        }
     }
 
     /**
@@ -173,41 +214,50 @@ public class IIOPOutputStream
      * in ObjectOutputStream.
      * @since     JDK1.1.6
      */
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void simpleWriteObject(Object obj, byte formatVersion)
-    /* throws IOException */
     {
-        byte oldStreamFormatVersion = streamFormatVersion;
+        if (valueHandlerDebug())
+            dputil.enter("simpleWriteObject", "obj", obj ) ;
 
-        streamFormatVersion = formatVersion;
+        try {
+            byte oldStreamFormatVersion = streamFormatVersion;
 
-    	Object prevObject = currentObject;
-    	ObjectStreamClass prevClassDesc = currentClassDesc;
-    	simpleWriteDepth++;
+            streamFormatVersion = formatVersion;
 
-    	try {
-	    // if (!checkSpecialClasses(obj) && !checkSubstitutableSpecialClasses(obj))
-	    outputObject(obj);
+            Object prevObject = currentObject;
+            ObjectStreamClass prevClassDesc = currentClassDesc;
+            simpleWriteDepth++;
 
-    	} catch (IOException ee) {
-    	    if (abortIOException == null)
-		abortIOException = ee;
-    	} finally {
-    	    /* Restore state of previous call incase this is a nested call */
-            streamFormatVersion = oldStreamFormatVersion;
-    	    simpleWriteDepth--;
-    	    currentObject = prevObject;
-    	    currentClassDesc = prevClassDesc;
-    	}
+            try {
+                // if (!checkSpecialClasses(obj) && !checkSubstitutableSpecialClasses(obj))
+                outputObject(obj);
 
-    	/* If the recursion depth is 0, test for and clear the pending exception.
-    	 * If there is a pending exception throw it.
-    	 */
-    	IOException pending = abortIOException;
-    	if (simpleWriteDepth == 0)
-    	    abortIOException = null;
-    	if (pending != null) {
-	    bridge.throwException( pending ) ;
-    	}
+            } catch (IOException ee) {
+                if (abortIOException == null)
+                    abortIOException = ee;
+            } finally {
+                /* Restore state of previous call incase this is a nested call */
+                streamFormatVersion = oldStreamFormatVersion;
+                simpleWriteDepth--;
+                currentObject = prevObject;
+                currentClassDesc = prevClassDesc;
+            }
+
+            /* If the recursion depth is 0, test for and clear the pending exception.
+             * If there is a pending exception throw it.
+             */
+            IOException pending = abortIOException;
+            if (simpleWriteDepth == 0)
+                abortIOException = null;
+            if (pending != null) {
+                bridge.throwException( pending ) ;
+            }
+        } finally {
+            if (valueHandlerDebug()) 
+                dputil.exit() ;
+        }
     }
 
     // Required by the superclass.
@@ -220,9 +270,14 @@ public class IIOPOutputStream
      * in ObjectOutputStream.
      * @since     JDK1.1.6
      */
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void defaultWriteObjectDelegate()
     /* throws IOException */
     {
+        if (valueHandlerDebug())
+            dputil.enter("defaultWriteObjectDelegate" ) ;
+
         try {
 	    if (currentObject == null || currentClassDesc == null)
 		// XXX I18N, Logging needed.
@@ -236,7 +291,10 @@ public class IIOPOutputStream
 	    }
         } catch(IOException ioe) {
 	    bridge.throwException(ioe);
-	}
+	} finally {
+            if (valueHandlerDebug()) 
+                dputil.exit() ;
+        }
     }
 
     /**
@@ -265,6 +323,8 @@ public class IIOPOutputStream
         // no op
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void flush() throws IOException{
         try{
             orbStream.flush();
@@ -275,6 +335,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     protected final Object replaceObject(Object obj) throws IOException{
 	// XXX I18N, Logging needed.
         throw new IOException("Method replaceObject not supported");
@@ -290,6 +352,8 @@ public class IIOPOutputStream
      * will be written to the stream again.
      * @since     JDK1.1
      */
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void reset() throws IOException{
         try{
             //orbStream.reset();
@@ -312,6 +376,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void write(byte b[]) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -324,6 +390,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void write(byte b[], int off, int len) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -336,6 +404,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void write(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -348,6 +418,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeBoolean(boolean data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -360,6 +432,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeByte(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -372,6 +446,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeBytes(String data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -385,6 +461,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeChar(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -397,6 +475,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeChars(String data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -410,6 +490,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeDouble(double data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -422,6 +504,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeFloat(float data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -434,6 +518,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeInt(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -446,6 +532,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeLong(long data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -458,6 +546,8 @@ public class IIOPOutputStream
 	}
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeShort(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -486,6 +576,8 @@ public class IIOPOutputStream
         stream.write_wstring(data);
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     public final void writeUTF(String data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -538,75 +630,94 @@ public class IIOPOutputStream
     /*
      * Write out the object
      */
+    @TraceValueHandler
+    @ValueHandlerWrite
     private void outputObject(final Object obj) throws IOException{
+        if (valueHandlerDebug())
+            dputil.enter("outputObject", "obj", obj ) ;
 
-    	currentObject = obj;
-    	Class currclass = obj.getClass();
+        try {
+            currentObject = obj;
+            Class currclass = obj.getClass();
 
-    	/* Get the Class descriptor for this class,
-    	 * Throw a NotSerializableException if there is none.
-    	 */
-    	currentClassDesc = ObjectStreamClass.lookup(currclass);
-    	if (currentClassDesc == null) {
-	    // XXX I18N, Logging needed.
-    	    throw new NotSerializableException(currclass.getName());
-    	}
+            /* Get the Class descriptor for this class,
+             * Throw a NotSerializableException if there is none.
+             */
+            currentClassDesc = ObjectStreamClass.lookup(currclass);
+            if (currentClassDesc == null) {
+                // XXX I18N, Logging needed.
+                throw new NotSerializableException(currclass.getName());
+            }
 
-    	/* If the object is externalizable,
-    	 * call writeExternal.
-    	 * else do Serializable processing.
-    	 */
-    	if (currentClassDesc.isExternalizable()) {
-	    // Write format version
-	    orbStream.write_octet(streamFormatVersion);
+            /* If the object is externalizable,
+             * call writeExternal.
+             * else do Serializable processing.
+             */
+            if (currentClassDesc.isExternalizable()) {
+                // Write format version
+                writeFormatVersion() ;
 
-    	    Externalizable ext = (Externalizable)obj;
-    	    ext.writeExternal(this);
-            
-    	} else {
+                // KMC issue 5161: need to save state for Externalizable also!
+                // Obviously an Externalizable may also call writeObject, which
+                // calls writeObjectOverride, which sends the writeData input to
+                // the state machine.  So we need a new state machine here!
+                WriteObjectState oldState = writeObjectState ;
+                setState( NOT_IN_WRITE_OBJECT ) ;
 
-    	    /* The object's classes should be processed from supertype to subtype
-    	     * Push all the clases of the current object onto a stack.
-    	     * Remember the stack pointer where this set of classes is being pushed.
-    	     */
-    	    int stackMark = classDescStack.size();
-    	    try {
-    		ObjectStreamClass next;
-    		while ((next = currentClassDesc.getSuperclass()) != null) {
-    		    classDescStack.push(currentClassDesc);
-    		    currentClassDesc = next;
-    		}
+                try {
+                    Externalizable ext = (Externalizable)obj;
+                    ext.writeExternal(this);
+                } finally {
+                    setState(oldState) ;
+                }
+            } else {
 
-    		/*
-    		 * For currentClassDesc and all the pushed class descriptors
-    		 *    If the class is writing its own data
-    		 *		  set blockData = true; call the class writeObject method
-    		 *    If not
-    		 *     invoke either the defaultWriteObject method.
-    		 */
-    		do {
-
-                    WriteObjectState oldState = writeObjectState;
-
-                    try {
-
-                        setState(NOT_IN_WRITE_OBJECT);
-
-                        if (currentClassDesc.hasWriteObject()) {
-                            invokeObjectWriter(currentClassDesc, obj );
-                        } else {
-                            defaultWriteObjectDelegate();
-                        }
-                    } finally {
-                        setState(oldState);
+                /* The object's classes should be processed from supertype to subtype
+                 * Push all the clases of the current object onto a stack.
+                 * Remember the stack pointer where this set of classes is being pushed.
+                 */
+                int stackMark = classDescStack.size();
+                try {
+                    ObjectStreamClass next;
+                    while ((next = currentClassDesc.getSuperclass()) != null) {
+                        classDescStack.push(currentClassDesc);
+                        currentClassDesc = next;
                     }
 
-    		} while (classDescStack.size() > stackMark && 
-		    (currentClassDesc = classDescStack.pop()) != null);
-    	    } finally {
-		classDescStack.setSize(stackMark);
-    	    }
-    	}
+                    /*
+                     * For currentClassDesc and all the pushed class descriptors
+                     *    If the class is writing its own data
+                     *		  set blockData = true; call the class writeObject method
+                     *    If not
+                     *     invoke either the defaultWriteObject method.
+                     */
+                    do {
+
+                        WriteObjectState oldState = writeObjectState;
+
+                        try {
+
+                            setState(NOT_IN_WRITE_OBJECT);
+
+                            if (currentClassDesc.hasWriteObject()) {
+                                invokeObjectWriter(currentClassDesc, obj );
+                            } else {
+                                defaultWriteObjectDelegate();
+                            }
+                        } finally {
+                            setState(oldState);
+                        }
+
+                    } while (classDescStack.size() > stackMark && 
+                        (currentClassDesc = classDescStack.pop()) != null);
+                } finally {
+                    classDescStack.setSize(stackMark);
+                }
+            }
+        } finally {
+            if (valueHandlerDebug())
+                dputil.exit() ;
+        }
     }
 
     /*
@@ -614,40 +725,52 @@ public class IIOPOutputStream
      * _REVISIT_ invokeObjectWriter and invokeObjectReader behave inconsistently with each other since
      * the reader returns a boolean...fix later
      */
+    @TraceValueHandler
+    @ValueHandlerWrite
     private void invokeObjectWriter(ObjectStreamClass osc, Object obj)
 	throws IOException
     {
-	Class c = osc.forClass() ;
+        if (valueHandlerDebug())
+            dputil.enter("invokeObjectWriter", "obj", obj ) ;
 
-    	try {
+        try {
+            Class c = osc.forClass() ;
 
-	    // Write format version
-            orbStream.write_octet(streamFormatVersion);
+            try {
+                // Write format version
+                writeFormatVersion() ;
 
-            writeObjectState.enterWriteObject(this);
+                writeObjectState.enterWriteObject(this);
 
-	    // writeObject(obj, c, this);
-	    osc.writeObjectMethod.invoke( obj, this ) ;
-
-            writeObjectState.exitWriteObject(this);
-
-    	} catch (InvocationTargetException e) {
-    	    Throwable t = e.getTargetException();
-    	    if (t instanceof IOException)
-    		throw (IOException)t;
-    	    else if (t instanceof RuntimeException)
-    		throw (RuntimeException) t;
-    	    else if (t instanceof Error)
-    		throw (Error) t;
-    	    else
-		// XXX I18N, Logging needed.
-    		throw new Error("invokeObjectWriter internal error",e);
-    	} catch (IllegalAccessException e) {
-    	    // cannot happen
-    	}
+                try {
+                    // writeObject(obj, c, this);
+                    osc.writeObjectMethod.invoke( obj, this ) ;
+                } finally {
+                    writeObjectState.exitWriteObject(this);
+                }
+            } catch (InvocationTargetException e) {
+                Throwable t = e.getTargetException();
+                if (t instanceof IOException)
+                    throw (IOException)t;
+                else if (t instanceof RuntimeException)
+                    throw (RuntimeException) t;
+                else if (t instanceof Error)
+                    throw (Error) t;
+                else
+                    // XXX I18N, Logging needed.
+                    throw new Error("invokeObjectWriter internal error",e);
+            } catch (IllegalAccessException e) {
+                // cannot happen
+            }
+        } finally {
+            if (valueHandlerDebug())
+                dputil.exit() ;
+        }
     }
 
     // This is needed for the OutputStreamHook interface.
+    @TraceValueHandler
+    @ValueHandlerWrite
     void writeField(ObjectStreamField field, Object value) throws IOException {
         switch (field.getTypeCode()) {
             case 'B':
@@ -709,6 +832,8 @@ public class IIOPOutputStream
 	    }
     }
 
+    @TraceValueHandler
+    @ValueHandlerWrite
     private void writeObjectField(ObjectStreamField field,
                                   Object objectValue) throws IOException {
 
@@ -763,6 +888,8 @@ public class IIOPOutputStream
     /* Write the fields of the specified class by invoking the appropriate
      * write* method on this class.
      */
+    @TraceValueHandler
+    @ValueHandlerWrite
     private void outputClassFields(Object o, Class cl,
 				   ObjectStreamField[] fields)
 	throws IOException, InvalidClassException {

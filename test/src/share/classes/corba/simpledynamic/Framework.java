@@ -49,13 +49,13 @@ import javax.rmi.CORBA.Tie ;
 import javax.naming.InitialContext ;
 import javax.naming.NamingException ;
 
-import org.omg.CORBA.ORB ;
-
 import org.testng.TestNG ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
 import org.testng.annotations.Configuration ;
 import org.testng.annotations.ExpectedExceptions ;
+
+import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.impl.orbutil.ORBConstants ;
 
@@ -110,7 +110,7 @@ public abstract class Framework {
 	    props.setProperty( ORBConstants.ORB_ID_PROPERTY, "clientORB" ) ;
 	}
 
-	ORB orb = ORB.init( new String[0], props ) ;
+	ORB orb = (ORB)ORB.init( new String[0], props ) ;
 
 	if (isServer) {
 	    new TransientNameService( 

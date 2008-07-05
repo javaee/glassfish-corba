@@ -503,6 +503,9 @@
 
             <!--exclude name="corba/dynamicrmiiiop/testclasses/**"/-->
 	</javac>
+    </target>
+
+    <target name="compile-tests-experimental" depends="init, prepare-dirs">
 	<mkdir dir="${experimentaltestclasses.dir}"/>
 	<javac destdir="${experimentaltestclasses.dir}" 
 		classpathref="test-classpath.master"

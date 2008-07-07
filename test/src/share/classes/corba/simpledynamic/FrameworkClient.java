@@ -111,7 +111,7 @@ public class FrameworkClient extends Framework {
 	bindServant( makeServant( SERVER_NAME ), Echo.class, TEST_REF_NAME ) ;
     }
 
-    // DONTRUN @Test( groups = { TESTREF_GROUP } ) 
+    @Test( groups = { TESTREF_GROUP } ) 
     public void firstTest() {
 	try {
 	    InterceptorTester.theTester.clear() ;
@@ -266,12 +266,12 @@ public class FrameworkClient extends Framework {
 	}
     }
 
-    // DONTRUN @Test( groups = { TESTREF_GROUP } ) 
+    @Test( groups = { TESTREF_GROUP } ) 
     public void testWriteFailureFragment() {
 	testWriteFailure( makeIntArray( 50000 ) ) ;
     }
 
-    // DONTRUN @Test( groups = { TESTREF_GROUP } ) 
+    @Test( groups = { TESTREF_GROUP } ) 
     public void testWriteFailureNoFragment() {
 	testWriteFailure( makeIntArray( 50 ) ) ;
     }
@@ -301,7 +301,7 @@ public class FrameworkClient extends Framework {
 	}
     }
 
-    // DONTRUN @Test()
+    @Test()
     public void testRecursiveTypeCode() {
 	int ctr=0 ;
 	try {
@@ -325,7 +325,7 @@ public class FrameworkClient extends Framework {
 	}
     }
 
-    // DONTRUN @Test()
+    @Test()
     public void testCorbalocRir() {
 	msg( "corbaloc:rir URL test" ) ;
 	String name = "UseThisName" ;

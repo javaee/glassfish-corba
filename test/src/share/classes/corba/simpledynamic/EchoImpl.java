@@ -80,12 +80,4 @@ public class EchoImpl extends PortableRemoteObject implements Echo {
     public BuckPasserVectorOriginal echo( BuckPasserVectorOriginal arg ) throws RemoteException {
         return arg ;
     }
-
-    public BuckPasserVectorSimple echo( BuckPasserVectorSimple arg ) throws RemoteException {
-        return arg ;
-    }
-
-    public BuckPasserVectorReadObject echo( BuckPasserVectorReadObject arg ) throws RemoteException {
-        return arg ;
-    }
 }

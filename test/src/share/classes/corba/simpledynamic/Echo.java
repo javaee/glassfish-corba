@@ -57,8 +57,6 @@ public interface Echo extends Remote {
     BuckPasserAL echo( BuckPasserAL arg ) throws RemoteException ;
     BuckPasserV echo( BuckPasserV arg ) throws RemoteException ;
     BuckPasserVectorOriginal echo( BuckPasserVectorOriginal arg ) throws RemoteException ;
-    BuckPasserVectorSimple echo( BuckPasserVectorSimple arg ) throws RemoteException ;
-    BuckPasserVectorReadObject echo( BuckPasserVectorReadObject arg ) throws RemoteException ;
 }
 
 

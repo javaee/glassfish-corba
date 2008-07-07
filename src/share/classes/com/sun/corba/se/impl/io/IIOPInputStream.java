@@ -304,7 +304,9 @@ public class IIOPInputStream
                 }
             }
         } finally {
-            dputil.exit() ;
+            if (valueHandlerDebug()) {
+                dputil.exit() ;
+            }
         }
     }
 

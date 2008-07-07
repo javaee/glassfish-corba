@@ -1745,7 +1745,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 blockLength = maxBlockLength;
 
                 bbwi.position(bbwi.position() - 4);
-                dputil.info( "unread last long!" ) ;
+                if (orb.cdrDebugFlag)
+                    dputil.info( "unread last long!" ) ;
             }
         } finally {
             if (orb.cdrDebugFlag)

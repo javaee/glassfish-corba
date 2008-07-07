@@ -453,40 +453,6 @@ public class FrameworkClient extends Framework {
         } ) ;
     }
 
-    @Test( groups = { GROUP_5161 } )
-    public void test5161VectorSimple() {
-        doOperation( "Testing VectorSimple", new NullaryFunction() {
-            public Object evaluate() {
-                try {
-                    BuckPasserVectorSimple bps = new BuckPasserVectorSimple() ;
-                    bps.add( new Buck( "The Buck" ) ) ;
-                    BuckPasserVectorSimple bps2 = clientRef5161.echo( bps ) ;
-                    Assert.assertTrue( bps2.equals( bps ) ) ;
-                    return null ;
-                } catch (RemoteException exc) {
-                    throw new RuntimeException( exc ) ;
-                }
-            }
-        } ) ;
-    }
-
-    @Test( groups = { GROUP_5161 } )
-    public void test5161VectorReadObject() {
-        doOperation( "Testing VectorReadObject", new NullaryFunction() {
-            public Object evaluate() {
-                try {
-                    BuckPasserVectorReadObject bpvro = new BuckPasserVectorReadObject() ;
-                    bpvro.add( new Buck( "The Buck" ) ) ;
-                    BuckPasserVectorReadObject bpvro2 = clientRef5161.echo( bpvro ) ;
-                    Assert.assertTrue( bpvro2.equals( bpvro ) ) ;
-                    return null ;
-                } catch (RemoteException exc) {
-                    throw new RuntimeException( exc ) ;
-                }
-            }
-        } ) ;
-    }
-
     // @Test( groups = { GROUP_5161 } )
     public void test5161() throws RemoteException {
         // System.out.println( "Running test for issue 5161" ) ;

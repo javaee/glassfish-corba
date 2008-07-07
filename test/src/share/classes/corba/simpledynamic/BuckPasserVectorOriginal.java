@@ -36,5 +36,5 @@
 
 package corba.simpledynamic ;
 
-public class BuckPasserVectorOriginal extends VectorOriginal {
+public class BuckPasserVectorOriginal extends java.util.Vector {
 }

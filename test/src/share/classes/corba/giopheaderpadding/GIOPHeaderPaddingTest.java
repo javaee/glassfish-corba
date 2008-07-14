@@ -45,7 +45,7 @@ import corba.framework.CORBATest;
 
 import java.util.Properties;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orb.ORB;
 
 import corba.framework.*;

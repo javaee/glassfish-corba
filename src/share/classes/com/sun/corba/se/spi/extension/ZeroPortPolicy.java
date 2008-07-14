@@ -38,7 +38,7 @@ package com.sun.corba.se.spi.extension ;
 
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.LocalObject ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 /** Policy used to implement zero IIOP port policy in the POA.
 */

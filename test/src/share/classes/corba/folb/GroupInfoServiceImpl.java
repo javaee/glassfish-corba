@@ -53,7 +53,7 @@ import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 import com.sun.corba.se.spi.folb.SocketInfo;
 
 import com.sun.corba.se.impl.folb.ServerGroupManager;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 /**

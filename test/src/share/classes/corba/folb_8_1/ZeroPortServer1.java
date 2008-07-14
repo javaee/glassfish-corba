@@ -53,7 +53,7 @@ import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 
 /**

@@ -72,29 +72,24 @@ import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.FieldInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
 
-import com.sun.corba.se.impl.orbutil.codegen.AssignmentStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.CaseBranch ;
 import com.sun.corba.se.impl.orbutil.codegen.CurrentClassLoader ;
+
+// Visible in interface
 import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+
 import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
 import com.sun.corba.se.impl.orbutil.codegen.CodeGeneratorUtil ;
-import com.sun.corba.se.impl.orbutil.codegen.DefinitionStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
 import com.sun.corba.se.impl.orbutil.codegen.Identifier ;
 import com.sun.corba.se.impl.orbutil.codegen.ImportListImpl ;
 import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.MethodGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.BreakStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ReturnStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.Statement ;
 import com.sun.corba.se.impl.orbutil.codegen.SwitchStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ThrowStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.Util ;
 import com.sun.corba.se.impl.orbutil.codegen.FieldGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
 import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
 
 /** Main API for runtime code generation.

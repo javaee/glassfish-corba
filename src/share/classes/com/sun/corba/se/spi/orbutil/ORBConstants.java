@@ -34,9 +34,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orbutil;
-
-import com.sun.corba.se.impl.util.SUNVMCID ;
+package com.sun.corba.se.spi.orbutil;
 
 public class ORBConstants {
     private ORBConstants() {}

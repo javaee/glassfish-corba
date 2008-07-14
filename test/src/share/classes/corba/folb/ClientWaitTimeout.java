@@ -49,7 +49,7 @@ import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import corba.framework.Controller;

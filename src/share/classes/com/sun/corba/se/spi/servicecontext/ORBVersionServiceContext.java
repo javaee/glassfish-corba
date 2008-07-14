@@ -38,7 +38,7 @@ package com.sun.corba.se.spi.servicecontext;
 
 import com.sun.corba.se.spi.orb.ORBVersion ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 public interface ORBVersionServiceContext extends ServiceContext {
     int SERVICE_CONTEXT_ID = ORBConstants.TAG_ORB_VERSION ;

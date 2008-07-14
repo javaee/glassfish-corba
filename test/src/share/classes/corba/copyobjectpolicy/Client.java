@@ -66,7 +66,7 @@ import org.omg.PortableServer.POAPackage.AdapterAlreadyExists ;
 
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 import com.sun.corba.se.spi.extension.CopyObjectPolicy ;

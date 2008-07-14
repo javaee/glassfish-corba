@@ -41,7 +41,7 @@ import com.sun.corba.se.spi.orbutil.threadpool.ThreadPool;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;
 
 import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.util.HashMap;
 import java.util.ArrayList;

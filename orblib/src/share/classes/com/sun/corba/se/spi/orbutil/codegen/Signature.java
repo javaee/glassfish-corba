@@ -50,10 +50,6 @@ import java.util.Iterator ;
 import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
 
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
-import com.sun.corba.se.impl.orbutil.codegen.NodeBase ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-
 import com.sun.corba.se.spi.orbutil.copyobject.Immutable ;
 
 /** Represents the signature of a method, which is sometimes needed

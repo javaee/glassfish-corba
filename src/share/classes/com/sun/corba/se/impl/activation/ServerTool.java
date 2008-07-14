@@ -47,7 +47,7 @@ import java.util.StringTokenizer;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.INITIALIZE;
 import org.omg.CORBA.CompletionStatus;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
 import com.sun.corba.se.spi.activation.*;
 import com.sun.corba.se.spi.activation.ServerHeldDown;

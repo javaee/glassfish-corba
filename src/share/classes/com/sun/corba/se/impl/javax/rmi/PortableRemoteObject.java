@@ -64,7 +64,6 @@ import java.rmi.server.ExportException;
 
 import java.net.URL;
 
-import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.RepositoryId;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;

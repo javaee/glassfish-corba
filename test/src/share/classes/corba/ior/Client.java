@@ -123,7 +123,7 @@ import com.sun.corba.se.impl.encoding.CDROutputStream ;
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 import org.testng.annotations.Test ;

@@ -36,7 +36,7 @@
 
 package com.sun.corba.se.impl.encoding;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.encoding.BufferManagerWrite;
 import com.sun.corba.se.pept.encoding.OutputObject;

@@ -67,7 +67,7 @@ import com.sun.corba.se.spi.protocol.PIHandler ;
 import com.sun.corba.se.impl.logging.POASystemException ;
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.oa.poa.POAManagerImpl ;
 

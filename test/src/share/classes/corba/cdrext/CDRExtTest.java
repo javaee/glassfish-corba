@@ -38,7 +38,7 @@ package corba.cdrext;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class CDRExtTest extends CORBATest {
 

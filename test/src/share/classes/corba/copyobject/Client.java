@@ -97,7 +97,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 public abstract class Client extends TestCase
 {

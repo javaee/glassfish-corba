@@ -59,7 +59,7 @@ import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 import com.sun.corba.se.impl.transport.SocketOrChannelContactInfoImpl;
 

@@ -36,7 +36,7 @@
 package pi.policyfactory;
 
 import com.sun.corba.se.impl.interceptors.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.corba.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.ORB;

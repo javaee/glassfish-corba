@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBVersion ;
 import com.sun.corba.se.spi.orb.ORBVersionFactory ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.encoding.CDRInputStream ;
 

@@ -40,7 +40,7 @@ import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 import java.util.*;
 import org.omg.CORBA.OMGVMCID;
-import com.sun.corba.se.impl.util.SUNVMCID;
+import com.sun.corba.se.spi.util.SUNVMCID;
 
 /**
  * The root class for all CORBA standard exceptions. These exceptions

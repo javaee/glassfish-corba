@@ -101,7 +101,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 import com.sun.corba.se.spi.transport.TcpTimeouts ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 import com.sun.corba.se.impl.logging.OMGSystemException ;

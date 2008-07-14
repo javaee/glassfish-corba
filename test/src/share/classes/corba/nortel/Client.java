@@ -58,7 +58,7 @@ import org.testng.annotations.Test ;
 import org.testng.annotations.Configuration ;
 import org.testng.annotations.ExpectedExceptions ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.naming.cosnaming.TransientNameService ;
 

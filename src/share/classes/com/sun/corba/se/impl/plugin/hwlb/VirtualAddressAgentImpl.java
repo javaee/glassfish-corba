@@ -96,7 +96,7 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory ;
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileImpl ;
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileTemplateImpl ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.orb.ORBDataParserImpl ;
 

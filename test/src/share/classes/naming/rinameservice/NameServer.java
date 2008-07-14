@@ -36,7 +36,7 @@
 package naming.rinameservice;
 
 import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import org.omg.CORBA.ORB;
 import corba.framework.*;
 import java.util.*;

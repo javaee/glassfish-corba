@@ -45,7 +45,7 @@ import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.ServantLocatorPackage.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 public class counterServer {
     public static boolean debug = true;

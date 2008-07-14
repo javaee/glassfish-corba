@@ -1,0 +1,2 @@
+# Note: we should get org/omg/CORBA/ORB*.class as well: How?
+Export-Package: javax.rmi; javax.rmi.CORBA;version=10.0.0

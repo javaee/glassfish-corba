@@ -52,7 +52,7 @@ import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import com.sun.corba.se.spi.orbutil.threadpool.WorkQueue;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 
 public class ThreadPoolImpl implements ThreadPool

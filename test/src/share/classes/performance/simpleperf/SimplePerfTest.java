@@ -35,7 +35,7 @@
  */
 package performance.simpleperf;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import corba.framework.CORBATest;
 import corba.framework.Controller;

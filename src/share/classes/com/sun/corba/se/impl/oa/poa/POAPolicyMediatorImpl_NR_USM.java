@@ -52,7 +52,7 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.impl.oa.NullServantImpl ;

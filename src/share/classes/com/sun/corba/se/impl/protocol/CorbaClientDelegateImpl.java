@@ -76,7 +76,7 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
 
 import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;

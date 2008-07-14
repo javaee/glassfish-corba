@@ -45,7 +45,7 @@ import javax.naming.InitialContext;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import corba.framework.Options;
 import corba.hcks.C;

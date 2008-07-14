@@ -40,7 +40,7 @@ import java.nio.ByteBuffer;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.pept.transport.ByteBufferPool;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 /**
  * @author Charlie Hunt

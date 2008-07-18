@@ -589,15 +589,34 @@
    
     <target name="split-jars" depends="orb-split,orb-library-split"/>
 
+    <macro name="make-bundle"_
+        <attribute name="classpath"/>
+        <attribute name="file"/>
+            <sequential>
+                <java jar="${bnd.jar}" fork="true" depends="init">
+                    <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
+                    <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
+                    <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
+                    <jvmarg value="-Dcorba.build.identifier=${corba.build.identifier}"/>
+                    <arg value="build"/>
+                    <arg value="-classpath"/>
+                    <arg value="@{classpath}"/>
+                    <arg value="-output"/>
+                    <arg value="${releaselib.dir}/bundles"/>
+                    <arg value="make/@{file}.bnd"/>
+                </java>
+            </sequential>
+    </macro>
+
     <target name="make-bundles" depends="init">
-        <java jar="${bnd-jar}" fork="true" dir="${root.dir}">
-            <arg value="build"/>
-            <arg value="-classpath"/>
-            <arg value="${classes.dir}"/>
-            <arg value="-output"/>
-            <arg value="${releaselib.dir}/bundles"/>
-            <arg value="make/orb.bnd"/>
-        </java>
+        <!-- we are not generating bundles for activation or rmic-iiop
+             because they are not used in GFv3.
+        -->
+        <make-bundle classpath="${classes.dir}" file="orb"/>
+        <make-bundle classpath="${classes.dir}" file="omgai-extension"/>
+        <make-bundle classpath="${classes.dir}" file="orbtransactions"/>
+        <make-bundle classpath="${classes.dir}" file="naming"/>
+        <make-bundle classpath="${classes.dir}" file="dynamicany"/>
     </target>
 
     <target name="orb-split" depends="init">
@@ -666,23 +685,10 @@
                 <include name="com/sun/corba/se/spi/costransactions/*.class"/>
 	    </fileset>
 	</jar>
-	<jar jarfile="${releaselib.dir}/rmic-iiop.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-                <include name="sun/rmi/**"/>
-	    </fileset>
-	</jar>
 	<jar jarfile="${releaselib.dir}/csiv2-idl.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
                 <include name="com/sun/corba/se/org/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/activation.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-                <include name="com/sun/corba/se/spi/activation/**"/>
-                <include name="com/sun/corba/se/impl/activation/**"/>
 	    </fileset>
 	</jar>
 	<jar jarfile="${releaselib.dir}/naming.jar"
@@ -697,6 +703,23 @@
                 <include name="com/sun/corba/se/impl/dynamicany/**"/>
 	    </fileset>
 	</jar>
+        <!-- Don't really need this in GFv3
+	<jar jarfile="${releaselib.dir}/rmic-iiop.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="sun/rmi/**"/>
+	    </fileset>
+	</jar>
+        -->
+        <!-- Don't really need this in GFv3
+	<jar jarfile="${releaselib.dir}/activation.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="com/sun/corba/se/spi/activation/**"/>
+                <include name="com/sun/corba/se/impl/activation/**"/>
+	    </fileset>
+	</jar>
+        -->
     </target>
 
     <target name="orb-library-split" depends="init">

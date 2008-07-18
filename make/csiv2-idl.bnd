@@ -1,0 +1,2 @@
+-include bnd.properties
+Export-Package: com.sun.corba.se.org.* ;version=${version}

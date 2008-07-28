@@ -90,4 +90,12 @@ public abstract class Algorithms {
 
 	return null ;
     }
+
+    public static <A,R> R fold( List<A> list, R initial, BinaryFunction<R,A,R> func ) {
+        R result = initial ;
+        for (A elem : list) {
+            result = func.evaluate( result, elem ) ;
+        }
+        return result ;
+    }
 }

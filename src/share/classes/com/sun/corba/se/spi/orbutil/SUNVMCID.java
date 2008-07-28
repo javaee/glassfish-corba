@@ -34,7 +34,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.util;
+package com.sun.corba.se.spi.orbutil;
 
 /**
  * The vendor minor code ID reserved for Sun by the OMG.

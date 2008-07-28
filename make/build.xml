@@ -589,7 +589,7 @@
    
     <target name="split-jars" depends="orb-split,orb-library-split"/>
 
-    <macro name="make-bundle"_
+    <macrodef name="make-bundle">
         <attribute name="classpath"/>
         <attribute name="file"/>
             <sequential>
@@ -606,7 +606,7 @@
                     <arg value="make/@{file}.bnd"/>
                 </java>
             </sequential>
-    </macro>
+    </macrodef>
 
     <target name="make-bundles" depends="init">
         <!-- we are not generating bundles for activation or rmic-iiop

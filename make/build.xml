@@ -571,12 +571,16 @@
 
     <!-- ========================= ORB library  ==================== 
 	The ORB library is a collection of all the reuseable, ORB-independent
-	modules that the ORB uses.  This is currently used to generate
-	the timing points file.
+	modules that the ORB uses.  This is currently used in the build to generate
+	the timing points file, and to handle copyright processing and renaming.
 
 	Note that this must work either renamed or not renamed, so both 
 	the relocated directory and the non-relocated directory for
 	ASM are included here.
+
+        There are some classes in the ORB library that are not used at
+        all at runtime.  These classes are excluded from the delivered
+        OSGi bundles for GFv3.
      -->
     <target name="orb-library" depends="init, compile-orb-library"> 
 	<jar jarfile="${releaselib.dir}/orblib.jar"
@@ -587,37 +591,14 @@
 	</jar>
     </target>
    
+    <!-- ========================= Split Jar Packaging  ==================== 
+        The split jar packaging splits the ORB code into a number of smaller
+        jar files containing closely related packages.  The OSGi package 
+        (see make-bundles) closely follows this packaging, except that only
+        those classes acutally needs in GFv3 are packaged as bundles.
+    -->
+
     <target name="split-jars" depends="orb-split,orb-library-split"/>
-
-    <macrodef name="make-bundle">
-        <attribute name="classpath"/>
-        <attribute name="file"/>
-            <sequential>
-                <java jar="${bnd.jar}" fork="true" depends="init">
-                    <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
-                    <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
-                    <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
-                    <jvmarg value="-Dcorba.build.identifier=${corba.build.identifier}"/>
-                    <arg value="build"/>
-                    <arg value="-classpath"/>
-                    <arg value="@{classpath}"/>
-                    <arg value="-output"/>
-                    <arg value="${releaselib.dir}/bundles"/>
-                    <arg value="make/@{file}.bnd"/>
-                </java>
-            </sequential>
-    </macrodef>
-
-    <target name="make-bundles" depends="init">
-        <!-- we are not generating bundles for activation or rmic-iiop
-             because they are not used in GFv3.
-        -->
-        <make-bundle classpath="${classes.dir}" file="orb"/>
-        <make-bundle classpath="${classes.dir}" file="omgai-extension"/>
-        <make-bundle classpath="${classes.dir}" file="orbtransactions"/>
-        <make-bundle classpath="${classes.dir}" file="naming"/>
-        <make-bundle classpath="${classes.dir}" file="dynamicany"/>
-    </target>
 
     <target name="orb-split" depends="init">
 	<jar jarfile="${releaselib.dir}/orb.jar"
@@ -703,15 +684,12 @@
                 <include name="com/sun/corba/se/impl/dynamicany/**"/>
 	    </fileset>
 	</jar>
-        <!-- Don't really need this in GFv3
 	<jar jarfile="${releaselib.dir}/rmic-iiop.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
                 <include name="sun/rmi/**"/>
 	    </fileset>
 	</jar>
-        -->
-        <!-- Don't really need this in GFv3
 	<jar jarfile="${releaselib.dir}/activation.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
@@ -719,7 +697,6 @@
                 <include name="com/sun/corba/se/impl/activation/**"/>
 	    </fileset>
 	</jar>
-        -->
     </target>
 
     <target name="orb-library-split" depends="init">
@@ -751,6 +728,17 @@
 		<include name="com/sun/corba/se/spi/orbutil/misc/**"/>
 	    </fileset>
 	</jar>
+	<jar jarfile="${releaselib.dir}/asm.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="org/objectweb/**"/>
+	    </fileset>
+	</jar>
+
+        <!-- the following jars are not needed in the GF ORB, so we won't
+             make bundles for these.
+        --> 
+
 	<jar jarfile="${releaselib.dir}/orbtools.jar"
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
@@ -758,12 +746,6 @@
 		<include name="com/sun/corba/se/impl/orbutil/test/**"/>
 		<include name="com/sun/corba/se/spi/orbutil/file/**"/>
 		<include name="com/sun/corba/se/spi/orbutil/argparser/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/asm.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="org/objectweb/**"/>
 	    </fileset>
 	</jar>
 	<jar jarfile="${releaselib.dir}/orbtransport.jar"
@@ -783,6 +765,49 @@
 	    </fileset>
 	</jar>
     </target>
+
+    <macrodef name="make-bundle">
+        <attribute name="classpath"/>
+        <attribute name="file"/>
+            <sequential>
+                <java jar="${bnd-jar}" fork="true">
+                    <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
+                    <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
+                    <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
+                    <jvmarg value="-Dcorba.build.identifier=${corba.build.identifier}"/>
+                    <arg value="build"/>
+                    <arg value="-classpath"/>
+                    <arg value="@{classpath}"/>
+                    <arg value="-output"/>
+                    <arg value="${releaselib.dir}/bundles"/>
+                    <arg value="make/@{file}.bnd"/>
+                </java>
+            </sequential>
+    </macrodef>
+
+    <!-- ========================= OSGi bundle packaging ==================== 
+        The ORB as delivered into GFv3 contains 9 OSGi bundles.
+        These bundles are constructed in the make-bundles target using
+        bnd and the various .bnd files.
+    -->
+
+    <target name="make-bundles" depends="init">
+        <!-- we are not generating bundles for activation or rmic-iiop
+             because they are not used in GFv3.
+        -->
+        <make-bundle classpath="${classes.dir}" file="orb"/>
+        <make-bundle classpath="${classes.dir}" file="omgapi-extension"/>
+        <make-bundle classpath="${classes.dir}" file="orbtransactions"/>
+        <make-bundle classpath="${classes.dir}" file="naming"/>
+        <make-bundle classpath="${classes.dir}" file="dynamicany"/>
+
+        <make-bundle classpath="${orblib.classes.dir}" file="codegen"/>
+        <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
+        <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
+        <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
+    </target>
+
+    <!-- ========================= Build the ORB library ====================  -->
 
     <target name="compile-orb-library" depends="init, prepare-dirs">
 	<echo message="Compiling ORB library"/>
@@ -1060,58 +1085,9 @@
     </target>
 
 
-    <!-- ======================== PUSH TO MAVEN REPOSITORY ========= -->
-
-    <target name="-push-to-maven-init" depends="init" description="define a task for pushing bits to the maven repository">
-        <echo>lib/maven-repository-importer-${orb.maven_repository_importer.version}.jar</echo>
-        <taskdef resource="maven-repository-importer.properties">
-            <classpath>
-                <pathelement path="lib/maven-repository-importer-${orb.maven_repository_importer.version}.jar" />
-            </classpath>
-        </taskdef>
-    </target>
-
-    <target name="push-to-maven-prepare" depends="-push-to-maven-init, jar"
-        description="creates an image for the 'push-to-maven' goal">        
-        <delete dir="build/maven-repo" /><!-- clean it -->
-        <delete dir="${release.dir}/META-INF"/>
-            <maven-repository-importer destdir="build/maven-repo" version="${release.version}-${build.version}">
-                <artifact jar="${release.orb.jar}"  pom="make/glassfish-corba.pom" />                
-            </maven-repository-importer>
-    </target>
-
-    <target name="push-to-maven" depends="push-to-maven-prepare"
-	description="pushes jars to the java.net maven repository">
-        <cvs-import src="build/maven-repo" dest="glassfish/repo" />
-    </target>
-
-
-    <!--
-        import files to CVS
-  
-        For example, <cvs-import src="build/doc" dest="jaxb/www/doc" />
-     -->
-     <macrodef name="cvs-import">
-        <attribute name="src"/>
-        <attribute name="dest"/>
-            <sequential>
-                <tstamp />
-                    <echo>importing to CVS...</echo>
-                    <cvs dest="@{src}">
-                        <commandline>
-  	                    <argument value="-d${glassfish.cvsroot}"/>
-            		    <argument line="-z9 import -ko"/>
-		            <argument value="-W"/>
-                	    <argument line="*.jar -kb"/>
-		            <argument value="-m"/>
-                	    <argument value="deploying new jars to the java.net maven repository"/>
-                
-	                    <argument value="@{dest}"/>
-            	            <argument line="deployment-to-maven-repository t${DSTAMP}${TSTAMP}" />
-		        </commandline>
-	            </cvs>
-	    </sequential>
-	</macrodef>
+    <!-- ======================== PUSH TO MAVEN REPOSITORY begin. ===== -->
+    <import file="./push2maven.xml"/>
+    <!-- ======================== PUSH TO MAVEN REPOSITORY end.i  ===== -->
 
     <!-- ======================== findbugs integration ========= 
 

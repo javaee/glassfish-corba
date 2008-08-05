@@ -225,6 +225,16 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     private static final PresentationManager globalPM = 
 	PresentationDefaults.makeOrbPresentationManager() ;
 
+    public void destroy() {
+        logWrapperTable = null ;
+        wrapper = null ;
+        omgWrapper = null ;
+        typeCodeMap = null ;
+        primitiveTypeCodeConstants = null ;
+        byteBufferPool = null ;
+        wireObjectKeyTemplate = null ;
+    }
+
     /** Get the single instance of the PresentationManager
      */
     public static PresentationManager getPresentationManager() 

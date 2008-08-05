@@ -188,7 +188,21 @@ public class PIHandlerImpl implements PIHandler
 		return new RequestInfoStack<ServerRequestInfoImpl>();
 	    }
 	};
-     
+    
+    public void close() {
+        orb = null ;
+        wrapper = null ;
+        orbutilWrapper = null ;
+        omgWrapper = null ;
+        codecFactory = null ;
+        arguments = null ;
+        interceptorList = null ;
+        interceptorInvoker = null ;
+        current = null ;
+        policyFactoryTable = null ;
+        threadLocalClientRequestInfoStack = null ;
+        threadLocalServerRequestInfoStack = null ;
+    }
     // Class to contain all ThreadLocal data for ClientRequestInfo
     // maintenance.
     //

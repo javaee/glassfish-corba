@@ -681,7 +681,7 @@ public class #[ class-name ]# implements LogWrapperTable {
 	    (.println pw "import java.util.logging.Level ;")
 	    (.println pw)
 	    (.println pw "import org.omg.CORBA.OMGVMCID ;")
-	    (.println pw "import com.sun.corba.se.spi.orbutil.SUNVMCID ;")
+	    (.println pw "import com.sun.corba.se.org.omg.CORBA.SUNVMCID ;")
 	    (.println pw "import org.omg.CORBA.CompletionStatus ;")
 	    (.println pw "import org.omg.CORBA.SystemException ;")
 	    (.println pw)

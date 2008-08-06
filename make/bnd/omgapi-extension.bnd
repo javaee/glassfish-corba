@@ -1,3 +1,0 @@
-# Note: we should get org/omg/CORBA/ORB*.class as well: How?
--include bnd.properties
-Export-Package: javax.rmi.*

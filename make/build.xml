@@ -801,8 +801,7 @@
         -->
 
         <!-- orbtransactions includes only TSIdentificationImpl in the org.omg.CORBA package
-             so we use wrap instead of build.
-         -->
+             so we use wrap instead of build. NOT NEEDED: everything (except CSIv2) is going into omgapi.
 	<jar jarfile="${releaselib.dir}/orbtransactions.tmp.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
@@ -825,9 +824,10 @@
             <arg value="${releaselib.dir}/orbtransactions.tmp.jar"/>
         </java>
         <delete file="${releaselib.dir}/orbtransactions.tmp.jar"/>
+        -->
 
         <make-bundle classpath="${classes.dir}" file="orb"/>
-        <make-bundle classpath="${classes.dir}" file="omgapi-extension"/>
+        <make-bundle classpath="${classes.dir}" file="omgapi"/>
         <make-bundle classpath="${classes.dir}" file="naming"/>
         <make-bundle classpath="${classes.dir}" file="dynamicany"/>
         <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>

@@ -60,7 +60,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.rmi.server.RMIClassLoader;
 
-import com.sun.corba.se.impl.orbutil.GetPropertyAction;
+import com.sun.corba.se.org.omg.CORBA.GetPropertyAction;
 
 /**
  * Server implementation objects may either inherit from

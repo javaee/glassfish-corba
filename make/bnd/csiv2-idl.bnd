@@ -1,2 +1,2 @@
 -include bnd.properties
-Export-Package: com.sun.corba.se.org.*
+Export-Package: com.sun.corba.se.org.omg.GSSUP, com.sun.corba.se.org.omg.CSIIOP, com.sun.corba.se.org.omg.CSI

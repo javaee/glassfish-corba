@@ -144,14 +144,13 @@ naming conventions:
 The modules             (and their dependencies):
     asm                 -
     codegen             asm orbgeneric
-    csiv2-idl           -
-    dynamicany          orb
-    naming              orb
+    csiv2-idl           omgapi
+    dynamicany          omgapi orb
+    naming              omgapi orb
     newtimer            orbgeneric codegen 
-    omgapi-extension    orbgeneric 
-    orb                 codegen dynamicany newtimer omgapi-extension orbgeneric
+    omgapi              -
+    orb                 codegen dynamicany naming newtimer omgapi orbgeneric
     orbgeneric          -
-    orbtransactions     -
 
     Should these module names be prefixed with glassfish-corba?
 

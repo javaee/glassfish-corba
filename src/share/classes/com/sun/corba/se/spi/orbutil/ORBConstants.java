@@ -36,6 +36,8 @@
 
 package com.sun.corba.se.spi.orbutil;
 
+import com.sun.corba.se.org.omg.CORBA.SUNVMCID ;
+
 public class ORBConstants {
     private ORBConstants() {}
 

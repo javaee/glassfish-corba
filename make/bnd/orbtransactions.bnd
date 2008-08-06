@@ -1,4 +1,0 @@
-# Note: we also need org.omg.CORBA.TSIdentification
--include bnd.properties
-# Note that we really only want org.omg.CORBA.TSIdentification, but I can't figure out how to do that
-Export-Package: org.omg.CosTransactions.*, org.omg.CosTSPortability.*, org.omg.CosTSInteroperation.*, com.sun.corba.se.impl.txpoa.*, com.sun.corba.se.spi.costransactions.*, org.omg.CORBA.TSIdentificationPackage, org.omg.CORBA

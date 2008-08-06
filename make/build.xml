@@ -179,6 +179,8 @@
 	<property name="orblib.build.dir" location="orblib/build"/>
 	<property name="orblib.classes.dir" location="${orblib.build.dir}/classes"/>
 
+        <property name="bundle.name.prefix" value="glassfish-corba-"/>
+
 	<property name="releaselib.dir" location="${build.dir}/release/lib"/>   
 	<property name="test-build.dir" location="test/build"/>
 	<property name="test-classes.dir" location="${test-build.dir}/classes"/>
@@ -598,8 +600,6 @@
         those classes acutally needs in GFv3 are packaged as bundles.
     -->
 
-    <target name="split-jars" depends="orb-split,orb-library-split"/>
-
     <target name="orb-split" depends="init">
 	<jar jarfile="${releaselib.dir}/orb.jar"
 		    duplicate="fail">
@@ -684,12 +684,15 @@
                 <include name="com/sun/corba/se/impl/dynamicany/**"/>
 	    </fileset>
 	</jar>
+        <!-- Don't really need this in GFv3
 	<jar jarfile="${releaselib.dir}/rmic-iiop.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
                 <include name="sun/rmi/**"/>
 	    </fileset>
 	</jar>
+        -->
+        <!-- Don't really need this in GFv3
 	<jar jarfile="${releaselib.dir}/activation.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
@@ -697,6 +700,7 @@
                 <include name="com/sun/corba/se/impl/activation/**"/>
 	    </fileset>
 	</jar>
+        -->
     </target>
 
     <target name="orb-library-split" depends="init">
@@ -770,7 +774,7 @@
         <attribute name="classpath"/>
         <attribute name="file"/>
             <sequential>
-                <java jar="${bnd-jar}" fork="true">
+                <java jar="${bnd-jar}" fork="true" failonerror="true">
                     <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
                     <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
                     <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
@@ -779,8 +783,8 @@
                     <arg value="-classpath"/>
                     <arg value="@{classpath}"/>
                     <arg value="-output"/>
-                    <arg value="${releaselib.dir}/bundles"/>
-                    <arg value="make/@{file}.bnd"/>
+                    <arg value="${releaselib.dir}/bundles/${bundle.name.prefix}@{file}.jar"/>
+                    <arg value="make/bnd/@{file}.bnd"/>
                 </java>
             </sequential>
     </macrodef>
@@ -795,11 +799,38 @@
         <!-- we are not generating bundles for activation or rmic-iiop
              because they are not used in GFv3.
         -->
+
+        <!-- orbtransactions includes only TSIdentificationImpl in the org.omg.CORBA package
+             so we use wrap instead of build.
+         -->
+	<jar jarfile="${releaselib.dir}/orbtransactions.tmp.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+		<include name="org/omg/CORBA/TSIdentification.class"/>
+		<include name="org/omg/CORBA/TSIdentificationPackage/AlreadyIdentified.class"/>
+		<include name="org/omg/CORBA/TSIdentificationPackage/NotAvailable.class"/>
+		<include name="org/omg/CosTransactions/*.class"/>
+		<include name="org/omg/CosTSPortability/*.class"/>
+		<include name="org/omg/CosTSInteroperation/*.class"/>
+		<include name="com/sun/corba/se/impl/txpoa/*.class"/>
+		<include name="com/sun/corba/se/spi/costransactions/*.class"/>
+	    </fileset>
+	</jar>
+        <java jar="${bnd-jar}" fork="true" failonerror="true">
+            <arg value="wrap"/>
+            <arg value="-output"/>
+            <arg value="${releaselib.dir}/bundles/${bundle.name.prefix}orbtransactions.jar"/>
+            <arg value="-properties"/>
+            <arg value="make/bnd/bnd.properties"/>
+            <arg value="${releaselib.dir}/orbtransactions.tmp.jar"/>
+        </java>
+        <delete file="${releaselib.dir}/orbtransactions.tmp.jar"/>
+
         <make-bundle classpath="${classes.dir}" file="orb"/>
         <make-bundle classpath="${classes.dir}" file="omgapi-extension"/>
-        <make-bundle classpath="${classes.dir}" file="orbtransactions"/>
         <make-bundle classpath="${classes.dir}" file="naming"/>
         <make-bundle classpath="${classes.dir}" file="dynamicany"/>
+        <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>
 
         <make-bundle classpath="${orblib.classes.dir}" file="codegen"/>
         <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>

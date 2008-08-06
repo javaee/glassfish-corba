@@ -133,17 +133,26 @@ Section: Producing Multiple JARs from a single POM (maven limitations)
 <target name="test-chain">
 </target>
 
+Variables in templates:
+    groupId         always com.sun.corba
+    jarName         the name of the jar file (glassfish-corba-<module>)
+    version         the current CORBA version
+    jarDescription  a brief description of the jar contents
+    HEADER          the expanded version of make/pom/header.xml inserted into the pom file
+
 naming conventions:
-The modules:
-    asm                 
-    codegen
-    dynamicany
-    naming
-    newtimer
-    omgapi-extension
-    orb
-    orbgeneric
-    orbtransactions
+The modules             (and their dependencies):
+    asm                 -
+    codegen             asm orbgeneric
+    csiv2-idl           -
+    dynamicany          orb
+    naming              orb
+    newtimer            orbgeneric codegen 
+    omgapi-extension    orbgeneric 
+    orb                 codegen dynamicany newtimer omgapi-extension orbgeneric
+    orbgeneric          -
+    orbtransactions     -
+
     Should these module names be prefixed with glassfish-corba?
 
     for each module m:

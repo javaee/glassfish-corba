@@ -1,2 +1,0 @@
--include bnd.properties
-Export-Package: org.objectweb.asm.*;version=${version}

@@ -194,6 +194,8 @@ public class TestThreadPoolManager implements ThreadPoolManager {
 	return 0;
     }
 
+    public void close() throws java.io.IOException {
+    }
 } 
 
 

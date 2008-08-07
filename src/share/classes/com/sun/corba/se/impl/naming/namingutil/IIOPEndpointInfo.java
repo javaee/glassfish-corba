@@ -54,6 +54,11 @@ public class IIOPEndpointInfo
     private String host;
     private int port;
 
+    public String toString() {
+        return "IIOPEndpointInfo[" + major + "." + minor
+            + " " + host + ":" + port + "]" ;
+    }
+
     IIOPEndpointInfo( ) {
 	// Default IIOP Version 
 	major = ORBConstants.DEFAULT_INS_GIOP_MAJOR_VERSION;

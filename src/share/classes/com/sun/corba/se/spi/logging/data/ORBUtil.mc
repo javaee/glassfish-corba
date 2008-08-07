@@ -135,6 +135,8 @@
 	     58 WARNING "Could not find constructor <init>(String) in class {0}")
 	    (EXCEPTION_IN_CONVERT_ACTION
 	     59 WARNING "Exception in ConvertAction operation")
+            (IO_EXCEPTION_ON_CLOSE
+             60 FINE "Useless exception on call to Closeable.close()")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 
@@ -592,7 +594,7 @@
             (WORKER_THREAD_SET_NAME_FAILURE
              114 WARNING "Unable to set worker thread {0} name to {1}; cause {2}.")
             (WORK_QUEUE_THREAD_INTERRUPTED
-             115 WARNING "Worker Thread from thread pool, {0}, while waiting for work on work queue {1}, ignoring unexpected {2}.")
+             115 FINE "Worker Thread from thread pool {0} was interrupted: closeCalled is {1}.")
             (WORK_QUEUE_REQUEST_WORK_NO_WORK_FOUND
              116 WARNING "Ignoring unexpected {0} when retrieving of work from work queue, {1}.")
             (NO_FRAGMENT_QUEUE_FOR_REQUEST_ID
@@ -613,6 +615,18 @@
 	     124 WARNING "SharedCDRContactInfoImpl does not support SocketInfo calls")
 	    (DUPLICATE_REQUEST_IDS_IN_RESPONSE_WAITING_ROOM
 	     125 WARNING "Duplicate request ids in response waiting room: over wrote old one: {0},  with new one: {1}")
+            (THREAD_POOL_CLOSE_ERROR 
+             126 WARNING "Error in closing ThreadPool")
+            (THREAD_GROUP_IS_DESTROYED
+             127 WARNING "ThreadGroup {0} is already destroyed: can't destroy it")
+            (THREAD_GROUP_HAS_ACTIVE_THREADS_IN_CLOSE
+             128 WARNING "ThreadGroup {0} has {1} active threads: destroy may cause exception")
+            (THREAD_GROUP_HAS_SUB_GROUPS_IN_CLOSE
+             129 WARNING "ThreadGroup {0} has {1} sub-thread groups: destroy may cause exception")
+            (THREAD_GROUP_DESTROY_FAILED
+             130 WARNING "ThreadGroup {0} could not be destroyed")
+            (INTERRUPTED_JOIN_CALL_WHILE_CLOSING_THREAD_POOL
+             131 WARNING "Join was interrupted on thread {0} while closing ThreadPool {1}")
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 

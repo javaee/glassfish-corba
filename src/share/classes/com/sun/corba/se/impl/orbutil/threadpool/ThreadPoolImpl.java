@@ -36,8 +36,15 @@
 
 package com.sun.corba.se.impl.orbutil.threadpool;
 
+import java.io.IOException ;
+import java.io.Closeable ;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+
+import java.util.List ;
+import java.util.ArrayList ;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -101,9 +108,12 @@ public class ThreadPoolImpl implements ThreadPool
     private MonitoredObject threadpoolMonitoredObject;
     
     // ThreadGroup in which threads should be created
-    final private ThreadGroup threadGroup ;
+    private ThreadGroup threadGroup ;
 
     final private ClassLoader workerThreadClassLoader ; 
+
+    Object workersLock = new Object() ;
+    List<WorkerThread> workers = new ArrayList<WorkerThread>() ;
 
     /** Create an unbounded thread pool in the current thread group
      * with the current context ClassLoader as the worker thread default
@@ -168,6 +178,30 @@ public class ThreadPoolImpl implements ThreadPool
             }
         }
 	initializeMonitoring();
+    }
+
+
+    // Note that this method should not return until AFTER all threads have died.
+    public void close() throws IOException {
+        // Copy to avoid concurrent modification problems.
+        List<WorkerThread> copy = null ;
+        synchronized (workersLock) {
+            copy = new ArrayList<WorkerThread>( workers ) ;
+        }
+
+        for (WorkerThread wt : copy) {
+            wt.close() ;
+
+            while (wt.getState() != Thread.State.TERMINATED) {
+                try {
+                    wt.join() ;
+                } catch (InterruptedException exc) {
+                    wrapper.interruptedJoinCallWhileClosingThreadPool( exc, wt, this ) ;
+                }
+            }
+        }
+
+        threadGroup = null ;
     }
 
     private static ClassLoader getDefaultClassLoader() {
@@ -314,6 +348,9 @@ public class ThreadPoolImpl implements ThreadPool
 	//    for the ORB code itself, which contains all permissions
 	//    in either Java SE or Java EE.
 	WorkerThread thread = new WorkerThread(threadGroup, name);
+        synchronized (workersLock) {
+            workers.add( thread ) ;
+        }
 	
 	// The thread must be set to a daemon thread so the
 	// VM can exit if the only threads left are PooledThreads
@@ -360,36 +397,18 @@ public class ThreadPoolImpl implements ThreadPool
         }
     }
     
-    /** 
-    * This method will return the minimum number of threads maintained 
-    * by the threadpool. 
-    */ 
     public int minimumNumberOfThreads() {
         return minWorkerThreads;
     }
 
-    /** 
-    * This method will return an unsynchronized maximum number of threads in the 
-    * threadpool at any point in time, for the life of the threadpool. This 
-    * method should be used to get a close estimate of the maximum number
-    * of threads this thread will have only!
-    */ 
     public int maximumNumberOfThreads() {
         return maxWorkerThreads;
     }
 
-    /** 
-    * This method will return the time in milliseconds when idle 
-    * threads in the threadpool are removed. 
-    */ 
     public long idleTimeoutForThreads() {
         return inactivityTimeout;
     }
     
-    /** 
-    * This method will return the total number of threads 
-    * currently in the threadpool.
-    */ 
     public int currentNumberOfThreads() {
         synchronized (workQueue) {
             return currentThreadCount;
@@ -408,36 +427,22 @@ public class ThreadPoolImpl implements ThreadPool
         }
     }
 
-    /** 
-    * This method will return the number of available threads in the 
-    * threadpool which are waiting for work.
-    */ 
     public int numberOfAvailableThreads() {
          synchronized (workQueue) {
             return availableWorkerThreads;
         }
     }
 
-    /** 
-     * Returns the number of busy threads in the thread pool.
-     */
     public int numberOfBusyThreads() {
         synchronized (workQueue) {
             return (currentNumberOfThreads() - numberOfAvailableThreads());
         }
     }
     
-    /**
-     * Returns the average elapsed time taken to complete a Work
-     * item in milliseconds.
-     */
     public long averageWorkCompletionTime() {
         return (totalTimeTaken.get() / processedCount.get());
     }
     
-    /**
-     * This method returns the number of Work items processed by the threadpool
-     */
     public long currentProcessedCount() {
         return processedCount.get();
     }
@@ -480,17 +485,15 @@ public class ThreadPoolImpl implements ThreadPool
         }
     }
 
-    private class WorkerThread extends Thread
+    private class WorkerThread extends Thread implements Closeable
     {
         final private static String THREAD_POOLNAME_PREFIX_STR = "p: ";
         final private static String WORKER_THREAD_NAME_PREFIX_STR = "; w: ";
         final private static String IDLE_STR = "Idle";
-        private Work currentWork;
-        private int threadId = 0; // unique id for the thread
-        // thread pool this WorkerThread belongs too
+
+        private Work currentWork ;
+        private volatile boolean closeCalled = false ;
         private String threadPoolName;
-	// name seen by Thread.getName()
-	private StringBuffer workerThreadName = new StringBuffer();
 
         WorkerThread(ThreadGroup tg, String threadPoolName) {
 	    super(tg, THREAD_POOLNAME_PREFIX_STR + threadPoolName + 
@@ -519,88 +522,95 @@ public class ThreadPoolImpl implements ThreadPool
 	    thr.setContextClassLoader( workerThreadClassLoader ) ;
 	    return result ; 
 	}
+
+        public synchronized void close() {
+            closeCalled = true ;
+            interrupt() ;
+        }
         
+        private void resetClassLoader() {
+            ClassLoader currentClassLoader = null;
+            try {
+                if (System.getSecurityManager() == null) {
+                    currentClassLoader = getContextClassLoader() ;
+                } else {
+                    currentClassLoader = AccessController.doPrivileged(
+                        new PrivilegedAction<ClassLoader>() {
+                            public ClassLoader run() {
+                                return getContextClassLoader();
+                            }
+                        } 
+                    );
+                }
+            } catch (SecurityException se) {
+                throw wrapper.workerThreadGetContextClassloaderFailed(this, se);
+            }
+
+            if (workerThreadClassLoader != currentClassLoader) {
+                wrapper.workerThreadForgotClassloaderReset(this, 
+                    currentClassLoader, workerThreadClassLoader);
+
+                try {
+                    setClassLoader() ;
+                    wrapper.workerThreadClassloaderReset(this, 
+                        currentClassLoader, workerThreadClassLoader);
+                } catch (SecurityException se) {
+                    wrapper.workerThreadResetContextClassloaderFailed(this, se);
+                }
+            }
+        }
+
+        private void performWork() {
+            long start = System.currentTimeMillis();
+            try {
+                currentWork.doWork();
+            } catch (Throwable t) {
+                wrapper.workerThreadDoWorkThrowable(this, t);
+            }
+            long elapsedTime = System.currentTimeMillis() - start;
+            totalTimeTaken.addAndGet(elapsedTime);
+            processedCount.incrementAndGet();
+        }
+
         public void run() {
-            while (true) {
-                try  {
+            try  {
+                while (!closeCalled) {
                     try {
-                        // Get some work to do
-                        currentWork = ((WorkQueueImpl)workQueue).
-                                                 requestWork(inactivityTimeout);
+                        currentWork = ((WorkQueueImpl)workQueue).requestWork(
+                            inactivityTimeout);
+                        if (currentWork == null) 
+                            continue;
                     } catch (WorkerThreadNotNeededException toe) {
-                        // This thread should exit it is not needed / wanted.
-                        wrapper.workerThreadNotNeeded(this,
-                                                      currentNumberOfThreads(),
-                                                      minimumNumberOfThreads());
-                        return;
+                        wrapper.workerThreadNotNeeded(this, 
+                            currentNumberOfThreads(), minimumNumberOfThreads());
+                        closeCalled = true ;
+                        continue ;
+                    } catch (InterruptedException exc) {
+                        wrapper.workQueueThreadInterrupted( exc, getName(), 
+                            Boolean.valueOf( closeCalled ) ) ;
+
+                        continue ;
                     } catch (Throwable t) {
-                        // REVISIT - Should Throwables that are '*Error(s)" be
-                        //           treated differently?
                         wrapper.workerThreadThrowableFromRequestWork(this, t,
                                 workQueue.getName());
                         
-                        // On any Throwable other than a WorkerThreadNotNeededException,
-                        // go back to waiting on the WorkQueue for more Work.
                         continue;
-                    }
+                    } 
 
-                    if (currentWork == null) {
-                        continue;
-                    }
-
-		    long start = System.currentTimeMillis();
-                    
-		    try {
-			// Do the work
-			currentWork.doWork();
-		    } catch (Throwable t) {
-			// Ignore all errors.
-			wrapper.workerThreadDoWorkThrowable(this, t);
-		    }
-                    
-                    long elapsedTime = System.currentTimeMillis() - start;
-                    totalTimeTaken.addAndGet(elapsedTime);
-                    processedCount.incrementAndGet();
+                    performWork() ;
 
 		    // set currentWork to null so that the work item can be 
-		    // garbage collected
+		    // garbage collected without waiting for the next work item.
 		    currentWork = null;
 
-                    ClassLoader currentClassLoader = null;
-                    try {
-			if (System.getSecurityManager() == null) {
-			    currentClassLoader = getContextClassLoader() ;
-			} else {
-			    currentClassLoader = AccessController.doPrivileged(
-				new PrivilegedAction<ClassLoader>() {
-				    public ClassLoader run() {
-					return getContextClassLoader();
-				    }
-				} 
-			    );
-			}
-                    } catch (SecurityException se) {
-                        throw wrapper.workerThreadGetContextClassloaderFailed(this, se);
-                    }
-
-                    if (workerThreadClassLoader != currentClassLoader) {
-                        // thread's context ClassLoader has changed
-                        wrapper.workerThreadForgotClassloaderReset(this,
-                                                      currentClassLoader,
-                                                  workerThreadClassLoader);
-                        try {
-                           setClassLoader() ;
-                           wrapper.workerThreadClassloaderReset(this,
-                                                  currentClassLoader,
-                                              workerThreadClassLoader);
-                        } catch (SecurityException se) {
-                            // Failed to reset context ClassLoader
-                            wrapper.workerThreadResetContextClassloaderFailed(this, se);
-                        }
-                    }
-
-                } catch (Throwable e) {
-                    wrapper.workerThreadCaughtUnexpectedThrowable(this,e);
+                    resetClassLoader() ;
+                }
+            } catch (Throwable e) {
+                // This should not be possible
+                wrapper.workerThreadCaughtUnexpectedThrowable(this,e);
+            } finally {
+                synchronized (workersLock) {
+                    workers.remove( this ) ;
                 }
             }
         }

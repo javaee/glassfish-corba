@@ -3,12 +3,12 @@
     <dependencies>
         <dependency>
             <groupId>@groupId@</groupId>
-            <artifactId>glassfish-corba-asm</artifactId>
+            <artifactId>glassfish-corba-orbgeneric</artifactId>
             <version>@version@</version>
         </dependency>
         <dependency>
             <groupId>@groupId@</groupId>
-            <artifactId>glassfish-corba-orbgeneric</artifactId>
+            <artifactId>glassfish-corba-codegen</artifactId>
             <version>@version@</version>
         </dependency>
     </dependencies>

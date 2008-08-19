@@ -86,7 +86,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
-import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
 import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
@@ -256,12 +255,6 @@ class DynamicMBeanSkeleton {
 	    }
 	}
 	
-	// Check for @InheritedTable annotation.
-	final InheritedTable it = cls.getAnnotation( InheritedTable.class ) ;
-	if (it != null) {
-	    // XXX process it
-	}
-
 	// Check for @IncludeSubclass annotation.  Scan subclasses for attributes.
 	final IncludeSubclass is = cls.getAnnotation( IncludeSubclass.class ) ;
 	if (is != null) {

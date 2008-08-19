@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
+
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
@@ -47,6 +48,7 @@
   <!ENTITY test-rmic SYSTEM "test-rmic.xml">
   <!ENTITY test SYSTEM "test.xml">
   <!ENTITY emma SYSTEM "emma.xml">
+  <!ENTITY maven SYSTEM "push2maven.xml">
 ]>
 
 <!--
@@ -68,7 +70,7 @@
 	Deliver: not delivered.
 -->
 
-<project name="PEORB" default="all" basedir="..">
+<project name="GlassFish CORBA" default="all" basedir=".." xmlns:artifact="urn:maven-artifact-ant">
     <description>
 	This is the Ant file that builds the PEORB.
     </description>
@@ -153,6 +155,13 @@
 
     <!-- ========================= INIT ========================= -->
     <target name="init">
+        <property name="orb.version" value="${release.version}-${build.version}"/>
+        <property name="orb.groupId" value="com.sun.corba"/>
+        <property name="maven.ant.file" value="maven-ant-tasks-2.0.9.jar"/>
+        <property name="maven.ant.dir"  value="http://apache.hoxt.com/maven/binaries"/>
+        <property name="repo.url" value="java-net:/maven2-repository/trunk/www/repository"/>
+        <property name="file.url" value="file:/tmp/maven"/>
+        
 	<!-- properties needed for updating and validating copyright headers -->
 	<property name="findbugs.exclude.file" value="${root.dir}/make/findbugs-filter.xml"/>
 	<property name="copyright.file" value="${root.dir}/make/copyright-information/copyright.txt"/>
@@ -1115,11 +1124,6 @@
 
     </target>
 
-
-    <!-- ======================== PUSH TO MAVEN REPOSITORY begin. ===== -->
-    <import file="./push2maven.xml"/>
-    <!-- ======================== PUSH TO MAVEN REPOSITORY end.i  ===== -->
-
     <!-- ======================== findbugs integration ========= 
 
 	 This uses the findbugs command instead of the findbugs ant task because it
@@ -1199,5 +1203,6 @@
     &test-rmic;
     &test;
     &emma;
+    &maven;
 </project>
 

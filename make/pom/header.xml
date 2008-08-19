@@ -1,9 +1,9 @@
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.corba</groupId>
-    <artifactId>@jarName@</artifactId>
+    <groupId>@groupId@</groupId>
+    <artifactId>@artifactId@</artifactId>
     <version>@version@</version>
     <description>@jarDescription@</description>
-    <url>java-net:/maven2-repository/trunk/www/repository</url>
+    <url>@repositoryUrl@</url>
     <developers>
         <developer>
             <id>raih</id>

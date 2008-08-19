@@ -42,10 +42,19 @@ import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
 /** This annotation defines an attribute in open MBean (ManagedObject) or 
- * CompositeData (ManagedData).  It is useful in cases where the parent class cannot
- * be annotated (for example, Object.toString(), or a framework class that must be extended
+ * CompositeData (ManagedData).  It is useful in cases where the parent class 
+ * cannot be annotated (for example, Object.toString(), or a framework class 
+ * that must be extended
  * but cannot be modified).  The attribute id is defined in the annotation, and 
  * it is implemented by the methods inherited by the Managed entity. 
+ * <p>
+ * An example of a use of this is to handle @ManagedData that inherits from
+ * Collection<X>, and it is desired to display a read-only attribute containing
+ * the elements of the Collection.  Simple add the annotation
+ * <p>
+ * @InheritedAttribute( methodName="iterator" )
+ * <p>
+ * to handle this case.  Note that this only supports read-only attributes.
  */
 @Documented 
 @Target(ElementType.TYPE) 

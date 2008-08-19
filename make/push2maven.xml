@@ -1,55 +1,42 @@
-<?xml version="1.0"?>
-<!DOCTYPE project [
-  <!ENTITY maven        SYSTEM "xmls/maven.xml">
-  <!ENTITY upload2maven SYSTEM "xmls/upload2maven.xml">
-]>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->
 
 <!-- ==================	@author harsha.godugu@sun ===========  -->
-<!-- =================== Build for PROJECT =================== -->
-
-<project name="Glassfish corba "  basedir="." 
-		xmlns:artifact="urn:maven-artifact-ant" >
-
-<!-- ================= Properties   =================================== -->
-<property name="maven.ant.file" value="maven-ant-tasks-2.0.8.jar"/>
-<property name="maven.ant.dir"  value="http://apache.hoxt.com/maven/binaries"/>
-<property name="lib.dir"  value="${root.dir}/lib"/>
-<property name="build.dir"  value="${root.dir}/build"/>
-<property name="releaselib.dir"  value="${build.dir}/release/lib"/>
-<property name="ver.number"  value="${release.version}"/>
-<property name="build.number"  value="${build.version}"/>
-
-<!--  ====== release these for testing  =======
-<property name="ver.number"  value="v3"/>
-<property name="build.number"  value="test"/>
--->
-
-<!-- ===   destination for the upload - location of corba maven repo ===  -->
-<property name="repo.url" value="java-net:/maven2-repository/trunk/www/repository"/>
-<!-- only for testing : file based url for testing the upload of jars  -->
-<property name="file.url" value="file:/tmp/test/lib/jars"/>
-
-
-<!--  the name of the jar file to be pushed -->
-<property name="peorb"   value="glassfish-corba-peorb"/>
-<property name="omgapi"  value="glassfish-corba-omgapi"/>
-<property name="orblib"  value="glassfish-corba-orblib"/>
-<property name="idlj"    value="glassfish-corba-idlj"/>
-
-<!--  
-Below: A temporary file to store the pom; Remember maven is based on 'single 
-project produces single jar file. But, we are producing 4 jars from a single 
-project. Hence,we are having a template to store pom and modify it each time 
-we do the push.
-Refer: http://maven.apache.org/guides/mini/guide-using-one-source-directory.html
-Section: Producing Multiple JARs from a single POM (maven limitations)
--->
-<property name="pom.template" value="${root.dir}/make/corba.template.pom"/>
-<property name="peorb.template" value="${root.dir}/make/peorb.template.pom"/>
-<property name="orblib.template" value="${root.dir}/make/orblib.template.pom"/>
-<property name="idlj.template" value="${root.dir}/make/idlj.template.pom"/>
-<property name="omgapi.template" value="${root.dir}/make/omgapi.template.pom"/>
-<property name="corba.temp.pom" value="${root.dir}/make/corba.temp.pom"/>
+<!-- ==================	@author ken.cavanaugh@sun ===========  -->
 
 <!-- ================================================================== -->
 <!-- Set current date/time in case, if we decide to timestamp -->
@@ -90,7 +77,7 @@ Section: Producing Multiple JARs from a single POM (maven limitations)
 </target>
 
 <!-- ================================================================== -->
-<target name="mavenize" depends="checkmaven" description="initialize maven ">
+<target name="mavenize" depends="init, checkmaven" description="initialize maven ">
     <path id="maven-ant-tasks.classpath" 
 	  path="${lib.dir}/${maven.ant.file}" />
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" 
@@ -104,22 +91,12 @@ Section: Producing Multiple JARs from a single POM (maven limitations)
     </artifact:install-provider>
 </target>
 
-<!-- ================================================================== -->
-<target name="push-corba" depends="push-peorb, push-orblib, push-omgapi, push-idlj"
-    description="Deploy glassfish-corba jars to maven2 repository">
-   <echo message="Uploading corba jar files to maven repo done!"/>
-   <echo message="Version of the build being pushed...  ${ver.number}"/>
-   <echo message="Build number: ${build.number} "/>
-   <echo message="time-stamp: ${TODAY_LONG}"/>
-</target>
-
-<!-- 
 <target name="test-loadfile">
     <loadfile property="dependency" srcFile="make/dependency.template.xml">
         <filterchain>
             <replacetokens>
                 <token key="artifactId" value="codegen"/>
-                <token key="version" value="10.1.2"/>
+                <token key="version" value="${version}"/>
             </replacetokens>
         </filterchain>
     </loadfile>
@@ -133,12 +110,15 @@ Section: Producing Multiple JARs from a single POM (maven limitations)
 <target name="test-chain">
 </target>
 
+<!--
 Variables in templates:
     groupId         always com.sun.corba
     jarName         the name of the jar file (glassfish-corba-<module>)
     version         the current CORBA version
     jarDescription  a brief description of the jar contents
-    HEADER          the expanded version of make/pom/header.xml inserted into the pom file
+    HEADER-@{module} the expanded version of make/pom/header.xml inserted into the pom file
+                    Note that all properties must have unique names.  Ant is COMPLETELY
+                    braindead: see Greenberg's 10th law.
 
 naming conventions:
 The modules             (and their dependencies):
@@ -152,156 +132,71 @@ The modules             (and their dependencies):
     orb                 codegen dynamicany naming newtimer omgapi orbgeneric
     orbgeneric          -
 
-    Should these module names be prefixed with glassfish-corba?
-
     for each module m:
-        ${root.dir}/make/${m}.bnd
-        ${root.dir}/make/${m}.template.pom
-        ${releaselib.dir}/bundles/${m}.jar
+        bnd file:           ${root.dir}/make/bnd/${m}.bnd
+        pom template:       ${root.dir}/make/pom/${m}.template.pom
+        resulting jar:      ${releaselib.dir}/bundles/glassfish-corba-${m}.jar
+-->
 
 <macrodef name="make-file">
-    <attribute name="file"/>
-    <attribute name="target"/>
-    <element name="dependencies"/>
-    <copy file="${file}" tofile="${target}" overwrite="true">
-        <filterset>
-          <filter token="jarName" value="${module}" />
-          <filter token="version" value="${ver.number}-${build.number}" />
-          <filter token="jarDescription" value="${description}" />
-          <dependencies/>
-        </filterset>
-    </copy>
+    <attribute name="module"/>
+    <attribute name="description"/>
+    <sequential>
+        <loadfile property="HEADER-@{module}" srcFile="make/pom/header.xml">
+            <filterchain>
+                <replacetokens>
+                    <token key="artifactId" value="glassfish-corba-@{module}"/>
+                    <token key="version" value="${orb.version}"/>
+                    <token key="jarDescription" value="@{description}"/>
+                    <token key="groupId" value="${orb.groupId}"/>
+                    <token key="repositoryUrl" value="${repo.url}"/>
+                </replacetokens>
+            </filterchain>
+        </loadfile>
+        <copy file="make/pom/@{module}.template.xml" tofile="make/corba.temp.pom" overwrite="true">
+            <filterset>
+              <filter token="HEADER" value="${HEADER-@{module}}"/>
+              <filter token="version" value="${orb.version}"/>
+              <filter token="groupId" value="${orb.groupId}"/>
+            </filterset>
+        </copy>
+    </sequential>
 </macrodef>
+
+<!--  
+Note that we use a temporary file to store the pom because maven is based on 'single 
+project produces single jar file'. But, we are producing 9 jars from a single 
+project. Hence, we need a template to for each pom that generates the POM we use each
+time we publish.
+
+Refer: http://maven.apache.org/guides/mini/guide-using-one-source-directory.html
+Section: Producing Multiple JARs from a single POM (maven limitations)
+-->
 
 <macrodef name="push-to-maven">
     <attribute name="module"/>
     <attribute name="description"/>
-    <element name="dependencies"/>
     <sequential>
-        <make-file file="${root.dir}/make/${module}.template.pom" target="${corba.temp.pom}">
-            <dependencies/>
-        </make-file>
+        <make-file module="@{module}" description="@{description}"/>
 
-        <artifact:pom id="glassfish.corba.project" file="${corba.temp.pom}" />
-        <artifact:deploy file="${releaselib.dir}/bundles/${module}.jar">
+        <artifact:pom id="glassfish.corba.project" file="make/corba.temp.pom" />
+        <artifact:deploy file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
             <remoteRepository url="${repo.url}">
             </remoteRepository>
             <pom refid="glassfish.corba.project"/>
         </artifact:deploy>
-        <delete file="${corba.temp.pom}" verbose="true"/>
+        <delete file="make/corba.temp.pom" verbose="true"/>
     </sequential>
 </macrodef>
 
-<push-to-maven module="orb" description="The main GlassFish ORB module">
-    <dependencies>
-        <dependency module="codegen"/>
-        <dependency module="orbgeneric"/>
-        <dependency module="newtimer"/>
-        <dependency module="omgapi-ext"/>
-    </dependencies>
-</push-to-maven>
-
--->
-
-<!-- ========  publish peorb.jar with a POM file ====================== -->
-<target name="push-peorb" depends="mavenize">
-    <copy file="${peorb.template}"  tofile="${corba.temp.pom}" overwrite="true">
-        <filterset>
-          <filter token="jarName" value="${peorb}" />
-	  <filter token="OMGAPI" value="${omgapi}" />
-          <filter token="ORBLIB" value="${orblib}" />
-          <filter token="IDLJ" value="${idlj}" />
-          <filter token="version" value="${ver.number}-${build.number}" />
-          <filter token="jarDescription" value="Glassfish ORB implementation" />
-          <!-- add more filters for any other data like timestamps etc -->
-        </filterset>
-    </copy>
-
-    <artifact:pom id="glassfish.corba.project" file="${corba.temp.pom}" />
-    <artifact:deploy file="${releaselib.dir}/peorb.jar">
-        <remoteRepository url="${repo.url}">
-        </remoteRepository>
-        <pom refid="glassfish.corba.project"/>
-    </artifact:deploy>
-    <delete file="${corba.temp.pom}" verbose="true"/>
+<target name="release" depends="mavenize">
+    <push-to-maven module="asm" description="ASM version used in the ORB"/>
+    <push-to-maven module="codegen" description="Dynamic code generation library"/>
+    <push-to-maven module="csiv2-idl" description="IDL generated definitions for CSIv2"/>
+    <push-to-maven module="dynamicany" description="Dynamic Any support"/>
+    <push-to-maven module="naming" description="CosNaming service code"/>
+    <push-to-maven module="newtimer" description="ORB timer library"/>
+    <push-to-maven module="omgapi" description="OMG standard APIs"/>
+    <push-to-maven module="orb" description="The ORB implementation"/>
+    <push-to-maven module="orbgeneric" description="Generic libraries"/>
 </target>
-
-<!-- ========  publish omgapi.jar with a POM file ===================== -->
-<target name="push-omgapi" depends="mavenize">
-    <copy file="${omgapi.template}"  tofile="${corba.temp.pom}" overwrite="true">
-        <filterset>
-          <filter token="jarName" value="${omgapi}" />
-          <filter token="version" value="${ver.number}-${build.number}" />
-          <filter token="jarDescription" value="OMG APIs alone" />
-          <!-- add more filters for any other data like timestamps etc -->
-        </filterset>
-    </copy>
-
-    <artifact:pom id="glassfish.corba.project" file="${corba.temp.pom}" />
-    <artifact:deploy file="${releaselib.dir}/omgapi.jar">
-        <remoteRepository url="${repo.url}">
-        </remoteRepository>
-        <pom refid="glassfish.corba.project"/>
-    </artifact:deploy>
-    <delete file="${corba.temp.pom}" verbose="true"/>
-</target>
-
-<!-- ========  publish orblib.jar with a POM file ===================== -->
-<target name="push-orblib" depends="mavenize">
-    <copy file="${orblib.template}"  tofile="${corba.temp.pom}" overwrite="true">
-        <filterset>
-          <filter token="jarName" value="${orblib}" />
-          <filter token="version" value="${ver.number}-${build.number}" />
-	  <filter token="OMGAPI" value="${omgapi}" />
-          <filter token="jarDescription" value="asm implementation " />
-          <!-- add more filters for any other data like timestamps etc -->
-        </filterset>
-    </copy>
-
-    <artifact:pom id="glassfish.corba.project" file="${corba.temp.pom}" />
-    <artifact:deploy file="${releaselib.dir}/orblib.jar">
-        <remoteRepository url="${repo.url}">
-        </remoteRepository>
-        <pom refid="glassfish.corba.project"/>
-    </artifact:deploy>
-    <delete file="${corba.temp.pom}" verbose="true"/>
-</target>
-
-<!-- ========  publish idlj.jar with a POM file ======================= -->
-<target name="push-idlj" depends="mavenize" >
-    <copy file="${idlj.template}"  tofile="${corba.temp.pom}" overwrite="true">
-        <!-- Insert the Version and Build numbers in the POM file -->
-        <filterset>
-          <filter token="jarName" value="${idlj}" />
-          <filter token="version" value="${ver.number}-${build.number}" />
-          <filter token="jarDescription" value="Sun's IDLJ idl to java impl.." />
-          <!-- add more filters for any other data like timestamps etc -->
-        </filterset>
-    </copy>
-
-    <artifact:pom id="glassfish.corba.project" file="${corba.temp.pom}" />
-    <artifact:deploy file="${releaselib.dir}/idlj.jar">
-        <remoteRepository url="${repo.url}">
-        </remoteRepository>
-        <pom refid="glassfish.corba.project"/>
-    </artifact:deploy>
-    <delete file="${corba.temp.pom}" verbose="true"/>
-</target>
-
-<!--
-    <artifact:deploy file="${lib.dir}/${glasfish.corba.artifactId}.jar">
-        <remoteRepository url="${corba.maven.repository}">
-    <authentication username="${maven.auth.username}" privateKey="${maven.auth.privkey}"/>
--->
-
-<!-- ===================  Maven 2.0 lib calls End ===================== -->
-<!-- ==============    Just for testing...============================= -->
-<target name="testing" depends="mavenize" >
-    <echo message="Today is.. ${TODAY_LONG}"/>
-    <echo message="Today long is..${TODAY_SHORT}"/>
-    <echo message="Root dir is ${root.dir} " />
-    <echo message="release dir is ${releaselib.dir} and build is  ${build.dir}" />
-    <echo message="release number = ${release.version} build=${build.version}  buildNmbr=${build.number}"/>
-</target>
-
-</project>

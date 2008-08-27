@@ -78,7 +78,7 @@ import com.sun.corba.se.spi.activation.ServerNotRegistered;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.logging.ActivationSystemException;
 

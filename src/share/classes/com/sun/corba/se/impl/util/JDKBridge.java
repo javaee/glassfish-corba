@@ -58,7 +58,7 @@ import java.util.WeakHashMap ;
 import java.lang.ref.SoftReference ;
 import java.lang.ref.ReferenceQueue ;
 
-import com.sun.corba.se.impl.orbutil.GetPropertyAction;
+import com.sun.corba.se.org.omg.CORBA.GetPropertyAction;
 
 /**
  *  Utility methods for doing various method calls which are used

@@ -53,7 +53,7 @@ import org.omg.PortableInterceptor.ORBInitializer;
 import org.omg.PortableInterceptor.ServerRequestInterceptor;
 import org.omg.PortableInterceptor.ServerRequestInfo;
 import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class Interceptor
     extends

@@ -54,7 +54,6 @@ import junit.framework.TestCase ;
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
 
 import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
 import com.sun.corba.se.impl.orbutil.codegen.Node ;
 import com.sun.corba.se.impl.orbutil.codegen.Util ;
 

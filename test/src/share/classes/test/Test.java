@@ -65,7 +65,7 @@ import sun.tools.java.ClassPath;
 import sun.tools.java.ClassFile;
 import java.net.ServerSocket;
 import java.util.Properties;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orb.ORB ;
 
 /**

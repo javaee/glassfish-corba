@@ -48,7 +48,7 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactories;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.ior.GenericIdentifiable ;

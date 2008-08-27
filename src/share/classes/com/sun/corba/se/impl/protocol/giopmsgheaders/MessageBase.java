@@ -63,7 +63,7 @@ import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.orb.ObjectKeyCacheEntryNoObjectAdapterImpl;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.AddressingDispositionException;
 import com.sun.corba.se.impl.protocol.CorbaRequestIdImpl;
 import com.sun.corba.se.impl.transport.MessageTraceManagerImpl;

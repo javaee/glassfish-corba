@@ -95,7 +95,7 @@ import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.naming.cosnaming.TransientNameService ;
 

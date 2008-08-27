@@ -40,7 +40,7 @@ import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.rmi.PortableRemoteObject;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import corba.framework.Options;
 import corba.hcks.C;

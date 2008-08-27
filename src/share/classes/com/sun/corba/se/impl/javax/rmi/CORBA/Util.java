@@ -116,7 +116,7 @@ import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
 import com.sun.corba.se.impl.io.ValueHandlerImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.logging.OMGSystemException;
 import com.sun.corba.se.impl.util.Utility;

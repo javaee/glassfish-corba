@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
+
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
@@ -47,6 +48,7 @@
   <!ENTITY test-rmic SYSTEM "test-rmic.xml">
   <!ENTITY test SYSTEM "test.xml">
   <!ENTITY emma SYSTEM "emma.xml">
+  <!ENTITY maven SYSTEM "push2maven.xml">
 ]>
 
 <!--
@@ -68,7 +70,7 @@
 	Deliver: not delivered.
 -->
 
-<project name="PEORB" default="all" basedir="..">
+<project name="GlassFish CORBA" default="all" basedir=".." xmlns:artifact="urn:maven-artifact-ant">
     <description>
 	This is the Ant file that builds the PEORB.
     </description>
@@ -140,6 +142,7 @@
     <property name="jmxri-jar"			value="${root.dir}/lib/jmxri.jar"/>
     <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
     <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
+    <property name="bnd-jar"                    value="${root.dir}/lib/bnd.jar"/>
 
     <property name="findbugs.home"		value="${root.dir}/lib/findbugs-1.3.3"/>
 
@@ -152,6 +155,13 @@
 
     <!-- ========================= INIT ========================= -->
     <target name="init">
+        <property name="orb.version" value="${release.version}-${build.version}"/>
+        <property name="orb.groupId" value="com.sun.corba"/>
+        <property name="maven.ant.file" value="maven-ant-tasks-2.0.9.jar"/>
+        <property name="maven.ant.dir"  value="http://apache.hoxt.com/maven/binaries"/>
+        <property name="repo.url" value="java-net:/maven2-repository/trunk/www/repository"/>
+        <property name="file.url" value="file:/tmp/maven"/>
+        
 	<!-- properties needed for updating and validating copyright headers -->
 	<property name="findbugs.exclude.file" value="${root.dir}/make/findbugs-filter.xml"/>
 	<property name="copyright.file" value="${root.dir}/make/copyright-information/copyright.txt"/>
@@ -177,6 +187,8 @@
 	<property name="orblib.src.dir" location="orblib/src/share/classes"/>
 	<property name="orblib.build.dir" location="orblib/build"/>
 	<property name="orblib.classes.dir" location="${orblib.build.dir}/classes"/>
+
+        <property name="bundle.name.prefix" value="glassfish-corba-"/>
 
 	<property name="releaselib.dir" location="${build.dir}/release/lib"/>   
 	<property name="test-build.dir" location="test/build"/>
@@ -230,6 +242,7 @@
 	<mkdir dir="${gensrc.dir}"/>
 	<mkdir dir="${classes.dir}"/>
 	<mkdir dir="${releaselib.dir}"/>
+	<mkdir dir="${releaselib.dir}/bundles"/>
 	<mkdir dir="${test-classes.dir}"/>
 	<mkdir dir="${test-values1.dir}"/>
 	<mkdir dir="${test-values2.dir}"/>
@@ -569,12 +582,16 @@
 
     <!-- ========================= ORB library  ==================== 
 	The ORB library is a collection of all the reuseable, ORB-independent
-	modules that the ORB uses.  This is currently used to generate
-	the timing points file.
+	modules that the ORB uses.  This is currently used in the build to generate
+	the timing points file, and to handle copyright processing and renaming.
 
 	Note that this must work either renamed or not renamed, so both 
 	the relocated directory and the non-relocated directory for
 	ASM are included here.
+
+        There are some classes in the ORB library that are not used at
+        all at runtime.  These classes are excluded from the delivered
+        OSGi bundles for GFv3.
      -->
     <target name="orb-library" depends="init, compile-orb-library"> 
 	<jar jarfile="${releaselib.dir}/orblib.jar"
@@ -584,98 +601,84 @@
 	    </fileset>
 	</jar>
     </target>
-    
+   
+    <!-- ========================= Split Jar Packaging  ==================== 
+        The split jar packaging splits the ORB code into a number of smaller
+        jar files containing closely related packages.  The OSGi package 
+        (see make-bundles) closely follows this packaging, except that only
+        those classes acutally needs in GFv3 are packaged as bundles.
+    -->
+
     <target name="orb-split" depends="init">
 	<jar jarfile="${releaselib.dir}/orb.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
                 <include name="com/sun/corba/se/internal/**"/>
                 <include name="com/sun/corba/se/pept/**"/>
-                <include name="com/sun/corba/se/spi/ior/**"/>
-                <include name="com/sun/corba/se/spi/resolver/**"/>
-                <include name="com/sun/corba/se/spi/encoding/**"/>
-                <include name="com/sun/corba/se/spi/orb/**"/>
-                <include name="com/sun/corba/se/spi/legacy/**"/>
+                <include name="com/sun/corba/se/spi/btrace/**"/>
                 <include name="com/sun/corba/se/spi/copyobject/**"/>
-                <include name="com/sun/corba/se/spi/oa/**"/>
-                <include name="com/sun/corba/se/spi/orbutil/**"/>
-                <include name="com/sun/corba/se/spi/protocol/**"/>
-                <include name="com/sun/corba/se/spi/monitoring/**"/>
-                <include name="com/sun/corba/se/spi/transport/**"/>
-                <include name="com/sun/corba/se/spi/folb/**"/>
-                <include name="com/sun/corba/se/spi/presentation/**"/>
-                <include name="com/sun/corba/se/spi/logging/**"/>
-                <include name="com/sun/corba/se/spi/servicecontext/**"/>
+                <include name="com/sun/corba/se/spi/encoding/**"/>
                 <include name="com/sun/corba/se/spi/extension/**"/>
-                <include name="com/sun/corba/se/spi/**"/>
+                <include name="com/sun/corba/se/spi/folb/**"/>
+                <include name="com/sun/corba/se/spi/ior/**"/>
+                <include name="com/sun/corba/se/spi/legacy/**"/>
+                <include name="com/sun/corba/se/spi/logging/**"/>
+                <include name="com/sun/corba/se/spi/monitoring/**"/>
+                <include name="com/sun/corba/se/spi/oa/**"/>
+                <include name="com/sun/corba/se/spi/orb/**"/>
+                <include name="com/sun/corba/se/spi/orbutil/**"/>
+                <include name="com/sun/corba/se/spi/presentation/**"/>
+                <include name="com/sun/corba/se/spi/protocol/**"/>
+                <include name="com/sun/corba/se/spi/resolver/**"/>
+                <include name="com/sun/corba/se/spi/servicecontext/**"/>
+                <include name="com/sun/corba/se/spi/transport/**"/>
+                <include name="com/sun/corba/se/impl/copyobject/**"/>
+                <include name="com/sun/corba/se/impl/corba/**"/>
+                <include name="com/sun/corba/se/impl/encoding/**"/>
+                <include name="com/sun/corba/se/impl/folb/**"/>
+                <include name="com/sun/corba/se/impl/interceptors/**"/>
+                <include name="com/sun/corba/se/impl/io/**"/>
+                <include name="com/sun/corba/se/impl/ior/**"/>
+                <include name="com/sun/corba/se/impl/javax/**"/>
+                <include name="com/sun/corba/se/impl/legacy/**"/>
                 <include name="com/sun/corba/se/impl/logging/**"/>
                 <include name="com/sun/corba/se/impl/monitoring/**"/>
-                <include name="com/sun/corba/se/impl/corba/**"/>
-                <include name="com/sun/corba/se/impl/copyobject/**"/>
-                <include name="com/sun/corba/se/impl/protocol/**"/>
-                <include name="com/sun/corba/se/impl/orbutil/**"/>
-                <include name="com/sun/corba/se/impl/interceptors/**"/>
-                <include name="com/sun/corba/se/impl/presentation/**"/>
-                <include name="com/sun/corba/se/impl/orb/**"/>
-                <include name="com/sun/corba/se/impl/folb/**"/>
-                <include name="com/sun/corba/se/impl/transport/**"/>
-                <include name="com/sun/corba/se/impl/io/**"/>
-                <include name="com/sun/corba/se/impl/plugin/**"/>
-                <include name="com/sun/corba/se/impl/javax/**"/>
                 <include name="com/sun/corba/se/impl/oa/**"/>
-                <include name="com/sun/corba/se/impl/ior/**"/>
-                <include name="com/sun/corba/se/impl/legacy/**"/>
-                <include name="com/sun/corba/se/impl/servicecontext/**"/>
-                <include name="com/sun/corba/se/impl/encoding/**"/>
-                <include name="com/sun/corba/se/impl/util/**"/>
+                <include name="com/sun/corba/se/impl/orb/**"/>
+                <include name="com/sun/corba/se/impl/orbutil/**"/>
+                <include name="com/sun/corba/se/impl/plugin/**"/>
+                <include name="com/sun/corba/se/impl/presentation/**"/>
+                <include name="com/sun/corba/se/impl/protocol/**"/>
                 <include name="com/sun/corba/se/impl/resolver/**"/>
+                <include name="com/sun/corba/se/impl/servicecontext/**"/>
+                <include name="com/sun/corba/se/impl/transport/**"/>
+                <include name="com/sun/corba/se/impl/util/**"/>
 	    </fileset>
 	</jar>
-	<jar jarfile="${releaselib.dir}/omgapi.jar"
+	<jar jarfile="${releaselib.dir}/omgapi-extension.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
 		<include name="org/omg/CORBA/ORB*.class"/>
-		<include name="org/omg/CORBA/portable/ValueInputStream.class"/>
-		<include name="org/omg/CORBA/portable/ValueOutputStream.class"/>
-		<include name="javax/rmi/PortableRemoteObject.class"/>
-		<include name="javax/rmi/CORBA/Stub.class"/>
-		<include name="javax/rmi/CORBA/Util.class"/>
-		<include name="javax/rmi/CORBA/EnumDesc.class"/>
-		<include name="javax/rmi/CORBA/ProxyDesc.class"/>
-		<include name="javax/rmi/CORBA/ValueHandlerMultiFormat.class"/>
+		<include name="javax/rmi/*.class"/>
+		<include name="javax/rmi/CORBA/*.class"/>
 	    </fileset>
 	</jar>
-	<jar jarfile="${releaselib.dir}/transactions.jar"
+	<jar jarfile="${releaselib.dir}/orbtransactions.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
 		<include name="org/omg/CORBA/TSIdentification.class"/>
-		<include name="org/omg/CORBA/TRANSACTION_UNAVAILABLE.class"/>
-		<include name="org/omg/CORBA/TSIdentificationPackage/AlreadyIdentified.class"/>
-		<include name="org/omg/CORBA/TSIdentificationPackage/NotAvailable.class"/>
+		<include name="org/omg/CORBA/TSIdentificationPackage/*.class"/>
 		<include name="org/omg/CosTransactions/*.class"/>
 		<include name="org/omg/CosTSPortability/*.class"/>
 		<include name="org/omg/CosTSInteroperation/*.class"/>
-                <include name="com/sun/corba/se/impl/txpoa/**"/>
-                <include name="com/sun/corba/se/spi/costransactions/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/rmic-iiop.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-                <include name="sun/rmi/**"/>
+                <include name="com/sun/corba/se/impl/txpoa/*.class"/>
+                <include name="com/sun/corba/se/spi/costransactions/*.class"/>
 	    </fileset>
 	</jar>
 	<jar jarfile="${releaselib.dir}/csiv2-idl.jar"
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
                 <include name="com/sun/corba/se/org/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/activation.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-                <include name="com/sun/corba/se/spi/activation/**"/>
-                <include name="com/sun/corba/se/impl/activation/**"/>
 	    </fileset>
 	</jar>
 	<jar jarfile="${releaselib.dir}/naming.jar"
@@ -690,6 +693,23 @@
                 <include name="com/sun/corba/se/impl/dynamicany/**"/>
 	    </fileset>
 	</jar>
+        <!-- Don't really need this in GFv3
+	<jar jarfile="${releaselib.dir}/rmic-iiop.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="sun/rmi/**"/>
+	    </fileset>
+	</jar>
+        -->
+        <!-- Don't really need this in GFv3
+	<jar jarfile="${releaselib.dir}/activation.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+                <include name="com/sun/corba/se/spi/activation/**"/>
+                <include name="com/sun/corba/se/impl/activation/**"/>
+	    </fileset>
+	</jar>
+        -->
     </target>
 
     <target name="orb-library-split" depends="init">
@@ -700,37 +720,16 @@
 		<include name="com/sun/corba/se/impl/orbutil/newtimer/**"/>
 	    </fileset>
 	</jar>
-	<jar jarfile="${releaselib.dir}/transport.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="com/sun/corba/se/spi/orbutil/transport/**"/>
-		<include name="com/sun/corba/se/impl/orbutil/transport/**"/>
-		<include name="com/sun/corba/se/spi/orbutil/concurrent/**"/>
-		<include name="com/sun/corba/se/impl/orbutil/concurrent/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/copyobject.jar"
+	<jar jarfile="${releaselib.dir}/codegen.jar"
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
 		<include name="com/sun/corba/se/spi/orbutil/copyobject/**"/>
 		<include name="com/sun/corba/se/impl/orbutil/copyobject/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/codegen.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
 		<include name="com/sun/corba/se/spi/orbutil/codegen/**"/>
 		<include name="com/sun/corba/se/impl/orbutil/codegen/**"/>
 	    </fileset>
 	</jar>
-	<jar jarfile="${releaselib.dir}/jmx.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="com/sun/corba/se/spi/orbutil/jmx/**"/>
-		<include name="com/sun/corba/se/impl/orbutil/jmx/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/generic.jar"
+	<jar jarfile="${releaselib.dir}/orbgeneric.jar"
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
 		<include name="com/sun/corba/se/spi/orbutil/generic/**"/>
@@ -738,37 +737,8 @@
 		<include name="com/sun/corba/se/impl/orbutil/closure/**"/>
 		<include name="com/sun/corba/se/spi/orbutil/proxy/**"/>
 		<include name="com/sun/corba/se/impl/orbutil/graph/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/test.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="com/sun/corba/se/spi/orbutil/test/**"/>
-		<include name="com/sun/corba/se/impl/orbutil/test/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/file.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="com/sun/corba/se/spi/orbutil/file/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/fsm.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
 		<include name="com/sun/corba/se/spi/orbutil/fsm/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/misc.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
 		<include name="com/sun/corba/se/spi/orbutil/misc/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/argparser.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="com/sun/corba/se/spi/orbutil/argparser/**"/>
 	    </fileset>
 	</jar>
 	<jar jarfile="${releaselib.dir}/asm.jar"
@@ -777,7 +747,107 @@
 		<include name="org/objectweb/**"/>
 	    </fileset>
 	</jar>
+
+        <!-- the following jars are not needed in the GF ORB, so we won't
+             make bundles for these.
+        --> 
+
+	<jar jarfile="${releaselib.dir}/orbtools.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/test/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/test/**"/>
+		<include name="com/sun/corba/se/spi/orbutil/file/**"/>
+		<include name="com/sun/corba/se/spi/orbutil/argparser/**"/>
+	    </fileset>
+	</jar>
+	<jar jarfile="${releaselib.dir}/orbtransport.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/transport/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/transport/**"/>
+		<include name="com/sun/corba/se/spi/orbutil/concurrent/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/concurrent/**"/>
+	    </fileset>
+	</jar>
+   	<jar jarfile="${releaselib.dir}/orbjmx.jar"
+		    duplicate="fail">
+	    <fileset dir="${orblib.classes.dir}">
+		<include name="com/sun/corba/se/spi/orbutil/jmx/**"/>
+		<include name="com/sun/corba/se/impl/orbutil/jmx/**"/>
+	    </fileset>
+	</jar>
     </target>
+
+    <macrodef name="make-bundle">
+        <attribute name="classpath"/>
+        <attribute name="file"/>
+            <sequential>
+                <java jar="${bnd-jar}" fork="true" failonerror="true">
+                    <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
+                    <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
+                    <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
+                    <jvmarg value="-Dcorba.build.identifier=${corba.build.identifier}"/>
+                    <arg value="build"/>
+                    <arg value="-classpath"/>
+                    <arg value="@{classpath}"/>
+                    <arg value="-output"/>
+                    <arg value="${releaselib.dir}/bundles/${bundle.name.prefix}@{file}.jar"/>
+                    <arg value="make/bnd/@{file}.bnd"/>
+                </java>
+            </sequential>
+    </macrodef>
+
+    <!-- ========================= OSGi bundle packaging ==================== 
+        The ORB as delivered into GFv3 contains 9 OSGi bundles.
+        These bundles are constructed in the make-bundles target using
+        bnd and the various .bnd files.
+    -->
+
+    <target name="make-bundles" depends="init">
+        <!-- we are not generating bundles for activation or rmic-iiop
+             because they are not used in GFv3.
+        -->
+
+        <!-- orbtransactions includes only TSIdentificationImpl in the org.omg.CORBA package
+             so we use wrap instead of build. NOT NEEDED: everything (except CSIv2) is going into omgapi.
+	<jar jarfile="${releaselib.dir}/orbtransactions.tmp.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
+		<include name="org/omg/CORBA/TSIdentification.class"/>
+		<include name="org/omg/CORBA/TSIdentificationPackage/AlreadyIdentified.class"/>
+		<include name="org/omg/CORBA/TSIdentificationPackage/NotAvailable.class"/>
+		<include name="org/omg/CosTransactions/*.class"/>
+		<include name="org/omg/CosTSPortability/*.class"/>
+		<include name="org/omg/CosTSInteroperation/*.class"/>
+		<include name="com/sun/corba/se/impl/txpoa/*.class"/>
+		<include name="com/sun/corba/se/spi/costransactions/*.class"/>
+	    </fileset>
+	</jar>
+        <java jar="${bnd-jar}" fork="true" failonerror="true">
+            <arg value="wrap"/>
+            <arg value="-output"/>
+            <arg value="${releaselib.dir}/bundles/${bundle.name.prefix}orbtransactions.jar"/>
+            <arg value="-properties"/>
+            <arg value="make/bnd/bnd.properties"/>
+            <arg value="${releaselib.dir}/orbtransactions.tmp.jar"/>
+        </java>
+        <delete file="${releaselib.dir}/orbtransactions.tmp.jar"/>
+        -->
+
+        <make-bundle classpath="${classes.dir}" file="orb"/>
+        <make-bundle classpath="${classes.dir}" file="omgapi"/>
+        <make-bundle classpath="${classes.dir}" file="naming"/>
+        <make-bundle classpath="${classes.dir}" file="dynamicany"/>
+        <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>
+
+        <make-bundle classpath="${orblib.classes.dir}" file="codegen"/>
+        <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
+        <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
+        <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
+    </target>
+
+    <!-- ========================= Build the ORB library ====================  -->
 
     <target name="compile-orb-library" depends="init, prepare-dirs">
 	<echo message="Compiling ORB library"/>
@@ -1054,60 +1124,6 @@
 
     </target>
 
-
-    <!-- ======================== PUSH TO MAVEN REPOSITORY ========= -->
-
-    <target name="-push-to-maven-init" depends="init" description="define a task for pushing bits to the maven repository">
-        <echo>lib/maven-repository-importer-${orb.maven_repository_importer.version}.jar</echo>
-        <taskdef resource="maven-repository-importer.properties">
-            <classpath>
-                <pathelement path="lib/maven-repository-importer-${orb.maven_repository_importer.version}.jar" />
-            </classpath>
-        </taskdef>
-    </target>
-
-    <target name="push-to-maven-prepare" depends="-push-to-maven-init, jar"
-        description="creates an image for the 'push-to-maven' goal">        
-        <delete dir="build/maven-repo" /><!-- clean it -->
-        <delete dir="${release.dir}/META-INF"/>
-            <maven-repository-importer destdir="build/maven-repo" version="${release.version}-${build.version}">
-                <artifact jar="${release.orb.jar}"  pom="make/glassfish-corba.pom" />                
-            </maven-repository-importer>
-    </target>
-
-    <target name="push-to-maven" depends="push-to-maven-prepare"
-	description="pushes jars to the java.net maven repository">
-        <cvs-import src="build/maven-repo" dest="glassfish/repo" />
-    </target>
-
-
-    <!--
-        import files to CVS
-  
-        For example, <cvs-import src="build/doc" dest="jaxb/www/doc" />
-     -->
-     <macrodef name="cvs-import">
-        <attribute name="src"/>
-        <attribute name="dest"/>
-            <sequential>
-                <tstamp />
-                    <echo>importing to CVS...</echo>
-                    <cvs dest="@{src}">
-                        <commandline>
-  	                    <argument value="-d${glassfish.cvsroot}"/>
-            		    <argument line="-z9 import -ko"/>
-		            <argument value="-W"/>
-                	    <argument line="*.jar -kb"/>
-		            <argument value="-m"/>
-                	    <argument value="deploying new jars to the java.net maven repository"/>
-                
-	                    <argument value="@{dest}"/>
-            	            <argument line="deployment-to-maven-repository t${DSTAMP}${TSTAMP}" />
-		        </commandline>
-	            </cvs>
-	    </sequential>
-	</macrodef>
-
     <!-- ======================== findbugs integration ========= 
 
 	 This uses the findbugs command instead of the findbugs ant task because it
@@ -1187,5 +1203,6 @@
     &test-rmic;
     &test;
     &emma;
+    &maven;
 </project>
 

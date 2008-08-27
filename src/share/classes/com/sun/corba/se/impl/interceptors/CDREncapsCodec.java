@@ -47,7 +47,7 @@ import com.sun.corba.se.impl.corba.AnyImpl;
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
 import org.omg.IOP.Codec;

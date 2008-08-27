@@ -38,7 +38,7 @@ package corba.msgtypes;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class MsgTypesTest extends CORBATest {
     static final int GROW = 0;

@@ -63,7 +63,7 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 public class WorkspaceRename {
     private static final String[] SUBSTITUTE_SUFFIXES = {
-	"c", "h", "java", "sjava", "idl", "htm", "html", "xml", "dtd",
+	"c", "h", "java", "sjava", "idl", "htm", "html", "xml", "dtd", "bnd",
 	"tdesc", "policy", "secure", "mc", "mcd", "scm", "vthought",
 	"ksh", "sh", "classlist", "config", "jmk", "properties", "prp", 
 	"xjmk", "set", "data", "txt", "text", "javaref", "idlref" } ;

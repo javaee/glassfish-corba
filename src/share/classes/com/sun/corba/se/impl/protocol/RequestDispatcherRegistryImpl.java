@@ -53,7 +53,7 @@ import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.orbutil.misc.DenseIntMapImpl ;
 
 /**

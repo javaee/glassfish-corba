@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.CorbaClientDelegateImpl;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
 

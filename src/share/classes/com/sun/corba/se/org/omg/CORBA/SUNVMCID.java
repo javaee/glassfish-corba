@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,33 +33,20 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.orbutil.jmx ;
 
-import java.lang.annotation.Documented ;
-import java.lang.annotation.Target ;
-import java.lang.annotation.ElementType ;
-import java.lang.annotation.Retention ;
-import java.lang.annotation.RetentionPolicy ;
+package com.sun.corba.se.org.omg.CORBA ;
 
-/** This annotation defines an attribute in open MBean (ManagedObject) or 
- * CompositeData (ManagedData).   The attribute id is defined in the annotation, and 
- * it is implemented by the methods inherited by the Managed entity.  The managed
- * entity must inherit from a subtype of Collection<X>, where cls is of type
- * Class<X>.  The attribute has type ArrayType, where the ArrayType has contents
- * of type given by the mapping of X.  
+/**
+ * The vendor minor code ID reserved for Sun by the OMG.
+ * All VMCIDs occupy the high order 20 bits.
  */
-@Documented 
-@Target(ElementType.TYPE) 
-@Retention(RetentionPolicy.RUNTIME)
-public @interface InheritedTable {
-    /** The description of the operation.  Should be a key to a resource
-     * bundle for I18N support.
+
+public interface SUNVMCID {
+
+    /**
+     * The vendor minor code ID reserved for Sun. This value is or'd with
+     * the high order 20 bits of the minor code to produce the minor value
+     * in a system exception.
      */
-    String description() default "" ;
-
-    String id() default "contents" ;
-
-    Class<?> cls() ;
+    static final int value = 0x53550000;
 }
-
-

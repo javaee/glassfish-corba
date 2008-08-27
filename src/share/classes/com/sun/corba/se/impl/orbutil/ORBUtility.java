@@ -81,6 +81,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.corba.CORBAObjectImpl ;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;

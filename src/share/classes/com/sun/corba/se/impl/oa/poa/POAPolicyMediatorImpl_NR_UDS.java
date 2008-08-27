@@ -49,7 +49,7 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.POAPackage.NoServant ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 /** Implementation of POAPolicyMediator that provides policy specific
  * operations on the POA.

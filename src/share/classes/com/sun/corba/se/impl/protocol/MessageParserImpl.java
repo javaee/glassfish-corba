@@ -45,7 +45,7 @@ import com.sun.corba.se.spi.protocol.CorbaRequestId;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.protocol.MessageParser;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;

@@ -133,6 +133,12 @@
             </export>
             <export>
                 <type>folder</type>
+                <location>test/build/classes</location>
+                <script>${ant.script}</script>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
                 <location>experimental/build/classes</location>
                 <script>${ant.script}</script>
                 <build-target>build</build-target>

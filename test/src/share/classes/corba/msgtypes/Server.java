@@ -36,7 +36,7 @@
 package corba.msgtypes;
 
 import org.omg.PortableInterceptor.ForwardRequest;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.protocol.ForwardException;

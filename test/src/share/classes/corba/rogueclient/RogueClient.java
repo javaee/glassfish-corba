@@ -36,7 +36,7 @@
 
 package corba.rogueclient;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress;

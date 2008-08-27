@@ -43,7 +43,7 @@ import org.omg.PortableServer.*;
 import org.omg.PortableInterceptor.*;
 import com.sun.corba.se.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.util.*;
 import java.io.*;

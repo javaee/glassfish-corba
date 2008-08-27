@@ -35,7 +35,7 @@
  */
 package naming.instest;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import test.Test;
 import corba.framework.*;
 import java.util.*;

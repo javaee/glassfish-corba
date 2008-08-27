@@ -52,7 +52,7 @@ import org.omg.CORBA.COMM_FAILURE;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.SystemException;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 /**
  * @Author Ken Cavanaugh

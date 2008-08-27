@@ -43,7 +43,7 @@ import corba.framework.Options ;
 import corba.framework.Controller ;
 
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.plugin.hwlb.VirtualAddressAgentImpl ;
 import com.sun.corba.se.impl.plugin.hwlb.NoConnectionCacheImpl ;
 

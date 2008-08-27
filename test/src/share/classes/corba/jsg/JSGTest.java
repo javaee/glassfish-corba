@@ -47,7 +47,7 @@ import corba.framework.CORBATest;
 
 import corba.framework.*;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class JSGTest extends CORBATest {
     public static final String thisPackage =

@@ -50,7 +50,7 @@ import com.sun.corba.se.spi.folb.GroupInfoService;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.folb.ClientGroupManager;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import corba.folb_8_1.SocketFactoryImpl;

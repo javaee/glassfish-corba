@@ -39,7 +39,7 @@ import java.io.*;
 import java.util.*;
 import test.*;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 

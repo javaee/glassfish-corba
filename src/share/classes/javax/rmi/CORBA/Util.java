@@ -64,7 +64,7 @@ import java.security.PrivilegedAction;
 import java.util.Properties;
 import java.rmi.server.RMIClassLoader;
 
-import com.sun.corba.se.impl.orbutil.GetPropertyAction;
+import com.sun.corba.se.org.omg.CORBA.GetPropertyAction;
 
 /**
  * Provides utility methods that can be used by stubs and ties to

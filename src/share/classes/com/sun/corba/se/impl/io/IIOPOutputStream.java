@@ -44,28 +44,21 @@
 
 package com.sun.corba.se.impl.io;
 
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.portable.OutputStream;
 
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
 import java.io.IOException;
-import java.io.DataOutputStream;
-import java.io.Serializable;
 import java.io.InvalidClassException;
-import java.io.StreamCorruptedException;
 import java.io.Externalizable;
-import java.io.ObjectStreamException;
 import java.io.NotSerializableException;
 import java.io.NotActiveException;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Field;
 
 import java.util.Stack;
 
-import javax.rmi.CORBA.ValueHandlerMultiFormat;
 
 import sun.corba.Bridge ;
 
@@ -82,7 +75,6 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 /**
  * IIOPOutputStream is ...
@@ -194,6 +186,7 @@ public class IIOPOutputStream
      */
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeObjectOverride(Object obj)
 	throws IOException
     {
@@ -325,6 +318,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void flush() throws IOException{
         try{
             orbStream.flush();
@@ -337,6 +331,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     protected final Object replaceObject(Object obj) throws IOException{
 	// XXX I18N, Logging needed.
         throw new IOException("Method replaceObject not supported");
@@ -354,6 +349,7 @@ public class IIOPOutputStream
      */
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void reset() throws IOException{
         try{
             //orbStream.reset();
@@ -378,6 +374,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void write(byte b[]) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -392,6 +389,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void write(byte b[], int off, int len) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -406,6 +404,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void write(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -420,6 +419,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeBoolean(boolean data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -434,6 +434,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeByte(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -448,6 +449,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeBytes(String data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -463,6 +465,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeChar(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -477,6 +480,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeChars(String data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -492,6 +496,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeDouble(double data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -506,6 +511,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeFloat(float data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -520,6 +526,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeInt(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -534,6 +541,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeLong(long data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -548,6 +556,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeShort(int data) throws IOException{
         try{
             writeObjectState.writeData(this);
@@ -578,6 +587,7 @@ public class IIOPOutputStream
 
     @TraceValueHandler
     @ValueHandlerWrite
+    @Override
     public final void writeUTF(String data) throws IOException{
         try{
             writeObjectState.writeData(this);

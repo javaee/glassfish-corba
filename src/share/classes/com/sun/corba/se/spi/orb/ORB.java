@@ -114,7 +114,7 @@ import com.sun.corba.se.impl.corba.TypeCodeImpl ;
 import com.sun.corba.se.impl.corba.TypeCodeFactory ;
 
 // XXX Should there be a SPI level constants ?
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 // XXX This goes away when we convert ORBD to ORT
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;

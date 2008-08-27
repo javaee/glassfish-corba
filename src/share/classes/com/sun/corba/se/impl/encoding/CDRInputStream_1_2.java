@@ -36,7 +36,7 @@
 package com.sun.corba.se.impl.encoding;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class CDRInputStream_1_2 extends CDRInputStream_1_1
 {

@@ -38,7 +38,7 @@ package corba.custom;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 // Loops through all possible fragment sizes from 32 through user defined
 // max.  Currently [32, 512]

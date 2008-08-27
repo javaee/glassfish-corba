@@ -51,10 +51,9 @@ import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolChooser;
 
 import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
 
 public class ThreadPoolManagerImpl implements ThreadPoolManager 
 { 

@@ -45,7 +45,7 @@ import org.omg.CosNaming.NamingContext;
 
 import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
 import com.sun.corba.se.impl.logging.NamingSystemException;
 

@@ -44,6 +44,7 @@ import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.pept.transport.ConnectionCache;
 
 import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
@@ -95,6 +96,14 @@ public abstract class CorbaConnectionCacheBase
 	synchronized (backingStore()) {
 	    return values().size();
 	}
+    }
+
+    public void close() {
+        synchronized (backingStore()) {
+            for (Object obj : values()) {
+                ((CorbaConnection)obj).closeConnectionResources() ;
+            }
+        }
     }
 
     public long numberOfIdleConnections()

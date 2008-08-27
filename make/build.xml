@@ -273,6 +273,8 @@
 	    <include name="com/sun/corba/se/pept/**"/>
 	    <include name="com/sun/corba/se/spi/**"/>
 	    <include name="com/sun/corba/se/impl/**"/>
+	    <include name="com/sun/corba/se/impl/**"/>
+	    <include name="com/sun/corba/se/tool/**"/>
 	    <include name="sun/corba/**"/>
 	    <include name="sun/rmi/rmic/**"/>
 	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>

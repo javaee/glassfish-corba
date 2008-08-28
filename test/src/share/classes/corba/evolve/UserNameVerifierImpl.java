@@ -83,9 +83,9 @@ public class UserNameVerifierImpl
         try {
             Class fimpl = Class.forName( "FeatureInfoImpl" ) ;
             Constructor cons = fimpl.getConstructor( String.class, String.class ) ;
-            return cons.invoke( FEATURE_NAME, FEATURE_DESCRIPTION ) ;
+            return (FeatureInfo)cons.newInstance( FEATURE_NAME, FEATURE_DESCRIPTION ) ;
         } catch (Exception exc) {
-            throw new RemoteException( exc ) ;
+            throw new RemoteException( "", exc ) ;
         }
     }
 

@@ -7,7 +7,7 @@ public class FeatureInfoImpl implements FeatureInfo, java.io.Serializable  {
     protected String name;
     protected String description;
     
-    public MBeanFeatureInfo(String name, String description)
+    public FeatureInfoImpl(String name, String description)
 	    throws IllegalArgumentException {
 	this.name = name;    
 	this.description = description;
@@ -24,9 +24,9 @@ public class FeatureInfoImpl implements FeatureInfo, java.io.Serializable  {
     public boolean equals(Object o) {
 	if (o == this)
 	    return true;
-	if (!(o instanceof MBeanFeatureInfo))
+	if (!(o instanceof FeatureInfoImpl))
 	    return false;
-	MBeanFeatureInfo p = (MBeanFeatureInfo) o;
+	FeatureInfoImpl p = (FeatureInfoImpl) o;
 	return (p.getName().equals(getName()) &&
 		p.getDescription().equals(getDescription()));
     }

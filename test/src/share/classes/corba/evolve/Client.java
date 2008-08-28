@@ -74,15 +74,22 @@ public class Client
             verifier.verifyName(localName);
 
             System.out.println("PASSED");
+
             System.out.println("Requesting a name...");
-
             UserNameInt testName = verifier.requestName();
-
             if (testName == null || !testName.validate())
                 throw new Exception("Name returned from server was null or invalid");
 
             System.out.println("PASSED");
 
+            System.out.println( "Requesting a FeatureInfo" ) ;
+            FeatureInfo finfo = verifier.getFeatureInfo() ;
+            System.out.println("PASSED");
+
+            System.out.println("Validating the FeatureInfo" ) ;
+            boolean result = verifier.validateFeatureInfo( finfo ) ;
+            if (!result)
+                throw new Exception( "Failure validating FeatureInfo "  + finfo ) ;
         } catch (Throwable t) {
             t.printStackTrace(System.out);
             System.exit (1);

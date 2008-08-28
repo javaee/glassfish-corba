@@ -328,7 +328,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	try {
 	    ot = new ArrayType( 1, cotype ) ;
 	} catch (OpenDataException exc) {
-	    throw new IllegalArgumentException( "Arrays of arrays not support: " + cotype, exc ) ;
+	    throw new IllegalArgumentException( "Arrays of arrays not supported: " + cotype, exc ) ;
 	}
 
 	final OpenType myManagedType = ot ;
@@ -489,8 +489,6 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	// Scan for all methods annotated with @ManagedAttribute, including inherited methods.
 	// Construct tables Map<String,Method> for getters (no setters in CompositeData, since
 	// CompositeData is immutable).
-	// Get open types for getter type
-	// Construct OpenMBeanAttributeInfos and actual methods, and put into CompositeData
 	final List<Method> attributes = AnnotationUtil.getAnnotatedMethods( cls, ManagedAttribute.class ) ;
 
 	for (Method m : attributes) {

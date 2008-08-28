@@ -97,22 +97,15 @@ public class RepositoryId {
 	
     private static final long serialVersionUID = 123456789L;
 
-    private static String defaultServerURL = null;
-    private static boolean useCodebaseOnly = false;
+    private static final String defaultServerURL = (String)JDKBridge.getLocalCodebase() ;
+    private static final boolean useCodebaseOnly = JDKBridge.useCodebaseOnly() ;
 
-    static {
-	if (defaultServerURL == null)
-	    defaultServerURL = (String)JDKBridge.getLocalCodebase();
-	useCodebaseOnly = JDKBridge.useCodebaseOnly();
+    private static final Map classToRepStr = new WeakHashMap();
+    private static final Map classIDLToRepStr = new WeakHashMap();
+    private static final Map classSeqToRepStr = new WeakHashMap();
 
-    }
-
-    private static Map classToRepStr = new WeakHashMap();
-    private static Map classIDLToRepStr = new WeakHashMap();
-    private static Map classSeqToRepStr = new WeakHashMap();
-
-    private static Map repStrToByteArray = new IdentityHashMap();
-    private static Map repStrToClass = new SoftCache();
+    private static final Map repStrToByteArray = new IdentityHashMap();
+    private static final Map repStrToClass = new SoftCache();
 
     private String repId = null;
     private boolean isSupportedFormat = true;

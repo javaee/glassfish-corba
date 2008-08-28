@@ -789,6 +789,7 @@ class DummyConnectionCache
     public long numberOfIdleConnections() { return 0; }
     public long numberOfBusyConnections() { return 0; }
     public boolean reclaim() { return true; }
+    public void close() {}
 }
 
 // End of file.

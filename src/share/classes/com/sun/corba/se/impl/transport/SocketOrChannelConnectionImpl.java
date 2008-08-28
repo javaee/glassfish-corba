@@ -112,7 +112,7 @@ public class SocketOrChannelConnectionImpl
 	Work
 {
 
-    final public static boolean dprintWriteLocks = false;
+    final private static boolean dprintWriteLocks = false;
 
     ///
     // New transport.

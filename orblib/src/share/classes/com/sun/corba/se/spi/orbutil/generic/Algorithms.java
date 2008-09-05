@@ -98,4 +98,13 @@ public abstract class Algorithms {
         }
         return result ;
     }
+
+    public static <T> T getOne( List<T> list, String zeroMsg, String manyMsg ) {
+        if (list.size() == 0)
+            throw new IllegalArgumentException( zeroMsg ) ;
+        if (list.size() > 0)
+            throw new IllegalArgumentException( manyMsg ) ;
+        return list.get(0) ;
+    }
+
 }

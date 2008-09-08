@@ -74,12 +74,8 @@ import javax.management.openmbean.OpenMBeanParameterInfo ;
 import javax.management.openmbean.OpenMBeanParameterInfoSupport ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
-import com.sun.corba.se.spi.orbutil.generic.BinaryVoidFunction ;
 import com.sun.corba.se.spi.orbutil.generic.BinaryFunction ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedData ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
@@ -87,7 +83,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
 // XXX What about open constructors and notifications?  Do we need them?
 class DynamicMBeanSkeleton {
@@ -96,7 +91,7 @@ class DynamicMBeanSkeleton {
 
     private String type ;
     private final MBeanInfo mbInfo ;
-    private final ManagedObjectManager mom ;
+    private final ManagedObjectManagerInternal mom ;
     private final Map<String,AttributeDescriptor> setters ;
     private final Map<String,AttributeDescriptor> getters ;
     private final Map<String,Map<List<String>,Operation>> operations ;
@@ -130,7 +125,8 @@ class DynamicMBeanSkeleton {
     }
 
     private void analyzeInheritedAttributes( Class<?> annotatedClass, ClassAnalyzer ca ) {
-	// Check for @InheritedAttribute(s) annotation.  Find methods for these attributes in superclasses. 
+	// Check for @InheritedAttribute(s) annotation.  
+        // Find methods for these attributes in superclasses. 
 	final InheritedAttribute[] iaa = AnnotationUtil.getInheritedAttributes( annotatedClass ) ;
 	if (iaa != null) {
 	    for (InheritedAttribute attr : iaa) {
@@ -252,7 +248,7 @@ class DynamicMBeanSkeleton {
     }
 
     public DynamicMBeanSkeleton( final Class<?> annotatedClass, final ClassAnalyzer ca,
-        final ManagedObjectManager mom ) {
+        final ManagedObjectManagerInternal mom ) {
 
 	this.mom = mom ;
 

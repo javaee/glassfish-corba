@@ -37,6 +37,7 @@
 package com.sun.corba.se.spi.orbutil.jmx ;
 
 import com.sun.corba.se.impl.orbutil.jmx.ManagedObjectManagerImpl ;
+import com.sun.corba.se.impl.orbutil.jmx.ManagedObjectManagerInternal ;
 
 /** Factory used to create ManagedObjectManager instances.
  */
@@ -56,7 +57,8 @@ public final class ManagedObjectManagerFactory {
      * a set of properties in their ObjectNames.
      */
     public static ManagedObjectManager create( ManagedObjectManager mom, String... props ) {
-	return ManagedObjectManagerImpl.makeDelegate( mom, props ) ;
+	return ManagedObjectManagerImpl.makeDelegate( (ManagedObjectManagerInternal)mom, 
+            props ) ;
     }
 }
 

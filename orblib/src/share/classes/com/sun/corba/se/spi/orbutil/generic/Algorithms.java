@@ -107,4 +107,9 @@ public abstract class Algorithms {
         return list.get(0) ;
     }
 
+    public static <T> T getFirst( List<T> list, String zeroMsg ) {
+        if (list.size() == 0)
+            throw new IllegalArgumentException( zeroMsg ) ;
+        return list.get(0) ;
+    }
 }

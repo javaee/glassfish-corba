@@ -34,53 +34,12 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.jmx ;
+package com.sun.corba.se.impl.orbutil.jmx ;
 
-import java.util.Properties ;
+import java.lang.reflect.Type ;
 
-import javax.management.ObjectName ;
-import javax.management.MBeanServer ;
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 
-/** An interface used to managed Open MBeans created from annotated
- * objects.  This is mostly a facade over MBeanServer.
- */
-public interface ManagedObjectManager {
-    /** Construct an Open Mean for obj according to its annotations,
-     * and register it with domain getDomain() and the key/value pairs
-     * given by props in the form key=value.  The MBeanServer from 
-     * setMBeanServer (or its default) is used.
-     */
-    void register( Object obj, String... props ) ;
-
-    /** Same as register( Object, String...) except that key/value
-     * pairs are given as properties.
-     */
-    void register( Object obj, Properties props )  ;
-
-    /** Unregister the Open MBean corresponding to obj from the
-     * mbean server.
-     */
-    void unregister( Object obj ) ;
-
-    /** Get the ObjectName for the given object (which must have
-     * been registered via a register call).
-     */
-    ObjectName getObjectName( Object obj ) ;
-
-    /** Get the Object that was registered with the given ObjectName.
-     */
-    Object getObject( ObjectName oname ) ;
-
-    /** Return the domain name that was used when this ManagedObjectManager
-     * was created.
-     */
-    String getDomain() ;
-
-    /** Set the MBeanServer to which all MBeans using this interface
-     * are published.  The default value is 
-     * java.lang.management.ManagementFactory.getPlatformMBeanServer().
-     */
-    void setMBeanServer( MBeanServer server ) ;
-
-    MBeanServer getMBeanServer() ;
+public interface ManagedObjectManagerInternal extends ManagedObjectManager {
+    TypeConverter getTypeConverter( Type type ) ;
 }

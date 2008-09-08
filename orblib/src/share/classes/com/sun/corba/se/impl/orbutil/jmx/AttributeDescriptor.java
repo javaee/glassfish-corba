@@ -53,23 +53,9 @@ import javax.management.ReflectionException ;
 
 import java.lang.annotation.Annotation ;
 
-import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
-import com.sun.corba.se.spi.orbutil.generic.BinaryVoidFunction ;
-import com.sun.corba.se.spi.orbutil.generic.BinaryFunction ;
 import com.sun.corba.se.spi.orbutil.generic.Algorithms ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.generic.Graph ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedData ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
-import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
-import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
-import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
     
 public class AttributeDescriptor {
     public enum AttributeType { SETTER, GETTER } ;
@@ -184,7 +170,7 @@ public class AttributeDescriptor {
     }
 
     private static boolean startsWithNotEquals( String str, String prefix ) {
-	return str.startsWith( str ) && !str.equals( prefix ) ;
+	return str.startsWith( prefix ) && !str.equals( prefix ) ;
     }
 
     private static String stripPrefix( String str, String prefix ) {
@@ -200,7 +186,7 @@ public class AttributeDescriptor {
     /** Find the attribute corresponding to a getter or setter with the given id.
      * Returns null if no such attribute is found.
      */
-    public static AttributeDescriptor findAttribute( ManagedObjectManager mom,
+    public static AttributeDescriptor findAttribute( ManagedObjectManagerInternal mom,
         final ClassAnalyzer ca, final String id, 
         final String description, final AttributeType at ) {
 
@@ -221,22 +207,19 @@ public class AttributeDescriptor {
         return new AttributeDescriptor( mom, methods, id, description, at ) ;
     }
 
-    private AttributeDescriptor( ManagedObjectManager mom, final List<Method> methods, 
+    private AttributeDescriptor( ManagedObjectManagerInternal mom, final List<Method> methods, 
         final String id, final String description, final AttributeType at ) {
+
         this( mom, 
             (at == AttributeType.GETTER) ?
-                Algorithms.getOne( methods, 
-                    "No getter named " + id + " found",
-                    "More than one getter named " + id + " found" ) 
+                Algorithms.getFirst( methods, "No getter named " + id + " found" )
             :
-                Algorithms.getOne( methods, 
-                    "No setter named " + id + " found",
-                    "More than one setter named " + id + " found" ), 
+                Algorithms.getFirst( methods, "No setter named " + id + " found" ),
             id, description ) ;
     }
 
     // Handle a method that is NOT annotated with @ManagedAttribute
-    public AttributeDescriptor( ManagedObjectManager mom, Method m, 
+    public AttributeDescriptor( ManagedObjectManagerInternal mom, Method m, 
         String extId, String description ) {
 
         this.method = m ;
@@ -302,7 +285,7 @@ public class AttributeDescriptor {
     }
 
     // Handle a method with an @ManagedAttribute annotation
-    public AttributeDescriptor( ManagedObjectManager mom, Method m ) {
+    public AttributeDescriptor( ManagedObjectManagerInternal mom, Method m ) {
         this( mom, m,
             m.getAnnotation( ManagedAttribute.class ).id(),
             m.getAnnotation( ManagedAttribute.class ).description() ) ;

@@ -74,7 +74,6 @@ import javax.management.openmbean.TabularDataSupport ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.orbutil.generic.Algorithms ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedData ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
@@ -82,7 +81,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
 /** A ManagedEntity is one of the pre-defined Open MBean types: SimpleType, ObjectName, 
  * TabularData, or CompositeData.
@@ -255,7 +253,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
      *
      * XXX Can we automate the handling of recursive types?
      */
-    public static TypeConverter makeTypeConverter( Type type, ManagedObjectManager mom ) {
+    public static TypeConverter makeTypeConverter( Type type, ManagedObjectManagerInternal mom ) {
 	OpenType stype = simpleTypeMap.get( type ) ;
 	if (stype != null) {
 	    return handleSimpleType( (Class)type, mom, stype ) ;
@@ -299,7 +297,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleManagedObject( final Class type, 
-	final ManagedObjectManager mom, ManagedObject mo ) {
+	final ManagedObjectManagerInternal mom, ManagedObject mo ) {
 
 	return new TypeConverterImpl( type, SimpleType.OBJECTNAME ) {
 	    public Object toManagedEntity( Object obj ) {
@@ -319,7 +317,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleArrayType( final GenericArrayType type, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
 
 	final Type ctype = type.getGenericComponentType() ;
 	final TypeConverter ctypeTc = mom.getTypeConverter( ctype ) ;
@@ -379,7 +377,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleEnum( final Class cls, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
 
 	return new TypeConverterImpl( cls, SimpleType.STRING ) {
 	    public Object toManagedEntity( Object obj ) {
@@ -397,7 +395,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleAsString( final Class cls, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
 
 	Constructor cs = null ;
 	try {
@@ -435,7 +433,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleSimpleType( final Class cls, 
-	final ManagedObjectManager mom, final OpenType stype ) {
+	final ManagedObjectManagerInternal mom, final OpenType stype ) {
 
 	return new TypeConverterImpl( cls, stype ) {
 	    public Object toManagedEntity( Object obj ) {
@@ -455,7 +453,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
     
     private static List<AttributeDescriptor> analyzeManagedData( final Class<?> cls, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
        
         Pair<Class<?>,ClassAnalyzer> pair = AnnotationUtil.getClassAnalyzer( cls, ManagedData.class ) ;
 
@@ -523,7 +521,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleManagedData( final Class cls, 
-	final ManagedObjectManager mom, final ManagedData md ) {
+	final ManagedObjectManagerInternal mom, final ManagedData md ) {
 
 	final List<AttributeDescriptor> minfos = analyzeManagedData(
 	    cls, mom ) ;
@@ -746,7 +744,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     //    type is T<K,V>.  This maps to a TabularType, with key field named "key" of type
     //    mapping of K, and value field "value" of type mapping of V.
     private static TypeConverter handleParameterizedType( final ParameterizedType type, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
 
         TypeConverter result = null ;
 

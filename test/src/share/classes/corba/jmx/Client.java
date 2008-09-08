@@ -86,12 +86,15 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManagerFactory ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.VersionedHashSet ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 
+import com.sun.corba.se.impl.orbutil.jmx.TypeConverter ;
+import com.sun.corba.se.impl.orbutil.jmx.AttributeDescriptor ;
+import com.sun.corba.se.impl.orbutil.jmx.ClassAnalyzer ;
 import com.sun.corba.se.impl.orbutil.jmx.AnnotationUtil ;
+import com.sun.corba.se.impl.orbutil.jmx.ManagedObjectManagerInternal ;
 
 import static java.util.Arrays.asList ;
 
@@ -235,11 +238,13 @@ public class Client {
     // C precedes C.super, all C.implements in R
     // C is the first element of R.
 
+
     @Test() 
     public void testGetInheritanceChain() {
-	List<Class<?>> res = AnnotationUtil.getInheritanceChain( I.class ) ;
-	// System.out.println( "Inheritance chain for class " + I.class.getName() 
-	    // + " is " + res ) ;
+        ClassAnalyzer ca = new ClassAnalyzer( I.class ) ;
+        List<Class<?>> res = ca.findClasses( ca.alwaysTrue() ) ;
+	System.out.println( "Inheritance chain for class " + I.class.getName() 
+	    + " is " + res ) ;
 
 	Map<Class,Integer> positions = new HashMap<Class,Integer>() ;
 	int position = 0 ;
@@ -336,9 +341,12 @@ public class Client {
 
     @Test()
     public void testFindMethod() {
-	final UnaryBooleanFunction<Method> predicate = 
-	    new UnaryBooleanFunction<Method>() {
-		public boolean evaluate( Method method ) {
+        final ClassAnalyzer ca = new ClassAnalyzer( DD.class ) ;
+	final ClassAnalyzer.Predicate predicate = 
+	    new ClassAnalyzer.Predicate() {
+		public boolean evaluate( Object obj ) {
+                    Method method = (Method)obj ;
+
 		    return (method.getName() == "barA") &&
 			(method.getReturnType() == int.class) ;
 		}
@@ -346,15 +354,16 @@ public class Client {
 
 	final Method expectedResult = getMethod( AA.class, "barA" ) ;
 
-	final Method result = AnnotationUtil.findMethod( DD.class,
-	    predicate ) ;
-
-	Assert.assertEquals( expectedResult, result ) ;
+	final List<Method> result = ca.findMethods( predicate ) ;
+        Assert.assertEquals( result.size(), 1 ) ;
+        Method resultMethod = result.get(0) ;
+	Assert.assertEquals( expectedResult, resultMethod ) ;
     }
 
     @Test
     public void testGetAnnotatedMethods() {
-	List<Method> methods = AnnotationUtil.getAnnotatedMethods( DD.class, Test2.class ) ;
+        ClassAnalyzer ca = new ClassAnalyzer( DD.class ) ;
+        List<Method> methods = ca.findMethods( ca.forAnnotation( Test2.class ) ) ;
 	Set<Method> methodSet = new HashSet<Method>( methods ) ;
 
 	Method[] expectedMethods = { 
@@ -371,19 +380,14 @@ public class Client {
 
     @Test
     public void testGetClassAnnotations() {
-	Set<Pair<Class<?>,Test3>> expectedClassAnnotations = 
-	    new HashSet<Pair<Class<?>,Test3>>() ;
-	expectedClassAnnotations.add( new Pair<Class<?>,Test3>( CC.class, 
-	    CC.class.getAnnotation( Test3.class ))) ;
-	expectedClassAnnotations.add( new Pair<Class<?>,Test3>( AA.class, 
-	    AA.class.getAnnotation( Test3.class ))) ;
+        List<Class<?>> expectedResult = new ArrayList<Class<?>>() ;
+        expectedResult.add( CC.class ) ;
+        expectedResult.add( AA.class ) ;
 
-	List<Pair<Class<?>,Test3>> classAnnotationList = AnnotationUtil.getClassAnnotations( 
-	    DD.class, Test3.class ) ;
-	Set<Pair<Class<?>,Test3>> classAnnotations = new HashSet<Pair<Class<?>,Test3>>( 
-	    classAnnotationList ) ;
+        ClassAnalyzer ca = new ClassAnalyzer( DD.class ) ;
+        List<Class<?>> classes = ca.findClasses( ca.forAnnotation( Test3.class ) ) ;
 
-	Assert.assertEquals( expectedClassAnnotations, classAnnotations ) ;
+	Assert.assertEquals( classes, expectedResult ) ;
     }
 
     private static Method getter_fooA = getMethod( AA.class, "getFooA" ) ;
@@ -397,27 +401,39 @@ public class Client {
     @Test
     public void testIsSetterIsGetter() {
 	Method m = null ;
+        ClassAnalyzer ca = new ClassAnalyzer( DD.class ) ;
+	ManagedObjectManagerInternal mom = 
+            (ManagedObjectManagerInternal)ManagedObjectManagerFactory.create( "ORBTest" ) ;
 
-	m = AnnotationUtil.getGetterMethod( DD.class, "fooA" ) ;
-	Assert.assertEquals( getter_fooA, m ) ;
+        AttributeDescriptor ad = null ;
 
-	m = AnnotationUtil.getSetterMethod( DD.class, "fooA" ) ;
-	Assert.assertEquals( setter_fooA, m ) ;
+        ad = AttributeDescriptor.findAttribute( mom, ca, "fooA", "null description", 
+            AttributeDescriptor.AttributeType.GETTER ) ;
+	Assert.assertEquals( getter_fooA, ad.method() ) ;
+        
+        ad = AttributeDescriptor.findAttribute( mom, ca, "fooA", "null description", 
+            AttributeDescriptor.AttributeType.SETTER ) ;
+	Assert.assertEquals( setter_fooA, ad.method() ) ;
 
-	m = AnnotationUtil.getGetterMethod( DD.class, "barA" ) ;
-	Assert.assertEquals( getter_barA, m ) ;
+        ad = AttributeDescriptor.findAttribute( mom, ca, "barA", "null description", 
+            AttributeDescriptor.AttributeType.GETTER ) ;
+	Assert.assertEquals( getter_barA, ad.method() ) ;
 
-	m = AnnotationUtil.getSetterMethod( DD.class, "barA" ) ;
-	Assert.assertEquals( setter_barA, m ) ;
+        ad = AttributeDescriptor.findAttribute( mom, ca, "barA", "null description", 
+            AttributeDescriptor.AttributeType.SETTER ) ;
+	Assert.assertEquals( setter_barA, ad.method() ) ;
 
-	m = AnnotationUtil.getGetterMethod( DD.class, "something" ) ;
-	Assert.assertEquals( getter_something, m ) ;
+        ad = AttributeDescriptor.findAttribute( mom, ca, "something", "null description", 
+            AttributeDescriptor.AttributeType.GETTER ) ;
+	Assert.assertEquals( getter_something, ad.method() ) ;
 
-	m = AnnotationUtil.getGetterMethod( DD.class, "fooC" ) ;
-	Assert.assertEquals( getter_fooC, m ) ;
+        ad = AttributeDescriptor.findAttribute( mom, ca, "fooC", "null description", 
+            AttributeDescriptor.AttributeType.GETTER ) ;
+	Assert.assertEquals( getter_fooC, ad.method() ) ;
 
-	m = AnnotationUtil.getSetterMethod( DD.class, "fooD" ) ;
-	Assert.assertEquals( setter_fooD, m ) ;
+        ad = AttributeDescriptor.findAttribute( mom, ca, "fooD", "null description", 
+            AttributeDescriptor.AttributeType.SETTER ) ;
+	Assert.assertEquals( setter_fooD, ad.method() ) ;
     }
 
     // @ExpectedExceptions( { IllegalArgumentException.class } )
@@ -487,7 +503,8 @@ public class Client {
 
     @Test
     public void testPrimitiveTypeConverter() {
-	ManagedObjectManager mom = ManagedObjectManagerFactory.create( "ORBTest" ) ;
+	ManagedObjectManagerInternal mom = 
+            (ManagedObjectManagerInternal)ManagedObjectManagerFactory.create( "ORBTest" ) ;
 
 	for (Object[] data : primitiveTCTestData) {
 	    Class cls = (Class)data[0] ;
@@ -652,7 +669,8 @@ public class Client {
 
     @Test
     public void testManagedDataTypeConverter() {
-	ManagedObjectManager mom = ManagedObjectManagerFactory.create( "ORBTest" ) ;
+	ManagedObjectManagerInternal mom = 
+            (ManagedObjectManagerInternal)ManagedObjectManagerFactory.create( "ORBTest" ) ;
     
 	TypeConverter tc = mom.getTypeConverter( ManagedDataExample.class ) ;
 	Assert.assertTrue( tc.getDataType() == ManagedDataExample.class ) ;

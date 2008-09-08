@@ -68,7 +68,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
     
 /** Analyzes class inheritance hiearchy and provides methods for searching for
  * classes and methods.
@@ -125,6 +124,7 @@ public class ClassAnalyzer {
     } ;
 
     private List<Class<?>> classInheritance ;
+    private String contents = null ;
 
     private ClassAnalyzer( Graph<Class<?>> gr ) {
 	List<Class<?>> result = new ArrayList<Class<?>>( gr.getPostorderList() ) ;
@@ -149,6 +149,16 @@ public class ClassAnalyzer {
             }
         } ;
     }
+    
+    private static final Predicate alwaysTrue = new Predicate() {
+        public boolean evaluate( Object elem ) {
+            return true ;
+        }
+    } ;
+
+    public Predicate alwaysTrue() {
+        return alwaysTrue ;
+    }
 
     public List<Class<?>> findClasses( Predicate pred ) {
 	final List<Class<?>> result = new ArrayList<Class<?>>() ;
@@ -161,6 +171,7 @@ public class ClassAnalyzer {
         return result ;
     }
 
+    // Tested by testFindMethod
     // Tested by testGetAnnotatedMethods XXX rename the test
     public List<Method> findMethods( Predicate pred ) {
 	final List<Method> result = new ArrayList<Method>() ;
@@ -175,18 +186,24 @@ public class ClassAnalyzer {
 	return result ;
     }
 
-    // Tested by testFindMethod
-    // XXX Do we really need this, or just use findMethods, and look at 
-    // length of result?
-    public Method findMethod( Predicate pred ) {
-	for (Class<?> c : classInheritance) {
-	    for (Method m : c.getDeclaredMethods()) {
-                if (pred.evaluate( m )) {
-                    return m ;
-                }
-	    }
-	}
+    public synchronized String toString() {
+        if (contents == null) {
+            StringBuilder sb = new StringBuilder() ;
 
-	return null ;
+            boolean first = true ;
+            sb.append( "ClassAnalyzer[" ) ;
+            for (Class cls : classInheritance) {
+                if (first) {
+                    first = false ;
+                } else {
+                    sb.append( " " ) ;
+                }
+                sb.append( cls.getName() ) ;
+            }
+            sb.append( "]" ) ;
+            contents = sb.toString() ;
+        }
+
+        return contents ;
     }
 }

@@ -67,7 +67,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
     
 public abstract class AnnotationUtil {
     private AnnotationUtil() {}
@@ -80,9 +79,16 @@ public abstract class AnnotationUtil {
         Class<? extends Annotation> annotationClass ) {
 
         ClassAnalyzer ca = new ClassAnalyzer( cls ) ;
-        Class<?> annotatedClass = Algorithms.getOne( ca.findClasses( ca.forAnnotation( annotationClass ) ),
+        /* This is the versions that expects EXACTLY ONE annotation
+        Class<?> annotatedClass = Algorithms.getOne( 
+            ca.findClasses( ca.forAnnotation( annotationClass ) ),
             "No " + annotationClass.getName() + " annotation found",
             "More than one " + annotationClass.getName() + " annotation found" ) ;
+        */
+        
+        Class<?> annotatedClass = Algorithms.getFirst( 
+            ca.findClasses( ca.forAnnotation( annotationClass ) ),
+            "No " + annotationClass.getName() + " annotation found" ) ;
         
         List<Class<?>> classes = new ArrayList<Class<?>>() ;
         classes.add( annotatedClass ) ;

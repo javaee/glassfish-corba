@@ -60,9 +60,10 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
-public class ManagedObjectManagerImpl implements ManagedObjectManager {
+// XXX What about cleanup?  Probably want a close() method that unregisters
+// all registered objects and flushes caches.
+public class ManagedObjectManagerImpl implements ManagedObjectManagerInternal {
     private String domain ;
     private MBeanServer server ; 
     private Map<Object,ObjectName> objectMap ;
@@ -122,10 +123,11 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
      * fixed properties to each ObjectName on the register call.
      * Each element in props must be in the "name=value" form.
      */
-    public static ManagedObjectManager makeDelegate( final ManagedObjectManager mom, 
+    public static ManagedObjectManager makeDelegate( 
+        final ManagedObjectManagerInternal mom, 
 	final String... props ) {
 
-	return new ManagedObjectManager() {
+	return new ManagedObjectManagerInternal() {
 	    final Properties savedProps = makeProps( props ) ;
 
 	    public void register( Object obj, String... mprops )  {

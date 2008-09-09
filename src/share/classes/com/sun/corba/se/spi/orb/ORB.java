@@ -78,6 +78,7 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
 import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
 import com.sun.corba.se.spi.orb.Operation ;
@@ -108,6 +109,8 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsDisabledImpl ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsEnabledImpl ;
+
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 
 // XXX needs an SPI or else it does not belong here
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;
@@ -279,9 +282,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	wireObjectKeyTemplate = new WireObjectKeyTemplate(this);
     }
 
-    protected TimerManager<TimingPoints> makeTimerManager( String orbId ) {
+    protected TimerManager<TimingPoints> makeTimerManager( 
+        ManagedObjectManager mom, String orbId ) {
+
 	TimerManager<TimingPoints> timerManager = 
-	    new TimerManager<TimingPoints>( orbId ) ;
+	    new TimerManager<TimingPoints>( mom, orbId ) ;
 
 	TimingPoints tp = null ;
 	if ((getORBData() != null) && getORBData().timingPointsEnabled()) {
@@ -615,6 +620,9 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	return null ;
     }
 
+    public ManagedObjectManager mom() {
+        return null ;
+    }
 }
 
 // End of file.

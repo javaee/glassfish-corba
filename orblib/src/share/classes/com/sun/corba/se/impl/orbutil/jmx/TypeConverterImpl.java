@@ -289,7 +289,21 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	} 
 	
 	if (type instanceof WildcardType) {
-	    throw new IllegalArgumentException( "WildcardType " + type + " not supported" ) ;
+            // Just treat this the same as its bound type
+            WildcardType wt = (WildcardType)type ;
+            Type[] upperBounds = wt.getUpperBounds() ;
+            Type[] lowerBounds = wt.getLowerBounds() ;
+            if (lowerBounds.length > 0)
+                throw new IllegalArgumentException( "WildcardType " + type 
+                    + " with lower bounds is not supported" ) ;
+            if (upperBounds.length == 0)
+                throw new IllegalArgumentException( "WildcardType " + type 
+                    + " with no bounds is not supported" ) ;
+            if (upperBounds.length > 1)
+                throw new IllegalArgumentException( "WildcardType " + type 
+                    + " with multiple upper bounds is not supported" ) ;
+
+            return makeTypeConverter( upperBounds[0], mom ) ;
 	} else {
 	    // this should not happen
 	    throw new IllegalArgumentException( "Unknown kind of Type " + type ) ;
@@ -401,9 +415,11 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	try {
 	    cs = cls.getDeclaredConstructor( String.class ) ;
 	} catch (Exception exc) {
-	    throw new IllegalArgumentException( 
-		"Error in obtaining (String) constructor for " 
-		+ cls, exc ) ;
+            // No exception here: if no constructor, then fromManagedEntity should
+            // throw an exception if it is ever called.
+	    // throw new IllegalArgumentException( 
+		// "Error in obtaining (String) constructor for " 
+		// + cls, exc ) ;
 	}
 	final Constructor cons = cs ;
 

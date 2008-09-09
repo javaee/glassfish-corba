@@ -43,6 +43,7 @@ import java.util.Set ;
 import java.util.HashSet ;
 import java.util.Collections ;
 
+import com.sun.corba.se.spi.orbutil.newtimer.Named ;
 import com.sun.corba.se.spi.orbutil.newtimer.Controllable ;
 import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
@@ -55,6 +56,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.NamedBase ;
 
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
 
 // TimerFactory is a TimerGroup containing all timers and timer groups 
@@ -71,6 +73,8 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
 // A lock will also be used in Timer to control access to the
 // activation state of a Timer.
 public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
+    private ManagedObjectManager mom ;
+
     // The string<->int dictionary for timer names
     private Map<Controllable,Integer> conToInt ;
     private Map<Integer,Controllable> intToCon;
@@ -85,8 +89,14 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
     private Map<String,TimerEventHandler> timerEventHandlers ;
     private Map<String,TimerEventControllerBase> timerEventControllers ;
 
-    public TimerFactoryImpl( String name, String description ) {
+    private void manage( Named obj ) {
+        if (mom != null) 
+            mom.register( obj, "name=" + obj.name() ) ;
+    }
+
+    public TimerFactoryImpl( ManagedObjectManager mom, String name, String description ) {
 	super( 0, null, name, description ) ;
+        this.mom = mom ;
 	setFactory( this ) ;
 	add( this ) ; // The TimerFactory is a group containing all 
 		      // Timers and TimerGroups it creates, so it
@@ -105,6 +115,8 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
 	timerEventHandlers = new HashMap<String,TimerEventHandler>() ;
 	timerEventControllers = new HashMap<String,TimerEventControllerBase>() ;
+
+        manage( this ) ;
     }
 
     // con must be a Controllable with an id already set (which is
@@ -172,6 +184,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    throw new IllegalArgumentException( "Name " + name 
 		+ " is already in use." ) ;
 	TimerEventHandler result = new TracingEventHandler( factory(), name ) ;
+        manage( result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -181,6 +194,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    throw new IllegalArgumentException( "Name " + name 
 		+ " is already in use." ) ;
 	LogEventHandler result = new LogEventHandlerImpl( factory(), name ) ;
+        manage( result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -191,6 +205,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 		+ " is already in use." ) ;
 	StatsEventHandler result = new StatsEventHandlerImpl( factory(), 
 	    name ) ;
+        manage( result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -203,6 +218,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 		+ " is already in use." ) ;
 	StatsEventHandler result = new MultiThreadedStatsEventHandlerImpl( 
 	    factory(), name ) ;
+        manage( result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -217,6 +233,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	checkArgs( timers.keySet(), name, description ) ;
 
 	TimerImpl result = new TimerImpl( nextIndex, this, name, description ) ;
+        manage( result ) ;
 	mapId( result ) ;
 	timers.put( name, result ) ;
 	add( result ) ;  // Remember, a TimerFactory is a TimerGroup 
@@ -236,6 +253,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
 	TimerGroupImpl result = new TimerGroupImpl( nextIndex, this, name, 
 	    description ) ;
+        manage( result ) ;
 
 	mapId( result ) ;
 	timerGroups.put( result.name(), result ) ;
@@ -260,6 +278,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
     public synchronized TimerEventController makeController( String name ) {
 	TimerEventController result = new TimerEventController( this, name ) ;
+        manage( result ) ;
 	return result ;
     }
 

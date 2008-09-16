@@ -134,10 +134,11 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	    SimpleType st = (SimpleType)ot ;
 	    return (Class)simpleOpenTypeMap.get( st ) ;
 	} else if (ot instanceof ArrayType) {
-	    // This code is rather odd.  We need to get the opentype of the array components, convert
-	    // that to a java type, and then construct a Java type (Class) that has that java type
-	    // as its component (java) type.  I think the only way to do this is to call 
-	    // Array.newInstance, and then take the class from the resulting array instance.
+	    // This code is rather odd.  We need to get the opentype of the array components, 
+            // convert that to a java type, and then construct a Java type (Class) that has 
+            // that java type as its component (java) type.  I think the only way to do this 
+            // is to call Array.newInstance, and then take the class from the resulting array 
+            // instance.
 	    ArrayType at = (ArrayType)ot ;
 	    OpenType cot = at.getElementOpenType() ;
 	    Class cjt = getJavaClass( cot ) ;
@@ -198,19 +199,24 @@ public abstract class TypeConverterImpl implements TypeConverter {
      *  @ManagedData			CompositeType( 
      *					    @ManagedData.name, 
      *					    @ManagedData.description, 
-     *					    ALL @ManagedAttribute ID, // extract from the method name
+     *					    ALL @ManagedAttribute ID, (extracted from the method 
+     *					                               name)
      *					    ALL @ManagedAttribute.description, 
-     *					    ALL @ManagedAttribute OT(Type) ) // extracted from the 
-     *						method attribute TYPE
+     *					    ALL @ManagedAttribute OT(Type) ) (extracted from the 
+     *						                              method attribute 
+     *						                              TYPE)
      *					We also need to include @IncludeSubclass and 
      *					@InheritedAttribute(s) attributes
-     *					Also note that @InheritTable adds an attribute to the class.  
+     *					Also note that @InheritTable adds an attribute to the 
+     *					class.  
      *					The inherited table is mapped to an array.  
      *					The InheritTable annotation specifies a class X, which must
-     *					be part of the Type C<X>, where C is a subclass of Collection.  
+     *					be part of the Type C<X>, where C is a subclass of 
+     *					Collection, Iterable, Iterator, or Enumerable.  
      *					JT -> OT: invoke attribute methods, collect results, 
      *					    construct CompositeDataSupport
      *					OT -> JT: NOT SUPPORTED (for now)
+     *					(can only be supported in Collection case)
      *
      *	C<X>, C a subtype of Collection, Iterator, Iterable, or Enumeration
      *	        			Mapped to array data containing OT(X) 
@@ -221,24 +227,28 @@ public abstract class TypeConverterImpl implements TypeConverter {
      *					What about SortedSet?
      *
      *	M<K,V>, M a subtype of Map or Dictionary
-     *	                                Mapped to tabular data containing id="key" OT(K) as the key 
-     *	    				and id="value" OT(V) 
-     *	                                What about SortedMap?
+     *	                                Mapped to tabular data containing id="key" OT(K) as 
+     *	                                the key and id="value" OT(V) 
+     *	                                XXX What about SortedMap?
      *	    
      *	X[]				OT(X)[]
-     *					    As for CompositeData, we will mostly treat this as readonly.
-     *					Mappings same as C<X> case. This really should be an Array.
+     *					    As for CompositeData, we will mostly treat this as 
+     *					    readonly.  Mappings same as C<X> case. 
      *
      *	TypeVariable			
-     *	WildCardType			Both need to be supported.  The basic idea is that the upper bounds
-     *					give us information on what interfaces must be implemented by 
-     *					by an instance of the type variable.  This in turn tells us what
-     *					subclasses identified by @IncludeSubclass should be used when 
-     *					mapping the actual data to a CompositeData instance.
-     *					Not supported: lower bounds (what would that mean?  Do I need it?)
-     *						       multiple upper bounds (I don't think I need this?)
-     *					Multiple upper bounds PROBABLY means the intersection of the 
-     *					included subclasses for all of the bounds
+     *	WildCardType			Both need to be supported.  The basic idea is that 
+     *	                                the upper bounds give us information on what interfaces 
+     *	                                must be implemented by by an instance of the type 
+     *	                                variable.  This in turn tells us what
+     *					subclasses identified by @IncludeSubclass should be 
+     *					used when mapping the actual data to a CompositeData 
+     *					instance.
+     *					Not supported: lower bounds (what would that mean?  
+     *					               Do I need it?)
+     *						       multiple upper bounds (I don't think I 
+     *						       need this?)
+     *					Multiple upper bounds PROBABLY means the intersection of 
+     *					the included subclasses for all of the bounds
      *
      *	Other				String
      *					    JT -> OT: use toString
@@ -246,12 +256,19 @@ public abstract class TypeConverterImpl implements TypeConverter {
      *
      * XXX How much do we support the OpenType -> JavaType mapping?  This is mainly a question for
      * CompositeData.  Note that CompositeData is immutable, so all @ManagedAttributes in 
-     * CompositeData must be getters.  I think this would mainly apply to a setter in an MBean whose 
-     * type maps to CompositeData.
-     * For now, we will ignore this, because I think all CompositeData types in the ORB will be read only.
-     * If this is NOT the case, we can adopt a solution similar to the MXBean @ConstructorProperties.
+     * CompositeData must be getters.  I think this would mainly apply to a setter in an MBean 
+     * whose type maps to CompositeData.
+     * For now, we will ignore this, because I think all CompositeData types in the ORB will be 
+     * read only.  If this is NOT the case, we can adopt a solution similar to the MXBean 
+     * @ConstructorProperties.
      *
      * XXX Can we automate the handling of recursive types?
+     * Yes, but I'm not sure if it's worthwhile.  Basic idea is to introduce more annotations:
+     * @Key is used on a method that returns a value unique per instance of the class 
+     * (like @ObjectNameKey, although support of multiple keys is questionable here)
+     * Then @ManagedAttributes that are also annotated with @Map are mapped to the value
+     * returned from the @Key field of the returned value.  Details are definitely needed 
+     * here.
      */
     public static TypeConverter makeTypeConverter( Type type, ManagedObjectManagerInternal mom ) {
 	OpenType stype = simpleTypeMap.get( type ) ;
@@ -341,7 +358,8 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	try {
 	    ot = new ArrayType( 1, cotype ) ;
 	} catch (OpenDataException exc) {
-	    throw new IllegalArgumentException( "Arrays of arrays not supported: " + cotype, exc ) ;
+	    throw new IllegalArgumentException( "Arrays of arrays not supported: " 
+                + cotype, exc ) ;
 	}
 
 	final OpenType myManagedType = ot ;
@@ -441,7 +459,8 @@ public abstract class TypeConverterImpl implements TypeConverter {
 		    }
 		} else {
 		    throw new UnsupportedOperationException( 
-			"There is no <init>(String) constructor available to convert a String into a " 
+			"There is no <init>(String) constructor " 
+                        + "available to convert a String into a " 
 			+ cls ) ;
 		}
 	    }
@@ -471,7 +490,8 @@ public abstract class TypeConverterImpl implements TypeConverter {
     private static List<AttributeDescriptor> analyzeManagedData( final Class<?> cls, 
 	final ManagedObjectManagerInternal mom ) {
        
-        Pair<Class<?>,ClassAnalyzer> pair = AnnotationUtil.getClassAnalyzer( cls, ManagedData.class ) ;
+        Pair<Class<?>,ClassAnalyzer> pair = AnnotationUtil.getClassAnalyzer( cls, 
+            ManagedData.class ) ;
 
         Class<?> annotatedClass = pair.first() ;
         ClassAnalyzer ca = pair.second() ;
@@ -491,7 +511,8 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	// Scan for all methods annotated with @ManagedAttribute, including inherited methods.
 	// Construct tables Map<String,Method> for getters (no setters in CompositeData, since
 	// CompositeData is immutable).
-	final List<Method> attributes = ca.findMethods( ca.forAnnotation( ManagedAttribute.class ) ) ;
+	final List<Method> attributes = ca.findMethods( 
+            ca.forAnnotation( ManagedAttribute.class ) ) ;
 	for (Method m : attributes) {
 	    AttributeDescriptor ainfo = new AttributeDescriptor( mom, m ) ;
 
@@ -701,8 +722,10 @@ public abstract class TypeConverterImpl implements TypeConverter {
 
             final String[] itemNames = new String[] { "key", "value" } ;
 
+            // XXX need to use message formatter
             String description = "row type for " + mapType ;
 
+            // XXX need to use message formatter
             final String[] itemDescriptions = new String[] {
                 "Key of map " + mapType,
                 "Value of map " + mapType
@@ -713,11 +736,13 @@ public abstract class TypeConverterImpl implements TypeConverter {
             } ;
 
             try {
+                // XXX need to use message formatter
                 CompositeType rowType = new CompositeType( mapType,
                     "Row type for map " + mapType, itemNames, itemDescriptions, itemTypes ) ;
 
                 String[] keys = new String[] { "key" } ;
 
+                // XXX need to use message formatter
                 TabularType result = new TabularType( "Table:" + mapType, 
                     "Table for map " + mapType, rowType, keys ) ;
 
@@ -768,7 +793,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
         
         final Type[] args = type.getActualTypeArguments() ;
         if (args.length < 1) 
-            throw new IllegalArgumentException( cls + " must have at least 1 type argument" ) ;
+            throw new IllegalArgumentException( type + " must have at least 1 type argument" ) ;
 
         final Type firstType = args[0] ;
         final TypeConverter firstTc = mom.getTypeConverter( firstType ) ;

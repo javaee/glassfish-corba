@@ -33,62 +33,24 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.corba.se.spi.orbutil.jmx ;
 
-import java.util.Properties ;
-import java.util.ResourceBundle ;
+import java.lang.annotation.Documented ;
+import java.lang.annotation.Target ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-import javax.management.ObjectName ;
-import javax.management.MBeanServer ;
-
-/** An interface used to managed Open MBeans created from annotated
- * objects.  This is mostly a facade over MBeanServer.
+/** This annotation is applied to a method that takes no arguments and returns a value
+ * that is converted into a String for use in the ObjectName when an instance of the enclosing
+ * class is used to construct an open MBean.
  */
-public interface ManagedObjectManager {
-    /** Construct an Open Mean for obj according to its annotations,
-     * and register it with domain getDomain() and the key/value pairs
-     * given by props in the form key=value.  The MBeanServer from 
-     * setMBeanServer (or its default) is used.
+@Documented 
+@Target(ElementType.METHOD) 
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ObjectNameKey {
+    /** The name in the name/value pair to be added to the ObjectName when the MBean is registered.
+     * The default value is the same as in an attribute getter method.
      */
-    void register( Object obj, String... props ) ;
-
-    /** Same as register( Object, String...) except that key/value
-     * pairs are given as properties.
-     */
-    void register( Object obj, Properties props )  ;
-
-    /** Unregister the Open MBean corresponding to obj from the
-     * mbean server.
-     */
-    void unregister( Object obj ) ;
-
-    /** Get the ObjectName for the given object (which must have
-     * been registered via a register call).
-     */
-    ObjectName getObjectName( Object obj ) ;
-
-    /** Get the Object that was registered with the given ObjectName.
-     */
-    Object getObject( ObjectName oname ) ;
-
-    /** Return the domain name that was used when this ManagedObjectManager
-     * was created.
-     */
-    String getDomain() ;
-
-    /** Set the MBeanServer to which all MBeans using this interface
-     * are published.  The default value is 
-     * java.lang.management.ManagementFactory.getPlatformMBeanServer().
-     */
-    void setMBeanServer( MBeanServer server ) ;
-
-    MBeanServer getMBeanServer() ;
-
-    /** Set the ResourceBundle to use for getting localized descriptions.
-     * If not set, the description is the value in the annotation.
-     */
-    void setResourceBundle( ResourceBundle rb ) ;
-
-    ResourceBundle getResourceBundle() ;
+    String value() default "" ;
 }

@@ -37,6 +37,7 @@
 package com.sun.corba.se.impl.orbutil.jmx ;
 
 import java.util.List ;
+import java.util.ResourceBundle ;
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.WeakHashMap ;
@@ -65,6 +66,7 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
 // all registered objects and flushes caches.
 public class ManagedObjectManagerImpl implements ManagedObjectManagerInternal {
     private String domain ;
+    private ResourceBundle rb ;
     private MBeanServer server ; 
     private Map<Object,ObjectName> objectMap ;
     private Map<ObjectName,Object> objectNameMap ;
@@ -179,6 +181,14 @@ public class ManagedObjectManagerImpl implements ManagedObjectManagerInternal {
 	    public MBeanServer getMBeanServer() {
 		return mom.getMBeanServer() ;
 	    }
+
+            public void setResourceBundle( ResourceBundle rb ) {
+                mom.setResourceBundle( rb ) ;
+            }
+
+            public ResourceBundle getResourceBundle() {
+                return mom.getResourceBundle() ;
+            }
 	} ;
     }
 
@@ -276,6 +286,14 @@ public class ManagedObjectManagerImpl implements ManagedObjectManagerInternal {
 
     public MBeanServer getMBeanServer() {
 	return server ;
+    }
+
+    public void setResourceBundle( ResourceBundle rb ) {
+        this.rb = rb ;
+    }
+
+    public ResourceBundle getResourceBundle() {
+        return rb ;
     }
 }
 

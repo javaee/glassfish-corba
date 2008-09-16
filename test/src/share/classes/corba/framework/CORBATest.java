@@ -466,6 +466,8 @@ public abstract class CORBATest extends test.RemoteTest
                 props.getProperty( key ) ) ;
         }
 
+        props.setProperty( "corba.test.controller.name", name ) ;
+
 	String traceFlags = (String)traceMap.get( name ) ;
 	if (traceFlags != null)
 	    copy.setProperty( ORBConstants.DEBUG_PROPERTY,

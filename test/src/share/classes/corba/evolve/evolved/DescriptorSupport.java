@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import sun.reflect.misc.ReflectUtil;
+// import sun.reflect.misc.ReflectUtil;
 
 
 /**
@@ -954,8 +954,8 @@ public class DescriptorSupport
 	try {
 	    final ClassLoader contextClassLoader =
 		Thread.currentThread().getContextClassLoader();
-            if (contextClassLoader == null)
-		ReflectUtil.checkPackageAccess(className);
+            // if (contextClassLoader == null)
+		// ReflectUtil.checkPackageAccess(className);
             final Class c =
 		Class.forName(className, false, contextClassLoader);
 	    constr = c.getConstructor(new Class[] {String.class});

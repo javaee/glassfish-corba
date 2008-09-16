@@ -114,16 +114,21 @@ public class TestngRunner {
      * @param outdir The directory in which the test reports should be placed.
      */
     public TestngRunner() {
-        outdirName = System.getProperty( "junit.report.dir" ) ; 
-        if (outdirName == null)
+        String reportDir = System.getProperty( "junit.report.dir" ) ; 
+        if (reportDir == null)
             throw new RuntimeException( "property junit.report.dir is not set" ) ;
 
-        File outdir = new File( outdirName ) ;
+        File outdir = new File( reportDir ) ;
         if (!outdir.exists())
             throw new RuntimeException( outdir + " does not exist" ) ;
 
         if (!outdir.isDirectory())
             throw new RuntimeException( outdir + " is not a directory" ) ;
+
+        outdirName = reportDir + File.separatorChar + Options.getControllerName() ;
+
+        File destDir = new File( outdirName ) ;
+        destDir.mkdir() ;
 
         suiteClasses = new HashSet<Class<?>>() ;
         hasFailure = false ;

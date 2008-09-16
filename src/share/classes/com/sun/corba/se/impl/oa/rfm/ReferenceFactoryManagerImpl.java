@@ -232,6 +232,12 @@ public class ReferenceFactoryManagerImpl
 	}
     }
 
+    // XXX rfmMightDeadlock exceptions are a problem, because it is possible
+    // to attempt to deploy an EJB while the cluster shape is changing.
+    // We really need to enqueue (at least) create calls while suspended.
+    // It may also be better to get rid of separate suspend/resume calls, instead
+    // passing an object to a method that does suspend/resume (as in 
+    // doPrivileged).  See GF issue 4560.
     public ReferenceFactory create( final String name, 
 				    final String repositoryId,
 				    final List<Policy> policies,

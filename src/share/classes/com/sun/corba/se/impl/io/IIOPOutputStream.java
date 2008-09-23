@@ -560,12 +560,22 @@ public class IIOPOutputStream
     	 * else do Serializable processing.
     	 */
     	if (currentClassDesc.isExternalizable()) {
-	    // Write format version
-	    orbStream.write_octet(streamFormatVersion);
+            WriteObjectState oldState = writeObjectState;
 
-    	    Externalizable ext = (Externalizable)obj;
-    	    ext.writeExternal(this);
-            
+            try {
+                // Issue 5161:
+                // Set state to default state so that writeExternal does not
+                // interfere with state of current object.
+                setState(NOT_IN_WRITE_OBJECT);
+
+                // Write format version
+                orbStream.write_octet(streamFormatVersion);
+
+                Externalizable ext = (Externalizable)obj;
+                ext.writeExternal(this);
+            } finally {
+                setState( oldState ) ;
+            }
     	} else {
 
     	    /* The object's classes should be processed from supertype to subtype

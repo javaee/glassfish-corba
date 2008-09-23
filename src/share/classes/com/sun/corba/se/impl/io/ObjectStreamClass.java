@@ -582,7 +582,10 @@ public class ObjectStreamClass implements java.io.Serializable {
         // If we have a write object method, precompute the
         // RMI-IIOP stream format version 2 optional data
         // repository ID.  
-        if (hasWriteObject())
+        // GlassFish issue 5161: need to compute the Repo ID for externalizable too:
+        // the writeExternal method calls writeObject just as in the Serializable
+        // custom marshaled case!
+        if (hasWriteObject() || isExternalizable())
             rmiiiopOptionalDataRepId = computeRMIIIOPOptionalDataRepId();
 
         // This must be done last.

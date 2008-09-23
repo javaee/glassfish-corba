@@ -1009,17 +1009,26 @@ public class IIOPInputStream
                     currentObject = (currentClass == null) ?
                         null : currentClassDesc.newInstance();
                     if (currentObject != null) {
+                        // Issue 5161:
+                        // Set state to default state so that readExternal does not
+                        // interfere with state of current object.
+                        ReadObjectState oldState = readObjectState;
+                        setState(DEFAULT_STATE);
 
-                        // Store this object and its beginning position
-                        // since there might be indirections to it while
-                        // it's been unmarshalled.
-                        activeRecursionMgr.addObject(offset, currentObject);
+                        try {
+                            // Store this object and its beginning position
+                            // since there might be indirections to it while
+                            // it's been unmarshalled.
+                            activeRecursionMgr.addObject(offset, currentObject);
 
-                        // Read format version
-                        readFormatVersion();
+                            // Read format version
+                            readFormatVersion();
 
-                        Externalizable ext = (Externalizable)currentObject;
-                        ext.readExternal(this);
+                            Externalizable ext = (Externalizable)currentObject;
+                            ext.readExternal(this);
+                        } finally {
+                            setState(oldState) ;
+                        }
 		    }
 		} catch (InvocationTargetException e) {
 		    InvalidClassException exc = new InvalidClassException(

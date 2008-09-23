@@ -536,7 +536,7 @@ public class ThreadPoolImpl implements ThreadPool
                     } catch (Throwable t) {
                         // REVISIT - Should Throwables that are '*Error(s)" be
                         //           treated differently?
-                        wrapper.workerThreadThrowableFromRequestWork(this, t,
+                        wrapper.workerThreadThrowableFromRequestWork(t, this,
                                 workQueue.getName());
                         
                         // On any Throwable other than a WorkerThreadNotNeededException,
@@ -555,7 +555,7 @@ public class ThreadPoolImpl implements ThreadPool
 			currentWork.doWork();
 		    } catch (Throwable t) {
 			// Ignore all errors.
-			wrapper.workerThreadDoWorkThrowable(this, t);
+			wrapper.workerThreadDoWorkThrowable(t, this);
 		    }
                     
                     long elapsedTime = System.currentTimeMillis() - start;
@@ -580,7 +580,7 @@ public class ThreadPoolImpl implements ThreadPool
 			    );
 			}
                     } catch (SecurityException se) {
-                        throw wrapper.workerThreadGetContextClassloaderFailed(this, se);
+                        throw wrapper.workerThreadGetContextClassloaderFailed(se, this);
                     }
 
                     if (workerThreadClassLoader != currentClassLoader) {
@@ -595,12 +595,12 @@ public class ThreadPoolImpl implements ThreadPool
                                               workerThreadClassLoader);
                         } catch (SecurityException se) {
                             // Failed to reset context ClassLoader
-                            wrapper.workerThreadResetContextClassloaderFailed(this, se);
+                            wrapper.workerThreadResetContextClassloaderFailed(se, this);
                         }
                     }
 
                 } catch (Throwable e) {
-                    wrapper.workerThreadCaughtUnexpectedThrowable(this,e);
+                    wrapper.workerThreadCaughtUnexpectedThrowable(e, this);
                 }
             }
         }

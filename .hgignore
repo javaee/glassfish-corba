@@ -19,6 +19,7 @@ deleted_files/**
 Codemgr_wsdata/**
 freezepoint/**
 make/errorfile
+make/gen/**
 NORENAME
 .rename.*
 make/scripts/pkgrename/sed_pattern_file.version

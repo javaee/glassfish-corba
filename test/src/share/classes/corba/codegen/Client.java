@@ -1008,8 +1008,13 @@ public class Client extends TestCase {
     {
 	TestSuite main = TestCaseTools.makeTestSuite( Client.class, 
 	    TestCaseTools.TestSuiteType.SINGLE ) ;
-	TestSuite typesuite = TestCaseTools.makeTestSuite( TypeTestSuite.class ) ;
-	main.addTest( typesuite ) ;
+
+	TestSuite suite = TestCaseTools.makeTestSuite( TypeTestSuite.class ) ;
+	main.addTest( suite ) ;
+
+	suite = TestCaseTools.makeTestSuite( ClassInfoBaseTestSuite.class ) ;
+	main.addTest( suite ) ;
+
 	return main ;
     }
 

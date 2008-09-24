@@ -656,48 +656,43 @@ public final class EmitterFactory {
 	    slot ) ;
     }
 
-    // XXX refactor makeEmitter methods for FieldAccessExpression:
-    // most of the code is shareable.
-
     /** Create an emitter that generates the instruction needed to
-     * either store the TOS value into the non-static field (isStore==true)
-     * or push the non-static fields's value onto the stack (isStore==false).
+     * either store the TOS value into the field (isStore==true)
+     * or push the fields's value onto the stack (isStore==false).
      */
-    public static Emitter makeEmitter( 
-	ExpressionFactory.NonStaticFieldAccessExpression expr,
-	boolean isStore ) {
-	Type targetType = expr.target().type() ;	
+    public static Emitter makeEmitter( String fieldName, 
+	Type targetType, boolean isStore, boolean isStatic ) {
 
 	ClassInfo cinfo = targetType.classInfo() ;
-	FieldInfo fld = cinfo.fieldInfo().get( expr.fieldName() ) ;
+	FieldInfo fld = cinfo.findFieldInfo( fieldName ) ;
 	if (fld == null)
-	    throw new IllegalArgumentException( expr.fieldName() + 
+	    throw new IllegalArgumentException( "Field " + fieldName + 
 		" is not a valid field in class " + targetType.name() ) ;
 
-	// XXX we need access control checking here!!!
-	return makeFieldInsnEmitter( isStore, false, targetType, expr.fieldName(),
+	ClassInfo definingClass = getAncestor( ClassGenerator.class ) ;
+	ClassInfo accessingClass = targetType.classInfo() ;
+	if (!fld.isAccessibleInContext( definingClass, accessingClass ) ;
+	    throw new IllegalArgumentException( "Field " + fieldName
+		+ " cannot be accessed from class " + definingClass.name() 
+		+ " in an expression of type " + accessingClass.name() ) ;
+
+	return makeFieldInsnEmitter( isStore, isStatic, targetType, fieldName,
 	    fld.type() ) ;
     }
 
-    /** Create an emitter that generates the instruction needed to
-     * either store the TOS value into the static field (isStore==true)
-     * or push the static fields's value onto the stack (isStore==false).
-     */
+    public static Emitter makeEmitter( 
+	ExpressionFactory.NonStaticFieldAccessExpression expr,
+	boolean isStore ) {
+
+	Type targetType = expr.target().type() ;	
+	makeEmitter( expr.fieldName(), targetType, isStore, false ) ;
+    }
+
     public static Emitter makeEmitter( 
 	ExpressionFactory.StaticFieldAccessExpression expr,
 	boolean isStore ) {
 	Type targetType = expr.target() ;
-
-	ClassInfo cinfo = targetType.classInfo() ;
-	FieldInfo fld = cinfo.fieldInfo().get( expr.fieldName() ) ;
-	if (fld == null)
-	    throw new IllegalArgumentException( expr.fieldName() + 
-		" is not a valid field in class " + targetType.name() ) ;
-
-	// XXX we need access control checking here!!!
-
-	return makeFieldInsnEmitter( isStore, true, targetType,
-	    expr.fieldName(), fld.type() ) ;
+	makeEmitter( expr.fieldName(), targetType, isStore, true ) ;
     }
 
     private static final Emitter arrayStore = new SimpleEmitter( AASTORE ) ;

@@ -353,8 +353,7 @@ public class TypeTestSuite extends TestCase {
 		}
 	    }
 
-	// Fix this later
-	// assertTrue( errorCount == 0 ) ;
+	assertTrue( errorCount == 0 ) ;
     }
 
     // Expected results for X.hasReferenceWideningConversionFrom( Y ):
@@ -408,7 +407,6 @@ public class TypeTestSuite extends TestCase {
 		}
 	    }
 
-	// Fix this later
-	// assertTrue( errorCount == 0 ) ;
+	assertTrue( errorCount == 0 ) ;
     }
 }

@@ -63,19 +63,9 @@ public class CorbanameURL extends INSURLBase
         int delimiterIndex = url.indexOf( '#' );
         String corbalocString = null;
         if( delimiterIndex != -1 ) {
-                // Append corbaloc: for Grammar check, Get the string between
-                // corbaname: and # which forms the corbaloc string
-                corbalocString = "corbaloc:" +
-                    url.substring( 0, delimiterIndex ) + "/";
+	    corbalocString = "corbaloc:" + url.substring( 0, delimiterIndex ) ;
         } else {
-            // Build a corbaloc string to check the grammar.
-            // 10 is the length of corbaname:
-            corbalocString = "corbaloc:" + url.substring( 0, url.length() );
-            // If the string doesnot end with a / then add one to end the
-            // URL correctly
-            if( corbalocString.endsWith( "/" ) != true ) {
-                corbalocString = corbalocString + "/";
-            }
+            corbalocString = "corbaloc:" + url ;
         }
         try {
             // Check the corbaloc grammar and set the returned corbaloc

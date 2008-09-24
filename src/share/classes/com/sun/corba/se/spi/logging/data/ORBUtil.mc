@@ -572,19 +572,19 @@
 	    (WORKER_THREAD_CLASSLOADER_RESET
 	     105 FINE "Worker thread {0} finished work item with ClassLoader {1}; ClassLoader successfully reset to {2}")
 	    (WORKER_THREAD_GET_CONTEXT_CLASSLOADER_FAILED
-	     106 WARNING "Unable to get worker thread {0} context ClassLoader; cause {1}; check security policy file, must grant 'getContextClassLoader' runtime permission.")
+	     106 WARNING "Unable to get worker thread {0} context ClassLoader; check security policy file, must grant 'getContextClassLoader' runtime permission.")
 	    (WORKER_THREAD_FORGOT_CLASSLOADER_RESET
 	     107 FINE "Worker thread {0} context ClassLoader was changed to {1}; will attempt a reset to its initial ClassLoader {2}.")
 	    (WORKER_THREAD_RESET_CONTEXT_CLASSLOADER_FAILED
-	     108 WARNING "Unable to set worker thread {0} context ClassLoader; cause {1}; check security policy file, must grant 'setContextClassLoader' runtime permission, or reset the thread context ClassLoader before returning the worker thread to the thread pool.")
+	     108 WARNING "Unable to set worker thread {0} context ClassLoader; check security policy file, must grant 'setContextClassLoader' runtime permission, or reset the thread context ClassLoader before returning the worker thread to the thread pool.")
             	    (WORKER_THREAD_THROWABLE_FROM_REQUEST_WORK
-             	     109 FINE "Worker thread {0} caught throwable {1} when requesting work from work queue {2}.")
+             	     109 FINE "Worker thread {0} caught throwable when requesting work from work queue {1}.")
             (WORKER_THREAD_NOT_NEEDED
              110 FINE "Worker thread {0} will exit; current thread count, {1}, greater than minunum worker threads needed, {2}.")
             (WORKER_THREAD_DO_WORK_THROWABLE
-             111 WARNING "Worker thread {0} caught throwable {1} while executing work.")
+             111 WARNING "Worker thread {0} caught throwable while executing work.")
             (WORKER_THREAD_CAUGHT_UNEXPECTED_THROWABLE
-             112 WARNING "Worker thread {0} caught unexpected throwable {1}.")
+             112 WARNING "Worker thread {0} caught unexpected throwable.")
             (WORKER_THREAD_CREATION_FAILURE
              113 SEVERE "Worker thread creation failure; cause {0}.")
             (WORKER_THREAD_SET_NAME_FAILURE

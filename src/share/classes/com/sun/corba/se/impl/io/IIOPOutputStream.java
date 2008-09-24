@@ -564,8 +564,14 @@ public class IIOPOutputStream
 	    orbStream.write_octet(streamFormatVersion);
 
     	    Externalizable ext = (Externalizable)obj;
-    	    ext.writeExternal(this);
-            
+	    // Fix for issue 5161: need to save and restore state around
+	    // writeExternal call.
+	    WriteObjectState oldState = writeObjectState ;
+	    try {
+    	        ext.writeExternal(this);
+	    } finally {
+		setState( oldState ) ;
+	    }
     	} else {
 
     	    /* The object's classes should be processed from supertype to subtype

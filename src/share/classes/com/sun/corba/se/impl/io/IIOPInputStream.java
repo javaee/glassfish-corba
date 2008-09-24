@@ -1019,7 +1019,15 @@ public class IIOPInputStream
                         readFormatVersion();
 
                         Externalizable ext = (Externalizable)currentObject;
-                        ext.readExternal(this);
+			// Fix for issue 5161: need to save/restore the state 
+			// around the readExternal call.
+			ReadObjectState oldState = readObjectState ;
+			setState( DEFAULT_STATE ) ;
+			try {
+			    ext.readExternal(this);
+			} finally {
+			    setState( oldState ) ;
+			}
 		    }
 		} catch (InvocationTargetException e) {
 		    InvalidClassException exc = new InvalidClassException(

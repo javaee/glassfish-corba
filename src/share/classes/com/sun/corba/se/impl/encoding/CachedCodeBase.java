@@ -45,6 +45,8 @@ import com.sun.org.omg.SendingContext.CodeBaseHelper;
 import com.sun.org.omg.SendingContext._CodeBaseImplBase;
 import com.sun.org.omg.SendingContext._CodeBaseStub;
 
+import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+
 import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.ior.IOR ;
@@ -71,6 +73,8 @@ import com.sun.corba.se.spi.orb.ORB ;
  */
 public class CachedCodeBase extends _CodeBaseImplBase
 {
+    private ORBUtilSystemException wrapper ;
+
     private Hashtable<String,String> implementations ;
     private Hashtable<String,FullValueDescription> fvds ;
     private Hashtable<String,String[]> bases ;
@@ -94,6 +98,8 @@ public class CachedCodeBase extends _CodeBaseImplBase
 
     public CachedCodeBase(CorbaConnection connection) {
         conn = connection;
+        wrapper = connection.getBroker().getLogWrapperTable()
+            .get_RPC_ENCODING_ORBUtil() ;
     }
 
     public com.sun.org.omg.CORBA.Repository get_ir () {
@@ -181,38 +187,29 @@ public class CachedCodeBase extends _CodeBaseImplBase
         if (delegate != null)
             return true;
 
-        // The delegate was null, so see if the connection's
-        // IOR was set.  If so, then we just need to connect
-        // it.  Otherwise, there is no hope of checking the
-        // remote code base.  That could be bug if the
-        // service context processing didn't occur, or it
-        // could be that we're talking to a foreign ORB which
-        // doesn't include this optional service context.
         if (conn.getCodeBaseIOR() == null) {
-            // REVISIT.  Use Merlin logging service to report that
-            // codebase functionality was requested but unavailable.
-            if (conn.getBroker().transportDebugFlag)
-                conn.dprint("CodeBase unavailable on connection: " + conn);
-
+            // The delegate was null, so see if the connection's
+            // IOR was set.  If so, then we just need to connect
+            // it.  Otherwise, there is no hope of checking the
+            // remote code base.  That could be a bug if the
+            // service context processing didn't occur, or it
+            // could be that we're talking to a foreign ORB which
+            // doesn't include this optional service context.
+            wrapper.codeBaseUnavailable( conn ) ;
             return false;
         }
 
         synchronized(iorMapLock) {
-            // Recheck the condition to make sure another
-            // thread didn't already do this while we waited
-            if (delegate != null)
-                return true;
-
             // Do we have a reference initialized by another connection?
-            delegate = CachedCodeBase.iorMap.get( conn.getCodeBaseIOR());
+            delegate = iorMap.get( conn.getCodeBaseIOR() );
             if (delegate != null)
                 return true;
             
             // Connect the delegate and update the cache
-            delegate = CodeBaseHelper.narrow(getObjectFromIOR());
+            delegate = CodeBaseHelper.narrow( getObjectFromIOR() );
             
             // Save it for the benefit of other connections
-            CachedCodeBase.iorMap.put(conn.getCodeBaseIOR(), delegate);
+            iorMap.put( conn.getCodeBaseIOR(), delegate );
         }
 
         // It's now safe to use the delegate

@@ -138,8 +138,8 @@
 	    (WCHAR_BAD_GIOP_VERSION_SENT    5  WARNING "wchar or wstring data erroneosly sent by client over GIOP 1.0 connection ")
 	    (WCHAR_BAD_GIOP_VERSION_RETURNED 6 WARNING "wchar or wstring data erroneously returned by server over GIOP 1.0 connection ")
 	    (UNSUPPORTED_FORMAT_VERSION	    7  WARNING "Unsupported RMI/IDL custom value type stream format")
-	    (RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1 8 WARNING "No optional data available")
-	    (RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE2 8 WARNING "Not enough space left in current chunk")
+	    (RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1 8 FINE "No optional data available")
+	    (RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE2 8 FINE "Not enough space left in current chunk")
 	    (RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE3 8 FINE "Not enough optional data available"))
 	(NO_IMPLEMENT
 	    (MISSING_LOCAL_VALUE_IMPL	    1  WARNING "Missing local value implementation")

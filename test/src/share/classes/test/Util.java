@@ -386,6 +386,7 @@ public class Util {
 
         // Test setup
 	"corba.test.orb.classpath",
+        "corba.test.controller.name",
         "http.server.port",
         "name.server.port",
         "java.rmi.server.codebase",

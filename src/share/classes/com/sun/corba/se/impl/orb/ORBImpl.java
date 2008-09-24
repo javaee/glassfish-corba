@@ -1499,6 +1499,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
                 timerManager.destroy() ;
                 timerManager = null ;
                 status = STATUS_DESTROYED;
+            } else {
+                // Already destroyed: don't want to throw null pointer exceptions.
+                return ;
             }
         }
 
@@ -2135,6 +2138,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     public void setThreadPoolManager(ThreadPoolManager mgr) 
     {
+        // XXX Consider making it an error to set the thread pool manager more than once?
 	synchronized (threadPoolManagerAccessLock) {
 	    threadpoolMgr = mgr;
 	}

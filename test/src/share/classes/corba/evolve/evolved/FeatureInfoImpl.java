@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 import corba.evolve.FeatureInfo ;
 
-public class FeatureInfoImpl implements Serializable { 
+public class FeatureInfoImpl implements FeatureInfo, Serializable { 
     static final long serialVersionUID = 3952882688968447265L;
 
     protected String name;

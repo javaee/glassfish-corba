@@ -38,7 +38,7 @@ package com.sun.corba.se.spi.extension ;
 
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.LocalObject ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 /** Policy used to specify the copyObject implementation to use.
 */

@@ -40,61 +40,59 @@ import org.omg.CosNaming.NamingContextPackage.*;
 import org.omg.CORBA.*;
 import java.util.*;
 import examples.*;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
-public class policy2Client
-{
-	
-	private static final String msgPassed = "policy_2: **PASSED**";
-	
-	private static final String msgFailed = "policy_2: **FAILED**";
-	
-	public static void main( String args[] )
-	{
-		try
-		{
+public class policy2Client {
+    private static final String msgPassed = "policy_2: **PASSED**";
+    
+    private static final String msgFailed = "policy_2: **FAILED**";
+    
+    public static void main( String args[] ) {
+        JUnitReportHelper helper = new JUnitReportHelper( policy2Client.class.getName() ) ;
 
-			System.out.println( "POLICIES : ORB_CTRL_MODEL,PERSISTENT,UNIQUE_ID,SYSTEM_ID,RETAIN,USE_ACTIVE_OBJECT_MAP_ONLY,NO_IMPLICIT_ACTIVATION" );
-			System.out.println( "Starting client" );
-			System.out.println( "ORB Initializing" );
-			Properties props = new Properties();
-			props.put( "org.omg.corba.ORBClass", System.getProperty("org.omg.CORBA.ORBClass"));
-			props.setProperty( "com.sun.corba.se.ORBid", "sunorb1");
-		        System.out.println("com.sun.corba.se.ORBid " + props.getProperty("com.sun.corba.se.ORBid"));
-			ORB orb1 = ORB.init( args, props );
+        try {
+            helper.start( "TwoORBTest" ) ;
+            System.out.println( "POLICIES : ORB_CTRL_MODEL,PERSISTENT,UNIQUE_ID,SYSTEM_ID,RETAIN,USE_ACTIVE_OBJECT_MAP_ONLY,NO_IMPLICIT_ACTIVATION" );
+            System.out.println( "Starting client" );
+            System.out.println( "ORB Initializing" );
+            Properties props = new Properties();
+            props.put( "org.omg.corba.ORBClass", System.getProperty("org.omg.CORBA.ORBClass"));
+            props.setProperty( "com.sun.corba.se.ORBid", "sunorb1");
+            System.out.println("com.sun.corba.se.ORBid " + props.getProperty("com.sun.corba.se.ORBid"));
+            ORB orb1 = ORB.init( args, props );
 
-			props = new Properties();
-			props.put( "org.omg.corba.ORBClass", System.getProperty("org.omg.CORBA.ORBClass"));
-			props.setProperty( "com.sun.corba.se.ORBid", "sunorb2");
-		        System.out.println("com.sun.corba.se.ORBid " + props.getProperty("com.sun.corba.se.ORBid"));
-			ORB orb2 = ORB.init( args, props );
+            props = new Properties();
+            props.put( "org.omg.corba.ORBClass", System.getProperty("org.omg.CORBA.ORBClass"));
+            props.setProperty( "com.sun.corba.se.ORBid", "sunorb2");
+            System.out.println("com.sun.corba.se.ORBid " + props.getProperty("com.sun.corba.se.ORBid"));
+            ORB orb2 = ORB.init( args, props );
 
-	                lookupAndInvoke(orb1, "Object1");
-	                lookupAndInvoke(orb2, "Object2");
-		} catch( Exception exp ) {
-			exp.printStackTrace();
-			System.out.println( msgFailed + "\n" );
-		}
-	}
+            lookupAndInvoke(orb1, "Object1");
+            lookupAndInvoke(orb2, "Object2");
+            helper.pass() ;
+        } catch( Exception exp ) {
+            exp.printStackTrace();
+            System.out.println( msgFailed + "\n" );
+            helper.fail( exp ) ;
+        } finally {
+            helper.done() ;
+        }
+    }
 
-	public static void lookupAndInvoke(org.omg.CORBA.ORB orb, String ObjName) throws Exception
-	{
-
-	    try {
-		System.out.println( "Looking for naming Service" );
-		org.omg.CORBA.Object objRef = orb.resolve_initial_references( "NameService" );
-		NamingContext ncRef = NamingContextHelper.narrow( objRef );
-		System.out.println( "Getting Object Reference" );
-		NameComponent nc = new NameComponent( ObjName, "" );
-			NameComponent path[] = 
-			{
-				nc
-			};
-			policy_2 Ref = policy_2Helper.narrow( ncRef.resolve( path ) );
-			int l = Ref.increment();
-			System.out.println( "Incremented value:" + l );
-			System.out.println( msgPassed + "\n" );
-	    } catch( Exception exp ) {
-			throw exp;
-	    }
-	}
+    public static void lookupAndInvoke(org.omg.CORBA.ORB orb, String ObjName) throws Exception {
+        try {
+            System.out.println( "Looking for naming Service" );
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references( "NameService" );
+            NamingContext ncRef = NamingContextHelper.narrow( objRef );
+            System.out.println( "Getting Object Reference" );
+            NameComponent nc = new NameComponent( ObjName, "" );
+            NameComponent path[] = { nc };
+            policy_2 Ref = policy_2Helper.narrow( ncRef.resolve( path ) );
+            int l = Ref.increment();
+            System.out.println( "Incremented value:" + l );
+            System.out.println( msgPassed + "\n" );
+        } catch( Exception exp ) {
+            throw exp;
+        }
+    }
 }

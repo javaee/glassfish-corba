@@ -36,7 +36,7 @@
 
 package com.sun.corba.se.impl.orb ;
 
-import com.sun.corba.se.impl.orbutil.GetPropertyAction ;
+import com.sun.corba.se.org.omg.CORBA.GetPropertyAction ;
 
 import java.security.PrivilegedAction ;
 import java.security.AccessController ;
@@ -61,7 +61,7 @@ import java.io.FileInputStream ;
 import com.sun.corba.se.spi.orb.DataCollector ;
 import com.sun.corba.se.spi.orb.PropertyParser ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 public abstract class DataCollectorBase implements DataCollector {

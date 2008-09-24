@@ -44,7 +44,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.impl.orbutil.copyobject.ClassCopierOrdinaryImpl ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import junit.framework.Test ;
 
@@ -70,6 +70,11 @@ public class NewReflectTest extends Client
     { 
 	Client root = new NewReflectTest() ;
 	Client.doMain( args, root ) ; 
+    }
+
+    public static Test suite() {
+	Client root = new NewReflectTest() ;
+	return root.makeSuite() ;
     }
 
     public boolean isTestExcluded()

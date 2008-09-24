@@ -54,15 +54,27 @@ package com.sun.corba.se.spi.orbutil.fsm ;
  */
 public interface FSM
 {
+    /** Return the state engine used to create this FSM.
+     */
+    public StateEngine getStateEngine() ;
+
+    /** Get the parent state machine.
+     */
+    public FSM getParent() ;
+
+    /** Set the parent state machine.
+     */
+    public void setParent( FSM fsm ) ;
+
+    /** Set the current state of this FSM.  May not be called
+     * inside a transition action, or from a State method.
+     * Only here for use by the StateEngine.
+     */
+    public void setState( State state ) ;
+
     /** Get the current state of this FSM.
     */
     public State getState() ;
-
-    /** Perform the action and transition to the next state based
-    * on the current state of the FSM and the input.
-    */
-    public void doIt( Input in ) ;
 }
 
 // end of FSM.java
-

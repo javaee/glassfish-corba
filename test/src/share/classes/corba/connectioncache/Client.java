@@ -58,10 +58,8 @@ import java.util.logging.LogRecord ;
 import java.io.PrintWriter ;
 import java.io.IOException ;
 
-import org.testng.TestNG ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
-import org.testng.annotations.Configuration ;
 import org.testng.annotations.ExpectedExceptions ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue ;
@@ -74,6 +72,8 @@ import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
 import com.sun.corba.se.spi.orbutil.transport.InboundConnectionCache ;
 import com.sun.corba.se.spi.orbutil.transport.OutboundConnectionCache ;
 import com.sun.corba.se.spi.orbutil.transport.ConnectionCacheFactory ;
+
+import corba.framework.TestngRunner ;
 
 public class Client {
     // Ignore all of the LogRecord information except the message.
@@ -740,16 +740,9 @@ public class Client {
     }
 
     public static void main( String[] args ) {
-	TestNG tng = new TestNG() ;
-
-	Class[] tngClasses = new Class[] {
-	    Client.class 
-	} ;
-
-	tng.setTestClasses( tngClasses ) ;
-
-	tng.run() ;
-
-	System.exit( tng.hasFailure() ? 1 : 0 ) ;
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
+        runner.systemExit() ;
     }
 }

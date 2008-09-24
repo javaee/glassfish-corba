@@ -36,77 +36,60 @@
 
 package com.sun.corba.se.spi.orbutil.fsm ;
 
-import java.util.Set ;
-import java.util.HashSet ;
-
-import com.sun.corba.se.spi.orbutil.fsm.Input ;
-import com.sun.corba.se.spi.orbutil.fsm.StateEngine ;
-import com.sun.corba.se.spi.orbutil.fsm.FSM ;
-
-import com.sun.corba.se.impl.orbutil.fsm.StateEngineImpl ;
-
 /**
  * This is the main class that represents an instance of a state machine
  * using a state engine.  It may be used as a base class, in which case
  * the guards and actions have access to the derived class.
+ * Note that this is optional; an FSM implementation may directly
+ * implement the FSM interface if desired.
  *
  * @author Ken Cavanaugh
  */
 public class FSMImpl implements FSM
 {
     private boolean debug ;
+    private FSM parent ;
     private State state ;
-    private StateEngineImpl stateEngine ;
+    private StateEngine stateEngine ;
 
     /** Create an instance of an FSM using the StateEngine
     * in a particular start state.
     */
-    public FSMImpl( StateEngine se, State startState )
+    public FSMImpl( StateEngine se, State initialState )
     {
-	this( se, startState, false ) ;
+	this( se, initialState, false ) ;
     }
 
-    public FSMImpl( StateEngine se, State startState, boolean debug )
+    public FSMImpl( StateEngine se, State initialState, boolean debug )
     {
-	state = startState ;
-	stateEngine = (StateEngineImpl)se ;
+	parent = null ;
+	state = initialState ;
+	stateEngine = se ;
+	if (!(se.getStates( State.Kind.INITIAL ).contains( initialState )))
+	    throw new IllegalStateException(
+		"Error: State " + initialState + " is not an initial state" ) ;
 	this.debug = debug ;
+    }
+
+    public FSM getParent() {
+	return parent ;
+    }
+
+    public void setParent( FSM fsm ) {
+	parent = fsm ;
+    }
+    
+    public StateEngine getStateEngine() {
+	return stateEngine ;
     }
 
     /** Return the current state.
     */
-    public State getState()
-    {
+    public State getState() {
 	return state ;
     }
 
-    /** Perform the transition for the given input in the current state.  This proceeds as follows:
-    * <p>Let S be the current state of the FSM.  
-    * If there are guarded actions for S with input in, evaluate their guards successively until
-    * all have been evaluted, or one returns a non-DISABLED Result. 
-    * <ol>
-    * <li>If a DEFERED result is returned, retry the input
-    * <li>If a ENABLED result is returned, the action for the guarded action 
-    * is the current action
-    * <li>Otherwise there is no enabled action.  If S has a default action and next state, use them; otherwise
-    * use the state engine default action (the next state is always the current state).
-    * </ol>
-    * After the action is available, the transition proceeds as follows:
-    * <ol>
-    * <li>If the next state is not the current state, execute the current state postAction method.
-    * <li>Execute the action.
-    * <li>If the next state is not the current state, execute the next state preAction method.
-    * <li>Set the current state to the next state.
-    * </ol>
-    */
-    public void doIt( Input in )
-    {
-	stateEngine.doIt( this, in, debug ) ;
-    }
-
-    // Methods for use only by StateEngineImpl
-
-    public void internalSetState( State nextState ) 
+    public void setState( State nextState ) 
     {
 	if (debug) {
 	    System.out.println( "Calling internalSetState with nextState = " +

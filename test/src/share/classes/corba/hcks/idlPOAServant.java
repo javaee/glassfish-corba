@@ -91,7 +91,7 @@ import com.sun.corba.se.impl.ior.ObjectReferenceTemplateImpl ;
 import com.sun.corba.se.impl.ior.ObjectKeyFactoryImpl ;
 
 import com.sun.corba.se.impl.orb.ORBVersionImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 class idlPOAServant

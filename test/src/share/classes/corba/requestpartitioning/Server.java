@@ -38,7 +38,7 @@ package corba.requestpartitioning;
 
 import java.util.Properties;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.extension.RequestPartitioningPolicy;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 

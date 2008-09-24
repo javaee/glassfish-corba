@@ -56,7 +56,7 @@ import com.sun.corba.se.impl.encoding.CDRInputStream_1_2;
 import com.sun.corba.se.impl.encoding.CDROutputStream_1_2;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 

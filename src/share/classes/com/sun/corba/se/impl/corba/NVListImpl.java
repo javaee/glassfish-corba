@@ -118,7 +118,7 @@ public class NVListImpl extends NVList
     {
         try {
             _namedValues.remove(index);
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             throw new Bounds();
         }
     }

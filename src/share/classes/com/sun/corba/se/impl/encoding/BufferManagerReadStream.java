@@ -55,6 +55,10 @@ public class BufferManagerReadStream
     private boolean endOfStream = true;
     private BufferQueue fragmentQueue = new BufferQueue();
 
+    // XXX Should this be static?  Should we make it configurable?
+    // Bug 6372405
+    private long FRAGMENT_TIMEOUT = 6000 ;
+
     // REVISIT - This should go in BufferManagerRead. But, since
     //           BufferManagerRead is an interface. BufferManagerRead
     //           might ought to be an abstract class instead of an
@@ -123,13 +127,23 @@ public class BufferManagerReadStream
 		    throw wrapper.endOfStream() ;
                 }
 
+		boolean interrupted = false ;
                 try {
-                    fragmentQueue.wait();
-                } catch (InterruptedException e) {}
+		    // Bug 6372405
+                    fragmentQueue.wait( FRAGMENT_TIMEOUT );
+                } catch (InterruptedException e) {
+		    interrupted = true ;
+		}
+
+		// Bug 6372405
+		if (!interrupted && fragmentQueue.size() == 0)
+		    // XXX Can we add some debug info here?
+		    throw wrapper.bufferReadManagerTimeout() ;
 
                 if (receivedCancel) {
 		    if (debug) {
-		        dprint("underflow() - Cancel request id after wait: " + cancelReqId);
+		        dprint("underflow() - Cancel request id after wait: " 
+			    + cancelReqId);
 		    }
                     throw new RequestCanceledException(cancelReqId);
                 }
@@ -138,8 +152,7 @@ public class BufferManagerReadStream
             result = fragmentQueue.dequeue();
             result.setFragmented(true);
 
-            if (debug)
-            {
+            if (debug) {
                 // print address of ByteBuffer being dequeued
                 int bbAddr = System.identityHashCode(result.getByteBuffer());
                 StringBuffer sb1 = new StringBuffer(80);
@@ -152,12 +165,11 @@ public class BufferManagerReadStream
             // VERY IMPORTANT
             // Release bbwi.byteBuffer to the ByteBufferPool only if
             // this BufferManagerStream is not marked for potential restore.
-            if (markEngaged == false && bbwi != null && bbwi.getByteBuffer() != null)
-            {
+            if (markEngaged == false && bbwi != null && 
+		bbwi.getByteBuffer() != null) {
                 ByteBufferPool byteBufferPool = getByteBufferPool();
 
-                if (debug)
-                {
+                if (debug) {
                     // print address of ByteBuffer being released
                     int bbAddress = System.identityHashCode(bbwi.getByteBuffer());
                     StringBuffer sb = new StringBuffer(80);

@@ -64,8 +64,6 @@ import static com.sun.corba.se.spi.orbutil.copyobject.CopyType.* ;
 
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
 
-// import com.sun.corba.se.impl.orbutil.ORBConstants ;
-
 // General Object: use proper constructor, iterate over fields,
 // get/set fields using Unsafe or reflection.  This also handles readResolve,
 // but I don't think writeReplace is needed.
@@ -344,9 +342,8 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
     private static boolean useCodegenCopier()
     {
+        // XXX put this in an orblib constants class like ORBConstants
 	return Boolean.getBoolean( "com.sun.corba.se.ORBUseCodegenReflectiveCopyobject" ) ;
-	    // Commented out to avoid dependencies on non-orblib classes.
-	    // ORBConstants.USE_CODEGEN_REFLECTIVE_COPYOBJECT ) ;
     }
 
     private static final Package CODEGEN_SPI = 

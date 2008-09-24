@@ -116,13 +116,15 @@ import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
 import com.sun.corba.se.impl.io.ValueHandlerImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.logging.OMGSystemException;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.IdentityHashtable;
 import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.impl.logging.UtilSystemException;
+
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 /**
  * Provides utility methods that can be used by stubs and ties to
@@ -776,7 +778,8 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	    throw new NullPointerException() ;
 
 	Class compType = obj.getClass().getComponentType() ;
-	if (Remote.class.isAssignableFrom( compType ) && !compType.isInterface()) {
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( compType ) ;
+	if (cinfo.isARemote(compType) && cinfo.isInterface()) {
 	    // obj is an array of remote impl types.  This
 	    // causes problems with stream copier, so we copy
 	    // it over to an array of Remotes instead.

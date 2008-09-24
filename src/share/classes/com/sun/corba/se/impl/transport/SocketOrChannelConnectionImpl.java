@@ -89,7 +89,7 @@ import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
@@ -114,7 +114,7 @@ public class SocketOrChannelConnectionImpl
 
     final public static boolean dprintWriteLocks = false;
 
-    //
+    ///
     // New transport.
     //
 
@@ -847,7 +847,7 @@ public class SocketOrChannelConnectionImpl
 	}
     }
 
-    protected void closeConnectionResources() {
+    public void closeConnectionResources() {
         if (orb.transportDebugFlag) {
             dprint(".closeConnectionResources->: " + this);
 	}

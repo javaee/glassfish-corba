@@ -74,7 +74,7 @@ import com.sun.corba.se.impl.naming.namingutil.INSURLHandler;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.logging.NamingSystemException;
 
 import java.io.Serializable;

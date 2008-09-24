@@ -37,7 +37,7 @@ package corba.resolve_deadlock;
 
 import java.util.Properties ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
 

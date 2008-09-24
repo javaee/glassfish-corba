@@ -45,7 +45,7 @@ import org.omg.PortableServer.ServantLocatorPackage.*;
 import org.omg.PortableInterceptor.*;
 import com.sun.corba.se.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.util.*;
 import java.io.*;
@@ -86,52 +86,56 @@ public abstract class POAServer
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-	this.out = out;
-
-        // Get the root POA:
-        rootPOA = null;
-        out.println( "+ Obtaining handle to root POA and activating..." );
         try {
-            rootPOA = (POA)orb.resolve_initial_references( ROOT_POA );
+            this.out = out;
+
+            // Get the root POA:
+            rootPOA = null;
+            out.println( "+ Obtaining handle to root POA and activating..." );
+            try {
+                rootPOA = (POA)orb.resolve_initial_references( ROOT_POA );
+            }
+            catch( InvalidName e ) {
+                err.println( ROOT_POA + " is an invalid name." );
+                throw e;
+            }
+            rootPOA.the_POAManager().activate();
+            
+            // Set up hello object:
+            out.println( "+ Creating and binding Hello1 object..." );
+            TestInitializer.helloRef = createAndBind( rootPOA, "Hello1", 
+                                                      "[Hello1]" );
+
+            out.println( "+ Creating and binding Hello1Forward object..." );
+            TestInitializer.helloRefForward = createAndBind( rootPOA, 
+                                                             "Hello1Forward",
+                                                             "[Hello1Forward]" ); 
+
+            // Create 2 additional POAs, each with different IDs, so we can test
+            // adapter_id:
+            out.println( "+ Creating 2 additional POAs with different IDs..." );
+            createChildPOA( 1 );
+            createChildPOA( 2 );
+
+            handshake();
+            
+            // Test ServerRequestInfo
+            testServerRequestInfo();
+
+            // Test adapter_id
+            testAdapterId();
+
+            // Test get_server_policy
+            testGetServerPolicy();
+        } finally {
+            finish() ;
+
+            // Notify client it's time to exit.
+            exitClient();
+
+            // wait for invocations from clients
+            waitForClients();
         }
-        catch( InvalidName e ) {
-            err.println( ROOT_POA + " is an invalid name." );
-            throw e;
-        }
-        rootPOA.the_POAManager().activate();
-        
-        // Set up hello object:
-        out.println( "+ Creating and binding Hello1 object..." );
-        TestInitializer.helloRef = createAndBind( rootPOA, "Hello1", 
-						  "[Hello1]" );
-
-        out.println( "+ Creating and binding Hello1Forward object..." );
-        TestInitializer.helloRefForward = createAndBind( rootPOA, 
-							 "Hello1Forward",
-							 "[Hello1Forward]" ); 
-
-	// Create 2 additional POAs, each with different IDs, so we can test
-	// adapter_id:
-	out.println( "+ Creating 2 additional POAs with different IDs..." );
-	createChildPOA( 1 );
-	createChildPOA( 2 );
-
-	handshake();
-        
-	// Test ServerRequestInfo
-	testServerRequestInfo();
-
-	// Test adapter_id
-	testAdapterId();
-
-	// Test get_server_policy
-	testGetServerPolicy();
-
-	// Notify client it's time to exit.
-	exitClient();
-
-	// wait for invocations from clients
-	waitForClients();
     }
 
     // Output handshake or wake up main.

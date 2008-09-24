@@ -50,7 +50,7 @@ public class Server
     {
         try {
       
-            String fragmentSize = System.getProperty(com.sun.corba.se.impl.orbutil.ORBConstants.GIOP_FRAGMENT_SIZE);
+            String fragmentSize = System.getProperty(com.sun.corba.se.spi.orbutil.ORBConstants.GIOP_FRAGMENT_SIZE);
 
             if (fragmentSize != null)
                 System.out.println("---- Fragment size: " + fragmentSize);

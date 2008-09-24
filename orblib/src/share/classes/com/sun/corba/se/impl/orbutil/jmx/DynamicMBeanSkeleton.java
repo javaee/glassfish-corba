@@ -86,8 +86,8 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
-import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
+import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
 // XXX What about open constructors and notifications?  Do we need them?
 //
@@ -100,10 +100,10 @@ import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
 class DynamicMBeanSkeleton {
     private String type ;
     private MBeanInfo mbInfo ;
-    private ManagedObjectManagerImpl mom ;
-    private Map<String,AnnotationUtil.Setter> setters ;
-    private Map<String,AnnotationUtil.Getter> getters ;
-    private Map<String,Map<List<String>,AnnotationUtil.Operation>> operations ;
+    private ManagedObjectManager mom ;
+    private Map<String,AnnotationUtil.Setter> setterFunctions ;
+    private Map<String,AnnotationUtil.Getter> getterFunctions ;
+    private Map<String,Map<List<String>,AnnotationUtil.Operation>> operationFunctions ;
  
     // This method should only be called when getter.id.equals( setter.id ) 
     public void processAttribute( List<OpenMBeanAttributeInfo> list, 
@@ -124,12 +124,12 @@ class DynamicMBeanSkeleton {
 
 	if (setter != null) {
 	    AnnotationUtil.Setter setterFunction = AnnotationUtil.makeSetter( setter.method(), tc ) ;
-	    setters.put( name, setterFunction ) ;
+	    setterFunctions.put( name, setterFunction ) ;
 	}
 
 	if (getter != null) {
 	    AnnotationUtil.Getter getterFunction = AnnotationUtil.makeGetter( getter.method(), tc ) ;
-	    getters.put( name, getterFunction ) ;
+	    getterFunctions.put( name, getterFunction ) ;
 	}
 
 	list.add( ainfo ) ;
@@ -175,7 +175,7 @@ class DynamicMBeanSkeleton {
 	int ctr = 0 ;
 	for (TypeConverter tc : atcs) {
 	    paramInfo[ctr++] = new OpenMBeanParameterInfoSupport( 
-		"arg" + ctr, "", tc.getManagedType() ) ;
+		"arg" + ctr, desc, tc.getManagedType() ) ;
 	}
 
 	// XXX Note that impact is always set to ACTION_INFO here.  If this is useful to set
@@ -195,10 +195,10 @@ class DynamicMBeanSkeleton {
 	    dataTypes.add( pi.getType() ) ;
 	}
 	
-	Map<List<String>,AnnotationUtil.Operation> map = operations.get( m.getName() ) ;
+	Map<List<String>,AnnotationUtil.Operation> map = operationFunctions.get( m.getName() ) ;
 	if (map == null) {
 	    map = new HashMap<List<String>,AnnotationUtil.Operation>() ;
-	    operations.put( m.getName(), map ) ;
+	    operationFunctions.put( m.getName(), map ) ;
 	}
 
 	// XXX we might want to check and see if this was previously defined
@@ -207,7 +207,7 @@ class DynamicMBeanSkeleton {
 	list.add( info ) ;
     }
 
-    public DynamicMBeanSkeleton( final Class<?> cls, final ManagedObjectManagerImpl mom ) {
+    public DynamicMBeanSkeleton( final Class<?> cls, final ManagedObjectManager mom ) {
 	// This constructor analyzes the structure of cls.  It uses TypeConverters as necessary,
 	// updating the mapping based on the results of the analysis of cls.
 
@@ -221,6 +221,13 @@ class DynamicMBeanSkeleton {
 		+ " does not have an @ManagedObject annotation: cannot construct dynamic MBean" ) ;
 
 	type = mo.type() ;
+	if (type.equals( "" ))
+	    type = cls.getName() ;
+
+	setterFunctions = new HashMap<String,AnnotationUtil.Setter>() ;
+	getterFunctions = new HashMap<String,AnnotationUtil.Getter>() ; 
+	operationFunctions = new HashMap<String,Map<List<String>,AnnotationUtil.Operation>>() ;
+
 	final String moDescription = mo.description() ;
 	final List<OpenMBeanAttributeInfo> mbeanAttributeInfoList = 
 	    new ArrayList<OpenMBeanAttributeInfo>() ;
@@ -248,12 +255,6 @@ class DynamicMBeanSkeleton {
 	    }
 	}
 	
-	// Check for @InheritedTable annotation.
-	final InheritedTable it = cls.getAnnotation( InheritedTable.class ) ;
-	if (it != null) {
-	    // XXX process it
-	}
-
 	// Check for @IncludeSubclass annotation.  Scan subclasses for attributes.
 	final IncludeSubclass is = cls.getAnnotation( IncludeSubclass.class ) ;
 	if (is != null) {
@@ -304,7 +305,7 @@ class DynamicMBeanSkeleton {
 	    new OpenMBeanAttributeInfo[mbeanAttributeInfoList.size()] ) ;
 	OpenMBeanOperationInfo[] operInfos = mbeanOperationInfoList.toArray(
 	    new OpenMBeanOperationInfo[mbeanOperationInfoList.size() ] ) ;
-	OpenMBeanInfo mbeanInfo = new OpenMBeanInfoSupport( 
+	mbInfo = new OpenMBeanInfoSupport( 
 	    cls.getName(), moDescription, attrInfos, null, operInfos, null ) ;
     }
 
@@ -315,7 +316,7 @@ class DynamicMBeanSkeleton {
     public Object getAttribute( Object obj, String name) throws AttributeNotFoundException,
 	MBeanException, ReflectionException {
 
-	AnnotationUtil.Getter getter = getters.get( name ) ;
+	AnnotationUtil.Getter getter = getterFunctions.get( name ) ;
 	if (getter == null)
 	    throw new AttributeNotFoundException( "Could not find attribute " + name ) ;
 
@@ -331,7 +332,7 @@ class DynamicMBeanSkeleton {
 
 	String name = attribute.getName() ;
 	Object value = attribute.getValue() ;
-	AnnotationUtil.Setter setter = setters.get( name ) ;
+	AnnotationUtil.Setter setter = setterFunctions.get( name ) ;
 	if (setter == null)
 	    throw new AttributeNotFoundException( "Could not find writable attribute " + name ) ;
 
@@ -372,7 +373,7 @@ class DynamicMBeanSkeleton {
     public Object invoke( Object obj, String actionName, Object params[], String signature[])
 	throws MBeanException, ReflectionException  {
 
-	Map<List<String>,AnnotationUtil.Operation> opMap = operations.get( actionName ) ;
+	Map<List<String>,AnnotationUtil.Operation> opMap = operationFunctions.get( actionName ) ;
 	if (opMap == null)
 	    throw new IllegalArgumentException( "Could not find operation named " + actionName ) ;
 

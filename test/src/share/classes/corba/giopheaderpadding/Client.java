@@ -50,7 +50,7 @@ import corba.hcks.U;
 
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
 import com.sun.corba.se.impl.encoding.CDRInputStream;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.lang.reflect.*;
 import org.omg.PortableInterceptor.*;

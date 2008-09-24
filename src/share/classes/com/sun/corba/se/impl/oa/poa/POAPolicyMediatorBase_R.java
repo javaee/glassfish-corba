@@ -45,7 +45,7 @@ import org.omg.PortableServer.POAPackage.ObjectNotActive ;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 

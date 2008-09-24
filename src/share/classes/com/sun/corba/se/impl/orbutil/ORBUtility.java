@@ -81,6 +81,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.corba.CORBAObjectImpl ;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
@@ -107,9 +108,11 @@ public final class ORBUtility {
 	} catch (IOException exc ) {
 	    try {
 		sc.close() ;
-	    } finally {
-		throw exc ;
+	    } catch (IOException ioe) {
+		// Ignore this: close exceptions are useless.
 	    }
+
+	    throw exc ;
 	}
     }
 
@@ -269,8 +272,6 @@ public final class ORBUtility {
 
     private static ValueHandler vhandler = 
         new ValueHandlerImpl() ;
-    private static ValueHandler vhandler_1_3 = 
-        new ValueHandlerImpl_1_3() ;
     private static ValueHandler vhandler_1_3_1 = 
         new ValueHandlerImpl_1_3_1() ;
 
@@ -290,8 +291,6 @@ public final class ORBUtility {
         if (version == null)
             return vhandler;
 
-        if (version.equals(ORBVersionFactory.getOLD()))
-            return vhandler_1_3;
         if (version.equals(ORBVersionFactory.getNEW()))
             return vhandler_1_3_1;
 

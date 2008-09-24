@@ -47,7 +47,7 @@ import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 /** Implementation of POARequesHandler that provides policy specific

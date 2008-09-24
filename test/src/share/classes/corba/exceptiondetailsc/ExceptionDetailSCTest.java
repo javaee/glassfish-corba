@@ -50,31 +50,27 @@ public class ExceptionDetailSCTest
     public static final String thisPackage =
 	ExceptionDetailSCTest.class.getPackage().getName();
 
-    protected void doTest()
-	throws
-	    Throwable
-    {
-	Controller orbd   = createORBD();
-	orbd.start();
+    protected void doTest() throws Throwable {
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	doTestType("Server", "Server",
-		   "Client", "Client");
+        doTestType("Server", "Server",
+                   "Client", "Client");
 
-	Controller colocatedClientServer = 
-	    createClient(thisPackage + ".ColocatedClientServer",
-			 "colocatedClientServer");
-	colocatedClientServer.start();
-	colocatedClientServer.waitFor();
-	colocatedClientServer.stop();
+        Controller colocatedClientServer = 
+            createClient(thisPackage + ".ColocatedClientServer",
+                         "colocatedClientServer");
+        colocatedClientServer.start();
+        colocatedClientServer.waitFor();
+        colocatedClientServer.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 
-    protected void doTestType(String serverMainClass, String serverTestName,
-			      String clientMainClass, String clientTestName)
-	throws
-	    Throwable
-    {
+    protected void doTestType(
+        String serverMainClass, String serverTestName, 
+        String clientMainClass, String clientTestName) throws Throwable {
+
 	Controller server = createServer(thisPackage + "." + serverMainClass,
 					 serverTestName);
 	server.start();

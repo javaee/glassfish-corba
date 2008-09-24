@@ -222,7 +222,7 @@ Most actions are obvious from the table above, but values are
 complicated:
 
 "{":	start of new value type
-    - handle indіrection if present in input stream
+    - handle ind??rection if present in input stream
     - enter new ValueDatum into table for indirections
     - read value header, code base URL, and repo IDs
     - read chunk length if present

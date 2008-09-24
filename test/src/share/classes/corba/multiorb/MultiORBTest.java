@@ -43,23 +43,17 @@ public class MultiORBTest extends CORBATest
     protected void doTest() throws Throwable
     {
         Controller orbd = createORBD();
-
         orbd.start();
 
         Controller server = createServer("corba.multiorb.policy2Server");
-
         server.start();
 
         Controller client = createClient("corba.multiorb.policy2Client");
-    
         client.start();
-
         client.waitFor();
 
         client.stop();
-
         server.stop();
-
         orbd.stop();
     }
 }

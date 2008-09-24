@@ -37,7 +37,10 @@
 package com.sun.corba.se.impl.orbutil.newtimer ;
 
 import java.util.Iterator ;
+import java.util.Stack ;
 import java.util.NoSuchElementException ;
+
+import java.io.PrintStream ;
 
 import com.sun.corba.se.spi.orbutil.newtimer.Controllable ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
@@ -108,5 +111,82 @@ public class LogEventHandlerImpl extends NamedBase implements LogEventHandler {
     public synchronized void clear() {
 	initData( size, increment ) ;
     }
-}
 
+    // Class used to maintain a variable-length indent.
+    // Useful for displaying hierarchies.
+    private class Indent {
+	private final int width ;
+	private int level ;
+	private String rep ;
+
+	public Indent( final int width ) {
+	    this.width = width ;
+	    level = 0 ;
+	    rep = "" ;
+	}
+
+	private void update() {
+	    int size = level*width ;
+	    char[] content = new char[size] ;
+	    for (int ctr=0; ctr<size; ctr++) {
+		content[ctr] = ' ' ;
+	    }
+	    rep = new String( content ) ;
+	}
+
+	public void in() {
+	    level++ ;
+	    update() ;
+	}
+
+	public void out() {
+	    level-- ;
+	    update() ;
+	}
+
+	public String toString() {
+	    return rep ;
+	}
+    }
+
+    private static final String ENTER_REP = ">> " ;
+    private static final String EXIT_REP = "<< " ;
+
+    public void display( PrintStream arg, String msg ) {
+        arg.println( "Displaying contents of " + this + ": " + msg ) ;
+	final Stack<TimerEvent> stack = new Stack<TimerEvent>() ;
+	long startTime = -1 ;
+	Indent indent = new Indent( ENTER_REP.length() ) ;
+	for (TimerEvent te : this) {
+	    if (startTime == -1) {
+		startTime = te.time() ;
+	    }
+
+	    long relativeTime = (te.time() - startTime)/1000 ;
+
+	    final boolean isEnter = te.type() == TimerEvent.TimerEventType.ENTER ;
+
+	    if (isEnter) {
+		arg.printf( "%8d: %s%s%s\n", relativeTime, indent, 
+		    isEnter ? ENTER_REP : EXIT_REP,  te.timer().name() ) ;
+
+		// Copy te, otherwise the iterator will overwrite it!
+		stack.push( new TimerEvent(te) ) ;
+		indent.in() ;
+	    } else {
+		TimerEvent enterEvent = stack.pop() ;
+		indent.out() ;
+
+		String duration = null ;
+		if (enterEvent.timer().equals( te.timer() )) {
+		    duration = Long.toString( (te.time()-enterEvent.time())/1000 ) ;
+		} else {
+		    duration = "BAD NESTED EVENT: ENTER was " + enterEvent.timer().name() ;
+		}
+
+		arg.printf( "%8d: %s%s%s[%s]\n", relativeTime, indent, 
+		    isEnter ? ENTER_REP : EXIT_REP,  te.timer().name(), duration ) ;
+	    }
+	}
+    }
+}

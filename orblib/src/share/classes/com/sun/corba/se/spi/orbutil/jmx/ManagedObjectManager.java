@@ -36,6 +36,8 @@
 
 package com.sun.corba.se.spi.orbutil.jmx ;
 
+import java.lang.reflect.Type ;
+
 import java.util.Properties ;
 
 import javax.management.ObjectName ;
@@ -46,16 +48,15 @@ import javax.management.MBeanRegistrationException ;
 import javax.management.NotCompliantMBeanException ;
 
 public interface ManagedObjectManager {
-    void register( Object obj, String... props ) throws InstanceAlreadyExistsException,
-	MBeanRegistrationException, NotCompliantMBeanException ;
+    void register( Object obj, String... props ) ;
 
-    void register( Object obj, Properties props )  throws InstanceAlreadyExistsException,
-	MBeanRegistrationException, NotCompliantMBeanException ;
+    void register( Object obj, Properties props )  ;
 
-    void unregister( Object obj ) throws InstanceNotFoundException, 
-	MBeanRegistrationException ;
+    void unregister( Object obj ) ;
 
     ObjectName getObjectName( Object obj ) ;
+
+    Object getObject( ObjectName oname ) ;
 
     String getDomain() ;
 
@@ -64,4 +65,8 @@ public interface ManagedObjectManager {
      * java.lang.management.ManagementFactory.getPlatformMBeanServer().
      */
     void setMBeanServer( MBeanServer server ) ;
+
+    MBeanServer getMBeanServer() ;
+
+    TypeConverter getTypeConverter( Type type ) ;
 }

@@ -274,6 +274,12 @@
 	<param name="sourcefile-name" value="corba/stubserialization/EchoServant.java"/>
     </antcall>
     <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
+	<param name="rmic-args-value" value="-poa"/>
+	<param name="output-dir-value" value="${test-gensrc.dir}"/>
+	<param name="classfile-name" value="corba/enuminterop/EchoServant.class"/>
+	<param name="sourcefile-name" value="corba/enuminterop/EchoServant.java"/>
+    </antcall>
+    <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
 	<param name="rmic-args-value" value="-poa -nolocalstubs"/>
 	<param name="output-dir-value" value="${test-gensrc.dir}"/>
 	<param name="classfile-name" value="corba/giopheaderpadding/rmiiIServantPOA.class"/>

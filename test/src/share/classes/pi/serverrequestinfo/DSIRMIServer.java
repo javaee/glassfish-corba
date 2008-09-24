@@ -45,7 +45,7 @@ import org.omg.PortableServer.ServantLocatorPackage.*;
 import org.omg.PortableInterceptor.*;
 import com.sun.corba.se.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.util.*;
 import java.io.*;
@@ -65,31 +65,35 @@ public abstract class DSIRMIServer
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-	out.println( "+ Creating Initial naming context..." );
-	// Inform the JNDI provider of the ORB to use and create
-	// initial naming context:
-	Hashtable env = new Hashtable();
-	env.put( "java.naming.corba.orb", orb );
-	initialNamingContext = new InitialContext( env );
+        try {
+            out.println( "+ Creating Initial naming context..." );
+            // Inform the JNDI provider of the ORB to use and create
+            // initial naming context:
+            Hashtable env = new Hashtable();
+            env.put( "java.naming.corba.orb", orb );
+            initialNamingContext = new InitialContext( env );
 
-        // Set up hello object:
-        out.println( "+ Creating and binding Hello1 object..." );
-        TestInitializer.helloRef = createAndBind( "Hello1", 
-						  "[Hello1]" );
+            // Set up hello object:
+            out.println( "+ Creating and binding Hello1 object..." );
+            TestInitializer.helloRef = createAndBind( "Hello1", 
+                                                      "[Hello1]" );
 
-        out.println( "+ Creating and binding Hello1Forward object..." );
-        TestInitializer.helloRefForward = createAndBind( "Hello1Forward",
-							 "[Hello1Forward]" ); 
+            out.println( "+ Creating and binding Hello1Forward object..." );
+            TestInitializer.helloRefForward = createAndBind( "Hello1Forward",
+                                                             "[Hello1Forward]" ); 
 
-	handshake();
+            handshake();
 
-	// Test ServerInterceptor
-	testServerRequestInfo();
+            // Test ServerInterceptor
+            testServerRequestInfo();
+        } finally {
+            finish() ;
 
-	// Notify client it's time to exit.
-	exitClient();
+            // Notify client it's time to exit.
+            exitClient();
 
-	waitForClients();
+            waitForClients();
+        }
     }
 
     abstract void handshake();

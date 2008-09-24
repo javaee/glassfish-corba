@@ -39,7 +39,7 @@ package pi.clientrequestinfo;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import corba.framework.*;
@@ -101,8 +101,12 @@ public class RMIClient
 	env.put( "java.naming.corba.orb", orb );
 	initialNamingContext = new InitialContext( env );
 
-	// Test ClientInterceptor
-	testClientRequestInfo();
+        try {
+            // Test ClientInterceptor
+            testClientRequestInfo();
+        } finally {
+            finish() ;
+        }
     }
 
     /**

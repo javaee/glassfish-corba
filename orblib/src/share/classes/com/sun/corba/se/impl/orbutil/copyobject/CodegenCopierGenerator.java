@@ -64,6 +64,8 @@ import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
 /** Experimental class that generates a ClassFieldCopier using the codegen library.
  */
 public class CodegenCopierGenerator {
+    private static final String DEBUG = "false" ;
+
     private Class	       classToCopy ;
     private String	       className ;
 
@@ -138,9 +140,9 @@ public class CodegenCopierGenerator {
 	_end() ;
 
 	Properties debugProps = new Properties() ;
-	debugProps.setProperty( DUMP_AFTER_SETUP_VISITOR, "true" ) ;
-	debugProps.setProperty( TRACE_BYTE_CODE_GENERATION, "true" ) ;
-	debugProps.setProperty( USE_ASM_VERIFIER, "true" ) ;
+	debugProps.setProperty( DUMP_AFTER_SETUP_VISITOR, DEBUG ) ;
+	debugProps.setProperty( TRACE_BYTE_CODE_GENERATION, DEBUG ) ;
+	debugProps.setProperty( USE_ASM_VERIFIER, DEBUG ) ;
 	
 	Class cls = _generate( cl, pd, debugProps ) ;
 	return cls ;

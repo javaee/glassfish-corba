@@ -1,0 +1,19 @@
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>@groupId@</groupId>
+    <artifactId>@artifactId@</artifactId>
+    <version>@version@</version>
+    <description>@jarDescription@</description>
+    <url>@repositoryUrl@</url>
+    <developers>
+        <developer>
+            <id>raih</id>
+            <name>Harsha Godugu</name>
+            <email>harsha.godugu@sun.com</email>
+        </developer>
+        <developer>
+            <id>kcavanaugh</id>
+            <name>Ken Cavanaugh</name>
+            <email>ken.cavanaugh@sun.com</email>
+        </developer>
+    </developers>
+

@@ -70,4 +70,13 @@ public class TestConstants {
          "corbaloc:iiop:[::FFFF:10.5.32.14" 
          + ORBInitialPort + "/" + INSServiceName;
      public static final String returnString = "HELLO";
+
+     Object[][] data = new Object[][] {
+         { "testIIOPVersionAndPort", corbalocURL1, true },
+         { "testIIOPNoVersionAndPort", corbalocURL2, true },
+         { "testIIOPVersionAndNoPort", corbalocURL3, true },
+         { "testIIOPNoVersionAndNoPort", corbalocURL4, true },
+         { "testNoColon", corbalocURL5, false },
+         { "testNoColonNoBracket", corbalocURL6, false },
+     } ;
 }

@@ -59,7 +59,7 @@ import com.sun.corba.se.spi.orb.DataCollector ;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.folb.ServerGroupManager;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import corba.framework.Options;
@@ -187,7 +187,7 @@ public class Server
 	    // repo id, object id  and locator managed by ReferenceFactory.
 	    //
 
-	    Servant s = (Servant) javax.rmi.CORBA.Util.getTie(new TestServant(orb));
+	    Servant s = (Servant) javax.rmi.CORBA.Util.getTie(new EchoTestServant(orb));
 	    String repositoryId = s._all_interfaces(null, null)[0];
 	    // objectId is used to make a reference but it is
 	    // never used in the dispatch.
@@ -357,7 +357,7 @@ public class Server
 	    throws ForwardRequest
 	{
 	    try {
-		return (Servant) javax.rmi.CORBA.Util.getTie(new TestServant(orb));
+		return (Servant) javax.rmi.CORBA.Util.getTie(new EchoTestServant(orb));
 	    } catch (RemoteException e) {
 		e.printStackTrace(System.out);
 	    }

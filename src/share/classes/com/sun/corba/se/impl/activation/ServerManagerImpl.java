@@ -89,12 +89,11 @@ import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
 
 import com.sun.corba.se.impl.logging.ActivationSystemException ;
 
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.util.Utility;
 

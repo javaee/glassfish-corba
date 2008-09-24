@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testSuite name="WSpex" xmlns="http://www.sun.com/japex/testSuite">
+    <param name="japex.warmupTime" value="15"/>
+    <param name="japex.runTime" value="15"/>
+    <param name="japex.runsPerDriver" value="2"/>
+    <param name="japex.reportsDirectory" value="./reports/non-periodic"/>
+
+    <param name="japex.classPath" value="../../../../../../build/classes"/>
+    <param name="japex.classPath" value="../../../../../../orblib/build/classes"/>
+    <param name="japex.classPath" value="../../../../../../test/build/classes"/>
+    
+    <driver name="StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+    </driver>
+    
+    <testCase name="echoVoid">
+        <param name="methodName" value="echoVoid"/>
+        <param name="size" value="0"/>
+    </testCase>
+
+    <testCase name="echoString">
+        <param name="methodName" value="echoString"/>
+        <param name="size" value="0"/>
+    </testCase>
+
+    <testCase name="echoStruct">
+        <param name="methodName" value="echoStruct"/>
+        <param name="size" value="0"/>
+    </testCase>
+
+    <testCase name="echoSynthetic4K">
+        <param name="methodName" value="echoSynthetic"/>
+        <param name="size" value="4096"/>
+    </testCase>
+
+    <testCase name="echoSynthetic8K">
+        <param name="methodName" value="echoSynthetic"/>
+        <param name="size" value="8192"/>
+    </testCase>
+
+    <testCase name="echoSynthetic12K">
+        <param name="methodName" value="echoSynthetic"/>
+        <param name="size" value="12288"/>
+    </testCase>
+
+    <testCase name="echoArray40">
+        <param name="methodName" value="echoArray"/>
+        <param name="size" value="40"/>
+    </testCase>
+
+    <testCase name="echoArray80">
+        <param name="methodName" value="echoArray"/>
+        <param name="size" value="80"/>
+    </testCase>
+
+    <testCase name="echoArray120">
+        <param name="methodName" value="echoArray"/>
+        <param name="size" value="120"/>
+    </testCase>
+
+    <testCase name="getOrder50">
+        <param name="methodName" value="getOrder"/>
+        <param name="size" value="0"/>
+    </testCase>
+
+    <testCase name="echoOrder200">
+        <param name="methodName" value="echoOrder"/>
+        <param name="size" value="200"/>
+    </testCase>
+
+    <testCase name="echoOrder500">
+        <param name="methodName" value="echoOrder"/>
+        <param name="size" value="500"/>
+    </testCase>
+</testSuite>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->

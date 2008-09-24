@@ -94,7 +94,12 @@ public class ThreadExec extends InternalExec
         PrintStream output = new PrintStream(out, true);
         PrintStream errors = new PrintStream(err, true);
 
-        process.run(environment, programArgs, output, errors, extra);
+        try {
+            process.run(environment, programArgs, output, errors, extra);
+        } catch (Exception ex) {
+            ex.printStackTrace(errors);
+            exitValue = 1;
+        }
     }
 
     private ThreadProcess process = null;

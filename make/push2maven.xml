@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->
+
+<!-- ==================	@author harsha.godugu@sun ===========  -->
+<!-- ==================	@author ken.cavanaugh@sun ===========  -->
+
+<!-- ================================================================== -->
+<!-- Set current date/time in case, if we decide to timestamp -->
+<tstamp>
+    <format property="TODAY_LONG"  pattern="EEE MMM d HH:mm:ss z yyyy"/>
+    <format property="TODAY_SHORT" pattern="yyyy-MM-dd"/>
+</tstamp>
+
+<!-- ================================================================== -->
+<!--      Bootstrap - a task getting here the Maven-Ant library         -->
+<!-- ================================================================== -->
+<target name="bootstrap" 
+	description="Fetch Maven library - needed only the first time.">
+   <get
+       src="${maven.ant.dir}/${maven.ant.file}"
+       dest="${lib.dir}/${maven.ant.file}"
+       verbose="true"
+       usetimestamp="true"/>
+</target>
+
+<!-- ================================================================== -->
+<target name="testAntJar"
+    description="Check if the mavn-ant-tasks jar is already present in the lib dir.. .">
+    <condition property="maven.lib.present">
+       <available file="${lib.dir}/${maven.ant.file}"/>
+    </condition>
+</target>
+
+<!-- ================================================================== -->
+<target name="checkmaven" depends="testAntJar"  unless="maven.lib.present">
+    <echo>
+        Missing ${maven.ant.file} library. 
+	It can be fetched from the Internet by giving 
+	the command "ant bootstrap"
+     </echo>
+     <echo message="I'm getting it from internet for You!"/>
+     <antcall target="bootstrap"/>
+</target>
+
+<!-- ================================================================== -->
+<target name="mavenize" depends="init, checkmaven" description="initialize maven ">
+    <path id="maven-ant-tasks.classpath" 
+	  path="${lib.dir}/${maven.ant.file}" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" 
+        uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath">
+    </typedef>
+    <!-- ============Download the SVN provider ====================== -->
+    <artifact:install-provider artifactId="wagon-svn" groupId="org.jvnet.wagon-svn" version="1.7">
+    <artifact:remoteRepository id="java.net.maven2.repository" url="http://download.java.net/maven/2/" />
+    <!-- store the provider in temp local repository-->
+    <artifact:localRepository path="/tmp/test"/>
+    </artifact:install-provider>
+</target>
+
+<target name="test-loadfile">
+    <loadfile property="dependency" srcFile="make/dependency.template.xml">
+        <filterchain>
+            <replacetokens>
+                <token key="artifactId" value="codegen"/>
+                <token key="version" value="${version}"/>
+            </replacetokens>
+        </filterchain>
+    </loadfile>
+    <echo message="${dependency}"/>
+    <sequential>
+        <property name="dependencies" value="orb,codegen,asm"/>
+        <foreach list="${dependencies}" target="test-chain" name="foo"/>
+    </sequential>
+</target>
+
+<target name="test-chain">
+</target>
+
+<!--
+Variables in templates:
+    groupId         always com.sun.corba
+    jarName         the name of the jar file (glassfish-corba-<module>)
+    version         the current CORBA version
+    jarDescription  a brief description of the jar contents
+    HEADER-@{module} the expanded version of make/pom/header.xml inserted into the pom file
+                    Note that all properties must have unique names.  Ant is COMPLETELY
+                    braindead: see Greenberg's 10th law.
+
+naming conventions:
+The modules             (and their dependencies):
+    asm                 -
+    codegen             asm orbgeneric
+    csiv2-idl           omgapi
+    dynamicany          omgapi orb
+    naming              omgapi orb
+    newtimer            orbgeneric codegen 
+    omgapi              -
+    orb                 codegen dynamicany naming newtimer omgapi orbgeneric
+    orbgeneric          -
+
+    for each module m:
+        bnd file:           ${root.dir}/make/bnd/${m}.bnd
+        pom template:       ${root.dir}/make/pom/${m}.template.pom
+        resulting jar:      ${releaselib.dir}/bundles/glassfish-corba-${m}.jar
+-->
+
+<macrodef name="make-file">
+    <attribute name="module"/>
+    <attribute name="description"/>
+    <sequential>
+        <loadfile property="HEADER-@{module}" srcFile="make/pom/header.xml">
+            <filterchain>
+                <replacetokens>
+                    <token key="artifactId" value="glassfish-corba-@{module}"/>
+                    <token key="version" value="${orb.version}"/>
+                    <token key="jarDescription" value="@{description}"/>
+                    <token key="groupId" value="${orb.groupId}"/>
+                    <token key="repositoryUrl" value="${repo.url}"/>
+                </replacetokens>
+            </filterchain>
+        </loadfile>
+        <copy file="make/pom/@{module}.template.xml" tofile="make/corba.temp.pom" overwrite="true">
+            <filterset>
+              <filter token="HEADER" value="${HEADER-@{module}}"/>
+              <filter token="version" value="${orb.version}"/>
+              <filter token="groupId" value="${orb.groupId}"/>
+            </filterset>
+        </copy>
+    </sequential>
+</macrodef>
+
+<!--  
+Note that we use a temporary file to store the pom because maven is based on 'single 
+project produces single jar file'. But, we are producing 9 jars from a single 
+project. Hence, we need a template to for each pom that generates the POM we use each
+time we publish.
+
+Refer: http://maven.apache.org/guides/mini/guide-using-one-source-directory.html
+Section: Producing Multiple JARs from a single POM (maven limitations)
+-->
+
+<macrodef name="push-to-maven">
+    <attribute name="module"/>
+    <attribute name="description"/>
+    <sequential>
+        <make-file module="@{module}" description="@{description}"/>
+
+        <artifact:pom id="glassfish.corba.project" file="make/corba.temp.pom" />
+        <artifact:deploy file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
+            <remoteRepository url="${repo.url}">
+            </remoteRepository>
+            <pom refid="glassfish.corba.project"/>
+        </artifact:deploy>
+        <delete file="make/corba.temp.pom" verbose="true"/>
+    </sequential>
+</macrodef>
+
+<target name="release" depends="mavenize">
+    <push-to-maven module="asm" description="ASM version used in the ORB"/>
+    <push-to-maven module="codegen" description="Dynamic code generation library"/>
+    <push-to-maven module="csiv2-idl" description="IDL generated definitions for CSIv2"/>
+    <push-to-maven module="dynamicany" description="Dynamic Any support"/>
+    <push-to-maven module="naming" description="CosNaming service code"/>
+    <push-to-maven module="newtimer" description="ORB timer library"/>
+    <push-to-maven module="omgapi" description="OMG standard APIs"/>
+    <push-to-maven module="orb" description="The ORB implementation"/>
+    <push-to-maven module="orbgeneric" description="Generic libraries"/>
+</target>

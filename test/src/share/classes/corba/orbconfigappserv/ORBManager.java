@@ -51,7 +51,7 @@ import javax.rmi.PortableRemoteObject;
 import javax.naming.InitialContext;
 import javax.naming.Context;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 
 public class ORBManager 

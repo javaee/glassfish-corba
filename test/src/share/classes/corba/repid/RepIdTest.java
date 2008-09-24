@@ -46,7 +46,6 @@ import corba.framework.CORBATest;
 import corba.framework.*;
 
 public class RepIdTest extends CORBATest {
-
     public static final String thisPackage =
 	RepIdTest.class.getPackage().getName();
 

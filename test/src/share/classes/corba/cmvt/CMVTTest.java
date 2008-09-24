@@ -38,7 +38,7 @@ package corba.cmvt;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class CMVTTest extends CORBATest {
     static final int GROW = 0;
@@ -75,7 +75,7 @@ public class CMVTTest extends CORBATest {
     }
 
     private void setClient(int version, int strategy){
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
 
         int fragmentSize = 1024;
         clientProps.put(ORBConstants.GIOP_FRAGMENT_SIZE, "" + fragmentSize);
@@ -86,16 +86,16 @@ public class CMVTTest extends CORBATest {
     }
 
     private void setServer(int version, int strategy){
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
 
         serverProps.put(ORBConstants.GIOP_VERSION, GIOP_version[version]);
         serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + GIOP_strategy[strategy]);
         serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + GIOP_strategy[strategy]);
     }
 
-    private void runTest() throws Throwable{
-        Controller server = createServer("corba.cmvt.Server");
-        Controller client = createClient("corba.cmvt.Client");
+    private void runTest( String name ) throws Throwable{
+        Controller server = createServer("corba.cmvt.Server", name);
+        Controller client = createClient("corba.cmvt.Client", name);
 
         server.start();
         client.start();
@@ -125,20 +125,19 @@ public class CMVTTest extends CORBATest {
         setClient(0,0);
         setServer(0,0);
         printBeginTest(0,0,0,0);
-        runTest();
+        runTest( "1_0_grow" );
 
         //1.2 + grow
         setClient(2,0);
         setServer(2,0);
         printBeginTest(2,0,2,0);
-        runTest();
+        runTest( "1_2_grow" );
 
         //1.2 + stream
         setClient(2,2);
         setServer(2,2);
         printBeginTest(2,2,2,2);
-        runTest();
-
+        runTest( "1_2_stream" );
 
         System.out.print("      Test result : " );
         

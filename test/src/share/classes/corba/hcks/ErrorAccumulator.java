@@ -40,26 +40,44 @@
 
 package corba.hcks;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.sun.corba.se.spi.orbutil.generic.Pair ;
+
 public class ErrorAccumulator
 {
     public int numberOfErrors;
+    public ArrayList<MessageAndException> errors;
 
-    public ArrayList errors;
+    private int numberOfErrorsInTest ;
+    public ArrayList<MessageAndException> errorsInTest ;
+
+    public void startTest() {
+        numberOfErrorsInTest = 0 ;
+        errorsInTest = new ArrayList<MessageAndException>() ;
+    }
+
+    public List<MessageAndException> getTestErrors() {
+        return errorsInTest ;
+    }
 
     public ErrorAccumulator() 
     {
 	numberOfErrors = 0; 
-	errors = new ArrayList();
+	errors = new ArrayList<MessageAndException>();
+        startTest() ;
     }
 
     public void add(String errorMessage, Throwable t)
     {
+	MessageAndException mae = new MessageAndException(errorMessage, t);
 	numberOfErrors++;
-	errors.add(new MessageAndException(errorMessage, t));
+	errors.add( mae );
+        numberOfErrorsInTest++ ;
+        errorsInTest.add( mae ) ;
     }
 
     public int getNumberOfErrors()
@@ -92,17 +110,18 @@ public class ErrorAccumulator
 	}
     }
 
-    public class MessageAndException
-    {
-	public String message;
-	public Throwable exception; // May be null in case of incorrect result;
-	public MessageAndException(String message, Throwable exception)
-	{
-	    this.message = message;
-	    this.exception = exception;
+    public class MessageAndException extends Pair<String,Throwable> {
+	public MessageAndException(String message, Throwable exception) {
+            super( message, exception ) ;
 	}
-	public String getMessage() { return message; }
-	public Throwable getException() { return exception; }
+
+	public String getMessage() {
+            return first() ;
+        }
+
+	public Throwable getException() { 
+            return second() ; 
+        }
     }
 }
 

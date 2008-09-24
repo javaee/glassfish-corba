@@ -47,10 +47,9 @@ import corba.framework.CORBATest;
 
 import corba.framework.*;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class JSGTest extends CORBATest {
-
     public static final String thisPackage =
 	JSGTest.class.getPackage().getName();
     
@@ -82,11 +81,11 @@ public class JSGTest extends CORBATest {
 			      String clientMainClass, String clientTestName)
         throws Throwable {
       
-	Properties clientProps = Options.getExtraClientProperties();
+	Properties clientProps = Options.getClientProperties();
 	clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
 			"corba.jsg.Client", "true");
 
-	Properties serverProps = Options.getExtraServerProperties();
+	Properties serverProps = Options.getServerProperties();
 	serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
                       "corba.jsg.Server", "true");
 

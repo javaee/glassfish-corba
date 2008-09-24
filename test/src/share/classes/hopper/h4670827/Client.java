@@ -38,76 +38,50 @@ package hopper.h4670827;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Object;
 import java.util.*;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class Client implements Runnable {
-
-    public void signalError () {
-        System.exit(1);
-    }
-
+    private JUnitReportHelper helper ;
+    private boolean failed = false ;
 
     public static void main(String args[]) {
         new Client().run();
     }
 
-    ORB orb;
-    public void run()
-    {
-        try {
+    private ORB orb;
 
+    public void run() {
+        helper = new JUnitReportHelper( Client.class.getName() ) ;
+        try {
             orb = ORB.init( (String[]) null, null );
 
-            boolean passed = testURL( TestConstants.corbalocURL1, true );
-            if( passed ) {
-                System.out.println( "Passed URL Test 1 " );
-            } else { 
-                System.err.println( "Test URL1 Failed.." );
-                signalError( );
+            for (Object[] arr : TestConstants.data) {
+                String name = arr[0] ;
+                String url = arr[1] ;
+                boolean shouldSucceed = arr[2] ;
+                helper.start( name ) ;
+                try {
+                    if (testURL( url, shouldSucceed )) {
+                        System.out.println( "Passed test " + name ) ;
+                        helper.pass() ;
+                    } else {
+                        System.out.println( "Test " + name + " failed" ) ;
+                        helper.fail( "failed" ) ;
+                        failed = true ;
+                    }
+                } catch (Exception exc) {
+                    helper.fail( exc ) ;
+                    failed = true ;
+                }
             }
-            passed = testURL( TestConstants.corbalocURL2, true );
-            if( passed ) {
-                System.out.println( "Passed URL Test 2 " );
-            } else { 
-                System.err.println( "Test URL2 Failed.." );
-                signalError( );
-            } 
-            passed = testURL( TestConstants.corbalocURL3, true );
-            if( passed ) {
-                System.out.println( "Passed URL Test 3 " );
-            } else { 
-                System.err.println( "Test URL3 Failed.." );
-                signalError( );
-            } 
-            passed = testURL( TestConstants.corbalocURL4, true );
-            if( passed ) {
-                System.out.println( "Passed URL Test 4 " );
-            } else { 
-                System.err.println( "Test URL4 Failed.." );
-                signalError( );
-            } 
-            passed = testURL( TestConstants.corbalocURL5, false );
-            if( passed ) {
-                System.out.println( "Passed URL Test 5 " );
-            } else { 
-                System.err.println( "Test URL5 Failed.." );
-                signalError( );
-            } 
-            passed = testURL( TestConstants.corbalocURL6, false );
-            if( passed ) {
-                System.out.println( "Passed URL Test 6 " );
-            } else { 
-                System.err.println( "Test URL6 Failed.." );
-                signalError( );
-            } 
-        } catch (Exception e ) {
-             e.printStackTrace( System.err );
-             signalError( );
-        }
+
         System.out.println("Thread "+ Thread.currentThread()+" done.");
+        if (failed)
+            System.exit(1) ;
     }
 
     private boolean testURL ( String url, boolean shouldPass ) {
-        if( shouldPass ) {
+        if (shouldPass) {
             org.omg.CORBA.Object obj = orb.string_to_object( url );
             if( obj == null ) {
                 System.err.println( url + " lookup failed.." );
@@ -132,10 +106,8 @@ public class Client implements Runnable {
                 System.out.println( "Caught Exception " + e + " as expected " );
             }
         }
+        
         // If we are here then we passed the test
         return true;
     }
 }
-
-
-

@@ -48,7 +48,7 @@ public class ThreadPoolMonitoringTests extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-       // Create client controller using the given
+        // Create client controller using the given
         // class.  You can also specify names for these (for instance,
         // you may want to distinguish between many clients) by using
         // the equivalent methods that take two Strings.

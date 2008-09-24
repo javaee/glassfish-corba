@@ -43,10 +43,7 @@ package corba.islocal;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 
-public class IsLocalTest
-    extends
-	CORBATest
-{
+public class IsLocalTest extends CORBATest {
     public static final String thisPackage =
 	IsLocalTest.class.getPackage().getName();
 
@@ -57,17 +54,17 @@ public class IsLocalTest
 	Controller orbd   = createORBD();
 	orbd.start();
 
-	doTestType("Server", "Server",
-		   "Client", "Client");
+        doTestType("Server", "Server",
+                   "Client", "Client");
 
-	Controller colocatedClientServer = 
-	    createClient(thisPackage + ".ColocatedClientServer",
-			 "colocatedClientServer");
-	colocatedClientServer.start();
-	colocatedClientServer.waitFor();
-	colocatedClientServer.stop();
+        Controller colocatedClientServer = 
+            createClient(thisPackage + ".ColocatedClientServer",
+                         "colocatedClientServer");
+        colocatedClientServer.start();
+        colocatedClientServer.waitFor();
+        colocatedClientServer.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 
     protected void doTestType(String serverMainClass, String serverTestName,

@@ -52,6 +52,9 @@
     <timer name="waitForResponse" description="Waiting for a response"/>
 
     <!-- CDROutputStream timers -->
+    <timer name="callValueHandlerWriteReplaceFromCDRStream" description="Calling ValueHandler.writeReplace from CDR Stream"/>
+    <timer name="callValueHandlerIsCustomMarshaledFromCDRStream" description="Calling ValueHandler.isCustomMarshaled from CDR Stream"/>
+    <timer name="callValueHandlerWriteValueFromCDRStream" description="Calling ValueHandler.isCustomMarshaled from CDR Stream"/>
     <timer name="createCDROutputStream" description="Constructing a new CDR Output Stream"/>
     <timer name="writeBooleanToCDRStream" description="Write a boolean to a CDR Stream"/>
     <timer name="writeCharToCDRStream" description="Write a character to a CDR Stream"/>
@@ -108,6 +111,7 @@
     <timer name="endValueCDRStream" description="call end_value on a CDR Stream"/>
 
     <!-- CDRInputStream timers -->
+    <timer name="callValueHandlerReadValueFromCDRStream" description="Calling ValueHandler.readValue from CDR Stream"/>
     <timer name="createCDRInputStream" description="Constructing a new CDR Input Stream"/>
     <timer name="readBooleanFromCDRStream" description="Read a boolean from a CDR Stream"/>
     <timer name="readCharFromCDRStream" description="Read a character from a CDR Stream"/>
@@ -263,6 +267,9 @@
     </timerGroup>
 
     <timerGroup name="CDROutputStream" description="Unmarshaling methods on CDR Output Stream">
+        <contains name="callValueHandlerWriteReplaceFromCDRStream"/>
+        <contains name="callValueHandlerIsCustomMarshaledFromCDRStream"/>
+        <contains name="callValueHandlerWriteValueFromCDRStream"/>
 	<contains name="createCDROutputStream"/> 
 	<contains name="writeBooleanToCDRStream"/> 
 	<contains name="writeCharToCDRStream"/> 
@@ -320,6 +327,7 @@
     </timerGroup>
 
     <timerGroup name="CDRInputStream" description="Marshaling methods on CDR Input Stream">
+        <contains name="callValueHandlerReadValueFromCDRStream"/>
 	<contains name="createCDRInputStream"/>
 	<contains name="readBooleanFromCDRStream"/>
 	<contains name="readCharFromCDRStream"/>

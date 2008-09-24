@@ -43,6 +43,8 @@
 // clients or servers within the test process will be run
 // with the -separateprocess flag. 
 
+-test corba.jmx.JmxTest
+-test corba.copyobjectpolicy.CopyObjectPolicyTest
 -test corba.connectioncache.ConnectionCacheTest
 -test corba.timer.TimerTest
 // MixedOrbTest passes when run outside of the framework,
@@ -51,18 +53,19 @@
 // -test corba.mixedorb.MixedOrbTest
 -test corba.resolve_deadlock.ResolveDeadlockTest
 
-// These two tests are for the special HW LB plugin code
 -test corba.lb.LBTest -ifpresent
--test corba.retryplugin.RetryPluginTest -ifpresent
+
+// I don't think this is needed, and it takes 4.5 minutes to run, so comment it out for now
+// -test corba.retryplugin.RetryPluginTest -ifpresent
 
 -test corba.giopgen.GIOPGenTest
 -test corba.rfm.TestRFM
--test corba.codegen.CodegenTest -ifpresent
--test corba.messagetrace.MessageTraceTest
--test corba.misc.MiscTest
+// now run directly from ant junit task: -test corba.codegen.CodegenTest -ifpresent
+// now run directly from ant junit task: -test corba.messagetrace.MessageTraceTest
+// now run directly from ant junit task: -test corba.misc.MiscTest
 -test corba.requestpartitioning.RequestPartitioningTest
 -test corba.rogueclient.RogueClientTest
-// Commented out until we get the ORB retry logic fixed.
+// XXX Is the ORB retry logic fixed?
 // -test corba.folb.FolbTest -ifpresent
 -test corba.folb_8_1.FolbTest
 -test corba.fwddecl.ForwardDeclTest
@@ -71,7 +74,7 @@
 -test corba.legacyorbclasses.LegacyORBClassesTest
 -test corba.legacybootstrapserver.LegacyBootstrapServerTest
 -test corba.stubserialization.StubSerializationTest
--test corba.dynamicrmiiiop.DynamicRmiIIOPTest
+// now run directly from ant junit task: -test corba.dynamicrmiiiop.DynamicRmiIIOPTest
 -test corba.threadpoolmonitoring.ThreadPoolMonitoringTests
 -test corba.adapteractivator.AdapterActivator
 -test corba.monitoring.MonitoringTests
@@ -107,7 +110,6 @@
 -test corba.poaandequals.POAAndEquals -separateprocess
 -test corba.multiorb.MultiORBTest
 -test corba.serialization.good.GoodRepIdTest
--test corba.serialization.bad.BadRepIdTest
 -test corba.cdrstreams.CDRTests
 -test corba.giopheaderpadding.GIOPHeaderPaddingTest
 -test corba.systemexceptions.SystemExceptionsTest

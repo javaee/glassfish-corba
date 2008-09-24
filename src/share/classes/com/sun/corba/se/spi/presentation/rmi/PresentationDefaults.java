@@ -44,7 +44,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
 import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.presentation.rmi.StubFactoryFactoryProxyImpl;
 import com.sun.corba.se.impl.presentation.rmi.StubFactoryFactoryStaticImpl;

@@ -31,9 +31,12 @@
 #  and therefore, elected the GPL Version 2 license, then the option applies
 #  only if the new code is made subject to such option by the copyright
 #  holder.
+#
 
-corba test suite:
---------------------------------------------------------------------------------
+Note: this is very out of date: update after junit conversion!
+
+corba test suite:			    test case structure		total test case		framework notes
+---------------------------------------------------------------------------------------------------------------
 ./corba/cdrext				    30 test cases		30
 ./corba/cdrstreams			    7 TC			 7   
 ./corba/cmvt				    3 TC                         3
@@ -71,12 +74,12 @@ corba test suite:
 ./corba/orbconfigappserv		    1 TC			 1
 ./corba/poacallback			    1 TC			 1
 ./corba/preinvokepostinvoke		    1 TC			 1
-./corba/copyobject			    105 TC, 4 variations       420
+./corba/copyobject			    127 TC, 5 variations       635			junit
 ./corba/copyobjectpolicy		    2 TC			 2
 ./corba/exceptiondetailsc		    1 TC			 1 
-./corba/adapteractivator		    1 TC			 1
+./corba/adapteractivator		    1 TC			 1			statusU
 --------------------------------------------------------------------------------
-								      1108
+								      1323
 --------------------------------------------------------------------------------
 
 IBM test suite:
@@ -166,7 +169,7 @@ PI test suite:
 
 Totals:		    Test Suites		Test Cases
 --------------------------------------------------------------------------------
-CORBA			     41		      1108
+CORBA			     41		      1323
 IBM			     17		       398
 Hopper			      9			 9
 Mantis			      1			 1
@@ -174,5 +177,5 @@ Naming			      4			13
 Performance		      2			 7
 PI			     11		       329
 --------------------------------------------------------------------------------
-			     85		      1866
+			     85		      2077
 

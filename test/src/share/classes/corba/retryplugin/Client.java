@@ -52,7 +52,7 @@ import org.omg.CORBA.ORB;
 
 import com.sun.corba.se.impl.plugin.hwlb.RetryClientRequestInterceptor ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 /**
  * @author Harold Carr

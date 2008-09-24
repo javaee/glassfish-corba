@@ -47,6 +47,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
+import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 // This file contains some utility methods that
 // originally were in the OSC in the RMI-IIOP
@@ -73,10 +76,11 @@ class ObjectStreamClassCorbaExt {
      *	  java.rmi.RemoteException's super classes.
      */
     static final boolean isAbstractInterface(Class cl) {
-        if (!cl.isInterface() || // #1
-	        java.rmi.Remote.class.isAssignableFrom(cl)) { // #2
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+	if (!cinfo.isInterface() || cinfo.isARemote(cl)) {
             return false;
         }
+
         Method[] methods = cl.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Class exceptions[] = methods[i].getExceptionTypes();
@@ -93,23 +97,61 @@ class ObjectStreamClassCorbaExt {
 		return false;
 	    }
 	}
+
 	return true;
     }
 
+    // Common collisions (same length):
+    // java.lang.String
+    // java.math.BigDecimal
+    // java.math.BigInteger
+    private static final String objectString         = "Ljava/lang/Object;" ;
+    private static final String serializableString   = "Ljava/io/Serializable;" ;
+    private static final String externalizableString = "Ljava/io/Externalizable;" ;
+
+    // Note that these 3 lengths are different!
+    private static final int objectLength = objectString.length() ;
+    private static final int serializableLength = serializableString.length() ;
+    private static final int externalizableLength = externalizableString.length() ;
+
+    private static final boolean debugIsAny = false ;
+
     /*
      *  Returns TRUE if type is 'any'.
+     *  This is in the marshaling path, so we want it to run as
+     *  fast as possible.
      */
     static final boolean isAny(String typeString) {
+	if (debugIsAny) {
+	    ORBUtility.dprint( 
+		ObjectStreamClassCorbaExt.class.getName(), 
+		"IsAny: typeString = " + typeString ) ;
+	}
 
-	int isAny = 0;
+	int length = typeString.length() ;
 
-	if ( (typeString != null) &&
-	    (typeString.equals("Ljava/lang/Object;") ||
-	     typeString.equals("Ljava/io/Serializable;") ||
-	     typeString.equals("Ljava/io/Externalizable;")) )
-                isAny = 1;
+	if (length == objectLength) {
+	    // Note that java.lang.String occurs a lot, and has the
+	    // same length as java.lang.Object!
+	    if (typeString.charAt(length-2) == 't')
+		return objectString.equals( typeString ) ;
+	    else
+		return false ;
+	}
 
-        return (isAny==1);
+	if (length == serializableLength) {
+	    // java.math.BigInteger and java.math.BigDecimal have the same
+	    // length as java.io.Serializable
+	    if (typeString.charAt(length-2) == 'e')
+		return serializableString.equals( typeString ) ;
+	    else 
+		return false ;
+	}
+
+	if (length == externalizableLength)
+	    return externalizableString.equals( typeString ) ;
+
+	return false ;
     }
 
     private static final Method[] getDeclaredMethods(final Class clz) {

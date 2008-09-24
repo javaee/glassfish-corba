@@ -42,19 +42,17 @@ import org.omg.CORBA.INTERNAL ;
 import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.fsm.Action ;
-import com.sun.corba.se.spi.orbutil.fsm.ActionBase ;
 import com.sun.corba.se.spi.orbutil.fsm.Guard ;
-import com.sun.corba.se.spi.orbutil.fsm.GuardBase ;
 import com.sun.corba.se.spi.orbutil.fsm.State ;
-import com.sun.corba.se.spi.orbutil.fsm.StateImpl ;
 import com.sun.corba.se.spi.orbutil.fsm.Input ;
-import com.sun.corba.se.spi.orbutil.fsm.InputImpl ;
 import com.sun.corba.se.spi.orbutil.fsm.FSM ;
 import com.sun.corba.se.spi.orbutil.fsm.FSMImpl ;
+import com.sun.corba.se.spi.orbutil.fsm.Runner ;
 import com.sun.corba.se.spi.orbutil.fsm.StateEngine ;
-import com.sun.corba.se.spi.orbutil.fsm.StateEngineFactory ;
 
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
+
+import static com.sun.corba.se.spi.orbutil.fsm.Guard.Base.* ;
 
 /** AOMEntry represents a Servant or potential Servant in the ActiveObjectMap.
 * It may be in several states to allow for long incarnate or etherealize operations.
@@ -64,6 +62,7 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 * transitions are explicitly visible.
 */
 public class AOMEntry extends FSMImpl {
+    private Runner runner ;
     private final Thread[] etherealizer ;   // The actual etherealize operation 
 					    // for this entry.  It is 
 					    // represented as a Thread because
@@ -75,21 +74,22 @@ public class AOMEntry extends FSMImpl {
 
     final POAImpl poa ;
 
-    public static final State INVALID = new StateImpl( "Invalid" ) ;
-    public static final State INCARN  = new StateImpl( "Incarnating" ) {
+    public static final State INVALID = new State( "Invalid", State.Kind.INITIAL ) ;
+    public static final State INCARN  = new State( "Incarnating" ) {
 	public void postAction( FSM fsm ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    entry.wait.signalAll() ;
 	}
     };
-    public static final State VALID   = new StateImpl( "Valid" ) ;
-    public static final State ETHP    = new StateImpl( "EtherealizePending" ) ;
-    public static final State ETH     = new StateImpl( "Etherealizing" ) {
-	public void preAction( FSM fsm ) {
+    public static final State VALID   = new State( "Valid" ) ;
+    public static final State ETHP    = new State( "EtherealizePending" ) ;
+    public static final State ETH     = new State( "Etherealizing" ) {
+	public FSM preAction( FSM fsm ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    Thread etherealizer = entry.etherealizer[0] ;
 	    if (etherealizer != null) 
 		etherealizer.start() ;
+	    return null ;
 	}
 
 	public void postAction( FSM fsm ) {
@@ -97,24 +97,24 @@ public class AOMEntry extends FSMImpl {
 	    entry.wait.signalAll() ;
 	}
     };
-    public static final State DESTROYED = new StateImpl( "Destroyed" ) ;
+    public static final State DESTROYED = new State( "Destroyed" ) ;
 
-    static final Input START_ETH    = new InputImpl( "startEtherealize" ) ;
-    static final Input ETH_DONE	    = new InputImpl( "etherealizeDone" ) ;
-    static final Input INC_DONE	    = new InputImpl( "incarnateDone" ) ;
-    static final Input INC_FAIL	    = new InputImpl( "incarnateFailure" ) ;
-    static final Input ACTIVATE	    = new InputImpl( "activateObject" ) ;
-    static final Input ENTER	    = new InputImpl( "enter" ) ;
-    static final Input EXIT	    = new InputImpl( "exit" ) ;
+    static final Input START_ETH    = new Input.Base( "startEtherealize" ) ;
+    static final Input ETH_DONE	    = new Input.Base( "etherealizeDone" ) ;
+    static final Input INC_DONE	    = new Input.Base( "incarnateDone" ) ;
+    static final Input INC_FAIL	    = new Input.Base( "incarnateFailure" ) ;
+    static final Input ACTIVATE	    = new Input.Base( "activateObject" ) ;
+    static final Input ENTER	    = new Input.Base( "enter" ) ;
+    static final Input EXIT	    = new Input.Base( "exit" ) ;
 
-    private static Action incrementAction = new ActionBase( "increment" ) {
+    private static Action incrementAction = new Action.Base( "increment" ) {
 	public void doIt( FSM fsm, Input in ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    entry.counter[0]++ ;
 	}
     } ;
 
-    private static Action decrementAction = new ActionBase( "decrement" ) {
+    private static Action decrementAction = new Action.Base( "decrement" ) {
 	public void doIt( FSM fsm, Input in ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    if (entry.counter[0] > 0)
@@ -124,7 +124,7 @@ public class AOMEntry extends FSMImpl {
 	}
     } ;
 
-    private static Action throwIllegalStateExceptionAction = new ActionBase( 
+    private static Action throwIllegalStateExceptionAction = new Action.Base( 
 	"throwIllegalStateException" ) {
 	public void doIt( FSM fsm, Input in ) {
 	    throw new IllegalStateException( 
@@ -132,13 +132,13 @@ public class AOMEntry extends FSMImpl {
 	} 
     } ;
 
-    private static Action oaaAction = new ActionBase( "throwObjectAlreadyActive" ) {
+    private static Action oaaAction = new Action.Base( "throwObjectAlreadyActive" ) {
 	public void doIt( FSM fsm, Input in ) {
 	    throw new RuntimeException( new ObjectAlreadyActive() ) ;
 	}
     } ;
 
-    private static Guard waitGuard = new GuardBase( "wait" ) {
+    private static Guard waitGuard = new Guard.Base( "wait" ) {
 	public Guard.Result evaluate( FSM fsm, Input in ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    try {
@@ -148,36 +148,30 @@ public class AOMEntry extends FSMImpl {
 		// NO-OP
 	    }
 
-	    return Guard.Result.DEFERED ;
+	    return Guard.Result.DEFERRED ;
 	}
     } ;
 
+    private static IntFunc counterFunc = 
+	new IntFunc( "counterFunc" ) {
+	    public int evaluate( FSM fsm, Input in ) {
+		AOMEntry entry = (AOMEntry)fsm ;
+		return entry.counter[0] ;
+	    }
+	} ;
 
-    private static class CounterGuard extends GuardBase {
-	private int value ;
+    private static IntFunc one = constant( 1 ) ;
+    private static IntFunc zero = constant( 0 ) ;
 
-	public CounterGuard( int value ) 
-	{
-	    super( "counter>" + value ) ;
-	    this.value = value ;
-	}
-
-	public Guard.Result evaluate( FSM fsm, Input in ) 
-	{
-	    AOMEntry entry = (AOMEntry)fsm ;
-	    return Guard.Result.convert( entry.counter[0] > value ) ;
-	}
-    } ;
-
-    private static GuardBase greaterZeroGuard = new CounterGuard( 0 ) ;
-    private static Guard zeroGuard = new Guard.Complement( greaterZeroGuard ) ;
-    private static GuardBase greaterOneGuard = new CounterGuard( 1 ) ;
-    private static Guard oneGuard = new Guard.Complement( greaterOneGuard ) ;
+    private static Guard greaterZeroGuard = makeGuard( gt( counterFunc, zero ) ) ;
+    private static Guard zeroGuard = makeGuard( eq( counterFunc, zero ) ) ;
+    private static Guard greaterOneGuard = makeGuard( gt( counterFunc, one ) ) ;
+    private static Guard oneGuard = makeGuard( eq( counterFunc, one ) ) ;
 
     private static StateEngine engine ;
 
     static {
-	engine = StateEngineFactory.create() ;
+	engine = StateEngine.create() ;
 
 	//	    State,   Input,     Guard,			Action,		    new State
 
@@ -217,6 +211,7 @@ public class AOMEntry extends FSMImpl {
     public AOMEntry( POAImpl poa )
     {
 	super( engine, INVALID, ((ORB)poa.getORB()).poaFSMDebugFlag ) ;
+	runner = new Runner( this ) ;
 	this.poa = poa ;
 	etherealizer = new Thread[1] ;
 	etherealizer[0] = null ;
@@ -231,18 +226,18 @@ public class AOMEntry extends FSMImpl {
     public void startEtherealize( Thread etherealizer ) 
     { 
 	this.etherealizer[0] = etherealizer ;
-	doIt( START_ETH ) ; 
+	runner.doIt( START_ETH ) ; 
     }
 
-    public void etherealizeComplete() { doIt( ETH_DONE ) ; }
-    public void incarnateComplete() { doIt( INC_DONE ) ; }
-    public void incarnateFailure() { doIt( INC_FAIL ) ; }
-    public void enter() { doIt( ENTER ) ; }
-    public void exit() { doIt( EXIT ) ; }
+    public void etherealizeComplete() { runner.doIt( ETH_DONE ) ; }
+    public void incarnateComplete() { runner.doIt( INC_DONE ) ; }
+    public void incarnateFailure() { runner.doIt( INC_FAIL ) ; }
+    public void enter() { runner.doIt( ENTER ) ; }
+    public void exit() { runner.doIt( EXIT ) ; }
 
     public void activateObject() throws ObjectAlreadyActive { 
 	try {
-	    doIt( ACTIVATE ) ; 
+	    runner.doIt( ACTIVATE ) ; 
 	} catch (RuntimeException exc) {
 	    Throwable thr = exc.getCause() ;
 	    if (thr instanceof ObjectAlreadyActive)

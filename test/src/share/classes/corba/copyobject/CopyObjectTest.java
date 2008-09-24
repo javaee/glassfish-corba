@@ -53,7 +53,7 @@ public class CopyObjectTest extends CORBATest
 	doSingleTest( "OldReflectTest" ) ;
 	doSingleTest( "ORBStreamTest" ) ;
 	doSingleTest( "JavaStreamTest" ) ;
-	// doSingleTest( "JbossStreamTest" ) ;
+	doSingleTest( "JbossStreamTest" ) ;
 	System.out.println() ;
     }
 

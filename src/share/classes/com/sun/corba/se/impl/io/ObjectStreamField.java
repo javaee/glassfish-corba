@@ -53,6 +53,8 @@ import sun.corba.Bridge ;
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 /**
  * A description of a field in a serializable class.
  * A array of these is used to declare the persistent fields of
@@ -70,12 +72,11 @@ public class ObjectStreamField implements Comparable
 	    } 
 	) ;
 
-    /**
-     * Create a named field with the specified type.
-     */
-    ObjectStreamField(String n, Class clazz) {
+    // Create a named field with the specified type.
+    public ObjectStreamField(String n, Class clazz) {
     	name = n;
     	this.clazz = clazz;
+	cinfo = ClassInfoCache.get( clazz ) ;
 
 	// Compute the typecode for easy switching
 	if (clazz.isPrimitive()) {
@@ -96,7 +97,7 @@ public class ObjectStreamField implements Comparable
 	    } else if (clazz == Boolean.TYPE) {
 		type = 'Z';
 	    }
-	} else if (clazz.isArray()) {
+	} else if (cinfo.isArray()) {
 	    type = '[';
 	    typeString = ObjectStreamClass.getSignature(clazz);
 	} else {
@@ -111,26 +112,9 @@ public class ObjectStreamField implements Comparable
 
     }
 
-    ObjectStreamField(Field field) {
+    public ObjectStreamField(Field field) {
 	this(field.getName(), field.getType());
 	setField( field ) ;
-    }
-
-    /**
-     * Create an ObjectStreamField containing a reflected Field.
-     */
-    ObjectStreamField(String n, char t, Field f, String ts)
-    {
-	name = n;
-	type = t;
-	setField( f ) ;
-	typeString = ts;
-
-	if (typeString != null)
-	    signature = typeString;
-	else
-	    signature = String.valueOf(type);
-	
     }
 
     /**
@@ -138,6 +122,10 @@ public class ObjectStreamField implements Comparable
      */
     public String getName() {
     	return name;
+    }
+
+    public ClassInfoCache.ClassInfo getClassInfo() {
+	return cinfo ;
     }
 
     /**
@@ -189,12 +177,6 @@ public class ObjectStreamField implements Comparable
  	this.fieldID = bridge.objectFieldOffset( field ) ;
     }
 
-    /*
-     * Default constructor creates an empty field.
-     * Usually used just to get to the sort functions.
-     */
-    ObjectStreamField() {
-    }
 
     /**
      * test if this field is a primitive or not.
@@ -273,6 +255,7 @@ public class ObjectStreamField implements Comparable
     private Field field;		// Reflected field
     private String typeString;		// iff object, typename
     private Class clazz;		// the type of this field, if has been resolved
+    private ClassInfoCache.ClassInfo cinfo ;
 
     // the next 2 things are RMI-IIOP specific, it can be easily
     // removed, if we can figure out all place where there are dependencies

@@ -56,6 +56,7 @@ public class MyLabel extends Label {
 	emitted = flag ;
     }
 
+    @Override
     public String toString() {
 	return "ML" + current ;
     }

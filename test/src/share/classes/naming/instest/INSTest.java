@@ -35,7 +35,7 @@
  */
 package naming.instest;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
@@ -67,7 +67,7 @@ public class INSTest extends CORBATest
 
         compileJavaFiles();
 
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         serverProps.setProperty(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                                 TestConstants.PERSISTENT_PORT);
 
@@ -76,7 +76,7 @@ public class INSTest extends CORBATest
 
         server.start();
 
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.setProperty(TestConstants.URL_PROPERTY,
                                 "corbaloc:iiop:1.2@localhost:"
                                 + TestConstants.PERSISTENT_PORT

@@ -41,7 +41,7 @@ import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
-/** This annotation defines CompositeData.   An interface or class annotated as @ManagedObject
+/** This annotation defines CompositeData.   An interface or class annotated as @ManagedData
  * has a corresponding CompositeData instance constructed according to the @ManagedAttribute 
  * annotations on its methods.
  */

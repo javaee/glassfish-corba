@@ -35,15 +35,20 @@
   holder.
 -->
 
+
+<!-- Macro used to run CTF tests.  Some of these are also junit tests, but cannot be run directly under the junit ant task. -->
 <macrodef name="run-test">
     <attribute name="args"/>
     <sequential>
 	<echo message="Called run-test with args=@{args}"/>
-	<java classname="test.Test" classpathref="test-classpath.master" fork="true" dir="test/make">
+	<java classname="test.Test" classpathref="test-classpath.master" fork="true" dir="${test.run.base}">
 	    <jvmarg value="-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
-	    <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}"/>
+	    <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}"/>
+            <!-- add this to debug use of JUnitReportHelper:
+            <jvmarg value="-Dcorba.test.junit.helper.debug=true"/>
+            -->
 	    <jvmarg value="-Dhttp.server.port=9090"/>
 	    <jvmarg value="-Djava.rmi.server.codebase=http://localhost:9090/"/>
 	    <jvmarg value="-Dhttp.server.root.directory=../build/values2/classes"/>
@@ -59,11 +64,13 @@
 	    <jvmarg value="-Dcom.sun.corba.se.encoding.ORBEnableJavaSerialization=${use.java.serialization}"/>
 	    <jvmarg value="-Dcom.sun.corba.se.ORBDebugForkedProcess=${debug.forked.process}"/>
 	    <jvmarg value="-Dcom.sun.corba.se.ORBDebugStubGeneration=false"/>
+	    <jvmarg value="-Djunit.report.dir=junitreports"/>
 	    <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
 	    <jvmarg value="-Demma.coverage.out.merge=true"/>
 	    <jvmarg value="-Demma.rt.control=false"/>
-	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/>
+	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/>
 	    <jvmarg line="${debug.args}"/>
+            <jvmarg value="-Xmx200m"/>
 	    <!-- was:
 	    <arg line="-file ../src/share/classes/@{testfile}"/>
 	    <arg value="-verbose"/>
@@ -71,11 +78,52 @@
 
 	    <arg line="@{args}"/>
 
-	    <!-- Uncomment this to dump information about arguments to forked processes.
+	    <!-- Uncomment this to dump information about arguments to forked processes. 
 	    <arg line="-forkdebuglevel 1"/>
-	    -->
+            -->
 	    <arg line="-output gen"/>
 	</java>
+    </sequential>
+</macrodef>
+
+<!-- Macro used to run junit tests directly. -->
+<macrodef name="run-junit-test">
+    <element name="test-cases" optional="no"/>
+    <sequential>
+	<!-- <run-test args="-file ../src/share/classes/corba/CopyObjectTests.tdesc -verbose"/> 
+	<run-test args="-test corba.copyobjectpolicy.CopyObjectPolicyTest -verbose"/> -->
+	<junit printsummary="on" fork="on" forkmode="perTest" newenvironment="true" maxmemory="200M" showoutput="true" dir="${test.run.base}">
+	    <sysproperty key="javax.rmi.CORBA.UtilClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
+	    <sysproperty key="javax.rmi.CORBA.StubClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
+	    <sysproperty key="javax.rmi.CORBA.PortableRemoteObjectClass" value="com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
+	    <sysproperty key="corba.test.orb.classpath" value="${classes.dir}:${orblib.classes.dir}"/>
+	    <sysproperty key="http.server.port" value="9090"/>
+	    <sysproperty key="java.rmi.server.codebase" value="http://localhost:9090/"/>
+	    <sysproperty key="http.server.root.directory" value="../build/values2/classes"/>
+	    <sysproperty key="java.security.policy" value="../src/share/classes/test.policy"/>
+	    <sysproperty key="java.security.debug" value="debug"/>
+	    <sysproperty key="org.omg.CORBA.ORBClass" value="com.sun.corba.se.impl.orb.ORBImpl"/>
+	    <sysproperty key="org.omg.CORBA.ORBSingletonClass" value="com.sun.corba.se.impl.orb.ORBSingleton"/>
+	    <sysproperty key="com.sun.corba.se.POA.ORBServerId" value="1"/>
+	    <sysproperty key="com.sun.corba.se.ORBBase" value="${basedir}"/>
+	    <sysproperty key="com.sun.corba.se.test.sourcepath" value="${test.source.path}"/>
+	    <sysproperty key="com.sun.corba.se.ORBUseDynamicStub" value="${use.dynamic.stub}"/>
+	    <sysproperty key="com.sun.corba.se.ORBUseCodegenReflectiveCopyobject" value="${use.codegen.copyobject}"/>
+	    <sysproperty key="com.sun.corba.se.encoding.ORBEnableJavaSerialization" value="${use.java.serialization}"/>
+	    <sysproperty key="com.sun.corba.se.ORBDebugForkedProcess" value="${debug.forked.process}"/>
+	    <sysproperty key="com.sun.corba.se.ORBDebugStubGeneration" value="false"/>
+	    <sysproperty key="junit.report.dir" value="junitreports"/>
+	    <sysproperty key="emma.coverage.out.file" value="../../${emma.dir}/orb_coverage.ec"/>
+	    <sysproperty key="emma.coverage.out.merge" value="true"/>
+	    <sysproperty key="emma.rt.control" value="false"/>
+	    <classpath>
+		<path refid="test-classpath.master"/>
+	    </classpath> 
+	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/> 
+	    <jvmarg line="${debug.args}"/>
+	    <formatter type="xml"/>
+	    <test-cases/>
+	</junit>
     </sequential>
 </macrodef>
 
@@ -85,9 +133,17 @@
     <run-test args="${test-args}"/>
 </target>
 
+<target name="test" depends="init, build-tests, test-all"/>
+
 <target name="test-all" depends="init, clean-test-output, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
 
-<target name="test" depends="init, build-tests, test-all"/>
+<target name="archive-test-results" depends="init">
+    <jar jarfile="${releaselib.dir}/test-results.jar">
+	<fileset dir="${test.output}">
+	    <include name="*"/>
+	</fileset>
+    </jar>
+</target>
 
 <target name="clean-test-output">
     <delete dir="${test.output}" quiet="true"/>
@@ -95,6 +151,7 @@
 
 <target name="make-output-directory" depends="init">
     <mkdir dir="${test.output}"/>
+    <mkdir dir="${junit.reports}"/>
 </target>
 
 <target name="test-rmi-iiop" depends="make-output-directory">
@@ -102,12 +159,35 @@
     <run-test args="-file ../src/share/classes/test/AllTests.tdesc -verbose"/>
 </target>
 
-<target name="test-corba" depends="make-output-directory">
+<target name="test-experimental" depends="make-output-directory">
+    <run-test args="-file ../../experimental/test/src/share/classes/corba/ExperimentalTests.tdesc -verbose"/>
+</target>
+
+<target name="test-corba" depends="make-output-directory,test-corba-junit">
     <run-test args="-file ../src/share/classes/corba/CORBATests.tdesc -verbose"/>
 </target>
 
+<target name="test-corba-junit" depends="make-output-directory">
+    <run-junit-test>
+        <test-cases>
+            <test name="corba.codegen.Client" todir="${junit.reports}"/>
+            <test name="corba.messagetrace.Client" todir="${junit.reports}"/>
+            <test name="corba.misc.Client" todir="${junit.reports}"/>
+            <test name="corba.dynamicrmiiiop.Client" todir="${junit.reports}"/>
+        </test-cases>
+    </run-junit-test>
+</target>
+
 <target name="test-copyobject" depends="make-output-directory">
-    <run-test args="-file ../src/share/classes/corba/CopyObjectTests.tdesc -verbose"/>
+    <run-junit-test>
+	<test-cases>
+	    <test name="corba.copyobject.NewReflectTest" todir="${junit.reports}"/>
+	    <test name="corba.copyobject.NewReflectFallbackTest" todir="${junit.reports}"/>
+	    <test name="corba.copyobject.OldReflectTest" todir="${junit.reports}"/>
+	    <test name="corba.copyobject.JavaStreamTest" todir="${junit.reports}"/>
+	    <test name="corba.copyobject.ORBStreamTest" todir="${junit.reports}"/>
+	</test-cases>
+    </run-junit-test>
 </target>
 
 <target name="test-pi" depends="make-output-directory">
@@ -125,6 +205,7 @@
 <target name="test-naming" depends="make-output-directory">
     <run-test args="-file ../src/share/classes/naming/NamingTests.tdesc -verbose"/>
 </target>
+
 
 <target name="test-perf" depends="make-output-directory">
     <run-test args="-file ../src/share/classes/performance/Tests.tdesc -verbose"/>

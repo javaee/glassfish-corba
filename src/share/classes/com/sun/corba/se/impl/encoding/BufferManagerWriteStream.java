@@ -52,11 +52,12 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
 import com.sun.corba.se.impl.encoding.BufferManagerWrite;
 import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 
 /**
  * Streaming buffer manager.
@@ -87,32 +88,30 @@ public class BufferManagerWriteStream extends BufferManagerWrite
         // Set the fragment's moreFragments field to true
         MessageBase.setFlag(bbwi.getByteBuffer(), Message.MORE_FRAGMENTS_BIT);
 
-	try
-	{
+	try {
             sendFragment(false);
-	}
-	catch (SystemException se)
-	{
+	} catch (SystemException se) {
 	    // REVISIT: this part similar to 
 	    // CorbaClientRequestDispatchImpl.beginRequest() 
 	    // and CorbaClientRequestDelegate.request()
 	    CorbaContactInfoListIterator itr;
-	    try
-	    {
+	    try {
 		itr = getContactInfoListIterator();
-	    }
-	    catch (EmptyStackException ese)
-	    {
+	    } catch (EmptyStackException ese) {
 		// server side, don't reportException
 		throw se;
 	    }
+	    
+	    // bug 6382377: must not lose exception in PI
+	    orb.getPIHandler().invokeClientPIEndingPoint( ReplyMessage.SYSTEM_EXCEPTION, se ) ;
+
 	    boolean retry = itr.reportException(null, se);
 	    if (retry) {
 	        Bridge bridge = Bridge.get();
 	        bridge.throwException(new RemarshalException());
-	    }
-	    else
-	    { // re-throw the SystemException
+	    } else { // re-throw the SystemException
+		// XXX This exception is lost, and not reported correctly to PI.
+		// Do we need to call the client PI end method?
 	        throw se;
 	    }
 	}

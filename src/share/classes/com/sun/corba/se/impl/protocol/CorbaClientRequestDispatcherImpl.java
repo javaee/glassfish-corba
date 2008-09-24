@@ -117,7 +117,7 @@ import com.sun.corba.se.impl.encoding.MarshalOutputStream;
 import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
@@ -125,7 +125,6 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ProfileAddr;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReferenceAddr;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
-import com.sun.corba.se.impl.util.JDKBridge;
 
 /**
  * ClientDelegate is the RMI client-side subcontract or representation
@@ -398,11 +397,14 @@ public class CorbaClientRequestDispatcherImpl
 	    boolean retry  =
 		getContactInfoListIterator(orb)
 	            .reportException(messageMediator.getContactInfo(), e);
+
+	    // Bug 6382377: must not lose exception in PI
+	    // Must run interceptor end point before retrying.
+	    Exception newException = 
+		orb.getPIHandler().invokeClientPIEndingPoint(
+		    ReplyMessage.SYSTEM_EXCEPTION, e);
+
 	    if (retry) {
-		// Must run interceptor end point before retrying.
-		Exception newException = 
-		    orb.getPIHandler().invokeClientPIEndingPoint(
-                        ReplyMessage.SYSTEM_EXCEPTION, e);
 		if (newException == e) {
 		    continueOrThrowSystemOrRemarshal(messageMediator,
 						     new RemarshalException());
@@ -412,7 +414,11 @@ public class CorbaClientRequestDispatcherImpl
 		}
 	    } else {
 		// NOTE: Interceptor ending point will run in releaseReply.
-		throw e;
+		if (newException instanceof RuntimeException)
+		    throw (RuntimeException)newException ;
+		else 
+		    // XXX Not sure what to do in this case, or if it is even possible.
+		    throw e ;
 	    }
 	    return null; // for compiler
 	}

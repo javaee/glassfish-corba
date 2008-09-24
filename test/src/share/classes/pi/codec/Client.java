@@ -47,9 +47,12 @@ import CodecTest.*; // for IDL struct definitions
 import java.util.*;
 import java.io.*;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public class Client 
     implements InternalProcess 
 {
+    private JUnitReportHelper helper = new JUnitReportHelper( Client.class.getName() ) ;
 
     private ORB orb;
     private PrintStream out;
@@ -81,16 +84,18 @@ public class Client
 	this.err = err;
 	this.orb = orb;
 
-	// Test the codec factory:
-	testCodecFactory();
+        try {
+            // Test the codec factory:
+            testCodecFactory();
 
-	// Test the codec:
-	testCodec();
-
+            // Test the codec:
+            testCodec();
+        } finally {
+            helper.done() ;
+        }
     }
 
-    private void testCodecFactory() 
-	throws Exception 
+    private void testCodecFactory() throws Exception 
     {
 	out.println( "Testing CodecFactory" );
 	out.println( "====================" );
@@ -108,70 +113,82 @@ public class Client
 	testInvalidCodecs();
     }
 
-    private void testReference() 
-	throws Exception 
+    private void testReference() throws Exception 
     {
-	out.println( "resolve_initial_references( \"CodecFactory\" ): " );
+        helper.start( "testReference" ) ;
 
-	org.omg.CORBA.Object objRef = 
-	    orb.resolve_initial_references("CodecFactory");
+        try {
+            out.println( "resolve_initial_references( \"CodecFactory\" ): " );
 
-	if( objRef != null ) {
-	    out.println( "  - Retrieved reference." );
-	}
-	else {
-	    throw new RuntimeException( "null Reference from ORB." );
-	}
+            org.omg.CORBA.Object objRef = 
+                orb.resolve_initial_references("CodecFactory");
 
-	codecFactory = CodecFactoryHelper.narrow(objRef);
+            if( objRef != null ) {
+                out.println( "  - Retrieved reference." );
+            } else {
+                throw new RuntimeException( "null Reference from ORB." );
+            }
 
-	if( objRef != null ) {
-	    out.println( "  - Narrowed reference." );
-	}
-	else {
-	    throw new RuntimeException( 
-		"CodecFactory Reference narrowed to null" );
-	}
+            codecFactory = CodecFactoryHelper.narrow(objRef);
+
+            if( objRef != null ) {
+                out.println( "  - Narrowed reference." );
+            } else {
+                throw new RuntimeException( 
+                    "CodecFactory Reference narrowed to null" );
+            }
+
+            helper.pass() ;
+        } catch (Exception exc) {
+            helper.fail( exc ) ;
+        }
     }
 
-    private void testValidCodecs() 
-	throws Exception 
+    private void testValidCodecs() throws Exception 
     {
-	for( int minor = 0; minor <=2; minor++ ) {
-	    try {
-	        out.print( "create_codec( ENCODING_CDR_ENCAPS, 1, " + 
-		    minor + " ):" );
-		Encoding encoding = new Encoding( 
-		    (short)ENCODING_CDR_ENCAPS.value, (byte)1, (byte)minor );
-	        Codec codec = codecFactory.create_codec( encoding );
-		if( codec != null ) {
-		    out.println( "valid (ok)" );
-		}
-		else {
-		    out.println( "null (error)" );
-		    throw new RuntimeException( "Null Codec returned for 1." + 
-			                        minor );
-		}
-	    }
-	    catch( UnknownEncoding e ) {
-		out.println( "unknown (error)" );
-		throw new RuntimeException( 
-		    "Could not get Codec for 1." + minor );
-	    }
-	}
+        for( int minor = 0; minor <=2; minor++ ) {
+            helper.start( "testValidCodecs_" + minor ) ;
+
+            try { 
+                try {
+                    out.print( "create_codec( ENCODING_CDR_ENCAPS, 1, " + 
+                        minor + " ):" );
+                    Encoding encoding = new Encoding( 
+                        (short)ENCODING_CDR_ENCAPS.value, (byte)1, (byte)minor );
+                    Codec codec = codecFactory.create_codec( encoding );
+
+                    if( codec != null ) {
+                        out.println( "valid (ok)" );
+                    } else {
+                        out.println( "null (error)" );
+                        throw new RuntimeException( "Null Codec returned for 1." + 
+                                                    minor );
+                    }
+                } catch( UnknownEncoding e ) {
+                    out.println( "unknown (error)" );
+                    throw new RuntimeException( 
+                        "Could not get Codec for 1." + minor );
+                }
+
+                helper.pass() ;
+            } catch (Exception exc) {
+                helper.fail( exc ) ;
+                throw exc ;
+            }
+        }
     }
 
-    private void testInvalidCodecs() 
-	throws Exception 
+    private void testInvalidCodecs() throws Exception 
     {
 	for( int format = ENCODING_CDR_ENCAPS.value; 
-	     format <= ENCODING_CDR_ENCAPS.value + 1; format ++ )
-	{
+	     format <= ENCODING_CDR_ENCAPS.value + 1; format ++ ) {
 	    // (try 0 and 1)
 	    for( int major = 2; major <= 3; major+=1 ) {
 		for( int minor = 3 - (major-2) * 2; 
-		     minor <= 5 - (major-2) * 2; minor+=1 ) 
-		{
+		    minor <= 5 - (major-2) * 2; minor+=1 ) {
+
+                    helper.start( "testInvalidCodecs_" + format + "_" + major + "_" + minor ) ;
+
 		    // (try 2.3, 2.4, 2.5, 3.1, 3.2, 3.3)
 		    try {
 			out.print( "create_codec( " + format + ", " + 
@@ -179,17 +196,18 @@ public class Client
 			Encoding encoding = new Encoding( 
 			    (short)format, (byte)major, (byte)minor );
 			Codec codec = codecFactory.create_codec( encoding );
-			if( codec == null ) {
-			    out.println( "null (error)" );
-			}
-			else {
-			    out.println( "valid (error)" );
-			}
+
+                        String msg = (codec == null) ?
+                            "null (error)" :
+                            "valid (error)" ;
+                        out.println( msg );
+                        helper.fail( msg ) ;
+
 			throw new RuntimeException( 
 			    "No exception thrown for " + major + "." + minor );
-		    }
-		    catch( UnknownEncoding e ) {
+		    } catch( UnknownEncoding e ) {
 			// We expect these versions to fail.
+                        helper.pass() ;
 			out.println( "unknown (ok)" );
 		    }
 		} // minor loop
@@ -310,41 +328,48 @@ public class Client
                         Any source, int lenWithType, int lenWOType ) 
 	throws Exception
     {
-	byte[] octets; 		// Holds the intermediate octet stream
-	Any destAny;		// Holds the target any
-	TypeCode tc = source.type();
-	int expectedLength;     // Expected length of octet stream
+        helper.start( "encodeDecode_" + type + "_valueOnly_" + valueOnly ) ;
 
-	out.print( "  - " + type + ": " );
-	if( valueOnly ) {
-	    octets = codec.encode_value( source );
-	    expectedLength = lenWOType;
-	}
-	else {
-	    octets = codec.encode( source );
-	    expectedLength = lenWithType;
-	}
-	out.print( "size: " + octets.length );
-	if( valueOnly ) {
-	    destAny = codec.decode_value( octets, tc );
-	}
-	else {
-	    destAny = codec.decode( octets );
-	}
-	boolean compare = source.equal( destAny );
-	out.println( " compare: " + compare );
-        out.println( "    " + dumpHex( octets ) );
+        try {
+            byte[] octets; 		// Holds the intermediate octet stream
+            Any destAny;		// Holds the target any
+            TypeCode tc = source.type();
+            int expectedLength;     // Expected length of octet stream
 
-	if( !compare ) {
-	    throw new RuntimeException( 
-		"" + type + " fails loopback test content comparison" );
-	}
+            out.print( "  - " + type + ": " );
+            if (valueOnly) {
+                octets = codec.encode_value( source );
+                expectedLength = lenWOType;
+            } else {
+                octets = codec.encode( source );
+                expectedLength = lenWithType;
+            }
+            out.print( "size: " + octets.length );
+            if (valueOnly) {
+                destAny = codec.decode_value( octets, tc );
+            } else {
+                destAny = codec.decode( octets );
+            }
+            boolean compare = source.equal( destAny );
+            out.println( " compare: " + compare );
+            out.println( "    " + dumpHex( octets ) );
 
-	if( octets.length != expectedLength ) {
-	    throw new RuntimeException( 
-		"" + type + " fails loopback test length comparison: expected " +
-		expectedLength + " got " + octets.length );
-	}
+            if (!compare) {
+                throw new RuntimeException( 
+                    "" + type + " fails loopback test content comparison" );
+            }
+
+            if (octets.length != expectedLength) {
+                throw new RuntimeException( 
+                    "" + type + " fails loopback test length comparison: expected " +
+                    expectedLength + " got " + octets.length );
+            }
+
+            helper.pass() ;
+        } catch (Exception exc) {
+            helper.fail( exc ) ;
+            throw exc ;
+        }
     }
 
     // Dumps the hex values in the given byte array
@@ -413,8 +438,8 @@ public class Client
 			  (byte)2 ) );
 
 	// Test decode()
-        checkInvalid( codec, false, "decode()", invalidForDecode, typeCodes );
-        checkInvalid( codec, true, "decode_value()", invalidForDecodeValue,
+        checkInvalid( codec, false, "decode", invalidForDecode, typeCodes );
+        checkInvalid( codec, true, "decode_value", invalidForDecodeValue,
 	              typeCodes );
 
     }
@@ -426,15 +451,16 @@ public class Client
 	out.println( "Testing FormatMismatch for " + type );
 
 	for( int i = 0; i < cases.length; i++ ) {
+            helper.start( "formatMismatch_" + type + "_" + i ) ;
+
 	    out.print( "  - Case #" + i + ": " );
 	    byte[] data = cases[i];
 	    boolean pass = false;
 
 	    try {
-		if( valueOnly ) {
+		if (valueOnly) {
 	            codec.decode_value( data, typeCodes[i] );
-		}
-		else {
+		} else {
 	            codec.decode( data );
 		}
 	    }
@@ -445,9 +471,10 @@ public class Client
             
 	    if( pass ) {
 		out.println( "FormatMismatch thrown (ok)" );
-	    }
-	    else {
-		out.println( "FormatMistmatch not thrown (error)" );
+                helper.pass() ;
+	    } else {
+		out.println( "FormatMismatch not thrown (error)" );
+                helper.fail( "FormatMismatch not thrown" ) ;
 	    }
 
 	    // Let us see what the data was:

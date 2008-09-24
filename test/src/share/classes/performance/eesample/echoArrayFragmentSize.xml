@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testSuite name="WSpex" xmlns="http://www.sun.com/japex/testSuite">
+    <param name="japex.warmupTime" value="15"/>
+    <param name="japex.runTime" value="15"/>
+    <param name="japex.runsPerDriver" value="2"/>
+    <param name="japex.reportsDirectory" value="./reports/non-periodic"/>
+
+    <param name="japex.singleClassLoader" value="true"/>
+    <param name="japex.classPath" value="../../../../../../build/classes"/>
+    <param name="japex.classPath" value="../../../../../../orblib/build/classes"/>
+    <param name="japex.classPath" value="../../../../../../test/build/classes"/>
+    <param name="japex.chartType" value="linechart"/>
+    <param name="japex.plotDrivers" value="false"/>
+    
+    <driver name="1024:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="1024"/>
+	<param name="port" value="3300"/>
+    </driver>
+    
+    <driver name="1280:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="1280"/>
+	<param name="port" value="3400"/>
+    </driver>
+    
+    <driver name="1536:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="1536"/>
+	<param name="port" value="3500"/>
+    </driver>
+    
+    <driver name="1792:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="1792"/>
+	<param name="port" value="3600"/>
+    </driver>
+    
+    <driver name="2048:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="2048"/>
+	<param name="port" value="3700"/>
+    </driver>
+    
+    <driver name="2304:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="2304"/>
+	<param name="port" value="3800"/>
+    </driver>
+
+    <driver name="2560:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="2560"/>
+	<param name="port" value="3900"/>
+    </driver>
+
+    <driver name="2816:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="2816"/>
+	<param name="port" value="4000"/>
+    </driver>
+    
+    <driver name="3072:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="3072"/>
+	<param name="port" value="4100"/>
+    </driver>
+
+    <driver name="3328:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="3328"/>
+	<param name="port" value="4200"/>
+    </driver>
+    
+    <driver name="3584:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="3584"/>
+	<param name="port" value="4300"/>
+    </driver>
+    
+    <driver name="3840:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="3840"/>
+	<param name="port" value="4400"/>
+    </driver>
+    
+    <driver name="4096:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="4096"/>
+	<param name="port" value="4500"/>
+    </driver>
+    
+    <driver name="4352:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="4352"/>
+	<param name="port" value="4600"/>
+    </driver>
+    
+    <driver name="4608:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="4608"/>
+	<param name="port" value="4700"/>
+    </driver>
+    
+    <driver name="4864:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="4864"/>
+	<param name="port" value="4800"/>
+    </driver>
+    
+    <driver name="5120:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="5120"/>
+	<param name="port" value="4900"/>
+    </driver>
+    
+    <driver name="5376:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="5376"/>
+	<param name="port" value="5000"/>
+    </driver>
+    
+    <driver name="5632:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="5632"/>
+	<param name="port" value="5100"/>
+    </driver>
+
+    <driver name="5888:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="5888"/>
+	<param name="port" value="5200"/>
+    </driver>
+
+    <driver name="6144:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="6144"/>
+	<param name="port" value="5300"/>
+    </driver>
+ 
+    <driver name="6400:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="6400"/>
+	<param name="port" value="5400"/>
+    </driver>
+ 
+    <driver name="6656:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="6656"/>
+	<param name="port" value="5500"/>
+    </driver>
+ 
+    <driver name="6912:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="6912"/>
+	<param name="port" value="5600"/>
+    </driver>
+ 
+    <driver name="7168:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="7168"/>
+	<param name="port" value="5700"/>
+    </driver>
+ 
+    <driver name="7424:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="7424"/>
+	<param name="port" value="5800"/>
+    </driver>
+ 
+    <driver name="7680:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="7680"/>
+	<param name="port" value="5900"/>
+    </driver>
+ 
+    <driver name="7936:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="7936"/>
+	<param name="port" value="6000"/>
+    </driver>
+ 
+    <driver name="8192:StandardTest" xmlns="http://www.sun.com/japex/testSuite">
+	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
+	<param name="description" value="TestService IIOP Driver"/>
+	<param name="fragmentSize" value="8192"/>
+	<param name="port" value="6100"/>
+    </driver>
+ 
+     <testCase name="echoArray120">
+        <param name="methodName" value="echoArray"/>
+        <param name="size" value="120"/>
+    </testCase>
+</testSuite>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms of either the GNU
+  General Public License Version 2 only ("GPL") or the Common Development
+  and Distribution License("CDDL") (collectively, the "License").  You
+  may not use this file except in compliance with the License. You can obtain
+  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+  language governing permissions and limitations under the License.
+ 
+  When distributing the software, include this License Header Notice in each
+  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+  Sun designates this particular file as subject to the "Classpath" exception
+  as provided by Sun in the GPL Version 2 section of the License file that
+  accompanied this code.  If applicable, add the following below the License
+  Header, with the fields enclosed by brackets [] replaced by your own
+  identifying information: "Portions Copyrighted [year]
+  [name of copyright owner]"
+ 
+  Contributor(s):
+ 
+  If you wish your version of this file to be governed by only the CDDL or
+  only the GPL Version 2, indicate your decision by adding "[Contributor]
+  elects to include this software in this distribution under the [CDDL or GPL
+  Version 2] license."  If you don't indicate a single choice of license, a
+  recipient has the option to distribute your version of this file under
+  either the CDDL, the GPL Version 2 or to extend the choice of license to
+  its licensees as provided above.  However, if you add GPL Version 2 code
+  and therefore, elected the GPL Version 2 license, then the option applies
+  only if the new code is made subject to such option by the copyright
+  holder.
+-->

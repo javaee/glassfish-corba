@@ -1,0 +1,38 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sun.corba</groupId>
+  <artifactId>@jarName@</artifactId>
+  <version>@version@</version>
+  <description>@jarDescription@</description>
+  <url>java-net:/maven2-repository/trunk/www/repository</url>
+  <developers>
+    <developer>
+      <id>raih</id>
+      <name>Harsha Godugu</name>
+      <email>harsha.godugu@sun.com</email>
+    </developer>
+  </developers>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.sun.corba</groupId>
+      <artifactId>@OMGAPI@</artifactId>
+      <version>@version@</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.corba</groupId>
+      <artifactId>@ORBLIB@</artifactId>
+      <version>@version@</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.corba</groupId>
+      <artifactId>@IDLJ@</artifactId>
+      <version>@version@</version>
+    </dependency>
+
+  </dependencies>
+</project>
+

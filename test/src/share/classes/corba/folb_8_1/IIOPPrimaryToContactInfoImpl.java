@@ -79,7 +79,6 @@ public class IIOPPrimaryToContactInfoImpl
 
     private static MyLogger _logger = new MyLogger();
 
-
     public final String baseMsg = IIOPPrimaryToContactInfoImpl.class.getName();
 
     // This is made package private for FOLB timing test.
@@ -333,7 +332,7 @@ class MyLogger
 
     boolean isLoggable(Level level)
     {
-	return true;
+	return false;
     }
 }
 

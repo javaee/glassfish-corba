@@ -43,6 +43,7 @@ package corba.hcks;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import java.util.List;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
@@ -87,8 +88,61 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public class U
 {
+    private static JUnitReportHelper helper = null ;
+    private static ErrorAccumulator ea ;
+    private static String testName ;
+    private static boolean hasError = false ;
+    
+    public static boolean hasError() {
+        return hasError ;
+    }
+
+    // KMC: initialize the helper and ErrorAccumulator
+    public static void initialize( String name ) {
+        helper = new JUnitReportHelper( name ) ;
+        ea = new ErrorAccumulator() ;
+        testName = null ;
+    }
+
+    // KMC: all done
+    public static void done() {
+        if (testName != null) 
+            testComplete() ;
+
+        helper.done() ;
+    }
+    
+    // KMC: helper support
+    private static void testComplete() {
+        List<ErrorAccumulator.MessageAndException> errors = ea.getTestErrors() ;
+        if (errors.size() == 0)
+            helper.pass() ;
+        else {
+            StringBuilder sb = new StringBuilder() ;
+            sb.append( "Errors in test:\n" ) ;
+            for (ErrorAccumulator.MessageAndException mea : errors) {
+                sb.append( "    " ) ;
+                sb.append( mea.toString() ) ;
+                sb.append( "\n" ) ;
+            }
+
+            helper.fail( sb.toString() ) ;
+        }
+    }
+
+    // KMC: helper support
+    private static void testStart( Object x ) {
+        if (testName != null)
+            testComplete() ;
+        testName = x.toString() ;
+        helper.start( testName ) ;
+        ea.startTest() ;
+    }
+
     //
     // OMG Standard Constants.
     //
@@ -443,10 +497,12 @@ public class U
 	System.out.flush();
     }
 
+    // KMC: called before the start of a test case
     public static void HEADER(java.lang.Object x)
     {
 	lf();
 	sop("--------------------------------------------------");
+        testStart( x ) ;
 	sop(x);
 	lf();
     }
@@ -465,6 +521,7 @@ public class U
     {
 	sop(unexpectedException(msg, t));
 	t.printStackTrace(System.out);
+        hasError = true ;
     }
 
     public static String OK(String msg)
@@ -480,12 +537,16 @@ public class U
     public static void sopShouldNotSeeThis()
     {
 	sop(SHOULD_NOT_SEE_THIS);
+        ea.add( SHOULD_NOT_SEE_THIS, new RuntimeException() ) ;
+        hasError = true ;
 	throw new RuntimeException(SHOULD_NOT_SEE_THIS);
     }
 
     public static void sopShouldNotSeeThis(String msg)
     {
 	sop(msg + " " + SHOULD_NOT_SEE_THIS);
+        ea.add( msg, new RuntimeException( SHOULD_NOT_SEE_THIS ) ) ;
+        hasError = true ;
 	throw new RuntimeException(msg + " " + SHOULD_NOT_SEE_THIS);
     }
 
@@ -567,28 +628,25 @@ public class U
     public static final String _result = "result";
     public static final String _exception = "exception";
 
-    public static void expect(ErrorAccumulator errorAccumulator,
-			      int kind,
+    public static void expect( int kind,
 			      Object expected,
 			      Object ref,
 			      String methodName)
     {
-	expect(errorAccumulator, kind, expected, ref, methodName, noArgs);
+	expect(kind, expected, ref, methodName, noArgs);
     }
 
-    public static void expect(ErrorAccumulator errorAccumulator,
-			      int kind,
+    public static void expect( int kind,
 			      Object expected,
 			      Object ref,
 			      String methodName,
 			      Object arg1)
     {
 	Object[] args = { arg1 };
-	expect(errorAccumulator, kind, expected, ref, methodName, args);
+	expect(kind, expected, ref, methodName, args);
     }
 
-    public static void expect(ErrorAccumulator errorAccumulator,
-			      int kind,
+    public static void expect( int kind,
 			      Object expected,
 			      Object ref,
 			      String methodName,
@@ -596,11 +654,11 @@ public class U
 			      Object arg2)
     {
 	Object[] args = { arg1, arg2 };
-	expect(errorAccumulator, kind, expected, ref, methodName, args);
+	expect(kind, expected, ref, methodName, args);
     }
 
 
-    public static void expect(ErrorAccumulator errorAccumulator,
+    public static void expect(
 			      int kind,
 			      Object expected,
 			      Object ref,
@@ -641,18 +699,18 @@ public class U
 	switch (kind) {
 	case U.result :
 	    if (! gotResult) {
-		reportError(errorAccumulator, result,
+		reportError(result,
 			    result, expected, ref, methodName, args,
 			    _result, _exception);
 	    } else if (result == null) {
 		if (expected != null) {
 		    // This handles oneways (and voids?).
-		    reportError(errorAccumulator, null,
+		    reportError(null,
 				result, expected, ref, methodName, args,
 				_result, _result);
 		}
 	    } else if (! result.equals(expected)) {
-		reportError(errorAccumulator, null,
+		reportError(null,
 			    result, expected, ref, methodName, args,
 			    _result, _result);
 	    }
@@ -660,11 +718,11 @@ public class U
 	case exceptionEquals :
 	case exception :
 	    if (gotResult) {
-		reportError(errorAccumulator, null,
+		reportError(null,
 			    result, expected, ref, methodName, args,
 			    _exception, _result);
 	    } else if (! result.getClass().isInstance(expected)) {
-		reportError(errorAccumulator, result,
+		reportError(result,
 			    result, expected, ref, methodName,args,
 			    _exception, _exception);
 	    } else if (kind == exceptionEquals) {
@@ -675,7 +733,7 @@ public class U
 		// which is just a reference compare.
 
 		if (! result.equals(expected)) {
-		    reportError(errorAccumulator, result,
+		    reportError(result,
 				result, expected, ref, methodName, args,
 				_exception, _exception);
 		}
@@ -686,8 +744,7 @@ public class U
 	}
     }
 
-    public static void reportError(ErrorAccumulator ea,
-				   Object exception, // null if none.
+    public static void reportError( Object exception, // null if none.
 				   Object result,
 				   Object expected,
 				   Object ref,
@@ -703,7 +760,7 @@ public class U
 	sb.append(newlineTab);
 	sb.append("but got " + resultType + ": ");
 	sb.append(result);
-	reportError(ea, sb.toString(), (Throwable)exception);
+	reportError(sb.toString(), (Throwable)exception);
     }
 
     public static StringBuffer formatCall(Object ref,
@@ -735,11 +792,11 @@ public class U
 	printStackTrace = b;
     }
 
-    public static void reportError(ErrorAccumulator ea, 
-				   String msg, 
+    public static void reportError( String msg, 
 				   Throwable t)
     {
 	ea.add(msg, t);
+        hasError = true ;
 
 	if (displayErrorsWhenTheyHappen) {
 	    reportError(printStackTrace, msg, t);
@@ -750,6 +807,9 @@ public class U
 				   String msg,
 				   Throwable t)
     {
+        ea.add( msg, t ) ;
+        hasError = true ;
+
 	sop("--------------------------------------------------");
 	sop(msg);
 	if (t != null && printStackTrace) {

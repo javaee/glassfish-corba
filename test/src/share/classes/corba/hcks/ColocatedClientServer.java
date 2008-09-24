@@ -63,7 +63,7 @@ public class ColocatedClientServer
     public static void main (String args[])
     {
 
-
+        Client.testName = ColocatedClientServer.class.getName() ;
 	isColocated = true; // Used by Client and Server.
 
 	try {

@@ -38,7 +38,7 @@ package corba.codeset;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import org.omg.CORBA.*;
 
 /**
@@ -48,14 +48,12 @@ public class CodeSetTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-        // First do simple conversions
-
         // Now GIOP 1.1.
         Controller orbd = createORBD();
 
         // Specify the GIOP version property
-        Properties clientProps = Options.getExtraClientProperties();
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties clientProps = Options.getClientProperties();
+        Properties serverProps = Options.getServerProperties();
 
         clientProps.setProperty(ORBConstants.GIOP_VERSION, "1.1");
         serverProps.setProperty(ORBConstants.GIOP_VERSION, "1.2");

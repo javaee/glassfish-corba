@@ -43,6 +43,7 @@ import org.omg.CosNaming.NamingContextPackage.*;
 import corba.framework.statusU;
 import corba.framework.RTMConstants;
 import corba.framework.GetID;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper;
 
 /**
 * Purpose			: To verify that AdapterActivator implementation registered, recreates
@@ -67,6 +68,8 @@ public class AdapterActivatorClient {
     private NamingContext rootContext;
     private ORB orb;
     private statusU status = new statusU();
+    private JUnitReportHelper helper = new JUnitReportHelper( AdapterActivatorClient.class.getName() ) ;
+
     final String testDesc = "To verify that the AdapterActivator registers and"+
              "\n             recreates the POA when the ORB received a request"+
              "\n             for an object reference which identifies the" +
@@ -93,6 +96,7 @@ public class AdapterActivatorClient {
 	    status.addStatus(GetID.generateID(this, ""), RTMConstants.FAIL,
                              "Got exception: "+ Ex.toString());
         } finally {
+            helper.done() ;
             status.printSummary(GetID.generateID(this, ""), testDesc);
 	    if (status.totalFail() > 0)
 		System.exit(1) ;
@@ -102,6 +106,7 @@ public class AdapterActivatorClient {
     void adapterActivatorTest1() {
 
         String subTestName = "Test01";
+        helper.start( subTestName ) ;
 	try {
 
 	    // Resolve Object Reference
@@ -116,7 +121,9 @@ public class AdapterActivatorClient {
 	    System.out.println(helloRef1.sayHello());
             status.addStatus(subTestName, RTMConstants.PASS, "Calling "+
                              "operation on HelloServant of Poa1 ok");
+            helper.pass() ;
 	} catch(Exception ex) {
+            helper.fail( ex ) ;
 	    ex.printStackTrace();
             status.addStatus(subTestName, RTMConstants.FAIL,
                              "Got exception: "+ ex.toString());
@@ -126,6 +133,7 @@ public class AdapterActivatorClient {
     void adapterActivatorTest2() {
 
         String subTestName = "Test02";
+        helper.start( subTestName ) ;
 	try {
 
 	    //Resolve Object Reference
@@ -138,14 +146,17 @@ public class AdapterActivatorClient {
 			       "child of RootPoa, RootPoa is registered with AdapterActivator "+
 			       "implementation which creates Poa1 otherwise returns false");
 	    System.out.println(helloRef2.sayHello());
+            helper.fail( "Unexpected success: should see OBJECT_NOT_EXIST exception" ) ;
 	} catch (org.omg.CORBA.OBJECT_NOT_EXIST ex) {
             status.addStatus(subTestName, RTMConstants.PASS, "Operation on "+
                              "HelloServant threw the expected OBJECT_NOT_EXIST"+
                              " exception");
+            helper.pass() ;
 	} catch(Exception ex) {
             ex.printStackTrace();
             status.addStatus(subTestName, RTMConstants.FAIL,
                              "Got exception: "+ ex.toString());
+            helper.fail( ex ) ;
 	}
     }
 

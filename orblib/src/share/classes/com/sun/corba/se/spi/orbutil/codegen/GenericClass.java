@@ -85,8 +85,12 @@ public class GenericClass<T> {
 	if (constructor == null) {
 	    List<Type> atypes = new ArrayList<Type>() ;
 	    for (Object arg : args) {
-		Class<?> cls = arg.getClass() ;
-		Type type = Type.type( cls ) ;
+		Type type = Type._null() ;
+		if (arg != null) {
+		    Class<?> cls = arg.getClass() ;
+		    type = Type.type( cls ) ;
+		}
+
 		atypes.add( type ) ;
 	    }
 

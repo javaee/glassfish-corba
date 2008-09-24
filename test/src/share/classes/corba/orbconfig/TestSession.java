@@ -41,6 +41,8 @@ import java.util.Properties ;
 import java.util.LinkedList ;
 import java.util.Iterator ;
 import java.util.StringTokenizer ;
+import java.util.List ;
+import java.util.ArrayList ;
 import java.util.Arrays ;
 import java.util.Map ;
 import java.util.Set ;
@@ -53,6 +55,8 @@ import com.sun.corba.se.spi.orbutil.closure.Closure ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 /** TestSession manages running of tests and checking results within
 * a test session.  If the session fails any test, the whole session 
 * fails with an Error, which can be used to trigger failure in the
@@ -62,17 +66,20 @@ import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 */
 public class TestSession 
 {
+    private JUnitReportHelper helper ;
     private PrintStream out ;
     private boolean errorFlag ;
     private String sessionName ;
+    private List<String> failures ;
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Public interface
 /////////////////////////////////////////////////////////////////////////////////////
 
-    public TestSession( PrintStream out )
+    public TestSession( PrintStream out, JUnitReportHelper helper )
     {
 	this.out = System.out ;
+        this.helper = helper ;
     }
 
     /** Print a message indicating the start of the session.
@@ -83,14 +90,28 @@ public class TestSession
 	this.sessionName = sessionName ;
 	this.errorFlag = false ;
 	out.println( "Test Session " + sessionName ) ;
+        helper.start( sessionName ) ;
+        failures = new ArrayList<String>() ;
     }
 
     /** Check for errors at the end of the session.
     */
     public void end()
     {
-	if (errorFlag)
-	    throw new Error( "Test session " + sessionName + " failed" ) ;
+	if (errorFlag) {
+            StringBuilder sb = new StringBuilder() ;
+            sb.append( "Test failed with errors:\n" ) ;
+            for (String thr : failures) {
+                sb.append( "    " ) ;
+                sb.append( thr ) ;
+                sb.append( "\n" ) ;
+            }
+            String msg = sb.toString() ;
+            helper.fail( msg ) ;
+	    throw new Error( msg ) ;
+        } else {
+            helper.pass() ;
+        }
     }
 
     public void testForPass( String name, Closure closure, Object expectedResult )
@@ -140,6 +161,7 @@ public class TestSession
 
     private void testFail( String msg )
     {
+        failures.add( msg ) ;
 	out.println( "\t\tFAILED: " + msg ) ;
 	errorFlag = true ;
     }

@@ -207,7 +207,7 @@ the app server that uses IOR stringification.
 <P CLASS="western"><BR><BR>
 </P>
 <P CLASS="western">Instead, the principal idea is that server IORs
-contain “persistant” references to ORBDs which then redirect
+contain ???persistant??? references to ORBDs which then redirect
 requests to appropriate servers. In other words, we &quot;nail down&quot;
 the address of one part of the system, the ORBD, so that other parts
 may have much more dynamic behavior. We then highly optimize the
@@ -325,7 +325,7 @@ architecture specification. It also assumes familiarity with the
 CORBA mechanisms used to support load-balancing, fault tolerance and
 online-upgrades: client-side stub operation, addressing and request
 retry mechanisms, ORT exchange and LOCATION_FORWARD . This document
-contains a section “A Tutorial on J2SE ORBD Operation” which
+contains a section ???A Tutorial on J2SE ORBD Operation??? which
 illustrates these mechanisms with several use cases. We emphasis that
 this material is NOT specifying the S1AS8/EE ORBD. It IS a tutorial
 and can be safely skipped if one already understands the basic
@@ -1091,7 +1091,7 @@ in Java). The upgrade proceeds as follows:</P>
 	goes well, S2/A can then be upgraded to S2/A2 in a similar fashion.</P>
 </OL>
 <P CLASS="first-line-indent-western">It may happen that the online
-upgrade fails. In that case, S1/A2 must be “upgraded” to S1/A,
+upgrade fails. In that case, S1/A2 must be ???upgraded??? to S1/A,
 which reverts to the original state.</P>
 <H1 CLASS="western">Redundant ORBD</H1>
 <P CLASS="western">ORBD is redundant to avoid becoming a single point
@@ -1104,13 +1104,13 @@ instances O1 ... On. Each ORBD instance is assigned a unique host
 name, which we will refer to as name1 through <SPAN LANG="en-US">namen.</SPAN>
 Each ORBD instance also has a fixed port.  Call these port1 .. portn.
 We will assume that each ORBD has a unique Object Key, probably
-“ORBD” or something similar. Then each ORBD instance registers a
+???ORBD??? or something similar. Then each ORBD instance registers a
 suitable IOR in naming under the name ORBD. A server that needs to
 call a method on an ORBD instance can then use INS as follows to get
 to ORBD:</P>
 <OL>
 	<LI><P CLASS="western">Create a URL of the form
-	“corbaloc::{host}:{port}/ORBD”</P>
+	???corbaloc::{host}:{port}/ORBD???</P>
 	<LI><P CLASS="western">Use <SPAN LANG="en-US">ORB.string</SPAN>_to_object
 	to convert the URL into a generic stub containing an IOR for the
 	ORBD.</P>
@@ -1153,7 +1153,7 @@ ServerInstance for ORB, ApplicationInstance, and ObjectAdapter
 information.</P>
 <H2 CLASS="western">Redundant ORBD operation</H2>
 <P CLASS="western">This is the same as in normal case, described in
-“General ORBD Operation”. IORs contain a host/port for each ORBD
+???General ORBD Operation???. IORs contain a host/port for each ORBD
 instance. The client ORB, during method invocation, chooses one
 host/port and invokes the method. Since each ORBD replica has the
 same state, it does not matter which replica is chosen. If a request
@@ -2447,7 +2447,7 @@ following figure:</P>
 	<LI><P CLASS="first-line-indent-western">The Client invokes on the
 	stub (created as the result of resolving an IOR from naming). The
 	stub uses the effective IOR to service the invocation. Even though
-	the client “thinks” it is invoking an IOR for server S it is
+	the client ???thinks??? it is invoking an IOR for server S it is
 	actually invoking an IOR  pointing to the ORBD (indicated by O/x)
 	since that is what is contained in the effective IOR field.</P>
 	<LI><P CLASS="first-line-indent-western">ORBD receives the request.</P>
@@ -2469,7 +2469,7 @@ following figure:</P>
 	no further ORBD interaction. However, if the server goes down
 	(gracefully or otherwise) the client stub will transparently fall
 	back to the target IOR resulting in a request to ORBD (which will
-	try to activate the server – as shown later).</P>
+	try to activate the server ??? as shown later).</P>
 </OL>
 <P ALIGN=LEFT STYLE="margin-top: 0.17in; margin-bottom: 0.08in; background: transparent; line-height: 125%; page-break-inside: avoid; widows: 0; orphans: 0; page-break-after: avoid">
 <FONT SIZE=4>Use Case: Second Invocation, Server Running</FONT></P>
@@ -2546,7 +2546,7 @@ profiles and/or TAG_ALTERNATE_IIOP_ADDRESS TAGGED_COMPONENTs in
 profiles (as in CSIv2).  CorbaContactInfoList is responsible for
 choosing the &quot;best&quot; address.  It is also responsible for
 choosing the next &quot;best&quot; address should one fail.  That
-includes failing over to the original address (e.g., the target IOR –
+includes failing over to the original address (e.g., the target IOR ???
 which would contain profiles for redundant ORBDs).  The client
 delegate just keeps asking for the next one on failure. 
 CorbaContactInfoList does not necessarily just iterate through a

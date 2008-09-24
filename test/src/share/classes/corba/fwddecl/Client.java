@@ -49,6 +49,11 @@ import com.sun.corba.se.impl.encoding.CDROutputStream ;
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 
+import org.testng.Assert ;
+import org.testng.annotations.Test ;
+
+import corba.framework.TestngRunner ;
+
 public class Client
 {
     private ORB orb;
@@ -76,6 +81,7 @@ public class Client
 	return new EncapsInputStream( orb, data, data.length ) ;
     }
 
+    @Test
     public void verifyNewFoo() {
 	try {
 
@@ -109,6 +115,7 @@ public class Client
 	}
     }
 
+    @Test
     public void verifyBar() {
 	try {
 	    Any any = orb.create_any();
@@ -153,6 +160,7 @@ public class Client
 
     }
 
+    @Test
     public void verifyMoreFoo() {
 	try {
 
@@ -192,28 +200,20 @@ public class Client
 	}
     }
 
-    private void runtest() {
-	verifyNewFoo();
-	verifyBar();
-	verifyMoreFoo();
-    }
+    private static String[] args ;
 
-    public Client(Properties props, String args[]) {
+    public Client() {
+        Properties props = new Properties( System.getProperties() ) ;
+        props.put( "org.omg.CORBA.ORBClass", 
+            "com.sun.corba.se.impl.orb.ORBImpl" ) ;
 	this.orb = (ORB)ORB.init( args, props ) ;
-	runtest();
     }
 
-    public static void main(String args[])
-    {        
-	try{
-	    Properties props = new Properties( System.getProperties() ) ;
-	    props.put( "org.omg.CORBA.ORBClass", 
-		"com.sun.corba.se.impl.orb.ORBImpl" ) ;
-	    new Client( props, args) ;
-        } catch (Exception e) {
-            System.out.println("ERROR : " + e) ;
-            e.printStackTrace(System.out);
-            System.exit (1);
-        }
+    public static void main(String args[]) {        
+        Client.args = args ;
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
+        runner.systemExit() ;
     }
 }

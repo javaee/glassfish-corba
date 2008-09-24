@@ -86,16 +86,20 @@ public class Scanner {
     public boolean scan( final Action action ) throws IOException {
 	boolean result = true ;
 	for (File file : roots) {
-	    if (file.isDirectory()) {
-		if (!skipDirectory(file)) {
-		    result = doScan( file, action ) ;
+	    // Skip non-existent roots
+	    if (file.exists()) {
+		if (file.isDirectory()) {
+		    if (!skipDirectory(file)) {
+			result = doScan( file, action ) ;
+		    }
+		} else  {
+		    final FileWrapper fw = new FileWrapper( file ) ;
+		    result = action.evaluate( fw ) ;
 		}
-	    } else  {
-		final FileWrapper fw = new FileWrapper( file ) ;
-		result = action.evaluate( fw ) ;
+
+		if (!result) 
+		    break ;
 	    }
-	    if (!result) 
-		break ;
 	}
 
 	return result ;

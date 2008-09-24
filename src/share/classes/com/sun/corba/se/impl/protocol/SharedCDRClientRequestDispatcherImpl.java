@@ -117,13 +117,12 @@ import com.sun.corba.se.impl.encoding.CodeSetConversion;
 import com.sun.corba.se.impl.encoding.MarshalOutputStream;
 import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ProfileAddr;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReferenceAddr;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
-import com.sun.corba.se.impl.util.JDKBridge;
 
 /**
  * ClientDelegate is the RMI client-side subcontract or representation

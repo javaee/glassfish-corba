@@ -48,7 +48,7 @@ import org.omg.CosNaming.*;
 import org.omg.CosNaming.NamingContextPackage.*;
 import corba.framework.Controller;
 import corba.framework.Options;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class Client 
 {

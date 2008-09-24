@@ -67,7 +67,7 @@ import com.sun.corba.se.spi.protocol.PIHandler ;
 import com.sun.corba.se.impl.logging.POASystemException ;
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.oa.poa.POAManagerImpl ;
 
@@ -85,6 +85,7 @@ public class POAFactory implements ObjectAdapterFactory
     private ORB orb ;
     private POASystemException wrapper ;
     private OMGSystemException omgWrapper ;
+    private boolean isShuttingDown = false ;
 
     public POASystemException getWrapper() 
     {
@@ -173,6 +174,7 @@ public class POAFactory implements ObjectAdapterFactory
 	// pm.deactivate removes itself from poaManagers!
 	Iterator managers = null ;
 	synchronized (this) {
+            isShuttingDown = true ;
 	    managers = (new HashSet(poaManagers)).iterator();
 	}
 
@@ -218,6 +220,10 @@ public class POAFactory implements ObjectAdapterFactory
     public synchronized POA getRootPOA()
     {
 	if (rootPOA == null) {
+            if (isShuttingDown) {
+                throw omgWrapper.noObjectAdaptor() ;
+            }
+
 	    try {
 		Object obj = orb.resolve_initial_references(
 		    ORBConstants.ROOT_POA_NAME ) ;

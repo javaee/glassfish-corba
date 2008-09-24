@@ -49,6 +49,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock ;
 
 import java.util.List ;
+import java.util.Set ;
+import java.util.HashSet ;
 import java.util.ArrayList ;
 import java.util.Iterator ;
 import java.util.Properties ;
@@ -62,9 +64,6 @@ import java.util.Enumeration ;
 import java.util.WeakHashMap ;
 
 import java.net.InetAddress ;
-
-import java.security.PrivilegedAction;
-import java.security.AccessController ;
 
 import javax.rmi.CORBA.ValueHandler;
 
@@ -147,7 +146,6 @@ import com.sun.corba.se.spi.monitoring.MonitoringManagerFactory;
 import com.sun.corba.se.spi.monitoring.MonitoringFactories;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
 import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility;
 import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
@@ -163,8 +161,8 @@ import com.sun.corba.se.impl.corba.EnvironmentImpl;
 import com.sun.corba.se.impl.corba.AsynchInvoke;
 import com.sun.corba.se.impl.corba.AnyImpl;
 import com.sun.corba.se.impl.corba.RequestImpl;
-import com.sun.corba.se.impl.dynamicany.DynAnyFactoryImpl;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
+import com.sun.corba.se.impl.encoding.CachedCodeBase;
 import com.sun.corba.se.impl.interceptors.PIHandlerImpl;
 import com.sun.corba.se.impl.interceptors.PINoOpHandlerImpl;
 import com.sun.corba.se.impl.ior.TaggedComponentFactoryFinderImpl;
@@ -174,7 +172,7 @@ import com.sun.corba.se.impl.oa.toa.TOAFactory;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.se.impl.oa.poa.DelegateImpl;
 import com.sun.corba.se.impl.oa.poa.POAFactory;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl;
 import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolManagerImpl;
@@ -251,8 +249,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     private int transientServerId ;
 
-    private ThreadGroup threadGroup ; 
-
     private ServiceContextFactoryRegistry serviceContextFactoryRegistry ;
 
     private ServiceContextsCache serviceContextsCache;
@@ -312,6 +308,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private IdentifiableFactoryFinder<TaggedProfileTemplate> taggedProfileTemplateFactoryFinder ;
 
     private ObjectKeyFactory objectKeyFactory ;
+
+    private boolean orbOwnsThreadPoolManager = false ;
 
     private ThreadPoolManager threadpoolMgr;
 
@@ -401,46 +399,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         // end of this method.
 	pihandler = new PINoOpHandlerImpl( );
 
-	// See bugs 4916766 and 4936203
-	// We intend to create new threads in a reliable thread group.
-	// This avoids problems if the application/applet
-	// creates a thread group, makes JavaIDL calls which create a new
-	// connection and ReaderThread, and then destroys the thread
-	// group. If our ReaderThreads were to be part of such destroyed thread
-	// group then it might get killed and cause other invoking threads
-	// sharing the same connection to get a non-restartable
-	// CommunicationFailure. We'd like to avoid that.
-	//
-	// Our solution is to create all of our threads in the highest thread
-	// group that we have access to, given our own security clearance.
-	//
-        try { 
-	    // try to get a thread group that's as high in the threadgroup  
-	    // parent-child hierarchy, as we can get to.
-	    // this will prevent an ORB thread created during applet-init from 
-	    // being killed when an applet dies.
-	    threadGroup = AccessController.doPrivileged( 
-		new PrivilegedAction<ThreadGroup>() { 
-		    public ThreadGroup run() { 
-			ThreadGroup tg = Thread.currentThread().getThreadGroup() ;  
-			ThreadGroup ptg = tg ; 
-			try { 
-			    while (ptg != null) { 
-				tg = ptg;  
-				ptg = tg.getParent(); 
-			    } 
-			} catch (SecurityException se) { 
-			    // Discontinue going higher on a security exception.
-			}
-			return new ThreadGroup(tg, "ORB ThreadGroup"); 
-		    } 
-		}
-	    );
-	} catch (SecurityException e) { 
-	    // something wrong, we go back to the original code 
-	    threadGroup = Thread.currentThread().getThreadGroup(); 
-	}
- 
 	// This is the unique id of this server (JVM). Multiple incarnations
 	// of this server will get different ids.
 	// Compute transientServerId = milliseconds since Jan 1, 1970
@@ -1408,17 +1366,20 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    // If wait is true, another thread already called shutdown( true ),
 	    // and so we wait for completion
 	    if (wait) {
-		while (status == STATUS_SHUTTING_DOWN)
+                while (true) {
+                    synchronized (this) {
+                        if (status == STATUS_SHUTDOWN)
+                            break ;
+                    }
+
 		    try {
 			shutdownObj.wait() ;
 		    } catch (InterruptedException exc) {
 			// NOP: just loop and wait until state is changed
 		    }
+                }
 	    } else {
-		// XXX access to requestDispatcherRegistry should be protected
-		// by the ORBImpl instance monitor, but is not here in the
-		// shutdownServants call.  Note that this shuts down all object
-		// adapters, which in turn will cause new request to be rejected.
+                // perform the actual shutdown
 		shutdownServants(wait_for_completion);
 
 		if (wait_for_completion) {
@@ -1442,19 +1403,20 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         }
     }
 
-    /** This method shuts down the ORB and causes orb.run() to return.
-     *	It will cause all POAManagers to be deactivated, which in turn
-     *  will cause all POAs to be deactivated.
-     */
+    // Cause all ObjectAdapaterFactories to clean up all of their internal state, which 
+    // may include activated objects that have associated state and callbacks that must
+    // complete in order to shutdown.  This will cause new request to be rejected.
     protected void shutdownServants(boolean wait_for_completion) {
-	Iterator iter = requestDispatcherRegistry.getObjectAdapterFactories().iterator() ;
-	while (iter.hasNext()) {
-	    ObjectAdapterFactory oaf = (ObjectAdapterFactory)iter.next() ;
-	    oaf.shutdown( wait_for_completion ) ;
-	}
+        Set<ObjectAdapterFactory> oaset ;
+        synchronized(this) {
+            oaset = new HashSet<ObjectAdapterFactory>( 
+                requestDispatcherRegistry.getObjectAdapterFactories() ) ;
+        }
+
+        for (ObjectAdapterFactory oaf : oaset) 
+            oaf.shutdown( wait_for_completion ) ;
     }
 
-    // REVISIT: was protected - made public for framework
     // Note that the caller must hold the ORBImpl lock.
     public void checkShutdownState() 
     {
@@ -1503,24 +1465,101 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
      */
     public void destroy() 
     {
-	boolean shutdownFirst = false ;
+        boolean shutdownFirst = false ;
+        synchronized (this) {
+            shutdownFirst = (status == STATUS_OPERATING) ;
+        }
 
-	synchronized (this) {
-	    shutdownFirst = (status == STATUS_OPERATING) ;
-	}
-
-	if (shutdownFirst) {
+        if (shutdownFirst) {
             shutdown(true);
         }
 
         synchronized (this) {
-	    if (status < STATUS_DESTROYED) {
-		getCorbaTransportManager().close();
-		getPIHandler().destroyInterceptors() ;
-		timerManager.destroy() ;
-		status = STATUS_DESTROYED;
-	    }
-	}
+            if (status < STATUS_DESTROYED) {
+                getCorbaTransportManager().close();
+                getPIHandler().destroyInterceptors() ;
+                timerManager.destroy() ;
+                timerManager = null ;
+                status = STATUS_DESTROYED;
+            }
+        }
+
+        synchronized (threadPoolManagerAccessLock) {
+            if (orbOwnsThreadPoolManager) {
+                try {
+                    threadpoolMgr.close() ;
+                    threadpoolMgr = null ;
+                } catch (IOException exc) {
+                    wrapper.ioExceptionOnClose( exc ) ;
+                }
+            }
+        }
+
+        try {
+            monitoringManager.close() ;
+            monitoringManager = null ;
+        } catch (IOException exc) {
+            wrapper.ioExceptionOnClose( exc ) ;
+        }
+
+        CachedCodeBase.cleanCache( this ) ;
+        try {
+            pihandler.close() ;
+        } catch (IOException exc) {
+            wrapper.ioExceptionOnClose( exc ) ;
+        }
+
+        super.destroy() ;
+
+        badServerIdHandlerAccessLock = null ;
+        clientDelegateFactoryAccessorLock = null ;
+        corbaContactInfoListFactoryAccessLock = null ; 
+        corbaContactInfoListFactoryReadLock = null ;
+        corbaContactInfoListFactoryWriteLock = null ;
+
+        objectKeyFactoryAccessLock = null ;
+        legacyServerSocketManagerAccessLock = null ;
+        threadPoolManagerAccessLock = null ;
+        transportManager = null ;
+        legacyServerSocketManager = null ;
+        OAInvocationInfoStack  = null ; 
+        clientInvocationInfoStack  = null ; 
+        codeBase = null ; 
+        codeBaseIOR = null ;
+        dynamicRequests  = null ; 
+        svResponseReceived  = null ;
+        runObj = null ;
+        shutdownObj = null ;
+        waitForCompletionObj = null ;
+        invocationObj = null ;
+        isProcessingInvocation = null ;
+        typeCodeForClassMap  = null ;
+        valueFactoryCache = null ;
+        orbVersionThreadLocal = null ; 
+        requestDispatcherRegistry = null ;
+        copierManager = null ;
+        serviceContextFactoryRegistry = null ;
+        serviceContextsCache= null ;
+        toaFactory = null ;
+        poaFactory = null ;
+        pihandler = null ;
+        configData = null ;
+        badServerIdHandler = null ;
+        clientDelegateFactory = null ;
+        corbaContactInfoListFactory = null ;
+        resolver = null ;
+        localResolver = null ;
+        insNamingDelegate = null ;
+        resolverLock = null ;
+        urlOperation = null ;
+        urlOperationLock = null ;
+        taggedComponentFactoryFinder = null ;
+        taggedProfileFactoryFinder = null ;
+        taggedProfileTemplateFactoryFinder = null ;
+        objectKeyFactory = null ;
+        invocationInterceptor = null ;
+        objectKeyCache = null ; 
+        objectKeyCacheLock = null ;
     }
 
     /**
@@ -1927,11 +1966,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
     }
 
-    final private ReentrantReadWriteLock 
+    private ReentrantReadWriteLock 
           corbaContactInfoListFactoryAccessLock = new ReentrantReadWriteLock();
-    final private Lock corbaContactInfoListFactoryReadLock =
+    private Lock corbaContactInfoListFactoryReadLock =
                                corbaContactInfoListFactoryAccessLock.readLock();
-    final private Lock corbaContactInfoListFactoryWriteLock = 
+    private Lock corbaContactInfoListFactoryWriteLock = 
                               corbaContactInfoListFactoryAccessLock.writeLock();
     
     public void setCorbaContactInfoListFactory( CorbaContactInfoListFactory factory ) 
@@ -2087,7 +2126,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     {
 	synchronized (threadPoolManagerAccessLock) {
 	    if (threadpoolMgr == null) {
-		threadpoolMgr = new ThreadPoolManagerImpl( threadGroup );
+		threadpoolMgr = new ThreadPoolManagerImpl();
+                orbOwnsThreadPoolManager = true ;
 	    }
 	    return threadpoolMgr;
 	}

@@ -63,7 +63,7 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 public class WorkspaceRename {
     private static final String[] SUBSTITUTE_SUFFIXES = {
-	"c", "h", "java", "sjava", "idl", "htm", "html", "xml", "dtd",
+	"c", "h", "java", "sjava", "idl", "htm", "html", "xml", "dtd", "bnd",
 	"tdesc", "policy", "secure", "mc", "mcd", "scm", "vthought",
 	"ksh", "sh", "classlist", "config", "jmk", "properties", "prp", 
 	"xjmk", "set", "data", "txt", "text", "javaref", "idlref" } ;
@@ -75,7 +75,8 @@ public class WorkspaceRename {
     private static final String[] COPY_SUFFIXES = {
 	"sxc", "sxi", "sxw", "odp", "gif", "png", "jar", "zip", "jpg", "pom",
 	"pdf", "doc", "mif", "fm", "book", "zargo", "zuml", "cvsignore", 
-	"hgignore", "list", "old", "orig", "rej" 
+	"hgignore", "list", "old", "orig", "rej", "hgtags", "xsl", "bat", "css",
+        "icns"
     } ;
 
     private static final String[] IGNORE_SUFFIXES = {
@@ -88,7 +89,8 @@ public class WorkspaceRename {
 
     private static final String[] IGNORE_DIRS = {
 	".hg", ".snprj", ".cvs", "SCCS", "obj", "obj_g", "Codemgr_wsdata", 
-	"deleted_files", "build", "rename", "freezepoint", "test-output"
+	"deleted_files", "build", "rename", "freezepoint", "test-output",
+	"webrev", "javadoc"
     } ;
 
     private static final String[][] patterns = {
@@ -126,6 +128,10 @@ public class WorkspaceRename {
 	@Help( "If true, copy all files without renaming anything" )
 	@DefaultValue( "false" )
 	boolean copyonly() ;
+
+        @Help( "If true, expand all tabs into spaces on files that are renamed (all text file)" ) 
+        @DefaultValue ( "true" ) 
+        boolean expandtabs() ;
     }
 
     // Extract these from args so that the methods in Arguments are not
@@ -140,6 +146,7 @@ public class WorkspaceRename {
     private final File destination ;
     private final String version ;
     private final boolean copyonly ;
+    private final boolean expandtabs ;
 
     private void trace( String msg ) {
 	System.out.println( msg ) ;
@@ -183,6 +190,7 @@ public class WorkspaceRename {
 	verbose = args.verbose() ;
 	dryrun = args.dryrun() ;
 	copyonly = args.copyonly() ;
+        expandtabs = args.expandtabs() ;
 
 	if (verbose > 0) {
 	    trace( "Main: args:\n" + args ) ;
@@ -250,6 +258,9 @@ public class WorkspaceRename {
 
 			    Block sourceBlock = BlockParser.getBlock( fw ) ;
 			    Block targetBlock = sourceBlock.substitute( substitutions ) ;
+                            if (expandtabs) {
+                                targetBlock = targetBlock.expandTabs() ;
+                            }
 
 			    target.delete() ;
 			    target.open( FileWrapper.OpenMode.WRITE ) ;

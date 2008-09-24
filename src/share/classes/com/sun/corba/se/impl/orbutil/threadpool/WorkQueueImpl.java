@@ -49,7 +49,7 @@ import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import com.sun.corba.se.spi.orbutil.threadpool.WorkQueue;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 
 public class WorkQueueImpl implements WorkQueue
@@ -162,7 +162,9 @@ public class WorkQueueImpl implements WorkQueue
         }
     }
 
-    synchronized Work requestWork(long waitTime) throws WorkerThreadNotNeededException {
+    synchronized Work requestWork(long waitTime) throws WorkerThreadNotNeededException, 
+        InterruptedException {
+
         if (this.isQueueEmpty()) {
             try {
                 ((ThreadPoolImpl)workerThreadPool).incrementNumberOfAvailableThreads();
@@ -205,11 +207,6 @@ public class WorkQueueImpl implements WorkQueue
                   // item is returned, the WorkerThread simply returns back
                   // to this method and waits for additional Work. Hence,
                   // a "spurious wakeup" is handled appropriately.
-            } catch (InterruptedException e) {
-                // clear Thread's interrupted status
-                Thread.interrupted();
-                wrapper.workQueueThreadInterrupted(getThreadPool().getName(),
-                                                   getName(), e.toString());
             } finally {
                 ((ThreadPoolImpl)workerThreadPool).decrementNumberOfAvailableThreads();
             }

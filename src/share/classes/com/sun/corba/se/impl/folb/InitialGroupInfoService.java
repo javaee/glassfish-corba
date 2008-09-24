@@ -76,7 +76,7 @@ import org.omg.PortableServer.ServantLocator ;
 
 import org.omg.CORBA.ORB;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.folb.GroupInfoService;
 
 import org.omg.PortableServer.ForwardRequest ;

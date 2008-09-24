@@ -53,6 +53,8 @@ import com.sun.corba.se.spi.orbutil.closure.Closure ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 /** TestSession manages running of tests and checking results within
 * a test session.  If the session fails any test, the whole session 
 * fails with an Error, which can be used to trigger failure in the
@@ -65,14 +67,16 @@ public class TestSession
     private PrintStream out ;
     private boolean errorFlag ;
     private String sessionName ;
+    private JUnitReportHelper helper ;
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Public interface
 /////////////////////////////////////////////////////////////////////////////////////
 
-    public TestSession( PrintStream out )
+    public TestSession( PrintStream out, Class cls )
     {
 	this.out = System.out ;
+        helper = new JUnitReportHelper( cls.getName() ) ;
     }
 
     /** Print a message indicating the start of the session.
@@ -89,6 +93,7 @@ public class TestSession
     */
     public void end()
     {
+        helper.done() ;
 	if (errorFlag)
 	    throw new Error( "Test session " + sessionName + " failed" ) ;
     }
@@ -133,6 +138,7 @@ public class TestSession
     {
 	out.println( "\t" + msg + ": Test aborted due to unexpected exception " + thr ) ;
 	thr.printStackTrace() ;
+        helper.done() ;
 	System.exit( 1 ) ;
     }
 
@@ -143,12 +149,14 @@ public class TestSession
     private void testStart( String name )
     {
 	out.println( "\tTest " + name + "..." ) ;
+        helper.start( name ) ;
     }
 
     private void testFail( String msg )
     {
 	out.println( "\t\tFAILED: " + msg ) ;
 	errorFlag = true ;
+        helper.fail( msg ) ;
     }
 
     private void testPass() 
@@ -162,5 +170,6 @@ public class TestSession
 	if ((msg != null) && (msg != ""))
 	    out.print( ": " + msg ) ;
 	out.println() ;
+        helper.pass() ;
     }
 }

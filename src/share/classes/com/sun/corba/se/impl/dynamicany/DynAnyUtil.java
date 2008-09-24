@@ -40,7 +40,6 @@ import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.portable.OutputStream;
-//import org.omg.CORBA.ORBPackage.*;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.TypeCodePackage.Bounds;
 import org.omg.CORBA.portable.InputStream;
@@ -131,16 +130,6 @@ public class DynAnyUtil
                 return new DynAnyBasicImpl(orb, typeCode);
         }
     }
-
-    // Extracts a member value according to the given TypeCode from the given complex Any
-    // (at the Anys current internal stream position, consuming the anys stream on the way)
-    // and returns it wrapped into a new Any
-/*
-    static Any extractAnyFromAny(TypeCode memberType, Any any, ORB orb) {
-        // Moved this functionality into AnyImpl because it is needed for Any.equal()
-        return ((AnyImpl)any).extractAny(memberType, orb);
-    }
-*/
 
     // Extracts a member value according to the given TypeCode from the given complex Any
     // (at the Anys current internal stream position, consuming the anys stream on the way)

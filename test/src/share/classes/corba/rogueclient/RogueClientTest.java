@@ -45,15 +45,13 @@
 package corba.rogueclient;
 
 import java.util.Properties;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
 
-public class RogueClientTest
-    extends
-	CORBATest
-{
+public class RogueClientTest extends CORBATest {
+
     public static final String thisPackage =
 	RogueClientTest.class.getPackage().getName();
 
@@ -63,18 +61,18 @@ public class RogueClientTest
     {
 	Controller orbd = createORBD();
 	orbd.start();
-//        Properties serverProps = Options.getExtraServerProperties();
+//        Properties serverProps = Options.getServerProperties();
 //        serverProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
 	Controller server = createServer(thisPackage + ".Server","Server");
 	server.start();
 
-//        Properties rogueClientProps = Options.getExtraClientProperties();
+//        Properties rogueClientProps = Options.getClientProperties();
 //        rogueClientProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
 	Controller rogueClient = createClient(thisPackage + ".RogueClient","RogueClient");
 
         // put some tougher than defaults settings on well behaved client
 	// so command line property for read timeouts gets executed
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.setProperty(ORBConstants.TRANSPORT_TCP_TIMEOUTS_PROPERTY,
                                 "150:2500:25");
 	Controller client = createClient(thisPackage + ".Client","Client");

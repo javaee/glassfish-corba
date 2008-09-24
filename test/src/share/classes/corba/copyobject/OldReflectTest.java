@@ -75,6 +75,11 @@ public class OldReflectTest extends Client
 	Client.doMain( args, root ) ; 
     }
 
+    public static Test suite() {
+	Client root = new OldReflectTest() ;
+	return root.makeSuite() ;
+    }
+
     public boolean isTestExcluded()
     {
 	String testName = getName() ;

@@ -38,7 +38,7 @@ package corba.custom;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 // Loops through all possible fragment sizes from 32 through user defined
 // max.  Currently [32, 512]
@@ -51,6 +51,7 @@ public class CustomTest extends CORBATest
     {
         Options.setRMICClasses(rmicClasses);
         Options.addRMICArgs("-poa -nolocalstubs -iiop -keep -g");
+        boolean failed = false ;
 
         compileRMICFiles();
         compileJavaFiles();
@@ -60,15 +61,13 @@ public class CustomTest extends CORBATest
 
         System.out.println();
 
-        int failures = 0;
-
         for (int fragmentSize = 32; fragmentSize <= 512; fragmentSize+=16) {
 
             System.out.print("  Fragment size " + fragmentSize + ": ");
 
             // Specify the fragment size property
-            Properties clientProps = Options.getExtraClientProperties();
-            Properties serverProps = Options.getExtraServerProperties();
+            Properties clientProps = Options.getClientProperties();
+            Properties serverProps = Options.getServerProperties();
 
             clientProps.setProperty(ORBConstants.GIOP_FRAGMENT_SIZE,
                                     "" + fragmentSize);
@@ -85,19 +84,20 @@ public class CustomTest extends CORBATest
             // Go ahead and restart both server and client each time to
             // make sure we test all fragment sizes for replies, too.
             server.start();
-            client.start();
+            client.start() ; 
 
             try {
                 if (client.waitFor(60000) == Controller.SUCCESS) {
                     System.out.println("PASSED");
                 } else {
-                    System.out.println("FAILED (" + client.exitValue() + ')');
-                    failures++;
+                    String msg = "FAILED (" + client.exitValue() + ")" ;
+                    System.out.println( msg ) ;
+                    failed = true;
                 }
             } catch (Exception e) {
                 // Timed out waiting for the client
                 System.out.println("HUNG");
-                failures++;
+                failed = true ;
             } finally {
                 client.stop();
                 server.stop();
@@ -107,8 +107,8 @@ public class CustomTest extends CORBATest
         orbd.stop();
 
         System.out.println();
-        System.out.println("  Total failures: " + failures);
-        if (failures > 0)
-            throw new Error("Failures detected: " + failures);
+
+        if (failed)
+            throw new Error("Failures detected" );
     }
 }

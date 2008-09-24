@@ -48,7 +48,6 @@ import corba.framework.CORBATest;
 import corba.framework.*;
 
 public class SystemExceptionsTest extends CORBATest {
-
     public static final String thisPackage =
 	SystemExceptionsTest.class.getPackage().getName();
     
@@ -56,7 +55,7 @@ public class SystemExceptionsTest extends CORBATest {
 	Controller orbd = createORBD();
 	orbd.start();
 
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
 			"corba.systemexceptions.Client", "true");
 

@@ -137,7 +137,7 @@ import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.encoding.MarshalOutputStream;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.monitoring.MonitoringManager;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 

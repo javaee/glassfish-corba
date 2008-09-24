@@ -47,16 +47,29 @@ import java.io.*;
  */
 public class InternalExec extends ControllerAdapter
 {
-    public void start() throws Exception
+    private long startTime ;
+    private long duration ;
+
+    public void start( ) throws Exception
     {
-        Loader loader = new Loader();
-        loader.addPath(Options.getOutputDirectory());
+        startTime = System.currentTimeMillis() ;
 
-        Object obj = (loader.loadClass(className)).newInstance();
+        try {
+            Loader loader = new Loader();
+            loader.addPath(Options.getOutputDirectory());
 
-        activateObject(obj);
+            Object obj = (loader.loadClass(className)).newInstance();
+
+            activateObject(obj);
+        } finally {
+            duration = System.currentTimeMillis() - startTime ;
+        }
     }
-    
+   
+    public long duration() {
+        return duration ;
+    }
+
     public void stop()
     {
 	// Can't be stopped
@@ -104,9 +117,7 @@ public class InternalExec extends ControllerAdapter
         PrintStream errors = new PrintStream(err, true);
 
         try {
-
             process.run(environment, programArgs, output, errors, extra);
-            
         } catch (Exception ex) {
             ex.printStackTrace(errors);
             exitValue = 1;

@@ -76,9 +76,14 @@ public class JavaStreamTest extends Client
     public static void main( String[] args ) 
     { 
   	// Create an instance of the test suite that is used only
-	// to invoke the suite() method.  No name is needed here.
+	// to invoke the makeSuite() method.  No name is needed here.
 	Client root = new JavaStreamTest() ;
 	Client.doMain( args, root ) ; 
+    }
+
+    public static Test suite() {
+	Client root = new JavaStreamTest() ;
+	return root.makeSuite() ;
     }
     
     public ObjectCopierFactory getCopierFactory( ORB orb )

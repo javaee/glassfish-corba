@@ -43,7 +43,7 @@ import org.omg.CORBA.*;
 import java.util.Properties;
 import org.omg.PortableServer.*;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 public class Server
 {

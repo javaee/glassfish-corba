@@ -75,127 +75,102 @@
 	This is the Ant file that builds the PEORB.
     </description>
 
-    <!-- ===================== Initialize Property Values =================== -->
-
- 
-    <property file="make/build.properties"/>
-
-    <!-- The core src and test files. -->
-    <property environment="env"/>
-    <property name="rt.jar"			value="${env.JAVA_HOME}/jre/lib/rt.jar"/>
-    <property name="boot.dir"			value="${env.ALT_BOOTDIR}"/>
-    <property name="test.run.base"              value="test/run"/>
-    <property name="test.output"		value="${test.run.base}/gen"/>
-    <property name="junit.reports"		value="${test.run.base}/junitreports"/>
-    <property name="javac.optimize"		value="false"/>
-    <!-- property name="javac.debug"		value="${env.DEBUG_CLASSFILES}"/ -->
-    <property name="javac.debug"		value="true"/>
-    <property name="src.dir"			value="src/share/classes"/>
-    <property name="test.src.dir"		value="test/src/share/classes"/>
-    <property name="javadoc.dir"		value="www/javadoc"/>
-    <property name="build.sysclasspath"		value="ignore"/>
-
-    <!-- Conditional properties used in test targets -->
-    <!-- <condition property="use.dynamic.stub" value="false">
-	<equals arg1="${env.STATIC_STUB}" arg2="1"/>
-    </condition> 
-    <condition property="use.dynamic.stub" value="true" else="false">
-	<equals arg1="${env.DYNAMIC_STUB}" arg2="1"/>
-    </condition> -->
-    <property name="use.dynamic.stub" value="true"/>
-    <property name="use.codegen.copyobject" value="false"/>
-    <!-- <condition property="use.codegen.copyobject" value="true" else="false">
-	<equals arg1="${env.CODEGEN_COPYOBJECT}" arg2="1"/>
-    </condition>
-    -->
-    <condition property="use.java.serialization" value="true" else="false">
-	<equals arg1="${env.JAVA_SERIALIZATION}" arg2="1"/>
-    </condition>
-    <condition property="debug.forked.process" value="true" else="false">
-	<equals arg1="${env.DEBUGGER}" arg2="1"/>
-    </condition>
-    <condition property="debug.args" value="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y">
-	<equals arg1="${env.DEBUGGER}" arg2="1"/>
-    </condition> 
-    <condition property="debug.args" value="-Xrunoii intuitive.audit.Audit -port 31900 -pause -noexit -startCPUprofiler:type=instrumentation,precision=micro">
-	<equals arg1="${env.DEBUGGER}" arg2="2"/>
-    </condition> 
-    <property name="debug.args" value=""/>
-
-    <!-- experimental files -->
-    <property name="experimentalsrc.dir"		value="experimental/src/share/classes"/>
-    <property name="experimentalgensrc.dir"		value="experimental/build/gensrc"/>
-    <property name="experimentaltest.src.dir"	value="experimental/test/src/share/classes"/>
-    <property name="experimentalclasses.dir"	value="experimental/build/classes"/>
-    <property name="experimentaltestclasses.dir"	value="experimental/test/build/classes"/>
-
-    <!-- jar files -->
-    <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
-    <property name="root.dir"			value="${basedir}"/>
-    <property name="emma-jar"			value="${root.dir}/lib/emma.jar"/>
-    <property name="jscheme-jar"		value="${root.dir}/lib/jscheme.jar"/>
-    <property name="jschemelogutil-jar"		value="${root.dir}/lib/jschemelogutil.jar"/>
-    <property name="javatest-jar"		value="${root.dir}/lib/javatest.jar"/>
-    <property name="ejb-jar"			value="${root.dir}/lib/ejb-2_1-api.jar"/>
-    <property name="junit-jar"			value="${root.dir}/lib/ant-junit.jar"/>
-    <property name="ant-junit-jar"		value="${root.dir}/lib/junit.jar"/>
-    <property name="jmxri-jar"			value="${root.dir}/lib/jmxri.jar"/>
-    <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
-    <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
-    <property name="bnd-jar"                    value="${root.dir}/lib/bnd.jar"/>
-
-    <property name="findbugs.home"		value="${root.dir}/lib/findbugs-1.3.3"/>
-
-    <!-- javac flags -->
-    <property name="deprecation" value="off"/>
-
     <!-- =================== START HERE =================================== -->
-    <target name="build" depends="init, prepare-dirs, compile, create-jars">
-    </target>
+    <target name="build" depends="init, prepare-dirs, compile, create-jars"/>
 
-    <!-- ========================= INIT ========================= -->
     <target name="init">
-        <property name="orb.version" value="${release.version}-${build.version}"/>
-        <property name="orb.groupId" value="com.sun.corba"/>
-        <property name="maven.ant.file" value="maven-ant-tasks-2.0.9.jar"/>
-        <property name="maven.ant.dir"  value="http://apache.hoxt.com/maven/binaries"/>
-        <property name="repo.url" value="java-net:/maven2-repository/trunk/www/repository"/>
-        <property name="file.url" value="file:/tmp/maven"/>
+        <!-- environmental dependencies -->
+        <property environment="env"/>
+        <property name="java.home"                  value="${env.JAVA_HOME}"/>
+        <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
+
+        <property name="root.dir"			value="${basedir}"/>
+
+        <!-- Required JAR files -->
+        <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
+        <property name="rt.jar"			        value="${java.home}/lib/rt.jar"/>
+        <property name="emma-jar"			value="${root.dir}/lib/emma.jar"/>
+        <property name="jscheme-jar"		        value="${root.dir}/lib/jscheme.jar"/>
+        <property name="jschemelogutil-jar"		value="${root.dir}/lib/jschemelogutil.jar"/>
+        <property name="javatest-jar"		        value="${root.dir}/lib/javatest.jar"/>
+        <property name="ejb-jar"			value="${root.dir}/lib/ejb-2_1-api.jar"/>
+        <property name="junit-jar"			value="${root.dir}/lib/ant-junit.jar"/>
+        <property name="ant-junit-jar"		        value="${root.dir}/lib/junit.jar"/>
+        <property name="jmxri-jar"			value="${root.dir}/lib/jmxri.jar"/>
+        <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
+        <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
+        <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
+
+
+        <!-- Places where the build puts things -->
+	<property name="build.dir"                      location="build"/>
+	<property name="findbugs.dir"                   location="build/findbugs"/>
+	<property name="gensrc.dir"                     location="${build.dir}/gensrc"/>
+	<property name="lib.dir"                        location="${build.dir}/lib"/>
+	<property name="classes.dir"                    location="${build.dir}/classes"/>
+
+	<property name="releaselib.dir"                 location="${build.dir}/release/lib"/>   
+
+        <!-- ORB library build directories -->
+	<property name="orblib.src.dir"                 location="orblib/src/share/classes"/>
+	<property name="orblib.build.dir"               location="orblib/build"/>
+	<property name="orblib.classes.dir"             location="${orblib.build.dir}/classes"/>
+
+        <!-- Main ORB build directories -->
+        <property name="src.dir"		        value="src/share/classes"/>
+        <property name="test.src.dir"	    	        value="test/src/share/classes"/>
+        <property name="javadoc.dir"		        value="www/javadoc"/>
+        <property name="build.sysclasspath"	        value="ignore"/>
+
+        <!-- experimental files -->
+        <property name="experimentalsrc.dir"		value="experimental/src/share/classes"/>
+        <property name="experimentalgensrc.dir"		value="experimental/build/gensrc"/>
+        <property name="experimentaltest.src.dir"	value="experimental/test/src/share/classes"/>
+        <property name="experimentalclasses.dir"	value="experimental/build/classes"/>
+        <property name="experimentaltestclasses.dir"	value="experimental/test/build/classes"/>
+
+        <!-- ORB Test directories -->
+        <property name="test.run.base"                  value="test/run"/>
+        <property name="test.output"		        value="${test.run.base}/gen"/>
+        <property name="junit.reports"		        value="${test.run.base}/junitreports"/>
+	<property name="test-build.dir"                 location="test/build"/>
+	<property name="test-classes.dir"               location="${test-build.dir}/classes"/>
+	<property name="test-values1.dir"               location="${test-build.dir}/values1/classes"/>
+	<property name="test-values2.dir"               location="${test-build.dir}/values2/classes"/>
+	<property name="test-gensrc.dir"                location="${test-classes.dir}/gensrc"/>
+
+        <!-- Emma related -->
+	<property name="emma.dir"                       value="build/coverage"/>
+	<property name="emma.classes.dir"               location="${emma.dir}/classes"/>
+	<property name="emma.metadata.file"             location="${emma.dir}/coverage.em"/>
+
+        <!-- javac flags -->
+        <property name="deprecation"                    value="off"/>
+        <property name="javac.optimize"		        value="false"/>
+        <property name="javac.debug"		        value="true"/>
+
+        <!-- Findbugs related -->
+        <property name="findbugs.home"		        value="${root.dir}/lib/findbugs-1.3.3"/>
+	<property name="findbugs.exclude.file"          value="${root.dir}/make/findbugs-filter.xml"/>
         
 	<!-- properties needed for updating and validating copyright headers -->
-	<property name="findbugs.exclude.file" value="${root.dir}/make/findbugs-filter.xml"/>
-	<property name="copyright.file" value="${root.dir}/make/copyright-information/copyright.txt"/>
-	<property name="copyright.roots" value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/> 
-	<property name="copyright.skip" value="SCCS,.hg,.cvs,Codemgr_wsdata,deleted_files,copyright-information,freezepoint,apache,objectweb,build,webrev,test-output,gen,lib"/>
+	<property name="copyright.file"                 value="${root.dir}/make/copyright-information/copyright.txt"/>
+	<property name="copyright.roots"                value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/> 
+	<property name="copyright.skip"                 value="SCCS,.hg,.cvs,Codemgr_wsdata,deleted_files,copyright-information,freezepoint,apache,objectweb,build,webrev,test-output,gen,lib"/>
+
         <!-- properties needed for pushing jar to maven repository -->
-        <property name="release.dir" value="build/release"/>
-        <property name="release.orb.jar" 
-	          value="${release.dir}/glassfish-corba.jar"/>
+        <property name="release.dir"                    value="build/release"/>
+        <property name="release.orb.jar"                value="${release.dir}/glassfish-corba.jar"/>
         <property name="orb.maven_repository_importer.version" value="1.1"/>
-        <property name="glassfish.cvsroot" value=":pserver:${glassfish.cvs.username}@cvs.dev.java.net:/cvs"/>
+        <property name="glassfish.cvsroot"              value=":pserver:${glassfish.cvs.username}@cvs.dev.java.net:/cvs"/>
+        <property name="orb.version"                    value="${release.version}-${build.version}"/>
+        <property name="orb.groupId"                    value="com.sun.corba"/>
+        <property name="maven.ant.file"                 value="maven-ant-tasks-2.0.9.jar"/>
+        <property name="maven.ant.dir"                  value="http://apache.hoxt.com/maven/binaries"/>
+        <property name="repo.url"                       value="java-net:/maven2-repository/trunk/www/repository"/>
+        <property name="file.url"                       value="file:/tmp/maven"/>
+        <property name="bundle.name.prefix"             value="glassfish-corba-"/>
 
-	<property name="build.dir" location="build"/>
-	<property name="emma.dir" value="build/coverage"/>
-	<property name="findbugs.dir" location="build/findbugs"/>
-	<property name="gensrc.dir" location="${build.dir}/gensrc"/>
-	<property name="lib.dir" location="${build.dir}/lib"/>
-	<property name="classes.dir" location="${build.dir}/classes"/>
-
-	<property name="emma.classes.dir" location="${emma.dir}/classes"/>
-	<property name="emma.metadata.file" location="${emma.dir}/coverage.em"/>
-
-	<property name="orblib.src.dir" location="orblib/src/share/classes"/>
-	<property name="orblib.build.dir" location="orblib/build"/>
-	<property name="orblib.classes.dir" location="${orblib.build.dir}/classes"/>
-
-        <property name="bundle.name.prefix" value="glassfish-corba-"/>
-
-	<property name="releaselib.dir" location="${build.dir}/release/lib"/>   
-	<property name="test-build.dir" location="test/build"/>
-	<property name="test-classes.dir" location="${test-build.dir}/classes"/>
-	<property name="test-values1.dir" location="${test-build.dir}/values1/classes"/>
-	<property name="test-values2.dir" location="${test-build.dir}/values2/classes"/>
-	<property name="test-gensrc.dir" location="${test-classes.dir}/gensrc"/>
 	<path id="classpath.master">
 	    <pathelement location="${emma.classes.dir}"/>
 	    <pathelement location="${orblib.classes.dir}"/>
@@ -203,7 +178,10 @@
 	    <pathelement location="${tools-jar}"/>
 	    <pathelement location="${emma-jar}"/>
 	</path>
+
 	<path id="test-classpath.master">
+            <path refid="classpath.master"/>
+
 	    <pathelement location="${jscheme-jar}"/>
 	    <pathelement location="${jschemelogutil-jar}"/>
 	    <pathelement location="${ant-junit-jar}"/>
@@ -211,19 +189,15 @@
 	    <pathelement location="${ejb-jar}"/>
 	    <pathelement location="${testng-jar}"/>
 	    <pathelement location="${japex-jar}"/>
-	    <pathelement location="${tools-jar}"/>
-	    <pathelement location="${emma-jar}"/>
-	    <pathelement location="${emma.classes.dir}"/>
-	    <pathelement location="${orblib.classes.dir}"/>
-	    <pathelement location="${classes.dir}"/>
-	    <pathelement location="${experimentalclasses.dir}"/>
 	    <pathelement location="${test-classes.dir}"/>
 	    <pathelement location="${test-gensrc.dir}"/>
 	    <pathelement location="${test.output}"/>
 	    <pathelement location="${test-values1.dir}"/>
 	    <pathelement location="${test.src.dir}"/>
+	    <pathelement location="${experimentalclasses.dir}"/>
 	    <pathelement location="${experimentaltestclasses.dir}"/>
 	</path>
+
 	<pathconvert property="test.source.path">
 	    <path>
 		<pathelement location="${src.dir}"/>
@@ -302,7 +276,7 @@
     </target>
 
     <!-- ========================= DELETE-JAVA-SOURCE ===================== -->
-    <target name="delete-java-sources">
+    <target name="delete-java-sources" depends="init">
 	<!-- Delete duplicate files and unwanted files. -->
 	<delete>
 	    <fileset dir="${gensrc.dir}">
@@ -563,8 +537,7 @@
     </target>
 
     <!-- ========================= EXPERIMENTAL ========================= -->
-    <target name="compile-experimental" 
-            depends="init">
+    <target name="compile-experimental" depends="init">
 	<echo message="Compiling experimental ORB components"/>
 	<mkdir dir="${experimentalclasses.dir}"/>
 	<javac destdir="${experimentalclasses.dir}" 
@@ -1082,6 +1055,7 @@
 
     <!-- ========================= JAVADOC ========================= -->
     <target name="javadoc" depends="init">
+        <mkdir dir="${javadoc.dir}"/>
 	<javadoc packagenames="com.sun.corba.se.spi.*,com.sun.corba.se.pept.*"
 	         sourcepath="${src.dir}:${orblib.src.dir}:${gensrc.dir}"
 		 classpathref="classpath.master"
@@ -1094,7 +1068,7 @@
 
     <!-- ========================= CREATE JAR FILE TO PUSH ============ -->
 
-    <target name="jar" depends="compile, create-jars">
+    <target name="jar" depends="init, compile, create-jars">
       <mkdir dir="${release.dir}/META-INF"/>
       <copy file="legal/CDDLv1.0.txt" tofile="${release.dir}/META-INF/LICENSE.txt"/>
         <jar jarfile="${release.orb.jar}">          

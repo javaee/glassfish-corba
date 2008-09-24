@@ -52,6 +52,8 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 public abstract class StubFactoryFactoryDynamicBase extends 
     StubFactoryFactoryBase
 {
@@ -69,16 +71,17 @@ public abstract class StubFactoryFactoryDynamicBase extends
 	Class cls = null ;
 
 	try {
-	    cls = Util.getInstance().loadClass( className, remoteCodeBase, classLoader ) ;
+	    cls = Util.getInstance().loadClass( className, remoteCodeBase, 
+		classLoader ) ;
 	} catch (ClassNotFoundException exc) {
 	    throw wrapper.classNotFound3( 
 		CompletionStatus.COMPLETED_MAYBE, exc, className ) ;
 	}
 
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
 	PresentationManager pm = ORB.getPresentationManager() ;
 
-	if (IDLEntity.class.isAssignableFrom( cls ) && 
-	    !Remote.class.isAssignableFrom( cls )) {
+	if (cinfo.isAIDLEntity(cls) && !cinfo.isARemote(cls)) {
 	    // IDL stubs must always use static factories.
 	    PresentationManager.StubFactoryFactory sff = 
 		pm.getStubFactoryFactory( false ) ; 

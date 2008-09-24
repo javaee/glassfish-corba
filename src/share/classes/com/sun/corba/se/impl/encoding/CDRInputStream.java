@@ -55,7 +55,7 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.encoding.CodeSetConversion;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
 
 /**
@@ -114,7 +114,7 @@ public abstract class CDRInputStream
 	    .getTimerManager().points() ;
     }
 
-    public CDRInputStream(CDRInputStream is) {
+     public CDRInputStream(CDRInputStream is) {
         impl = is.impl.dup();
         impl.setParent(this);
 	tp = is.tp ;
@@ -400,6 +400,7 @@ public abstract class CDRInputStream
 	    tp.exit_readTypeCodeFromCDRStream() ;
 	}
     }
+
     public final Any read_any() {
 	tp.enter_readAnyFromCDRStream() ;
 	try {

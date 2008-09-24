@@ -83,7 +83,7 @@ public interface Acceptor
 
     /**
      * Set the
-     * {@link com.sun.corba.se.pept.transport.Inbound.ConnectionCache InboundConnectionCache}
+     * {@link com.sun.corba.se.pept.transport.InboundConnectionCache InboundConnectionCache}
      * to be used by this <code>Acceptor</code>.
      *
      * PEPt uses separate caches for each type of <code>Acceptor</code>
@@ -91,13 +91,13 @@ public interface Acceptor
      * {@link #setConnectionCache} and {@link #getConnectionCache} support
      * an optimzation to avoid hashing to find that cache.
      *
-     * @param connectionCache.
+     * @param connectionCache The InboundConnectionCache to associate with this Acceptor.
      */
     public void setConnectionCache(InboundConnectionCache connectionCache);
 
     /**
      * Get the
-     * {@link com.sun.corba.se.pept.transport.Inbound.ConnectionCache InboundConnectionCache}
+     * {@link com.sun.corba.se.pept.transport.InboundConnectionCache InboundConnectionCache}
      * used by this <code>Acceptor</code>
      *
      * PEPt uses separate caches for each type of <code>Acceptor</code>
@@ -161,13 +161,13 @@ public interface Acceptor
 
     /**
      * Used to get a
-     * {@link com.sun.corba.se.pept.protocol.MessageMeidator MessageMediator}
+     * {@link com.sun.corba.se.pept.protocol.MessageMediator MessageMediator}
      * to hold internal data for a message received using the specific
      * encoding, protocol, transport combination represented by this
      * <code>Acceptor</code>.
      *
      * @return 
-     * {@link com.sun.corba.se.pept.protocol.MessageMeidator MessageMediator}
+     * {@link com.sun.corba.se.pept.protocol.MessageMediator MessageMediator}
      */
     public MessageMediator createMessageMediator(Broker xbroker,
 						 Connection xconnection);

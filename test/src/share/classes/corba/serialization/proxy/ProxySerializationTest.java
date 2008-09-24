@@ -48,7 +48,7 @@ public class ProxySerializationTest extends CORBATest {
         Options.addServerArg("-debug");
         Controller orbd = createORBD();
  
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         orbd.start();
  
         Controller server = createServer("corba.serialization.proxy.Server");

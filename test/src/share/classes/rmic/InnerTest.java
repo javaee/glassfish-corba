@@ -57,6 +57,8 @@ import sun.rmi.rmic.iiop.CompoundType;
 import sun.rmi.rmic.iiop.ContextStack;
 import sun.tools.java.ClassPath;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public class InnerTest extends Test implements Constants {
 
     private ByteArrayOutputStream out = null;
@@ -128,37 +130,41 @@ public class InnerTest extends Test implements Constants {
         }
     }
     
-    private void testInner() {
-        for (int i = 0; i < CASES.length; i++) {
-            String outerClass = "rmic." + CASES[i];   
-            checkType(outerClass,CASES[i].charAt(0));
-            checkType(outerClass + ".Inner",CASES[i].charAt(1));
-            checkType(outerClass + ".Inner",CASES[i].charAt(1));
-        }
-    }
-    
     
     /**
      * Run the test.
      */
     public void run () {
+        JUnitReportHelper helper = new JUnitReportHelper( 
+            this.getClass().getName() ) ;
+
         try {
     
             out = new ByteArrayOutputStream();
-            env = new TestEnv(ParseTest.createClassPath(),out);
+            env = new TestEnv(rmic.ParseTest.createClassPath(),out);
             stack = new ContextStack(env);
 
             // Do the tests...
-
-            testInner();
+            for (int i = 0; i < CASES.length; i++) {
+                helper.start( "test_" + CASES[i] ) ;
+                String outerClass = "rmic." + CASES[i];   
+                checkType(outerClass,CASES[i].charAt(0));
+                checkType(outerClass + ".Inner",CASES[i].charAt(1));
+                checkType(outerClass + ".Inner",CASES[i].charAt(1));
+                helper.pass() ;
+            }
+    
             env.shutdown();
 
         } catch (ThreadDeath death) {
             throw death;
         } catch (Throwable e) {
+            helper.fail( e ) ;
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             e.printStackTrace(new PrintStream(out));
             status = new Error("Caught " + out.toString());
+        } finally {
+            helper.done() ;
         }
     }
 }

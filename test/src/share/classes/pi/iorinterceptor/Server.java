@@ -48,7 +48,7 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactories;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.ior.GenericIdentifiable ;
@@ -60,9 +60,12 @@ import java.io.*;
 
 import IORInterceptorTest.*;    // for IDL
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public class Server 
     implements InternalProcess 
 {
+    JUnitReportHelper helper = new JUnitReportHelper( Server.class.getName() ) ;
 
     private static final String ROOT_POA = "RootPOA";
 
@@ -89,164 +92,201 @@ public class Server
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-	this.out = out;
-	this.err = err;
+        try {
+            this.out = out;
+            this.err = err;
 
-	out.println( "Instantiating ORB" );
-	out.println( "=================" );
+            out.println( "Instantiating ORB" );
+            out.println( "=================" );
 
-	// Initializer class
-	String testInitializer = "pi.iorinterceptor.ServerTestInitializer";
-	ServerTestInitializer.out = out;
+            // Initializer class
+            String testInitializer = "pi.iorinterceptor.ServerTestInitializer";
+            ServerTestInitializer.out = out;
 
-	// create and initialize the ORB
-	Properties props = new Properties() ;
-	props.put( "org.omg.CORBA.ORBClass", 
-                   System.getProperty("org.omg.CORBA.ORBClass"));
-	props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
-		   testInitializer, "" );
-	orb = ORB.init(args, props);
-	ServerTestInitializer.orb = orb;
+            // create and initialize the ORB
+            Properties props = new Properties() ;
+            props.put( "org.omg.CORBA.ORBClass", 
+                       System.getProperty("org.omg.CORBA.ORBClass"));
+            props.put( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX +
+                       testInitializer, "" );
+            orb = ORB.init(args, props);
+            ServerTestInitializer.orb = orb;
 
-	// Get root POA:
-	out.println( "Server retrieving root POA:" );
-	rootPOA = (POA)orb.resolve_initial_references( "RootPOA" );
-	rootPOA.the_POAManager().activate();
+            // Get root POA:
+            out.println( "Server retrieving root POA:" );
+            rootPOA = (POA)orb.resolve_initial_references( "RootPOA" );
+            rootPOA.the_POAManager().activate();
 
-	// Create another child POA, with a set of policies.
-	out.println( "Server creating child POA with some policies..." );
-	Policy[] policies = new Policy[2];
+            // Create another child POA, with a set of policies.
+            out.println( "Server creating child POA with some policies..." );
+            Policy[] policies = new Policy[2];
 
-	// _REVISIT_ Once our orb is CORBA 2.4 compliant, this test can
-	// make use of orb.create_policy for the POA policies as well.
+            // _REVISIT_ Once our orb is CORBA 2.4 compliant, this test can
+            // make use of orb.create_policy for the POA policies as well.
 
-	// Insert two standard policies and one custom policy:
-	policies[0] = rootPOA.create_id_uniqueness_policy( 
-	    IdUniquenessPolicyValue.MULTIPLE_ID );
-	Any value = orb.create_any();
-	value.insert_long( 99 );
-        policies[1] = orb.create_policy( 100, value );
+            // Insert two standard policies and one custom policy:
+            policies[0] = rootPOA.create_id_uniqueness_policy( 
+                IdUniquenessPolicyValue.MULTIPLE_ID );
+            Any value = orb.create_any();
+            value.insert_long( 99 );
+            policies[1] = orb.create_policy( 100, value );
 
-	policyPOA = rootPOA.create_POA( "PolicyPOA", null, policies );
-	policyPOA.the_POAManager().activate();
+            policyPOA = rootPOA.create_POA( "PolicyPOA", null, policies );
+            policyPOA.the_POAManager().activate();
 
-	// Note at this point, if establish_components does not properly
-	// handle exceptions, the exception will be passed here and thrown
-	// before the server gets its handshake in, which will cause the
-	// test to fail.  This tests whether the implementation properly
-	// handles exceptions in establish_components.  If we got this
-	// far, exceptions are handled properly considering the 
-	// NPEIORInterceptor is registered.
-	out.println( "NullPointerException handled gracefully (ok)" );
-        
-	// Check to make sure all interceptors are registered:
-	checkRegistered();
+            // Note at this point, if establish_components does not properly
+            // handle exceptions, the exception will be passed here and thrown
+            // before the server gets its handshake in, which will cause the
+            // test to fail.  This tests whether the implementation properly
+            // handles exceptions in establish_components.  If we got this
+            // far, exceptions are handled properly considering the 
+            // NPEIORInterceptor is registered.
+            out.println( "NullPointerException handled gracefully (ok)" );
+            
+            // Check to make sure all interceptors are registered:
+            checkRegistered();
 
-	// Check to make sure all establish_components calls were made:
-	checkEstablishComponentsCalled();
+            // Check to make sure all establish_components calls were made:
+            checkEstablishComponentsCalled();
 
-	// Check to make sure all establish_components calls all passed:
-	checkEstablishComponentsPassed();
-        
-        // Check to make sure tagged components are inserted into IORs.
-        checkTaggedComponentsPresent();
-        
-        //handshake:
-        out.println("Server is ready.");
-        out.flush();
+            // Check to make sure all establish_components calls all passed:
+            checkEstablishComponentsPassed();
+            
+            // Check to make sure tagged components are inserted into IORs.
+            checkTaggedComponentsPresent();
+        } finally {
+            helper.done() ;
+                   
+            //handshake:
+            out.println("Server is ready.");
+            out.flush();
 
-	// wait for invocations from clients
-	java.lang.Object sync = new java.lang.Object();
-	synchronized (sync) {
-	    sync.wait();
-	}
-
+            // wait for invocations from clients
+            java.lang.Object sync = new java.lang.Object();
+            synchronized (sync) {
+                sync.wait();
+            }
+        }
     }
 
     // Check to make sure all interceptors were registered
     private void checkRegistered() {
-	out.println( "Checking if interceptors were registered..." );
-	if( !NPEIORInterceptor.registered ) {
-	    throw new RuntimeException( 
-		"NPEIORInterceptor never registered!");
-	}
-	out.println( "    - NPEIORInterceptor was registered." );
-	if( !SampleIORInterceptor.registered ) {
-	    throw new RuntimeException( 
-		"SampleIORInterceptor never registered!");
-	}
-	out.println( "    - SampleIORInterceptor was registered." );
+        helper.start( "checkRegistered" ) ;
+
+        try {
+            out.println( "Checking if interceptors were registered..." );
+            if( !NPEIORInterceptor.registered ) {
+                throw new RuntimeException( 
+                    "NPEIORInterceptor never registered!");
+            }
+            out.println( "    - NPEIORInterceptor was registered." );
+            if( !SampleIORInterceptor.registered ) {
+                throw new RuntimeException( 
+                    "SampleIORInterceptor never registered!");
+            }
+            out.println( "    - SampleIORInterceptor was registered." );
+
+            helper.pass() ;
+        } catch (RuntimeException exc) {
+            helper.fail( exc ) ;
+            throw exc ;
+        }
     }
 
     // Checks to make sure establish_components was called on all 
     // IORInterceptors.
     private void checkEstablishComponentsCalled() {
-	out.println( "Checking if establish_components called..." );
-	if( !NPEIORInterceptor.establishComponentsCalled ) {
-	    throw new RuntimeException( 
-		"NPEIORInterceptor.establish_components never called!");
-	}
-	out.println( "    - NPEIORInterceptor.establish_components() called.");
-	if( !SampleIORInterceptor.establishComponentsCalled ) {
-	    throw new RuntimeException( 
-		"SampleIORInterceptor.establish_components never called!");
-	}
-	out.println( "    - SampleIORInterceptor.establish_components() " + 
-	    "called.");
+        helper.start( "checkEstablishComponentsCalled" ) ;
+
+        try {
+            out.println( "Checking if establish_components called..." );
+            if( !NPEIORInterceptor.establishComponentsCalled ) {
+                throw new RuntimeException( 
+                    "NPEIORInterceptor.establish_components never called!");
+            }
+            out.println( "    - NPEIORInterceptor.establish_components() called.");
+            if( !SampleIORInterceptor.establishComponentsCalled ) {
+                throw new RuntimeException( 
+                    "SampleIORInterceptor.establish_components never called!");
+            }
+            out.println( "    - SampleIORInterceptor.establish_components() " + 
+                "called.");
+            helper.pass() ;
+        } catch (RuntimeException exc) {
+            helper.fail( exc ) ;
+            throw exc ;
+        }
     }
 
     // Checks to make sure establish_components passed on all 
     // IORInterceptors.
     private void checkEstablishComponentsPassed() {
-	out.println( "Checking if establish_components passed..." );
-	if( !SampleIORInterceptor.establishComponentsPassed ) {
-	    throw new RuntimeException( 
-		"SampleIORInterceptor.establish_components did not pass!");
-	}
-	out.println( "    - SampleIORInterceptor.establish_components() " + 
-	    "passed.");
+        helper.start( "checkEstablishComponentsPassed" ) ;
+
+        try {
+            out.println( "Checking if establish_components passed..." );
+            if( !SampleIORInterceptor.establishComponentsPassed ) {
+                throw new RuntimeException( 
+                    "SampleIORInterceptor.establish_components did not pass!");
+            }
+            out.println( "    - SampleIORInterceptor.establish_components() " + 
+                "passed.");
+
+            helper.pass() ;
+        } catch (RuntimeException exc) {
+            helper.fail( exc ) ;
+            throw exc ;
+        }
     }
     
     // Creates an object and checks its IOR to make sure the tagged
     // components added by the IOR Interceptors are actually present.
     private void checkTaggedComponentsPresent() throws Exception {
-	out.println( "Checking if tagged components are present..." );
-        
-        // Create an object:
-	out.println( "    + Creating sample object and getting IOR..." );
-        org.omg.CORBA.Object obj = createSampleObject();
-        
-        // Obtain the IOR for this object by writing it to an OutputStream
-        // and reading it back from an input stream.
-        EncapsOutputStream encapsOutputStream = new EncapsOutputStream( 
-	    (com.sun.corba.se.spi.orb.ORB)orb, GIOPVersion.V1_2 );
-        encapsOutputStream.write_Object( obj );
-        EncapsInputStream encapsInputStream = 
-	    (EncapsInputStream)encapsOutputStream.create_input_stream();
-        IOR ior = IORFactories.makeIOR( 
-	    (com.sun.corba.se.spi.orb.ORB)orb, encapsInputStream );
-        
-        // Check if the appropriate tagged components are present in the IOR.
-	out.println( "    + Searching for tagged components..." );
-        IIOPProfile profile = ior.getProfile();
-        IIOPProfileTemplate template = 
-	    (IIOPProfileTemplate)profile.getTaggedProfileTemplate();
-        
-        // The template is a List of TaggedComponent objects.  We are 
-        // interested in the tagged components with the IDs 
-        // SampleIORInterceptor.FAKE_TAG_1 and FAKE_TAG_2.
-        // FAKE_TAG_2 should appear twice, since it is being used to test
-        // that multiple tagged components with the same ID can co-exist in
-        // the same profile.
-        Iterator fake1 = template.iteratorById( 
-            SampleIORInterceptor.FAKE_TAG_1 );
-        verifyComponent( fake1, SampleIORInterceptor.FAKE_TAG_1, 
-                         SampleIORInterceptor.FAKE_DATA_1, 1 );
-        
-        Iterator fake2 = template.iteratorById( 
-            SampleIORInterceptor.FAKE_TAG_2 );
-        verifyComponent( fake2, SampleIORInterceptor.FAKE_TAG_2, 
-                         SampleIORInterceptor.FAKE_DATA_2, 2 );
+        helper.start( "checkTaggedComponentsPresent" ) ;
+
+        try {
+            out.println( "Checking if tagged components are present..." );
+            
+            // Create an object:
+            out.println( "    + Creating sample object and getting IOR..." );
+            org.omg.CORBA.Object obj = createSampleObject();
+            
+            // Obtain the IOR for this object by writing it to an OutputStream
+            // and reading it back from an input stream.
+            EncapsOutputStream encapsOutputStream = new EncapsOutputStream( 
+                (com.sun.corba.se.spi.orb.ORB)orb, GIOPVersion.V1_2 );
+            encapsOutputStream.write_Object( obj );
+            EncapsInputStream encapsInputStream = 
+                (EncapsInputStream)encapsOutputStream.create_input_stream();
+            IOR ior = IORFactories.makeIOR( 
+                (com.sun.corba.se.spi.orb.ORB)orb, encapsInputStream );
+            
+            // Check if the appropriate tagged components are present in the IOR.
+            out.println( "    + Searching for tagged components..." );
+            IIOPProfile profile = ior.getProfile();
+            IIOPProfileTemplate template = 
+                (IIOPProfileTemplate)profile.getTaggedProfileTemplate();
+            
+            // The template is a List of TaggedComponent objects.  We are 
+            // interested in the tagged components with the IDs 
+            // SampleIORInterceptor.FAKE_TAG_1 and FAKE_TAG_2.
+            // FAKE_TAG_2 should appear twice, since it is being used to test
+            // that multiple tagged components with the same ID can co-exist in
+            // the same profile.
+            Iterator fake1 = template.iteratorById( 
+                SampleIORInterceptor.FAKE_TAG_1 );
+            verifyComponent( fake1, SampleIORInterceptor.FAKE_TAG_1, 
+                             SampleIORInterceptor.FAKE_DATA_1, 1 );
+            
+            Iterator fake2 = template.iteratorById( 
+                SampleIORInterceptor.FAKE_TAG_2 );
+            verifyComponent( fake2, SampleIORInterceptor.FAKE_TAG_2, 
+                             SampleIORInterceptor.FAKE_DATA_2, 2 );
+            helper.pass() ;
+        } catch (Exception exc) {
+            helper.fail( exc ) ;
+            throw exc ;
+        }
     }
 
     /**

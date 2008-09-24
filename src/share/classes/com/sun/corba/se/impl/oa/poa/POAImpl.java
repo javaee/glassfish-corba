@@ -112,7 +112,7 @@ import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 import com.sun.corba.se.impl.ior.POAObjectKeyTemplate ;
 import com.sun.corba.se.impl.ior.ObjectAdapterIdArray ;
 import com.sun.corba.se.impl.orbutil.ORBUtility; 
-import com.sun.corba.se.impl.orbutil.ORBConstants; 
+import com.sun.corba.se.spi.orbutil.ORBConstants; 
 
 /**
  * POAImpl is the implementation of the Portable Object Adapter. It 

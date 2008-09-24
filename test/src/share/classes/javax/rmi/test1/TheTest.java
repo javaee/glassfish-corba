@@ -59,17 +59,15 @@ import test.Util;
 import test.Test;
 import java.util.Hashtable;
 
-/*
- * @test
- */
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
 public class TheTest extends test.Test {
-    
     // This test runs the NameServer on port 1050.
-    
     private static  String[] myArgs = new String[]{"-ORBInitialPort" , "1050" };
 
     public  void run() {
-	//public static void main(String[] args) throws Exception {
+        JUnitReportHelper helper = new JUnitReportHelper( 
+            this.getClass().getName() ) ;
 
         String testName     = new TheTest().getClass().getName();
         Process nameServer  = null;
@@ -77,11 +75,8 @@ public class TheTest extends test.Test {
         boolean testPassed  = true;
 
     	try {
-    	    
     	    // First Compile the classes to generate the Stub and Tie 
-    	    // files that are needed.  NOTE: This requires the latest
-    	    // RMIC compiler that supports IIOP.
-
+    	    // files that are needed.  
             if (!getArgs().containsKey("-normic")) {
                 compileClasses();
             }
@@ -118,6 +113,7 @@ public class TheTest extends test.Test {
     	    Context ic = new InitialContext(env);
     	    
     	    // Let the test begin...
+            helper.start( "test1" ) ;
             // Resolve the Object Reference using JNDI/CosNaming
             java.lang.Object objref  = ic.lookup("TheTestServer");
 
@@ -184,30 +180,25 @@ public class TheTest extends test.Test {
             System.out.println(testName + " FAILED.");
     	    ex.printStackTrace();
     	    testPassed = false;
-    	}
-
-        finally {
-
-            // Make sure we kill the test server...
-
+    	} finally {
             if (server != null) {
                 server.destroy();
             }
   
-            // Make sure we kill the NameServer...
-            
             if (nameServer != null) {
                 nameServer.destroy();
             }
         }
 
         if ( testPassed == true ) {
+            helper.pass() ;
             status = null;
-        }
-        else {
+        } else {
+            helper.fail( "test failed" ) ;
             status = new Error("PortableRemoteObject.narrow Test Failed");
         }
 
+        helper.done() ;
     }
 
     // Compiling ComboInterface cause the compiler to compile

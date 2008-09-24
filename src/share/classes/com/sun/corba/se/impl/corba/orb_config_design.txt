@@ -352,7 +352,7 @@ ORB classes:
 
 11. RequestHandler and ORB
 
-    The RH interface is currently implemented in the ORB class, but mig�t better be a separate
+    The RH interface is currently implemented in the ORB class, but mig???t better be a separate
     class.  The API is currently almost the same as a ServerSubcontract.  Should we regularize
     this?  Also, the API would need to be extended to handle shutdown properly.
 

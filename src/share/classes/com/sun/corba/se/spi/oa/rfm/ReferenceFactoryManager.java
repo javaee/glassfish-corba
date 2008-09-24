@@ -113,8 +113,11 @@ public interface ReferenceFactoryManager extends org.omg.CORBA.Object,
      * It is an error for the policies list to contain any value
      * of the above 3 policies.
      * All other policies must be given explicitly in the list.
-     * @parameter String name is the name of this ReferenceFactory.  This is a
+     * @param name is the name of this ReferenceFactory.  This is a
      * simple flat name, not a hierarchical name.
+     * @param repositoryId is the repoid to be used when this reference factory
+     * creates a new CORBA Object reference.
+     * @param policies are the policies to be used to create the underlying POA.
      */
     public ReferenceFactory create( String name, String repositoryId, List<Policy> policies,
 	ServantLocator manager ) ;

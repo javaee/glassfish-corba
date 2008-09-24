@@ -86,7 +86,7 @@ import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry ;
 import com.sun.corba.se.impl.legacy.connection.USLPort ;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ProfileAddr ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReferenceAddr ;

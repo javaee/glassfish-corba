@@ -46,7 +46,7 @@
 	    (EXCEPTION_IN_LOAD_STUB 5 WARNING 
 	     "Exception in loadStub")
 	    (COULD_NOT_MAKE_STUB_FROM_REPOSITORY_ID 6 WARNING 
-	     "�nable to make stub from any of the repository IDs of the interface")
+	     "???nable to make stub from any of the repository IDs of the interface")
 	    (EXCEPTION_IN_CREATE_IIOP_OUTPUT_STREAM 7 WARNING
 	     "An IOException occured while creating an IIOPOutputStream")
 	    (EXCEPTION_IN_CREATE_IIOP_INPUT_STREAM 8 WARNING

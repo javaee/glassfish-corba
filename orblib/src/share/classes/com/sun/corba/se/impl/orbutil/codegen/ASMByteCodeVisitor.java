@@ -36,23 +36,17 @@
 
 package com.sun.corba.se.impl.orbutil.codegen;
 
-import java.lang.reflect.Modifier ;
 
 import java.io.PrintStream ;
 
-import java.util.Properties ;
-import java.util.List ;
 import java.util.Map ;
-import java.util.ArrayList ;
 
 import org.objectweb.asm.ClassWriter ;
 
-import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 
 import com.sun.corba.se.impl.orbutil.codegen.ASMUtil ;
@@ -61,7 +55,6 @@ import com.sun.corba.se.impl.orbutil.codegen.AssignmentStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.CaseBranch ;
 import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
 import com.sun.corba.se.impl.orbutil.codegen.DefinitionStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
 import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
@@ -75,7 +68,6 @@ import com.sun.corba.se.impl.orbutil.codegen.TreeWalker ;
 import com.sun.corba.se.impl.orbutil.codegen.TreeWalkerContext ;
 import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.FieldGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
 import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
 
 /** Visitor that is used to generate byte code for a class.

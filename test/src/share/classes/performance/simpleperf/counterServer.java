@@ -60,7 +60,7 @@ import org.omg.PortableServer.ServantLocator ;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 import org.omg.PortableServer.ServantRetentionPolicyValue ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import corba.framework.ThreadProcess ;
 
 public class counterServer extends ThreadProcess {

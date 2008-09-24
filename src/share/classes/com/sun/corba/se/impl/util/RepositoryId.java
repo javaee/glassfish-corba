@@ -62,6 +62,8 @@ import com.sun.corba.se.spi.orbutil.misc.SoftCache;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 public class RepositoryId {
 	
     // Legal IDL Identifier characters (1 = legal). Note
@@ -612,15 +614,23 @@ public class RepositoryId {
     	return repId;
     }
 
+    public static boolean useFullValueDescription(Class clazz, 
+	String repositoryID) throws IOException{
+
+	return useFullValueDescription( clazz, ClassInfoCache.get( clazz ),
+	    repositoryID ) ;
+    }
+
     /**
      * Checks to see if the FullValueDescription should be retrieved.
      * @exception IOException if suids do not match or if the repositoryID
      * is not an RMIValueType
      */
     public static boolean useFullValueDescription(Class clazz, 
+	ClassInfoCache.ClassInfo cinfo,
 	String repositoryID) throws IOException{
 
-	String clazzRepIDStr = createForAnyType(clazz);
+	String clazzRepIDStr = createForAnyType(clazz, cinfo );
 
 	if (clazzRepIDStr.equals(repositoryID))
 	    return false;
@@ -664,8 +674,8 @@ public class RepositoryId {
 
     private static String createHashString(java.lang.Class clazz) {
 
-	if (clazz.isInterface() || 
-	    !java.io.Serializable.class.isAssignableFrom(clazz))
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
+	if (cinfo.isInterface() || !cinfo.isASerializable(clazz))
 	    return kInterfaceHashCode;
 
 	long actualLong = ObjectStreamClass.getActualSerialVersionUID(clazz);
@@ -751,21 +761,31 @@ public class RepositoryId {
 
 
     public static String createForSpecialCase(java.lang.Class clazz){
-	if (clazz.isArray()){
+	return createForSpecialCase( clazz, ClassInfoCache.get( clazz ) ) ;
+    }
+
+    public static String createForSpecialCase(java.lang.Class clazz,
+	ClassInfoCache.ClassInfo cinfo ){
+	if (cinfo.isArray()) {
 	    return createSequenceRepID(clazz);
-	}
-	else {
-	    return (String)kSpecialCasesRepIDs.get(clazz);
+	} else {
+	    if (clazz == String.class)
+		return kWStringValueRepID ;
+	    if (clazz == Class.class) 
+		return kClassDescValueRepID ;
+	    if (clazz == java.rmi.Remote.class) 
+		return kRemoteValueRepID ;
+	    return null ;
 	}
     }
 
     public static String createForSpecialCase(java.io.Serializable ser){
 	Class clazz = ser.getClass();
-	if (clazz.isArray()){
+	if (ClassInfoCache.get(clazz).isArray()) {
 	    return createSequenceRepID(ser);
-	}
-	else
+	} else {
 	    return createForSpecialCase(clazz);
+	}
     }
 	
     /**
@@ -797,6 +817,12 @@ public class RepositoryId {
 	}
     }
 
+    public static String createForJavaType(Class clz)
+        throws com.sun.corba.se.impl.io.TypeMismatchException
+    {
+	return createForJavaType( clz, ClassInfoCache.get( clz ) ) ;
+    }
+
     /**
      * Creates a repository ID for a normal Java Type.
      * @param clz The Java class to create a repository ID for
@@ -804,11 +830,11 @@ public class RepositoryId {
      * ser implements the * org.omg.CORBA.portable.IDLEntity interface 
      * which indicates it is an IDL Value type.
      **/
-    public static String createForJavaType(Class clz)
+    public static String createForJavaType(Class clz, ClassInfoCache.ClassInfo cinfo )
         throws com.sun.corba.se.impl.io.TypeMismatchException
     {
 	synchronized (classToRepStr){
-	    String repid = createForSpecialCase(clz);
+	    String repid = createForSpecialCase(clz,cinfo);
 	    if (repid != null)
 		return repid;
 
@@ -867,39 +893,48 @@ public class RepositoryId {
 	}
     }
 
+    public static String createForAnyType(Class type ) {
+	return createForAnyType( type, ClassInfoCache.get( type ) ) ;
+    }
+
     /**
      * Createa a repository ID for the type if it is either a java type
      * or an IDL type.
      * @param type The type to create rep. id for
+     * @param cinfo The ClassInfo for the type (pre-computed elsewhere to save time)
      * @return The rep. id.
      **/
-    public static String createForAnyType(Class type) {
+    public static String createForAnyType(Class type, ClassInfoCache.ClassInfo cinfo) {
 	try{
-	    if (type.isArray())
-		return createSequenceRepID(type);
-	    else if (IDLEntity.class.isAssignableFrom(type))
-		{
+	    // We may re-compute the repo id more than once, but that's OK, because
+	    // it's always the same.
+	    String result = cinfo.getRepositoryId() ;
+	    if (result == null) {
+		if (cinfo.isArray()) {
+		    result = createSequenceRepID(type);
+		} else if (cinfo.isAIDLEntity(type)) {
 		    try{
-			return getIdFromHelper(type);
-		    }
-		    catch(Throwable t) {
+			result = getIdFromHelper(type);
+		    } catch(Throwable t) {
 			return createForIDLType(type, 1, 0);
 		    }
-		}
-	    else return createForJavaType(type);
-	}
-	catch(com.sun.corba.se.impl.io.TypeMismatchException e){ 
+		} else 
+		    result = createForJavaType(type, cinfo );
+
+		cinfo.setRepositoryId( result ) ;
+	    }
+
+	    return result ;
+	} catch(com.sun.corba.se.impl.io.TypeMismatchException e){ 
 	    return null; 
 	}
 
     }
 
     public static boolean isAbstractBase(Class clazz) {
-	return (clazz.isInterface() && 
-		IDLEntity.class.isAssignableFrom(clazz) &&
-		(!ValueBase.class.isAssignableFrom(clazz)) &&
-		(!org.omg.CORBA.Object.class.isAssignableFrom(clazz)));
-				
+	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
+	return cinfo.isInterface() && cinfo.isAIDLEntity(clazz) 
+	    && !cinfo.isAValueBase(clazz) && !cinfo.isACORBAObject(clazz) ;
     }
 
     public static boolean isAnyRequired(Class clazz) {

@@ -63,7 +63,7 @@ import com.sun.corba.se.impl.ior.JIDLObjectKeyTemplate ;
 import com.sun.corba.se.impl.oa.NullServantImpl;
 import com.sun.corba.se.impl.oa.poa.Policies;
 import com.sun.corba.se.impl.oa.toa.TransientObjectManager ;
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.protocol.JIDLLocalCRDImpl ;
 
 /** The Transient Object Adapter (TOA) represents the OA for purely transient

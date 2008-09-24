@@ -47,13 +47,13 @@ public class POAPoliciesTest extends CORBATest
                     + (poaFactory == null ? "(Default)" : poaFactory));
 
         if (poaFactory != null) {
-            Properties serverProps = Options.getExtraServerProperties();
+            Properties serverProps = Options.getServerProperties();
             serverProps.setProperty("POAFactory", poaFactory);
         }
         
         Controller server = createServer("corba.poapolicies.HelloServer");
 
-        Controller client = createClient("corba.poapolicies.HelloClient");
+        Controller client = createClient("corba.poapolicies.HelloClient", poaFactory );
 
         server.start();
 

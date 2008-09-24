@@ -36,6 +36,8 @@
 
 package com.sun.corba.se.spi.protocol;
 
+import java.io.Closeable ;
+
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.Interceptor ;
 import org.omg.PortableInterceptor.Current ;
@@ -62,7 +64,7 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage ;
 /** This interface defines the PI interface that is used to interface the rest of the
  * ORB to the PI implementation.
  */
-public interface PIHandler {
+public interface PIHandler extends Closeable {
     /** Complete the initialization of the PIHandler.  This will execute the methods
     * on the ORBInitializers, if any are defined.  This must be done here so that
     * the ORB can obtain the PIHandler BEFORE the ORBInitializers run, since they
@@ -239,7 +241,7 @@ public interface PIHandler {
      * @param servant The servant.  This is java.lang.Object because in the
      *     POA case, this will be a org.omg.PortableServer.Servant whereas
      *     in the ServerRequestDispatcher case this will be an ObjectImpl.
-     * @param targetMostDerivedInterface.  The most derived interface.  This
+     * @param targetMostDerivedInterface  The most derived interface.  This
      *     is passed in instead of calculated when needed because it requires
      *     extra information in the POA case that we didn't want to bother
      *     creating extra methods for to pass in.

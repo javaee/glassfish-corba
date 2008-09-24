@@ -43,12 +43,11 @@ import java.util.*;
  * This tests if invocation on non-existent targets results in COMM_FAILURE.
  */
 public class InvocationTest extends CORBATest {
-
     public static String URL_PROPERTY = "naming.instest.urlProperty";
 
     protected void doTest() throws Throwable {
 
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.setProperty(URL_PROPERTY,
                                 "corbaloc:iiop:1.2@localhost:" + 3050 + '/' +
 				"HelloService");

@@ -82,7 +82,7 @@ import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.interceptors.ClientRequestInfoImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 // BEGIN imports for IIOPPrimaryToContactInfo

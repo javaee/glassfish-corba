@@ -45,7 +45,7 @@ import corba.framework.CORBATest;
 
 import java.util.Properties;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orb.ORB;
 
 import corba.framework.*;
@@ -56,39 +56,38 @@ public class GIOPHeaderPaddingTest extends CORBATest {
 	GIOPHeaderPaddingTest.class.getPackage().getName();
 
     protected void doTest() throws Throwable {
-
         if (test.Test.useJavaSerialization()) {
             return;
         }
 
-	Controller orbd = createORBD();
-	orbd.start();
+        Controller orbd = createORBD();
+        orbd.start();
 
-	Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
-			"corba.giopheaderpadding.Client", "true");
+                        "corba.giopheaderpadding.Client", "true");
         clientProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
-			"corba.giopheaderpadding.Server", "true");
+                        "corba.giopheaderpadding.Server", "true");
         clientProps.put(ORBConstants.GIOP_VERSION, "1.2");
         clientProps.put(ORBConstants.GIOP_12_BUFFMGR, "0"); // GROW
 
-	Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         serverProps.put("org.omg.PortableInterceptor.ORBInitializerClass." +
-			"corba.giopheaderpadding.Server", "true");
+                        "corba.giopheaderpadding.Server", "true");
         serverProps.put(ORBConstants.GIOP_VERSION, "1.2");
         serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "0"); // GROW
 
-	doTestType("Server", "Server",
-		   "Client", "Client");
+        doTestType("Server", "Server",
+                   "Client", "Client");
 
-	Controller colocatedClientServer = 
-	    createClient(thisPackage + ".ColocatedClientServer",
-			 "colocatedClientServer");
-	colocatedClientServer.start();
-	colocatedClientServer.waitFor();
-	colocatedClientServer.stop();
+        Controller colocatedClientServer = 
+            createClient(thisPackage + ".ColocatedClientServer",
+                         "colocatedClientServer");
+        colocatedClientServer.start();
+        colocatedClientServer.waitFor();
+        colocatedClientServer.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 
     protected void doTestType(String serverMainClass, String serverTestName,

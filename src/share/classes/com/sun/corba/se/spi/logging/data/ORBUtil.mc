@@ -135,6 +135,8 @@
 	     58 WARNING "Could not find constructor <init>(String) in class {0}")
 	    (EXCEPTION_IN_CONVERT_ACTION
 	     59 WARNING "Exception in ConvertAction operation")
+            (IO_EXCEPTION_ON_CLOSE
+             60 FINE "Useless exception on call to Closeable.close()")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 
@@ -198,7 +200,7 @@
 	    (BAD_TIMEOUT_STRING_DATA
 	     30 WARNING "{0} is not a valid positive decimal integer for {1}")
 	    (BAD_TIMEOUT_DATA_LENGTH
-	     31 WARNING "Timeout data must be 3 positive decimal integers separated by :")
+	     31 WARNING "Timeout data must be 3 or 4 positive decimal integers separated by :")
 	    )
 	(BAD_INV_ORDER 
 	    (DSIMETHOD_NOTCALLED 
@@ -224,7 +226,7 @@
 	     2 WARNING "Invoked operation on unresolved recursive TypeCode"))
 	(COMM_FAILURE 
 	    (CONNECT_FAILURE
-	     1  WARNING "Connection failure: socketType: {0}; hostname: {1}; port: {2}")
+	     1  FINE "Connection failure: socketType: {0}; hostname: {1}; port: {2}")
 	    (WRITE_ERROR_SEND
 	     3  FINE "Write error sent")
 	    (GET_PROPERTIES_ERROR
@@ -293,6 +295,8 @@
 	     35 FINE "Received {0}, in a non-blocking read on connection, {1}, because an 'end of stream' was detected")
 	    (IOEXCEPTION_IN_ACCEPT_FINE
 	     36 FINE "IOException in accept")
+	    (BUFFER_READ_MANAGER_TIMEOUT
+	     37 WARNING "Timeout while reading data in buffer manager")
 	    )
 	(DATA_CONVERSION
 	    (BAD_STRINGIFIED_IOR_LEN 
@@ -572,25 +576,25 @@
 	    (WORKER_THREAD_CLASSLOADER_RESET
 	     105 FINE "Worker thread {0} finished work item with ClassLoader {1}; ClassLoader successfully reset to {2}")
 	    (WORKER_THREAD_GET_CONTEXT_CLASSLOADER_FAILED
-	     106 WARNING "Unable to get worker thread {0} context ClassLoader; cause {1}; check security policy file, must grant 'getContextClassLoader' runtime permission.")
+	     106 WARNING "Unable to get worker thread {0} context ClassLoader; check security policy file, must grant 'getContextClassLoader' runtime permission.")
 	    (WORKER_THREAD_FORGOT_CLASSLOADER_RESET
 	     107 FINE "Worker thread {0} context ClassLoader was changed to {1}; will attempt a reset to its initial ClassLoader {2}.")
 	    (WORKER_THREAD_RESET_CONTEXT_CLASSLOADER_FAILED
 	     108 WARNING "Unable to set worker thread {0} context ClassLoader; cause {1}; check security policy file, must grant 'setContextClassLoader' runtime permission, or reset the thread context ClassLoader before returning the worker thread to the thread pool.")
             	    (WORKER_THREAD_THROWABLE_FROM_REQUEST_WORK
-             	     109 FINE "Worker thread {0} caught throwable {1} when requesting work from work queue {2}.")
+             	     109 FINE "Worker thread {0} caught throwable when requesting work from work queue {1}.")
             (WORKER_THREAD_NOT_NEEDED
-             110 FINE "Worker thread {0} will exit; current thread count, {1}, greater than minunum worker threads needed, {2}.")
+             110 FINE "Worker thread {0} will exit; current thread count, {1}, greater than minimum worker threads needed, {2}.")
             (WORKER_THREAD_DO_WORK_THROWABLE
-             111 WARNING "Worker thread {0} caught throwable {1} while executing work.")
+             111 WARNING "Worker thread {0} caught throwable while executing work.")
             (WORKER_THREAD_CAUGHT_UNEXPECTED_THROWABLE
-             112 WARNING "Worker thread {0} caught unexpected throwable {1}.")
+             112 WARNING "Worker thread {0} caught unexpected throwable.")
             (WORKER_THREAD_CREATION_FAILURE
              113 SEVERE "Worker thread creation failure; cause {0}.")
             (WORKER_THREAD_SET_NAME_FAILURE
              114 WARNING "Unable to set worker thread {0} name to {1}; cause {2}.")
             (WORK_QUEUE_THREAD_INTERRUPTED
-             115 WARNING "Worker Thread from thread pool, {0}, while waiting for work on work queue {1}, ignoring unexpected {2}.")
+             115 FINE "Worker Thread from thread pool {0} was interrupted: closeCalled is {1}.")
             (WORK_QUEUE_REQUEST_WORK_NO_WORK_FOUND
              116 WARNING "Ignoring unexpected {0} when retrieving of work from work queue, {1}.")
             (NO_FRAGMENT_QUEUE_FOR_REQUEST_ID
@@ -611,6 +615,18 @@
 	     124 WARNING "SharedCDRContactInfoImpl does not support SocketInfo calls")
 	    (DUPLICATE_REQUEST_IDS_IN_RESPONSE_WAITING_ROOM
 	     125 WARNING "Duplicate request ids in response waiting room: over wrote old one: {0},  with new one: {1}")
+            (THREAD_POOL_CLOSE_ERROR 
+             126 WARNING "Error in closing ThreadPool")
+            (THREAD_GROUP_IS_DESTROYED
+             127 WARNING "ThreadGroup {0} is already destroyed: can't destroy it")
+            (THREAD_GROUP_HAS_ACTIVE_THREADS_IN_CLOSE
+             128 WARNING "ThreadGroup {0} has {1} active threads: destroy may cause exception")
+            (THREAD_GROUP_HAS_SUB_GROUPS_IN_CLOSE
+             129 WARNING "ThreadGroup {0} has {1} sub-thread groups: destroy may cause exception")
+            (THREAD_GROUP_DESTROY_FAILED
+             130 WARNING "ThreadGroup {0} could not be destroyed")
+            (INTERRUPTED_JOIN_CALL_WHILE_CLOSING_THREAD_POOL
+             131 WARNING "Join was interrupted on thread {0} while closing ThreadPool {1}")
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 
@@ -783,7 +799,7 @@
 	)
 	(TRANSIENT
 	    (REQUEST_CANCELED
-	     1 WARNING "Request cancelled by exception"))
+	     1 FINE "Request cancelled by exception"))
 	(UNKNOWN 
 	    (UNKNOWN_CORBA_EXC
 	     1  WARNING "Unknown user exception while unmarshalling")

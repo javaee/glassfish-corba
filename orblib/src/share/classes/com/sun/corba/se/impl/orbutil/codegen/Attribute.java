@@ -41,11 +41,9 @@ import java.util.HashSet ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
 
-/** Class used to define dynamic attributes on Node instances.
+/** Class used to define dynamic attributes on AttributedObject instances.
  * Note that T cannot be a generic type, due to problems with
  * Class<T> when T is a generic.  To work around this problem,
  * simply create an interface that extends the generic type
@@ -76,7 +74,7 @@ public class Attribute<T> {
 	    throw new IllegalArgumentException() ;
     }
 
-    public static Set<Attribute<?>> getAttributes( Node node ) {
+    public static Set<Attribute<?>> getAttributes( AttributedObject node ) {
 	List<Object> attrs = node.attributes() ;
 	Set<Attribute<?>> result = new HashSet<Attribute<?>>() ;
 
@@ -96,7 +94,7 @@ public class Attribute<T> {
     private String name ;
     private NullaryFunction<T> initializer ;
     private T defaultValue ;
-    private Class<?> cls ;
+    private Class<T> cls ;
     private int attributeIndex ;
 
     public String toString() {
@@ -113,7 +111,7 @@ public class Attribute<T> {
 	attributeIndex = next( this ) ;
     }
 
-    public Attribute( Class<?> cls, String name, 
+    public Attribute( Class<T> cls, String name, 
 	NullaryFunction<T> initializer ) {
 	this.cls = cls ;
 	this.name = name ;
@@ -123,12 +121,8 @@ public class Attribute<T> {
 	attributeIndex = next( this ) ;
     }
 
-    public T get( Node node ) {
-	// Note that we cannot use cls here to perform the cast.
-	// That would require cls to have type Class<T> instead
-	// of Class<?>, but then it is impossible to create
-	// Attributes of generic type such as Attribute<List<String>>.
-	T result = (T)( node.get( attributeIndex ) ) ;
+    public T get( AttributedObject node ) {
+	T result = cls.cast( node.get( attributeIndex ) ) ;
 	if (result == null) {
 	    if (initializer != null)
 		result = initializer.evaluate() ;
@@ -140,11 +134,11 @@ public class Attribute<T> {
 	return result ;
     }
 
-    public void set( Node node, T arg ) {
+    public void set( AttributedObject node, T arg ) {
 	node.set( attributeIndex, arg ) ;
     }
 
-    public boolean isSet( Node node ) {
+    public boolean isSet( AttributedObject node ) {
 	return node.get( attributeIndex ) != null ;
     }
 

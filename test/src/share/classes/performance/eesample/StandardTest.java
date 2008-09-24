@@ -36,6 +36,7 @@
 
 package performance.eesample;
 
+import java.lang.reflect.Field ;
 import java.lang.reflect.Method ;
 
 import java.lang.annotation.ElementType ;
@@ -43,12 +44,7 @@ import java.lang.annotation.RetentionPolicy ;
 import java.lang.annotation.Target ;
 import java.lang.annotation.Retention ;
 
-import java.rmi.RemoteException ;
-import java.rmi.Remote ;
 import java.io.PrintStream ;
-
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
 
 import java.util.Arrays ;
 import java.util.List ;
@@ -58,9 +54,12 @@ import java.util.Set ;
 import java.util.HashMap ;
 import java.util.Properties ;
 
-import javax.rmi.PortableRemoteObject ;
+import java.rmi.RemoteException ;
+import java.rmi.Remote ;
+
 
 import javax.rmi.CORBA.Tie ;
+import javax.rmi.CORBA.Stub ;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.datatype.DatatypeFactory;
@@ -96,9 +95,14 @@ import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.naming.cosnaming.TransientNameService ;
+
+import com.sun.corba.se.impl.javax.rmi.PortableRemoteObject ;
+import com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl ;
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
+
 import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 
 import com.sun.corba.se.spi.copyobject.CopyobjectDefaults ;
@@ -111,6 +115,7 @@ import com.sun.corba.se.spi.orbutil.argparser.DefaultValue ;
 import com.sun.corba.se.spi.orbutil.argparser.ArgParser ;
 
 import com.sun.corba.se.spi.orbutil.codegen.GenericClass ;
+import com.sun.corba.se.spi.orbutil.codegen.Type ;
 
 import performance.eesample.wspex.Address ;
 import performance.eesample.wspex.ArrayOfLineItem ;
@@ -167,6 +172,61 @@ import com.sun.japex.TestCase ;
  * @author Ken Cavanaugh
  */
 public class StandardTest extends JapexDriverBase {
+    private static Field proDelegate ;
+    private static Field stubDelegateClass ;
+    private static Field utilDelegate ;
+    private static Field singletonORB ;
+    private static boolean corbaReinit = false ;
+
+    private static boolean useSingleClassLoader = true ;
+
+    static {
+	if (!useSingleClassLoader) {
+	    Type.clearCaches() ;
+	    try {
+		proDelegate = javax.rmi.PortableRemoteObject.class.getDeclaredField(
+		    "proDelegate" ) ;
+		stubDelegateClass = Stub.class.getDeclaredField( 
+		    "stubDelegateClass" ) ;
+		utilDelegate = javax.rmi.CORBA.Util.class.getDeclaredField( 
+		    "utilDelegate" ) ;
+		singletonORB = org.omg.CORBA.ORB.class.getDeclaredField(
+		    "singleton" ) ;
+
+		proDelegate.setAccessible( true ) ;
+		stubDelegateClass.setAccessible( true ) ;
+		utilDelegate.setAccessible( true ) ;
+		singletonORB.setAccessible( true ) ;
+	    } catch (Exception exc) {
+		System.out.println( "Error in initializer: " + exc ) ;
+	    }
+	}
+    }
+
+    // This ugly little hack is here so that the CORBA delegates set in one
+    // Japex run (to objects in that run's JapexClassLoader) are not reused
+    // in a subsequent run, which causes severe problems with objects
+    // not having the correct type (because the class names are the same,
+    // but the ClassLoaders are different).  This works by re-initializaing delegates
+    // at the beginning of each run. 
+    private synchronized static void reinitCorbaDelegateHack() {
+	if (!corbaReinit) {
+	    try {
+		stubDelegateClass.set( null, StubDelegateImpl.class ) ;
+		proDelegate.set( null, new PortableRemoteObject() ) ;
+		utilDelegate.set( null, new Util() ) ; 
+
+		synchronized( org.omg.CORBA.ORB.class ) {
+		    singletonORB.set( null, null ) ;
+		}
+	    } catch (Exception exc) {
+		System.out.println( "Error in corbaDelegateHack: " + exc ) ;
+	    }
+	}
+
+	corbaReinit = true ;
+    }
+
     // This is static because it is shared between the command-line instantiation
     // of StandardTest, and the instance created by Japex, when run in Japex mode.
     private static ArgParser<ArgumentData> ap = new ArgParser( ArgumentData.class ) ;
@@ -871,6 +931,7 @@ public class StandardTest extends JapexDriverBase {
 	// initializer client and server ORBs.
 	// Initialize server using RFM and register objrefs in naming
 	Properties baseProps = new Properties() ;
+	// baseProps.setProperty( ORBConstants.DEBUG_PROPERTY, "cdrCache" ) ;
 	baseProps.setProperty( "org.omg.CORBA.ORBSingletonClass",
 	    "com.sun.corba.se.impl.orb.ORBSingleton" ) ;
 	baseProps.setProperty( "org.omg.CORBA.ORBClass",
@@ -1017,7 +1078,7 @@ public class StandardTest extends JapexDriverBase {
 	    ReferenceFactory factory = useCaching ? cacheFactory : nocacheFactory ;
 	    byte[] oid = new byte[] { (byte)0, (byte)1, (byte)2 } ;
 	    org.omg.CORBA.Object objref = factory.createReference( oid ) ; 
-	    Test ref = Test.class.cast( PortableRemoteObject.narrow( objref,
+	    Test ref = Test.class.cast( javax.rmi.PortableRemoteObject.narrow( objref,
 		Test.class )) ;
 	    locator.setRef( ref ) ;
 	    try {
@@ -1041,8 +1102,8 @@ public class StandardTest extends JapexDriverBase {
 
     private Test getTestRef( String name ) {
 	try {
-	    Test ref = Test.class.cast( PortableRemoteObject.narrow( 
-		clientNamingRoot.resolve_str( name ), Test.class )) ;
+	    org.omg.CORBA.Object obj = clientNamingRoot.resolve_str( name ) ;
+	    Test ref = (Test)javax.rmi.PortableRemoteObject.narrow( obj, Test.class ) ;
 	    return ref ;
 	} catch (Exception exc) {
 	    fatal( "Could not get object reference: " + exc, exc ) ;
@@ -1183,14 +1244,34 @@ public class StandardTest extends JapexDriverBase {
     private Test testRef = null ;
 
     public void initializeDriver() {
-	log( "Calling initializeDriver" ) ;
-	// initialize the ORB here
+	if (!useSingleClassLoader)
+	    reinitCorbaDelegateHack() ;
+
+	String fragmentSize ;
+	if (hasParam( "fragmentSize" ))
+	    fragmentSize = getParam( "fragmentSize" ) ;
+	else
+	    fragmentSize = "4096" ;
+
+	String port ;
+	if (hasParam( "port" ))
+	    port = getParam( "port" ) ;
+	else
+	    port = "3700" ;
+
+	String[] args = { "-fragmentSize", fragmentSize, "-port", port } ;
+
+	argData = ap.parse( args ) ;
+
+	log( "Calling initializeDriver with fragmentSize = " + fragmentSize ) ;
+
 	if (argData.mode() == TestMode.LOCAL) {
 	    initializeServer() ;
 	}
 	initializeClientORB() ;
 
 	testRef = getTestRef( JAPEX_OBJREF_NAME ) ;
+	System.out.println( "My ClassLoader = " + this.getClass().getClassLoader() ) ;
     }
 
     public void prepare( TestCase testCase ) {
@@ -1230,6 +1311,7 @@ public class StandardTest extends JapexDriverBase {
 	if (argData.mode() == TestMode.LOCAL) {
 	    cleanUpServer() ;
 	}
+	// clearCorbaDelegateHack() ;
     }
     //
     //

@@ -60,12 +60,11 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.impl.orbutil.copyobject.ClassCopierOrdinaryImpl ;
 
 import com.sun.corba.se.spi.orbutil.fsm.State ;
-import com.sun.corba.se.spi.orbutil.fsm.StateImpl ;
 import com.sun.corba.se.spi.orbutil.fsm.Input ;
 import com.sun.corba.se.spi.orbutil.fsm.FSM ;
 import com.sun.corba.se.spi.orbutil.fsm.FSMImpl ;
+import com.sun.corba.se.spi.orbutil.fsm.Runner ;
 import com.sun.corba.se.spi.orbutil.fsm.StateEngine ;
-import com.sun.corba.se.spi.orbutil.fsm.StateEngineFactory ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
@@ -73,29 +72,24 @@ import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.FieldInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
 
-import com.sun.corba.se.impl.orbutil.codegen.AssignmentStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.CaseBranch ;
 import com.sun.corba.se.impl.orbutil.codegen.CurrentClassLoader ;
+
+// Visible in interface
 import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+
 import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
 import com.sun.corba.se.impl.orbutil.codegen.CodeGeneratorUtil ;
-import com.sun.corba.se.impl.orbutil.codegen.DefinitionStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
 import com.sun.corba.se.impl.orbutil.codegen.Identifier ;
 import com.sun.corba.se.impl.orbutil.codegen.ImportListImpl ;
 import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.MethodGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.BreakStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ReturnStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.Statement ;
 import com.sun.corba.se.impl.orbutil.codegen.SwitchStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ThrowStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.Util ;
 import com.sun.corba.se.impl.orbutil.codegen.FieldGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
 import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
 
 /** Main API for runtime code generation.
@@ -332,24 +326,23 @@ public final class Wrapper {
     // SIMPLE represents simple statements: return, throw, expr, assign
     // and define.
 
-    // Note that the state objects must extend StateImpl, so we cannot
+    // Note that the state objects must extend State, so we cannot
     // use enum here.
-    private static final State S_INIT = new StateImpl( "S_INIT" ) ;
-    private static final State S_DONE = new StateImpl( "S_DONE" ) ;
-    private static final State S_PACKAGE = new StateImpl( "S_PACKAGE" ) ;
-    private static final State S_CLASS = new StateImpl( "S_CLASS" ) ;
-    private static final State S_INITIALIZER = new StateImpl( "S_INITIALIZER" ) ;
-    private static final State S_METHOD = new StateImpl( "S_METHOD" ) ;
-    private static final State S_BODY = new StateImpl( "S_BODY" ) ;
-    private static final State S_IF = new StateImpl( "S_IF" ) ;
-    private static final State S_ELSE = new StateImpl( "S_ELSE" ) ;
-    private static final State S_TRY = new StateImpl( "S_TRY" ) ;
-    private static final State S_FINAL = new StateImpl( "S_FINAL" ) ;
-    private static final State S_SWITCH = new StateImpl( "S_SWITCH" ) ;
-    private static final State S_DEFAULT = new StateImpl( "S_DEFAULT" ) ;
+    private static final State S_INIT = new State( "S_INIT", State.Kind.INITIAL ) ;
+    private static final State S_DONE = new State( "S_DONE", State.Kind.FINAL ) ;
+    private static final State S_PACKAGE = new State( "S_PACKAGE" ) ;
+    private static final State S_CLASS = new State( "S_CLASS", State.Kind.INITIAL ) ;
+    private static final State S_INITIALIZER = new State( "S_INITIALIZER" ) ;
+    private static final State S_METHOD = new State( "S_METHOD", State.Kind.INITIAL ) ;
+    private static final State S_BODY = new State( "S_BODY", State.Kind.INITIAL ) ;
+    private static final State S_IF = new State( "S_IF", State.Kind.INITIAL ) ;
+    private static final State S_ELSE = new State( "S_ELSE" ) ;
+    private static final State S_TRY = new State( "S_TRY", State.Kind.INITIAL ) ;
+    private static final State S_FINAL = new State( "S_FINAL" ) ;
+    private static final State S_SWITCH = new State( "S_SWITCH", State.Kind.INITIAL ) ;
+    private static final State S_DEFAULT = new State( "S_DEFAULT" ) ;
 
-    private static final StateEngine engine = 
-	StateEngineFactory.create() ;
+    private static final StateEngine engine = StateEngine.create() ;
 
     // This set of transitions is used in several states,
     // so we use this method to avoid repetition.
@@ -435,7 +428,7 @@ public final class Wrapper {
     private static boolean DEBUG = false;
 
     private static abstract class Context {
-	private final FSMImpl fsm ;
+	private final Runner runner ;
 	private final Context parent ;
 	protected final Stack<Context> contexts ;
 
@@ -467,7 +460,8 @@ public final class Wrapper {
 	}
 
 	public Context( Stack<Context> contexts, State start ) {
-	    this.fsm = new FSMImpl( engine, start, DEBUG ) ;
+	    FSM fsm = new FSMImpl( engine, start, DEBUG ) ;
+	    this.runner = new Runner( fsm ) ;
 
 	    this.contexts = contexts ;
 	    if (contexts.empty())
@@ -482,7 +476,7 @@ public final class Wrapper {
 	}
 
 	public final void stateTransition( Operation op ) {
-	    fsm.doIt( op ) ;
+	    runner.doIt( op ) ;
 	}
 
 	public final Context parent() {

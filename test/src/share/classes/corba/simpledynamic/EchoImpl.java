@@ -39,11 +39,18 @@ import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 import javax.rmi.PortableRemoteObject ;
 
+import corba.misc.BuckPasserAL  ;
+import corba.misc.BuckPasserV  ;
+
 public class EchoImpl extends PortableRemoteObject implements Echo {
     private String name ;
 
     public EchoImpl( String name ) throws RemoteException {
 	this.name = name ;
+    }
+
+    public String sayHello( Object obj ) throws RemoteException {
+	return "Hello " + obj ;
     }
 
     public Echo say( Echo echo ) {
@@ -53,6 +60,24 @@ public class EchoImpl extends PortableRemoteObject implements Echo {
     public String name() {
 	return name ;
     }
+
+    public int[] echo( int[] arg ) {
+	return arg ;
+    }
+
+    public Object echo( Object arg ) {
+	return arg ;
+    }
+
+    public BuckPasserAL echo( BuckPasserAL arg ) {
+        return arg ;
+    }
+
+    public BuckPasserV echo( BuckPasserV arg ) {
+        return arg ;
+    }
+
+    public BuckPasserVectorOriginal echo( BuckPasserVectorOriginal arg ) throws RemoteException {
+        return arg ;
+    }
 }
-
-

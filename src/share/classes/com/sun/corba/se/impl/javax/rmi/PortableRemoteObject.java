@@ -64,7 +64,6 @@ import java.rmi.server.ExportException;
 
 import java.net.URL;
 
-import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.RepositoryId;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
@@ -72,7 +71,8 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 
 import java.security.AccessController;
-import com.sun.corba.se.impl.orbutil.GetPropertyAction;
+
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 /**
  * Server implementation objects may either inherit from
@@ -234,7 +234,7 @@ public class PortableRemoteObject
 
 	    // Is narrowTo an interface that might be
 	    // implemented by a servant running on iiop?
-	    if (narrowTo.isInterface() && 
+	    if (ClassInfoCache.get( narrowTo ).isInterface() &&
 		narrowTo != java.io.Serializable.class &&
 		narrowTo != java.io.Externalizable.class) {
 	

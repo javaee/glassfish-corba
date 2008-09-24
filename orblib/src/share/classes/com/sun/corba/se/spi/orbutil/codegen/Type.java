@@ -45,12 +45,12 @@ import java.util.WeakHashMap ;
 import java.lang.reflect.Modifier ;
 
 import com.sun.corba.se.impl.orbutil.codegen.Identifier ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.NodeBase ;
+
+// ClassGenerator is visible in the interface.
 import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+
 import com.sun.corba.se.impl.orbutil.codegen.ClassInfoReflectiveImpl ;
 import com.sun.corba.se.impl.orbutil.codegen.CurrentClassLoader ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.Immutable ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;

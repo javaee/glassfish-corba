@@ -38,8 +38,6 @@ package corba.codegen.test ;
 
 import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
-
 import corba.codegen.ClassGeneratorFactory ;
 
 import static java.lang.reflect.Modifier.* ;

@@ -42,7 +42,8 @@ import corba.framework.CORBATest ;
 import corba.framework.Options ;
 import corba.framework.Controller ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.plugin.hwlb.VirtualAddressAgentImpl ;
 import com.sun.corba.se.impl.plugin.hwlb.NoConnectionCacheImpl ;
 
@@ -67,7 +68,7 @@ public class LBTest
 	// ORBs to be initialized without connection caching, and the server
 	// ORBs to use ORT to set the server port to Sx_PORT, while creating
 	// IORs that contains the LB_PORT.
-	Properties serverProps = Options.getExtraServerProperties() ; 
+	Properties serverProps = Options.getServerProperties() ; 
 	serverProps.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY, 
 	    Integer.toString(SHARED_SERVER_ID)) ;
 	serverProps.setProperty( ORBConstants.USER_CONFIGURATOR_PREFIX 
@@ -78,7 +79,7 @@ public class LBTest
 	serverProps.setProperty( VirtualAddressAgentImpl.VAA_PORT_PROPERTY, 
 	    Integer.toString(LB_PORT) ) ;
 
-	Properties clientProps = Options.getExtraClientProperties() ; 
+	Properties clientProps = Options.getClientProperties() ; 
 	clientProps.setProperty( ORBConstants.USER_CONFIGURATOR_PREFIX 
 		+ pluginPackage + "." + "NoConnectionCacheImpl",
 		"dummy" ) ;

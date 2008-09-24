@@ -41,7 +41,7 @@ import org.omg.CORBA.SystemException;
 import java.util.*;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class Client implements Runnable {
 

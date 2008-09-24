@@ -78,6 +78,7 @@ import com.sun.corba.se.impl.presentation.rmi.codegen.CodegenProxyCreator ;
  * <OL>
  */
 public class TestCodegenProxyCreator extends TestCase {
+    private static final boolean DEBUG = false ;
 
     public static class TestException extends Exception {
     }
@@ -443,7 +444,7 @@ public class TestCodegenProxyCreator extends TestCase {
 			"corba.dynamicrmiiiop.TestInterfaceProxy", 
 			baseClassName, interfaces, methods ) ;
 
-		proxyClass = pc.create( pd, loader, true, System.out ) ;
+		proxyClass = pc.create( pd, loader, DEBUG, System.out ) ;
 	    }
 
 	    try {

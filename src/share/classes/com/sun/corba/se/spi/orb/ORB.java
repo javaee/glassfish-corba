@@ -114,7 +114,7 @@ import com.sun.corba.se.impl.corba.TypeCodeImpl ;
 import com.sun.corba.se.impl.corba.TypeCodeFactory ;
 
 // XXX Should there be a SPI level constants ?
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 // XXX This goes away when we convert ORBD to ORT
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
@@ -176,7 +176,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean giopReadDebugFlag = false;
     public boolean invocationTimingDebugFlag = false ;
     public boolean interceptorDebugFlag = false ;
-
+    public boolean cdrCacheDebugFlag = false ;
+    public boolean cdrDebugFlag = false ;
+    public boolean streamFormatVersionDebugFlag = false ;
+    public boolean valueHandlerDebugFlag = false ;
+    
     private LogWrapperTable logWrapperTable ;
 
     private static LogWrapperTable staticLogWrapperTable = 
@@ -220,6 +224,16 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // must be global.  It is initialized here as well.
     private static final PresentationManager globalPM = 
 	PresentationDefaults.makeOrbPresentationManager() ;
+
+    public void destroy() {
+        logWrapperTable = null ;
+        wrapper = null ;
+        omgWrapper = null ;
+        typeCodeMap = null ;
+        primitiveTypeCodeConstants = null ;
+        byteBufferPool = null ;
+        wireObjectKeyTemplate = null ;
+    }
 
     /** Get the single instance of the PresentationManager
      */

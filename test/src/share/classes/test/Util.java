@@ -62,7 +62,7 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import sun.rmi.rmic.Main;
 import com.sun.corba.se.impl.util.JDKBridge;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import java.net.InetAddress;
 
 public class Util {
@@ -364,21 +364,43 @@ public class Util {
     	return result;
     }
 
-    private static String[] PROCESS_PROPERTIES =    {
-	"corba.test.orb.classpath",
+    // List of properties that must be inherited by any process
+    // the test framework starts by Runtime.exec.  Used both in
+    // the IBM tests (based on test.Test) and the CORBA test framework
+    // tests (based on corba.framework.CORBATest).
+    public static String[] PROCESS_PROPERTIES =    {
+        // RMI delegates
+        "javax.rmi.CORBA.UtilClass",
+        "javax.rmi.CORBA.StubClass",
+        "javax.rmi.CORBA.PortableRemoteObjectClass",
+
+        // Standard ORB impl classes
+        "org.omg.CORBA.ORBClass",
+        "org.omg.CORBA.ORBSingletonClass",
+
+        // Security related
+        "com.sun.corba.se.ORBBase",
         "java.security.policy",
+        "java.security.debug",
+        "java.security.manager",
+
+        // Test setup
+	"corba.test.orb.classpath",
         "http.server.port",
         "name.server.port",
         "java.rmi.server.codebase",
         "java.compiler",
         "java.rmi.server.codebase",
         "http.server.root.directory",
-        "org.omg.CORBA.ORBClass",
-        "org.omg.CORBA.ORBSingletonClass",
-        "LD_LIBRARY_PATH",
+        "com.sun.corba.se.JavaIDLHome",
+
+        // For testing tools
 	"emma.coverage.out.file",
 	"emma.coverage.out.merge",
 	"emma.rt.control",
+        "junit.report.dir",
+
+        // Test configuration properties
         ORBConstants.ORB_SERVER_ID_PROPERTY,
         ORBConstants.GIOP_VERSION,
         ORBConstants.GIOP_FRAGMENT_SIZE,
@@ -389,7 +411,9 @@ public class Util {
 	ORBConstants.ENABLE_JAVA_SERIALIZATION_PROPERTY,
 	ORBConstants.USE_CODEGEN_REFLECTIVE_COPYOBJECT,
 	ORBConstants.INIT_DEBUG_PROPERTY,
-	ORBConstants.DEBUG_DYNAMIC_STUB
+	ORBConstants.DEBUG_DYNAMIC_STUB,
+        ORBConstants.INITIAL_PORT_PROPERTY,
+        ORBConstants.ORBD_PORT_PROPERTY
     };
 
     public static void inheritProperties( Vector command )
@@ -552,7 +576,7 @@ public class Util {
 	    trace( "Util.rmicInternal called" ) ;
 	    trace( "\tgeneratorArg = " + generatorArg ) ;
 	    trace( "\tadditionalArgs = " + Test.display(additionalArgs)) ;
-	    trace( "/tclasses = " + Test.display(classes)) ;
+	    trace( "\tclasses = " + Test.display(classes)) ;
 
 	    if (classes != null && classes.length > 0) {
 		int commandCount = classes.length+2;

@@ -54,6 +54,10 @@ public class FileOutputDecorator implements Controller
         this.delegate = delegate;
     }
 
+    public long duration() {
+        return delegate.duration() ;
+    }
+
     /**
      * Setup everything necessary to execute the given class.
      *

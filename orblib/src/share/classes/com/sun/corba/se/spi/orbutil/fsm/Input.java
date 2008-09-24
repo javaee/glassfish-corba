@@ -47,6 +47,9 @@ package com.sun.corba.se.spi.orbutil.fsm;
  */
 public interface Input
 {
+    public class Base extends NameBase implements Input {
+	public Base( String name ) { super( name ) ; } 
+    }
 }
 
 // end of Input.java

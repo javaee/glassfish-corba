@@ -56,7 +56,6 @@ public class WStringValueHelperTest extends CORBATest
     // The actual test:
 
     public void checkWStringValueHelper() throws Exception {
-
         System.out.print(INDENT
                          + "  Checking WStringValueHelper from JDK...");
 
@@ -66,10 +65,12 @@ public class WStringValueHelperTest extends CORBATest
             tc = tc.content_type();
 
         if (!tc.kind().equals(TCKind.tk_value_box) ||
-            !tc.content_type().kind().equals(TCKind.tk_wstring))
-            throw new Exception("Bad TypeCode from WStringValueHelper: "
+            !tc.content_type().kind().equals(TCKind.tk_wstring)) {
+            Exception exc = new Exception("Bad TypeCode from WStringValueHelper: "
                                 + " kind: " 
                                 + tc.content_type().kind().value());
+            throw exc ;
+        }
 
         System.out.println("PASSED");
     }

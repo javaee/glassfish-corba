@@ -65,6 +65,8 @@ import com.sun.corba.se.impl.orbutil.copyobject.ClassCopier ;
 import com.sun.corba.se.impl.orbutil.copyobject.ClassCopierFactory ;
 import com.sun.corba.se.impl.orbutil.copyobject.PipelineClassCopierFactory ;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 // XXX Not good to be importing this, but seems to be necessary.
 import com.sun.corba.se.impl.util.Utility ;
 
@@ -124,20 +126,22 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 
     private static ClassCopierFactory specialClassCopierFactory = 
 	new ClassCopierFactory() {
-	    public ClassCopier getClassCopier( Class cls ) throws ReflectiveCopyException
+	    public ClassCopier getClassCopier( Class cls 
+	    ) throws ReflectiveCopyException
 	    {
+		ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
+		
 		// Handle Remote: this must come before CORBA.Object,
 		// since a corba Object may also be a Remote.
-		if (Remote.class.isAssignableFrom( cls ))
+		if (cinfo.isARemote(cls))
 		    return remoteClassCopier ;
 
 		// Handle org.omg.CORBA.portable.ObjectImpl
-		if (ObjectImpl.class.isAssignableFrom( cls ))
+		if (cinfo.isAObjectImpl(cls))
 		    return corbaClassCopier ;
 
 		// Need this case to handle TypeCode.
-		if (ORB.class.isAssignableFrom(cls) ||
-		    LogWrapperBase.class.isAssignableFrom(cls))
+		if (cinfo.isAORB(cls) || cinfo.isALogWrapperBase(cls))
 		    return DefaultClassCopiers.getIdentityClassCopier() ;
 
 		return null ;

@@ -49,82 +49,53 @@ import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import corba.framework.Controller;
 import corba.hcks.U;
 
+import org.testng.annotations.BeforeSuite ;
+import org.testng.annotations.Test ;
+
+import org.testng.Assert ;
+
 /**
  * @author Harold Carr
  */
-public class ClientWaitTimeout
-{
-    public static void main(String[] av)
-    {
-	try {
+public class ClientWaitTimeout extends ClientBase {
 
-	    Properties props = new Properties();
-	    Client.setProperties(props);
+    @BeforeSuite
+    public void clientSetup() throws Exception {
+	    Properties props = getDefaultProperties();
+            
 	    // Set retry timeout to 5 seconds.
 	    props.setProperty(ORBConstants.WAIT_FOR_RESPONSE_TIMEOUT, "5000");
 	    props.setProperty(ORBConstants.DEBUG_PROPERTY,
 			      "transport,subcontract");
 
-	    //
-	    // Setup
-	    //
-
-	    Client.setup(props);
-	    ClientCircular.setup();
-
-	    //
-	    // TEST
-	    //
-
-	    dprint("--------------------------------------------------");
-	    dprint("neverReturns - so should timeout in wait");
-	    dprint("--------------------------------------------------");
-
-	    try {
-		Client.testRfmWithAddressesWithLabel.neverReturns();
-		dprint("--------------------------------------------------");
-		dprint("!!! neverReturns FAILED.");
-		dprint("!!! Call incorrectly succeeded.");
-		dprint("--------------------------------------------------");
-		Client.numberOfFailures++;
-	    } catch (java.rmi.MarshalException e) {
-		SystemException cf = 
-		    ClientCircular.wrapper.communicationsTimeoutWaitingForResponse(
-		        CompletionStatus.COMPLETED_MAYBE, -1);
-		ClientCircular.checkMarshalException("neverReturns", e, cf);
-	    }
-
-	    // Check final results
-	    //
-
-	    if (Client.numberOfFailures > 0) {
-		throw new Exception("Failures: " 
-				    + new Integer(Client.numberOfFailures).toString());
-	    }
-
-	    dprint("--------------------------------------------------");
-	    dprint("ClientWaitTimeout SUCCESS");
-	    dprint("--------------------------------------------------");
-	    System.exit(Controller.SUCCESS);
-
-	} catch (Exception e) {
-	    e.printStackTrace(System.out);
-	    dprint("--------------------------------------------------");
-	    dprint("ClientWaitTimeout FAILURE");
-	    dprint("--------------------------------------------------");
-	    System.exit(1);
-	}
+	    setup(props);
+	    circularSetup();
     }
 
-    public static void dprint(String msg)
-    {
-	ORBUtility.dprint("ClientWaitTimeout", msg);
+    @Test
+    public void test() throws Exception {
+        dprint("--------------------------------------------------");
+        dprint("neverReturns - so should timeout in wait");
+        dprint("--------------------------------------------------");
+
+        try {
+            testRfmWithAddressesWithLabel.neverReturns();
+            Assert.fail( "should not return, but did return" ) ;
+        } catch (java.rmi.MarshalException e) {
+            SystemException cf = wrapper.communicationsTimeoutWaitingForResponse(
+                    CompletionStatus.COMPLETED_MAYBE, -1);
+            checkMarshalException("neverReturns", e, cf);
+        }
+    }
+
+    public static void main(String[] av) {
+        doMain( ClientWaitTimeout.class ) ;
     }
 }
 

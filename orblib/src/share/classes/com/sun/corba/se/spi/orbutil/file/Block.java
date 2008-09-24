@@ -218,6 +218,37 @@ public class Block {
 	return new Block( result ) ;
     }
 
+    private String expandTabs( String src ) {
+        int outCtr = 0 ;
+        StringBuilder result = new StringBuilder() ;
+        for (int ctr=0; ctr<src.length(); ctr++) {
+            char ch = src.charAt( ctr ) ;
+            if (ch == '\t') {
+                int nextTab = ((outCtr >> 3) + 1) << 3 ;
+                while (outCtr < nextTab) {
+                    result.append( ' ' ) ;
+                    outCtr++ ;
+                }
+            } else {
+                result.append( ch ) ;
+                outCtr++ ;
+            }
+        }
+
+        return result.toString() ;
+    }
+
+    /** Replace tabs with spaces, assuming tab stops are located as usual at n*8 + 1
+     */
+    public Block expandTabs() {
+	List<String> result = new ArrayList<String>() ;
+	for (String line : data) {
+            String exp = expandTabs( line ) ;
+	    result.add( exp ) ;
+	}
+	return new Block( result ) ;
+    }
+
     public Block substitute( List<Pair<String,String>> substitutions ) {
 	List<String> result = new ArrayList<String>() ;
 	for (String line : data) {

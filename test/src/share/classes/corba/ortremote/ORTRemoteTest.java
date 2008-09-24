@@ -38,7 +38,7 @@ package corba.ortremote;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orb.ORB;
 
 public class ORTRemoteTest extends CORBATest

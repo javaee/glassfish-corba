@@ -51,6 +51,6 @@
 	(BAD_PARAM 
 	    (BAD_OID_IN_IOR_TEMPLATE_LIST 1 WARNING "Profiles in IOR do not all have the same Object ID, so conversion to IORTemplateList is impossible")
 	    (INVALID_TAGGED_PROFILE 2 WARNING "Error in reading IIOP TaggedProfile")
-	    (BAD_IIOP_ADDRESS_PORT 3 WARNING "Attempt to create IIOPAdiress with port {0}, which is out of range"))
+	    (BAD_IIOP_ADDRESS_PORT 3 WARNING "Attempt to create IIOPAddress with port {0}, which is out of range"))
 	(INV_OBJREF
 	    (IOR_MUST_HAVE_IIOP_PROFILE 1 WARNING "IOR must have at least one IIOP profile"))))

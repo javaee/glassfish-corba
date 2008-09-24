@@ -39,7 +39,7 @@ package pi.clientinterceptor;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.interceptors.*;
 import org.omg.PortableInterceptor.*; 
 import corba.framework.*;
@@ -129,8 +129,12 @@ public class DIIRMILocalClient
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
-	// Test ClientInterceptor
-	testClientInterceptor();
+        try {
+            // Test ClientInterceptor
+            testClientInterceptor();
+        } finally {
+            finish() ;
+        }
     }
 
     /**
@@ -233,7 +237,8 @@ public class DIIRMILocalClient
      * Overridden from ClientCommon.  Resets the servant after each
      * invocation.
      */
-    protected void testInvocation( int mode,
+    protected void testInvocation( String name, 
+                                   int mode,
                                    String correctOrder,
                                    String methodName,
                                    boolean shouldInvokeTarget,
@@ -241,7 +246,7 @@ public class DIIRMILocalClient
                                    boolean forwardExpected )
         throws Exception
     {
-	super.testInvocation( mode, correctOrder, methodName,
+	super.testInvocation( name, mode, correctOrder, methodName,
 			      shouldInvokeTarget,
 			      exceptionExpected,
 			      forwardExpected );

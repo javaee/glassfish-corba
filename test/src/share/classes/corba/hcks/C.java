@@ -51,7 +51,7 @@ import org.omg.CORBA.portable.UnknownException;
 import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.CurrentHelper;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.util.Hashtable;
 import java.util.Properties;

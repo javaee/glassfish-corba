@@ -43,8 +43,8 @@ public class TestRFM extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-	// Controller orbd = createORBD() ;
-	// orbd.start() ;
+        // Controller orbd = createORBD() ;
+        // orbd.start() ;
 
         Controller client = createClient("corba.rfm.TestClient");
 
@@ -56,7 +56,7 @@ public class TestRFM extends CORBATest
 
         // Make sure all the processes are shut down.
         client.stop();
-	// orbd.stop() ;
+        // orbd.stop() ;
     }
 }
 

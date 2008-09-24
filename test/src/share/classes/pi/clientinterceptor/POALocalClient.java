@@ -39,7 +39,7 @@ package pi.clientinterceptor;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import corba.framework.*;
@@ -128,12 +128,15 @@ public class POALocalClient
 	             PrintStream err, Hashtable extra) 
         throws Exception
     {
+        try {
+            // Test ClientInterceptor
+            testClientInterceptor();
 
-	// Test ClientInterceptor
-	testClientInterceptor();
-
-	// Test POA Special operations
-	testSpecialOperations();
+            // Test POA Special operations
+            testSpecialOperations();
+        } finally { 
+            finish() ;
+        }
     }
 
     /**

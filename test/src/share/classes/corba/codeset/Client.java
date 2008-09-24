@@ -40,7 +40,7 @@ import CodeSetTester.VerifierPackage.*;
 import org.omg.CosNaming.*;
 import org.omg.CORBA.*;
 import java.util.Properties;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 
 public class Client

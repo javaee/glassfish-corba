@@ -39,7 +39,7 @@ package pi.clientinterceptor;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.interceptors.*;
 import org.omg.PortableInterceptor.*; 
 import corba.framework.*;
@@ -48,6 +48,8 @@ import java.util.*;
 import java.io.*;
 
 import ClientRequestInterceptor.*;
+
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /**
  * Common methods for Client implementations in this test to use
@@ -62,7 +64,9 @@ abstract public class ClientCommon
     
     // Set from run()
     protected PrintStream err;
-    
+   
+    private JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
+
     /**
      * Creates a com.sun.corba.se.spi.orb.ORB and notifies the TestInitializer of its presence
      */
@@ -78,6 +82,10 @@ abstract public class ClientCommon
 	TestInitializer.orb = this.orb;
     }
 
+    protected void finish() {
+        helper.done() ;
+    }
+
     /**
      * Perform common ClientRequestInterceptor tests
      */
@@ -89,7 +97,7 @@ abstract public class ClientCommon
         // No exceptions thrown.  Should call send_request, sayHello, and
         // then receive_reply on all 3 interceptors in the correct order
         out.println( "- Testing standard invocation..." );
-        testInvocation(
+        testInvocation( "standardInvocation",
             SampleClientRequestInterceptor.MODE_NORMAL,
             "sr1sr2sr3rr3rr2rr1", "sayHello", true, false, false );
 
@@ -97,7 +105,7 @@ abstract public class ClientCommon
         // saySystemException, and then receive_exception on all 3 
         // interceptors in the correct order.
         out.println( "- Testing invocation resulting in SYSTEM_EXCEPTION..." );
-        testInvocation(
+        testInvocation( "systemExceptionResult",
             SampleClientRequestInterceptor.MODE_NORMAL,
             "sr1sr2sr3re3re2re1", "sayException", true, true, false );
         
@@ -106,7 +114,7 @@ abstract public class ClientCommon
         // on all 3 interceptors in the correct order.
         out.println( 
             "- Testing oneway invocation resulting in receive_other..." );
-        testInvocation(
+        testInvocation( "receiveOtherResult",
             SampleClientRequestInterceptor.MODE_NORMAL,
             "sr1sr2sr3ro3ro2ro1", "sayOneway", true, false, false );
         
@@ -117,7 +125,7 @@ abstract public class ClientCommon
         out.println(
             "- Testing standard invocation where interceptor #2 " +
             "throws exception." );
-        testInvocation(
+        testInvocation( "interceptor2SystemException",
             SampleClientRequestInterceptor.MODE_SYSTEM_EXCEPTION,
             "sr1sr2re1", "sayHello", false, true, false );
         
@@ -128,7 +136,7 @@ abstract public class ClientCommon
         out.println(
             "- Testing standard invocation where interceptor #2 " +
             "throws system exception in receive_reply." );
-        testInvocation(
+        testInvocation( "interceptor2SystemExceptionReceiveReply",
             SampleClientRequestInterceptor.MODE_RECEIVE_REPLY_EXCEPTION,
             "sr1sr2sr3rr3rr2re1", "sayHello", true, true, false );
         
@@ -139,7 +147,7 @@ abstract public class ClientCommon
         out.println(
             "- Testing oneway invocation where interceptor #2 " +
             "throws SYSTEM_EXCEPTION in receive_other." );
-        testInvocation(
+        testInvocation( "interceptor2SystemExceptionReceiveOther",
             SampleClientRequestInterceptor.MODE_RECEIVE_OTHER_EXCEPTION,
             "sr1sr2sr3ro3ro2re1", "sayOneway", true, true, false );
 
@@ -150,7 +158,7 @@ abstract public class ClientCommon
         out.println(
             "- Testing standard invocation where interceptor #2 " +
             "throws ForwardRequest." );
-        testInvocation(
+        testInvocation( "interceptor2ForwardRequest",
             SampleClientRequestInterceptor.MODE_FORWARD_REQUEST,
             "sr1sr2ro1sr1sr2sr3rr3rr2rr1", "sayHello", true, false, true );
         
@@ -161,7 +169,7 @@ abstract public class ClientCommon
         out.println(
             "- Testing standard invocation where interceptor #2 " +
             "throws ForwardRequest in receive_exception." );
-        testInvocation(
+        testInvocation( "intercepto2ForwardRequestReceiveException",
             SampleClientRequestInterceptor.MODE_RECEIVE_EXCEPTION_FORWARD,
             "sr1sr2sr3re3re2ro1sr1sr2sr3re3re2re1", "sayException", 
             true, true, true );
@@ -197,19 +205,19 @@ abstract public class ClientCommon
 	// actually invoked.
 
         out.println( "+ Testing _is_a..." );
-        testInvocation(
+        testInvocation( "isATest",
             SampleClientRequestInterceptor.MODE_NORMAL,
             "sr1sr2sr3rr3rr2rr1", "_is_a", false, false, false );
 
 	// Expected exception return value since we do not implement this
 	// method.
         out.println( "+ Testing _get_interface_def..." );
-        testInvocation(
+        testInvocation( "getInterfaceDefTest",
             SampleClientRequestInterceptor.MODE_NORMAL,
             "sr1sr2sr3re3re2re1", "_get_interface_def", false, false, false );
 
         out.println( "+ Testing _non_existent..." );
-        testInvocation(
+        testInvocation( "nonExistentTest",
             SampleClientRequestInterceptor.MODE_NORMAL,
             "sr1sr2sr3rr3rr2rr1", "_non_existent", false, false, false );
     }
@@ -257,7 +265,7 @@ abstract public class ClientCommon
      *     should result in a forward to another object and that that object
      *     should be invoked.
      */
-    protected void testInvocation( int mode, 
+    protected void testInvocation( String testName, int mode, 
                                    String correctOrder,
                                    String methodName,
                                    boolean shouldInvokeTarget,
@@ -265,76 +273,84 @@ abstract public class ClientCommon
                                    boolean forwardExpected ) 
         throws Exception 
     {
-        // Tell interceptor to behave while clearing invocation flag:
-        SampleClientRequestInterceptor.testMode = 
-            SampleClientRequestInterceptor.MODE_NORMAL;
+        helper.start( testName ) ;
 
-	resolveReferences();
-
-	// Clear invocation flags in helloRef and helloRefForward:
-	clearInvoked();
-        SampleClientRequestInterceptor.testMode = mode;
-        
-        // Clear invocation order.  It is critical that this is done after
-        // clearInvoked is called so that we do not record the interceptors
-        // called during the clearInvoked() invocation itself.
-        SampleClientRequestInterceptor.invocationOrder = "";
-        
         try {
-	    // Invoke the method.
-	    invokeMethod( methodName );
-        }
-        catch( UNKNOWN e ) {
-            // Check to make sure we expected this exception.
-            if( !exceptionExpected ) {
-                throw e;
+            // Tell interceptor to behave while clearing invocation flag:
+            SampleClientRequestInterceptor.testMode = 
+                SampleClientRequestInterceptor.MODE_NORMAL;
+
+            resolveReferences();
+
+            // Clear invocation flags in helloRef and helloRefForward:
+            clearInvoked();
+            SampleClientRequestInterceptor.testMode = mode;
+            
+            // Clear invocation order.  It is critical that this is done after
+            // clearInvoked is called so that we do not record the interceptors
+            // called during the clearInvoked() invocation itself.
+            SampleClientRequestInterceptor.invocationOrder = "";
+            
+            try {
+                // Invoke the method.
+                invokeMethod( methodName );
+            } catch( UNKNOWN e ) {
+                // Check to make sure we expected this exception.
+                if( !exceptionExpected ) {
+                    throw e;
+                }
             }
-        }
-        
-        // Tell interceptor to behave while analyzing results:
-        SampleClientRequestInterceptor.testMode = 
-            SampleClientRequestInterceptor.MODE_NORMAL;
-        
-        // Examine invocation order to ensure everything was called in the
-        // right order.
-        //
-        // NOTE: This is merely a convenient way to check ordering.
-        // Since the specification does not require that the order in which
-        // interceptors are registered match the order in which they are
-        // invoked, the actual invocationOrder may be different but still
-        // valid.  This test may need modification if we change the way
-        // we determine the initial invocation order of interceptors.
-        String order = SampleClientRequestInterceptor.invocationOrder;
-        checkOrder( correctOrder, order );
-        
-        // Determine if the method was invoked when it was supposed to be
-        // or not invoked when it was not supposed to be.
+            
+            // Tell interceptor to behave while analyzing results:
+            SampleClientRequestInterceptor.testMode = 
+                SampleClientRequestInterceptor.MODE_NORMAL;
+            
+            // Examine invocation order to ensure everything was called in the
+            // right order.
+            //
+            // NOTE: This is merely a convenient way to check ordering.
+            // Since the specification does not require that the order in which
+            // interceptors are registered match the order in which they are
+            // invoked, the actual invocationOrder may be different but still
+            // valid.  This test may need modification if we change the way
+            // we determine the initial invocation order of interceptors.
+            String order = SampleClientRequestInterceptor.invocationOrder;
+            checkOrder( correctOrder, order );
+            
+            // Determine if the method was invoked when it was supposed to be
+            // or not invoked when it was not supposed to be.
 
-	// But first, if this was a oneway call, leave sufficient time for
-	// the call to get there. 
-        if( methodName.equals( "sayOneway" ) ) {
-	    try {
-		// 2 seconds *should* almost always be enough.
-		Thread.sleep( 2000 );
-	    }
-	    catch( InterruptedException e ) {
-	    }
-	}
+            // But first, if this was a oneway call, leave sufficient time for
+            // the call to get there. 
+            if( methodName.equals( "sayOneway" ) ) {
+                try {
+                    // 2 seconds *should* almost always be enough.
+                    Thread.sleep( 2000 );
+                }
+                catch( InterruptedException e ) {
+                }
+            }
 
-        boolean didInvoke = wasInvoked();
-        boolean didForward = didForward();
-        
-        out.println( "    + Should inovke method: " + shouldInvokeTarget );
-        out.println( "    + Did invoke method: " + didInvoke );
-        if( didInvoke != shouldInvokeTarget ) {
-            throw new RuntimeException( "Method should " + 
-                (!shouldInvokeTarget ? "not" : "") + " have been invoked!" );
-        }
-        out.println( "    + Should forward and invoke: " + forwardExpected );
-        out.println( "    + Did forward and invoke: " + didForward );
-        if( didForward != forwardExpected ) {
-            throw new RuntimeException( "Method should " +
-                (!forwardExpected ? "not" : "") + " have forwarded!" );
+            boolean didInvoke = wasInvoked();
+            boolean didForward = didForward();
+            
+            out.println( "    + Should inovke method: " + shouldInvokeTarget );
+            out.println( "    + Did invoke method: " + didInvoke );
+            if( didInvoke != shouldInvokeTarget ) {
+                throw new RuntimeException( "Method should " + 
+                    (!shouldInvokeTarget ? "not" : "") + " have been invoked!" );
+            }
+            out.println( "    + Should forward and invoke: " + forwardExpected );
+            out.println( "    + Did forward and invoke: " + didForward );
+            if( didForward != forwardExpected ) {
+                throw new RuntimeException( "Method should " +
+                    (!forwardExpected ? "not" : "") + " have forwarded!" );
+            }
+
+            helper.pass() ;
+        } catch (Exception exc) {
+            helper.fail( exc ) ;
+            throw exc ;
         }
     }
 

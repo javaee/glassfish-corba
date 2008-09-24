@@ -43,7 +43,7 @@ import java.util.ArrayList ;
  * keys in the range 0..max such that "most" of the key space is actually
  * used.
  */
-public class DenseIntMapImpl<E> 
+public class DenseIntMapImpl<E> implements IntMap<E>
 {
     private ArrayList<E> list = new ArrayList<E>() ;
 

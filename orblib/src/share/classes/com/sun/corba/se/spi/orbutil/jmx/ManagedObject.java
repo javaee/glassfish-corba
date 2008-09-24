@@ -41,9 +41,9 @@ import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
-/** This annotation defines a Managed Object.   An interface or class annotated as @ManagedObject
- * has a corresponding open MBean constructed according to the @ManagedAttribute and
- * @ManagedOperation annotations on its methods.
+/** This annotation defines a Managed Object.   An interface or class annotated as ManagedObject
+ * has a corresponding open MBean constructed according to the ManagedAttribute and
+ * ManagedOperation annotations on its methods.
  */
 @Documented 
 @Target(ElementType.TYPE) 
@@ -55,7 +55,8 @@ public @interface ManagedObject {
     String description() default "" ;
 
     /** The type value stored in the ObjectName for an open MBean corresponding
-     * to the annotated class.  Defaults to the class name.
+     * to the annotated class.  Defaults to the class name.  This is used in
+     * creating ObjectNames for mbeans with this annotation.
      */
     String type() default "" ;
 

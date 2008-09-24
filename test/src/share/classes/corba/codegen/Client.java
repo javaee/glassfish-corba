@@ -48,6 +48,7 @@ import java.util.Iterator ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Arrays ;
+import java.util.ArrayList ;
 import java.util.Properties ;
 
 import java.lang.reflect.Method ;
@@ -127,7 +128,7 @@ import static corba.codegen.ControlBase.moa ;
  * </UL>
  */
 public class Client extends TestCase {
-    private static final boolean DEBUG = true ;
+    private static final boolean DEBUG = false ;
 
     // Make sure that ControlBase is loaded in the ClassLoader
     // that loaded Client, otherwise it could first be
@@ -152,14 +153,16 @@ public class Client extends TestCase {
 	JavaCodeGenerator gen = new JavaCodeGenerator( 
 	    ClassGeneratorFactoryRegistry.get( "_DImpl_Tie" )) ;
 	Class<?> cls = gen.generate( makeClassLoader() ) ;
-	gen.reportTimes() ;
+        if (DEBUG)
+            gen.reportTimes() ;
 	assertNotNull( cls ) ;
     }
 
     private ClassInfo getClassInfo( SimpleCodeGenerator cg ) {
 	ClassLoader cl = makeClassLoader() ;
 	Class<?> cls = cg.generate( cl ) ;
-	cg.reportTimes() ;
+        if (DEBUG)
+            cg.reportTimes() ;
 	assertNotNull( cls ) ;
 	Type type = Type.type( cls ) ;
 	return type.classInfo() ;
@@ -183,7 +186,8 @@ public class Client extends TestCase {
 	JavaCodeGenerator gen = new JavaCodeGenerator( 
 	    ClassGeneratorFactoryRegistry.get( "MyRemote__Adapter" ) ) ;
 	Class<?> cls = gen.generate( makeClassLoader() ) ;
-	gen.reportTimes() ;
+        if (DEBUG)
+            gen.reportTimes() ;
 	assertNotNull( cls ) ;
     }
 
@@ -233,19 +237,33 @@ public class Client extends TestCase {
 	private static final Attribute<Integer> bar = 
 	    new Attribute<Integer>( Integer.class, "bar", 1 ) ;
 
-	private static final NullaryFunction<List<String>> rgbl =
-	    new NullaryFunction<List<String>>() {
-		public List<String> evaluate() {
-		    return Arrays.asList( 
-			"red", "blue", "green" ) ;
+	private interface StringList extends List<String> { } 
+
+	private static class StringArrayList extends ArrayList<String> 
+	    implements StringList {
+
+	    public StringArrayList() {
+		super() ;
+	    }
+
+	    public StringArrayList( List<String> list ) {
+		super( list ) ;
+	    }
+	}
+
+	private static final NullaryFunction<StringList> rgbl =
+	    new NullaryFunction<StringList>() {
+		public StringList evaluate() {
+		    return new StringArrayList( Arrays.asList( 
+			"red", "blue", "green" ) ) ;
 		} 
 	    };
 
 	private static final Attribute<Integer> notUsed = 
 	    new Attribute<Integer>( Integer.class, "notUsed", 0 ) ;
 
-	private static final Attribute<List<String>> baz = 
-	    new Attribute<List<String>>( List.class, "baz", rgbl ) ;
+	private static final Attribute<StringList> baz = 
+	    new Attribute<StringList>( StringList.class, "baz", rgbl ) ;
 
 	// Create a single node, set/get the attributes
 	public void testSimpleNode() {
@@ -260,8 +278,8 @@ public class Client extends TestCase {
 	    bar.set(node, 42) ;
 	    assertEquals( bar.get(node), new Integer(42) ) ;
 
-	    List<String> tval = Arrays.asList( 
-		"yellow", "orange" ) ;
+	    StringList tval = new StringArrayList( Arrays.asList( 
+		"yellow", "orange" ) ) ;
 	    baz.set(node, tval) ;
 	    assertEquals( baz.get(node), tval ) ;
 
@@ -287,8 +305,8 @@ public class Client extends TestCase {
 	    // Copy node1 and then set some more attributes
 	    NodeBase node2 = DefaultCopier.copy( node1, NodeBase.class ) ;
 	    bar.set(node2, 13) ;
-	    List<String> tval = Arrays.asList( 
-		"yellow", "orange" ) ;
+	    StringList tval = new StringArrayList( Arrays.asList( 
+		"yellow", "orange" ) ) ;
 	    baz.set(node2, tval) ;
 
 	    // make sure that we get the correct value for bar
@@ -321,7 +339,8 @@ public class Client extends TestCase {
 	JavaCodeGenerator gen = new JavaCodeGenerator( 
 	    ClassGeneratorFactoryRegistry.get( "_DImpl_Tie" ) ) ;
 	Class<?> cls = gen.generate( cl ) ;
-	gen.reportTimes() ;
+        if (DEBUG)
+            gen.reportTimes() ;
 	assertNotNull( cls ) ;
 
 	ClassInfo cinfo = _classGenerator() ;
@@ -972,11 +991,11 @@ public class Client extends TestCase {
     // Test code generation by generating byte code directly.  
     public static class EJBAdapterBytecodeTestSuite extends EJBAdapterTestSuiteBase {
 	public EJBAdapterBytecodeTestSuite( String name ) {
-	    super( "MyRemote__Adapter", name, true, true ) ;
+	    super( "MyRemote__Adapter", name, true, DEBUG ) ;
 	}
 
 	public EJBAdapterBytecodeTestSuite( ) {
-	    super( "MyRemote__Adapter", true, true ) ;
+	    super( "MyRemote__Adapter", true, DEBUG ) ;
 	}
     }
 
@@ -996,11 +1015,11 @@ public class Client extends TestCase {
     // Test code generation by generating byte code directly.  
     public static class EJBAdapterSimplifiedBytecodeTestSuite extends EJBAdapterTestSuiteBase {
 	public EJBAdapterSimplifiedBytecodeTestSuite( String name ) {
-	    super( "MyRemote__Adapter_Simplified", name, true, true ) ;
+	    super( "MyRemote__Adapter_Simplified", name, true, DEBUG ) ;
 	}
 
 	public EJBAdapterSimplifiedBytecodeTestSuite( ) {
-	    super( "MyRemote__Adapter_Simplified", true, true ) ;
+	    super( "MyRemote__Adapter_Simplified", true, DEBUG ) ;
 	}
     }
 
@@ -1008,8 +1027,13 @@ public class Client extends TestCase {
     {
 	TestSuite main = TestCaseTools.makeTestSuite( Client.class, 
 	    TestCaseTools.TestSuiteType.SINGLE ) ;
-	TestSuite typesuite = TestCaseTools.makeTestSuite( TypeTestSuite.class ) ;
-	main.addTest( typesuite ) ;
+
+	TestSuite suite = TestCaseTools.makeTestSuite( TypeTestSuite.class ) ;
+	main.addTest( suite ) ;
+
+	suite = TestCaseTools.makeTestSuite( ClassInfoBaseTestSuite.class ) ;
+	main.addTest( suite ) ;
+
 	return main ;
     }
 

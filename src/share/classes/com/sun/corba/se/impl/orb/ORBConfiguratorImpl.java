@@ -115,7 +115,7 @@ import com.sun.corba.se.impl.legacy.connection.SocketFactoryContactInfoListImpl;
 import com.sun.corba.se.impl.legacy.connection.USLPort;
 
 // XXX These should move to SPI
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 // XXX This needs an SPI
 import com.sun.corba.se.impl.dynamicany.DynAnyFactoryImpl ;

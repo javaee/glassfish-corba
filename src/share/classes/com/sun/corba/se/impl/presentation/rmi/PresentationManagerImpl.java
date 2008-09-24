@@ -78,6 +78,8 @@ import com.sun.corba.se.impl.orbutil.graph.Node ;
 import com.sun.corba.se.impl.orbutil.graph.Graph ;
 import com.sun.corba.se.impl.orbutil.graph.GraphImpl ;
 
+import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
 public final class PresentationManagerImpl implements PresentationManager
 {
     private Map classToClassData ;
@@ -249,7 +251,7 @@ public final class PresentationManagerImpl implements PresentationManager
     {
 	Set rootSet = null ;
 
-	if (target.isInterface()) {
+	if (ClassInfoCache.get(target).isInterface()) {
 	    gr.add( root ) ;
 	    rootSet = gr.getRoots() ; // rootSet just contains root here
 	} else {
@@ -349,7 +351,9 @@ public final class PresentationManagerImpl implements PresentationManager
 	    Class[] interfaces = interf.getInterfaces() ;
 	    for (int ctr=0; ctr<interfaces.length; ctr++) {
 		Class cls = interfaces[ctr] ;
-		if (Remote.class.isAssignableFrom(cls) &&
+		ClassInfoCache.ClassInfo cinfo = 
+		    ClassInfoCache.get( cls ) ;
+		if (cinfo.isARemote(cls) &&
 		    !Remote.class.equals(cls))
 		    result.add( new NodeImpl( cls ) ) ;
 	    }

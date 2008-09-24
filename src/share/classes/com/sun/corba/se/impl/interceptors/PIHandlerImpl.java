@@ -81,14 +81,13 @@ import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.protocol.PIHandler;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 
 import com.sun.corba.se.impl.logging.InterceptorsSystemException;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.OMGSystemException;
 import com.sun.corba.se.impl.corba.RequestImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 
@@ -188,7 +187,21 @@ public class PIHandlerImpl implements PIHandler
 		return new RequestInfoStack<ServerRequestInfoImpl>();
 	    }
 	};
-     
+    
+    public void close() {
+        orb = null ;
+        wrapper = null ;
+        orbutilWrapper = null ;
+        omgWrapper = null ;
+        codecFactory = null ;
+        arguments = null ;
+        interceptorList = null ;
+        interceptorInvoker = null ;
+        current = null ;
+        policyFactoryTable = null ;
+        threadLocalClientRequestInfoStack = null ;
+        threadLocalServerRequestInfoStack = null ;
+    }
     // Class to contain all ThreadLocal data for ClientRequestInfo
     // maintenance.
     //

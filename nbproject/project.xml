@@ -39,7 +39,7 @@
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
             <!--Do not use Project Properties customizer when editing this file manually.-->
-            <name>Java CORBA Development for GFv3 workspace re-structure</name>
+            <name>Java CORBA Performance Work</name>
             <properties>
                 <property name="ant.script">make/build.xml</property>
             </properties>
@@ -79,6 +79,16 @@
                     <type>java</type>
                     <location>test/src/share/classes/values2</location>
                 </source-folder>
+                <source-folder>
+                    <label>experimental/src/share/classes</label>
+                    <type>java</type>
+                    <location>experimental/src/share/classes</location>
+                </source-folder>
+                <source-folder>
+                    <label>experimental/test/src/share/classes</label>
+                    <type>java</type>
+                    <location>experimental/test/src/share/classes</location>
+                </source-folder>
             </folders>
             <ide-actions>
                 <action name="build">
@@ -117,39 +127,65 @@
             </export>
             <export>
                 <type>folder</type>
+                <location>orblib/build/classes</location>
+                <script>${ant.script}</script>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
                 <location>test/build/classes</location>
+                <script>${ant.script}</script>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>experimental/build/classes</location>
+                <script>${ant.script}</script>
+                <build-target>build</build-target>
+            </export>
+            <export>
+                <type>folder</type>
+                <location>experimental/test/build/classes</location>
                 <script>${ant.script}</script>
                 <build-target>build</build-target>
             </export>
             <view>
                 <items>
                     <source-folder style="packages">
-                        <label>Main ORB source</label>
+                        <label>src/share/classes</label>
                         <location>src/share/classes</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>ORB library source</label>
+                        <label>orblib/src/share/classes</label>
                         <location>orblib/src/share/classes</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>Main ORB test source</label>
+                        <label>test/src/share/classes</label>
                         <location>test/src/share/classes</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>Generated source</label>
+                        <label>build/gensrc</label>
                         <location>build/gensrc</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>Old test12 source</label>
+                        <label>test/src/share/classes/test12</label>
                         <location>test/src/share/classes/test12</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>Test values1 source</label>
+                        <label>test/src/share/classes/values1</label>
                         <location>test/src/share/classes/values1</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>Test values2 source</label>
+                        <label>test/src/share/classes/values2</label>
                         <location>test/src/share/classes/values2</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>experimental/src/share/classes</label>
+                        <location>experimental/src/share/classes</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>experimental/test/src/share/classes</label>
+                        <location>experimental/test/src/share/classes</location>
                     </source-folder>
                     <source-file>
                         <location>${ant.script}</location>
@@ -230,6 +266,8 @@
                 <built-to>test/build/classes</built-to>
                 <built-to>orblib/build/classes</built-to>
                 <built-to>test/build/classes</built-to>
+                <built-to>experimental/build/classes</built-to>
+                <built-to>experimental/test/build/classes</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
             <compilation-unit>
@@ -262,6 +300,15 @@
             </compilation-unit>
             <compilation-unit>
                 <package-root>test/src/share/classes/values2</package-root>
+                <unit-tests/>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>experimental/src/share/classes</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>experimental/test/src/share/classes</package-root>
                 <unit-tests/>
                 <source-level>1.5</source-level>
             </compilation-unit>

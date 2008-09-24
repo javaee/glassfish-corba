@@ -65,11 +65,11 @@ public interface ContactInfo
 
     /**
      * The parent
-     * {@link com.sun.corba.se.pept.broker.ContactInfoList ContactInfoList}
+     * {@link com.sun.corba.se.pept.transport.ContactInfoList ContactInfoList}
      * for this <code>ContactInfo</code>.
      *
      * @return
-     * {@link com.sun.corba.se.pept.broker.ContactInfoList ContactInfoList}
+     * {@link com.sun.corba.se.pept.transport.ContactInfoList ContactInfoList}
      */
     public ContactInfoList getContactInfoList();
 
@@ -126,7 +126,7 @@ public interface ContactInfo
 
     /**
      * Set the
-     * {@link com.sun.corba.se.pept.transport.Outbound.ConnectionCache OutboundConnectionCache}
+     * {@link com.sun.corba.se.pept.transport.OutboundConnectionCache OutboundConnectionCache}
      * to be used by this <code>ContactInfo</code>.
      *
      * PEPt uses separate caches for each type of <code>ContactInfo</code>
@@ -134,13 +134,13 @@ public interface ContactInfo
      * {@link #setConnectionCache} and {@link #getConnectionCache} support
      * an optimzation to avoid hashing to find that cache.
      *
-     * @param connectionCache.
+     * @param connectionCache OutboundConnectionCache to bind to this ContactInfo.
      */
     public void setConnectionCache(OutboundConnectionCache connectionCache);
 
     /**
      * Get the
-     * {@link com.sun.corba.se.pept.transport.Outbound.ConnectionCache OutboundConnectionCache}
+     * {@link com.sun.corba.se.pept.transport.OutboundConnectionCache OutboundConnectionCache}
      * used by this <code>ContactInfo</code>
      *
      * PEPt uses separate caches for each type of <code>ContactInfo</code>
@@ -166,7 +166,7 @@ public interface ContactInfo
 
     /**
      * Used to get a
-     * {@link com.sun.corba.se.pept.protocol.MessageMeidator MessageMediator}
+     * {@link com.sun.corba.se.pept.protocol.MessageMediator MessageMediator}
      * to hold internal data for a message to be sent using the specific
      * encoding, protocol, transport combination represented by this
      * <code>ContactInfo</code>.
@@ -180,13 +180,13 @@ public interface ContactInfo
 
     /**
      * Used to get a
-     * {@link com.sun.corba.se.pept.protocol.MessageMeidator MessageMediator}
+     * {@link com.sun.corba.se.pept.protocol.MessageMediator MessageMediator}
      * to hold internal data for a message received using the specific
      * encoding, protocol, transport combination represented by this
      * <code>ContactInfo</code>.
      *
      * @return 
-     * {@link com.sun.corba.se.pept.protocol.MessageMeidator MessageMediator}
+     * {@link com.sun.corba.se.pept.protocol.MessageMediator MessageMediator}
      */
     public MessageMediator createMessageMediator(Broker broker,
 						 Connection connection);

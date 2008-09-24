@@ -46,7 +46,7 @@ import java.util.Properties ;
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import corba.hcks.U;
 

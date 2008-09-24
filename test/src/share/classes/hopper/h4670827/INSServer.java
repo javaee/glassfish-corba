@@ -43,7 +43,7 @@ import org.omg.CORBA.*;
 import java.util.Properties;
 import java.util.Hashtable;
 import corba.framework.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class INSServer implements InternalProcess
 {

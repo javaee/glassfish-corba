@@ -54,21 +54,21 @@ public class PurgecallsTest
 	throws
 	    Throwable
     {
-	Controller orbd   = createORBD();
-	orbd.start();
+        Controller orbd   = createORBD();
+        orbd.start();
 
-	Controller server =
-	    createServer(thisPackage + "." + "Server", "Server");
-	Controller client = 
-	    createClient(thisPackage + "." + "Client", "Client");
+        Controller server =
+            createServer(thisPackage + "." + "Server", "Server");
+        Controller client = 
+            createClient(thisPackage + "." + "Client", "Client");
 
-	server.start();
-	client.start();
-	// When this test fails - it hangs, so do not wait forever.
-	client.waitFor(60000);
-	client.stop();
-	server.stop();
-	orbd.stop();
+        server.start();
+        client.start();
+        // When this test fails - it hangs, so do not wait forever.
+        client.waitFor(60000);
+        client.stop();
+        server.stop();
+        orbd.stop();
     }
 
 }

@@ -60,6 +60,10 @@ public final class RepIdDelegator_1_3_1
         return RepositoryId_1_3_1.createForAnyType(type);
     }
 
+    public String createForAnyType(Class type, ClassInfoCache.ClassInfo cinfo ) {
+        return RepositoryId_1_3_1.createForAnyType(type);
+    }
+
     public String createForJavaType(Serializable ser)
         throws TypeMismatchException
     {
@@ -67,6 +71,12 @@ public final class RepIdDelegator_1_3_1
     }
                
     public String createForJavaType(Class clz)
+        throws TypeMismatchException
+    {
+        return RepositoryId_1_3_1.createForJavaType(clz);
+    }
+
+    public String createForJavaType(Class clz, ClassInfoCache.ClassInfo cinfo )
         throws TypeMismatchException
     {
         return RepositoryId_1_3_1.createForJavaType(clz);

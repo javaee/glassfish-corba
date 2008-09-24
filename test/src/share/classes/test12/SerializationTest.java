@@ -49,12 +49,14 @@ import javax.rmi.CORBA.*;
 
 import java.io.*;
 import java.util.Properties ;
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
-public class SerializationTest extends test.Test
-{
-    public void run()
-    {
+public class SerializationTest extends test.Test {
+    public void run() {
+        JUnitReportHelper helper = new JUnitReportHelper( SerializationTest.class.getName() ) ;
+
         try {        
+            helper.start( "test1" ) ;
 	    Properties props = new Properties() ;
 	    props.put( "org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl" ) ;
             org.omg.CORBA.ORB orb = 
@@ -77,12 +79,13 @@ public class SerializationTest extends test.Test
 	    if (!rect.equals(_rect))
 		throw new Error("ARectangle test failed!");
 
+            helper.pass() ;
+        } catch(Throwable e) {
+            helper.fail( e ) ;
+            status = new Error(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            helper.done() ;
         }
-        catch(Throwable e)
-	    {
-		status = new Error(e.getMessage());
-		e.printStackTrace();
-	    }
     }
-
 }

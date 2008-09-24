@@ -71,6 +71,7 @@ public class ServiceExampleTest
 
 	Controller client = createClient(thisPackage + ".Client",
 					 "client");
+
 	client.start();
 	client.waitFor();
 	client.stop();

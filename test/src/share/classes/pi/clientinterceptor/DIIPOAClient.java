@@ -39,7 +39,7 @@ package pi.clientinterceptor;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.interceptors.*;
 import org.omg.PortableInterceptor.*; 
 import corba.framework.*;
@@ -88,11 +88,15 @@ public class DIIPOAClient
         out.println( "+ Creating ORB..." );
 	createORB( args );
 
-	// Test ClientInterceptor
-	testClientInterceptor();
+        try {
+            // Test ClientInterceptor
+            testClientInterceptor();
 
-	// Test POA Special operations
-	testSpecialOperations();
+            // Test POA Special operations
+            testSpecialOperations();
+        } finally {
+            finish() ;
+        }
     }
 
     /**

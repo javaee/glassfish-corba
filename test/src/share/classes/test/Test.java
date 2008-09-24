@@ -65,7 +65,7 @@ import sun.tools.java.ClassPath;
 import sun.tools.java.ClassFile;
 import java.net.ServerSocket;
 import java.util.Properties;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orb.ORB ;
 
 /**
@@ -604,9 +604,7 @@ public abstract class Test implements java.lang.Runnable
         InputStreamReader refStream = null;
 
         try {
-
             // First, get our resource streams and make sure they are valid...
-
             inStream = getResource(className,sourceExtension);
             refStream = getResource(className,targetExtension);
 
@@ -618,13 +616,10 @@ public abstract class Test implements java.lang.Runnable
                 throw new Error("Could not load " + className + targetExtension + " resource.");
             }
 
-            // Now create our tokenizers...
-
             StreamTokenizer in = new StreamTokenizer(inStream);
             StreamTokenizer ref = new StreamTokenizer(refStream);
 
             // Turn off 'number' parsing...
-
             in.ordinaryChars('0','9');
             in.wordChars('0','9');
             in.ordinaryChars('-','-');
@@ -639,39 +634,17 @@ public abstract class Test implements java.lang.Runnable
             ref.ordinaryChars('.','.');
             ref.wordChars('.','.');
 
-            // Now loop thru doing the comparison...
-
             while (!done) {
-
                 String expected = null;
                 String found = null;
 
-                // Do tokens match?
-
                 if (in.nextToken() == ref.nextToken()) {
-
-                    // Are we at EOF?
-                    
                     if (in.ttype == StreamTokenizer.TT_EOF) {
-                        
-                        // Yes.
-                        
                         done = true;
-                        
                     } else {
-                        
-                        // No, does the data match?
-                        
                         if (in.sval == null && ref.sval == null) {
-                            
-                            // Yes, both null.
-                            
                         } else {
-                        
                             if (in.sval == null || ref.sval == null || !in.sval.equals(ref.sval)) {
-                            
-                                // Nope...
-                                
                                 found = in.sval;
                                 expected = ref.sval;
                             }
@@ -682,17 +655,16 @@ public abstract class Test implements java.lang.Runnable
                     expected = String.valueOf((char)ref.ttype);
                 }
 
-                // Do we have an error?
-
                 if (expected != null) {
                     String error =  "found '" + found+ "', expected '" + expected + "' (line " + in.lineno() + ").";
                     throw new Error("Resource comparison failed for " + className + ": " + error);
                 }
             }
-
         } finally {
-            if (inStream != null) inStream.close();
-            if (refStream != null) refStream.close();
+            if (inStream != null) 
+                inStream.close();
+            if (refStream != null) 
+                refStream.close();
         }
     }
 
@@ -888,7 +860,7 @@ public abstract class Test implements java.lang.Runnable
         }
     }
 
-    public static boolean run (String args[])
+    public static boolean run( String args[])
     {
         Hashtable flags = createFromConsolePairs(args);
 

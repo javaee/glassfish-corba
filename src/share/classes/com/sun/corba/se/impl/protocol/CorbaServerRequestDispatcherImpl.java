@@ -101,7 +101,7 @@ import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.encoding.MarshalOutputStream;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.RequestCanceledException;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;

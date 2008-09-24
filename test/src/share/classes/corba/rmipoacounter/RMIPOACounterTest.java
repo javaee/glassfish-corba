@@ -38,7 +38,7 @@ package corba.rmipoacounter;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class RMIPOACounterTest extends CORBATest
 {
@@ -55,7 +55,7 @@ public class RMIPOACounterTest extends CORBATest
 
         Controller orbd = createORBD();
 
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
 
         serverProps.setProperty(ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
                                 Options.getUnusedPort().toString());

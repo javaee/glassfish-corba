@@ -36,7 +36,7 @@
 
 package corba.rogueclient;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
@@ -62,6 +62,10 @@ import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.rmi.PortableRemoteObject;
 
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
+import java.util.concurrent.atomic.AtomicInteger ;
+
 public class RogueClient extends Thread
 {
     // shared across all instances of RogueClients
@@ -83,14 +87,46 @@ public class RogueClient extends Thread
     private int itsPort = 0;
     private SocketChannel itsSocketChannel = null;
     private Socket itsSocket = null;
+    private JUnitReportHelper helper = new JUnitReportHelper( RogueClient.class.getName() ) ;
+    private int createConnectionToServerCallCounter = 0 ;
+    private static AtomicInteger numFailures = new AtomicInteger() ;
 
-    private void handleException(Exception ex) {
+    private static volatile boolean useHelper = true ;
+
+    private void start( String name, int ctr ) {
+        if (useHelper)
+            helper.start( name + ctr ) ;
+
+        U.sop( "RogueClient." + name + "()" ) ;
+    }
+
+    private void start( String name ) {
+        if (useHelper)
+            helper.start( name ) ;
+
+        U.sop( "RogueClient." + name + "()" ) ;
+    }
+
+    private void handlePass() {
+        if (useHelper)
+            helper.pass() ;
+
+        U.sop( "PASS" ) ;
+    }
+
+    private void handleException(Exception ex) throws Exception {
+        numFailures.incrementAndGet() ;
+
 	U.sop("Unexpected exception -> " + ex);
+
         StackTraceElement[] ste = ex.getStackTrace();
         for (int i = 0; i < ste.length; i++) {
             U.sop(ste[i].toString());
         }
-	System.exit(1);
+
+	helper.fail( ex ) ;
+
+        throw ex ;
     }
 
     private void printBuffer(ByteBuffer byteBuffer) {
@@ -172,9 +208,11 @@ public class RogueClient extends Thread
 	U.sop("Successful");
     } 
 
-    private void createConnectionToServer() {
+    private void createConnectionToServer() throws Exception {
+        start( "createConnectionToServer",
+            createConnectionToServerCallCounter++ ) ;
+        
 	// create SocketChannel to server
-	U.sop("\tRogueClient.createConnectionToServer()");
 	try {
 	    InetSocketAddress isa = new InetSocketAddress(itsHostname, itsPort);
 	    itsSocketChannel = ORBUtility.openSocketChannel(isa);
@@ -182,7 +220,8 @@ public class RogueClient extends Thread
 	catch (Exception ex) {
 	    handleException(ex);
 	}
-	U.sop("\tSuccessful");
+
+        handlePass() ;
     }
 
     private void write_octet(byte[] theBuf, int index, byte theValue) {
@@ -270,8 +309,8 @@ public class RogueClient extends Thread
 	return byteBuffer;
     }
 
-    private void runValidHeaderSlowBody() {
-	U.sop("RogueClient.runValidHeaderSlowBody()");
+    private void runValidHeaderSlowBody() throws Exception {
+        start( "runValidHeaderSlowBody" ) ;
 
 	ByteBuffer byteBuffer = createGIOPMessage();
 
@@ -303,17 +342,22 @@ public class RogueClient extends Thread
 		itsSocketChannel.close();
 	    } catch (IOException ioex) {
 		handleException(ioex);
+                throw ioex ;
 	    }
+
+            handleException( ioe ) ;
 	    createConnectionToServer();
+            throw ioe ;
 	} catch (Exception ex) {
 	    handleException(ex);
+            throw ex ;
 	}
 
-	U.sop("PASSED");
+        handlePass() ;
     }
 
-    private void runSlowGIOPHeader() {
-	U.sop("RogueClient.runSlowGIOPHeader()");
+    private void runSlowGIOPHeader() throws Exception {
+        start( "runSlowGIOPHeader" ) ;
 
 	ByteBuffer byteBuffer = createGIOPMessage();
 
@@ -337,17 +381,19 @@ public class RogueClient extends Thread
 		itsSocketChannel.close();
 	    } catch (IOException ioex) {
 		handleException(ioex);
+                throw ioex ;
 	    }
 	    createConnectionToServer();
 	} catch (Exception ex) {
 	    handleException(ex);
+            throw ex ;
 	}
 
-	U.sop("PASSED");
+        handlePass() ;
     }
 
-    private void runValidHeaderBogusLength() {
-	U.sop("RogueClient.runValidHeaderBogusLength()");
+    private void runValidHeaderBogusLength() throws Exception {
+        start( "runValidHeaderBogusLength" ) ;
 
 	ByteBuffer byteBuffer = createGIOPMessage();
 	write_message_size(byteBuffer.array(),8,byteBuffer.limit() + 50);
@@ -360,12 +406,13 @@ public class RogueClient extends Thread
 	    handleException(ex);
 	}
 
+        handlePass() ;
 	U.sop("PASSED");
     }
 
 
-    private void runSendMessageAndCloseConnection() {
-        U.sop("RogueClient.runSendMessageAndCloseConnection()");
+    private void runSendMessageAndCloseConnection() throws Exception {
+        start( "runSendMessageAndCloseConnection" ) ;
         
         ByteBuffer byteBuffer = createGIOPMessage();
         byteBuffer.flip();
@@ -377,28 +424,37 @@ public class RogueClient extends Thread
             handleException(ex);
         }
 
+        handlePass() ;
+
         createConnectionToServer();
-        U.sop("PASSED");
     }
 
     private void runRogueConnectManyTests() throws Exception {
-	U.sop("RogueClient.runRogueConnectManyTests()");
-	// create a bunch of RogueClients and let them bang away
-	RogueClient[] rogueClients = new RogueClient[NUM_ROGUE_CLIENTS];
+        helper.start( "runRogueConnectManyTests" ) ;
+        try {
+            U.sop("RogueClient.runRogueConnectManyTests()");
+            // create a bunch of RogueClients and let them bang away
+            RogueClient[] rogueClients = new RogueClient[NUM_ROGUE_CLIENTS];
 
-	for (int i = 0; i < NUM_ROGUE_CLIENTS; i++) {
-	    rogueClients[i] = new RogueClient();
-	}
+            for (int i = 0; i < NUM_ROGUE_CLIENTS; i++) {
+                rogueClients[i] = new RogueClient();
+            }
 
-        for (int i = 0; i < rogueClients.length; i++) {
-            rogueClients[i].start();
+            for (int i = 0; i < rogueClients.length; i++) {
+                rogueClients[i].start();
+            }
+            
+            for (int i = 0; i < rogueClients.length; i++) {
+                rogueClients[i].join();
+            }
+
+            U.sop("PASSED");
+        } finally {
+            if (numFailures.get() == 0)
+                helper.pass() ;
+            else
+                helper.fail( "Failed with " + numFailures.get() + " errors" ) ;
         }
-	
-	for (int i = 0; i < rogueClients.length; i++) {
-	    rogueClients[i].join();
-	}
-
-	U.sop("PASSED");
     }
 
     private void runSaneTest(Tester tester)
@@ -441,16 +497,17 @@ public class RogueClient extends Thread
         } catch (Throwable t) {
     	    U.sop("Unexpected throwable!!!");
             t.printStackTrace();
-            System.exit(1);
+            helper.done() ;
+            System.exit(1) ;
+        } finally {
+            helper.done() ;
         }
     }
 
-    public static void main(String args[])
-    {
-         U.sop("Beginning test...");
+    public static void main(String args[]) {
+        U.sop("Beginning test...");
 
-	if (dprint)
-	{
+	if (dprint) {
 	    Properties props = new Properties();
 	    props.put(ORBConstants.DEBUG_PROPERTY, "transport,giop");
 	}
@@ -460,15 +517,21 @@ public class RogueClient extends Thread
 	try {
 	    rogueClient.start();
 	    rogueClient.join();
+
+            useHelper = false ;
+
 	    // run a bunch of RogueClients
 	    rogueClient.runRogueConnectManyTests();
+
 	} catch (Exception ex) {
-	    rogueClient.handleException(ex);
-	}
+            ex.printStackTrace() ;
+	} 
 
+        int failures = numFailures.get() ;
+        if (failures == 0) 
+            U.sop("Test finished successfully...");
 
-        U.sop("Test finished successfully...");
-            
+        System.exit( numFailures.get() ) ;
     }
 }
 

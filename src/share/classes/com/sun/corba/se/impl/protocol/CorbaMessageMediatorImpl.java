@@ -102,7 +102,7 @@ import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.InterceptorsSystemException;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.AddressingDispositionHelper;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.CancelRequestMessage;
@@ -1816,7 +1816,9 @@ public class CorbaMessageMediatorImpl
 	((CDRInputObject)messageMediator.getInputObject()).unmarshalHeader();
 
         ORB orb = (ORB)messageMediator.getBroker();
-	orb.checkShutdownState();
+        synchronized( orb ) {
+            orb.checkShutdownState();
+        }
 
 	ObjectKey okey = messageMediator.getObjectKeyCacheEntry().getObjectKey();
         if (orb.subcontractDebugFlag) {

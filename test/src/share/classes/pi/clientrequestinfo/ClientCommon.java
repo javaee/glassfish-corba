@@ -39,7 +39,7 @@ package pi.clientrequestinfo;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import corba.framework.*;
@@ -48,6 +48,8 @@ import java.util.*;
 import java.io.*;
 
 import ClientRequestInfo.*;
+
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /**
  * Common methods for Client implementations in this test to use
@@ -71,7 +73,13 @@ abstract public class ClientCommon
 
     // The current Client being executed
     public static ClientCommon client;
+
+    JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
     
+    protected void finish() {
+        helper.done() ;
+    }
+
     /**
      * Creates a com.sun.corba.se.spi.orb.ORB and notifies the TestInitializer of its presence
      */
@@ -157,13 +165,21 @@ abstract public class ClientCommon
     protected void runTestCase( String testName ) 
 	throws Exception 
     {
-	out.println( "  - Resolving references." );
-	resolveReferences();
-	out.println( "  - Executing test " + testName + "." );
-	SampleClientRequestInterceptor.strategy = interceptorStrategy;
-	invokeStrategy.invoke();
-	if( interceptorStrategy.failed ) {
-	    throw new RuntimeException( interceptorStrategy.failReason );
+        helper.start( testName ) ;
+
+        try {
+            out.println( "  - Resolving references." );
+            resolveReferences();
+            out.println( "  - Executing test " + testName + "." );
+            SampleClientRequestInterceptor.strategy = interceptorStrategy;
+            invokeStrategy.invoke();
+            if( interceptorStrategy.failed ) {
+                throw new RuntimeException( interceptorStrategy.failReason );
+            }
+            helper.pass() ;
+        } catch (Exception exc) {
+            helper.fail( exc ) ;
+            throw exc ;
 	}
     }
 

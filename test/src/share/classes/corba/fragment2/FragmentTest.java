@@ -38,13 +38,13 @@ package corba.fragment2;
 import test.Test;
 import corba.framework.*;
 import java.util.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class FragmentTest extends CORBATest
 {
     protected void doTest() throws Throwable
     {
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
 
         int fragmentSize = 1024;
 
@@ -53,7 +53,7 @@ public class FragmentTest extends CORBATest
         clientProps.put("array.length", "" + fragmentSize);
         clientProps.put(ORBConstants.GIOP_VERSION, "1.2");
 
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         serverProps.put(ORBConstants.GIOP_VERSION, "1.2");
 
         //Controller orbd = createORBD();

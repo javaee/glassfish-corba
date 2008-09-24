@@ -46,18 +46,13 @@ import corba.framework.CORBATest;
 import corba.framework.Controller;
 import corba.framework.Options;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 /**
  * @author Harold Carr
  */
-public class GIOPGenTest
-    extends
-	CORBATest
-{
-    protected void doTest()
-	throws Exception
-    {
+public class GIOPGenTest extends CORBATest {
+    protected void doTest() throws Exception {
 	String thisPackage = GIOPGenTest.class.getPackage().getName();
 
 	Controller orbd = createORBD();

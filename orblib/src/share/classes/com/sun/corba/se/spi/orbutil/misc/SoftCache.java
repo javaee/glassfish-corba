@@ -169,6 +169,9 @@ public class SoftCache<K,V> extends AbstractMap<K,V> implements Map<K,V> {
 	}
     }
 
+    private static final int PROCESS_QUEUE_INTERVAL = 10 ;
+
+    private int processQueueCount = PROCESS_QUEUE_INTERVAL ;
 
     /* Hash table mapping keys to ValueCells */
     private Map<K,ValueCell<K,V>> hash;
@@ -184,12 +187,16 @@ public class SoftCache<K,V> extends AbstractMap<K,V> implements Map<K,V> {
        because that can lead to surprising ConcurrentModificationExceptions.
      */
     private void processQueue() {
-	ValueCell<K,V> vc;
-	while ((vc = (ValueCell<K,V>)queue.poll()) != null) {
-	    if (vc.isValid()) 
-		hash.remove(vc.key);
-	    else 
-		ValueCell.dropped--;
+	if (--processQueueCount == 0) {
+	    processQueueCount = PROCESS_QUEUE_INTERVAL ;
+
+	    ValueCell<K,V> vc;
+	    while ((vc = (ValueCell<K,V>)queue.poll()) != null) {
+		if (vc.isValid()) 
+		    hash.remove(vc.key);
+		else 
+		    ValueCell.dropped--;
+	    }
 	}
     }
 

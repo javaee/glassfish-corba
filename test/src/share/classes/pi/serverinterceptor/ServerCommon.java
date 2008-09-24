@@ -43,12 +43,14 @@ import org.omg.PortableServer.*;
 import org.omg.PortableInterceptor.*;
 import com.sun.corba.se.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.util.*;
 import java.io.*;
 
 import ServerRequestInterceptor.*;
+
+import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /**
  * Common methods for Server implementations in this test to use
@@ -86,6 +88,12 @@ public abstract class ServerCommon
     // an exception on the client side.
     static boolean exceptionRaised;
 
+    JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
+
+    protected void finish() {
+        helper.done() ;
+    }
+
     /**
      * Creates a com.sun.corba.se.spi.orb.ORB and notifies the TestInitializer of its presence
      */
@@ -121,7 +129,7 @@ public abstract class ServerCommon
         // receive_request, process sayHello, and then send_reply on all 
         // 3 interceptors in the correct order
         out.println( "+ Testing standard invocation..." );
-        testInvocation(
+        testInvocation( "testStandardInvocation",
             SampleServerRequestInterceptor.MODE_NORMAL,
             "rs1rs2rs3rr1rr2rr3sr3sr2sr1", "sayHello", "[Hello1]", false );
 
@@ -129,7 +137,7 @@ public abstract class ServerCommon
         // receive_request, process sayOneWay, and then send_reply on all 
         // 3 interceptors in the correct order
         out.println( "+ Testing oneway invocation..." );
-        testInvocation(
+        testInvocation( "testOnewayInvocation",
             SampleServerRequestInterceptor.MODE_NORMAL,
             "rs1rs2rs3rr1rr2rr3sr3sr2sr1", "sayOneway", "[Hello1]", false );
         
@@ -138,7 +146,7 @@ public abstract class ServerCommon
         // process saySystemException, and then send_exception on all 3
         // interceptors in the correct order.
         out.println( "+ Testing invocation resulting in SYSTEM_EXCEPTION..." );
-        testInvocation(
+        testInvocation( "testInvocationResultSystemException",
             SampleServerRequestInterceptor.MODE_NORMAL,
             "rs1rs2rs3rr1rr2rr3se3se2se1", "saySystemException", 
 	    "[Hello1]", true );
@@ -151,7 +159,7 @@ public abstract class ServerCommon
 	// the exception we are checking for (which is a SystemException).
 	// The check is instead done in the client code during invocation.
         out.println( "+ Testing invocation resulting in USER_EXCEPTION..." );
-        testInvocation(
+        testInvocation( "testInvocationResultUserException",
             SampleServerRequestInterceptor.MODE_NORMAL,
             "rs1rs2rs3rr1rr2rr3se3se2se1", "sayUserException", 
 	    "[Hello1]", false );
@@ -163,7 +171,7 @@ public abstract class ServerCommon
 	// invoked.
 	out.println( "+ Testing invocation where interceptor #2 " +
 	    "throws exception in rrsc." );
-        testInvocation(
+        testInvocation( "testInvocationInterceptorExceptionRRSC",
 	    SampleServerRequestInterceptor.MODE_RRSC_SYSTEM_EXCEPTION,
 	    "rs1rs2se1", "sayHello", "", true );
 
@@ -174,7 +182,7 @@ public abstract class ServerCommon
 	// on the second object.
 	out.println( "+ Testing invocation where interceptor #2 " +
 	    "raises ForwardRequest in rrsc." );
-        testInvocation(
+        testInvocation( "testInvocationInterceptorForwardRequestRRSC",
 	    SampleServerRequestInterceptor.MODE_RRSC_FORWARD_REQUEST,
 	    "rs1rs2so1rs1rs2rs3rr1rr2rr3sr3sr2sr1", "sayHello", 
 	    "[Hello1Forward]", false );
@@ -186,7 +194,7 @@ public abstract class ServerCommon
 	// invoked.
 	out.println( "+ Testing invocation where interceptor #2 " +
 	    "throws exception in rr." );
-        testInvocation(
+        testInvocation( "testInvocationInteceptorExceptionRR",
 	    SampleServerRequestInterceptor.MODE_RR_SYSTEM_EXCEPTION,
 	    "rs1rs2rs3rr1rr2se3se2se1", "sayHello", "", true );
 
@@ -197,7 +205,7 @@ public abstract class ServerCommon
 	// be called on the second object.
 	out.println( "+ Testing invocation where interceptor #2 " +
 	    "raises ForwardRequest in rr." );
-        testInvocation(
+        testInvocation( "testInvocationInterceptorForwardRequestRR",
 	    SampleServerRequestInterceptor.MODE_RR_FORWARD_REQUEST,
 	    "rs1rs2rs3rr1rr2so3so2so1rs1rs2rs3rr1rr2rr3sr3sr2sr1",
 	    "sayHello", "[Hello1Forward]", false );
@@ -209,7 +217,7 @@ public abstract class ServerCommon
 	// invoked.
 	out.println( "+ Testing invocation where interceptor #2 " +
 	    "throws exception in sr." );
-        testInvocation(
+        testInvocation( "testInvocationInterceptorExceptionSR",
 	    SampleServerRequestInterceptor.MODE_SR_SYSTEM_EXCEPTION,
 	    "rs1rs2rs3rr1rr2rr3sr3sr2se1", "sayHello", "[Hello1]", true );
 
@@ -220,7 +228,7 @@ public abstract class ServerCommon
 	// invoked.
 	out.println( "+ Testing invocation where interceptor #2 " +
 	    "throws exception in se." );
-        testInvocation(
+        testInvocation( "testInvocationInterceptorExceptionSE",
 	    SampleServerRequestInterceptor.MODE_SE_SYSTEM_EXCEPTION,
 	    "rs1rs2rs3rr1rr2rr3se3se2se1", "saySystemException", 
 	    "[Hello1]", true );
@@ -233,7 +241,7 @@ public abstract class ServerCommon
 	// object.
 	out.println( "+ Testing invocation where interceptor #2 " +
 	    "throws forward request in se." );
-        testInvocation(
+        testInvocation( "testInvocationInterceptorForwardRequestSE",
 	    SampleServerRequestInterceptor.MODE_SE_FORWARD_REQUEST,
 	    "rs1rs2rs3rr1rr2rr3se3se2so1rs1rs2rs3rr1rr2rr3se3se2se1", 
 	    "saySystemException", "[Hello1][Hello1Forward]", true );
@@ -275,73 +283,82 @@ public abstract class ServerCommon
      * @param exceptionExpected - True if an exception should make its way
      *     to the client or false if not.
      */
-    void testInvocation( int mode, 
+    void testInvocation( String name,
+                         int mode, 
                          String correctOrder,
                          String methodName,
                          String correctMethodOrder,
                          boolean exceptionExpected )
         throws Exception 
     {
-        // We are already synchronized with the client.
-        
-        // Prepare for the call:
-        nextMethodToInvoke = methodName;
-        servantInvoked = false;
-        SampleServerRequestInterceptor.invocationOrder = "";
-        SampleServerRequestInterceptor.methodOrder = "";
-        SampleServerRequestInterceptor.setTestMode( mode );
-        
-        // Return from syncWithServer() and let the client make the call:
-        synchronized( syncObject ) {
-            syncObject.notify();
+        helper.start( name ) ;
+
+        try {
+            // We are already synchronized with the client.
+            
+            // Prepare for the call:
+            nextMethodToInvoke = methodName;
+            servantInvoked = false;
+            SampleServerRequestInterceptor.invocationOrder = "";
+            SampleServerRequestInterceptor.methodOrder = "";
+            SampleServerRequestInterceptor.setTestMode( mode );
+            
+            // Return from syncWithServer() and let the client make the call:
+            synchronized( syncObject ) {
+                syncObject.notify();
+            }
+
+            // If this is a oneway call, wait an extra second to make sure
+            // everything went through okay.
+            if( methodName.equals( "sayOneway" ) ) {
+                out.println( "    - Delaying for oneway..." );
+                try {
+                    Thread.sleep( 1000 );
+                }
+                catch( InterruptedException e ) {
+                }
+                out.println( "    - This should be long enough." );
+            }
+            
+            // Wait for client to synchronize with server again.  Now we know
+            // for sure that the method invocation is complete.  Even if the
+            // call was a oneway, we can be fairly certain the call has completed
+            // since we delay for 0.5 seconds before exiting waitForClient()
+            // which should be enough time in most cases.
+            waitForClient();
+            
+            // Examine invocation order to ensure everything was called in the
+            // right order.
+            //
+            // NOTE: This is merely a convenient way to check ordering.
+            // Since the specification does not require that the order in which
+            // interceptors are registered match the order in which they are
+            // invoked, the actual invocationOrder may be different but still
+            // valid.  This test may need modification if we change the way
+            // we determine the initial invocation order of interceptors.
+            String order = SampleServerRequestInterceptor.invocationOrder;
+            checkOrder( correctOrder, order );
+
+            // Examine method invocation order to ensure all appropriate methods
+            // were called, and in the right order.
+            String methodOrder = SampleServerRequestInterceptor.methodOrder;
+            checkMethodOrder( correctMethodOrder, methodOrder );
+            
+            // Determine if an exception was raised:
+            out.println( "    - Client-side exception expected: " + 
+                exceptionExpected );
+            out.println( "    - Client-side exception raised: " + 
+                exceptionRaised );
+            if( exceptionExpected != exceptionRaised ) {
+                throw new RuntimeException( "Method should " + 
+                    (!exceptionExpected ? "not" : "") + 
+                    " have raised an exception!" );
+            }
+
+            helper.pass() ;
+        } catch (Exception exc) {
+            helper.fail( exc ) ;
         }
-
-	// If this is a oneway call, wait an extra second to make sure
-	// everything went through okay.
-	if( methodName.equals( "sayOneway" ) ) {
-	    out.println( "    - Delaying for oneway..." );
-	    try {
-		Thread.sleep( 1000 );
-	    }
-	    catch( InterruptedException e ) {
-	    }
-	    out.println( "    - This should be long enough." );
-	}
-        
-        // Wait for client to synchronize with server again.  Now we know
-        // for sure that the method invocation is complete.  Even if the
-        // call was a oneway, we can be fairly certain the call has completed
-        // since we delay for 0.5 seconds before exiting waitForClient()
-        // which should be enough time in most cases.
-        waitForClient();
-        
-        // Examine invocation order to ensure everything was called in the
-        // right order.
-        //
-        // NOTE: This is merely a convenient way to check ordering.
-        // Since the specification does not require that the order in which
-        // interceptors are registered match the order in which they are
-        // invoked, the actual invocationOrder may be different but still
-        // valid.  This test may need modification if we change the way
-        // we determine the initial invocation order of interceptors.
-        String order = SampleServerRequestInterceptor.invocationOrder;
-        checkOrder( correctOrder, order );
-
-	// Examine method invocation order to ensure all appropriate methods
-	// were called, and in the right order.
-        String methodOrder = SampleServerRequestInterceptor.methodOrder;
-        checkMethodOrder( correctMethodOrder, methodOrder );
-        
-	// Determine if an exception was raised:
-	out.println( "    - Client-side exception expected: " + 
-	    exceptionExpected );
-	out.println( "    - Client-side exception raised: " + 
-	    exceptionRaised );
-	if( exceptionExpected != exceptionRaised ) {
-            throw new RuntimeException( "Method should " + 
-                (!exceptionExpected ? "not" : "") + 
-		" have raised an exception!" );
-	}
     }
     
     /**

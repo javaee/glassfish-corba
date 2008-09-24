@@ -45,7 +45,7 @@
 
 package corba.requestpartitioning;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 import corba.framework.Controller;
 import corba.framework.CORBATest;
 import corba.framework.Options;
@@ -64,52 +64,44 @@ public class RequestPartitioningTest
 	throws
 	    Throwable
     {
-
         // Run test with DirectByteBuffers
-	Controller orbd = createORBD();
-	orbd.start();
+        Controller orbd = createORBD();
+        orbd.start();
 
-        Properties serverProps = Options.getExtraServerProperties();
+        Properties serverProps = Options.getServerProperties();
         serverProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "true");
 //        serverProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
-	Controller server = createServer(thisPackage + ".Server","Server");
-	server.start();
+        Controller server = createServer(thisPackage + ".Server","Server1");
+        server.start();
 
-        Properties clientProps = Options.getExtraClientProperties();
+        Properties clientProps = Options.getClientProperties();
         clientProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "true");
 //        clientProps.setProperty(ORBConstants.DEBUG_PROPERTY,"transport,giop");
-	Controller client = createClient(thisPackage + ".Client", "Client");
-	client.start();
+        Controller client = createClient(thisPackage + ".Client", "Client1");
+        client.start();
 
-	client.waitFor(CLIENT_TIMEOUT);
+        client.waitFor(CLIENT_TIMEOUT);
 
-	client.stop();
-	server.stop();
-
-	orbd.stop();
-
-        // Run the test with HeapByteBuffers
-        orbd = createORBD();
-        orbd.start();
+        client.stop();
+        server.stop();
 
         serverProps.setProperty(ORBConstants.DISABLE_DIRECT_BYTE_BUFFER_USE_PROPERTY, "true");
         serverProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "false");
-	server = createServer(thisPackage + ".Server","Server");
-	server.start();
+        server = createServer(thisPackage + ".Server","Server2");
+        server.start();
 
         clientProps.setProperty(ORBConstants.DISABLE_DIRECT_BYTE_BUFFER_USE_PROPERTY, "true");
         clientProps.setProperty(ORBConstants.ALWAYS_ENTER_BLOCKING_READ_PROPERTY, "false");
-	client = createClient(thisPackage + ".Client", "Client");
-	client.start();
+        client = createClient(thisPackage + ".Client", "Client2");
+        client.start();
 
-	client.waitFor(CLIENT_TIMEOUT);
+        client.waitFor(CLIENT_TIMEOUT);
 
-	client.stop();
-	server.stop();
+        client.stop();
+        server.stop();
 
-	orbd.stop();
+        orbd.stop();
     }
 }
 
 // End of file.
-

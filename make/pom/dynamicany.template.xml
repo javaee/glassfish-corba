@@ -1,0 +1,16 @@
+<project>
+    @HEADER@
+    <dependencies>
+        <dependency>
+            <groupId>@groupId@</groupId>
+            <artifactId>glassfish-corba-omgapi</artifactId>
+            <version>@version@</version>
+        </dependency>
+        <dependency>
+            <groupId>@groupId@</groupId>
+            <artifactId>glassfish-corba-orb</artifactId>
+            <version>@version@</version>
+        </dependency>
+    </dependencies>
+</project>
+

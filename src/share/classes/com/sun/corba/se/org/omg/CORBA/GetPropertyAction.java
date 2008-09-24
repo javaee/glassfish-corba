@@ -34,7 +34,7 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orbutil ;
+package com.sun.corba.se.org.omg.CORBA ;
 
 /**
  * A convenience class for retrieving the string value of a system

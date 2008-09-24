@@ -112,9 +112,9 @@ public class SocketOrChannelConnectionImpl
 	Work
 {
 
-    final public static boolean dprintWriteLocks = false;
+    final private static boolean dprintWriteLocks = false;
 
-    //
+    ///
     // New transport.
     //
 
@@ -847,7 +847,7 @@ public class SocketOrChannelConnectionImpl
 	}
     }
 
-    protected void closeConnectionResources() {
+    public void closeConnectionResources() {
         if (orb.transportDebugFlag) {
             dprint(".closeConnectionResources->: " + this);
 	}

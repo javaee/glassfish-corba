@@ -39,7 +39,6 @@ package com.sun.corba.se.spi.orbutil.fsm ;
 import java.util.Collections ;
 import java.util.Map ;
 import java.util.EnumMap ;
-import java.util.HashMap ;
 import java.util.HashSet ;
 import java.util.Set ;
 import java.util.Iterator ;

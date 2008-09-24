@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.sun.corba</groupId>
+  <groupId>@groupId@</groupId>
   <artifactId>@jarName@</artifactId>
   <version>@version@</version>
   <description>@jarDescription@</description>

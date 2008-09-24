@@ -55,5 +55,9 @@ public class MonitoringManagerFactoryImpl implements MonitoringManagerFactory {
 	}
         return m;
     }
+
+    public synchronized void remove( String nameOfTheRoot ) {
+        monitoringManagerTable.remove( nameOfTheRoot ) ;
+    }
 }
 

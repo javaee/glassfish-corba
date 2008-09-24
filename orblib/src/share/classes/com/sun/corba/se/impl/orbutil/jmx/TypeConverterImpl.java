@@ -46,10 +46,14 @@ import java.lang.reflect.WildcardType ;
 import java.lang.reflect.GenericArrayType ;
 
 import java.util.Date ;
+import java.util.Collection ;
 import java.util.List ;
 import java.util.ArrayList ;
 import java.util.Map ;
 import java.util.HashMap ;
+import java.util.Iterator ;
+import java.util.Enumeration ;
+import java.util.Dictionary ;
 
 import java.math.BigDecimal ;
 import java.math.BigInteger ;
@@ -76,7 +80,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
-import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
 import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
@@ -203,31 +206,29 @@ public abstract class TypeConverterImpl implements TypeConverter {
      *					We also need to include @IncludeSubclass and 
      *					@InheritedAttribute(s) attributes
      *					Also note that @InheritTable adds an attribute to the class.  
-     *					The inherited table is mapped to TabularData.  
+     *					The inherited table is mapped to an array.  
      *					The InheritTable annotation specifies a class X, which must
      *					be part of the Type C<X>, where C is a subclass of Collection.  
-     *					Since the row type of TabularData is CompositeData, X
-     *					must map to a CompositeData type.
-     *					The TabularData contains elements of type OT(X).
      *					JT -> OT: invoke attribute methods, collect results, 
      *					    construct CompositeDataSupport
      *					OT -> JT: NOT SUPPORTED (for now)
      *
-     *	C<X>, C a subtype of
-     *	    Collection			Mapped to array data containing OT(X) 
-     *					Also need to handle C isA Iterable
+     *	C<X>, C a subtype of Collection, Iterator, Iterable, or Enumeration
+     *	        			Mapped to array data containing OT(X) 
      *					JT -> OT: Construct ArrayType of type OT(X), 
      *					    fill it with all JT elements as mapped to their OT type
      *					OT -> JT: NOT SUPPORTED 
      *					    (unless CompositeData -> Java type is supported)
+     *					What about SortedSet?
      *
-     *	M<K,V>, M a subtype of		Mapped to tabular data containing id="key" OT(K) as the key 
-     *	    Map				and id="value" OT(V) (follow the JDK 6 MXBeans rules for 
-     *					Map vs. SortedMap here) 
+     *	M<K,V>, M a subtype of Map or Dictionary
+     *	                                Mapped to tabular data containing id="key" OT(K) as the key 
+     *	    				and id="value" OT(V) 
+     *	                                What about SortedMap?
      *	    
      *	X[]				OT(X)[]
      *					    As for CompositeData, we will mostly treat this as readonly.
-     *					Mappings same as C<X> case.
+     *					Mappings same as C<X> case. This really should be an Array.
      *
      *	TypeVariable			
      *	WildCardType			Both need to be supported.  The basic idea is that the upper bounds
@@ -250,6 +251,8 @@ public abstract class TypeConverterImpl implements TypeConverter {
      * type maps to CompositeData.
      * For now, we will ignore this, because I think all CompositeData types in the ORB will be read only.
      * If this is NOT the case, we can adopt a solution similar to the MXBean @ConstructorProperties.
+     *
+     * XXX Can we automate the handling of recursive types?
      */
     public static TypeConverter makeTypeConverter( Type type, ManagedObjectManager mom ) {
 	OpenType stype = simpleTypeMap.get( type ) ;
@@ -297,19 +300,12 @@ public abstract class TypeConverterImpl implements TypeConverter {
     private static TypeConverter handleManagedObject( final Class type, 
 	final ManagedObjectManager mom, ManagedObject mo ) {
 
-	return new TypeConverterImpl() {
-	    public Type getDataType() {
-		return type ;
-	    }
-
-	    public OpenType getManagedType() {
-		return SimpleType.OBJECTNAME ;
-	    }
-
+	return new TypeConverterImpl( type, SimpleType.OBJECTNAME ) {
 	    public Object toManagedEntity( Object obj ) {
 		return mom.getObjectName( obj ) ;
 	    }
 
+            @Override
 	    public Object fromManagedEntity( Object entity ) {
 		if (!(entity instanceof ObjectName))
 		    throw new IllegalArgumentException( 
@@ -317,10 +313,6 @@ public abstract class TypeConverterImpl implements TypeConverter {
 
 		ObjectName oname = (ObjectName)entity ;
 		return mom.getObject( oname ) ;
-	    }
-
-	    public boolean isIdentity() {
-		return false ; 
 	    }
 	} ;
     }
@@ -336,20 +328,12 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	try {
 	    ot = new ArrayType( 1, cotype ) ;
 	} catch (OpenDataException exc) {
-	    throw new IllegalArgumentException( "Arrays of arrays not support: " + cotype, exc ) ;
+	    throw new IllegalArgumentException( "Arrays of arrays not supported: " + cotype, exc ) ;
 	}
 
 	final OpenType myManagedType = ot ;
 
-	return new TypeConverterImpl() {
-	    public Type getDataType() {
-		return type ;
-	    }
-
-	    public OpenType getManagedType() {
-		return myManagedType ;
-	    }
-
+	return new TypeConverterImpl( type, myManagedType ) {
 	    public Object toManagedEntity( Object obj ) {
 		if (isIdentity()) {
 		    return obj ;
@@ -367,6 +351,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
 		}
 	    }
 
+            @Override
 	    public Object fromManagedEntity( Object entity ) {
 		if (isIdentity()) {
 		    return entity ;
@@ -385,6 +370,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
 		}
 	    }
 
+            @Override
 	    public boolean isIdentity() {
 		return ctypeTc.isIdentity() ; 
 	    }
@@ -394,28 +380,17 @@ public abstract class TypeConverterImpl implements TypeConverter {
     private static TypeConverter handleEnum( final Class cls, 
 	final ManagedObjectManager mom ) {
 
-	return new TypeConverterImpl() {
-	    public Type getDataType() {
-		return cls ;
-	    }
-
-	    public OpenType getManagedType() {
-		return SimpleType.STRING ;
-	    }
-
+	return new TypeConverterImpl( cls, SimpleType.STRING ) {
 	    public Object toManagedEntity( Object obj ) {
 		return obj.toString() ;
 	    }
 
+            @Override
 	    public Object fromManagedEntity( Object entity ) {
 		if (!(entity instanceof String))
 		    throw new IllegalArgumentException( entity + " is not a String" ) ;
 
 		return Enum.valueOf( cls, (String)entity ) ;
-	    }
-
-	    public boolean isIdentity() {
-		return false ; 
 	    }
 	} ;
     }
@@ -433,19 +408,12 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	}
 	final Constructor cons = cs ;
 
-	return new TypeConverterImpl() {
-	    public Type getDataType() {
-		return cls ;
-	    }
-
-	    public OpenType getManagedType() {
-		return SimpleType.STRING ;
-	    }
-
+	return new TypeConverterImpl( cls, SimpleType.STRING ) {
 	    public Object toManagedEntity( Object obj ) {
 		return obj.toString() ;
 	    }
 
+            @Override
 	    public Object fromManagedEntity( Object entity ) {
 		if (cons != null) {
 		    try {
@@ -462,33 +430,23 @@ public abstract class TypeConverterImpl implements TypeConverter {
 			+ cls ) ;
 		}
 	    }
-
-	    public boolean isIdentity() {
-		return false ; 
-	    }
 	} ;
     }
 
     private static TypeConverter handleSimpleType( final Class cls, 
 	final ManagedObjectManager mom, final OpenType stype ) {
 
-	return new TypeConverterImpl() {
-	    public Type getDataType() {
-		return cls ;
-	    }
-
-	    public OpenType getManagedType() {
-		return stype ;
-	    }
-
+	return new TypeConverterImpl( cls, stype ) {
 	    public Object toManagedEntity( Object obj ) {
 		return obj ;
 	    }
 
+            @Override
 	    public Object fromManagedEntity( Object entity ) {
 		return entity ;
 	    }
 
+            @Override
 	    public boolean isIdentity() {
 		return true ; 
 	    }
@@ -516,23 +474,21 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	    }
 	}
 	
-	// Check for @InheritedTable annotation.
-	final InheritedTable it = cls.getAnnotation( InheritedTable.class ) ;
-	if (it != null) {
-	    // XXX process it
-	}
-
 	// Check for @IncludeSubclass annotation.  Scan subclasses for attributes.
 	final IncludeSubclass is = cls.getAnnotation( IncludeSubclass.class ) ;
 	if (is != null) {
-	    // XXX process is
+            // XXX Check that class is not annotated with ManagedData or ManagedObject
+
+            // process class, add its attributes 
+            for (Class klass : is.cls()) {
+                List<AnnotationUtil.MethodInfo> klassInfos = analyzeManagedData( klass, mom ) ;
+                minfos.addAll( klassInfos ) ;
+            }
 	}
 	
 	// Scan for all methods annotated with @ManagedAttribute, including inherited methods.
 	// Construct tables Map<String,Method> for getters (no setters in CompositeData, since
 	// CompositeData is immutable).
-	// Get open types for getter type
-	// Construct OpenMBeanAttributeInfos and actual methods, and put into CompositeData
 	final List<Method> attributes = AnnotationUtil.getAnnotatedMethods( cls, ManagedAttribute.class ) ;
 
 	for (Method m : attributes) {
@@ -549,11 +505,8 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	return minfos ;
     }
 
-    private static TypeConverter handleManagedData( final Class cls, 
-	final ManagedObjectManager mom, final ManagedData md ) {
-
-	final List<AnnotationUtil.MethodInfo> minfos = analyzeManagedData(
-	    cls, mom ) ;
+    private static CompositeType makeCompositeType( final Class cls, final ManagedData md,
+        List<AnnotationUtil.MethodInfo> minfos ) {
 
 	String name = md.name() ;
 	if (name.equals( "" ))
@@ -570,42 +523,33 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	for (AnnotationUtil.MethodInfo minfo : minfos) {
 	    attrNames[ctr] = minfo.id() ;
 	    attrDescriptions[ctr] = minfo.description() ;
-	    attrOTypes[ctr] = mom.getTypeConverter( minfo.type() ).getManagedType() ;
+	    attrOTypes[ctr] = minfo.tc().getManagedType() ;
 	    ctr++ ;
 	}
 
-	CompositeType ot = null ;
 	try {
-	    ot = new CompositeType( 
+	    return new CompositeType( 
 		name, mdDescription, attrNames, attrDescriptions, attrOTypes ) ;
 	} catch (OpenDataException exc) {
 	    throw new IllegalArgumentException( exc ) ;
 	}
-	final CompositeType myType = ot ;
+    }
 
-	return new TypeConverterImpl() {
-	    public Type getDataType() {
-		return cls ;
-	    }
+    private static TypeConverter handleManagedData( final Class cls, 
+	final ManagedObjectManager mom, final ManagedData md ) {
 
-	    public OpenType getManagedType() {
-		return myType ;
-	    }
+	final List<AnnotationUtil.MethodInfo> minfos = analyzeManagedData(
+	    cls, mom ) ;
+        final CompositeType myType = makeCompositeType( cls, md, minfos ) ;
 
+	return new TypeConverterImpl( cls, myType ) {
 	    public Object toManagedEntity( Object obj ) {
 		Map<String,Object> data = new HashMap<String,Object>() ;
 		for (AnnotationUtil.MethodInfo minfo : minfos ) {
-		    Method method = minfo.method() ;
-		    TypeConverter tc = minfo.tc() ;
-		    Object ores = null ;
-		    try {
-			ores = method.invoke( obj ) ;
-		    } catch (Exception exc) {
-			throw new RuntimeException( exc ) ;
-		    }
-
-		    Object res = tc.toManagedEntity( ores ) ;
-		    data.put( minfo.id(), res ) ;
+                    if (minfo.isApplicable( obj )) {
+                        Object value = minfo.get( obj ) ;
+                        data.put( minfo.id(), value ) ;
+                    }
 		}
 
 		try {
@@ -614,54 +558,258 @@ public abstract class TypeConverterImpl implements TypeConverter {
 		    throw new IllegalArgumentException( exc ) ;
 		}
 	    }
-
-	    public Object fromManagedEntity( Object entity ) {
-		throw new UnsupportedOperationException(
-		    "We do not support converting CompositeData back into Java objects" ) ;
-	    }
-
-	    public boolean isIdentity() {
-		return false ; 
-	    }
 	} ;
     }
 
+    private static class EnumerationAdapter<T> implements Iterator<T> {
+        final private Enumeration<T> enumeration ;
+
+        public EnumerationAdapter( final Enumeration<T> en ) {
+            this.enumeration = en ;
+        }
+
+        public boolean hasNext() {
+            return enumeration.hasMoreElements() ;
+        }
+
+        public T next() {
+            return enumeration.nextElement() ;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException( "Remove is not supported" ) ;
+        }
+    }
+
+    private abstract static class TypeConverterListBase extends TypeConverterImpl {
+        final TypeConverter memberTc ;
+
+        public TypeConverterListBase( Type dataType, TypeConverter memberTc ) {
+            super( dataType, makeArrayType( memberTc.getManagedType() ) ) ;
+            this.memberTc = memberTc ;
+        }
+
+        private static ArrayType makeArrayType( OpenType ot ) {
+            try {
+                return new ArrayType( 1, ot ) ;
+            } catch (OpenDataException exc) {
+                throw new IllegalArgumentException( 
+                    ot + " caused an OpenType exception", exc ) ;
+            }
+        }
+
+        protected abstract Iterator getIterator( Object obj ) ;
+
+        public Object toManagedEntity( Object obj ) {
+            Iterator iter = getIterator( obj ) ;
+            List list = new ArrayList() ;
+            while (iter.hasNext()) 
+                list.add( iter.next() ) ;
+
+            Class cclass = getJavaClass( memberTc.getManagedType() ) ;
+            Object result = Array.newInstance( cclass, list.size() ) ;
+            int ctr = 0 ;
+            for (Object elem : list) {
+                Object mappedElem = memberTc.toManagedEntity( elem ) ;
+                Array.set( result, ctr++, mappedElem ) ;
+            }
+
+            return result ;
+        }
+    }
+
+    private interface Table<K,V> extends Iterable<K> {
+        V get( K key ) ;
+    }
+
+    private static class TableMapImpl<K,V> implements Table<K,V> {
+        final private Map<K,V> map ;
+
+        public TableMapImpl( Map<K,V> map ) {
+            this.map = map ;
+        }
+
+        public Iterator<K> iterator() {
+            return map.keySet().iterator() ;
+        }
+
+        public V get( K key ) {
+            return map.get( key ) ;
+        }
+    }
+
+    private static class TableDictionaryImpl<K,V> implements Table<K,V> {
+        final private Dictionary<K,V> dict ;
+
+        public TableDictionaryImpl( Dictionary<K,V> dict ) {
+            this.dict = dict ;
+        }
+
+        public Iterator<K> iterator() {
+            return new EnumerationAdapter( dict.elements() ) ;
+        }
+
+        public V get( K key ) {
+            return dict.get( key ) ;
+        }
+    }
+
+    private abstract static class TypeConverterMapBase extends TypeConverterImpl {
+        final private TypeConverter keyTypeConverter ;
+        final private TypeConverter valueTypeConverter ;
+
+        public TypeConverterMapBase( Type dataType, 
+            TypeConverter keyTypeConverter, TypeConverter valueTypeConverter ) {
+            super( dataType, makeMapTabularType( keyTypeConverter, valueTypeConverter ) ) ;
+            this.keyTypeConverter = keyTypeConverter ;
+            this.valueTypeConverter = valueTypeConverter ;
+        }
+
+        private static TabularType makeMapTabularType( TypeConverter firstTc, 
+            TypeConverter secondTc ) {
+            String mapType = firstTc + "->" + secondTc ;
+
+            final String[] itemNames = new String[] { "key", "value" } ;
+
+            String description = "row type for " + mapType ;
+
+            final String[] itemDescriptions = new String[] {
+                "Key of map " + mapType,
+                "Value of map " + mapType
+            } ;
+
+            final OpenType[] itemTypes = new OpenType[] {
+                firstTc.getManagedType(), secondTc.getManagedType() 
+            } ;
+
+            try {
+                CompositeType rowType = new CompositeType( mapType,
+                    "Row type for map " + mapType, itemNames, itemDescriptions, itemTypes ) ;
+
+                String[] keys = new String[] { "key" } ;
+
+                TabularType result = new TabularType( "Table:" + mapType, 
+                    "Table for map " + mapType, rowType, keys ) ;
+
+                return result ;
+            } catch (OpenDataException exc) {
+                throw new IllegalArgumentException( exc ) ;
+            }
+        }
+
+        protected abstract Table getTable( Object obj ) ;
+
+        public Object toManagedEntity( Object obj ) {
+            try {
+                Table table = getTable( obj ) ;
+                TabularType ttype = (TabularType)getManagedType() ;
+                CompositeType ctype = ttype.getRowType() ;
+                TabularData result = new TabularDataSupport( ttype ) ;
+                for (Object key : table) {
+                    Object value = table.get( key ) ;
+                    Object mappedKey = keyTypeConverter.toManagedEntity( key ) ;
+                    Object mappedValue = valueTypeConverter.toManagedEntity( value ) ;
+                    Map items = new HashMap() ;
+                    items.put( "key", mappedKey ) ;
+                    items.put( "value", mappedValue ) ;
+                    CompositeDataSupport cdata = new CompositeDataSupport( ctype, items ) ;
+                    result.put( cdata ) ;
+                }
+
+                return result ;
+            } catch (OpenDataException exc) {
+                throw new IllegalArgumentException( exc ) ;
+            }
+        }
+    }
+
+    // Type must be a T<X,...> :
+    // 1. T is a collection type: Collection, Iterator, Iterable, Enumeration, so the
+    //    type is T<X> for some type X.  This maps to an array of the mapping of X.
+    // 2. T is a mapping type: Map or Dictionary
+    //    type is T<K,V>.  This maps to a TabularType, with key field named "key" of type
+    //    mapping of K, and value field "value" of type mapping of V.
     private static TypeConverter handleParameterizedType( final ParameterizedType type, 
 	final ManagedObjectManager mom ) {
 
-	return new TypeConverter() {
-	    public Type getDataType() {
-		return type ;
-	    }
+        TypeConverter result = null ;
 
-	    public OpenType getManagedType() {
-		// XXX implement me
-		return null ;
-	    }
+        final Class cls = (Class)(type.getRawType()) ;
+        
+        final Type[] args = type.getActualTypeArguments() ;
+        if (args.length < 1) 
+            throw new IllegalArgumentException( cls + " must have at least 1 type argument" ) ;
 
-	    public Object toManagedEntity( Object obj ) {
-		// XXX implement me
-		return null ;
-	    }
+        final Type firstType = args[0] ;
+        final TypeConverter firstTc = mom.getTypeConverter( firstType ) ;
 
-	    public Object fromManagedEntity( Object entity ) {
-		throw new UnsupportedOperationException(
-		    "We do not support converting TabularData back into Java objects" ) ;
-	    }
+        // Case 1: Some kind of collection. Must have 1 type parameter.
+        if (Iterable.class.isAssignableFrom(cls)) {
+            result = new TypeConverterListBase( type, firstTc ) {
+                protected Iterator getIterator( Object obj ) {
+                    return ((Collection)obj).iterator() ;
+                }
+            } ;
+        } else if (Iterator.class.isAssignableFrom(cls)) {
+            result = new TypeConverterListBase( type, firstTc ) {
+                protected Iterator getIterator( Object obj ) {
+                    return (Iterator)obj ;
+                }
+            } ;
+        } else if (Enumeration.class.isAssignableFrom(cls)) {
+            result = new TypeConverterListBase( type, firstTc ) {
+                protected Iterator getIterator( Object obj ) {
+                    return new EnumerationAdapter( (Enumeration)obj ) ;
+                }
+            } ;
+        } else {
+            // Case 2: Some kind of mapping.  Must have 2 type parameters.
+            if (args.length != 2) 
+                throw new IllegalArgumentException( cls + " must have 2 type arguments" ) ;
 
-	    public boolean isIdentity() {
-		return false ; 
-	    }
-	} ;
+            final Type secondType = args[0] ;
+            final TypeConverter secondTc = mom.getTypeConverter( secondType ) ;
+
+            if (Map.class.isAssignableFrom(cls)) {
+                result = new TypeConverterMapBase( type, firstTc, secondTc ) {
+                    protected Table getTable( Object obj ) {
+                        return new TableMapImpl( (Map)obj ) ;
+                    }
+                } ;
+            } else if (Dictionary.class.isAssignableFrom(cls)) {
+                result = new TypeConverterMapBase( type, firstTc, secondTc ) {
+                    protected Table getTable( Object obj ) {
+                        return new TableDictionaryImpl( (Dictionary)obj ) ;
+                    }
+                } ;
+            } else {
+                throw new IllegalArgumentException( type + " is not supported" ) ;
+            }
+        }
+
+        return result ;
+    }
+    
+    // Basic support for all TypeConverters.
+    protected final Type dataType ;
+    protected final OpenType managedType ;
+
+    protected TypeConverterImpl( Type dataType, OpenType managedType ) {
+        this.dataType = dataType ;
+        this.managedType = managedType ;
     }
 
     /** Java generic type of attribute in problem-domain Object.
      */
-    public abstract Type getDataType() ;
+    public final Type getDataType() {
+        return dataType ;
+    }
 
     /** Open MBeans Open Type for management domain object.
      */
-    public abstract OpenType getManagedType() ;
+    public final OpenType getManagedType() {
+        return managedType ;
+    }
 
     /** Convert from a problem-domain Object obj to a ManagedEntity.
      */
@@ -669,10 +817,16 @@ public abstract class TypeConverterImpl implements TypeConverter {
 
     /** Convert from a ManagedEntity to a problem-domain Object.
      */
-    public abstract Object fromManagedEntity( Object entity ) ;
+    public Object fromManagedEntity( Object entity ) {
+        throw new UnsupportedOperationException(
+            "Converting from managed type " + managedType + " to java type " + dataType 
+                + " is not supported." ) ;
+    }
 
     /** Returns true if this TypeConverter is an identity transformation.
      */
-    public abstract boolean isIdentity() ;
+    public boolean isIdentity() {
+        return false ;
+    }
 }
 

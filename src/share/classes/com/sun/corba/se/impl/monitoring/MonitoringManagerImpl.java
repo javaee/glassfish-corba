@@ -36,6 +36,7 @@
 package com.sun.corba.se.impl.monitoring;
 
 import com.sun.corba.se.spi.monitoring.MonitoringManager;
+import com.sun.corba.se.spi.monitoring.MonitoringManagerFactory;
 import com.sun.corba.se.spi.monitoring.MonitoredObject;
 import com.sun.corba.se.spi.monitoring.MonitoredObjectFactory;
 import com.sun.corba.se.spi.monitoring.MonitoringFactories;
@@ -56,6 +57,12 @@ public class MonitoringManagerImpl implements MonitoringManager {
 
     public MonitoredObject getRootMonitoredObject( ) {
         return rootMonitoredObject;
+    }
+
+    public void close() {
+        MonitoringManagerFactory f = 
+            MonitoringFactories.getMonitoringManagerFactory();
+        f.remove( rootMonitoredObject.getName() ) ;
     }
 }
         

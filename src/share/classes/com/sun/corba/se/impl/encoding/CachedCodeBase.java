@@ -45,9 +45,13 @@ import com.sun.org.omg.SendingContext.CodeBaseHelper;
 import com.sun.org.omg.SendingContext._CodeBaseImplBase;
 import com.sun.org.omg.SendingContext._CodeBaseStub;
 
+import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+
 import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.ior.IOR ;
+
+import com.sun.corba.se.spi.orb.ORB ;
 
 /**
  * Provides the reading side with a per connection cache of
@@ -67,28 +71,42 @@ import com.sun.corba.se.spi.ior.IOR ;
  *
  * Needs cache management.
  */
-// REVISIT: revert to package protected after framework merge.
 public class CachedCodeBase extends _CodeBaseImplBase
 {
+    private ORBUtilSystemException wrapper ;
+
     private Hashtable<String,String> implementations ;
     private Hashtable<String,FullValueDescription> fvds ;
     private Hashtable<String,String[]> bases ;
 
-    private CodeBase delegate;
+    private volatile CodeBase delegate;
     private CorbaConnection conn;
 
-    private static Hashtable<IOR,CodeBase> iorToCodeBaseObjMap = 
+    private static Object iorMapLock = new Object() ; 
+    private static Hashtable<IOR,CodeBase> iorMap = 
 	new Hashtable<IOR,CodeBase>();
+
+    public static synchronized void cleanCache( ORB orb ) {
+        synchronized (iorMapLock) {
+            for (IOR ior : iorMap.keySet()) {
+                if (ior.getORB() == orb) {
+                    iorMap.remove( ior ) ;
+                }
+            }
+        }
+    }
 
     public CachedCodeBase(CorbaConnection connection) {
         conn = connection;
+        wrapper = connection.getBroker().getLogWrapperTable()
+            .get_RPC_ENCODING_ORBUtil() ;
     }
 
     public com.sun.org.omg.CORBA.Repository get_ir () {
         return null;
     }
         
-    public String implementation (String repId) {
+    public synchronized String implementation (String repId) {
         String urlResult = null;
 
         if (implementations == null)
@@ -106,7 +124,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
         return urlResult;
     }
 
-    public String[] implementations (String[] repIds) {
+    public synchronized String[] implementations (String[] repIds) {
         String[] urlResults = new String[repIds.length];
 
         for (int i = 0; i < urlResults.length; i++)
@@ -115,7 +133,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
         return urlResults;
     }
 
-    public FullValueDescription meta (String repId) {
+    public synchronized FullValueDescription meta (String repId) {
         FullValueDescription result = null;
 
         if (fvds == null)
@@ -133,7 +151,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
         return result;
     }
 
-    public FullValueDescription[] metas (String[] repIds) {
+    public synchronized FullValueDescription[] metas (String[] repIds) {
         FullValueDescription[] results 
             = new FullValueDescription[repIds.length];
 
@@ -143,7 +161,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
         return results;
     }
 
-    public String[] bases (String repId) {
+    public synchronized String[] bases (String repId) {
 
         String[] results = null;
 
@@ -165,45 +183,33 @@ public class CachedCodeBase extends _CodeBaseImplBase
     // Ensures that we've used the connection's IOR to create
     // a valid CodeBase delegate.  If this returns false, then
     // it is not valid to access the delegate.
-    private boolean connectedCodeBase() {
+    private synchronized boolean connectedCodeBase() {
         if (delegate != null)
             return true;
 
-        // The delegate was null, so see if the connection's
-        // IOR was set.  If so, then we just need to connect
-        // it.  Otherwise, there is no hope of checking the
-        // remote code base.  That could be bug if the
-        // service context processing didn't occur, or it
-        // could be that we're talking to a foreign ORB which
-        // doesn't include this optional service context.
         if (conn.getCodeBaseIOR() == null) {
-            // REVISIT.  Use Merlin logging service to report that
-            // codebase functionality was requested but unavailable.
-            if (conn.getBroker().transportDebugFlag)
-                conn.dprint("CodeBase unavailable on connection: " + conn);
-
+            // The delegate was null, so see if the connection's
+            // IOR was set.  If so, then we just need to connect
+            // it.  Otherwise, there is no hope of checking the
+            // remote code base.  That could be a bug if the
+            // service context processing didn't occur, or it
+            // could be that we're talking to a foreign ORB which
+            // doesn't include this optional service context.
+            wrapper.codeBaseUnavailable( conn ) ;
             return false;
         }
 
-        synchronized(this) {
-
-            // Recheck the condition to make sure another
-            // thread didn't already do this while we waited
-            if (delegate != null)
-                return true;
-
+        synchronized(iorMapLock) {
             // Do we have a reference initialized by another connection?
-            delegate = CachedCodeBase.iorToCodeBaseObjMap.get(
-		conn.getCodeBaseIOR());
+            delegate = iorMap.get( conn.getCodeBaseIOR() );
             if (delegate != null)
                 return true;
             
             // Connect the delegate and update the cache
-            delegate = CodeBaseHelper.narrow(getObjectFromIOR());
+            delegate = CodeBaseHelper.narrow( getObjectFromIOR() );
             
             // Save it for the benefit of other connections
-            CachedCodeBase.iorToCodeBaseObjMap.put(conn.getCodeBaseIOR(), 
-                                                   delegate);
+            iorMap.put( conn.getCodeBaseIOR(), delegate );
         }
 
         // It's now safe to use the delegate

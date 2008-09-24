@@ -48,4 +48,8 @@ public interface UserNameVerifier extends java.rmi.Remote
         throws RemoteException;
 
     public UserNameInt requestName() throws RemoteException;
+
+    public FeatureInfo getFeatureInfo() throws RemoteException ;
+
+    public boolean validateFeatureInfo( FeatureInfo info ) throws RemoteException ;
 }

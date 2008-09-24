@@ -1,2 +1,0 @@
--include bnd.properties
-Export-Package: com.sun.corba.se.impl.dynamicany.*;version=${version}

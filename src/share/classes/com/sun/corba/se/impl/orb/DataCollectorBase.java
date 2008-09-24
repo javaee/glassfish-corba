@@ -36,7 +36,7 @@
 
 package com.sun.corba.se.impl.orb ;
 
-import com.sun.corba.se.impl.orbutil.GetPropertyAction ;
+import com.sun.corba.se.org.omg.CORBA.GetPropertyAction ;
 
 import java.security.PrivilegedAction ;
 import java.security.AccessController ;

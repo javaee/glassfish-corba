@@ -52,6 +52,7 @@ import java.util.StringTokenizer;
 
 import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
+import com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission ;
 
 import com.sun.corba.se.impl.presentation.rmi.IDLType ;
 import com.sun.corba.se.impl.presentation.rmi.IDLTypeException ;
@@ -212,6 +213,10 @@ public class IDLNameTranslatorImpl implements IDLNameTranslator {
      */
     private IDLNameTranslatorImpl(Class[] interfaces) 
     {
+        SecurityManager s = System.getSecurityManager() ;
+        if (s != null) {
+            s.checkPermission( new DynamicAccessPermission( "access" ) ) ;
+        }
 
         try {
             IDLTypesUtil idlTypesUtil = new IDLTypesUtil();

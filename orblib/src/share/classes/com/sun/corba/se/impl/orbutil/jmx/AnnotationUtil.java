@@ -66,7 +66,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
-import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
 import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
     
@@ -300,6 +299,19 @@ public abstract class AnnotationUtil {
 	public final AttributeType atype() { return atype ; }
 	public final Type type() { return type ; }
 	public final TypeConverter tc() { return tc ; }
+
+        // Check whether or not this MethodInfo is applicable to obj.
+        public boolean isApplicable( Object obj ) {
+            return method.getDeclaringClass().isInstance( obj ) ;
+        }
+
+        public Object get( Object obj ) {
+            try {
+                return tc.toManagedEntity( method.invoke( obj ) ) ;
+            } catch (Exception exc) {
+                throw new RuntimeException( exc ) ;
+            }
+        }
 
 	// Handle a method that is NOT annotated with @ManagedAttribute
 	public MethodInfo( ManagedObjectManager mom, Method m, String extId, String description ) {

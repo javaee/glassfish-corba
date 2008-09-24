@@ -101,7 +101,7 @@ import com.sun.corba.se.impl.transport.TcpTimeoutsImpl;
 public class ParserTable {
     private static String MY_CLASS_NAME = ParserTable.class.getName() ;
 
-    private static ParserTable myInstance = new ParserTable() ;
+    private static final ParserTable myInstance = new ParserTable() ;
 
     private ORBUtilSystemException wrapper ;
 

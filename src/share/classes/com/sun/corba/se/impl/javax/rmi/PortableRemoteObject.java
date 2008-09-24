@@ -71,7 +71,6 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 
 import java.security.AccessController;
-import com.sun.corba.se.impl.orbutil.GetPropertyAction;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 

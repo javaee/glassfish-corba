@@ -90,6 +90,7 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
     }
 
     public synchronized TypeConverter getTypeConverter( Type type ) {
+        // XXX Beware of recursive types!
 	TypeConverter result = typeConverterMap.get( type ) ;	
 	if (result == null) {
 	    result = TypeConverterImpl.makeTypeConverter( type, this ) ;

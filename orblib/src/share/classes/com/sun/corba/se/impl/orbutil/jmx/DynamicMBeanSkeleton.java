@@ -86,7 +86,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
-import com.sun.corba.se.spi.orbutil.jmx.InheritedTable ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
 import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
@@ -100,11 +99,13 @@ import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 // do nothing (Setter), or throw an exception? (Operation).
 class DynamicMBeanSkeleton {
     private String type ;
-    private MBeanInfo mbInfo ;
-    private ManagedObjectManager mom ;
-    private Map<String,AnnotationUtil.Setter> setterFunctions ;
-    private Map<String,AnnotationUtil.Getter> getterFunctions ;
-    private Map<String,Map<List<String>,AnnotationUtil.Operation>> operationFunctions ;
+    private final MBeanInfo mbInfo ;
+    private final ManagedObjectManager mom ;
+    private final Map<String,AnnotationUtil.Setter> setterFunctions ;
+    private final Map<String,AnnotationUtil.Getter> getterFunctions ;
+    private final Map<String,Map<List<String>,AnnotationUtil.Operation>> operationFunctions ;
+    private final List<OpenMBeanAttributeInfo> mbeanAttributeInfoList ; 
+    private final List<OpenMBeanOperationInfo> mbeanOperationInfoList ; 
  
     // This method should only be called when getter.id.equals( setter.id ) 
     public void processAttribute( List<OpenMBeanAttributeInfo> list, 
@@ -217,8 +218,7 @@ class DynamicMBeanSkeleton {
 	// Get the @ManagedObject annotation.  This gives us the type and the description.
 	final ManagedObject mo = cls.getAnnotation( ManagedObject.class ) ;
 	if (mo == null)
-	    throw new IllegalArgumentException( 
-		"Class " + cls 
+	    throw new IllegalArgumentException( "Class " + cls 
 		+ " does not have an @ManagedObject annotation: cannot construct dynamic MBean" ) ;
 
 	type = mo.type() ;
@@ -228,13 +228,20 @@ class DynamicMBeanSkeleton {
 	setterFunctions = new HashMap<String,AnnotationUtil.Setter>() ;
 	getterFunctions = new HashMap<String,AnnotationUtil.Getter>() ; 
 	operationFunctions = new HashMap<String,Map<List<String>,AnnotationUtil.Operation>>() ;
+	mbeanAttributeInfoList = new ArrayList<OpenMBeanAttributeInfo>() ;
+	mbeanOperationInfoList = new ArrayList<OpenMBeanOperationInfo>() ;
 
-	final String moDescription = mo.description() ;
-	final List<OpenMBeanAttributeInfo> mbeanAttributeInfoList = 
-	    new ArrayList<OpenMBeanAttributeInfo>() ;
-	final List<OpenMBeanOperationInfo> mbeanOperationInfoList = 
-	    new ArrayList<OpenMBeanOperationInfo>() ;
+        analyzeClass( cls ) ;
 
+	OpenMBeanAttributeInfo[] attrInfos = mbeanAttributeInfoList.toArray( 
+	    new OpenMBeanAttributeInfo[mbeanAttributeInfoList.size()] ) ;
+	OpenMBeanOperationInfo[] operInfos = mbeanOperationInfoList.toArray(
+	    new OpenMBeanOperationInfo[mbeanOperationInfoList.size() ] ) ;
+	mbInfo = new OpenMBeanInfoSupport( 
+	    cls.getName(), mo.description(), attrInfos, null, operInfos, null ) ;
+    }
+
+    private void analyzeClass( Class<?> cls ) {
 	// Check for @InheritedAttribute(s) annotation.  Find methods for these attributes in superclasses. 
 	final InheritedAttribute[] iaa = AnnotationUtil.getInheritedAttributes( cls ) ;
 	
@@ -256,16 +263,14 @@ class DynamicMBeanSkeleton {
 	    }
 	}
 	
-	// Check for @InheritedTable annotation.
-	final InheritedTable it = cls.getAnnotation( InheritedTable.class ) ;
-	if (it != null) {
-	    // XXX process it
-	}
-
 	// Check for @IncludeSubclass annotation.  Scan subclasses for attributes.
 	final IncludeSubclass is = cls.getAnnotation( IncludeSubclass.class ) ;
 	if (is != null) {
 	    // XXX process is
+            // We should use a Graph with a Finder that traverses all IncludeSubclass references to
+            // generate the root set for the Finder in AnnotationUtils that traverses the inheritance
+            // graph.  First we expand the root set down the inheritance hierarchy, then up,
+            // then we process for attributes: no need for recursion here.
 	}
 	
 	// Scan for all methods annotated with @ManagedAttribute, including inherited methods.
@@ -307,14 +312,8 @@ class DynamicMBeanSkeleton {
 	for (Method m : operations) {
 	    processOperation( mbeanOperationInfoList, m ) ;
 	}
-
-	OpenMBeanAttributeInfo[] attrInfos = mbeanAttributeInfoList.toArray( 
-	    new OpenMBeanAttributeInfo[mbeanAttributeInfoList.size()] ) ;
-	OpenMBeanOperationInfo[] operInfos = mbeanOperationInfoList.toArray(
-	    new OpenMBeanOperationInfo[mbeanOperationInfoList.size() ] ) ;
-	mbInfo = new OpenMBeanInfoSupport( 
-	    cls.getName(), moDescription, attrInfos, null, operInfos, null ) ;
     }
+
 
     public String getType() {
 	return type ;

@@ -223,6 +223,8 @@ public class INSURLOperationImpl implements Operation
             }
         } catch( Exception e ) {
             clearRootNamingContextCache( );
+            // XXX Should this throw an exception or simply return null?
+            // See bug 6475580
 	    throw omgWrapper.soBadSchemaSpecific( e ) ;
         }
      }

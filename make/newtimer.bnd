@@ -1,3 +1,0 @@
--include bnd.properties
-Export-Package: com.sun.corba.se.spi.orbutil.newtimer;version=${version}
-Private-Package: com.sun.corba.se.impl.orbutil.newtimer;version=${version}

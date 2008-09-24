@@ -68,7 +68,7 @@
 	    <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
 	    <jvmarg value="-Demma.coverage.out.merge=true"/>
 	    <jvmarg value="-Demma.rt.control=false"/>
-	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/>
+	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${tools-jar}:${emma-jar}"/>
 	    <jvmarg line="${debug.args}"/>
             <jvmarg value="-Xmx200m"/>
 	    <!-- was:
@@ -127,17 +127,51 @@
     </sequential>
 </macrodef>
 
-<target name="run-test-target" depends="make-output-directory">
+<target name="test-init" depends="init">
+    <condition property="use.java.serialization" value="true" else="false">
+        <equals arg1="${env.JAVA_SERIALIZATION}" arg2="1"/>
+    </condition>
+
+    <condition property="debug.forked.process" value="true" else="false">
+        <equals arg1="${env.DEBUGGER}" arg2="1"/>
+    </condition>
+
+    <condition property="debug.args" value="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y" else="">
+        <equals arg1="${env.DEBUGGER}" arg2="1"/>
+    </condition> 
+
+    <condition property="debug.args" value="-Xrunoii intuitive.audit.Audit -port 31900 -pause -noexit -startCPUprofiler:type=instrumentation,precision=micro">
+        <equals arg1="${env.DEBUGGER}" arg2="2"/>
+    </condition> 
+
+    <condition property="use.dynamic.stub" value="false" else="true">
+        <equals arg1="${env.STATIC_STUB}" arg2="1"/>
+    </condition> 
+
+    <condition property="use.codegen.copyobject" value="true" else="false">
+        <equals arg1="${env.CODEGEN_COPYOBJECT}" arg2="1"/>
+    </condition>
+
+    <mkdir dir="${test.output}"/>
+    <mkdir dir="${junit.reports}"/>
+
+    <echo message="debug.args=${debug.args}"/>
+    <echo message="use.dynamic.stub=${use.dynamic.stub}"/>
+    <echo message="use.java.serialization=${use.java.serialization}"/>
+    <echo message="use.codegen.copyobject=${use.codegen.copyobject}"/>
+</target>
+
+<target name="run-test-target" depends="test-init">
     <property environment="env"/>
     <property name="test-args" value="${env.TEST_ARGS}"/>
     <run-test args="${test-args}"/>
 </target>
 
-<target name="test" depends="init, build-tests, test-all"/>
+<target name="test" depends="test-init, build-tests, test-all"/>
 
-<target name="test-all" depends="init, clean-test-output, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
+<target name="test-all" depends="test-init, clean-test-output, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
 
-<target name="archive-test-results" depends="init">
+<target name="archive-test-results" depends="test-init">
     <jar jarfile="${releaselib.dir}/test-results.jar">
 	<fileset dir="${test.output}">
 	    <include name="*"/>
@@ -149,25 +183,20 @@
     <delete dir="${test.output}" quiet="true"/>
 </target>
 
-<target name="make-output-directory" depends="init">
-    <mkdir dir="${test.output}"/>
-    <mkdir dir="${junit.reports}"/>
-</target>
-
-<target name="test-rmi-iiop" depends="make-output-directory">
+<target name="test-rmi-iiop" depends="test-init">
     <java classname="com.sun.corba.se.impl.util.ORBProperties" classpathref="test-classpath.master"/>
     <run-test args="-file ../src/share/classes/test/AllTests.tdesc -verbose"/>
 </target>
 
-<target name="test-experimental" depends="make-output-directory">
+<target name="test-experimental" depends="test-init">
     <run-test args="-file ../../experimental/test/src/share/classes/corba/ExperimentalTests.tdesc -verbose"/>
 </target>
 
-<target name="test-corba" depends="make-output-directory,test-corba-junit">
+<target name="test-corba" depends="test-init,test-corba-junit">
     <run-test args="-file ../src/share/classes/corba/CORBATests.tdesc -verbose"/>
 </target>
 
-<target name="test-corba-junit" depends="make-output-directory">
+<target name="test-corba-junit" depends="test-init">
     <run-junit-test>
         <test-cases>
             <test name="corba.codegen.Client" todir="${junit.reports}"/>
@@ -178,7 +207,7 @@
     </run-junit-test>
 </target>
 
-<target name="test-copyobject" depends="make-output-directory">
+<target name="test-copyobject" depends="test-init">
     <run-junit-test>
 	<test-cases>
 	    <test name="corba.copyobject.NewReflectTest" todir="${junit.reports}"/>
@@ -190,23 +219,23 @@
     </run-junit-test>
 </target>
 
-<target name="test-pi" depends="make-output-directory">
+<target name="test-pi" depends="test-init">
     <run-test args="-file ../src/share/classes/pi/PITests.tdesc -verbose"/>
 </target>
 
-<target name="test-hopper" depends="make-output-directory">
+<target name="test-hopper" depends="test-init">
     <run-test args="-file ../src/share/classes/hopper/HopperTests.tdesc -verbose"/>
 </target>
 
-<target name="test-mantis" depends="make-output-directory">
+<target name="test-mantis" depends="test-init">
     <run-test args="-file ../src/share/classes/mantis/MantisTests.tdesc -verbose"/>
 </target>
 
-<target name="test-naming" depends="make-output-directory">
+<target name="test-naming" depends="test-init">
     <run-test args="-file ../src/share/classes/naming/NamingTests.tdesc -verbose"/>
 </target>
 
 
-<target name="test-perf" depends="make-output-directory">
+<target name="test-perf" depends="test-init">
     <run-test args="-file ../src/share/classes/performance/Tests.tdesc -verbose"/>
 </target>

@@ -72,8 +72,6 @@ import javax.management.openmbean.CompositeType ;
 import org.testng.TestNG ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
-import org.testng.annotations.Configuration ;
-import org.testng.annotations.ExpectedExceptions ;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
 import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
@@ -435,8 +433,6 @@ public class Client {
             AttributeDescriptor.AttributeType.SETTER ) ;
 	Assert.assertEquals( setter_fooD, ad.method() ) ;
     }
-
-    // @ExpectedExceptions( { IllegalArgumentException.class } )
 
     //==============================================================================================
     // Tests for TypeConverter class

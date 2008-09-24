@@ -125,7 +125,8 @@ public class TestngRunner {
         if (!outdir.isDirectory())
             throw new RuntimeException( outdir + " is not a directory" ) ;
 
-        outdirName = reportDir + File.separatorChar + Options.getControllerName() ;
+        outdirName = reportDir + File.separatorChar + 
+            System.getProperty( "corba.test.controller.name", "default" ) ;
 
         File destDir = new File( outdirName ) ;
         destDir.mkdir() ;

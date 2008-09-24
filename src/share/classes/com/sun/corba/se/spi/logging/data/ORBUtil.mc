@@ -201,6 +201,8 @@
 	     30 WARNING "{0} is not a valid positive decimal integer for {1}")
 	    (BAD_TIMEOUT_DATA_LENGTH
 	     31 WARNING "Timeout data must be 3 or 4 positive decimal integers separated by :")
+            (CODE_BASE_UNAVAILABLE 
+             32 FINE "CodeBase unavailable on connection {0}")
 	    )
 	(BAD_INV_ORDER 
 	    (DSIMETHOD_NOTCALLED 

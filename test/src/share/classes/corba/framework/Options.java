@@ -566,8 +566,4 @@ public class Options {
     public static Port getUnusedPort() {
         return new Port();
     }
-
-    public static String getControllerName() {
-        return defaultProperties.getProperty( "corba.test.controller.name" ) ;
-    }
 }

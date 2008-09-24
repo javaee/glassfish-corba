@@ -1081,9 +1081,7 @@ public class IIOPInputStream
 
             try {
                 // KMC start of enum receiver-makes-right changes
-                // Alternate: if isAssignableFrom check with Enum.class
-                // if (cinfo.isEnum())
-                if (Enum.class.isAssignableFrom( clz )) {
+                if (cinfo.isEnum()) {
                     if (valueHandlerDebug())
                         dputil.info( "reading Enum" ) ;
 
@@ -1430,12 +1428,17 @@ public class IIOPInputStream
 	    ObjectStreamClass currdesc = currentClassDesc = ObjectStreamClass.lookup(clz);
 	    Class currclass = currentClass = clz;
 			
-	    /* If Externalizable,
-	     *  Create an instance and tell it to read its data.
-	     * else,
-	     *  Handle it as a serializable class.
-	     */
-	    if (currentClassDesc.isExternalizable()) {
+            // KMC start of enum receiver-makes-right changes
+            // Alternate: if isAssignableFrom check with Enum.class
+            // if (cinfo.isEnum()) if we start passing cinfo here
+            if (Enum.class.isAssignableFrom( clz )) {
+                if (valueHandlerDebug())
+                    dputil.info( "reading Enum" ) ;
+
+                int ordinal = orbStream.read_long() ;
+                String value = (String)orbStream.read_value( String.class ) ;
+                return Return.value(Enum.valueOf( clz, value ) );
+            } else if (currentClassDesc.isExternalizable()) {
 		try {
 		    currentObject = (currentClass == null) ?
 			null : currentClassDesc.newInstance();

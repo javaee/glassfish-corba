@@ -151,6 +151,12 @@ The modules:
         ${root.dir}/make/${m}.template.pom
         ${releaselib.dir}/bundles/${m}.jar
 
+<macrodef name="dependency">
+    <attribute name="module"/>
+    <sequential>
+    </sequential>
+</macrodef>
+
 <macrodef name="make-file">
     <attribute name="file"/>
     <attribute name="target"/>

@@ -203,6 +203,8 @@ public interface ORBData {
     public boolean blockingReadCheckMessageParser();
 
     public boolean timingPointsEnabled() ;
+
+    public boolean useEnumDesc() ;
 }
 
 // End of file.

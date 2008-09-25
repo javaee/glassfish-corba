@@ -487,6 +487,10 @@ public class ParserTable {
 	    ParserDataFactory.make( ORBConstants.TIMING_POINTS_ENABLED,
 		OperationFactory.booleanAction(),
 		"timingPointsEnabled", Boolean.FALSE,
+		Boolean.TRUE, "TRUE"),
+	    ParserDataFactory.make( ORBConstants.USE_ENUM_DESC,
+		OperationFactory.booleanAction(),
+		"useEnumDesc", Boolean.FALSE,
 		Boolean.TRUE, "TRUE")
 	} ;
 

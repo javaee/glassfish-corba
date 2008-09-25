@@ -172,7 +172,7 @@ public class ClassInfoBaseTestSuite extends TestCase {
     }
 
     public void testPkgName() {
-	assertTrue( Type._String().classInfo().packageName().equals( "java.lang" ) ) ;
+	assertTrue( Type._String().classInfo().pkgName().equals( "java.lang" ) ) ;
     }
 
     public void testIsSubclass() {

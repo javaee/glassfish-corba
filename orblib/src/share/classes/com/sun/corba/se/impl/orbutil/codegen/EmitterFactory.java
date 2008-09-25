@@ -664,17 +664,19 @@ public final class EmitterFactory {
     public static Emitter makeEmitter( 
 	ExpressionFactory.NonStaticFieldAccessExpression expr,
 	boolean isStore ) {
+
 	Type targetType = expr.target().type() ;	
 
 	ClassInfo cinfo = targetType.classInfo() ;
 	FieldInfo fld = cinfo.fieldInfo().get( expr.fieldName() ) ;
-	if (fld == null)
-	    throw new IllegalArgumentException( expr.fieldName() + 
-		" is not a valid field in class " + targetType.name() ) ;
+	if (fld == null) {
+	    throw new IllegalArgumentException( expr.fieldName() 
+                + " is not a valid field in class " + targetType.name() ) ;
+        }
 
 	// XXX we need access control checking here!!!
-	return makeFieldInsnEmitter( isStore, false, targetType, expr.fieldName(),
-	    fld.type() ) ;
+	return makeFieldInsnEmitter( isStore, false, targetType, 
+            expr.fieldName(), fld.type() ) ;
     }
 
     /** Create an emitter that generates the instruction needed to

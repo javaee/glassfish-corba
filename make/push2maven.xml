@@ -138,6 +138,12 @@ The modules             (and their dependencies):
         resulting jar:      ${releaselib.dir}/bundles/glassfish-corba-${m}.jar
 -->
 
+<macrodef name="dependency">
+    <attribute name="module"/>
+    <sequential>
+    </sequential>
+</macrodef>
+
 <macrodef name="make-file">
     <attribute name="module"/>
     <attribute name="description"/>

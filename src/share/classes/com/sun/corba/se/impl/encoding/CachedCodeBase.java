@@ -98,8 +98,6 @@ public class CachedCodeBase extends _CodeBaseImplBase
 
     public CachedCodeBase(CorbaConnection connection) {
         conn = connection;
-        wrapper = connection.getBroker().getLogWrapperTable()
-            .get_RPC_ENCODING_ORBUtil() ;
     }
 
     public com.sun.org.omg.CORBA.Repository get_ir () {
@@ -195,7 +193,13 @@ public class CachedCodeBase extends _CodeBaseImplBase
             // service context processing didn't occur, or it
             // could be that we're talking to a foreign ORB which
             // doesn't include this optional service context.
+            if (wrapper == null) {
+                ORB orb = conn.getBroker() ;
+                wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
+            }
+
             wrapper.codeBaseUnavailable( conn ) ;
+
             return false;
         }
 

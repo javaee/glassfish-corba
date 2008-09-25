@@ -51,6 +51,7 @@ import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.CompletionStatus;
 
 import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.pept.transport.ConnectionCache;
 import com.sun.corba.se.pept.transport.ByteBufferPool;
 import com.sun.corba.se.pept.transport.ContactInfo;
 import com.sun.corba.se.pept.transport.InboundConnectionCache;
@@ -210,6 +211,12 @@ public class CorbaTransportManagerImpl
 	    if (orb.transportDebugFlag) {
 		dprint(".close->");
 	    }
+            for (Object cc : outboundConnectionCaches.values()) {
+                ((ConnectionCache)cc).close() ;
+            }
+            for (Object cc : inboundConnectionCaches.values()) {
+                ((ConnectionCache)cc).close() ;
+            }
 	    getSelector(0).close();
 	} finally {
 	    if (orb.transportDebugFlag) {

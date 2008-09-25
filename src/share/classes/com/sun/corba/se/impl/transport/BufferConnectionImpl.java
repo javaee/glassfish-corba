@@ -255,6 +255,10 @@ public class BufferConnectionImpl
 	buffers.add( byteBuffer ) ;
     }
 
+    public void closeConnectionResources() 
+    {
+    }
+
     /**
      * Note:it is possible for this to be called more than once
      */

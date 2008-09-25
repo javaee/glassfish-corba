@@ -998,7 +998,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
 	Class clazz = object.getClass();
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-	if (cinfo.isEnum()) {
+	if (orb.getORBData().userEnumDesc() && cinfo.isEnum()) {
 	    String enumValue = ((Enum)object).name() ;
 	    EnumDesc desc = getEnumDesc( clazz.getName(), enumValue ) ;
 	    write_value( desc, (String)null ) ;

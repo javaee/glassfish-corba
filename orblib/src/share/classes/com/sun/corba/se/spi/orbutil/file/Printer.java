@@ -102,6 +102,13 @@ public class Printer{
 	return this ;
     }
 
+    public Printer p( Object... args ) {
+        for (Object obj : args)
+            p( obj ) ;
+
+        return this ;
+    }
+
     public Printer p( Object obj ) {
 	String str = obj.toString() ;
 	rightJustify( str ) ;
@@ -140,5 +147,71 @@ public class Printer{
 	bld = new StringBuilder() ;
 	bld.append( pad ) ; 
 	return this ;
+    }
+
+    private boolean isPrintable(char c) {
+	if (Character.isJavaIdentifierStart(c)) {
+	    // Letters and $ _
+	    return true;
+	}
+	if (Character.isDigit(c)) {
+	    return true;
+	}
+	switch (Character.getType(c)) {
+	    case Character.MODIFIER_SYMBOL : return true; // ` ^
+	    case Character.DASH_PUNCTUATION : return true; // -
+	    case Character.MATH_SYMBOL : return true; // = ~ + | < >
+	    case Character.OTHER_PUNCTUATION : return true; // !@#%&*;':",./?
+	    case Character.START_PUNCTUATION : return true; // ( [ {
+	    case Character.END_PUNCTUATION : return true; // ) ] }
+	}
+	return false;
+    }
+
+    public Printer printBuffer( byte[] buffer ) {
+	int length = buffer.length ;
+
+        for (int i = 0; i < length; i += 16) {
+            StringBuffer sbuf = new StringBuffer() ;
+            int j = 0;
+            
+            // For every 16 bytes, there is one line of output.  First, 
+            // the hex output of the 16 bytes with each byte separated
+            // by a space.
+            while (j < 16 && (i + j) < length) {
+                int k = buffer[i + j];
+                if (k < 0)
+                    k = 256 + k;
+                String hex = Integer.toHexString(k);
+                if (hex.length() == 1)
+                    hex = "0" + hex;
+                sbuf.append(hex + " ");
+                j++;
+            }
+            
+            // Add any extra spaces to align the
+            // text column in case we didn't end
+            // at 16
+            while (j < 16) {
+                sbuf.append("   ");
+                j++;
+            }
+            
+            // Now output the ASCII equivalents.  Non-ASCII
+            // characters are shown as periods.
+            int x = 0;
+            while (x < 16 && x + i < length) {
+                char ch = (char)buffer[i + x] ;
+                if (isPrintable( ch ))
+                    sbuf.append( ch ) ;
+                else
+                    sbuf.append( '.' ) ;
+                x++;
+            }
+
+            nl().p( sbuf ) ;
+        }
+
+        return this ;
     }
 }

@@ -101,7 +101,7 @@ import com.sun.corba.se.impl.transport.TcpTimeoutsImpl;
 public class ParserTable {
     private static String MY_CLASS_NAME = ParserTable.class.getName() ;
 
-    private static ParserTable myInstance = new ParserTable() ;
+    private static final ParserTable myInstance = new ParserTable() ;
 
     private ORBUtilSystemException wrapper ;
 
@@ -487,6 +487,10 @@ public class ParserTable {
 	    ParserDataFactory.make( ORBConstants.TIMING_POINTS_ENABLED,
 		OperationFactory.booleanAction(),
 		"timingPointsEnabled", Boolean.FALSE,
+		Boolean.TRUE, "TRUE"),
+	    ParserDataFactory.make( ORBConstants.USE_ENUM_DESC,
+		OperationFactory.booleanAction(),
+		"useEnumDesc", Boolean.FALSE,
 		Boolean.TRUE, "TRUE")
 	} ;
 

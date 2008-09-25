@@ -128,6 +128,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private boolean nonBlockingReadCheckMessageParser;
     private boolean blockingReadCheckMessageParser;
     private boolean timingPointsEnabled;
+    private boolean useEnumDesc ;
 
     // This is not initialized from ParserTable.
     private CodeSetComponentInfo codesets ;
@@ -513,6 +514,11 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public boolean timingPointsEnabled() 
     {
 	return timingPointsEnabled ;
+    }
+
+    public boolean useEnumDesc() 
+    {
+        return useEnumDesc ;
     }
 }
 

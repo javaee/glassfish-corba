@@ -543,7 +543,7 @@ public class ThreadPoolImpl implements ThreadPool
                     );
                 }
             } catch (SecurityException se) {
-                throw wrapper.workerThreadGetContextClassloaderFailed(this, se);
+                throw wrapper.workerThreadGetContextClassloaderFailed(se, this);
             }
 
             if (workerThreadClassLoader != currentClassLoader) {
@@ -555,7 +555,7 @@ public class ThreadPoolImpl implements ThreadPool
                     wrapper.workerThreadClassloaderReset(this, 
                         currentClassLoader, workerThreadClassLoader);
                 } catch (SecurityException se) {
-                    wrapper.workerThreadResetContextClassloaderFailed(this, se);
+                    wrapper.workerThreadResetContextClassloaderFailed(se, this);
                 }
             }
         }
@@ -565,7 +565,7 @@ public class ThreadPoolImpl implements ThreadPool
             try {
                 currentWork.doWork();
             } catch (Throwable t) {
-                wrapper.workerThreadDoWorkThrowable(this, t);
+                wrapper.workerThreadDoWorkThrowable(t, this);
             }
             long elapsedTime = System.currentTimeMillis() - start;
             totalTimeTaken.addAndGet(elapsedTime);
@@ -591,7 +591,7 @@ public class ThreadPoolImpl implements ThreadPool
 
                         continue ;
                     } catch (Throwable t) {
-                        wrapper.workerThreadThrowableFromRequestWork(this, t,
+                        wrapper.workerThreadThrowableFromRequestWork(t, this, 
                                 workQueue.getName());
                         
                         continue;
@@ -607,7 +607,7 @@ public class ThreadPoolImpl implements ThreadPool
                 }
             } catch (Throwable e) {
                 // This should not be possible
-                wrapper.workerThreadCaughtUnexpectedThrowable(this,e);
+                wrapper.workerThreadCaughtUnexpectedThrowable(e, this);
             } finally {
                 synchronized (workersLock) {
                     workers.remove( this ) ;

@@ -46,49 +46,72 @@ public class EvolveTest extends CORBATest
 {
     public static String[] rmicClasses = { "corba.evolve.UserNameVerifierImpl"};
 
+    public static String[] compileClasses = { "UserName", "UserNameRO", "UserNameROD", "FeatureInfoImpl" } ;
+
     public static final String EVOLVED_DIR = "evolved";
     public static final String ORIG_DIR = "original";
 
-    // Compile the original and evolved classes into separate
-    // directories under the output directory.
-    private void compileSpecialClasses() throws Exception
-    {
-        File origDir = new File(Options.getOutputDirectory()
-                                + File.separator
-                                + ORIG_DIR);
+    private String testDir ;
 
-        File evolvedDir = new File(Options.getOutputDirectory()
-                                   + File.separator
-                                   + EVOLVED_DIR);
+    private void compileFiles( String dirName ) throws Exception {
+        File dir = new File(Options.getOutputDirectory() 
+            + File.separator + dirName );
 
-        if (!origDir.mkdir() || !evolvedDir.mkdir())
-            throw new Exception("Error making test/make/gen/original or evolved dirs");
+        if (!dir.mkdir())
+            throw new Exception( "Error making directory" + dir ) ;
 
-        String testDir = Options.getTestDirectory() + File.separator;
-        String files[] = new String[] { testDir 
-                                        + ORIG_DIR 
-                                        + File.separator 
-                                        + "UserName.java" };
+        testDir = Options.getTestDirectory() + File.separator ;
 
-        // Compile the original UserName class into
-        // test/make/gen/corba/evolve/original
-        javac.compile(files,
-                      Options.getJavacArgs(),
-                      origDir.getAbsolutePath(),
-                      Options.getReportDirectory());
-                      
-        files[0] = testDir + EVOLVED_DIR + File.separator + "UserName.java";
+        String result[] = new String[compileClasses.length] ;
+        for (int ctr=0; ctr<compileClasses.length; ctr++) {
+            result[ctr] = testDir + dirName + File.separator 
+                + compileClasses[ctr] + ".java" ;
+        }
 
-        // Now compile the evolved version into
-        // test/make/gen/corba/evolve/evolved
-        javac.compile(files,
-                      Options.getJavacArgs(),
-                      evolvedDir.getAbsolutePath(),
-                      Options.getReportDirectory());
+        javac.compile( result, Options.getJavacArgs(),
+            dir.getAbsolutePath(), Options.getReportDirectory() ) ;
     }
 
-    protected void doTest() throws Throwable
-    {
+    // Compile the original and evolved classes into separate
+    // directories under the output directory.
+    private void compileSpecialClasses() throws Exception {
+        compileFiles( ORIG_DIR ) ;
+        compileFiles( EVOLVED_DIR ) ;
+    }
+
+    private int failures = 0 ;
+    private String origClasspath ;
+    private String evolClasspath ;
+
+    private String setClasspath( String side, boolean isOriginal ) {
+        Test.dprint( "Starting " + side + " with the " 
+            + (isOriginal ? "original" : "evolved") + " classpath" ) ;
+        Options.setClasspath( isOriginal ? origClasspath : evolClasspath ) ;
+        return (isOriginal ? "orig_" : "evol_") + side ;
+    }
+
+    private void runTest( boolean clientIsOriginal ) throws Exception {
+        String serverName = setClasspath( "server", !clientIsOriginal ) ;
+        Controller server = createServer( "corba.evolve.Server", 
+            serverName ) ;
+        server.start();
+
+        String clientName = setClasspath( "client", clientIsOriginal ) ;
+        Controller client = createClient( "corba.evolve.Client", 
+            clientName ) ;
+        client.start();
+            
+        if (client.waitFor(Options.getMaximumTimeout()) != Controller.SUCCESS) {
+            System.out.println("Bad client exit value (" + client.exitValue() 
+                + ") with evolved class");
+            failures++;
+        }
+
+        server.stop();
+        client.stop();
+    }
+
+    protected void doTest() throws Throwable {
         Options.setRMICClasses(rmicClasses);
         Options.addRMICArgs("-poa -nolocalstubs -iiop -keep -g");
 
@@ -105,70 +128,18 @@ public class EvolveTest extends CORBATest
 
         String testClasspath = Options.getClasspath();
 
-        String origClasspath = (Options.getOutputDirectory() 
-                                + ORIG_DIR 
-                                + File.pathSeparator 
-                                + testClasspath);
+        origClasspath = Options.getOutputDirectory() + ORIG_DIR 
+            + File.pathSeparator + testClasspath; 
+        evolClasspath = Options.getOutputDirectory() + EVOLVED_DIR 
+            + File.pathSeparator + testClasspath;
 
-        String evolClasspath = (Options.getOutputDirectory()
-                                + EVOLVED_DIR 
-                                + File.pathSeparator 
-                                + testClasspath);
-
-        int failures = 0;
-
-        /***********************************************************
-         * Test 1:  Server with the original class vs evolved client
-         **********************************************************/
-
-        Test.dprint("Starting server with the original class");
-        Options.setClasspath(origClasspath);
-        Controller server = createServer("corba.evolve.Server",
-                                         "orig_server");
-        server.start();
-
-        Test.dprint("Starting client with the evolved class");
-        Options.setClasspath(evolClasspath);
-        Controller client = createClient("corba.evolve.Client",
-                                         "evol_client");
-        client.start();
-            
-        if (client.waitFor(Options.getMaximumTimeout()) != Controller.SUCCESS) {
-            System.out.println("Bad client exit value ("
-                               + client.exitValue()
-                               + ") with evolved class");
-            failures++;
-        }
-
-        server.stop();
-        client.stop();
+        // Test 1:  Server with the original class vs evolved client
+        runTest( true ) ;
 
         try { Thread.sleep(1000); } catch (InterruptedException e) {}
 
-        /***********************************************************
-         * Test 2:  Server with the evolved class vs original client
-         **********************************************************/
-
-        Test.dprint("Starting server with the evolved class");
-        Options.setClasspath(evolClasspath);
-        server = createServer("corba.evolve.Server",
-                              "evol_server");
-        server.start();
-
-        Test.dprint("Starting client with the original class");
-        Options.setClasspath(origClasspath);
-        client = createClient("corba.evolve.Client",
-                              "orig_client");
-        client.start();
-        if (client.waitFor(Options.getMaximumTimeout()) != Controller.SUCCESS) {
-            System.out.println("Bad client exit value ("
-                               + client.exitValue()
-                               + ") with original class");
-            failures++;
-        }
-
-        server.stop();
-        client.stop();
+        // Test 2:  Server with the evolved class vs original client
+        runTest( false ) ;
 
         orbd.stop();
 

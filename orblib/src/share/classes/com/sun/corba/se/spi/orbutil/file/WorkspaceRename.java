@@ -163,8 +163,17 @@ public class WorkspaceRename {
 	}
 
 	if (sourceName.startsWith( rootName)) {
-	    String targetName = sourceName.substring( rootName.length() ).replace( "com/sun/corba/se",
-		"com/sun/corba/" + version ) ;
+            final String targetName ;
+
+            // Special handling for ASM!
+            if (sourceName.indexOf( "org/objectweb" ) >= 0) {
+                targetName = sourceName.substring( rootName.length() ).replace( "org/objectweb/asm",
+                    "com/sun/corba/" + version + "/org/objectweb/asm" ) ;
+            } else {
+                targetName = sourceName.substring( rootName.length() ).replace( "com/sun/corba/se",
+                    "com/sun/corba/" + version ) ;
+            }
+
 	    File result = new File( destination, targetName ) ;
 	    File resultDir = result.getParentFile() ;
 	    resultDir.mkdirs() ;

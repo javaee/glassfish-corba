@@ -1004,7 +1004,11 @@ public class IIOPInputStream
     	    throw new ClassNotFoundException(currentClassDesc.getName());
 
         try {
-            if (currentClassDesc.isExternalizable()) {
+            if (Enum.class.isAssignableFrom( clz )) {
+                int ordinal = orbStream.read_long() ;
+                String value = (String)orbStream.read_value( String.class ) ;
+                return Enum.valueOf( clz, value ) ;
+            } else if (currentClassDesc.isExternalizable()) {
                 try {
                     currentObject = (currentClass == null) ?
                         null : currentClassDesc.newInstance();
@@ -1309,12 +1313,18 @@ public class IIOPInputStream
 	    ObjectStreamClass currdesc = currentClassDesc = ObjectStreamClass.lookup(clz);
 	    Class currclass = currentClass = clz;
 			
-	    /* If Externalizable,
+	    /* if enum,
+             *  use Enum.valueOf to get the correct enum instance.
+             * else If Externalizable,
 	     *  Create an instance and tell it to read its data.
 	     * else,
 	     *  Handle it as a serializable class.
 	     */
-	    if (currentClassDesc.isExternalizable()) {
+            if (Enum.class.isAssignableFrom( clz )) {
+                int ordinal = orbStream.read_long() ;
+                String value = (String)orbStream.read_value( String.class ) ;
+                return Enum.valueOf( clz, value ) ;
+	    } else if (currentClassDesc.isExternalizable()) {
 		try {
 		    currentObject = (currentClass == null) ?
 			null : currentClassDesc.newInstance();

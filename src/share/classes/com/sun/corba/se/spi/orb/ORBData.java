@@ -203,6 +203,12 @@ public interface ORBData {
     public boolean blockingReadCheckMessageParser();
 
     public boolean timingPointsEnabled() ;
+
+    // Should marshaling of enums be done with EnumDesc, or by simply
+    // marshaling as a value type with receiver-make-right?  Use EnumDesc
+    // if this returns true.  The default is false, but the ORB will do
+    // the right thing if it receives an EnumDesc in any case.
+    public boolean useEnumDesc() ;
 }
 
 // End of file.

@@ -597,6 +597,11 @@ public class ORBConstants {
     // even if none of the individual timing points are themselves enabled.
     public static final String TIMING_POINTS_ENABLED = SUN_PREFIX 
 	+ "ORBEnableTimingPoints" ;
+
+    // Enable the use of the EnumDesc class for marshaling enums.  Really only
+    // present for testing.
+    public static final String USE_ENUM_DESC = SUN_PREFIX 
+        + "ORBUseEnumDesc" ;
 }
 
 // End of file.

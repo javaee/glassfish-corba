@@ -172,6 +172,7 @@ public class SocketOrChannelContactInfoImpl
     // RMI-IIOP Failover will break.  See IIOPPrimaryToContactInfoImpl.java
     // in the app server or in the Corba unit tests.
     
+    @Override
     public int hashCode() 
     {
 	if (! isHashCodeCached) {
@@ -185,6 +186,7 @@ public class SocketOrChannelContactInfoImpl
     // RMI-IIOP Failover will break.  See IIOPPrimaryToContactInfoImpl.java
     // in the app server or in the Corba unit tests.
     
+    @Override
     public boolean equals(Object obj) 
     {
 	if (obj == null) {

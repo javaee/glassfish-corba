@@ -215,13 +215,13 @@ public final class TypeCodeImpl extends TypeCode
 
     // the ORB instance: may be instanceof ORBSingleton or ORB
     @Copy( CopyType.IDENTITY )
-    private ORB _orb; 		
+    private transient ORB _orb; 		
 
     @Copy( CopyType.IDENTITY )
-    private ORBUtilSystemException wrapper ;
+    private transient ORBUtilSystemException wrapper ;
 
     @Copy( CopyType.IDENTITY )
-    private TimingPoints tp ;
+    private transient TimingPoints tp ;
 
     ///////////////////////////////////////////////////////////////////////////
     // Constructors...
@@ -738,11 +738,7 @@ public final class TypeCodeImpl extends TypeCode
 
     private void setId(String newID) {
 	_id = newID;
-	if (_orb instanceof TypeCodeFactory) {
-	    ((TypeCodeFactory)_orb).setTypeCode(_id, this);
-	}
-	// check whether return value != this which would indicate that the
-	// repository id isn't unique.
+        _orb.setTypeCode(_id, this);
     }
 
     private void setParent(TypeCodeImpl parent) {
@@ -949,9 +945,11 @@ public final class TypeCodeImpl extends TypeCode
 			    // check for member count
 			    if (_memberCount != tc.member_count())
 				return false;
+
 			    // check for repository id
 			    if (_id.compareTo(tc.id()) != 0)
 				return false;
+                            
 			    // check for member types.
 			    for (int i = 0 ; i < _memberCount ; i++)
 				if (_memberAccess[i] != tc.member_visibility(i) ||
@@ -959,16 +957,20 @@ public final class TypeCodeImpl extends TypeCode
 				    return false;
 			    if (_type_modifier == tc.type_modifier())
 				return false;
+                            
 			    // concrete_base may be null
 			    TypeCode tccb = tc.concrete_base_type();
-			    if ((_concrete_base == null && tccb != null) ||
-				(_concrete_base != null && tccb == null) ||
-				! _concrete_base.equal(tccb))
-			    {
-				return false;
-			    }
+
+                            if (_concrete_base == null) {
+                                return tccb == null ;
+                            }
+
+                            if (tccb == null) {
+                                return false ;
+                            }
+
 			    // ignore id and names since those are optional.
-			    return true;
+                            return _concrete_base.equal(tccb) ;
 			}
 
 		    case TCKind._tk_alias:
@@ -1389,13 +1391,8 @@ public final class TypeCodeImpl extends TypeCode
 
     private void read_value_recursive(TypeCodeInputStream is) {
 	// don't wrap a CDRInputStream reading "inner" TypeCodes.
-	if (is instanceof TypeCodeReader) {
-	    if (read_value_kind((TypeCodeReader)is))
-		read_value_body(is);
-	} else {
-	    read_value_kind((InputStream)is);
-	    read_value_body(is);
-	}
+        if (read_value_kind((TypeCodeReader)is))
+            read_value_body(is);
     }
 
     boolean read_value_kind(TypeCodeReader tcis) 

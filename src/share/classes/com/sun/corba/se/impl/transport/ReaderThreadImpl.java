@@ -53,16 +53,14 @@ public class ReaderThreadImpl
 {
     private ORB orb;
     private Connection connection;
-    private Selector selector;
     private boolean keepRunning;
     private long enqueueTime;
 
     public ReaderThreadImpl(ORB orb, 
-			    Connection connection, Selector selector)
+			    Connection connection)
     {
 	this.orb = orb;
 	this.connection = connection;
-	this.selector = selector;
 	keepRunning = true;
     }
 

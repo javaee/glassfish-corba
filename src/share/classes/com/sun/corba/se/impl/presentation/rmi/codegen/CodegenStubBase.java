@@ -143,7 +143,7 @@ public class CodegenStubBase extends Stub
 
 			setDefaultDelegateMethod.invoke( stub ) ;
 		    } catch (Exception exc) {
-			throw wrapper.couldNotAccessStubDelegate() ;
+			throw wrapper.couldNotAccessStubDelegate( exc ) ;
 		    }
 		    return null ;
 		}
@@ -183,7 +183,7 @@ public class CodegenStubBase extends Stub
 
     public String[] _ids()
     {
-	return typeIds ;
+	return typeIds.clone() ;
     }
 
     /** Must be called to complete the initialization of the stub.

@@ -60,7 +60,7 @@ public class JUnitReportHelper {
             System.out.println( "JUnitReportHelper: " + str ) ;
     }
 
-    public class Counts extends Pair<Integer,Integer> {
+    public static class Counts extends Pair<Integer,Integer> {
         Counts( int numPass, int numFail ) {
             super( numPass, numFail ) ;
         }

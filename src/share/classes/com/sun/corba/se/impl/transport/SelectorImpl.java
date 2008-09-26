@@ -488,7 +488,7 @@ public class SelectorImpl
 	}
 	Acceptor acceptor = eventHandler.getAcceptor();
 	ListenerThread listenerThread =
-	    new ListenerThreadImpl(orb, acceptor, this);
+	    new ListenerThreadImpl(orb, acceptor);
 	listenerThreads.put(eventHandler, listenerThread);
 	Throwable throwable = null;
 	try {
@@ -530,7 +530,7 @@ public class SelectorImpl
 	}
 	Connection connection = eventHandler.getConnection();
 	ReaderThread readerThread = 
-	    new ReaderThreadImpl(orb, connection, this);
+	    new ReaderThreadImpl(orb, connection );
 	readerThreads.put(eventHandler, readerThread);
 	Throwable throwable = null;
 	try {
@@ -581,7 +581,7 @@ public class SelectorImpl
     // Op.
     // REVISIT - Could do away with this class and use the EventHanlder
     //           directly.
-    private class SelectionKeyAndOp
+    private static class SelectionKeyAndOp
     {
         // A SelectionKey.[OP_READ|OP_WRITE|OP_ACCEPT|OP_CONNECT]
         public int keyOp;

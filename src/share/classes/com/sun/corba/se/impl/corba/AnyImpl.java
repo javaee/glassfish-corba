@@ -104,9 +104,9 @@ public class AnyImpl extends Any
     // Always valid.
     //
     private TypeCodeImpl typeCode;
-    protected ORB orb;
-    private TimingPoints tp ;
-    private ORBUtilSystemException wrapper ;
+    protected transient ORB orb;
+    private transient TimingPoints tp ;
+    private transient ORBUtilSystemException wrapper ;
 
     //
     // Validity depends upon typecode. The 'value' and 'object' instance
@@ -116,7 +116,7 @@ public class AnyImpl extends Any
     // stream type is an Any extension of CDR stream that is used to
     // detect an optimization in read_value().
     //
-    private CDRInputStream stream;
+    private transient CDRInputStream stream;
     private long value;
     private java.lang.Object object;
 

@@ -344,7 +344,7 @@ public class CorbaTransportManagerImpl
 	new ThreadLocal() {
 	    public Object initialValue() 
 	    {
-		return new MessageTraceManagerImpl( orb ) ;
+		return new MessageTraceManagerImpl( ) ;
 	    }
 	} ;
 

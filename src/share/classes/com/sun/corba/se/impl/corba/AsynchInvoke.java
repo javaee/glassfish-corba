@@ -81,19 +81,20 @@ public class AsynchInvoke implements Runnable {
 
     public void run() 
     {
-	// do the actual invocation
-	_req.doInvocation();
+        synchronized (_req) {
+            // do the actual invocation
+            _req.doInvocation();
+        }
     
 	// for the asynchronous case, note that the response has been
 	// received.
-	synchronized (_req)
-	    {
-		// update local boolean indicator
-		_req.gotResponse = true;
+	synchronized (_req) {
+            // update local boolean indicator
+            _req.gotResponse = true;
 
-		// notify any client waiting on a 'get_response'
-		_req.notify();
-	    }
+            // notify any client waiting on a 'get_response'
+            _req.notify();
+        }
       
 	if (_notifyORB == true) {
 	    _orb.notifyORB() ;

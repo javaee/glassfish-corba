@@ -52,11 +52,11 @@ public class PrincipalImpl extends org.omg.CORBA.Principal
 
     public void name(byte[] value)
     {
-	this.value = value;
+	this.value = value.clone();
     }
 
     public byte[] name()
     {
-	return value;
+	return value.clone() ;
     }
 }

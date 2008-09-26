@@ -56,7 +56,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 public class NVListImpl extends NVList 
 {
-    private final int	 INITIAL_CAPACITY	= 4;
+    private final static int	 INITIAL_CAPACITY	= 4;
 
     private List<NamedValue> _namedValues;
     private ORB orb;

@@ -36,20 +36,23 @@
 
 package com.sun.corba.se.spi.orbutil.newtimer ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.ManagedObject ;
+import com.sun.jmxa.Description ;
 
 /** Used to create specific TimerEvent instances through a TimerEventController.
  * The contents() method in a Timer returns an unmodifiable empty set.
  *
  * @author  Ken Cavanaugh
  */
-@ManagedObject( description="A timer represents a particular action that has a duration from ENTER to EXIT" )
+@ManagedObject
+@Description( "A timer represents a particular action that has a duration from ENTER to EXIT" )
 public interface Timer extends Controllable {
     /** Return true if this Timer is ready to create TimerEvents.
      * This is the case either if this Timer is enabled, or is reachable
      * through contents() from an enabled TimerGroup.
      */
-    @ManagedAttribute( description="True if this Timer is enabled, and can generate TimerEvents" ) 
+    @ManagedAttribute
+    @Description( "True if this Timer is enabled, and can generate TimerEvents" ) 
     boolean isActivated() ;
 }

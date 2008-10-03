@@ -38,19 +38,23 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import java.util.Set ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
+import com.sun.jmxa.ManagedOperation ;
+import com.sun.jmxa.ManagedObject ;
+import com.sun.jmxa.Description ;
 
 /** A TimerGroup is a collection of Controllables, which includes
  * Timers and TimerGroups.  The contents() method in a TimerGroup
  * returns an unmodifiable set.  The contents may only be updated
  * throught the add and remove methods.
  */
-@ManagedObject( description="A group of Timers or other TimerGroups, which may be enabled or disabled together" ) 
+@ManagedObject
+@Description( "A group of Timers or other TimerGroups, which may be enabled or disabled together" ) 
 public interface TimerGroup extends Controllable {
-    @ManagedOperation( description="Add a new Timer or TimerGroup to this TimerGroup" ) 
+    @ManagedOperation
+    @Description( "Add a new Timer or TimerGroup to this TimerGroup" ) 
     boolean add( Controllable con ) ;
 
-    @ManagedOperation( description="Remove a new Timer or TimerGroup from this TimerGroup" ) 
+    @ManagedOperation
+    @Description( "Remove a new Timer or TimerGroup from this TimerGroup" ) 
     boolean remove( Controllable con ) ;
 }

@@ -46,14 +46,16 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedData ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
-import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.InheritedAttribute ;
+import com.sun.jmxa.Description ;
 
 /** An IOR is represented as a list of profiles.
 * Only instances of TaggedProfile are contained in the list.
 */
-@ManagedData( description="Interoperable Object Reference: the internal structure of a remote object reference" )
+@ManagedData
+@Description( "Interoperable Object Reference: the internal structure of a remote object reference" )
 @InheritedAttribute( id="iterator" )
 public interface IOR extends List<TaggedProfile>, Writeable, MakeImmutable
 {
@@ -61,7 +63,8 @@ public interface IOR extends List<TaggedProfile>, Writeable, MakeImmutable
 
     /** Return the type id string from the IOR.
     */
-    @ManagedAttribute( description="The repository ID of the IOR" ) 
+    @ManagedAttribute
+    @Description( "The repository ID of the IOR" ) 
     String getTypeId() ;
    
     /** Return an iterator that iterates over tagged profiles with

@@ -78,7 +78,7 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
 import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+import com.sun.jmxa.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
 import com.sun.corba.se.spi.orb.Operation ;
@@ -110,7 +110,7 @@ import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsDisabledImpl ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsEnabledImpl ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+import com.sun.jmxa.ManagedObjectManager ;
 
 // XXX needs an SPI or else it does not belong here
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;

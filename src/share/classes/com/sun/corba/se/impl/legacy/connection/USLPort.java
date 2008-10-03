@@ -35,6 +35,13 @@
  */
 package com.sun.corba.se.impl.legacy.connection;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.Description ;
+import com.sun.jmxa.ManagedAttribute ;
+
+@ManagedData
+@Description( "An address of a transport endpoint that the ORB "
+    + "uses for listening to incoming requests" ) 
 public class USLPort
 {
     private String type;
@@ -46,7 +53,12 @@ public class USLPort
 	this.port = port;
     }
 
+    @ManagedAttribute
+    @Description( "The type of the port (e.g. plain text vs. SSL)" )
     public String getType  () { return type; }
+
+    @ManagedAttribute
+    @Description( "The TCP port number" ) 
     public int    getPort  () { return port; }
     public String toString () { return type + ":" + port; }
 }

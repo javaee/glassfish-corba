@@ -38,7 +38,7 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimerFactoryImpl ;
 
-import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
+import com.sun.jmxa.IncludeSubclass ;
 
 /** Handles timer events, represented by timer instances.
  * An enter event means that a measurement has begun for an event,

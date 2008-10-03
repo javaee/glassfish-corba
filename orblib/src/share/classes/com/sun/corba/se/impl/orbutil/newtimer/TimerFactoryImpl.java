@@ -56,8 +56,9 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.NamedBase ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
+import com.sun.jmxa.ManagedObjectManager ;
+import com.sun.jmxa.ManagedObject ;
+import com.sun.jmxa.Description ;
 
 // TimerFactory is a TimerGroup containing all timers and timer groups 
 // that it creates
@@ -90,8 +91,15 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
     private Map<String,TimerEventControllerBase> timerEventControllers ;
 
     private void manage( Named obj ) {
+        // Note that no extra parameters are needed here, because Named.getName
+        // is an ObjectNameKey.
         if (mom != null) 
-            mom.register( obj, "name=" + obj.name() ) ;
+            mom.register( obj ) ;
+    }
+
+    private void unmanage( Named obj ) {
+        if (mom != null) 
+            mom.unregister( obj ) ;
     }
 
     public TimerFactoryImpl( ManagedObjectManager mom, String name, String description ) {
@@ -154,8 +162,8 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    + " must be between 0 and " + (nextIndex - 1)) ;
     }
 
-    @ManagedObject( 
-	description="A simple TimerEventHandler that just displays TimerEvents as they occur" ) 
+    @ManagedObject
+    @Description( "A simple TimerEventHandler that just displays TimerEvents as they occur" ) 
     public static class TracingEventHandler 
 	extends NamedBase 
 	implements TimerEventHandler {
@@ -227,6 +235,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	TimerEventHandler handler ) {
 
 	timerEventHandlers.remove( handler.name() ) ;
+        unmanage( handler ) ;
     }
 
     public synchronized Timer makeTimer( String name, String description ) {
@@ -286,6 +295,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	TimerEventControllerBase controller ) {
 
 	timerEventControllers.remove( controller.name() ) ;
+        unmanage( controller ) ;
     }
 
     public synchronized Set<? extends Controllable> enabledSet() {

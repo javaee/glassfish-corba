@@ -75,9 +75,9 @@ public class POAFactory implements ObjectAdapterFactory
 {
     // Maps servants to POAs for deactivating servants when unexportObject is called.
     // Maintained by POAs activate_object and deactivate_object.
-    private Map exportedServantsToPOA = new WeakHashMap();
+    private Map<Servant,POA> exportedServantsToPOA = new WeakHashMap<Servant,POA>();
 
-    private Set poaManagers ;
+    private Set<POAManager> poaManagers ;
     private int poaManagerId ;
     private int poaId ;
     private POAImpl rootPOA ;
@@ -96,7 +96,7 @@ public class POAFactory implements ObjectAdapterFactory
     */
     public POAFactory() 
     {
-	poaManagers = Collections.synchronizedSet(new HashSet(4));
+	poaManagers = Collections.synchronizedSet(new HashSet<POAManager>(4));
 	poaManagerId = 0 ;
 	poaId = 0 ;
 	rootPOA = null ;
@@ -106,7 +106,7 @@ public class POAFactory implements ObjectAdapterFactory
 
     public synchronized POA lookupPOA (Servant servant) 
     {
-        return (POA)exportedServantsToPOA.get(servant);
+        return exportedServantsToPOA.get(servant);
     }
 
     public synchronized void registerPOAForServant(POA poa, Servant servant) 
@@ -172,15 +172,15 @@ public class POAFactory implements ObjectAdapterFactory
     {
     	// It is important to copy the list of POAManagers first because 
 	// pm.deactivate removes itself from poaManagers!
-	Iterator managers = null ;
+	Iterator<POAManager> managers = null ;
 	synchronized (this) {
             isShuttingDown = true ;
-	    managers = (new HashSet(poaManagers)).iterator();
+	    managers = (new HashSet<POAManager>(poaManagers)).iterator();
 	}
 
 	while ( managers.hasNext() ) {
 	    try {
-	        ((POAManager)managers.next()).deactivate(true, waitForCompletion);
+	        managers.next().deactivate(true, waitForCompletion);
 	    } catch ( org.omg.PortableServer.POAManagerPackage.AdapterInactive e ) {}
 	}
     }

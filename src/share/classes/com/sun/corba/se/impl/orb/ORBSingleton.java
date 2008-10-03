@@ -604,10 +604,6 @@ public class ORBSingleton extends ORB
         throw new SecurityException("ORBSingleton: access denied");
     }
 
-    public int getLowWaterMark(){
-        throw new SecurityException("ORBSingleton: access denied");
-    }
-
     public int getNumberToReclaim(){
         throw new SecurityException("ORBSingleton: access denied");
     }

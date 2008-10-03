@@ -40,7 +40,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+import com.sun.jmxa.ManagedObjectManager ;
 
 /** Provides access to timer facilities.
  * This is intended to make it easy to set up timing,

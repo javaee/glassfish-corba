@@ -161,14 +161,11 @@ public abstract class CorbaConnectionCacheBase
 			+ " ("
 			+ orb.getORBData().getHighWaterMark()
 			+ "/"
-			+ orb.getORBData().getLowWaterMark()
-			+ "/"
 			+ orb.getORBData().getNumberToReclaim()
 			+ ")");
 	    }
 
-	    if (numberOfConnections <= orb.getORBData().getHighWaterMark() ||
-		numberOfConnections < orb.getORBData().getLowWaterMark()) {
+	    if (numberOfConnections <= orb.getORBData().getHighWaterMark()) {
 		return false;
 	    }
 	    
@@ -263,7 +260,6 @@ public abstract class CorbaConnectionCacheBase
 		   + numberOfIdleConnections() + "/idle"
 		   + " (" 
 		   + orb.getORBData().getHighWaterMark() + "/"
-		   + orb.getORBData().getLowWaterMark() + "/"
 		   + orb.getORBData().getNumberToReclaim() 
 		   + ")");
 	}

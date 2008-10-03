@@ -91,6 +91,8 @@ import org.omg.CORBA.portable.ValueFactory;
 
 import org.omg.CORBA.ORBPackage.InvalidName;
 
+import org.omg.PortableServer.Servant ;
+
 import com.sun.org.omg.SendingContext.CodeBase;
 
 import com.sun.corba.se.pept.broker.Broker;
@@ -154,8 +156,8 @@ import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManagerFactory ;
+import com.sun.jmxa.ManagedObjectManager ;
+import com.sun.jmxa.ManagedObjectManagerFactory ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
@@ -194,7 +196,12 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.copyobject.CopierManagerImpl;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
-             
+         
+import com.sun.jmxa.ManagedObject ;
+import com.sun.jmxa.Description ;
+import com.sun.jmxa.InheritedAttribute ;
+import com.sun.jmxa.InheritedAttributes ;
+
 /**
  * The JavaIDL ORB implementation.
  */
@@ -393,6 +400,41 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         orbVersionThreadLocal.set(verObj);
     }
 
+    // Interfaces used only to define InheritedAttributes for other classes
+    // If we register a class that has Servant in its inheritance, it will
+    // pick up these InheritedAttributes.
+    @ManagedObject
+    @Description( "A servant, which implements a remote object in the server" )
+    @InheritedAttributes( attributes={ 
+        @InheritedAttribute( methodName="_get_delegate", id="delegate", 
+            description="Delegate that implements this servant" ),
+        @InheritedAttribute( methodName="_orb", id="orb",
+            description="The ORB for this Servant" ),
+        @InheritedAttribute( methodName="toString", id="representation",
+            description="Representation of this Servant" ),
+        @InheritedAttribute( methodName="_all_interfaces", id="typeIds",
+            description="The types implemented by this Servant" ) } 
+    )
+    public interface DummyServant{}
+
+    // DummyDelegate
+    // DummyORB
+    // DummyPOA
+
+    private ManagedObjectManager initManagedObjectManager( String orbId ) {
+        ManagedObjectManager baseMom = ManagedObjectManagerFactory.create( "com.sun.corba" ) ;
+        // mom is set up to always include ORBId as one of the name/value pairs for
+        // MBean object names.
+        mom = ManagedObjectManagerFactory.create( baseMom, "ORBId=" + orbId ) ;
+        mom.register( configData ) ;
+
+        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedObject.class ) ) ;
+        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( Description.class ) ) ;
+        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( InheritedAttributes.class ) ) ;
+        
+        return mom ;
+    }
+
 /****************************************************************************
  * The following methods are ORB initialization
  ****************************************************************************/
@@ -563,10 +605,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         // after the configData has been initialized.
         String orbId = getUniqueOrbId() ;
 
-        ManagedObjectManager baseMom = ManagedObjectManagerFactory.create( "com.sun.corba" ) ;
-        // mom is set up to always include ORBId as one of the name/value pairs for
-        // MBean object names.
-        mom = ManagedObjectManagerFactory.create( baseMom, "ORBId=" + orbId ) ;
+        mom = initManagedObjectManager( orbId ) ;
 
 	// The TimerManager must be
 	// initialized BEFORE the pihandler.initialize() call, in

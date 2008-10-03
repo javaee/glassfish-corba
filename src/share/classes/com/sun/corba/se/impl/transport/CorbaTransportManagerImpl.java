@@ -86,22 +86,26 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 /**
  * @author Harold Carr
  */
+// Note that no ObjectKeyName attribute is needed, because there is only
+// one CorbaTransportManager per ORB.
+@ManagedObject
+@Description( "The Transport Manager for the ORB" )
 public class CorbaTransportManagerImpl 
     implements
 	CorbaTransportManager
 {
     protected ORB orb;
-    protected List acceptors;
-    protected Map outboundConnectionCaches;
-    protected Map inboundConnectionCaches;
+    protected List<Acceptor> acceptors;
+    protected Map<String,OutboundConnectionCache> outboundConnectionCaches;
+    protected Map<String,InboundConnectionCache> inboundConnectionCaches;
     protected Selector selector;
     
     public CorbaTransportManagerImpl(ORB orb) 
     {
 	this.orb = orb;
-	acceptors = new ArrayList();
-	outboundConnectionCaches = new HashMap();
-	inboundConnectionCaches = new HashMap();
+	acceptors = new ArrayList<Acceptor>();
+	outboundConnectionCaches = new HashMap<String,OutboundConnectionCache>();
+	inboundConnectionCaches = new HashMap<String,InboundConnectionCache>();
 	selector = new SelectorImpl(orb);
     }
 
@@ -122,9 +126,8 @@ public class CorbaTransportManagerImpl
 	    if (contactInfo.getConnectionCache() == null) {
 		OutboundConnectionCache connectionCache = null;
 		synchronized (outboundConnectionCaches) {
-		    connectionCache = (OutboundConnectionCache)
-			outboundConnectionCaches.get(
-                            contactInfo.getConnectionCacheType());
+		    connectionCache = outboundConnectionCaches.get(
+                        contactInfo.getConnectionCacheType());
 		    if (connectionCache == null) {
 			// REVISIT: Would like to be able to configure
 			// the connection cache type used.
@@ -142,9 +145,19 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    public Collection getOutboundConnectionCaches()
+    @ManagedAttribute
+    @Description( "Outbound Connection Cache (client initiated connections)" )
+    public Collection<OutboundConnectionCache> getOutboundConnectionCaches()
     {
 	return outboundConnectionCaches.values();
+    }
+
+    // Only used for MBeans
+    @ManagedAttribute
+    @Description( "Inbound Connection Cache (server accepted connections)" )
+    public Collection<InboundConnectionCache> getInboundConnectionCaches()
+    {
+	return inboundConnectionCaches.values();
     }
 
     public InboundConnectionCache getInboundConnectionCache(
@@ -154,8 +167,7 @@ public class CorbaTransportManagerImpl
 	    if (acceptor.getConnectionCache() == null) {
 		InboundConnectionCache connectionCache = null;
 		synchronized (inboundConnectionCaches) {
-		    connectionCache = (InboundConnectionCache)
-			inboundConnectionCaches.get(
+		    connectionCache = inboundConnectionCaches.get(
                             acceptor.getConnectionCacheType());
 		    if (connectionCache == null) {
 			// REVISIT: Would like to be able to configure
@@ -174,9 +186,15 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    public Collection getInboundConnectionCaches()
+    public Collection<InboundConnectionCache> getInboundConnectionCaches()
     {
 	return inboundConnectionCaches.values();
+    }
+
+    @ManagedAttribute
+    @Description( "The Selector, which listens for all I/O events" )
+    public Selector getSelector() {
+        return selector ;
     }
 
     public Selector getSelector(int id) 
@@ -211,11 +229,11 @@ public class CorbaTransportManagerImpl
 	    if (orb.transportDebugFlag) {
 		dprint(".close->");
 	    }
-            for (Object cc : outboundConnectionCaches.values()) {
-                ((ConnectionCache)cc).close() ;
+            for (OutboundConnectionCache cc : outboundConnectionCaches.values()) {
+                cc.close() ;
             }
-            for (Object cc : inboundConnectionCaches.values()) {
-                ((ConnectionCache)cc).close() ;
+            for (InboundConnectionCache cc : inboundConnectionCaches.values()) {
+                cc.close() ;
             }
 	    getSelector(0).close();
 	} finally {
@@ -230,16 +248,20 @@ public class CorbaTransportManagerImpl
     // CorbaTransportManager
     //
 
-    public Collection getAcceptors(String objectAdapterManagerId,
+    @ManagedAttribute
+    @Description( "List of all Acceptors in this ORB" ) 
+    public Collection<Acceptor> getAcceptors() {
+        returng getAcceptors( null, null ) ;
+    }
+
+    public Collection<Acceptor> getAcceptors(String objectAdapterManagerId,
 				   ObjectAdapterId objectAdapterId)
     {
 	// REVISIT - need to filter based on arguments.
 
 	// REVISIT - initialization will be moved to OA.
 	// Lazy initialization of acceptors.
-	Iterator iterator = acceptors.iterator();
-	while (iterator.hasNext()) {
-	    Acceptor acceptor = (Acceptor) iterator.next();
+        for (Acceptor acc : acceptors) {
 	    if (acceptor.initialize()) {
 		if (acceptor.shouldRegisterAcceptEvent()) {
 		    orb.getTransportManager().getSelector(0)

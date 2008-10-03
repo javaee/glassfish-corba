@@ -215,11 +215,6 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 	return highWaterMark; 
     }
 
-    public int getLowWaterMark() 
-    { 
-	return lowWaterMark; 
-    }
-
     public int getNumberToReclaim() 
     { 
 	return numberToReclaim; 

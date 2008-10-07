@@ -189,6 +189,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     private static LogWrapperTable staticLogWrapperTable = 
 	new LogWrapperTableStaticImpl() ;
 
+    // mom MUST be initialized in a subclass by calling createManagedObjectManager.
+    // In ORBSingleton, this happens in the constructor.  It ORBImpl, it cannot
+    // happen in the constructor: instead, it must be called in post_init.
+    private ManagedObjectManager mom ;
+    
     // SystemException log wrappers.  Protected so that they can be used in
     // subclasses.
     protected ORBUtilSystemException wrapper ; 
@@ -533,6 +538,15 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	return "###DEFAULT_UNIQUE_ORB_ID###" ;
     }
 
+    public void createManagedObjectManager() {
+        ManagedObjectManager baseMom = ManagedObjectManagerFactory.create( "com.sun.corba" ) ;
+        
+        // mom is set up to always include ORBId as one of the name/value pairs for
+        // MBean object names.
+        mom = ManagedObjectManagerFactory.create( baseMom, 
+            "ORBId=" + getUniqueOrbId() ) ;
+    }
+
     /** Return the ORB's TimerManager.
      */
     public abstract TimerManager<TimingPoints> getTimerManager() ;
@@ -621,7 +635,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     }
 
     public ManagedObjectManager mom() {
-        return null ;
+        return mom ;
     }
 }
 

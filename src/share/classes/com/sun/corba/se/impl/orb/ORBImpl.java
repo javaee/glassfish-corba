@@ -261,8 +261,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     private CopierManager copierManager ;
 
-    private ManagedObjectManager mom ;
-
     private TimerManager<TimingPoints> timerManager ;
 
     private int transientServerId ;
@@ -421,11 +419,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     // DummyORB
     // DummyPOA
 
-    private ManagedObjectManager initManagedObjectManager( String orbId ) {
-        ManagedObjectManager baseMom = ManagedObjectManagerFactory.create( "com.sun.corba" ) ;
-        // mom is set up to always include ORBId as one of the name/value pairs for
-        // MBean object names.
-        mom = ManagedObjectManagerFactory.create( baseMom, "ORBId=" + orbId ) ;
+    private ManagedObjectManager initManagedObjectManager() {
+        createORBManagedObjectManager() ;
+
         mom.register( configData ) ;
 
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedObject.class ) ) ;
@@ -2255,10 +2251,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}	  
 
 	return entry ;
-    }
-
-    public ManagedObjectManager mom() {
-        return mom ;
     }
 } // Class ORBImpl
 

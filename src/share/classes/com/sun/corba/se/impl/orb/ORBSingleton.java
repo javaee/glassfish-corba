@@ -159,6 +159,7 @@ public class ORBSingleton extends ORB
 
     public ORBSingleton() {
 	timerManager = makeTimerManager( null, getUniqueOrbId() ) ;
+        createManagedObjectManager() ;
 	initializePrimitiveTypeCodeConstants() ;
     }
 

@@ -89,7 +89,7 @@ public class ClassInfoBaseTestSuite extends TestCase {
     public static class C2 extends C1 implements C {
 	private int z ;
     }
-    public static class C3 extends C1 implements D {
+    public static class C3 extends C2 implements D {
 	protected int w ;
 	int t ;
     }

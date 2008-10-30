@@ -54,15 +54,13 @@ public class ListenerThreadImpl
 {
     private ORB orb;
     private Acceptor acceptor;
-    private Selector selector;
     private boolean keepRunning;
     private long enqueueTime;
 
-    public ListenerThreadImpl(ORB orb, Acceptor acceptor, Selector selector)
+    public ListenerThreadImpl(ORB orb, Acceptor acceptor)
     {
 	this.orb = orb;
 	this.acceptor = acceptor;
-	this.selector = selector;
 	keepRunning = true;
     }
 

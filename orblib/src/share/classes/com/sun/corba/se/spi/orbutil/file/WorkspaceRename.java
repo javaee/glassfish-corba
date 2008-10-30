@@ -66,7 +66,7 @@ public class WorkspaceRename {
 	"c", "h", "java", "sjava", "idl", "htm", "html", "xml", "dtd", "bnd",
 	"tdesc", "policy", "secure", "mc", "mcd", "scm", "vthought",
 	"ksh", "sh", "classlist", "config", "jmk", "properties", "prp", 
-	"xjmk", "set", "data", "txt", "text", "javaref", "idlref" } ;
+	"xjmk", "set", "settings", "data", "txt", "text", "javaref", "idlref" } ;
 
     private static final String[] SUBSTITUTE_NAMES = {
 	"Makefile.corba", "Makefile.example", "ExampleMakefile", "Makefile" 

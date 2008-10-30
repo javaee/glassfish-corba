@@ -55,7 +55,7 @@ import org.omg.CORBA.ORB;
 
 public class ExceptionListImpl extends ExceptionList {
 
-    private final int	 INITIAL_CAPACITY	= 2;
+    private static final int	 INITIAL_CAPACITY	= 2;
 
     private List<TypeCode> _exceptions;
 

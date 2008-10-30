@@ -125,7 +125,7 @@ public class InitialGroupInfoService {
         
     }
 
-    public class InitialGISImpl extends PortableRemoteObject implements InitialGIS {
+    public static class InitialGISImpl extends PortableRemoteObject implements InitialGIS {
        
         private ORB orb;
 

@@ -156,37 +156,37 @@ public class RequestImpl
 
     }
 
-    public org.omg.CORBA.Object target()
+    public synchronized org.omg.CORBA.Object target()
     {
         return _target;
     }
 
-    public String operation() 
+    public synchronized String operation() 
     {
         return _opName;
     }
 
-    public NVList arguments() 
+    public synchronized NVList arguments() 
     {
         return _arguments;
     }
     
-    public NamedValue result() 
+    public synchronized NamedValue result() 
     {
         return _result;
     }
     
-    public Environment env() 
+    public synchronized Environment env() 
     {
         return _env;
     }
     
-    public ExceptionList exceptions() 
+    public synchronized ExceptionList exceptions() 
     {
         return _exceptions;
     }
     
-    public ContextList contexts() 
+    public synchronized ContextList contexts() 
     {
         return _ctxList;
     }

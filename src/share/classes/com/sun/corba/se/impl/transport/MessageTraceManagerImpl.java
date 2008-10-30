@@ -41,8 +41,6 @@ import java.nio.ByteBuffer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
 import com.sun.corba.se.spi.transport.MessageTraceManager ;
 
 public class MessageTraceManagerImpl implements MessageTraceManager
@@ -50,16 +48,14 @@ public class MessageTraceManagerImpl implements MessageTraceManager
     // Note: this implementation does not need to be syncronized
     // because an instance of this class is only called from a single
     // thread.
-    private ORB orb  ;
     private List /* <byte[]> */ dataSent ;
     private List /* <byte[]> */ dataReceived ;
     private boolean enabled ;
     private boolean RHRCalled ; // Set to true whenever recordHeaderReceived is called.
     private byte[] header ;
 
-    public MessageTraceManagerImpl( ORB orb )
+    public MessageTraceManagerImpl()
     {
-	this.orb = orb ;
 	init() ;
 	enabled = false ;
     }

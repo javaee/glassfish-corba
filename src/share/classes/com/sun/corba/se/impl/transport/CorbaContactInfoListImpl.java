@@ -65,7 +65,7 @@ public class CorbaContactInfoListImpl
 	CorbaContactInfoList
 {
     protected ORB orb;
-    protected LocalClientRequestDispatcher LocalClientRequestDispatcher;
+    protected LocalClientRequestDispatcher localClientRequestDispatcher;
     protected IOR targetIOR;
     protected IOR effectiveTargetIOR;
     protected List<CorbaContactInfo> effectiveTargetIORContactInfoList;
@@ -133,7 +133,7 @@ public class CorbaContactInfoListImpl
 
     public synchronized LocalClientRequestDispatcher getLocalClientRequestDispatcher()
     {
-	return LocalClientRequestDispatcher;
+	return localClientRequestDispatcher;
     }
 
     ////////////////////////////////////////////////////
@@ -262,7 +262,7 @@ public class CorbaContactInfoListImpl
     protected void setLocalSubcontract()
     {
 	if (!effectiveTargetIOR.getProfile().isLocal()) {
-	    LocalClientRequestDispatcher = new NotLocalLocalCRDImpl();
+	    localClientRequestDispatcher = new NotLocalLocalCRDImpl();
 	    return;
 	}
 
@@ -274,8 +274,9 @@ public class CorbaContactInfoListImpl
 	// the ContactInfo level, rather than the IOR/profile level.
 	int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
 	    getSubcontractId() ;
-	LocalClientRequestDispatcherFactory lcsf = orb.getRequestDispatcherRegistry().getLocalClientRequestDispatcherFactory( scid ) ;
-	LocalClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
+	LocalClientRequestDispatcherFactory lcsf = 
+            orb.getRequestDispatcherRegistry().getLocalClientRequestDispatcherFactory( scid ) ;
+	localClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
     }
 
     // For timing test.

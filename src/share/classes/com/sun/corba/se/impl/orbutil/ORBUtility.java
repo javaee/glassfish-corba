@@ -214,7 +214,7 @@ public final class ORBUtility {
 
     private static StructMember[] members = null;
 
-    private static StructMember[] systemExceptionMembers (ORB orb) {
+    private synchronized static StructMember[] systemExceptionMembers (ORB orb) {
         if (members == null) {
             members = new StructMember[3];
             members[0] = new StructMember("id", orb.create_string_tc(0), null);
@@ -994,12 +994,14 @@ public final class ORBUtility {
 	    return "null";
 	}
 
-        String result = "[";
+        StringBuilder result = new StringBuilder() ;
+        result.append( "[" ) ;
 	for (int i = 0; i < a.length; ++i) {
-	    result += a[i] + " ";
+	    result.append( a[i] ) ;
+            result.append( " " ) ;
 	}
-	result += "]";
-	return result;
+        result.append( "]" ) ;
+	return result.toString() ;
     }
 }
 

@@ -158,6 +158,7 @@ public class StubFactoryCodegenImpl extends StubFactoryDynamicBase
 		}
 	    ) ;
 	} catch (Exception exc) {
+            // XXX Should this throw an exception?
 	    wrapper.couldNotInstantiateStubClass( exc,
 		stubClass.getName() ) ;
 	}

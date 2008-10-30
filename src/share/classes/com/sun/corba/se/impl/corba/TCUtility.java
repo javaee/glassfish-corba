@@ -196,6 +196,7 @@ public final class TCUtility {
 	    ORBUtilSystemException wrapper = 
             ((com.sun.corba.se.spi.orb.ORB)s.orb())
 				.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
+	    throw wrapper.typecodeNotSupported() ;
         }
     }
 

@@ -220,11 +220,11 @@ public class WorkQueueImpl implements WorkQueue
         return (queue.size() - waitingThreads <= 0);
     }
 
-    public void setThreadPool(ThreadPool workerThreadPool) {
+    public synchronized void setThreadPool(ThreadPool workerThreadPool) {
 	this.workerThreadPool = workerThreadPool;
     }
 
-    public ThreadPool getThreadPool() {
+    public synchronized ThreadPool getThreadPool() {
 	return workerThreadPool;
     }
 

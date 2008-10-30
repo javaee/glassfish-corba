@@ -52,7 +52,7 @@ import org.omg.CORBA.ORB;
 
 public class ContextListImpl extends ContextList 
 {
-    private final int	 INITIAL_CAPACITY	= 2;
+    private final static int	 INITIAL_CAPACITY	= 2;
 
     private org.omg.CORBA.ORB _orb;
     private List<String> _contexts;

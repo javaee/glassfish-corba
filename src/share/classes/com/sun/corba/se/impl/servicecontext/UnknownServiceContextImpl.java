@@ -51,7 +51,7 @@ public class UnknownServiceContextImpl extends ServiceContextBase
     public UnknownServiceContextImpl( int id, byte[] data ) 
     {
 	this.id = id ;
-	this.data = data ;
+	this.data = data.clone() ;
     }
 
     public UnknownServiceContextImpl( int id, InputStream is ) 
@@ -80,7 +80,7 @@ public class UnknownServiceContextImpl extends ServiceContextBase
 
     public byte[] getData() 
     {
-	return data ;
+	return data.clone() ;
     }
 }
 

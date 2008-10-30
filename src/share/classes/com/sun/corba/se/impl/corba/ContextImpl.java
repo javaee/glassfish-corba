@@ -66,7 +66,7 @@ public final class ContextImpl extends Context {
 
     public ContextImpl(Context parent) 
     {
-	throw wrapper.contextNotImplemented() ;
+        // Ignore: no wrapper available
     }
     
     public String context_name() 

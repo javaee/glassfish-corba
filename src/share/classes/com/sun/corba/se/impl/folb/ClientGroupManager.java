@@ -140,7 +140,7 @@ public class ClientGroupManager
     private IOR lastIOR;  // Initially null, thus the separate lock object.
     private Object lastIORLock = new Object();
     private CSIv2SSLTaggedComponentHandler csiv2SSLTaggedComponentHandler;
-    private GIS gis = new GIS();
+    private transient GIS gis = new GIS();
 
     public ClientGroupManager() {	
     }
@@ -366,6 +366,10 @@ public class ClientGroupManager
 		public String toString() {
 		    return "SocketInfo[" + type + " " + host + " " + port +"]";
 		}
+
+                public int hashCode() {
+                    return port ^ host.hashCode() ^ type.hashCode() ;
+                }
             };
     }
 
@@ -494,7 +498,8 @@ public class ClientGroupManager
 			// same location uses a SocketOrChannelContactInfo
 			// and vice versa.
 			if (debug) {
-			    dprint(".next: cannot find mapped entry in current list.  Removing mapped entry and trying .next again.");
+			    dprint(".next: cannot find mapped entry in current list.  "
+                                + "Removing mapped entry and trying .next again.");
 			}
 			reset(primary);
 			return next(primary, previous, contactInfos);

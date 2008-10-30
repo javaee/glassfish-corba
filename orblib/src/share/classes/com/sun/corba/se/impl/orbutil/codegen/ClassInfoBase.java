@@ -281,6 +281,11 @@ public abstract class ClassInfoBase implements ClassInfo {
 	if (this.equals( info ))
 	    return true ;
 
+        // All classes are subclasses of java.lang.Object.
+        // Note that superType() == null for interfaces.
+        if (info.equals( Type._Object().classInfo() ))
+            return true ;
+
 	// A class is a subclass of info if the
 	// class's superClass is a subclass of info
 	if (superType() != null)

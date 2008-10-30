@@ -100,7 +100,7 @@
         <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
         <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
         <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
-        <property name="jmxa-jar"                        value="${root.dir}/lib/JMXAnnotations.jar"/>
+        <property name="jmxa-jar"                        value="${root.dir}/lib/jmxa.jar"/>
 
 
         <!-- Places where the build puts things -->

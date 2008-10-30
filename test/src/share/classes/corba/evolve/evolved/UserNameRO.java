@@ -35,6 +35,7 @@
  */
 
 import java.io.ObjectInputStream ;
+import java.io.ObjectOutputStream ;
 import java.io.IOException ;
 
 public class UserNameRO implements corba.evolve.UserNameInt
@@ -44,10 +45,11 @@ public class UserNameRO implements corba.evolve.UserNameInt
 
     private static final String TEST_NAME = "Frank Furlow";
     
+    // Changed to transient, so writeObject will write it out.
     private String name = null;
 
     public UserNameRO() {
-        name = new String(TEST_NAME);
+        name = TEST_NAME;
     }
 
     public boolean validate() {
@@ -56,5 +58,17 @@ public class UserNameRO implements corba.evolve.UserNameInt
 
     private void readObject( ObjectInputStream in ) throws IOException, 
         ClassNotFoundException {
+        in.defaultReadObject() ;
+        int flag = in.read() ;
+        // If flag == -1, we hit the end, and so there is no more data
+        if (flag == 1) {
+            name = (String)in.readObject() ;
+        }
+    }
+
+    private void writeObject( ObjectOutputStream out ) throws IOException {
+        out.defaultWriteObject() ;
+        out.writeInt( 1 ) ;
+        out.writeObject( name ) ; 
     }
 }

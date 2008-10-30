@@ -1073,6 +1073,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     @CDRRead
     private Object readRMIIIOPValueType( int indirection, 
 	Class valueClass, String repositoryIDString ) {
+        if (orb.cdrDebugFlag) 
+            dputil.enter( "readRMIIIOPValueType" ) ;
+
 	try {
 	    if (valueHandler == null)
 		valueHandler = ORBUtility.createValueHandler(orb);
@@ -1094,173 +1097,189 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	} catch(Error e) {
 	    throw wrapper.valuehandlerReadError( 
 		CompletionStatus.COMPLETED_MAYBE, e ) ;
-	}
+	} finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
+        }
     }
 
     @CDR
     @CDRRead
     public Serializable read_value(Class expectedType) {
-	Object value = null ;
-        int vType = readValueTag();
-        if (vType == 0) 
-	    return Return.value(null );
+        if (orb.cdrDebugFlag)
+            dputil.enter( "read_value(Class)", "expectedType", expectedType ) ;
 
-	if (vType == 0xffffffff) {
-	    value = handleIndirection();
-	} else { 
-	    ClassInfoCache.ClassInfo cinfo = null ;
-	    if (expectedType != null)
-		cinfo = ClassInfoCache.get( expectedType ) ;
+        try {
+            Object value = null ;
+            int vType = readValueTag();
+            if (vType == 0) 
+                return Return.value(null );
 
-	    int indirection = get_offset() - 4;
+            if (vType == 0xffffffff) {
+                value = handleIndirection();
+            } else { 
+                ClassInfoCache.ClassInfo cinfo = null ;
+                if (expectedType != null)
+                    cinfo = ClassInfoCache.get( expectedType ) ;
 
-	    // Need to save this special marker variable
-	    // to restore its value during recursion
-	    boolean saveIsChunked = isChunked;
-	    isChunked = repIdUtil.isChunkedEncoding(vType);
-			    
-	    String codebase_URL = null;			
-	    if (repIdUtil.isCodeBasePresent(vType)) {
-		codebase_URL = read_codebase_URL();
-	    }
-			    
-	    // Read repository id(s)
-	    String repositoryIDString = readRepositoryIds(vType, expectedType, 
-		cinfo, null);
+                int indirection = get_offset() - 4;
 
-	    // If isChunked was determined to be true based
-	    // on the valuetag, this will read a chunk length
-	    start_block();
-
-	    // Remember that end_flag keeps track of all nested
-	    // valuetypes and is used for older ORBs
-	    end_flag--;
-	    if (isChunked)
-		chunkedValueNestingLevel--;
-
-	    if (repositoryIDString.equals(repIdStrs.getWStringValueRepId())) {
-		value = read_wstring();
-	    } else if (repositoryIDString.equals(
-		repIdStrs.getClassDescValueRepId())) {
-		value = readClass();
-	    } else {       
-		Class valueClass = expectedType;
-
-		// By this point, either the expectedType or repositoryIDString
-		// is guaranteed to be non-null.
-		if (valueClass == null || 
-		    !repositoryIDString.equals(repIdStrs.createForAnyType(
-			expectedType,cinfo))) {
-
-		    valueClass = getClassFromString(repositoryIDString, 
-			codebase_URL, expectedType);
-		}
-
-		if (valueClass == null) {
-		    // No point attempting to use value handler below, since the
-		    // class information is not available.
-		    // Fix for issue 1828: pass the class name for a better log
-		    // message.
-		    RepositoryIdInterface repositoryID 
-			= repIdStrs.getFromString(repositoryIDString);
-
-		    throw wrapper.couldNotFindClass( 
-			CompletionStatus.COMPLETED_MAYBE,
-			repositoryID.getClassName()) ;
-		}
-		
-		if (cinfo == null)
-		    cinfo = ClassInfoCache.get( valueClass ) ;
-
-		if (valueClass != null && cinfo.isAIDLEntity(valueClass)) {
-		    value = readIDLValue(indirection, repositoryIDString, 
-			valueClass, cinfo, codebase_URL);
-		} else {
-		    value = readRMIIIOPValueType( indirection, 
-			valueClass, repositoryIDString ) ;
-		}
-	    }
-	    
-	    // Skip any remaining chunks until we get to
-	    // an end tag or a valuetag.  If we see a valuetag,
-	    // that means there was another valuetype in the sender's
-	    // version of this class that we need to skip over.
-	    handleEndOfValue();
-	    
-	    // Read and process the end tag if we're chunking.
-	    // Assumes that we're at the position of the end tag
-	    // (handleEndOfValue should assure this)
-	    readEndTag();
-		
-	    // Cache the valuetype that we read
-	    if (valueCache == null)
-		valueCache = new CacheTable<Object>( "Input valueCache",orb,false);
-	    valueCache.put(value, indirection);
-	    
-	    // Allow for possible continuation chunk.
-	    // If we're a nested valuetype inside of a chunked
-	    // valuetype, and that enclosing valuetype has
-	    // more data to write, it will need to have this
-	    // new chunk begin after we wrote our end tag.
-	    isChunked = saveIsChunked;
-	    start_block();
-	}
-    	    
-	// Convert an EnumDesc into the enum instance it represents
-	if (value.getClass()==EnumDesc.class) {
-	    EnumDesc desc = EnumDesc.class.cast( value ) ;
-
-	    Class cls = null ;
-	    try {
-		cls = JDKBridge.loadClass( desc.className, null, null ) ;
-	    } catch (ClassNotFoundException cnfe) {
-		throw wrapper.enumClassNotFound( cnfe, desc.className ) ;
-	    }
-
-	    value = Enum.valueOf( cls, desc.value ) ;
-	}
-	
-	// Convert ProxyDesc into the proxy instance it represents
-        if (value.getClass()==ProxyDesc.class) {
-            ProxyDesc desc = ProxyDesc.class.cast( value ) ;
-            int numberOfInterfaces = desc.interfaces.length;
-
-            // Write code if the number is Zero. Unusual case
-            if (numberOfInterfaces==0) {
-                if (orb.cdrDebugFlag) {
-                    dprint("The proxy does not have any interfaces that are implemented dynamically! Check the Proxy implementation");
+                // Need to save this special marker variable
+                // to restore its value during recursion
+                boolean saveIsChunked = isChunked;
+                isChunked = repIdUtil.isChunkedEncoding(vType);
+                                
+                String codebase_URL = null;			
+                if (repIdUtil.isCodeBasePresent(vType)) {
+                    codebase_URL = read_codebase_URL();
                 }
-                return Return.value(null);
-            }
+                                
+                // Read repository id(s)
+                String repositoryIDString = readRepositoryIds(vType, expectedType, 
+                    cinfo, null);
+                if (orb.cdrDebugFlag)
+                    dputil.info( "repositoryIDString", repositoryIDString ) ;
 
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            try {
-                RMIClassLoader.loadProxyClass( desc.codebase, desc.interfaces, value.getClass().getClassLoader()) ;
-            } catch (ClassNotFoundException cnfe) {
-                throw wrapper.proxyClassNotFound( cnfe, getInterfacesList(desc.interfaces)) ;
-            } catch (MalformedURLException mue) {
-                throw wrapper.malformedProxyUrl( mue, getInterfacesList(desc.interfaces), desc.codebase) ;
-            }
+                // If isChunked was determined to be true based
+                // on the valuetag, this will read a chunk length
+                start_block();
 
-            Class[] list = new Class[desc.interfaces.length];
-            for(int i=0; i < numberOfInterfaces; ++i) {
+                // Remember that end_flag keeps track of all nested
+                // valuetypes and is used for older ORBs
+                end_flag--;
+                if (isChunked)
+                    chunkedValueNestingLevel--;
+
+                if (repositoryIDString.equals(repIdStrs.getWStringValueRepId())) {
+                    value = read_wstring();
+                } else if (repositoryIDString.equals(
+                    repIdStrs.getClassDescValueRepId())) {
+                    value = readClass();
+                } else {       
+                    Class valueClass = expectedType;
+
+                    // By this point, either the expectedType or repositoryIDString
+                    // is guaranteed to be non-null.
+                    if (valueClass == null || 
+                        !repositoryIDString.equals(repIdStrs.createForAnyType(
+                            expectedType,cinfo))) {
+
+                        valueClass = getClassFromString(repositoryIDString, 
+                            codebase_URL, expectedType);
+                    }
+
+                    if (orb.cdrDebugFlag) 
+                        dputil.info( "valueClass", valueClass ) ;
+
+                    if (valueClass == null) {
+                        // No point attempting to use value handler below, since the
+                        // class information is not available.
+                        // Fix for issue 1828: pass the class name for a better log
+                        // message.
+                        RepositoryIdInterface repositoryID 
+                            = repIdStrs.getFromString(repositoryIDString);
+
+                        throw wrapper.couldNotFindClass( 
+                            CompletionStatus.COMPLETED_MAYBE,
+                            repositoryID.getClassName()) ;
+                    }
+                    
+                    if (cinfo == null)
+                        cinfo = ClassInfoCache.get( valueClass ) ;
+
+                    if (valueClass != null && cinfo.isAIDLEntity(valueClass)) {
+                        value = readIDLValue(indirection, repositoryIDString, 
+                            valueClass, cinfo, codebase_URL);
+                    } else {
+                        value = readRMIIIOPValueType( indirection, 
+                            valueClass, repositoryIDString ) ;
+                    }
+                }
+                
+                // Skip any remaining chunks until we get to
+                // an end tag or a valuetag.  If we see a valuetag,
+                // that means there was another valuetype in the sender's
+                // version of this class that we need to skip over.
+                handleEndOfValue();
+                
+                // Read and process the end tag if we're chunking.
+                // Assumes that we're at the position of the end tag
+                // (handleEndOfValue should assure this)
+                readEndTag();
+                    
+                // Cache the valuetype that we read
+                if (valueCache == null)
+                    valueCache = new CacheTable<Object>( "Input valueCache",orb,false);
+                valueCache.put(value, indirection);
+                
+                // Allow for possible continuation chunk.
+                // If we're a nested valuetype inside of a chunked
+                // valuetype, and that enclosing valuetype has
+                // more data to write, it will need to have this
+                // new chunk begin after we wrote our end tag.
+                isChunked = saveIsChunked;
+                start_block();
+            }
+                
+            // Convert an EnumDesc into the enum instance it represents
+            if (value.getClass()==EnumDesc.class) {
+                EnumDesc desc = EnumDesc.class.cast( value ) ;
+
+                Class cls = null ;
                 try {
-                    list[i] = JDKBridge.loadClass(desc.interfaces[i], desc.codebase, cl);
-                 } catch (ClassNotFoundException cnfe) {
-                     throw wrapper.proxyClassNotFound(cnfe, desc.interfaces[i]);
-                 }
+                    cls = JDKBridge.loadClass( desc.className, null, null ) ;
+                } catch (ClassNotFoundException cnfe) {
+                    throw wrapper.enumClassNotFound( cnfe, desc.className ) ;
+                }
+
+                value = Enum.valueOf( cls, desc.value ) ;
+            }
+            
+            // Convert ProxyDesc into the proxy instance it represents
+            if (value.getClass()==ProxyDesc.class) {
+                ProxyDesc desc = ProxyDesc.class.cast( value ) ;
+                int numberOfInterfaces = desc.interfaces.length;
+
+                // Write code if the number is Zero. Unusual case
+                if (numberOfInterfaces==0) {
+                    if (orb.cdrDebugFlag) {
+                        dprint("The proxy does not have any interfaces that are implemented dynamically! Check the Proxy implementation");
+                    }
+                    return Return.value(null);
+                }
+
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                try {
+                    RMIClassLoader.loadProxyClass( desc.codebase, desc.interfaces, value.getClass().getClassLoader()) ;
+                } catch (ClassNotFoundException cnfe) {
+                    throw wrapper.proxyClassNotFound( cnfe, getInterfacesList(desc.interfaces)) ;
+                } catch (MalformedURLException mue) {
+                    throw wrapper.malformedProxyUrl( mue, getInterfacesList(desc.interfaces), desc.codebase) ;
+                }
+
+                Class[] list = new Class[desc.interfaces.length];
+                for(int i=0; i < numberOfInterfaces; ++i) {
+                    try {
+                        list[i] = JDKBridge.loadClass(desc.interfaces[i], desc.codebase, cl);
+                     } catch (ClassNotFoundException cnfe) {
+                         throw wrapper.proxyClassNotFound(cnfe, desc.interfaces[i]);
+                     }
+                }
+
+                try {
+                    value = Proxy.newProxyInstance(cl, list, desc.handler);
+                } catch (IllegalArgumentException iage) {
+                    throw wrapper.proxyWithIllegalArgs(iage);
+                } catch (NullPointerException npe) {
+                    throw wrapper.emptyProxyInterfaceList(npe);
+                }
             }
 
-            try {
-                value = Proxy.newProxyInstance(cl, list, desc.handler);
-            } catch (IllegalArgumentException iage) {
-                throw wrapper.proxyWithIllegalArgs(iage);
-            } catch (NullPointerException npe) {
-                throw wrapper.emptyProxyInterfaceList(npe);
-            }
+            return Return.value((java.io.Serializable)value);
+        } finally {
+            if (orb.cdrDebugFlag)
+                dputil.exit() ;
         }
-
-        return Return.value((java.io.Serializable)value);
     }
 
     private List getInterfacesList(String [] interfaces) {

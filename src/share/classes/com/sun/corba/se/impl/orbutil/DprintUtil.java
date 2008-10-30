@@ -82,7 +82,11 @@ public class DprintUtil {
             } else {
                 sb.append( ' ' ) ;
             }
-            sb.append( obj.toString() ) ;
+            if (obj == null) {
+                sb.append( "<NULL>" ) ;
+            } else {
+                sb.append( obj.toString() ) ;
+            }
         }
         sb.append( ')' ) ;
 

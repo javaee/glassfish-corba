@@ -57,7 +57,8 @@ public class EvolveTest extends CORBATest
         File dir = new File(Options.getOutputDirectory() 
             + File.separator + dirName );
 
-        if (!dir.mkdir())
+        dir.mkdirs() ;
+        if (!dir.isDirectory())
             throw new Exception( "Error making directory" + dir ) ;
 
         testDir = Options.getTestDirectory() + File.separator ;
@@ -101,7 +102,7 @@ public class EvolveTest extends CORBATest
             clientName ) ;
         client.start();
             
-        if (client.waitFor(Options.getMaximumTimeout()) != Controller.SUCCESS) {
+        if (client.waitFor(10*Options.getMaximumTimeout()) != Controller.SUCCESS) {
             System.out.println("Bad client exit value (" + client.exitValue() 
                 + ") with evolved class");
             failures++;

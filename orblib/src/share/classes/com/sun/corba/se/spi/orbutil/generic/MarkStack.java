@@ -47,7 +47,8 @@ import java.util.EmptyStackException ;
  */
 public final class MarkStack<E> {
     private List<E> items ;
-    private List<Integer> marks ;
+    // The int on the marks list points to the first element on items that is part of the mark.
+    private List<Integer> marks ; 
 
     public MarkStack() {
 	items = new ArrayList<E>() ;
@@ -81,6 +82,11 @@ public final class MarkStack<E> {
     /** Return true iff the stack is empty.
      */
     public boolean isEmpty() {
+        if (marks.size() > 0) {
+	    int topMark = marks.get( marks.size() - 1 ) ;
+            return topMark == items.size() ;
+        }
+
 	return items.size() == 0 ;
     }
 
@@ -106,7 +112,7 @@ public final class MarkStack<E> {
 
     /** Return an ordered list of stack elements starting with
      * the element that was on top of the stack when mark was
-     * called.
+     * called.  
      */
     public List<E> popMark() {
 	// Use a LinkedList here because addFirst runs in

@@ -1323,26 +1323,11 @@ public class SocketOrChannelConnectionImpl
         return orb;
     }
 
-    public CodeSetComponentInfo.CodeSetContext getCodeSetContext() {
-        // Needs to be synchronized for the following case when the client
-        // doesn't send the code set context twice, and we have two threads
-        // in ServerRequestDispatcher processCodeSetContext.
-        //
-        // Thread A checks to see if there is a context, there is none, so
-        //     it calls setCodeSetContext, getting the synch lock.
-        // Thread B checks to see if there is a context.  If we didn't synch,
-        //     it might decide to outlaw wchar/wstring.
-        if (codeSetContext == null) {
-            synchronized(this) {
-                return codeSetContext;
-            }
-        }
-
+    public synchronized CodeSetComponentInfo.CodeSetContext getCodeSetContext() {
         return codeSetContext;
     }
 
     public synchronized void setCodeSetContext(CodeSetComponentInfo.CodeSetContext csc) {
-        // Double check whether or not we need to do this
         if (codeSetContext == null) {
             
             if (OSFCodeSetRegistry.lookupEntry(csc.getCharCodeSet()) == null ||

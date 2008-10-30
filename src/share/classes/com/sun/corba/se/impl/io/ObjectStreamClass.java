@@ -209,9 +209,8 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     public static final long getSerialVersionUID( java.lang.Class clazz) {
 	ObjectStreamClass theosc = ObjectStreamClass.lookup( clazz );
-        if( theosc != null )
-	{
-		return theosc.getSerialVersionUID( );
+        if (theosc != null) {
+            return theosc.getSerialVersionUID( );
 	}
 	return 0;
     }

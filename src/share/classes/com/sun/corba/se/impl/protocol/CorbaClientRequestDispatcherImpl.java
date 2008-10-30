@@ -240,9 +240,7 @@ public class CorbaClientRequestDispatcherImpl
 	    // replies or client marshaling exceptions.
 	    orb.getInvocationInfo().setMessageMediator(messageMediator);
 
-	    if (connection != null && connection.getCodeSetContext() == null) {
-		performCodeSetNegotiation(messageMediator);
-	    }
+            performCodeSetNegotiation(messageMediator);
 
 	    tp.enter_requestAddServiceContexts() ;
 	    try {
@@ -959,59 +957,49 @@ public class CorbaClientRequestDispatcherImpl
 	}
     }
 
-
     protected void performCodeSetNegotiation(CorbaMessageMediator messageMediator)
     {
-	CorbaConnection conn = 
-	    (CorbaConnection) messageMediator.getConnection();
-	IOR ior =
-	    ((CorbaContactInfo)messageMediator.getContactInfo())
-	    .getEffectiveTargetIOR();
+	CorbaConnection conn = (CorbaConnection) messageMediator.getConnection();
+        if (conn == null)
+            return ;
+
 	GIOPVersion giopVersion = messageMediator.getGIOPVersion();
+        if (giopVersion.equals(GIOPVersion.V1_0))
+            return ;
 
-	// XXX This seems to be a broken double checked locking idiom: FIX IT!
+	IOR ior = ((CorbaContactInfo)messageMediator.getContactInfo())
+	    .getEffectiveTargetIOR();
 
-        // conn.getCodeSetContext() is null when no other requests have
-        // been made on this connection to trigger code set negotation.
-        if (conn != null &&
-            conn.getCodeSetContext() == null &&
-            !giopVersion.equals(GIOPVersion.V1_0)) {
-                        
-            synchronized(conn) {
-                // Double checking.  Don't let any other
-                // threads use this connection until the
-                // code sets are straight.
-                if (conn.getCodeSetContext() != null)
-                    return;
-                
-                // This only looks at the first code set component.  If
-                // there can be multiple locations with multiple code sets,
-                // this requires more work.
-                IIOPProfileTemplate temp = 
-		    (IIOPProfileTemplate)ior.getProfile().
-		    getTaggedProfileTemplate();
-                Iterator iter = temp.iteratorById(TAG_CODE_SETS.value);
-                if (!iter.hasNext()) {
-                    // Didn't have a code set component.  The default will
-                    // be to use ISO8859-1 for char data and throw an
-                    // exception if wchar data is used.
-                    return;
-                }
-
-                // Get the native and conversion code sets the
-                // server specified in its IOR
-                CodeSetComponentInfo serverCodeSets
-                    = ((CodeSetsComponent)iter.next()).getCodeSetComponentInfo();
-
-                // Perform the negotiation between this ORB's code sets and
-                // the ones from the IOR
-                CodeSetComponentInfo.CodeSetContext result
-                    = CodeSetConversion.impl().negotiate(
-                          conn.getBroker().getORBData().getCodeSetComponentInfo(),
-			  serverCodeSets);
-                
-                conn.setCodeSetContext(result);
+        synchronized( conn ) {
+            if (conn.getCodeSetContext() != null)
+                return;
+            
+            // This only looks at the first code set component.  If
+            // there can be multiple locations with multiple code sets,
+            // this requires more work.
+            IIOPProfileTemplate temp = (IIOPProfileTemplate)ior.getProfile().
+                getTaggedProfileTemplate();
+            Iterator iter = temp.iteratorById(TAG_CODE_SETS.value);
+            if (!iter.hasNext()) {
+                // Didn't have a code set component.  The default will
+                // be to use ISO8859-1 for char data and throw an
+                // exception if wchar data is used.
+                return;
             }
+
+            // Get the native and conversion code sets the
+            // server specified in its IOR
+            CodeSetComponentInfo serverCodeSets
+                = ((CodeSetsComponent)iter.next()).getCodeSetComponentInfo();
+
+            // Perform the negotiation between this ORB's code sets and
+            // the ones from the IOR
+            CodeSetComponentInfo.CodeSetContext result
+                = CodeSetConversion.impl().negotiate(
+                      conn.getBroker().getORBData().getCodeSetComponentInfo(),
+                      serverCodeSets);
+            
+            conn.setCodeSetContext(result);
         }
     }
 

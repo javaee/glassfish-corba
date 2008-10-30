@@ -119,8 +119,6 @@ public class SocketFactoryAcceptorImpl
 	Iterator iterator = iorTemplate.iteratorById(
             org.omg.IOP.TAG_INTERNET_IOP.value);
 
-	String hostname = orb.getORBData().getORBServerHost();
-
 	if (!iterator.hasNext()) {
 	    // If this is the first call, create the IIOP profile template.
 	    IIOPProfileTemplate iiopProfile = makeIIOPProfileTemplate(

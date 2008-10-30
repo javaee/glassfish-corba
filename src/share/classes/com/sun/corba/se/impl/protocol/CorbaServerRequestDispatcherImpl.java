@@ -849,50 +849,41 @@ public class CorbaServerRequestDispatcherImpl
 		CodeSetServiceContext cssc = (CodeSetServiceContext)sc ;
 		CodeSetComponentInfo.CodeSetContext csctx = cssc.getCodeSetContext();
 
-		// Note on threading:
-		//
-		// getCodeSetContext and setCodeSetContext are synchronized
-		// on the Connection.  At worst, this will result in 
-		// multiple threads entering this block and calling 
-		// setCodeSetContext but not actually changing the
-		// values on the Connection.
-		//
-		// Alternative would be to lock the connection for the
-		// whole block, but it's fine either way.
-
 		// The connection's codeSetContext is null until we've received a
 		// request with a code set context with the negotiated code sets.
-		if (((CorbaConnection)request.getConnection())
-		    .getCodeSetContext() == null) 
-                {
+                CorbaConnection connection = 
+                    (CorbaConnection)request.getConnection() ;
 
-		    // Use these code sets on this connection
-		    if (orb.subcontractDebugFlag) {
-			dprint(".processCodeSetContext: " + opAndId(request)
-			       + ": Setting code sets to: " + csctx);
-		    }
+                synchronized (connection) {
+                    if (connection.getCodeSetContext() == null) {
 
-		    ((CorbaConnection)request.getConnection())
-			.setCodeSetContext(csctx);
+                        // Use these code sets on this connection
+                        if (orb.subcontractDebugFlag) {
+                            dprint(".processCodeSetContext: " + opAndId(request)
+                                   + ": Setting code sets to: " + csctx);
+                        }
 
-		    // We had to read the method name using ISO 8859-1
-		    // (which is the default in the CDRInputStream for
-		    // char data), but now we may have a new char
-		    // code set.  If it isn't ISO8859-1, we must tell
-		    // the CDR stream to null any converter references
-		    // it has created so that it will reacquire
-		    // the code sets again using the new info.
-		    //
-		    // This should probably compare with the stream's
-		    // char code set rather than assuming it's ISO8859-1.
-		    // (However, the operation name is almost certainly
-		    // ISO8859-1 or ASCII.)
-		    if (csctx.getCharCodeSet() != 
-			OSFCodeSetRegistry.ISO_8859_1.getNumber()) {
-			((MarshalInputStream)request.getInputObject())
-			    .resetCodeSetConverters();
-		    }
-		}
+                        connection.setCodeSetContext(csctx);
+
+                        // We had to read the method name using ISO 8859-1
+                        // (which is the default in the CDRInputStream for
+                        // char data), but now we may have a new char
+                        // code set.  If it isn't ISO8859-1, we must tell
+                        // the CDR stream to null any converter references
+                        // it has created so that it will reacquire
+                        // the code sets again using the new info.
+                        //
+                        // This should probably compare with the stream's
+                        // char code set rather than assuming it's ISO8859-1.
+                        // (However, the operation name is almost certainly
+                        // ISO8859-1 or ASCII.)
+                        if (csctx.getCharCodeSet() != 
+                            OSFCodeSetRegistry.ISO_8859_1.getNumber()) {
+                            ((MarshalInputStream)request.getInputObject())
+                                .resetCodeSetConverters();
+                        }
+                    }
+                }
 	    }
 
 	    // If no code set information is ever sent from the client,

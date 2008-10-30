@@ -493,12 +493,10 @@ public class ThreadPoolImpl implements ThreadPool
 
         private Work currentWork ;
         private volatile boolean closeCalled = false ;
-        private String threadPoolName;
 
         WorkerThread(ThreadGroup tg, String threadPoolName) {
 	    super(tg, THREAD_POOLNAME_PREFIX_STR + threadPoolName + 
 		  WORKER_THREAD_NAME_PREFIX_STR + ThreadPoolImpl.getUniqueThreadId());
-            this.threadPoolName = threadPoolName;
             this.currentWork = null;
         }
 
@@ -506,7 +504,7 @@ public class ThreadPoolImpl implements ThreadPool
 	    if (System.getSecurityManager() == null)
 		setClassLoaderHelper() ;
 	    else {
-		ClassLoader oldClassLoader = AccessController.doPrivileged( 
+		AccessController.doPrivileged( 
 		    new PrivilegedAction<ClassLoader>() {
 			public ClassLoader run() {
 			    return WorkerThread.this.setClassLoaderHelper() ;
@@ -586,7 +584,7 @@ public class ThreadPoolImpl implements ThreadPool
                         closeCalled = true ;
                         continue ;
                     } catch (InterruptedException exc) {
-                        wrapper.workQueueThreadInterrupted( exc, getName(), 
+                        wrapper.workQueueThreadInterrupted( exc, super.getName(), 
                             Boolean.valueOf( closeCalled ) ) ;
 
                         continue ;

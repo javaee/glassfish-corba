@@ -419,7 +419,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     // DummyORB
     // DummyPOA
 
-    private ManagedObjectManager initManagedObjectManager() {
+    private void initManagedObjectManager() {
         createORBManagedObjectManager() ;
 
         mom.register( configData ) ;
@@ -427,8 +427,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedObject.class ) ) ;
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( Description.class ) ) ;
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( InheritedAttributes.class ) ) ;
-        
-        return mom ;
     }
 
 /****************************************************************************
@@ -547,22 +545,15 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	new HashMap<String,Integer>() ;
     private String rootName = null ;
 
-    public String getUniqueOrbId() 
-    {
+    public synchronized String getUniqueOrbId() {
 	if (rootName == null) {
 	    String orbid = getORBData().getORBId() ;
+
 	    int num = 1 ;
-
-	    // Look up the current count of ORB instances with 
-	    // the same ORBId.  If this is the first instance,
-	    // the count is 1, otherwise increment the count.
-	    synchronized (idcount) {
-		if (idcount.containsKey( orbid )) {
-		    num = idcount.get( orbid ) + 1 ;
-		}
-
-		idcount.put( orbid, num ) ;
-	    }
+            if (idcount.containsKey( orbid )) {
+                num = idcount.get( orbid ) + 1 ;
+            }
+            idcount.put( orbid, num ) ;
 
 	    rootName = MonitoringConstants.DEFAULT_MONITORING_ROOT ;
 
@@ -590,32 +581,28 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     {
 	// First, create the standard ORB config data.
 	// This must be initialized before the ORBConfigurator
-	// is executed.
+	// is executed. Note that the orbId is initialized here.
 	configData = new ORBDataParserImpl( this, dataCollector) ;
 	if (orbInitDebug) {
 	    System.out.println( "Contents of ORB configData:" ) ;
 	    System.out.println( ObjectUtility.defaultObjectToString( configData ) ) ;
 	}
 
-        // The ORB id depends on config data, so this call must happen
-        // after the configData has been initialized.
-        String orbId = getUniqueOrbId() ;
+	// Set the debug flags early so they can be used by other
+	// parts of the initialization.
+	setDebugFlags( configData.getORBDebugFlags() ) ;
 
-        mom = initManagedObjectManager( orbId ) ;
+        initManagedObjectManager() ;
 
 	// The TimerManager must be
 	// initialized BEFORE the pihandler.initialize() call, in
 	// case we want to time interceptor setup.  Obviously we
 	// want to initialize the timerManager as early as possible
 	// so we can time parts of initialization if desired.
-	timerManager = makeTimerManager( mom, orbId ) ;
+	timerManager = makeTimerManager( mom ) ;
 
 	// This requires a valid TimerManager.
 	initializePrimitiveTypeCodeConstants() ;
-
-	// Set the debug flags early so they can be used by other
-	// parts of the initialization.
-	setDebugFlags( configData.getORBDebugFlags() ) ;
 
 	initMonitoringManager() ;
 

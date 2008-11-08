@@ -78,7 +78,6 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
 import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.jmxa.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
 import com.sun.corba.se.spi.orb.Operation ;
@@ -110,7 +109,6 @@ import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsDisabledImpl ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsEnabledImpl ;
 
-import com.sun.jmxa.ManagedObjectManager ;
 
 // XXX needs an SPI or else it does not belong here
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;
@@ -134,6 +132,9 @@ import com.sun.corba.se.impl.logging.LogWrapperTableImpl ;
 import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
 
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
+
+import com.sun.jmxa.ManagedObjectManager ;
+import com.sun.jmxa.ManagedObjectManagerFactory ;
 
 public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     implements Broker, TypeCodeFactory
@@ -183,7 +184,10 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean cdrDebugFlag = false ;
     public boolean streamFormatVersionDebugFlag = false ;
     public boolean valueHandlerDebugFlag = false ;
-    
+    public boolean mbeanDebugFlag = false ;
+    public boolean mbeanFineDebugFlag = false ;
+    public boolean mbeanRuntimeDebugFlag = false ;
+
     private LogWrapperTable logWrapperTable ;
 
     private static LogWrapperTable staticLogWrapperTable = 
@@ -192,7 +196,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // mom MUST be initialized in a subclass by calling createManagedObjectManager.
     // In ORBSingleton, this happens in the constructor.  It ORBImpl, it cannot
     // happen in the constructor: instead, it must be called in post_init.
-    private ManagedObjectManager mom ;
+    protected ManagedObjectManager mom ;
     
     // SystemException log wrappers.  Protected so that they can be used in
     // subclasses.
@@ -288,7 +292,9 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     }
 
     protected TimerManager<TimingPoints> makeTimerManager( 
-        ManagedObjectManager mom, String orbId ) {
+        ManagedObjectManager mom ) {
+
+        String orbId = getUniqueOrbId() ;
 
 	TimerManager<TimingPoints> timerManager = 
 	    new TimerManager<TimingPoints>( mom, orbId ) ;
@@ -534,17 +540,25 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      * ORB class.  This is the default implementation inherited by the
      * ORBSingleton.
      */
-    public String getUniqueOrbId() {
+    public String getUniqueOrbId()  {
 	return "###DEFAULT_UNIQUE_ORB_ID###" ;
     }
 
-    public void createManagedObjectManager() {
-        ManagedObjectManager baseMom = ManagedObjectManagerFactory.create( "com.sun.corba" ) ;
-        
-        // mom is set up to always include ORBId as one of the name/value pairs for
-        // MBean object names.
-        mom = ManagedObjectManagerFactory.create( baseMom, 
-            "ORBId=" + getUniqueOrbId() ) ;
+    public void createORBManagedObjectManager() {
+        mom = ManagedObjectManagerFactory.create( 
+            "com.sun.corba", "ORBId=" + getUniqueOrbId() ) ;
+
+        if (mbeanFineDebugFlag) {
+            mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.FINE ) ;
+        } else if (mbeanDebugFlag) {
+            mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.NORMAL ) ;
+        } else {
+            mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.NONE ) ;
+        }
+
+        mom.setRuntimeDebug( mbeanRuntimeDebugFlag ) ;
+
+        mom.addTypePrefix( "com.sun.corba.se" ) ;
     }
 
     /** Return the ORB's TimerManager.

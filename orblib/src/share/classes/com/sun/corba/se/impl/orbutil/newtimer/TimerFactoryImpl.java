@@ -93,8 +93,10 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
     private void manage( Named obj ) {
         // Note that no extra parameters are needed here, because Named.getName
         // is an ObjectNameKey.
-        if (mom != null) 
+        if (mom != null)  {
+            System.out.println( "Registering " + obj ) ;
             mom.register( obj ) ;
+        }
     }
 
     private void unmanage( Named obj ) {

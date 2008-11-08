@@ -261,7 +261,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
             <compilation-unit>
                 <package-root>src/share/classes</package-root>
-                <classpath mode="compile">build/classes:orblib/build/classes</classpath>
+                <classpath mode="compile">build/classes:orblib/build/classes:lib/jmxa.jar</classpath>
                 <built-to>build/classes</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>

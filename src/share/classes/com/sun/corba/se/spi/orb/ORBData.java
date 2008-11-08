@@ -39,7 +39,7 @@ package com.sun.corba.se.spi.orb ;
 
 import org.omg.PortableInterceptor.ORBInitializer ;
 
-import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
@@ -151,9 +151,10 @@ public interface ORBData {
     public int getGIOPBufferSize() ;
     // XXX add setter?
 
-    @ManagedAttribute
-    @Description( "Int describing GIOP buffer management strategy: " 
-        + "0:grow, 1:collect, 2:stream (the default)") 
+    // Can't have an argument: what is the correct action here?
+    // @ManagedAttribute
+    //  @Description( "Int describing GIOP buffer management strategy: " 
+        // + "0:grow, 1:collect, 2:stream (the default)") 
     public int getGIOPBuffMgrStrategy(GIOPVersion gv) ;
 
     /**
@@ -230,9 +231,11 @@ public interface ORBData {
     /** Added to allow user configurators to add ORBInitializers
      * for PI.  This makes it possible to add interceptors from
      * an ORBConfigurator.
+     * XXX Should this be an operation, or a set only attribute?
+     * Should it even be exposed in the MBean?
      */
-    @ManagedAttribute
-    @Description( "DESC" ) 
+    // @ManagedAttribute
+    // @Description( "DESC" ) 
     public void addORBInitializer( ORBInitializer init ) ;
 
     @ManagedAttribute
@@ -250,7 +253,7 @@ public interface ORBData {
 
     @ManagedAttribute
     @Description( "DESC" ) 
-    public Acceptor[] getAcceptors();
+    public CorbaAcceptor[] getAcceptors();
 
     @ManagedAttribute
     @Description( "DESC" ) 

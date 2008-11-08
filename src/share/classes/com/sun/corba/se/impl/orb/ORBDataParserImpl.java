@@ -42,7 +42,7 @@ import java.net.InetAddress;
 import org.omg.CORBA.CompletionStatus ;
 import org.omg.PortableInterceptor.ORBInitializer ;
 
-import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.spi.orb.DataCollector ;
@@ -103,7 +103,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private Pair<String,String>[] orbInitialReferences ; 
     private String defaultInitRef ;
     private String[] debugFlags ;
-    private Acceptor[] acceptors;
+    private CorbaAcceptor[] acceptors;
     private CorbaContactInfoListFactory corbaContactInfoListFactory;
     private String acceptorSocketType;
     private boolean acceptorSocketUseSelectThreadToWait;
@@ -361,7 +361,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 	return debugFlags ;
     }
 
-    public Acceptor[] getAcceptors()
+    public CorbaAcceptor[] getAcceptors()
     {
 	return acceptors;
     }

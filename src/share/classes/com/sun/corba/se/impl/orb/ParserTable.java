@@ -56,13 +56,13 @@ import com.sun.corba.se.pept.broker.Broker;
 import com.sun.corba.se.pept.encoding.InputObject;
 import com.sun.corba.se.pept.encoding.OutputObject;
 import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Acceptor;
 import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.pept.transport.ContactInfo;
 import com.sun.corba.se.pept.transport.EventHandler;
 import com.sun.corba.se.pept.transport.InboundConnectionCache;
 
 import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.ObjectKey ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.spi.orb.ORB;
@@ -73,6 +73,7 @@ import com.sun.corba.se.spi.orb.ParserData ;
 import com.sun.corba.se.spi.orb.ParserDataFactory ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;
@@ -80,6 +81,8 @@ import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.TcpTimeouts;
 import com.sun.corba.se.spi.transport.TransportDefault;
+
+import com.sun.corba.se.impl.oa.poa.Policies;
 
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry ;
@@ -155,7 +158,7 @@ public class ParserTable {
 	    new Pair<String,String>( MY_CLASS_NAME + "$TestORBInitializer1", "dummy" ),
 	    new Pair<String,String>( MY_CLASS_NAME + "$TestORBInitializer2", "dummy" ) } ;
 
-	Acceptor[] TestAcceptors =
+	CorbaAcceptor[] TestAcceptors =
 	    { null, 
 	      new TestAcceptor2(), 
 	      new TestAcceptor1()
@@ -360,8 +363,8 @@ public class ParserTable {
 		TestORBInitializers, TestORBInitData, ORBInitializer.class ),
 	    ParserDataFactory.make( ORBConstants.ACCEPTOR_CLASS_PREFIX_PROPERTY,  
 		makeAcceptorInstantiationOperation(), 
-		"acceptors", new Acceptor[0],
-		TestAcceptors, TestAcceptorData, Acceptor.class ),
+		"acceptors", new CorbaAcceptor[0],
+		TestAcceptors, TestAcceptorData, CorbaAcceptor.class ),
 
 	    //
 	    // Socket/Channel control
@@ -577,7 +580,7 @@ public class ParserTable {
 	    return null ;
 	}
 
-	public void setAcceptedSocketOptions(Acceptor acceptor,
+	public void setAcceptedSocketOptions(CorbaAcceptor acceptor,
 					     ServerSocket serverSocket,
 					     Socket socket)
 	{
@@ -969,7 +972,7 @@ public class ParserTable {
     }
 
     public static final class TestAcceptor1
-	implements Acceptor
+	implements CorbaAcceptor
     {
 	public boolean equals( Object other )
 	{
@@ -994,10 +997,15 @@ public class ParserTable {
             Broker broker, MessageMediator messageMediator) { return null; }
 	public OutputObject createOutputObject(
             Broker broker, MessageMediator messageMediator) { return null; }
+        public String getObjectAdapterId() { return null ; }
+        public String getObjectAdapterManagerId() { return null ; }
+        public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
+                                     String codebase) { }
+        public String getMonitoringName() { return null ; }
     }
 
     public static final class TestAcceptor2
-	implements Acceptor
+	implements CorbaAcceptor
     {
 	public boolean equals( Object other )
 	{
@@ -1022,6 +1030,11 @@ public class ParserTable {
             Broker broker, MessageMediator messageMediator) { return null; }
 	public OutputObject createOutputObject(
             Broker broker, MessageMediator messageMediator) { return null; }
+        public String getObjectAdapterId() { return null ; }
+        public String getObjectAdapterManagerId() { return null ; }
+        public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
+                                     String codebase) { }
+        public String getMonitoringName() { return null ; }
     }
 
     // REVISIT - this is a cut and paste modification of makeROIOperation.
@@ -1041,18 +1054,18 @@ public class ParserTable {
 		// For security reasons avoid creating an instance 
 		// if this class is one that would fail the class cast 
 		// to ORBInitializer anyway.
-		if( Acceptor.class.isAssignableFrom( initClass ) ) {
+		if( CorbaAcceptor.class.isAssignableFrom( initClass ) ) {
 		    // Now that we have a class object, instantiate one and
 		    // remember it:
-		    Acceptor acceptor = null ; 
+		    CorbaAcceptor acceptor = null ; 
 
 		    try {
-			acceptor = (Acceptor)AccessController.doPrivileged(
-			    new PrivilegedExceptionAction() {
-				public Object run() 
+			acceptor = AccessController.doPrivileged(
+			    new PrivilegedExceptionAction<CorbaAcceptor>() {
+				public CorbaAcceptor run() 
 				    throws InstantiationException, IllegalAccessException 
 				{
-				    return initClass.newInstance() ;
+				    return (CorbaAcceptor)initClass.newInstance() ;
 				}
 			    } 
 			) ;

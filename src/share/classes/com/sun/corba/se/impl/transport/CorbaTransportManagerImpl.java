@@ -83,6 +83,10 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message_1_2;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 
+import com.sun.jmxa.ManagedObject ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
 /**
  * @author Harold Carr
  */
@@ -95,7 +99,7 @@ public class CorbaTransportManagerImpl
 	CorbaTransportManager
 {
     protected ORB orb;
-    protected List<Acceptor> acceptors;
+    protected List<CorbaAcceptor> acceptors;
     protected Map<String,OutboundConnectionCache> outboundConnectionCaches;
     protected Map<String,InboundConnectionCache> inboundConnectionCaches;
     protected Selector selector;
@@ -103,7 +107,7 @@ public class CorbaTransportManagerImpl
     public CorbaTransportManagerImpl(ORB orb) 
     {
 	this.orb = orb;
-	acceptors = new ArrayList<Acceptor>();
+	acceptors = new ArrayList<CorbaAcceptor>();
 	outboundConnectionCaches = new HashMap<String,OutboundConnectionCache>();
 	inboundConnectionCaches = new HashMap<String,InboundConnectionCache>();
 	selector = new SelectorImpl(orb);
@@ -186,11 +190,6 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    public Collection<InboundConnectionCache> getInboundConnectionCaches()
-    {
-	return inboundConnectionCaches.values();
-    }
-
     @ManagedAttribute
     @Description( "The Selector, which listens for all I/O events" )
     public Selector getSelector() {
@@ -202,7 +201,7 @@ public class CorbaTransportManagerImpl
 	return selector;
     }
 
-    public synchronized void registerAcceptor(Acceptor acceptor) 
+    public synchronized void registerAcceptor(CorbaAcceptor acceptor) 
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".registerAcceptor->: " + acceptor);
@@ -213,12 +212,7 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    public Collection getAcceptors()
-    {
-	return getAcceptors(null, null);
-    }
-
-    public synchronized void unregisterAcceptor(Acceptor acceptor)
+    public synchronized void unregisterAcceptor(CorbaAcceptor acceptor)
     {
 	acceptors.remove(acceptor);
     }
@@ -250,11 +244,11 @@ public class CorbaTransportManagerImpl
 
     @ManagedAttribute
     @Description( "List of all Acceptors in this ORB" ) 
-    public Collection<Acceptor> getAcceptors() {
-        returng getAcceptors( null, null ) ;
+    public Collection<CorbaAcceptor> getAcceptors() {
+        return getAcceptors( null, null ) ;
     }
 
-    public Collection<Acceptor> getAcceptors(String objectAdapterManagerId,
+    public Collection<CorbaAcceptor> getAcceptors(String objectAdapterManagerId,
 				   ObjectAdapterId objectAdapterId)
     {
 	// REVISIT - need to filter based on arguments.
@@ -262,10 +256,10 @@ public class CorbaTransportManagerImpl
 	// REVISIT - initialization will be moved to OA.
 	// Lazy initialization of acceptors.
         for (Acceptor acc : acceptors) {
-	    if (acceptor.initialize()) {
-		if (acceptor.shouldRegisterAcceptEvent()) {
+	    if (acc.initialize()) {
+		if (acc.shouldRegisterAcceptEvent()) {
 		    orb.getTransportManager().getSelector(0)
-			.registerForEvent(acceptor.getEventHandler());
+			.registerForEvent(acc.getEventHandler());
 		}
 	    }
 	}

@@ -59,7 +59,7 @@ public interface CorbaTransportManager
     public static final String SOCKET_OR_CHANNEL_CONNECTION_CACHE =
 	"SocketOrChannelConnectionCache";
 
-    public Collection getAcceptors(String objectAdapterManagerId,
+    public Collection<CorbaAcceptor> getAcceptors(String objectAdapterManagerId,
 				   ObjectAdapterId objectAdapterId);
 
     // REVISIT - POA specific policies
@@ -102,6 +102,10 @@ public interface CorbaTransportManager
      * independent copy.
      */
     MessageTraceManager getMessageTraceManager() ;
+
+    void registerAcceptor( CorbaAcceptor acceptor ) ;
+
+    void unregisterAcceptor( CorbaAcceptor acceptor ) ;
 }
     
 // End of file.

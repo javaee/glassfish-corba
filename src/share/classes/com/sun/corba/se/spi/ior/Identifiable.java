@@ -37,6 +37,8 @@
 
 package com.sun.corba.se.spi.ior;
 
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
 
 /** This interface represents an entity that can be written to an
  * OutputStream and has an identity that is represented by an integer.
@@ -49,5 +51,7 @@ public interface Identifiable extends Writeable
     /** Return the (type) identity of this entity.
      * @return int
      */
+    @ManagedAttribute
+    @Description( "Id of tagged component or profile" )
     public int getId();
 }

@@ -37,7 +37,15 @@ package com.sun.corba.se.spi.ior.iiop;
 
 import com.sun.corba.se.spi.ior.TaggedComponent;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
+@ManagedData
+@Description( "Component encoding request paritioning ID" )
 public interface RequestPartitioningComponent extends TaggedComponent
 {
+    @ManagedAttribute
+    @Description( "Request paritioning id (0-63); commonly 0" ) 
     public int getRequestPartitioningId();
 }

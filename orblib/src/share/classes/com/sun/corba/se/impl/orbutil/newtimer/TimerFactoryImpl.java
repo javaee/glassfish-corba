@@ -94,8 +94,17 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
         // Note that no extra parameters are needed here, because Named.getName
         // is an ObjectNameKey.
         if (mom != null)  {
-            System.out.println( "Registering " + obj ) ;
-            mom.register( obj ) ;
+            // System.out.println( "Registering " + obj ) ;
+            mom.registerAtRoot( obj ) ;
+        }
+    }
+
+    private void manage( Named parent, Named obj ) {
+        // Note that no extra parameters are needed here, because Named.getName
+        // is an ObjectNameKey.
+        if (mom != null)  {
+            // System.out.println( "Registering " + obj ) ;
+            mom.register( parent, obj ) ;
         }
     }
 
@@ -194,7 +203,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    throw new IllegalArgumentException( "Name " + name 
 		+ " is already in use." ) ;
 	TimerEventHandler result = new TracingEventHandler( factory(), name ) ;
-        manage( result ) ;
+        manage( this, result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -204,7 +213,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    throw new IllegalArgumentException( "Name " + name 
 		+ " is already in use." ) ;
 	LogEventHandler result = new LogEventHandlerImpl( factory(), name ) ;
-        manage( result ) ;
+        manage( this, result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -215,7 +224,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 		+ " is already in use." ) ;
 	StatsEventHandler result = new StatsEventHandlerImpl( factory(), 
 	    name ) ;
-        manage( result ) ;
+        manage( this, result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -228,7 +237,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 		+ " is already in use." ) ;
 	StatsEventHandler result = new MultiThreadedStatsEventHandlerImpl( 
 	    factory(), name ) ;
-        manage( result ) ;
+        manage( this, result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -244,7 +253,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	checkArgs( timers.keySet(), name, description ) ;
 
 	TimerImpl result = new TimerImpl( nextIndex, this, name, description ) ;
-        manage( result ) ;
+        manage( this, result ) ;
 	mapId( result ) ;
 	timers.put( name, result ) ;
 	add( result ) ;  // Remember, a TimerFactory is a TimerGroup 
@@ -264,7 +273,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
 	TimerGroupImpl result = new TimerGroupImpl( nextIndex, this, name, 
 	    description ) ;
-        manage( result ) ;
+        manage( this, result ) ;
 
 	mapId( result ) ;
 	timerGroups.put( result.name(), result ) ;
@@ -289,7 +298,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
     public synchronized TimerEventController makeController( String name ) {
 	TimerEventController result = new TimerEventController( this, name ) ;
-        manage( result ) ;
+        manage( this, result ) ;
 	return result ;
     }
 

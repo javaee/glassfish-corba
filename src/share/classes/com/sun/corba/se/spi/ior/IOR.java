@@ -56,7 +56,8 @@ import com.sun.jmxa.Description ;
 */
 @ManagedData
 @Description( "Interoperable Object Reference: the internal structure of a remote object reference" )
-@InheritedAttribute( id="iterator" )
+@InheritedAttribute( id="taggedProfiles", methodName="iterator", 
+    description="The list of profiles in this IOR" )  
 public interface IOR extends List<TaggedProfile>, Writeable, MakeImmutable
 {
     ORB getORB() ;

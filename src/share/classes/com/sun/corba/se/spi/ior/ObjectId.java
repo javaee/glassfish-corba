@@ -36,10 +36,18 @@
 
 package com.sun.corba.se.spi.ior;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
 /**
  * @author Ken Cavanaugh
  */
+@ManagedData
+@Description( "The ObjectId field within an ObjectKey in an IOR" )
 public interface ObjectId extends Writeable
 {
+    @ManagedAttribute
+    @Description( "The actual bytes in the ObjectKey" ) 
     public byte[] getId() ;
 }

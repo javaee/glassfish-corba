@@ -38,10 +38,16 @@ package com.sun.corba.se.spi.ior ;
 
 import java.util.Iterator ;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
 /** This is the object adapter ID for an object adapter.
 * Typically this is the path of strings starting from the
 * Root POA to get to a POA, but other implementations are possible.
 */
+@ManagedData
+@Description( "The identifier for a particular Object adapter in the ORB" ) 
 public interface ObjectAdapterId extends Iterable<String>, Writeable {
     /** Return the number of elements in the adapter ID.
     */
@@ -54,5 +60,7 @@ public interface ObjectAdapterId extends Iterable<String>, Writeable {
 
     /** Get the adapter name simply as an array of strings.
     */
+    @ManagedAttribute
+    @Description( "Sequence of strings in the ObjectAdapterId" ) 
     String[] getAdapterName() ;
 }

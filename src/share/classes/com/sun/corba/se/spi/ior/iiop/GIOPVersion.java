@@ -45,6 +45,12 @@ import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
+@ManagedData
+@Description( "The maximum GIOP version supported by this IOR" )
 public class GIOPVersion {
 
     // Static fields
@@ -90,10 +96,15 @@ public class GIOPVersion {
 
     // Accessor methods
 
+    @ManagedAttribute
+    @Description( "The Major GIOP version (almost always 1)" )
     public byte getMajor() {
         return this.major;
     }
 
+    @ManagedAttribute
+    @Description( "The Minor GIOP version (almost always 0, 1, or 2."
+        + " This ORB almost always uses 2" )
     public byte getMinor() {
         return this.minor;
     }

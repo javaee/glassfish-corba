@@ -48,7 +48,7 @@ import com.sun.jmxa.Description ;
  * It may also contain other Controllable instances.
  */
 @ManagedObject
-@IncludeSubclass( cls = { Timer.class, TimerGroup.class, TimerFactory.class } ) 
+@IncludeSubclass( { Timer.class, TimerGroup.class, TimerFactory.class } ) 
 public interface Controllable extends Named {
     /** A longer description giving some details of the meaning of this
      * Controllable.

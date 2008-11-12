@@ -1,5 +1,4 @@
-/*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+/* * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
  *
@@ -7,7 +6,7 @@
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
  * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+ * a copy of the License at https://glassfish.dev ;.net/public/CDDL+GPL.html
  * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
@@ -39,12 +38,32 @@ package com.sun.corba.se.spi.ior;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 import org.omg.CORBA.ORB ;
 
+import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent ;
+import com.sun.corba.se.spi.ior.iiop.CodeSetsComponent ;                
+import com.sun.corba.se.spi.ior.iiop.JavaCodebaseComponent ;
+import com.sun.corba.se.spi.ior.iiop.MaxStreamFormatVersionComponent ;
+import com.sun.corba.se.spi.ior.iiop.ORBTypeComponent ;
+import com.sun.corba.se.spi.ior.iiop.RequestPartitioningComponent ;
+
+import com.sun.corba.se.impl.ior.GenericTaggedComponent ;
+
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.Description ;
+import com.sun.jmxa.IncludeSubclass ;
+
 /** Generic interface for all tagged components.  Users of the ORB may
 * create implementations of this class and also corresponding factories
 * of type TaggedComponentFactory.  The factories can be registered with an
 * ORB instance, in which case they will be used to unmarshal IORs containing
 * the registered tagged component.
 */
+@ManagedData
+@Description( "Base class for all TaggedComponents" )
+@IncludeSubclass( { AlternateIIOPAddressComponent.class, 
+    CodeSetsComponent.class, JavaCodebaseComponent.class,
+    MaxStreamFormatVersionComponent.class, ORBTypeComponent.class,
+    RequestPartitioningComponent.class,
+    GenericTaggedComponent.class } )
 public interface TaggedComponent extends Identifiable
 {
     org.omg.IOP.TaggedComponent getIOPComponent( ORB orb ) ;

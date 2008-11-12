@@ -38,18 +38,32 @@ package com.sun.corba.se.spi.ior;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.IncludeSubclass ;
+import com.sun.jmxa.Description ;
+import com.sun.jmxa.ManagedAttribute ;
+
 /** TaggedProfile represents a tagged profile in an IOR.
  * A profile contains all of the information necessary for an invocation.
  * It contains one or more endpoints that may be used for an invocation.
  * A TaggedProfile conceptually has three parts: A TaggedProfileTemplate,
  * an ObjectKeyTemplate, and an ObjectId.  
  */
+@ManagedData
+@Description( "A TaggedProfile contained in an IOR" )
+@IncludeSubclass( { com.sun.corba.se.spi.ior.iiop.IIOPProfile.class } ) 
 public interface TaggedProfile extends Identifiable, MakeImmutable
 {
+    @ManagedAttribute
+    @Description( "Template for this TaggedProfile" ) 
     TaggedProfileTemplate getTaggedProfileTemplate() ;
 
+    @ManagedAttribute
+    @Description( "The ObjectId used in the IIOPProfile in this IOR" )
     ObjectId getObjectId() ;
 
+    @ManagedAttribute
+    @Description( "The template for the ObjectKey in the IIOPProfile in this IOR" ) 
     ObjectKeyTemplate getObjectKeyTemplate() ;
 
     ObjectKey getObjectKey() ;

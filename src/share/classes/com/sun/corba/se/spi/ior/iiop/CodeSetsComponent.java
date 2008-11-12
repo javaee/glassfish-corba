@@ -40,10 +40,22 @@ import com.sun.corba.se.spi.ior.TaggedComponent ;
 
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
+
 /**
  * @author Ken Cavanaugh
  */
+@ManagedData
+@Description( "The character codesets to be used for encoding "
+    + "strings sent to the object reference represented by "
+    + "this IOR" ) 
 public interface CodeSetsComponent extends TaggedComponent
 {
+    @ManagedAttribute
+    @Description( "The codeset component info" ) 
+    // we'll just use toString() to represent this
     public CodeSetComponentInfo getCodeSetComponentInfo() ;
 }

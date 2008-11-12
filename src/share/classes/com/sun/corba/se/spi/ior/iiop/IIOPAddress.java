@@ -38,12 +38,22 @@ package com.sun.corba.se.spi.ior.iiop;
 
 import com.sun.corba.se.spi.ior.Writeable ;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
 /** IIOPAddress represents the host and port used to establish a
  * TCP connection for an IIOP request.
  */
+@ManagedData
+@Description( "An IP address for the IIOP protocol" )
 public interface IIOPAddress extends Writeable 
 {
+    @ManagedAttribute
+    @Description( "The target host (name or IP address)" )
     public String getHost() ;
 
+    @ManagedAttribute
+    @Description( "The target port (0-65535)" )
     public int getPort() ;
 }

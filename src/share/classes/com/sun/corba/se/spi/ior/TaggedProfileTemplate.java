@@ -48,12 +48,22 @@ import com.sun.corba.se.spi.ior.WriteContents ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.Description ;
+import com.sun.jmxa.InheritedAttribute ;
+import com.sun.jmxa.IncludeSubclass ;
+
 /** Base template for creating TaggedProfiles.  A TaggedProfile will often contain
 * tagged components.  A template that does not contain components acts like 
 * an empty immutable list.
 *
 * @author Ken Cavanaugh
 */
+@ManagedData
+@Description( "A template for creating a TaggedProfile" ) 
+@InheritedAttribute( id="taggedComponents", methodName="iterator",
+    description="The list of TaggedComponents in this TaggedProfileTemplate" )
+@IncludeSubclass( { com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate.class } )
 public interface TaggedProfileTemplate extends List<TaggedComponent>, 
     Identifiable, WriteContents, MakeImmutable
 {    

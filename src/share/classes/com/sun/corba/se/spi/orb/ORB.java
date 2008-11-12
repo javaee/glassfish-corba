@@ -135,7 +135,15 @@ import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
 
 import com.sun.jmxa.ManagedObjectManager ;
 import com.sun.jmxa.ManagedObjectManagerFactory ;
+import com.sun.jmxa.ManagedObject ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.MBeanType ;
+import com.sun.jmxa.Description ;
+import com.sun.jmxa.ObjectNameKey ;
 
+@ManagedObject
+@Description( "The Main ORB Implementation object" ) 
+@MBeanType( type="ORB-Root", isContainer=true ) 
 public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     implements Broker, TypeCodeFactory
 {   
@@ -381,10 +389,14 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public abstract void set_parameters( Properties props ) ;
 
     // ORB versioning
+    @ManagedAttribute
+    @Description( "The implementation version of the ORB" )
     public abstract ORBVersion getORBVersion() ;
     public abstract void setORBVersion( ORBVersion version ) ;
 
     // XXX This needs a better name
+    @ManagedAttribute
+    @Description( "The IOR used for the Full Value Description" ) 
     public abstract IOR getFVDCodeBaseIOR() ;
 
     /**
@@ -399,6 +411,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     
     public abstract void notifyORB() ;
 
+    @ManagedAttribute 
+    @Description( "The PortableInterceptor Handler" ) 
     public abstract PIHandler getPIHandler() ;
 
     public abstract void checkShutdownState();
@@ -412,22 +426,37 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     /** Return this ORB's transient server ID.  This is needed for 
      * initializing object adapters.
      */
+    @ManagedAttribute
+    @Description( "The transient ServerId of this ORB instance" ) 
     public abstract int getTransientServerId();
 
+    @ManagedAttribute
+    @Description( "The registry for all ServerContext factories" ) 
     public abstract ServiceContextFactoryRegistry getServiceContextFactoryRegistry() ;
 
+    @ManagedAttribute
+    @Description( "The cache used to opimize marshaling of ServiceContexts" ) 
     public abstract ServiceContextsCache getServiceContextsCache();
 
+    @ManagedAttribute
+    @Description( "The RequestDispatcher registry, which contains the request handling code" ) 
     public abstract RequestDispatcherRegistry getRequestDispatcherRegistry();
 
+    @ManagedAttribute
+    @Description( "The ORB configuration data" ) 
     public abstract ORBData getORBData() ;
 
     public abstract void setClientDelegateFactory( ClientDelegateFactory factory ) ;
 
+    @ManagedAttribute
+    @Description( "The ClientDelegateFactory, which is used to create the ClientDelegate that represents an IOR" )
     public abstract ClientDelegateFactory getClientDelegateFactory() ;
 
     public abstract void setCorbaContactInfoListFactory( CorbaContactInfoListFactory factory ) ;
 
+    @ManagedAttribute
+    @Description( "The CorbaContactInfoListFactory, which creates the contact info list that represents "
+        + "possible endpoints in an IOR" ) 
     public abstract CorbaContactInfoListFactory getCorbaContactInfoListFactory() ;
 
     // XXX These next 7 methods should be moved to a ResolverManager.
@@ -540,13 +569,17 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      * ORB class.  This is the default implementation inherited by the
      * ORBSingleton.
      */
+    @ObjectNameKey
     public String getUniqueOrbId()  {
 	return "###DEFAULT_UNIQUE_ORB_ID###" ;
     }
 
     public void createORBManagedObjectManager() {
-        mom = ManagedObjectManagerFactory.create( 
-            "com.sun.corba", "ORBId=" + getUniqueOrbId() ) ;
+        // XXX the null rootParent should be replaced by an appropriate
+        // value when running in GFv3.  This should be done by extending
+        // the ORBData API appropriately.
+        mom = ManagedObjectManagerFactory.create( "com.sun.corba", 
+            null, this, getUniqueOrbId() ) ;
 
         if (mbeanFineDebugFlag) {
             mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.FINE ) ;
@@ -559,6 +592,10 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         mom.setRuntimeDebug( mbeanRuntimeDebugFlag ) ;
 
         mom.addTypePrefix( "com.sun.corba.se" ) ;
+        mom.addTypePrefix( "com.sun.corba.se.spi" ) ;
+        mom.addTypePrefix( "com.sun.corba.se.impl" ) ;
+        mom.addTypePrefix( "com.sun.corba.se.spi.orbutil" ) ;
+        mom.addTypePrefix( "com.sun.corba.se.impl.orbutil" ) ;
     }
 
     /** Return the ORB's TimerManager.

@@ -403,7 +403,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     // pick up these InheritedAttributes.
     @ManagedObject
     @Description( "A servant, which implements a remote object in the server" )
-    @InheritedAttributes( attributes={ 
+    @InheritedAttributes( {
         @InheritedAttribute( methodName="_get_delegate", id="delegate", 
             description="Delegate that implements this servant" ),
         @InheritedAttribute( methodName="_orb", id="orb",
@@ -422,7 +422,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private void initManagedObjectManager() {
         createORBManagedObjectManager() ;
 
-        mom.register( configData ) ;
+        mom.registerAtRoot( configData ) ;
 
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedObject.class ) ) ;
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( Description.class ) ) ;
@@ -545,6 +545,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	new HashMap<String,Integer>() ;
     private String rootName = null ;
 
+    @Override
     public synchronized String getUniqueOrbId() {
 	if (rootName == null) {
 	    String orbid = getORBData().getORBId() ;

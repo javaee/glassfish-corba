@@ -38,10 +38,18 @@ package com.sun.corba.se.spi.ior.iiop;
 
 import com.sun.corba.se.spi.ior.TaggedComponent ;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
 /**
  * @author Ken Cavanaugh
  */
+@ManagedData
+@Description( "Component representing Codebase URLs for downloading code" )
 public interface JavaCodebaseComponent extends TaggedComponent 
 {
+    @ManagedAttribute
+    @Description( "List of URLs in the codebase" ) 
     public String getURLs() ;
 }

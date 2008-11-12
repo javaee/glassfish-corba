@@ -45,7 +45,7 @@ import com.sun.jmxa.IncludeSubclass ;
  * and an exit event signals the end of the last measurement that
  * was started.
  */
-@IncludeSubclass( cls = { StatsEventHandler.class, LogEventHandler.class,
+@IncludeSubclass( { StatsEventHandler.class, LogEventHandler.class,
     TimerFactoryImpl.TracingEventHandler.class } )
 public interface TimerEventHandler extends Named {
     void notify( TimerEvent event ) ;

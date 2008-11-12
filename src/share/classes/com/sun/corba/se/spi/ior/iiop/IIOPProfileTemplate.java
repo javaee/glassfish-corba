@@ -40,10 +40,16 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
 /**
  * IIOPProfileTemplate represents the parts of an IIOPProfile that are independent
  * of the object identifier.  It is a container of tagged components.
  */
+@ManagedData
+@Description( "Template for an IIOP profile" )
 public interface IIOPProfileTemplate extends TaggedProfileTemplate
 {
     /** Return the GIOP version of this profile.
@@ -54,5 +60,7 @@ public interface IIOPProfileTemplate extends TaggedProfileTemplate
     * primary address here since other addresses may be contained in 
     * components.
     */
+    @ManagedAttribute
+    @Description( "The host and port of the IP address for the primary endpoint of this profile" )
     public IIOPAddress getPrimaryAddress()  ;
 }

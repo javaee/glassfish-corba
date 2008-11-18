@@ -56,11 +56,11 @@ public interface ObjectAdapterId extends Iterable<String>, Writeable {
     /** Return an iterator that iterates over the components 
     * of this adapter ID.  Each element is returned as a String.
     */
+    @ManagedAttribute
+    @Description( "Sequence of strings in the ObjectAdapterId" ) 
     Iterator<String> iterator() ;
 
     /** Get the adapter name simply as an array of strings.
     */
-    @ManagedAttribute
-    @Description( "Sequence of strings in the ObjectAdapterId" ) 
     String[] getAdapterName() ;
 }

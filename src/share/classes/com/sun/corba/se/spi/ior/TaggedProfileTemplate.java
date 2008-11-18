@@ -36,6 +36,9 @@
 
 package com.sun.corba.se.spi.ior;
 
+import com.sun.jmxa.ManagedAttribute ;
+import com.sun.jmxa.Description ;
+
 import java.util.List ;
 import java.util.Iterator ;
 
@@ -61,12 +64,14 @@ import com.sun.jmxa.IncludeSubclass ;
 */
 @ManagedData
 @Description( "A template for creating a TaggedProfile" ) 
-@InheritedAttribute( id="taggedComponents", methodName="iterator",
-    description="The list of TaggedComponents in this TaggedProfileTemplate" )
 @IncludeSubclass( { com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate.class } )
 public interface TaggedProfileTemplate extends List<TaggedComponent>, 
     Identifiable, WriteContents, MakeImmutable
 {    
+    @ManagedAttribute
+    @Description( "The list of TaggedComponents in this TaggedProfileTemplate" ) 
+    public Iterator<TaggedComponent> getTaggedComponents() ;
+
     /** Return an iterator that iterates over tagged components with
     * identifier id.  It is not possible to modify the list through this
     * iterator.  

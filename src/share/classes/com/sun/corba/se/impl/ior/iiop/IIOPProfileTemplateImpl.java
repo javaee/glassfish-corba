@@ -36,6 +36,8 @@
 
 package com.sun.corba.se.impl.ior.iiop;
 
+import java.util.Iterator ;
+
 import org.omg.IOP.TAG_INTERNET_IOP ;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
@@ -73,7 +75,11 @@ public class IIOPProfileTemplateImpl extends TaggedProfileTemplateBase
     private ORB orb ;
     private GIOPVersion giopVersion ;
     private IIOPAddress primary ;
-    
+   
+    public Iterator<TaggedComponent> getTaggedComponents() {
+        return iterator() ;
+    }
+
     public boolean equals( Object obj )
     {
 	if (!(obj instanceof IIOPProfileTemplateImpl))

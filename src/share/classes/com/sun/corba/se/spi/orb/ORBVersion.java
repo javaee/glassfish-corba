@@ -38,6 +38,8 @@ package com.sun.corba.se.spi.orb ;
 
 import org.omg.CORBA.portable.OutputStream ;
 
+@ManagedData
+@Description( "The version of the ORB" )
 public interface ORBVersion extends Comparable<ORBVersion>
 {
     byte FOREIGN = 0 ;		// ORB from another vendor
@@ -47,6 +49,8 @@ public interface ORBVersion extends Comparable<ORBVersion>
     byte NEWER = 10 ;		// JDK 1.4.x 
     byte PEORB = 20 ;		// PEORB in JDK 1.5, S1AS 8, J2EE 1.4
 
+    @ManagedAttribute
+    @Description( "ORB version (0=FOREIGN,1=OLD,2=NEW,3=JDK1_3_1_01,10=NEWER,20=PEORB)" )
     byte getORBType() ;
 
     void write( OutputStream os ) ;

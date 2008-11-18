@@ -109,12 +109,10 @@ import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsDisabledImpl ;
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsEnabledImpl ;
 
-
 // XXX needs an SPI or else it does not belong here
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;
 import com.sun.corba.se.impl.corba.TypeCodeFactory ;
 
-// XXX Should there be a SPI level constants ?
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 // XXX This goes away when we convert ORBD to ORT

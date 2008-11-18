@@ -93,6 +93,10 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
     private boolean isCachedHashValue = false;
     private int cachedHashValue;
 
+    public Iterator<TaggedProfile> getTaggedProfiles() {
+        return iterator() ;
+    }
+
     public ORB getORB()
     {
 	return factory ;

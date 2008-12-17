@@ -573,11 +573,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     }
 
     public void createORBManagedObjectManager() {
-        // XXX the null rootParent should be replaced by an appropriate
-        // value when running in GFv3.  This should be done by extending
-        // the ORBData API appropriately.
-        mom = ManagedObjectManagerFactory.create( "com.sun.corba", 
-            null, this, getUniqueOrbId() ) ;
+        // XXX createStandalone should be replaced by createFederated if running
+        // as part of GlassFish v3 or later.  An extension to the SPI is needed for
+        // this.
+        mom = ManagedObjectManagerFactory.createStandalone( "com.sun.corba" ) ;
+        mom.createRoot( this, getUniqueOrbId() ) ;
 
         if (mbeanFineDebugFlag) {
             mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.FINE ) ;

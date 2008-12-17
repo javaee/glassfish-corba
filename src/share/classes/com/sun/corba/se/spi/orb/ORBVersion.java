@@ -38,6 +38,10 @@ package com.sun.corba.se.spi.orb ;
 
 import org.omg.CORBA.portable.OutputStream ;
 
+import com.sun.jmxa.ManagedData ;
+import com.sun.jmxa.Description ;
+import com.sun.jmxa.ManagedAttribute ;
+
 @ManagedData
 @Description( "The version of the ORB" )
 public interface ORBVersion extends Comparable<ORBVersion>

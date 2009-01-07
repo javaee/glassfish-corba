@@ -1771,6 +1771,9 @@ public class CorbaMessageMediatorImpl
 	    dprint(".handleRequest: " + opAndId(messageMediator) 
 		   + ": sending response");
 	}
+        if (orb.orbIsShutdown())
+            return ;
+
 	// REVISIT - type and location
 	CDROutputObject outputObject = (CDROutputObject)
 	    messageMediator.getOutputObject();
@@ -1786,6 +1789,8 @@ public class CorbaMessageMediatorImpl
 	if (orb.subcontractDebugFlag) {
 	    dprint(".handleRequest<-: " + opAndId(messageMediator));
 	}
+        if (orb.orbIsShutdown())
+            return ;
 
         // release NIO ByteBuffers to ByteBufferPool
 
@@ -1816,9 +1821,8 @@ public class CorbaMessageMediatorImpl
 	((CDRInputObject)messageMediator.getInputObject()).unmarshalHeader();
 
         ORB orb = (ORB)messageMediator.getBroker();
-        synchronized( orb ) {
-            orb.checkShutdownState();
-        }
+        if (orb.orbIsShutdown())
+            return ;
 
 	ObjectKey okey = messageMediator.getObjectKeyCacheEntry().getObjectKey();
         if (orb.subcontractDebugFlag) {

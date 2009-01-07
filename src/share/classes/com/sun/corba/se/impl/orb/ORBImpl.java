@@ -2199,6 +2199,12 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 	return entry ;
     }
+
+    @Override
+    public synchronized boolean orbIsShutdown() {
+        return ((status == STATUS_DESTROYED) || 
+            (status == STATUS_SHUTDOWN)) ;
+    }
 } // Class ORBImpl
 
 ////////////////////////////////////////////////////////////////////////

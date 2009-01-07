@@ -99,15 +99,21 @@ import com.sun.corba.se.impl.transport.TcpTimeoutsImpl;
  * for ORBDataParserImpl.
  */
 public class ParserTable {
+    // There is a serious problem here with the DefaultSocketFactory.
+    // It is NOT immutable: in particular is has a setORB method, so instances
+    // of DefaultSocketFactoryImpl CANNOT be shared across ORBs.
+    // To clean this up, we'll simply create a new ParserTable for each call to
+    // get.
     private static String MY_CLASS_NAME = ParserTable.class.getName() ;
 
-    private static final ParserTable myInstance = new ParserTable() ;
+    // private static final ParserTable myInstance = new ParserTable() ;
 
     private ORBUtilSystemException wrapper ;
 
     public static ParserTable get()
     {
-	return myInstance ;
+	// return myInstance ;
+        return new ParserTable() ;
     }
 
     private ParserData[] parserData ;

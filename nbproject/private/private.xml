@@ -2,6 +2,8 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/ior/ObjectKeyImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/orbutil/threadpool/ThreadPoolImpl.java</file>
         <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/tools/corba/se/logutil/IndentingPrintWriter.java</file>
     </open-files>
 </project-private>

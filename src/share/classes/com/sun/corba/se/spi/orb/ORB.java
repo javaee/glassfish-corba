@@ -615,6 +615,12 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	return null ;
     }
 
+    /** Return whether or not the ORB is shutdown.  A shutdown ORB cannot process
+     * incoming requests.
+     */
+    public boolean orbIsShutdown() {
+        return true ;
+    }
 }
 
 // End of file.

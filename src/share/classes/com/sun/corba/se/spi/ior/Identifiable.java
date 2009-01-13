@@ -37,8 +37,8 @@
 
 package com.sun.corba.se.spi.ior;
 
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 /** This interface represents an entity that can be written to an
  * OutputStream and has an identity that is represented by an integer.

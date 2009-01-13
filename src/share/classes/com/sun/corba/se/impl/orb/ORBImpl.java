@@ -156,8 +156,8 @@ import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
-import com.sun.jmxa.ManagedObjectManager ;
-import com.sun.jmxa.ManagedObjectManagerFactory ;
+import org.glassfish.gmbal.ManagedObjectManager ;
+import org.glassfish.gmbal.ManagedObjectManagerFactory ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
@@ -197,17 +197,17 @@ import com.sun.corba.se.impl.copyobject.CopierManagerImpl;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
          
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.InheritedAttribute ;
-import com.sun.jmxa.InheritedAttributes ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.InheritedAttribute ;
+import org.glassfish.gmbal.InheritedAttributes ;
 
 /**
  * The JavaIDL ORB implementation.
  */
 public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 {
-    protected TransportManager transportManager;
+    protected CorbaTransportManager transportManager;
     protected LegacyServerSocketManager legacyServerSocketManager;
 
     private ThreadLocal OAInvocationInfoStack ; 
@@ -2135,14 +2135,14 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
     }
 
-    public TransportManager getTransportManager()
+    public CorbaTransportManager getTransportManager()
     {
 	return transportManager;
     }
 
     public CorbaTransportManager getCorbaTransportManager()
     {
-	return (CorbaTransportManager) getTransportManager();
+	return getTransportManager();
     }
 
     private Object legacyServerSocketManagerAccessLock = new Object();

@@ -38,9 +38,9 @@ package com.sun.corba.se.spi.orb ;
 
 import org.omg.CORBA.portable.OutputStream ;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
 
 @ManagedData
 @Description( "The version of the ORB" )

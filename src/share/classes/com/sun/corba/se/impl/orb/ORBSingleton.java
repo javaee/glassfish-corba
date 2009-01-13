@@ -453,7 +453,7 @@ public class ORBSingleton extends ORB
         throw new SecurityException("ORBSingleton: access denied");
     }
 
-    public TransportManager getTransportManager()
+    public CorbaTransportManager getTransportManager()
     {
         throw new SecurityException("ORBSingleton: access denied");
     }

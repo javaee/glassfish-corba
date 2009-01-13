@@ -83,9 +83,9 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message_1_2;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 /**
  * @author Harold Carr

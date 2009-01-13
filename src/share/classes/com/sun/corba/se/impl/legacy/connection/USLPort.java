@@ -35,9 +35,9 @@
  */
 package com.sun.corba.se.impl.legacy.connection;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
 
 @ManagedData
 @Description( "An address of a transport endpoint that the ORB "

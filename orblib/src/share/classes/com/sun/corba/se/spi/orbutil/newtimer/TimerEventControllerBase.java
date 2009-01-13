@@ -42,9 +42,9 @@ import java.util.HashSet ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimerFactoryImpl ;
 
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.ManagedOperation ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.Description ;
 
 /** Supports registration of TimerEventHandlers.  A subclass of this class
  * must also provide some mechanism to create and propagate TimerEvents,

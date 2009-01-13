@@ -51,9 +51,9 @@ import com.sun.corba.se.spi.orbutil.generic.Pair;
 import com.sun.corba.se.impl.legacy.connection.USLPort;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 // Which attributes should become setters?  NOT everything, but only
 // those that we think might actually be useful to set.  This may change

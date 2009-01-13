@@ -40,9 +40,9 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 /**
  * IIOPProfileTemplate represents the parts of an IIOPProfile that are independent

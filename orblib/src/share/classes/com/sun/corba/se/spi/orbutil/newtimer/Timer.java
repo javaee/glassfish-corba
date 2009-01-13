@@ -36,9 +36,9 @@
 
 package com.sun.corba.se.spi.orbutil.newtimer ;
 
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
 
 /** Used to create specific TimerEvent instances through a TimerEventController.
  * The contents() method in a Timer returns an unmodifiable empty set.

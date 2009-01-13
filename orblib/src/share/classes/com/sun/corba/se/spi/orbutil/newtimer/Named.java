@@ -36,9 +36,9 @@
 
 package com.sun.corba.se.spi.orbutil.newtimer ;
 
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.ObjectNameKey ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ObjectNameKey ;
 
 /** A simple interface used to provide access to the name and the
  * factory that created this instance.  All types that are

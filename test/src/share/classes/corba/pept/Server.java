@@ -70,8 +70,8 @@ import corba.framework.Options;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.TransportManager;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.impl.legacy.connection.LegacyServerSocketManagerImpl;
 import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
@@ -97,8 +97,8 @@ public class Server
 
     public static ORB orb;
     public static InitialContext initialContext;
-    public static TransportManager transportManager;
-    public static Acceptor acceptor;
+    public static CorbaTransportManager transportManager;
+    public static CorbaAcceptor acceptor;
     public static POA rootPOA;
 
     public static void main(String[] av)

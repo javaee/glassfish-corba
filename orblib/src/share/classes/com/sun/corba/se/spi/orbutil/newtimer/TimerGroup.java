@@ -38,9 +38,9 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import java.util.Set ;
 
-import com.sun.jmxa.ManagedOperation ;
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
 
 /** A TimerGroup is a collection of Controllables, which includes
  * Timers and TimerGroups.  The contents() method in a TimerGroup

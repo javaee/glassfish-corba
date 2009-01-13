@@ -43,9 +43,9 @@ import com.sun.corba.se.spi.orb.ORBVersion ;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
 
 /** IIOPProfile represents an IIOP tagged profile.
 * It is essentially composed of an object identifier and

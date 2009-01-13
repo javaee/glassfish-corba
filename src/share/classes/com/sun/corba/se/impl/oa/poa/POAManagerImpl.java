@@ -62,11 +62,11 @@ import com.sun.corba.se.impl.logging.POASystemException ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.ManagedOperation ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.ParameterNames ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ParameterNames ;
 
 /** POAManagerImpl is the implementation of the POAManager interface.
  *  Its public methods are activate(), hold_requests(), discard_requests()

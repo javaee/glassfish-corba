@@ -45,9 +45,9 @@ import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 @ManagedData
 @Description( "The maximum GIOP version supported by this IOR" )

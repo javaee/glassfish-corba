@@ -38,10 +38,10 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import java.io.PrintStream ;
 
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.ManagedOperation ;
-import com.sun.jmxa.InheritedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.InheritedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 /** A TimerEventHandler that stores all events that is receives.  It can
  * be used in the JDK 5 for loop.

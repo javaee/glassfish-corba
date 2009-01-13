@@ -59,6 +59,8 @@ public interface CorbaTransportManager
     public static final String SOCKET_OR_CHANNEL_CONNECTION_CACHE =
 	"SocketOrChannelConnectionCache";
 
+    public Collection<CorbaAcceptor> getAcceptors() ;
+
     public Collection<CorbaAcceptor> getAcceptors(String objectAdapterManagerId,
 				   ObjectAdapterId objectAdapterId);
 

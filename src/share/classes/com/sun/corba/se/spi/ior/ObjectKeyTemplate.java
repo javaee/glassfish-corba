@@ -43,9 +43,9 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 /** An ObjectKeyTemplate represents the part of an Object Key
  * that corresponds to the object adapter used to create an

@@ -46,10 +46,10 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.InheritedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.InheritedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 /** An IOR is represented as a list of profiles.
 * Only instances of TaggedProfile are contained in the list.

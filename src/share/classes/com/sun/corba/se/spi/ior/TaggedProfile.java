@@ -38,10 +38,10 @@ package com.sun.corba.se.spi.ior;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.IncludeSubclass ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.IncludeSubclass ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
 
 /** TaggedProfile represents a tagged profile in an IOR.
  * A profile contains all of the information necessary for an invocation.

@@ -38,9 +38,9 @@ package com.sun.corba.se.spi.ior.iiop;
 
 import com.sun.corba.se.spi.ior.Writeable ;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 /** IIOPAddress represents the host and port used to establish a
  * TCP connection for an IIOP request.

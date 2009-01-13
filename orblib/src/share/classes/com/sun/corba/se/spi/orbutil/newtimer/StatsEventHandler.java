@@ -38,10 +38,10 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import java.util.Map ;
 
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.ManagedOperation ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.Description ;
 
 /** Gather statistics on the times reported to this TimerEventHandler.  It will keep 
  * events from different thread separated in order to get good results, but the

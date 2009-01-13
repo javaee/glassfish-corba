@@ -131,17 +131,17 @@ import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
 
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
 
-import com.sun.jmxa.ManagedObjectManager ;
-import com.sun.jmxa.ManagedObjectManagerFactory ;
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.ManagedAttribute ;
-import com.sun.jmxa.MBeanType ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.ObjectNameKey ;
+import org.glassfish.gmbal.ManagedObjectManager ;
+import org.glassfish.gmbal.ManagedObjectManagerFactory ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.AMXMetadata ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ObjectNameKey ;
 
 @ManagedObject
 @Description( "The Main ORB Implementation object" ) 
-@MBeanType( type="ORB-Root", isContainer=true ) 
+@AMXMetadata( pathPart="ORB-Root", isLeaf=false ) 
 public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     implements Broker, TypeCodeFactory
 {   
@@ -577,7 +577,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         // as part of GlassFish v3 or later.  An extension to the SPI is needed for
         // this.
         mom = ManagedObjectManagerFactory.createStandalone( "com.sun.corba" ) ;
-        mom.createRoot( this, getUniqueOrbId() ) ;
 
         if (mbeanFineDebugFlag) {
             mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.FINE ) ;
@@ -589,11 +588,14 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
         mom.setRuntimeDebug( mbeanRuntimeDebugFlag ) ;
 
-        mom.addTypePrefix( "com.sun.corba.se" ) ;
-        mom.addTypePrefix( "com.sun.corba.se.spi" ) ;
-        mom.addTypePrefix( "com.sun.corba.se.impl" ) ;
-        mom.addTypePrefix( "com.sun.corba.se.spi.orbutil" ) ;
-        mom.addTypePrefix( "com.sun.corba.se.impl.orbutil" ) ;
+        mom.filterPrefix( "com.sun.corba.se" ) ;
+        mom.filterPrefix( "com.sun.corba.se.spi" ) ;
+        mom.filterPrefix( "com.sun.corba.se.spi.orb" ) ;
+        mom.filterPrefix( "com.sun.corba.se.impl" ) ;
+        mom.filterPrefix( "com.sun.corba.se.spi.orbutil" ) ;
+        mom.filterPrefix( "com.sun.corba.se.impl.orbutil" ) ;
+
+        mom.createRoot( this, getUniqueOrbId() ) ;
     }
 
     /** Return the ORB's TimerManager.
@@ -686,6 +688,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public ManagedObjectManager mom() {
         return mom ;
     }
+
+    public abstract CorbaTransportManager getTransportManager() ;
 }
 
 // End of file.

@@ -47,9 +47,9 @@ import com.sun.corba.se.spi.ior.iiop.RequestPartitioningComponent ;
 
 import com.sun.corba.se.impl.ior.GenericTaggedComponent ;
 
-import com.sun.jmxa.ManagedData ;
-import com.sun.jmxa.Description ;
-import com.sun.jmxa.IncludeSubclass ;
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.IncludeSubclass ;
 
 /** Generic interface for all tagged components.  Users of the ORB may
 * create implementations of this class and also corresponding factories

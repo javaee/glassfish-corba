@@ -44,7 +44,7 @@ import java.util.ArrayList ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimerFactoryImpl ;
 
-import com.sun.jmxa.ManagedObjectManager ;
+import org.glassfish.gmbal.ManagedObjectManager ;
 
 /** TimerFactoryBuilder creates independent
  * instances of the TimerFactory interface.

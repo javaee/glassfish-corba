@@ -56,9 +56,9 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.NamedBase ;
 
-import com.sun.jmxa.ManagedObjectManager ;
-import com.sun.jmxa.ManagedObject ;
-import com.sun.jmxa.Description ;
+import org.glassfish.gmbal.ManagedObjectManager ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
 
 // TimerFactory is a TimerGroup containing all timers and timer groups 
 // that it creates

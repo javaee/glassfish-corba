@@ -487,7 +487,7 @@ public class SocketOrChannelConnectionImpl
 	} catch (IOException ioe) {
 	    tp.exit_connectionRead1() ;
 	    if (state == CLOSE_RECVD) {
-		throw wrapper.connectionRebind();
+		throw wrapper.connectionRebind(ioe);
 	    } else {
 		throw ioe;
 	    }
@@ -539,7 +539,7 @@ public class SocketOrChannelConnectionImpl
 	} catch (IOException ioe) {
 	    tp.exit_connectionRead2() ;
 	    if (state == CLOSE_RECVD) {
-		throw wrapper.connectionRebind();
+		throw wrapper.connectionRebind(ioe);
 	    } else {
 		throw ioe;
 	    }
@@ -599,7 +599,7 @@ public class SocketOrChannelConnectionImpl
                         }
                     } while (n < size && !waiter.isExpired());
                 } catch (IOException ioe) {
-                    throw wrapper.exceptionWhenReadingWithTemporarySelector(
+                    throw wrapper.exceptionWhenReadingWithTemporarySelector(ioe,
                                             n, size, waiter.timeWaiting(), 
                                             tcpTimeouts.get_max_time_to_wait());
                 } finally {
@@ -735,7 +735,7 @@ public class SocketOrChannelConnectionImpl
                             }
                         }
                     } catch (IOException ioe) {
-                        throw wrapper.exceptionWhenWritingWithTemporarySelector(
+                        throw wrapper.exceptionWhenWritingWithTemporarySelector(ioe,
                             byteBuffer.position(), byteBuffer.limit(),
                             waiter.timeWaiting(), tcpTimeouts.get_max_time_to_wait());
                     } finally {
@@ -776,7 +776,7 @@ public class SocketOrChannelConnectionImpl
 	    getConnectionCache().stampTime(this);
 	} catch (IOException ioe) {
 	    if (state == CLOSE_RECVD) {
-		throw wrapper.connectionRebind();
+		throw wrapper.connectionRebind(ioe);
 	    } else {
 		throw ioe;
 	    }
@@ -1581,7 +1581,7 @@ public class SocketOrChannelConnectionImpl
 	    sendCancelRequest(giopVersion, requestId);
 	} catch (IOException ioe) {
 	    if (state == CLOSE_RECVD) {
-		throw wrapper.connectionRebind();
+		throw wrapper.connectionRebind(ioe);
 	    } else {
 		throw ioe;
 	    }
@@ -1938,7 +1938,7 @@ public class SocketOrChannelConnectionImpl
             getConnectionCache().stampTime(this);
         } catch (IOException ioe) {
             if (state == CLOSE_RECVD) {
-                throw wrapper.connectionRebind();
+                throw wrapper.connectionRebind(ioe);
             } else {
                 throw wrapper.ioexceptionWhenReadingConnection( ioe, this ) ;
             }

@@ -476,9 +476,15 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	    boolean success = (state == STATE_INIT_DONE) ;
 
-	    if (success) 
+	    if (success) {
 		state = STATE_RUN ;
-	    else {
+                unlock() ;
+	    } else {
+                // Issue 7061: do not hold POA lock while calling destroyer.doIt,
+                // because this would violate the lock ordering constraints,
+                // since doIt locks the parent first, then the child.
+                unlock() ;
+
 		// Don't just use destroy, because the check for 
 		// deadlock is too general, and can prevent this from
 		// functioning properly.
@@ -488,14 +494,18 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	    return success ;
 	} finally {
-	    adapterActivatorCV.signalAll() ;
+            lock() ;
 
-	    if (debug) {
-		ORBUtility.dprint( this, 
-		    "Exiting destroyIfNotInitDone on poa " + this ) ;
-	    }
+            try {
+                adapterActivatorCV.signalAll() ;
 
-	    unlock() ;
+                if (debug) {
+                    ORBUtility.dprint( this, 
+                        "Exiting destroyIfNotInitDone on poa " + this ) ;
+                }
+            } finally {
+                unlock() ;
+            }
 	}
     }
 

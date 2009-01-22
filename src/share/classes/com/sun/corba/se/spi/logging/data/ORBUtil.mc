@@ -276,9 +276,9 @@
 	    (TRANSPORT_WRITE_TIMEOUT_EXCEEDED
 	     25 WARNING "Write of message exceeded TCP timeout : max wait time = {0} ms, total time spent blocked, waiting to write = {1} ms.")
             (EXCEPTION_WHEN_READING_WITH_TEMPORARY_SELECTOR
-	     26 SEVERE "Unexpected exception when reading with a temporary selector: bytes read = {0}, bytes requested = {1}, time spent waiting = {2} ms, max time to wait = {4}.")
+	     26 SEVERE "Unexpected exception when reading with a temporary selector: bytes read = {0}, bytes requested = {1}, time spent waiting = {2} ms, max time to wait = {3}.")
             (EXCEPTION_WHEN_WRITING_WITH_TEMPORARY_SELECTOR
-	     27 SEVERE "Unexpected exception when writing with a temporary selector:  bytes written = {0}, total bytes requested to write = {1}, time spent waiting = {2} ms, max time to wait = {4}.")
+	     27 SEVERE "Unexpected exception when writing with a temporary selector:  bytes written = {0}, total bytes requested to write = {1}, time spent waiting = {2} ms, max time to wait = {3}.")
             (THROWABLE_IN_DO_OPTIMIZED_READ_STRATEGY
 	     28 FINE "Throwable received in doOptimizedReadStrategy")
 	    (BLOCKING_READ_TIMEOUT

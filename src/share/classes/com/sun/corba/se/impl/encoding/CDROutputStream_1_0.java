@@ -1043,7 +1043,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	} else if (cinfo.isAString( clazz )) {
             writeWStringValue((String)object);
 	} else if (cinfo.isAClass( clazz )) {
-            writeClass(repository_id, (Class)object, cinfo );
+            ClassInfoCache.ClassInfo lcinfo = ClassInfoCache.get( (Class)object ) ;
+            writeClass(repository_id, (Class)object, lcinfo );
 	} else {
             // RMI-IIOP value type
             writeRMIIIOPValueType( object, clazz, cinfo );

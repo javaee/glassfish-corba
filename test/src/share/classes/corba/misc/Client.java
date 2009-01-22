@@ -848,4 +848,39 @@ public class Client extends TestCase
         assertTrue( bpal2.equals( bpal ) ) ;
         assertTrue( bpv2.equals( bpv ) ) ;
     }
+
+    public void testClassMarshaling() {
+        System.out.println( "Running test for serialization of primitive classes" ) ;
+
+        Object[] arr = {
+            boolean.class,
+            byte.class,
+            Byte.class,
+            short.class,
+            int.class,
+            float.class,
+            long.class,
+            double.class,
+            char.class,
+            this.getClass() 
+        } ;
+
+        OutputStream out = (OutputStream)orb.create_output_stream();
+        out.write_value( arr ) ;
+        InputStream in = (InputStream)out.create_input_stream() ;
+        Object[] result = (Object[])in.read_value() ;
+
+        int errorCount = 0 ;
+        for (int ctr=0; ctr<arr.length; ctr++) {
+            if (!arr[ctr].equals( result[ctr] )) {
+                System.out.printf( "Error: expected class %s but read %s\n",
+                    arr[ctr].toString(), result[ctr].toString() ) ;
+                errorCount++ ;
+            }
+        }
+
+        if (errorCount > 0) {
+            fail( "Class marshaling test failed with " + errorCount + " errors" ) ;
+        }
+    }
 }

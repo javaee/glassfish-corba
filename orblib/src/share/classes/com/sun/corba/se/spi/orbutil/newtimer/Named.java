@@ -38,7 +38,7 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
-import org.glassfish.gmbal.ObjectNameKey ;
+import org.glassfish.gmbal.NameValue ;
 
 /** A simple interface used to provide access to the name and the
  * factory that created this instance.  All types that are
@@ -54,7 +54,7 @@ public interface Named {
     /** A short name for this Controllable.
      */
     @ManagedAttribute
-    @ObjectNameKey
+    @NameValue
     @Description( "Name of this Timer or TimerGroup" ) 
     String name() ;
 }

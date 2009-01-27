@@ -369,9 +369,9 @@
 	    (GET_SERVER_PORT_CALLED_BEFORE_ENDPOINTS_INITIALIZED 
 	     4 WARNING "legacyGetServerPort called before endpoints initialized")
 	    (PERSISTENT_SERVERPORT_NOT_SET  
-	     5 WARNING "Persistent server port is not set")
+	     5 FINE "Persistent server port is not set")
 	    (PERSISTENT_SERVERID_NOT_SET  
-	     6 WARNING "Persistent server ID is not set")
+	     6 FINE "Persistent server ID is not set")
 	    (USER_CONFIGURATOR_EXCEPTION
 	     7 WARNING "Exception occured while running a user configurator")
 	    )

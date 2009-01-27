@@ -137,7 +137,7 @@ import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.AMXMetadata ;
 import org.glassfish.gmbal.Description ;
-import org.glassfish.gmbal.ObjectNameKey ;
+import org.glassfish.gmbal.NameValue ;
 
 @ManagedObject
 @Description( "The Main ORB Implementation object" ) 
@@ -567,7 +567,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      * ORB class.  This is the default implementation inherited by the
      * ORBSingleton.
      */
-    @ObjectNameKey
+    @NameValue
     public String getUniqueOrbId()  {
 	return "###DEFAULT_UNIQUE_ORB_ID###" ;
     }
@@ -588,12 +588,9 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
         mom.setRuntimeDebug( mbeanRuntimeDebugFlag ) ;
 
-        mom.filterPrefix( "com.sun.corba.se" ) ;
-        mom.filterPrefix( "com.sun.corba.se.spi" ) ;
-        mom.filterPrefix( "com.sun.corba.se.spi.orb" ) ;
-        mom.filterPrefix( "com.sun.corba.se.impl" ) ;
-        mom.filterPrefix( "com.sun.corba.se.spi.orbutil" ) ;
-        mom.filterPrefix( "com.sun.corba.se.impl.orbutil" ) ;
+        mom.stripPrefix( "com.sun.corba.se", "com.sun.corba.se.spi", "com.sun.corba.se.spi.orb", 
+            "com.sun.corba.se.impl", "com.sun.corba.se.spi.orbutil", 
+            "com.sun.corba.se.impl.orbutil" ) ;
 
         mom.createRoot( this, getUniqueOrbId() ) ;
     }

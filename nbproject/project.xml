@@ -39,7 +39,7 @@
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
             <!--Do not use Project Properties customizer when editing this file manually.-->
-            <name>Java CORBA Development: codegen workspace</name>
+            <name>Java CORBA Development: master workspace</name>
             <properties>
                 <property name="ant.script">make/build.xml</property>
             </properties>

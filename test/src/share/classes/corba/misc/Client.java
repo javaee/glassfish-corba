@@ -532,26 +532,15 @@ public class Client extends TestCase
 	    orb = ORB.class.cast( ORB.init( args, props ) ) ;
 
 	    OutputStream os = OutputStream.class.cast( orb.create_output_stream() ) ;
+	    os.write_value( pair ) ;
+	    os.write_value( colors ) ;
 	    os.write_value( Color.BLUE ) ;
 	    os.write_value( Coin.NICKEL ) ;
 	    os.write_value( colors ) ;
-	    os.write_value( pair ) ;
 
 	    InputStream is = InputStream.class.cast( os.create_input_stream() ) ;
-	    Color shouldBeBlue = Color.class.cast( is.read_value() ) ;
-	    assertSame( "Result of read_value is not the expected value",
-		shouldBeBlue, Color.BLUE ) ;
 
-	    Coin shouldBeNickel = Coin.class.cast( is.read_value() ) ;
-	    assertSame( "Result of read_value is not the expected value",
-		shouldBeNickel, Coin.NICKEL ) ;
-
-	    Color[] shouldBeColors = (Color[])is.read_value() ;
-	    for (int ctr=0; ctr<colors.length; ctr++) {
-		assertSame( "Result[" + ctr + "] is not the expected value",
-		    shouldBeColors[ctr], colors[ctr] ) ;
-	    }
-
+            System.out.println( "Testing pair" ) ;
 	    SPair<SPair<Color,Color>,Color> shouldBePair = 
 		(SPair<SPair<Color,Color>,Color>)(is.read_value()) ;
 
@@ -563,6 +552,30 @@ public class Client extends TestCase
 
 	    assertSame( "pair.second()", shouldBePair.second(),
 		pair.second() ) ;
+
+            System.out.println( "Testing colors" ) ;
+	    Color[] shouldBeColors = (Color[])is.read_value() ;
+	    for (int ctr=0; ctr<colors.length; ctr++) {
+		assertSame( "Result[" + ctr + "] is not the expected value",
+		    shouldBeColors[ctr], colors[ctr] ) ;
+	    }
+
+            System.out.println( "Testing BLUE" ) ;
+	    Color shouldBeBlue = Color.class.cast( is.read_value() ) ;
+	    assertSame( "Result of read_value is not the expected value",
+		shouldBeBlue, Color.BLUE ) ;
+
+            System.out.println( "Testing NICKEL" ) ;
+	    Coin shouldBeNickel = Coin.class.cast( is.read_value() ) ;
+	    assertSame( "Result of read_value is not the expected value",
+		shouldBeNickel, Coin.NICKEL ) ;
+
+            System.out.println( "Testing colors" ) ;
+	    shouldBeColors = (Color[])is.read_value() ;
+	    for (int ctr=0; ctr<colors.length; ctr++) {
+		assertSame( "Result[" + ctr + "] is not the expected value",
+		    shouldBeColors[ctr], colors[ctr] ) ;
+	    }
 	} finally {
 	    if (orb != null)
 		orb.destroy() ;

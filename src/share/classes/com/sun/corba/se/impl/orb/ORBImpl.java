@@ -645,6 +645,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	postInit( null, dataCollector ) ;
     }
 
+    public void setParameters( String[] params, Properties props ) {
+        set_parameters( params, props ) ;
+    }
+
   /** 
    * we can't create object adapters inside the ORB init path, or else we'll get this same problem
    * in slightly different ways. (address in use exception)

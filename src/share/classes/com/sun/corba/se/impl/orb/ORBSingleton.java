@@ -162,6 +162,10 @@ public class ORBSingleton extends ORB
 	initializePrimitiveTypeCodeConstants() ;
     }
 
+    public void setParameters( String params[], Properties props ) {
+	// this is never called by ORB.init() 
+    }
+
     public void set_parameters( Properties props ) {
 	// this is never called by ORB.init() 
     }

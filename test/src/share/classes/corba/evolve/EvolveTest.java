@@ -46,7 +46,14 @@ public class EvolveTest extends CORBATest
 {
     public static String[] rmicClasses = { "corba.evolve.UserNameVerifierImpl"};
 
-    public static String[] compileClasses = { "UserName", "UserNameRO", "UserNameROD", "FeatureInfoImpl" } ;
+    public static String[] compileClasses = { "UserName", "UserNameRO", "UserNameROD", "FeatureInfoImpl",
+        "mymath" + File.separator + "BigDecimal",
+        "mymath" + File.separator + "BigInteger",
+        "mymath" + File.separator + "BitSieve",
+        "mymath" + File.separator + "MathContext",
+        "mymath" + File.separator + "MutableBigInteger",
+        "mymath" + File.separator + "RoundingMode",
+        "mymath" + File.separator + "SignedMutableBigInteger" };
 
     public static final String EVOLVED_DIR = "evolved";
     public static final String ORIG_DIR = "original";

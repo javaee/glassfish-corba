@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,30 +33,26 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.evolve;
 
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
-import mymath.BigDecimal ;
+package com.sun.corba.se.spi.orb;
 
-/**
- * Simple interface to send an Object and get it as a reply.  (Sometimes
- * replies fail even when requests don't.)
+import java.util.Properties ;
+
+import com.sun.corba.se.impl.orb.ORBImpl ;
+
+/** A simple factory for creating our ORB that avoids the ClassLoader
+ * problems with org.omg.CORBA.ORB.init, which must load the ORB impl class.
+ * The usual OSGi configuration prevents this, so we just directly use a
+ * static factory method here.
  */
-public interface UserNameVerifier extends java.rmi.Remote 
-{
-    public void verifyName(UserNameInt input)
-        throws RemoteException;
+public class ORBFactory {   
+    private ORBFactory() {} 
 
-    public UserNameInt requestName() throws RemoteException;
-
-    public FeatureInfo getFeatureInfo() throws RemoteException ;
-
-    public boolean validateFeatureInfo( FeatureInfo info ) throws RemoteException ;
-
-    // public Object echo( Object obj ) throws RemoteException ;
-
-    public BigDecimal echo( BigDecimal obj ) throws RemoteException ;
-
-    public WithoutPrimitives echo( WithoutPrimitives obj ) throws RemoteException ;
+    public static ORB create( String[] args, Properties props ) {
+        ORB result = new ORBImpl() ;
+        result.setParameters( args, props ) ;
+        return result ;
+    }
 }
+
+// End of file.

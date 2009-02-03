@@ -364,6 +364,10 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // with the standard ORB.init methods.
     public abstract void set_parameters( Properties props ) ;
 
+    // Added to provide an API for creating an ORB that avoids the org.omg.CORBA.ORB API
+    // to get around an OSGi problem.
+    public abstract void setParameters( String[] args, Properties props ) ;
+
     // ORB versioning
     public abstract ORBVersion getORBVersion() ;
     public abstract void setORBVersion( ORBVersion version ) ;

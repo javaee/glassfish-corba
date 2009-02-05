@@ -1478,14 +1478,19 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             shutdown(true);
         }
 
+        ThreadPoolManager tpToClose = null ;
         synchronized (threadPoolManagerAccessLock) {
             if (orbOwnsThreadPoolManager) {
-                try {
-                    threadpoolMgr.close() ;
-                    threadpoolMgr = null ;
-                } catch (IOException exc) {
-                    wrapper.ioExceptionOnClose( exc ) ;
-                }
+                tpToClose = threadpoolMgr ;
+                threadpoolMgr = null ;
+            }
+        }
+
+        if (tpToClose != null) {
+            try {
+                tpToClose.close() ;
+            } catch (IOException exc) {
+                wrapper.ioExceptionOnClose( exc ) ;
             }
         }
 

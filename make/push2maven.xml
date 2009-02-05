@@ -67,12 +67,7 @@
 
 <!-- ================================================================== -->
 <target name="checkmaven" depends="testAntJar"  unless="maven.lib.present">
-    <echo>
-        Missing ${maven.ant.file} library. 
-	It can be fetched from the Internet by giving 
-	the command "ant bootstrap"
-     </echo>
-     <echo message="I'm getting it from internet for You!"/>
+     <echo message="fetching ${maven.int.file}"/>
      <antcall target="bootstrap"/>
 </target>
 
@@ -195,7 +190,8 @@ Section: Producing Multiple JARs from a single POM (maven limitations)
     </sequential>
 </macrodef>
 
-<target name="release" depends="mavenize">
+<target name="release" depends="init, mavenize">
+    <echo message="Making modules with version ${orb.version}"/>
     <push-to-maven module="asm" description="ASM version used in the ORB"/>
     <push-to-maven module="codegen" description="Dynamic code generation library"/>
     <push-to-maven module="csiv2-idl" description="IDL generated definitions for CSIv2"/>

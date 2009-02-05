@@ -75,10 +75,13 @@
 	This is the Ant file that builds the PEORB.
     </description>
 
+
     <!-- =================== START HERE =================================== -->
     <target name="build" depends="init, prepare-dirs, compile, create-jars"/>
 
     <target name="init">
+        <property file="make/build.properties"/>
+        <echo message="Version is ${release.version}-${build.version}"/>
         <!-- environmental dependencies -->
         <property environment="env"/>
         <property name="java.home"                  value="${env.JAVA_HOME}"/>

@@ -1478,6 +1478,17 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             shutdown(true);
         }
 
+        synchronized (threadPoolManagerAccessLock) {
+            if (orbOwnsThreadPoolManager) {
+                try {
+                    threadpoolMgr.close() ;
+                    threadpoolMgr = null ;
+                } catch (IOException exc) {
+                    wrapper.ioExceptionOnClose( exc ) ;
+                }
+            }
+        }
+
         synchronized (this) {
             if (status < STATUS_DESTROYED) {
                 getCorbaTransportManager().close();
@@ -1488,17 +1499,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             } else {
                 // Already destroyed: don't want to throw null pointer exceptions.
                 return ;
-            }
-        }
-
-        synchronized (threadPoolManagerAccessLock) {
-            if (orbOwnsThreadPoolManager) {
-                try {
-                    threadpoolMgr.close() ;
-                    threadpoolMgr = null ;
-                } catch (IOException exc) {
-                    wrapper.ioExceptionOnClose( exc ) ;
-                }
             }
         }
 

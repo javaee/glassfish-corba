@@ -45,6 +45,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
 public class ReaderThreadImpl
     implements
@@ -55,6 +56,7 @@ public class ReaderThreadImpl
     private Connection connection;
     private boolean keepRunning;
     private long enqueueTime;
+    private ORBUtilSystemException wrapper ;
 
     public ReaderThreadImpl(ORB orb, 
 			    Connection connection)
@@ -62,6 +64,7 @@ public class ReaderThreadImpl
 	this.orb = orb;
 	this.connection = connection;
 	keepRunning = true;
+	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
 
     ////////////////////////////////////////////////////
@@ -74,13 +77,18 @@ public class ReaderThreadImpl
 	return connection;
     }
 
-    public void close()
+    public synchronized void close()
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".close: " + connection);
 	}
 
 	keepRunning = false;
+        connection.close() ;
+    }
+
+    private synchronized boolean isRunning() {
+        return keepRunning ;
     }
 
     ////////////////////////////////////////////////////
@@ -88,23 +96,21 @@ public class ReaderThreadImpl
     // Work methods.
     //
 
-    // REVISIT - this needs alot more from previous ReaderThread.
     public void doWork()
     {
 	try {
 	    if (orb.transportDebugFlag) {
 		dprint(".doWork: Start ReaderThread: " + connection);
 	    }
-	    while (keepRunning) {
-		try {
 
+	    while (isRunning()) {
+		try {
 		    if (orb.transportDebugFlag) {
 			dprint(".doWork: Start ReaderThread cycle: " 
 			       + connection);
 		    }
 
 		    if (connection.read()) {
-			// REVISIT - put in pool;
 			return;
 		    }
 
@@ -114,12 +120,22 @@ public class ReaderThreadImpl
 		    }
 
 		} catch (Throwable t) {
+                    wrapper.exceptionInReaderThread( t ) ;
+
 		    if (orb.transportDebugFlag) {
 			dprint(".doWork: exception in read: " + connection,t);
 		    }
+
 		    orb.getTransportManager().getSelector(0)
 			.unregisterForEvent(getConnection().getEventHandler());
-		    getConnection().close();
+
+                    try {
+                        if (isRunning()) {
+                            getConnection().close();
+                        }
+                    } catch (Exception exc) {
+                        wrapper.ioExceptionOnClose( exc ) ;
+                    }
 		}
 	    }
 	} finally {

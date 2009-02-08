@@ -629,6 +629,10 @@
              130 WARNING "ThreadGroup {0} could not be destroyed")
             (INTERRUPTED_JOIN_CALL_WHILE_CLOSING_THREAD_POOL
              131 WARNING "Join was interrupted on thread {0} while closing ThreadPool {1}")
+            (EXCEPTION_IN_READER_THREAD
+             132 FINE "Exception occurred in reader thread")
+            (EXCEPTION_IN_LISTENER_THREAD
+             133 FINE "Exception occurred in listener thread")
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 

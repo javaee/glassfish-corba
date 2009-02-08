@@ -175,6 +175,7 @@ public class Client extends TestCase
 	    try {
 		servant = new TestInterfaceImpl() ;
 	    } catch (RemoteException rex) {
+                rex.printStackTrace() ;
 		fail( "Unexpected remote exception " + rex ) ;
 	    }
 
@@ -204,6 +205,7 @@ public class Client extends TestCase
 		serverRef = (TestInterface)PortableRemoteObject.toStub( 
 		    servant ) ;
 	    } catch (Exception exc) {
+                exc.printStackTrace() ;
 		fail( "Unexpected exception in toStub: " + exc ) ;
 	    }
 
@@ -599,6 +601,7 @@ public class Client extends TestCase
 	    try {
 		result = tester.twoArrays( data1, data2 ) ;
 	    } catch (RemoteException rexc) {
+                rexc.printStackTrace() ;
 		fail( "Unexpected RemoteException " + rexc ) ;
 	    }
 
@@ -662,35 +665,50 @@ public class Client extends TestCase
 	 * 3. Verify that we can correctly read from the stream.
 	 * 4. Verify the contents of the message headers.
 	 */
-	public void testGetMessage()
+	public void testGetMessage() throws Exception
 	{
-	    init() ;
-	    for (int ctr=0; ctr<dataSent.length; ctr++) {
-		byte[] data = dataSent[ctr] ;
-		Message msg = ctm.getMessage( data ) ;	
-		checkMessage( msg, 
-		    ctr==0 ? Message.GIOPRequest : Message.GIOPFragment, 
-		    ctr, dataSent.length ) ;
-	    }
+            try {
+                init() ;
+                for (int ctr=0; ctr<dataSent.length; ctr++) {
+                    byte[] data = dataSent[ctr] ;
+                    Message msg = ctm.getMessage( data ) ;	
+                    checkMessage( msg, 
+                        ctr==0 ? Message.GIOPRequest : Message.GIOPFragment, 
+                        ctr, dataSent.length ) ;
+                }
+            } catch (Exception exc) {
+                exc.printStackTrace() ;
+                throw exc ;
+            }
 	}
 
-	public void testSentMDHeader()
+	public void testSentMDHeader() throws Exception
 	{
-	    init() ;
-	    checkMessages( sentMD.getMessages(), Message.GIOPRequest ) ;
+            try {
+                init() ;
+                checkMessages( sentMD.getMessages(), Message.GIOPRequest ) ;
+            } catch (Exception exc) {
+                exc.printStackTrace() ;
+                throw exc ;
+            }
 	}
 
-	public void testSentMDBody()
+	public void testSentMDBody() throws Exception
 	{
-	    init() ;
-	    CDRInputStream str = sentMD.getStream() ;
-	    byte[] arr1 = (byte[])str.read_value( byte[].class ) ;
-	    assertTrue( "First array is not the same as the original",
-		equalArrays( data1, arr1 ) ) ;
+            try {
+                init() ;
+                CDRInputStream str = sentMD.getStream() ;
+                byte[] arr1 = (byte[])str.read_value( byte[].class ) ;
+                assertTrue( "First array is not the same as the original",
+                    equalArrays( data1, arr1 ) ) ;
 
-	    byte[] arr2 = (byte[])str.read_value( byte[].class ) ;
-	    assertTrue( "Second array is not the same as the original",
-		equalArrays( data2, arr2 ) ) ;
+                byte[] arr2 = (byte[])str.read_value( byte[].class ) ;
+                assertTrue( "Second array is not the same as the original",
+                    equalArrays( data2, arr2 ) ) ;
+            } catch (Exception exc) {
+                exc.printStackTrace() ;
+                throw exc ;
+            }
 	}
 
 	/* The testing of received data is temporarily commented out, due to the

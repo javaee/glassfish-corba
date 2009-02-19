@@ -44,16 +44,12 @@ import java.util.WeakHashMap ;
 
 import java.lang.reflect.Modifier ;
 
-import com.sun.corba.se.impl.orbutil.codegen.Identifier ;
-
-// ClassGenerator is visible in the interface.
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-
-import com.sun.corba.se.impl.orbutil.codegen.ClassInfoReflectiveImpl ;
-import com.sun.corba.se.impl.orbutil.codegen.CurrentClassLoader ;
-
 import com.sun.corba.se.spi.orbutil.copyobject.Immutable ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
+
+import com.sun.corba.se.impl.orbutil.codegen.Identifier ;
+import com.sun.corba.se.impl.orbutil.codegen.ClassInfoReflectiveImpl ;
+import com.sun.corba.se.impl.orbutil.codegen.CurrentClassLoader ;
 
 /** Representation of Types (no generic support) used for
  * codegen API.
@@ -121,6 +117,7 @@ public class Type {
     
     private static ThreadLocal<Map<Class,Type>> classMap =
 	new ThreadLocal<Map<Class,Type>>() {
+        @Override
 	    public Map<Class,Type> initialValue() {
 		return new WeakHashMap<Class,Type>() ;
 	    }
@@ -128,6 +125,7 @@ public class Type {
 
     private static ThreadLocal<Map<String,Type>> classNameMap =
 	new ThreadLocal<Map<String,Type>>() {
+        @Override
 	    public Map<String,Type> initialValue() {
 		return new WeakHashMap<String,Type>() ;
 	    }
@@ -402,15 +400,18 @@ public class Type {
 	return classInfo ;
     }
 
+    @Override
     public int hashCode() {
 	return name.hashCode() ;
     }
 
+    @Override
     public String toString() {
 	return "Type[" + name + "," + signature + "," + size + "," + sort 
 	    + "]" ;
     }
 
+    @Override
     public boolean equals( Object obj ) {
 	if (!(obj instanceof Type))
 	    return false ;

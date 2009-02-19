@@ -36,28 +36,18 @@
 
 package corba.codegen ;
 
-import java.io.File ;
-import java.io.IOException ;
-import java.io.PrintStream ;
-import java.io.FileInputStream ;
-
 import java.rmi.RemoteException ;
 
 import java.util.Set ;
-import java.util.Iterator ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Arrays ;
 import java.util.ArrayList ;
-import java.util.Properties ;
 
 import java.lang.reflect.Method ;
 import java.lang.reflect.Constructor ;
-import java.lang.reflect.InvocationTargetException ;
 import java.lang.reflect.InvocationHandler ;
 import java.lang.reflect.Proxy ;
-
-import java.security.ProtectionDomain ;
 
 import javax.ejb.EJBException ;
 
@@ -67,24 +57,17 @@ import junit.framework.TestResult ;
 import junit.framework.TestSuite ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Wrapper ;
 import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.GenericClass ;
 
 import com.sun.corba.se.impl.orbutil.codegen.CurrentClassLoader ;
 import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
 import com.sun.corba.se.impl.orbutil.codegen.NodeBase ;
 import com.sun.corba.se.impl.orbutil.codegen.Attribute ;
 import com.sun.corba.se.impl.orbutil.codegen.Identifier ;
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+import com.sun.corba.se.impl.orbutil.codegen.ClassGeneratorImpl ;
 import com.sun.corba.se.impl.orbutil.codegen.TreeWalkerContext ;
-import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
 import com.sun.corba.se.impl.orbutil.codegen.ASMSetupVisitor ;
-import com.sun.corba.se.impl.orbutil.codegen.ASMByteCodeVisitor ;
-import com.sun.corba.se.impl.orbutil.codegen.Util ;
 
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
@@ -93,7 +76,6 @@ import com.sun.corba.se.spi.orbutil.copyobject.DefaultCopier ;
 
 import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
 
-import org.objectweb.asm.ClassWriter ;
 
 import corba.codegen.lib.EchoInt ;
 import corba.codegen.lib.Constants ;
@@ -331,7 +313,7 @@ public class Client extends TestCase {
 	// This works by first creating a simple class using the
 	// framework and the java compiler, then getting ClassInfo
 	// from the resulting class and comparing the ClassInfo
-	// from the ClassGenerator with the ClassInfo from the
+	// from the ClassGeneratorImpl with the ClassInfo from the
 	// generated Class.  We'll just reuse the Tie generator
 	// here.
 	ClassLoader cl = makeClassLoader() ;
@@ -454,7 +436,7 @@ public class Client extends TestCase {
 	    ClassGeneratorFactoryRegistry.get( "_DImpl_Tie" ) ;
 	ClassLoader cl = makeClassLoader() ;
 	CurrentClassLoader.set( cl ) ;
-	ClassGenerator cgen = generator.evaluate() ;
+	ClassGeneratorImpl cgen = (ClassGeneratorImpl)generator.evaluate() ;
 
 	// GenerationTestSuiteBase.displayNode( 
 	//     "Dump of _DImpl_Tie AST:", cgen ) ;
@@ -540,10 +522,10 @@ public class Client extends TestCase {
     //
     // 1. Test that MyRemote_gen produces a valid interface.  This 
     //    is quite simple:
-    //	  1. generate the AST, producing a ClassGenerator
+    //	  1. generate the AST, producing a ClassGeneratorImpl
     //	  2. generate bytecode from the AST
     //	  3. load the bytecode and get its ClassInfo
-    //	  4. verify that the ClassGenerator and the ClassInfo are equal
+    //	  4. verify that the ClassGeneratorImpl and the ClassInfo are equal
     //	  DONE
     //
     // For specific features, we put one feature per method in a generated class.

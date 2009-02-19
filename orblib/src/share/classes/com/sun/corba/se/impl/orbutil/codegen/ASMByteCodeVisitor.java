@@ -45,30 +45,9 @@ import org.objectweb.asm.ClassWriter ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 
-import com.sun.corba.se.impl.orbutil.codegen.ASMUtil ;
-import com.sun.corba.se.impl.orbutil.codegen.ByteCodeUtility ;
-import com.sun.corba.se.impl.orbutil.codegen.AssignmentStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.CaseBranch ;
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.DefinitionStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
-import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.MethodGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.ReturnStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.Statement ;
-import com.sun.corba.se.impl.orbutil.codegen.SwitchStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ThrowStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalker ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalkerContext ;
-import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.FieldGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
 
 /** Visitor that is used to generate byte code for a class.
  *  SetupVisitor must be called first before this 
@@ -112,8 +91,8 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	return mg ;
     }
 
-    private ClassGenerator findClassGenerator( Node arg ) {
-	ClassGenerator cg = findNode( ClassGenerator.class, arg ) ;
+    private ClassGeneratorImpl findClassGenerator( Node arg ) {
+	ClassGeneratorImpl cg = findNode( ClassGeneratorImpl.class, arg ) ;
 	assert cg != null ;
 	return cg ;
     }
@@ -155,34 +134,34 @@ public class ASMByteCodeVisitor extends TreeWalker {
     public void postNode( Node arg ) {
     }
 
-    // ClassGenerator
+    // ClassGeneratorImpl
     @Override
-    public boolean preClassGenerator( ClassGenerator arg ) {
+    public boolean preClassGenerator( ClassGeneratorImpl arg ) {
 	bcu = new ByteCodeUtility( cw, arg, debug, ps ) ;
 	return true ;
     }
 
     @Override
-    public boolean classGeneratorBeforeFields( ClassGenerator arg ) {
+    public boolean classGeneratorBeforeFields( ClassGeneratorImpl arg ) {
 	// Just make sure the fields get visited.
 	return true ;
     }
 
     @Override
-    public void classGeneratorBeforeInitializer( ClassGenerator arg ) {
+    public void classGeneratorBeforeInitializer( ClassGeneratorImpl arg ) {
 	// XXX need to setup the <clinit> method here
     }
 
     @Override
-    public void classGeneratorBeforeMethod( ClassGenerator arg ) {
+    public void classGeneratorBeforeMethod( ClassGeneratorImpl arg ) {
     }
 
     @Override
-    public void classGeneratorBeforeConstructor( ClassGenerator arg ) {
+    public void classGeneratorBeforeConstructor( ClassGeneratorImpl arg ) {
     }
 
     @Override
-    public void postClassGenerator( ClassGenerator arg ) {
+    public void postClassGenerator( ClassGeneratorImpl arg ) {
 	postNode( arg ) ;
     }
    
@@ -261,8 +240,8 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	// symbolic locations.  It is only on the LHS of an assignment that
 	// this is really important, because the code generation needs to
 	// carefully take this into account.
-	Expression lhs = arg.left() ;
-	Expression rhs = arg.right() ;
+	ExpressionInternal lhs = arg.left() ;
+	ExpressionInternal rhs = arg.right() ;
 
 	assert lhs.isAssignable() ;
    
@@ -271,15 +250,15 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	} else if (lhs instanceof ExpressionFactory.NonStaticFieldAccessExpression) {
 	    ExpressionFactory.NonStaticFieldAccessExpression expr = 
 		ExpressionFactory.NonStaticFieldAccessExpression.class.cast( lhs ) ;
-	    expr.target().accept( context.current() ) ;
+	    ((ExpressionInternal)expr.target()).accept( context.current() ) ;
 	    rhs.accept( context.current() ) ;
 	} else if (lhs instanceof ExpressionFactory.StaticFieldAccessExpression) {
 	    rhs.accept( context.current() ) ;
 	} else if (lhs instanceof ExpressionFactory.ArrayIndexExpression) {
 	    ExpressionFactory.ArrayIndexExpression expr = 
 		ExpressionFactory.ArrayIndexExpression.class.cast( lhs ) ;
-	    expr.expr().accept( context.current() ) ;
-	    expr.index().accept( context.current() ) ;
+	    ((ExpressionInternal)expr.expr()).accept( context.current() ) ;
+	    ((ExpressionInternal)expr.index()).accept( context.current() ) ;
 	    rhs.accept( context.current() ) ;
 	} else {
 	    throw new IllegalArgumentException( 
@@ -336,8 +315,8 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	    // or if the result of arg is an input to another expression.
 	    // However, here such a value must be popped, because it is the 
 	    // result of an expression that was executed only for its side-effects.
-	    if (lastStatement instanceof Expression) {
-		Expression expr = Expression.class.cast( lastStatement ) ;
+	    if (lastStatement instanceof ExpressionInternal) {
+		ExpressionInternal expr = ExpressionInternal.class.cast( lastStatement ) ;
 		if (!expr.type().equals( Type._void() )) 
 		    bcu.emitPop() ;
 	    }
@@ -368,8 +347,8 @@ public class ASMByteCodeVisitor extends TreeWalker {
 
 	// TreeWalker visits arg.var() then arg.expr(), which is wrong here,
 	// so we will do the visiting in this method directly.
-	arg.expr().accept( context.current() ) ;
-	arg.var().accept( context.current() ) ;
+	((ExpressionInternal)arg.expr()).accept( context.current() ) ;
+	((VariableInternal)arg.var()).accept( context.current() ) ;
 	recordVariable( arg.var() ) ;	
 	return false ;
     }
@@ -473,7 +452,7 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	MethodGenerator mg = findMethodGenerator( arg ) ;
 	Variable var = ASMUtil.returnVariable.get( mg ) ;
 	if (var != null)
-	    bcu.callEmitter( ASMUtil.setEmitter.get( var ) ) ;
+	    bcu.callEmitter( ASMUtil.setEmitter.get( (VariableInternal)var ) ) ;
 	
 	callFinallyBlocks( arg ) ;
 	
@@ -551,7 +530,7 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	bcu.emitLabel( ASMUtil.statementStartLabel, block ) ;
 	
 	// emit store of exception into var
-	bcu.callEmitter( ASMUtil.setEmitter.get( var ) ) ;
+	bcu.callEmitter( ASMUtil.setEmitter.get( (VariableInternal)var ) ) ;
 
 	recordVariable( var ) ;
     }
@@ -579,7 +558,8 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	    ASMUtil.uncaughtExceptionHandler.get( arg ) ;
 	    bcu.emitLabel( ASMUtil.uncaughtExceptionHandler, arg ) ;
 
-	    Variable uncaughtException = ASMUtil.uncaughtException.get( arg ) ;
+	    VariableInternal uncaughtException =
+                (VariableInternal)ASMUtil.uncaughtException.get( arg ) ;
 	    bcu.callEmitter( ASMUtil.setEmitter.get( uncaughtException ) ) ;
 	    bcu.emitJsr( ASMUtil.statementStartLabel.get( arg.finalPart() ) ) ;
 	    bcu.callEmitter( ASMUtil.getEmitter.get( uncaughtException ) ) ;
@@ -589,7 +569,7 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	    ASMUtil.statementStartLabel.get( arg.finalPart() ) ;
 	    bcu.emitLabel( ASMUtil.statementStartLabel, arg.finalPart() ) ;
 	    Variable ra = ASMUtil.returnAddress.get( arg ) ;
-	    bcu.callEmitter( ASMUtil.setEmitter.get( ra ) ) ;
+	    bcu.callEmitter( ASMUtil.setEmitter.get( (VariableInternal)ra ) ) ;
 	}
 
 	return true ;
@@ -613,7 +593,7 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	    Pair<Variable,BlockStatement> pair = entry.getValue() ;
 	    MyLabel handler = ASMUtil.statementStartLabel.get( pair.second() ) ;
 	    bcu.emitExceptionTableEntry( start, end, handler,
-		pair.first().type() ) ;
+		((VariableInternal)pair.first()).type() ) ;
 	}
 
 	if (!arg.finalPart().isEmpty()) {
@@ -648,19 +628,20 @@ public class ASMByteCodeVisitor extends TreeWalker {
 	postStatement( arg ) ;
     }
 
-    // Expression
+    // ExpressionInternal
     @Override
-    public boolean preExpression( Expression arg ) {
+    public boolean preExpression( ExpressionInternal arg ) {
 	return preStatement( arg ) ;
     }
 
     @Override
-    public void postExpression( Expression arg ) {
+    public void postExpression( ExpressionInternal arg ) {
 	postStatement( arg ) ;
     }
 
     private void recordVariable( Variable var ) {
-	MethodGenerator mg = var.getAncestor( MethodGenerator.class ) ;
+	MethodGenerator mg = ((VariableInternal)var).getAncestor(
+            MethodGenerator.class ) ;
 	if (mg == null)
 	    throw new IllegalStateException(
 		"No MethodGenerator found!" ) ;
@@ -670,7 +651,8 @@ public class ASMByteCodeVisitor extends TreeWalker {
 
     // Variable
     @Override
-    public boolean preVariable( Variable arg ) {
+    public boolean preVariable( Variable param ) {
+        VariableInternal arg = (VariableInternal)param ;
 	if (ASMUtil.emitter.isSet( arg ))
 	    bcu.callEmitter( ASMUtil.emitter.get( arg ) ) ;
 	return preExpression( arg ) ;
@@ -678,7 +660,7 @@ public class ASMByteCodeVisitor extends TreeWalker {
 
     @Override
     public void postVariable( Variable arg ) {
-	postExpression( arg ) ;
+	postExpression( (VariableInternal)arg ) ;
     }
 
     // ConstantExpression
@@ -756,7 +738,7 @@ public class ASMByteCodeVisitor extends TreeWalker {
 
     @Override
     public void postCastExpression( ExpressionFactory.CastExpression arg ) {
-	bcu.emitCast( arg.expr().type(), arg.type() ) ;
+	bcu.emitCast( ((ExpressionInternal)arg.expr()).type(), arg.type() ) ;
 
 	postExpression( arg ) ;
     }
@@ -795,10 +777,10 @@ public class ASMByteCodeVisitor extends TreeWalker {
     }
 
     // NonStaticCallExpression
-    // Expression arg.target()
+    // ExpressionInternal arg.target()
     // String arg.ident()
     // Signature arg.signature()
-    // List<Expression> args()
+    // List<ExpressionInternal> args()
     @Override
     public boolean preNonStaticCallExpression( ExpressionFactory.NonStaticCallExpression arg ) {
 	// TreeWalker visists the target then the args, which
@@ -813,7 +795,8 @@ public class ASMByteCodeVisitor extends TreeWalker {
 
     @Override
     public void postNonStaticCallExpression( ExpressionFactory.NonStaticCallExpression arg ) {
-	bcu.emitInvoke( arg.target().type(), arg.ident(), arg.signature() ) ;
+	bcu.emitInvoke( ((ExpressionInternal)arg.target()).type(),
+            arg.ident(), arg.signature() ) ;
 	postExpression( arg ) ;
     }
 
@@ -843,8 +826,8 @@ public class ASMByteCodeVisitor extends TreeWalker {
 
     // NewArrExpression
     // Type ctype()
-    // Expression size()
-    // List<Expression> exprs()
+    // ExpressionInternal size()
+    // List<ExpressionInternal> exprs()
     // visit order: 
     //	preNewArrExpression 
     //	newArrExpressionBeforeSize 
@@ -1011,13 +994,15 @@ public class ASMByteCodeVisitor extends TreeWalker {
     @Override
     public void ifExpressionBeforeTruePart( ExpressionFactory.IfExpression arg ) {
 	// branch if TOS is false to statementStartLabel of false branch
-	bcu.emitConditionalBranch( ASMUtil.statementStartLabel.get( arg.falsePart() ) ) ; 
+	bcu.emitConditionalBranch( ASMUtil.statementStartLabel.get( 
+            (ExpressionInternal)arg.falsePart() ) ) ;
     }
 
     @Override
     public boolean ifExpressionBeforeFalsePart( ExpressionFactory.IfExpression arg ) {
 	bcu.emitBranch( nextLabel( arg ) ) ;
-	bcu.emitLabel( ASMUtil.statementStartLabel, arg.falsePart() ) ;
+	bcu.emitLabel( ASMUtil.statementStartLabel,
+            (ExpressionInternal)arg.falsePart() ) ;
 	return true ;
     }
 

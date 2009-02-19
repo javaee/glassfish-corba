@@ -50,15 +50,13 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Utility ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 import com.sun.corba.se.spi.orbutil.codegen.Primitives ;
 import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 
 import static java.lang.reflect.Modifier.* ;
 
-import static java.util.Arrays.asList ;
 
 import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
 
@@ -176,11 +174,11 @@ public class CodegenProxyCreator {
 		wrappedArgs.add( Primitives.wrap( arg ) ) ;
 	    }
 	    
-	    Expression invokeArgs = _define( objectArrayType, "args", 
+	    Expression invokeArgs = _define( objectArrayType, "args",
 		_new_array_init( _Object(), wrappedArgs ) ) ;
 
 	    // create expression to call the invoke method
-	    Expression invokeExpression = _call( 
+	    Expression invokeExpression = _call(
 		_this(), "invoke", _const(mnum), invokeArgs ) ;
 
 	    // return result if non-void

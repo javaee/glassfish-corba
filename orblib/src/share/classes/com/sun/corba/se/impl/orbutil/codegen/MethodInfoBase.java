@@ -39,7 +39,6 @@ package com.sun.corba.se.impl.orbutil.codegen;
 import java.lang.reflect.Method ;
 import java.lang.reflect.Constructor ;
 
-import java.util.Iterator ;
 import java.util.List ;
 import java.util.ArrayList ;
 
@@ -103,7 +102,7 @@ public abstract class MethodInfoBase extends MemberInfoBase
 	if (!sigIsCached) {
 	    List<Type> argTypes = new ArrayList<Type>(arguments.size()) ;
 	    for (Variable var : arguments)
-		argTypes.add( var.type() ) ;
+		argTypes.add( ((VariableInternal)var).type() ) ;
 	    sig = Signature.make( rtype, argTypes ) ;
 	}
 

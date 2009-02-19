@@ -1095,11 +1095,13 @@ public class IIOPInputStream
             
             // KMC start of enum receiver-makes-right changes
             if (cinfo.isEnum()) {
-                if (valueHandlerDebug())
+                if (valueHandlerDebug()) {
                     dputil.info( "reading Enum" ) ;
+                }
 
-                int ordinal = orbStream.read_long() ;
+                // Only for backwards compatibility with JDK: int ordinal = orbStream.read_long() ;
                 String value = (String)orbStream.read_value( String.class ) ;
+                // Need to skip any other data marshaled from the enum, if the enum type has non-static non-transient state.
                 return Return.value(Enum.valueOf( clz, value ) );
             } else if (currentClassDesc.isExternalizable()) {
                 if (valueHandlerDebug()) {
@@ -1534,9 +1536,10 @@ public class IIOPInputStream
      */
     @TraceValueHandler
     @ValueHandlerRead
-    private Object inputObjectUsingFVD(Class clz, ClassInfoCache.ClassInfo cinfo,
-        String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender, 
-        int offset) throws IOException, ClassNotFoundException {
+    private Object inputObjectUsingFVD(final Class clz, 
+        final ClassInfoCache.ClassInfo cinfo,
+        final String repositoryID, final com.sun.org.omg.SendingContext.CodeBase sender, 
+        final int offset) throws IOException, ClassNotFoundException {
 
         if (valueHandlerDebug()) {
             dputil.enter( "inputObjectUsingFVD", "clz", clz, 
@@ -1558,8 +1561,9 @@ public class IIOPInputStream
                     dputil.info( "reading Enum" ) ;
                 }
 
-                int ordinal = orbStream.read_long() ;
+                // Only for backwards compatibility with JDK: int ordinal = orbStream.read_long() ;
                 String value = (String)orbStream.read_value( String.class ) ;
+                // Need to skip any other data marshaled from the enum, if the enum type has non-static non-transient state.
                 return Return.value(Enum.valueOf( clz, value ) );
             } else if (currentClassDesc.isExternalizable()) {
                 if (valueHandlerDebug()) {

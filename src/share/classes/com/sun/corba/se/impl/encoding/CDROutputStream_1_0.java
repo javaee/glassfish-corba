@@ -998,12 +998,25 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
 	Class clazz = object.getClass();
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-	if (orb.getORBData().useEnumDesc() && cinfo.isEnum()) {
-	    String enumValue = ((Enum)object).name() ;
-	    EnumDesc desc = getEnumDesc( clazz.getName(), enumValue ) ;
-	    write_value( desc, (String)null ) ;
-	    return ;
-	}
+        if (cinfo.isEnum()) {
+            String enumValue = ((Enum)object).name() ;
+            if (orb.getORBData().useEnumDesc()) {
+                EnumDesc desc = getEnumDesc( clazz.getName(), enumValue ) ;
+                write_value( desc, (String)null ) ;
+                return ;
+            } else {
+                // Write value_tag
+                int indirection = writeValueTag(false, true, 
+                    Util.getInstance().getCodebase(clazz));
+                updateIndirectionTable(indirection, object);
+                                        
+                // Write rep. id
+                write_repositoryId(repIdStrs.createForJavaType(clazz, cinfo ));
+				
+                // Just write the enum member name
+                write_value( enumValue ) ;
+            }
+        }
 
 	if (cinfo.isProxyClass()) {
             Class[] ifaces = clazz.getInterfaces();

@@ -36,8 +36,7 @@
 
 package com.sun.corba.se.impl.orbutil.copyobject ;
 
-import java.io.IOException ;
-import java.io.ByteArrayOutputStream ;
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 
 import java.lang.reflect.Modifier ;
 import java.lang.reflect.Field ;
@@ -54,7 +53,6 @@ import sun.corba.Bridge ;
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 

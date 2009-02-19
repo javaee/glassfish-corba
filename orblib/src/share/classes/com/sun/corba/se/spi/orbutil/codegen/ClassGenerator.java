@@ -36,14 +36,13 @@
 
 package com.sun.corba.se.spi.orbutil.codegen;
 
-public interface Variable extends Expression {
-    /** Return the name of this variable.
-     */
-    String ident() ;
-
-    /** Return the type of this variable.
-     *
-     * @return The variable type.
-     */
-    Type type() ;
+/** Represents a generated AST, which can be used to generate code.
+ *
+ * XXX Should we add methods to this interface that are similar to the methods
+ * on Wrapper like _generate?
+ *
+ * @author ken
+ */
+public interface ClassGenerator extends ClassInfo {
+    String name() ;
 }

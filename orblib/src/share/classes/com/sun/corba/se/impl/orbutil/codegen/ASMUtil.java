@@ -39,15 +39,12 @@ package com.sun.corba.se.impl.orbutil.codegen;
 import java.util.Properties ;
 import java.util.List ;
 import java.util.HashSet ;
-import java.util.Map ;
 import java.util.HashMap ;
 
 import java.io.IOException ;
 import java.io.PrintStream ;
 import java.io.FileOutputStream ;
 import java.io.File ;
-import java.io.ByteArrayInputStream ;
-import java.io.DataInputStream ;
 
 import org.objectweb.asm.ClassWriter ;
 
@@ -73,14 +70,8 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
-import com.sun.corba.se.spi.orbutil.codegen.Wrapper ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.Wrapper ;
-
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalkerContext ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
 
 // import com.sun.corba.se.impl.orbutil.codegen.constantpool.ConstantPool ;
 
@@ -105,7 +96,7 @@ public class ASMUtil {
 	ps.println( "=======================================================" ) ;
     }
 
-    public static void generateSourceCode( PrintStream ps, ClassGenerator cg,
+    public static void generateSourceCode( PrintStream ps, ClassGeneratorImpl cg,
 	ImportList imports, Properties options ) throws IOException {
 
 	TreeWalkerContext context = new TreeWalkerContext() ;
@@ -128,7 +119,7 @@ public class ASMUtil {
 	return sfile ;
     }
 
-    public static void generateSourceCode( String sourceGenDir, ClassGenerator cg, 
+    public static void generateSourceCode( String sourceGenDir, ClassGeneratorImpl cg,
 	ImportList imports, Properties options ) throws IOException {
 	
 	PrintStream ps = null ;
@@ -175,10 +166,10 @@ public class ASMUtil {
     }
 */
 
-    /** Given a completed ClassGenerator, use ASM to construct
+    /** Given a completed ClassGeneratorImpl, use ASM to construct
      * the byte array representing the compiled class.
      */
-    public static byte[] generate( ClassLoader cl, ClassGenerator cg, 
+    public static byte[] generate( ClassLoader cl, ClassGeneratorImpl cg,
 	ImportList imports, Properties options, PrintStream debugOutput ) {
 
 	// Make sure that ClassLoader cl is used where required (mainly in the
@@ -302,6 +293,7 @@ public class ASMUtil {
 
 		ps.println(method.name + method.desc);
 		TraceMethodVisitor mv = new TraceMethodVisitor() {
+                    @Override
 		    public void visitMaxs (final int maxStack, final int maxLocals) {
 			for (int i = 0; i < text.size(); ++i) {
 			    String s = frames[i] == null ? "null" : frames[i].toString();

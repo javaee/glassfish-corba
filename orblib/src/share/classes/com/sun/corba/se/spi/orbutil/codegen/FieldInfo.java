@@ -36,8 +36,6 @@
 
 package com.sun.corba.se.spi.orbutil.codegen;
 
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-
 public interface FieldInfo extends MemberInfo {
      /** Return the type of this Field.
      */

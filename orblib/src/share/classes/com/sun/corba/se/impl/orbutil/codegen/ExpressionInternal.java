@@ -34,17 +34,16 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.codegen;
+package com.sun.corba.se.impl.orbutil.codegen;
 
-import com.sun.corba.se.impl.orbutil.codegen.Statement ;
-
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 
 /**
  *
  * @author ken
  */
-public interface Expression extends Statement {
+public interface ExpressionInternal extends Expression, Statement {
     // Return true iff this expression represents a variable,
     // data member, or array index operation that may appear
     // on the left side of an assignment.

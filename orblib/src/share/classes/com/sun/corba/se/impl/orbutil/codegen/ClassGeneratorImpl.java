@@ -40,16 +40,10 @@ import java.util.Set ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.ArrayList ;
-import java.util.Properties ;
 
-import java.io.PrintStream ;
-
-import com.sun.corba.se.impl.orbutil.codegen.NodeBase ;
-import com.sun.corba.se.impl.orbutil.codegen.FieldGenerator ;
-
+import com.sun.corba.se.spi.orbutil.codegen.ClassGenerator ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.FieldInfo ;
 
 import static java.lang.reflect.Modifier.* ;
 
@@ -58,21 +52,23 @@ import static java.lang.reflect.Modifier.* ;
  * abstract.  Interfaces do not have a super class, an initializer,
  * or constructors.  Interfaces also do not have variables.
  * <p>
- * Note: the hashCode of a ClassGenerator changes whenever a
+ * Note: the hashCode of a ClassGeneratorImpl changes whenever a
  * method, constructor, or field is added, so do not put
  * ClassGenerators into sets or maps unless they are fully
  * populated.
  */
-public final class ClassGenerator extends ClassInfoBase implements Node {
+public final class ClassGeneratorImpl extends ClassInfoBase 
+    implements ClassGenerator, Node {
+
     private Node nodeImpl ;
     private BlockStatement initializer ;
     private List<MethodGenerator> methods ;
     private List<MethodGenerator> constructors ;
     private List<FieldGenerator> fields ;
 
-    /** Construct a ClassGenerator representing an interface.
+    /** Construct a ClassGeneratorImpl representing an interface.
      */
-    ClassGenerator( int modifiers, String name, List<Type> impls )  {
+    ClassGeneratorImpl( int modifiers, String name, List<Type> impls )  {
 	// Note that all interfaces must have the ABSTRACT and INTERFACE 
 	// modifiers.
 	super( modifiers | ABSTRACT | INTERFACE, Type._class(name) ) ;
@@ -86,9 +82,9 @@ public final class ClassGenerator extends ClassInfoBase implements Node {
 	fields = null ;
     }
 
-    /** Construct a ClassGenerator representing a class.
+    /** Construct a ClassGeneratorImpl representing a class.
      */
-    ClassGenerator( int modifiers, String name, Type superType, 
+    ClassGeneratorImpl( int modifiers, String name, Type superType,
 	List<Type> impls ) {
 	super( modifiers, Type._class( name ) ) ;
 	nodeImpl = new NodeBase( null ) ; 
@@ -211,7 +207,7 @@ public final class ClassGenerator extends ClassInfoBase implements Node {
 	    addConstructorInfo( mg ) ;
 	} else {
 	    // Add method to the list of MethodGenerators maintained
-	    // in the ClassGenerator API (not the same as 
+	    // in the ClassGeneratorImpl API (not the same as
 	    // methodInfoByName).
 	    methods.add( mg ) ;
 

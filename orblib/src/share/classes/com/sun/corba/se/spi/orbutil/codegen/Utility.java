@@ -38,9 +38,6 @@ package com.sun.corba.se.spi.orbutil.codegen ;
 
 import java.lang.reflect.Method ;
 
-import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.impl.orbutil.codegen.MethodInfoReflectiveImpl ;
 
 public class Utility {

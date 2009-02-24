@@ -149,7 +149,7 @@ import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility;
 import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 
 import com.sun.corba.se.impl.corba.TypeCodeFactory;
 import com.sun.corba.se.impl.corba.TypeCodeImpl;

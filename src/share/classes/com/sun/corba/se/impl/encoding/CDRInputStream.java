@@ -56,7 +56,7 @@ import com.sun.corba.se.impl.encoding.CodeSetConversion;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
 /**
  * This is delegates to the real implementation.

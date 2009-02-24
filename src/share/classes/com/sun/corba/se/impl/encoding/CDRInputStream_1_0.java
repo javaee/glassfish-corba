@@ -146,7 +146,7 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.DprintUtil;
 import com.sun.corba.se.impl.orbutil.CacheTable;
 
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
 import com.sun.org.omg.SendingContext.CodeBase;
 

@@ -105,9 +105,9 @@ import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsDisabledImpl ;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsEnabledImpl ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsDisabledImpl ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsEnabledImpl ;
 
 // XXX needs an SPI or else it does not belong here
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;

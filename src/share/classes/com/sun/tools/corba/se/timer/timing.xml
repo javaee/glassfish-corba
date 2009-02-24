@@ -37,7 +37,7 @@
 
 <!DOCTYPE timing SYSTEM "./timing.dtd">
 
-<timing name="TimingPoints" package="com.sun.corba.se.impl.orbutil.newtimer">
+<timing name="TimingPoints" package="com.sun.corba.se.impl.orbutil.newtimer.generated">
     <timer name="totalInvocation" description="Total time for a single invocation"/>
     <timer name="totalRequest" description="Total time for a single request in an invocation"/>
     <timer name="requestAddServiceContexts" description="Adding service contexts to a request"/>

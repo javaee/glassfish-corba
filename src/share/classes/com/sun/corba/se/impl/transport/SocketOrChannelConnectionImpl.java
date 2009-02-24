@@ -91,7 +91,7 @@ import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;

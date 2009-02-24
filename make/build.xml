@@ -846,7 +846,7 @@
 
     <target name="check-timing-file-changed" depends="init">
         <property name="tsrcfile" value="${src.dir}/com/sun/tools/corba/se/timer/timing.xml"/>
-        <property name="tjavafile" value="${gensrc.dir}/com/sun/corba/se/impl/orbutil/newtimer/TimingPoints.java"/>
+        <property name="tjavafile" value="${gensrc.dir}/com/sun/corba/se/impl/orbutil/newtimer/generated/TimingPoints.java"/>
 	<condition property="timing-file-changed">
 	    <or>
 		<not>

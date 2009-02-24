@@ -114,7 +114,7 @@ import com.sun.corba.se.impl.orbutil.DprintUtil ;
 import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
 import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
 import com.sun.corba.se.impl.orbutil.RepositoryIdFactory;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;

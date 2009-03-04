@@ -103,7 +103,7 @@
         <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
         <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
         <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
-
+        <property name="felix-jar"                        value="${root.dir}/lib/felix.jar"/>
 
         <!-- Places where the build puts things -->
 	<property name="build.dir"                      location="build"/>
@@ -180,6 +180,7 @@
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${tools-jar}"/>
 	    <pathelement location="${emma-jar}"/>
+	    <pathelement location="${felix-jar}"/>
 	</path>
 
 	<path id="test-classpath.master">
@@ -252,6 +253,7 @@
 	    <include name="com/sun/corba/se/impl/**"/>
 	    <include name="com/sun/corba/se/impl/**"/>
 	    <include name="com/sun/corba/se/tool/**"/>
+	    <include name="com/sun/corba/se/osgi/**"/>
 	    <include name="sun/corba/**"/>
 	    <include name="sun/rmi/rmic/**"/>
 	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
@@ -823,6 +825,7 @@
         <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
         <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
         <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
+        <make-bundle classpath="${classes.dir}" file="osgi-test"/>
     </target>
 
     <!-- ========================= Build the ORB library ====================  -->

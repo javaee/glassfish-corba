@@ -1,0 +1,2 @@
+#! /bin/sh
+java -Dfelix.config.properties=file:conf/config.properties -jar ../lib/felix.jar

@@ -201,4 +201,5 @@ Section: Producing Multiple JARs from a single POM (maven limitations)
     <push-to-maven module="omgapi" description="OMG standard APIs"/>
     <push-to-maven module="orb" description="The ORB implementation"/>
     <push-to-maven module="orbgeneric" description="Generic libraries"/>
+    <push-to-maven module="source" description="ORB source code"/>
 </target>

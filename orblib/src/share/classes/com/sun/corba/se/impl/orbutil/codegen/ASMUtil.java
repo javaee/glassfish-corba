@@ -209,7 +209,8 @@ public class ASMUtil {
 	    }
 	}
 
-	ClassWriter cw = new ClassWriter( true ) ; // have ASM compute max stack size
+        // have ASM compute max stack size
+	ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_MAXS ) ; 
 
 	// Prepare the tree for byte code generation.  We use a fresh
 	// TreeWalker context for each pass with a visitor.
@@ -268,7 +269,7 @@ public class ASMUtil {
 	ClassReader cr = new ClassReader( classData ) ;
 
 	ClassNode cn = new ClassNode();
-	cr.accept(new CheckClassAdapter(cn), true);
+	cr.accept(new CheckClassAdapter(cn), ClassReader.EXPAND_FRAMES );
 
 	List methods = cn.methods;
 	for (int i = 0; i < methods.size(); ++i) {

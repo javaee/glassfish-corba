@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.tree;
 
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 /**
@@ -38,63 +36,59 @@ import org.objectweb.asm.MethodVisitor;
  * 
  * @author Eric Bruneton
  */
-
 public class TryCatchBlockNode {
 
-  /**
-   * Beginning of the exception handler's scope (inclusive).
-   */
+    /**
+     * Beginning of the exception handler's scope (inclusive).
+     */
+    public LabelNode start;
 
-  public Label start;
+    /**
+     * End of the exception handler's scope (exclusive).
+     */
+    public LabelNode end;
 
-  /**
-   * End of the exception handler's scope (exclusive).
-   */
+    /**
+     * Beginning of the exception handler's code.
+     */
+    public LabelNode handler;
 
-  public Label end;
+    /**
+     * Internal name of the type of exceptions handled by the handler. May be
+     * <tt>null</tt> to catch any exceptions (for "finally" blocks).
+     */
+    public String type;
 
-  /**
-   * Beginning of the exception handler's code.
-   */
+    /**
+     * Constructs a new {@link TryCatchBlockNode}.
+     * 
+     * @param start beginning of the exception handler's scope (inclusive).
+     * @param end end of the exception handler's scope (exclusive).
+     * @param handler beginning of the exception handler's code.
+     * @param type internal name of the type of exceptions handled by the
+     *        handler, or <tt>null</tt> to catch any exceptions (for "finally"
+     *        blocks).
+     */
+    public TryCatchBlockNode(
+        final LabelNode start,
+        final LabelNode end,
+        final LabelNode handler,
+        final String type)
+    {
+        this.start = start;
+        this.end = end;
+        this.handler = handler;
+        this.type = type;
+    }
 
-  public Label handler;
-
-  /**
-   * Internal name of the type of exceptions handled by the handler. May be
-   * <tt>null</tt> to catch any exceptions (for "finally" blocks).
-   */
-
-  public String type;
-
-  /**
-   * Constructs a new {@link TryCatchBlockNode}.
-   *
-   * @param start beginning of the exception handler's scope (inclusive).
-   * @param end end of the exception handler's scope (exclusive).
-   * @param handler beginning of the exception handler's code.
-   * @param type internal name of the type of exceptions handled by the handler,
-   *      or <tt>null</tt> to catch any exceptions (for "finally" blocks).
-   */
-
-  public TryCatchBlockNode (
-    final Label start,
-    final Label end,
-    final Label handler,
-    final String type)
-  {
-    this.start = start;
-    this.end = end;
-    this.handler = handler;
-    this.type = type;
-  }
-
-  /**
-   * Makes the given visitor visit this try catch block.
-   *
-   * @param mv a method visitor.
-   */
-
-  public void accept (final MethodVisitor mv) {
-    mv.visitTryCatchBlock(start, end, handler, type);
-  }
+    /**
+     * Makes the given visitor visit this try catch block.
+     * 
+     * @param mv a method visitor.
+     */
+    public void accept(final MethodVisitor mv) {
+        mv.visitTryCatchBlock(start.getLabel(), end.getLabel(), handler == null
+                ? null
+                : handler.getLabel(), type);
+    }
 }

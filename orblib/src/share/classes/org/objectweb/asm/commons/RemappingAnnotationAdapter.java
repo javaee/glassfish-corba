@@ -1,7 +1,6 @@
-<html>
-<!--
+/***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +26,51 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
--->
-<body>
-Provides attributes sub classes that can work with the ASMifier utility.
+ */
 
-@since ASM 1.4.3
-</body>
-</html>
+package org.objectweb.asm.commons;
+
+import org.objectweb.asm.AnnotationVisitor;
+
+/**
+ * An <code>AnnotationVisitor</code> adapter for type remapping.
+ * 
+ * @author Eugene Kuleshov
+ */
+public class RemappingAnnotationAdapter implements AnnotationVisitor {
+    
+    private final AnnotationVisitor av;
+    
+    private final Remapper renamer;
+
+    public RemappingAnnotationAdapter(AnnotationVisitor av, Remapper renamer) {
+        this.av = av;
+        this.renamer = renamer;
+    }
+
+    public void visit(String name, Object value) {
+        av.visit(name, renamer.mapValue(value));
+    }
+
+    public void visitEnum(String name, String desc, String value) {
+        av.visitEnum(name, renamer.mapType(desc), value);
+    }
+
+    public AnnotationVisitor visitAnnotation(String name, String desc) {
+        AnnotationVisitor v = av.visitAnnotation(name, renamer.mapType(desc));
+        return v == null ? null : (v == av
+                ? this
+                : new RemappingAnnotationAdapter(v, renamer));
+    }
+
+    public AnnotationVisitor visitArray(String name) {
+        AnnotationVisitor v = av.visitArray(name);
+        return v == null ? null : (v == av
+                ? this
+                : new RemappingAnnotationAdapter(v, renamer));
+    }
+
+    public void visitEnd() {
+        av.visitEnd();
+    }
+}

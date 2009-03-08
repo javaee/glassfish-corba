@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,33 +27,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.commons;
 
 import org.objectweb.asm.Label;
 
 /**
  * A code generator for switch statements.
- *
+ * 
  * @author Juozas Baliuka
  * @author Chris Nokleberg
  * @author Eric Bruneton
  */
-
 public interface TableSwitchGenerator {
 
-  /**
-   * Generates the code for a switch case.
-   *
-   * @param key the switch case key.
-   * @param end a label that corresponds to the end of the switch statement.
-   */
+    /**
+     * Generates the code for a switch case.
+     * 
+     * @param key the switch case key.
+     * @param end a label that corresponds to the end of the switch statement.
+     */
+    void generateCase(int key, Label end);
 
-  void generateCase (int key, Label end);
-
-  /**
-   * Generates the code for the default switch case.
-   */
-
-  void generateDefault ();
+    /**
+     * Generates the code for the default switch case.
+     */
+    void generateDefault();
 }

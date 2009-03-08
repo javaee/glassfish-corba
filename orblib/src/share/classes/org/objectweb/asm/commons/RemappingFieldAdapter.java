@@ -1,6 +1,6 @@
-/**
+/***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,29 +28,38 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.objectweb.asm.util.attrs;
+package org.objectweb.asm.commons;
 
-import java.util.Map;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.FieldVisitor;
 
 /**
- * An attribute that can print the ASM code to create an equivalent attribute.
- *
- * Implementation should print the ASM code that generates
- * attribute data structures for current attribute state.
- *
+ * A <code>FieldVisitor</code> adapter for type remapping.
+ * 
  * @author Eugene Kuleshov
  */
+public class RemappingFieldAdapter implements FieldVisitor {
 
-public interface ASMifiable {
+    private final FieldVisitor fv;
+    
+    private final Remapper remapper;
 
-  /**
-   * Prints the ASM code to create an attribute equal to this attribute.
-   *
-   * @param buf A buffer used for printing Java code.
-   * @param varName name of the variable in a printed code used to store
-   *      attribute instance.
-   * @param labelNames map of label instances to their names.
-   */
+    public RemappingFieldAdapter(FieldVisitor fv, Remapper remapper) {
+        this.fv = fv;
+        this.remapper = remapper;
+    }
 
-  void asmify (StringBuffer buf, String varName, Map labelNames);
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        AnnotationVisitor av = fv.visitAnnotation(desc, visible);
+        return av == null ? null : new RemappingAnnotationAdapter(av, remapper);
+    }
+
+    public void visitAttribute(Attribute attr) {
+        fv.visitAttribute(attr);
+    }
+
+    public void visitEnd() {
+        fv.visitEnd();
+    }
 }

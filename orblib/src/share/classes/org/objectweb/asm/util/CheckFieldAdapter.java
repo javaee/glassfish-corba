@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,45 +27,51 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.objectweb.asm.util;
 
-package org.objectweb.asm.tree.analysis;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.FieldVisitor;
 
 /**
- * A fixed size map of integer values.
- * 
- * @author Eric Bruneton
+ * A {@link FieldVisitor} that checks that its methods are properly used.
  */
+public class CheckFieldAdapter implements FieldVisitor {
 
-class IntMap {
-  
-  private int size;
-  
-  private Object[] keys;
-  
-  private int[] values;
-  
-  public IntMap (final int size) {
-    this.size = size;
-    this.keys = new Object[size];
-    this.values = new int[size];
-  }
-  
-  public int get (final Object key) {
-    int n = size;
-    int i = (key.hashCode() & 0x7FFFFFFF)%n;
-    while (keys[i] != key) {
-      i = (i+1)%n;
+    private final FieldVisitor fv;
+
+    private boolean end;
+
+    public CheckFieldAdapter(final FieldVisitor fv) {
+        this.fv = fv;
     }
-    return values[i];
-  }
-  
-  public void put (final Object key, final int value) {
-    int n = size;
-    int i = (key.hashCode() & 0x7FFFFFFF)%n;
-    while (keys[i] != null) {
-      i = (i+1)%n;
+
+    public AnnotationVisitor visitAnnotation(
+        final String desc,
+        final boolean visible)
+    {
+        checkEnd();
+        CheckMethodAdapter.checkDesc(desc, false);
+        return new CheckAnnotationAdapter(fv.visitAnnotation(desc, visible));
     }
-    keys[i] = key;
-    values[i] = value;
-  }
+
+    public void visitAttribute(final Attribute attr) {
+        checkEnd();
+        if (attr == null) {
+            throw new IllegalArgumentException("Invalid attribute (must not be null)");
+        }
+        fv.visitAttribute(attr);
+    }
+
+    public void visitEnd() {
+        checkEnd();
+        end = true;
+        fv.visitEnd();
+    }
+
+    private void checkEnd() {
+        if (end) {
+            throw new IllegalStateException("Cannot call a visit method after visitEnd has been called");
+        }
+    }
 }

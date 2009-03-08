@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,90 +27,77 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.optimizer;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.Remapper;
+import org.objectweb.asm.commons.RemappingMethodAdapter;
 
 /**
- * A {@link MethodAdapter} that renames fields and methods, and removes debug 
+ * A {@link MethodAdapter} that renames fields and methods, and removes debug
  * info.
  * 
- * @author Eric Bruneton
+ * @author Eugene Kuleshov
  */
+public class MethodOptimizer extends RemappingMethodAdapter {
 
-public class MethodOptimizer extends MethodAdapter {
+    public MethodOptimizer(
+        int access,
+        String desc,
+        MethodVisitor mv,
+        Remapper remapper)
+    {
+        super(access, desc, mv, remapper);
+    }
+    
+    // ------------------------------------------------------------------------
+    // Overridden methods
+    // ------------------------------------------------------------------------
 
-  private NameMapping mapping;
-  
-  public MethodOptimizer (final MethodVisitor mv, final NameMapping mapping) {
-    super(mv);
-    this.mapping = mapping;
-  }
-  
-  // --------------------------------------------------------------------------
-  // Overriden methods
-  // --------------------------------------------------------------------------
-  
-  public AnnotationVisitor visitAnnotationDefault () {
-    throw new UnsupportedOperationException();
-  }
+    public AnnotationVisitor visitAnnotationDefault() {
+        // remove annotations
+        return null;
+    }
 
-  public AnnotationVisitor visitParameterAnnotation (
-    final int parameter, 
-    final String desc, 
-    final boolean visible) 
-  {
-    throw new UnsupportedOperationException();
-  }
+    public AnnotationVisitor visitParameterAnnotation(
+        final int parameter,
+        final String desc,
+        final boolean visible)
+    {
+        // remove annotations
+        return null;
+    }
 
-  public void visitTypeInsn (final int opcode, final String desc) {
-    mv.visitTypeInsn(
-        opcode, 
-        desc.startsWith("[") ? mapping.fix(desc) : mapping.map(desc));
-  }
+    public void visitLocalVariable(
+        final String name,
+        final String desc,
+        final String signature,
+        final Label start,
+        final Label end,
+        final int index)
+    {
+        // remove debug info
+    }
 
-  public void visitFieldInsn (
-    final int opcode, 
-    final String owner, 
-    final String name, 
-    final String desc) 
-  {
-    mv.visitFieldInsn(
-        opcode, 
-        mapping.map(owner), 
-        mapping.map(owner + "." + name),
-        mapping.fix(desc));
-  }
-
-  public void visitMethodInsn (
-    final int opcode, 
-    final String owner, 
-    final String name, 
-    final String desc) 
-  {
-    mv.visitMethodInsn(
-        opcode, 
-        mapping.map(owner), 
-        mapping.map(owner + "." + name + desc), 
-        mapping.fix(desc));
-  }
-
-  public void visitLocalVariable (
-    final String name, 
-    final String desc, 
-    final String signature, 
-    final Label start, 
-    final Label end, 
-    final int index) 
-  {
-    // remove debug info
-  }
-
-  public void visitLineNumber (final int line, final Label start) {
-    // remove debug info
-  }
+    public void visitLineNumber(final int line, final Label start) {
+        // remove debug info
+    }
+    
+    public void visitFrame(
+        int type,
+        int local,
+        Object[] local2,
+        int stack,
+        Object[] stack2)
+    {
+        // remove frame info
+    }
+    
+    public void visitAttribute(Attribute attr) {
+        // remove non standard attributes
+    }
 }

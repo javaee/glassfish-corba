@@ -1,6 +1,6 @@
-/***
+/**
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,64 +27,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.objectweb.asm.util;
 
-package org.objectweb.asm.tree.analysis;
-
-import java.util.Set;
-
-import org.objectweb.asm.tree.AbstractInsnNode;
+import java.util.Map;
 
 /**
- * A {@link Value} that is represented by its type in a two types type system.
- * This type system distinguishes the ONEWORD and TWOWORDS types.
+ * An attribute that can print eadable representation of the attribute.
  * 
- * @author Eric Bruneton
+ * Implementation should construct readable output from an attribute data
+ * structures for current attribute state. Such representation could be used in
+ * unit test assertions.
+ * 
+ * @author Eugene Kuleshov
  */
+public interface Traceable {
 
-public class DataflowValue implements Value {
-
-  /**
-   * The size of this value.
-   */
-  
-  public final int size;
-  
-  /**
-   * The instructions that can produce this value. For example, for the Java 
-   * code below, the instructions that can produce the value of <tt>i</tt>
-   * at line 5 are the txo ISTORE instructions at line 1 and 3:
-   * <pre>
-   * 1: i = 0;
-   * 2: if (...) {
-   * 3:   i = 1;
-   * 4: }
-   * 5: return i;
-   * </pre>
-   * This field is a set of {@link AbstractInsnNode} objects. 
-   */
-  
-  public final Set insns;
-  
-  public DataflowValue (final int size) {
-    this(size, SmallSet.EMPTY_SET);
-  }
-  
-  public DataflowValue (final int size, final AbstractInsnNode insn) {
-    this.size = size;
-    this.insns = new SmallSet(insn, null);
-  }
-  
-  public DataflowValue (final int size, final Set insns) {
-    this.size = size;
-    this.insns = insns;
-  }
-  
-  public int getSize () {
-    return size;
-  }
-
-  public boolean equals (final Object value) {
-    DataflowValue v = (DataflowValue)value;
-    return size == v.size && insns.equals(v.insns);
-  }
+    /**
+     * Build a human readable representation of the attribute.
+     * 
+     * @param buf A buffer used for printing Java code.
+     * @param labelNames map of label instances to their names.
+     */
+    void trace(StringBuffer buf, Map labelNames);
 }

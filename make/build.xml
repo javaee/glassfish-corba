@@ -159,7 +159,7 @@
 	<!-- properties needed for updating and validating copyright headers -->
 	<property name="copyright.file"                 value="${root.dir}/make/copyright-information/copyright.txt"/>
 	<property name="copyright.roots"                value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/> 
-	<property name="copyright.skip"                 value="SCCS,.hg,.cvs,Codemgr_wsdata,deleted_files,copyright-information,freezepoint,apache,objectweb,build,webrev,test-output,gen,lib"/>
+	<property name="copyright.skip"                 value="SCCS,.hg,.cvs,Codemgr_wsdata,deleted_files,copyright-information,freezepoint,apache,objectweb,build,webrev,test-output,gen,lib,pom"/>
 
         <!-- properties needed for pushing jar to maven repository -->
         <property name="release.dir"                    value="build/release"/>
@@ -586,7 +586,7 @@
         The split jar packaging splits the ORB code into a number of smaller
         jar files containing closely related packages.  The OSGi package 
         (see make-bundles) closely follows this packaging, except that only
-        those classes acutally needs in GFv3 are packaged as bundles.
+        those classes actually needed in GFv3 are packaged as bundles.
     -->
 
     <target name="orb-split" depends="init">
@@ -778,13 +778,27 @@
             </sequential>
     </macrodef>
 
+    <target name="make-src-bundle" depends="init">
+        <jar jarfile="${releaselib.dir}/bundles/glassfish-corba-source.jar" duplicate="fail">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${gensrc.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${orblib.src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </jar>
+    </target>
+
     <!-- ========================= OSGi bundle packaging ==================== 
         The ORB as delivered into GFv3 contains 9 OSGi bundles.
         These bundles are constructed in the make-bundles target using
         bnd and the various .bnd files.
     -->
 
-    <target name="make-bundles" depends="init">
+    <target name="make-bundles" depends="init,make-src-bundle">
         <!-- we are not generating bundles for activation or rmic-iiop
              because they are not used in GFv3.
         -->

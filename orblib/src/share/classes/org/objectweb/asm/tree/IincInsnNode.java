@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.tree;
+
+import java.util.Map;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -38,39 +39,39 @@ import org.objectweb.asm.Opcodes;
  * 
  * @author Eric Bruneton
  */
-
 public class IincInsnNode extends AbstractInsnNode {
 
-  /**
-   * Index of the local variable to be incremented.
-   */
+    /**
+     * Index of the local variable to be incremented.
+     */
+    public int var;
 
-  public int var;
+    /**
+     * Amount to increment the local variable by.
+     */
+    public int incr;
 
-  /**
-   * Amount to increment the local variable by.
-   */
+    /**
+     * Constructs a new {@link IincInsnNode}.
+     * 
+     * @param var index of the local variable to be incremented.
+     * @param incr increment amount to increment the local variable by.
+     */
+    public IincInsnNode(final int var, final int incr) {
+        super(Opcodes.IINC);
+        this.var = var;
+        this.incr = incr;
+    }
 
-  public int incr;
+    public int getType() {
+        return IINC_INSN;
+    }
 
-  /**
-   * Constructs a new {@link IincInsnNode}.
-   *
-   * @param var index of the local variable to be incremented.
-   * @param incr increment amount to increment the local variable by.
-   */
+    public void accept(final MethodVisitor mv) {
+        mv.visitIincInsn(var, incr);
+    }
 
-  public IincInsnNode (final int var, final int incr) {
-    super(Opcodes.IINC);
-    this.var = var;
-    this.incr = incr;
-  }
-
-  public void accept (final MethodVisitor mv) {
-    mv.visitIincInsn(var, incr);
-  }
-
-  public int getType () {
-    return IINC_INSN;
-  }
+    public AbstractInsnNode clone(final Map labels) {
+        return new IincInsnNode(var, incr);
+    }
 }

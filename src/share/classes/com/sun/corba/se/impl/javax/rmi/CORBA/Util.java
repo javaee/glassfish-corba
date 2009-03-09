@@ -153,19 +153,17 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
     static {
 	final String vendor = System.getProperty( "java.vendor" ) ;
-	String vhName = null ;
+	String vhName = "com.sun.corba.se.impl.io.ValueHandlerImpl" ;
 
-	if (vendor.equals( SUN_JAVA_VENDOR ))
+	if (vendor.equals( SUN_JAVA_VENDOR )) {
+            // GFv3: remove this for now (and maybe forever)
 	    // We are running with Sun's JDK, so use the ValueHandler in the JDK.
 	    // This is needed in GlassFish for compatibility with embedded use of
 	    // WebLogic.  The string concat is essential: it prevents the code 
 	    // from being affected by the ORB rename. The same reason makes it impossible
 	    // to just call new.
-	    vhName = "com.sun.corba." + "se.impl.io.ValueHandlerImpl" ;
-	else
-	    // This is NOT Sun's JDK, so allow the rename, which forces use of the
-	    // ValueHandler in the renamed ORB used in GlassFish.
-	    vhName = "com.sun.corba.se.impl.io.ValueHandlerImpl" ;
+	    // XXX vhName = "com.sun.corba." + "se.impl.io.ValueHandlerImpl" ;
+        }
 
 	try {
 	    valueHandlerSingleton = (ValueHandler) Class.forName(vhName).newInstance() ;

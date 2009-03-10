@@ -1002,7 +1002,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	    // Read repository id(s)
 	    String repositoryIDString = readRepositoryIds(vType, expectedType, 
 		null);
-
+            
 	    // If isChunked was determined to be true based
 	    // on the valuetag, this will read a chunk length
 	    start_block();
@@ -1101,7 +1101,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // Write code if the number is Zero. Unusual case
             if (numberOfInterfaces==0) {
                 if (debug) {
-                    dprint("The proxy does not have any interfaces that are implemented dynamically! Check the Proxy implementation");
+                    dprint("The proxy does not have any interfaces that "
+                        + "are implemented dynamically! Check the Proxy implementation");
                 }
                 return null;
             }

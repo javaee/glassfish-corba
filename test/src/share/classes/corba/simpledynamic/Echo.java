@@ -42,6 +42,8 @@ public interface Echo extends Remote {
     Echo say( Echo obj ) throws RemoteException ;
 
     String name() throws RemoteException ;
+
+    Object testExceptionContext() throws RemoteException ;
 }
 
 

@@ -92,6 +92,9 @@ import java.security.*;
 import java.util.*;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
+
+import com.sun.corba.se.impl.orbutil.OperationTracer;
+
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.logging.UtilSystemException ;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
@@ -411,6 +414,8 @@ public class IIOPInputStream
     	simpleReadDepth++;	// Entering
     	Object obj = null;
 
+        OperationTracer.startReadValue( clz.getName() ) ;
+
     	/*
     	 * Check for reset, handle it before reading an object.
     	 */
@@ -423,24 +428,20 @@ public class IIOPInputStream
 	    }
 
 	    obj = currentClassDesc.readResolve(obj);
-    	}
-    	catch(ClassNotFoundException cnfe)
-	    {
+    	} catch(ClassNotFoundException cnfe) {
 		bridge.throwException( cnfe ) ;
 		return null;
-	    }
-    	catch(IOException ioe)
-	    {
+        } catch(IOException ioe) {
 		// System.out.println("CLZ = " + clz + "; " + ioe.toString());
 		bridge.throwException(ioe) ;
 		return null;
-	    }
-    	finally {
+        } finally {
     	    simpleReadDepth --;
     	    currentObject = prevObject;
     	    currentClassDesc = prevClassDesc;
             currentClass = prevClass;
             streamFormatVersion = oldStreamFormatVersion;
+            OperationTracer.endReadValue() ;
     	}
 
 
@@ -572,30 +573,21 @@ public class IIOPInputStream
 		// XXX I18N, logging needed.
 		throw new NotActiveException("defaultReadObjectDelegate");
 
-            // The array will be null unless fields were retrieved
-            // remotely because of a serializable version difference.
-            // Bug fix for 4365188.  See the definition of
-            // defaultReadObjectFVDMembers for more information.
-            if (defaultReadObjectFVDMembers != null &&
-                defaultReadObjectFVDMembers.length > 0) {
-
-                // WARNING:  Be very careful!  What if some of
-                // these fields actually have to do this, too?
-                // This works because the defaultReadObjectFVDMembers
-                // reference is passed to inputClassFields, but
-                // there is no guarantee that
-                // defaultReadObjectFVDMembers will point to the
-                // same array after calling inputClassFields.
+            if (defaultReadObjectFVDMembers != null) {
+                // Clear this here so that a recursion back to another
+                // defaultReadObjectDelegate call from inputClassFields
+                // does NOT pick up inapplicable defaultReadObjectFVDMembers
+                // (see bug 6614558).
+                ValueMember[] valueMembers = defaultReadObjectFVDMembers ;
+                defaultReadObjectFVDMembers = null ;
 
                 // Use the remote fields to unmarshal.
                 inputClassFields(currentObject, 
                                  currentClass, 
                                  currentClassDesc,
-                                 defaultReadObjectFVDMembers,
+                                 valueMembers,
                                  cbSender);
-
             } else {
-
                 // Use the local fields to unmarshal.
                 ObjectStreamField[] fields =
                     currentClassDesc.getFieldsNoCopy();
@@ -1004,11 +996,20 @@ public class IIOPInputStream
     	    throw new ClassNotFoundException(currentClassDesc.getName());
 
         try {
+            /* We can't handle enums here, because this does NOT deal with a subclass of
+             * java.lang.Enum that contains serializable state.  Since the ORB does not
+             * handle enums specially, we just read all of the data, then if the object is
+             * an enum, construct the enum and return it, discarding the existing version.
+             * This is not strictly correct, but it IS compatible with the other ORBs.
+             * It is however, NOT interoperable with non-Sun ORBs.
+             *
             if (Enum.class.isAssignableFrom( clz )) {
                 int ordinal = orbStream.read_long() ;
                 String value = (String)orbStream.read_value( String.class ) ;
                 return Enum.valueOf( clz, value ) ;
-            } else if (currentClassDesc.isExternalizable()) {
+            } else 
+            */
+            if (currentClassDesc.isExternalizable()) {
                 try {
                     currentObject = (currentClass == null) ?
                         null : currentClassDesc.newInstance();
@@ -1257,7 +1258,18 @@ public class IIOPInputStream
             activeRecursionMgr.removeObject(offset);
         }
 		
-    	return currentObject;
+        /*
+        if (Enum.class.isAssignableFrom( clz )) {
+            // If we have read an enum, do NOT return it, because this violates the contract
+            // of an enum: there can be only one instance of a given type.
+            // Just get the value from the enum, and fetch the correct instance, discarding the
+            // unmarshaled object.
+            Enum streamEnum = (Enum)currentObject ;
+            String value = streamEnum.name() ;
+            return Enum.valueOf( clz, value ) ;
+        } else { */
+            return currentObject;
+        // }
     }
 
     // This retrieves a vector of FVD's for the hierarchy of serializable 
@@ -1320,11 +1332,14 @@ public class IIOPInputStream
 	     * else,
 	     *  Handle it as a serializable class.
 	     */
+            /*
             if (Enum.class.isAssignableFrom( clz )) {
                 int ordinal = orbStream.read_long() ;
                 String value = (String)orbStream.read_value( String.class ) ;
                 return Enum.valueOf( clz, value ) ;
-	    } else if (currentClassDesc.isExternalizable()) {
+	    } else 
+            */
+            if (currentClassDesc.isExternalizable()) {
 		try {
 		    currentObject = (currentClass == null) ?
 			null : currentClassDesc.newInstance();
@@ -1689,6 +1704,8 @@ public class IIOPInputStream
 	throws InvalidClassException, StreamCorruptedException,
 	       ClassNotFoundException, IOException
     {
+        OperationTracer.readingField( "<<readObject>>" ) ;
+
 	if (osc.readObjectMethod == null) {
 	    return false;
 	}
@@ -2025,6 +2042,7 @@ public class IIOPInputStream
 	try {
 
 	    for (int i = 0; i < fields.length; i++) {
+                OperationTracer.readingField( fields[i].name ) ;
 
                 switch (fields[i].type.kind().value()) {
 
@@ -2114,7 +2132,6 @@ public class IIOPInputStream
 
         // Handle the primitives first
         for (int i = 0; i < primFields; ++i) {
-
             switch (fields[i].getTypeCode()) {
                 case 'B':
                     byte byteValue = orbStream.read_octet();
@@ -2165,6 +2182,8 @@ public class IIOPInputStream
 	/* Read and set object fields from the input stream. */
 	if (currentClassDesc.objFields > 0) {
 	    for (int i = primFields; i < fields.length; i++) {
+                OperationTracer.readingField( fields[i].getName() ) ;
+
                 Object objectValue = null;
                 try {
                     objectValue = inputObjectField(fields[i]);
@@ -2201,6 +2220,8 @@ public class IIOPInputStream
 
 	if (o != null) {
 	    for (int i = 0; i < primFields; ++i) {
+                OperationTracer.readingField( fields[i].getName() ) ;
+
 		if (fields[i].getField() == null)
 		    continue;
 
@@ -2211,6 +2232,8 @@ public class IIOPInputStream
 	/* Read and set object fields from the input stream. */
 	if (currentClassDesc.objFields > 0) {
 	    for (int i = primFields; i < fields.length; i++) {
+                OperationTracer.readingField( fields[i].getName() ) ;
+
 		Object objectValue = null;
 
                 try {
@@ -2259,6 +2282,8 @@ public class IIOPInputStream
     {
 	try{
 	    for (int i = 0; i < fields.length; ++i) {
+                OperationTracer.readingField( fields[i].name ) ;
+
 		try {
 		    switch (fields[i].type.kind().value()) {
 		    case TCKind._tk_octet:
@@ -2401,7 +2426,7 @@ public class IIOPInputStream
 	       ClassNotFoundException, IOException
     {
 	for (int i = 0; i < fields.length; ++i) {
-	
+            OperationTracer.readingField( fields[i].name ) ;	
 	    try {
 					
 		switch (fields[i].type.kind().value()) {

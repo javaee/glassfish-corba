@@ -33,30 +33,40 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.evolve;
+import corba.evolve.FeatureInfo ;
 
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
-import mymath.BigDecimal ;
+public class FeatureInfoImpl implements FeatureInfo, java.io.Serializable  { 
+    /* Serial version */
+    static final long serialVersionUID = 3952882688968447265L;
 
-/**
- * Simple interface to send an Object and get it as a reply.  (Sometimes
- * replies fail even when requests don't.)
- */
-public interface UserNameVerifier extends java.rmi.Remote 
-{
-    public void verifyName(UserNameInt input)
-        throws RemoteException;
+    protected String name;
+    protected String description;
+    
+    public FeatureInfoImpl(String name, String description)
+	    throws IllegalArgumentException {
+	this.name = name;    
+	this.description = description;
+    }
 
-    public UserNameInt requestName() throws RemoteException;
+    public String getName() {
+	return name;
+    }
+    
+    public String getDescription() {
+	return description;
+    }  
 
-    public FeatureInfo getFeatureInfo() throws RemoteException ;
+    public boolean equals(Object o) {
+	if (o == this)
+	    return true;
+	if (!(o instanceof FeatureInfoImpl))
+	    return false;
+	FeatureInfoImpl p = (FeatureInfoImpl) o;
+	return (p.getName().equals(getName()) &&
+		p.getDescription().equals(getDescription()));
+    }
 
-    public boolean validateFeatureInfo( FeatureInfo info ) throws RemoteException ;
-
-    // public Object echo( Object obj ) throws RemoteException ;
-
-    public BigDecimal echo( BigDecimal obj ) throws RemoteException ;
-
-    public WithoutPrimitives echo( WithoutPrimitives obj ) throws RemoteException ;
+    public int hashCode() {
+	return getName().hashCode() ^ getDescription().hashCode();
+    }
 }

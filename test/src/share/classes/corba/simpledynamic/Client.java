@@ -176,6 +176,9 @@ public class Client {
 	    System.out.println( "Echoing third echoref" ) ;
 	    Echo ref2 = ref.say( ref ) ;
 	    Assert.assertEquals( ref2.name(), ref.name() ) ;
+
+            System.out.println( "Trying exception context" ) ;
+            ref.testExceptionContext() ;
 	} catch (Exception exc) {
 	    System.out.println( "Caught exception " + exc ) ;
 	    exc.printStackTrace() ;

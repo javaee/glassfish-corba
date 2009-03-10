@@ -98,6 +98,22 @@ public class Client
 		System.out.println("correct echo response: " + result);
 		test = test + "*" + test ;
 	    }
+
+            try {
+                System.out.println( "Testing exception context" ) ;
+                ref.testExceptionContext() ;
+            } catch (Exception exc) {
+                System.out.println( "Exception on testExceptionContext: " + exc ) ;
+                exc.printStackTrace() ;
+            }
+
+            try {
+                System.out.println( "Testing simple exception context" ) ;
+                ref.testSimpleExceptionContext() ;
+            } catch (Exception exc) {
+                System.out.println( "Exception on testExceptionContext: " + exc ) ;
+                exc.printStackTrace() ;
+            }
 	} catch (Exception e) {
 	    e.printStackTrace(System.out);
 	    System.out.println("--------------------------------------------");

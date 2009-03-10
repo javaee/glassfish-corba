@@ -107,6 +107,8 @@ import com.sun.corba.se.impl.orbutil.ORBUtility ;
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.oa.poa.POAImpl ;
 
+import com.sun.corba.se.impl.orbutil.OperationTracer ;
+
 import corba.folb_8_1.IIOPPrimaryToContactInfoImpl ;
 
 public class Client extends TestCase
@@ -927,5 +929,41 @@ public class Client extends TestCase
 	    // displayTimerFactories() ;
 	    assertTrue( findTimerFactoryForORB(orbId) == null ) ;
 	}
+    }
+
+    public void testOperationTracer() {
+        System.out.println( "Testing OperationTracer" ) ;
+        long time = System.currentTimeMillis() ;
+        OperationTracer.finish() ;
+        assertEquals( OperationTracer.getAsString(), "" ) ;
+        OperationTracer.begin( "Initial" ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:" ) ;
+        OperationTracer.startReadValue( "Foo" ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Foo" ) ;
+        OperationTracer.readingField( "a" ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Foo.a" ) ;
+        OperationTracer.readingField( "b" ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Foo.b" ) ;
+        OperationTracer.endReadValue() ;
+        assertEquals( OperationTracer.getAsString(), "Initial:" ) ;
+        OperationTracer.startReadArray( "Bar", 27 ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>" ) ;
+        OperationTracer.readingIndex( 0 ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[0]" ) ;
+        OperationTracer.readingIndex( 1 ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[1]" ) ;
+        OperationTracer.startReadValue( "Baz" ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[1],Baz" ) ;
+        OperationTracer.readingField( "x1" ) ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[1],Baz.x1" ) ;
+        OperationTracer.endReadValue() ;
+        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[1]" ) ;
+        OperationTracer.endReadArray() ;
+        assertEquals( OperationTracer.getAsString(), "Initial:" ) ;
+        OperationTracer.finish() ;
+        assertEquals( OperationTracer.getAsString(), "" ) ;
+        double elapsed = (time - System.currentTimeMillis())/1000 ;
+        System.out.println( 
+            "OperationTracer test complete in " + elapsed + " milliseconds" ) ;
     }
 }

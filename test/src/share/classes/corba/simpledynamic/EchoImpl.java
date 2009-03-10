@@ -35,12 +35,50 @@
  */
 package corba.simpledynamic;
 
+import java.util.Map ;
+import java.util.HashMap ;
+
 import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 import javax.rmi.PortableRemoteObject ;
 
+import com.sun.corba.se.spi.orb.ORB ;
+
+import com.sun.corba.se.spi.orbutil.generic.Pair ;
+
+import com.sun.corba.se.impl.logging.UtilSystemException ;
+
 public class EchoImpl extends PortableRemoteObject implements Echo {
     private String name ;
+    private static UtilSystemException wrapper = 
+        ORB.getStaticLogWrapperTable().get_UTIL_Util() ;
+    
+    private static class ThrowsSysEx {
+        private void readObject( java.io.ObjectInputStream is ) {
+            throw wrapper.testException( 42 ) ;
+        }
+    }
+
+    private static class Foo {
+        private Map m ;
+
+        public Foo( Object... args ) {
+            m = new HashMap() ;
+            boolean atKey = true ;
+            Object key = null ;
+            Object value = null ;
+            for (Object obj : args) {
+                if (atKey) {
+                    key = obj ;
+                } else {
+                    value = obj ;
+                    m.put( key, value ) ;
+                }
+
+                atKey = !atKey ;
+            }
+        }
+    }
 
     public EchoImpl( String name ) throws RemoteException {
 	this.name = name ;
@@ -52,6 +90,14 @@ public class EchoImpl extends PortableRemoteObject implements Echo {
 
     public String name() {
 	return name ;
+    }
+
+    public Object testExceptionContext() throws RemoteException {
+        Object d1 = new Pair<String,String>( "foo", "bar" ) ;
+        Object d2 = new Pair<String,ThrowsSysEx>( "baz", new ThrowsSysEx() ) ;
+        Foo f1 = new Foo( "d1", d1, "d2", d2 ) ;
+        Pair<String,Foo> result = new Pair<String,Foo>( "f1", f1 ) ;
+        return result ;
     }
 }
 

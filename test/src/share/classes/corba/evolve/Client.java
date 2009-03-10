@@ -36,56 +36,133 @@
 package corba.evolve;
 
 import javax.rmi.PortableRemoteObject;
-import org.omg.CosNaming.*;
-import org.omg.CORBA.*;
-import java.util.*;
 import java.rmi.RemoteException;
-import java.io.*;
+
+import org.omg.CORBA.ORB ;
+
+import org.omg.CosNaming.NamingContext ;
+import org.omg.CosNaming.NamingContextHelper ;
+import org.omg.CosNaming.NameComponent ;
+
+import org.testng.annotations.Test ;
+import org.testng.annotations.BeforeSuite ;
+import org.testng.Assert ;
+import org.testng.TestNG ;
+
+import mymath.BigDecimal ;
 
 public class Client
 {
-    public static void main(String args[])
-    {
-        try {
+    private UserNameVerifier verifier ;
+    private ORB orb ;
 
-            // First make sure we can find a UserName class.
-            Class userNameClass = Class.forName("UserName");
+    @BeforeSuite 
+    public void setup() throws Exception {
+        String[] args = new String[0] ;
+        orb = ORB.init(args, System.getProperties());
 
-            UserNameInt localName = (UserNameInt)userNameClass.newInstance();
+        org.omg.CORBA.Object objRef = 
+            orb.resolve_initial_references("NameService");
+        NamingContext ncRef = NamingContextHelper.narrow(objRef);
 
-            // If we get here, then we did.
+        NameComponent nc = new NameComponent("UserNameVerifier", "");
+        NameComponent path[] = {nc};
 
-            ORB orb = ORB.init(args, System.getProperties());
+        org.omg.CORBA.Object obj = ncRef.resolve(path);
 
-            org.omg.CORBA.Object objRef = 
-                orb.resolve_initial_references("NameService");
-            NamingContext ncRef = NamingContextHelper.narrow(objRef);
- 
-            NameComponent nc = new NameComponent("UserNameVerifier", "");
-            NameComponent path[] = {nc};
+        verifier = (UserNameVerifier) PortableRemoteObject.narrow(
+            obj, UserNameVerifier.class);
+    }
 
-            org.omg.CORBA.Object obj = ncRef.resolve(path);
+    @Test
+    public void testUserName() throws Exception {
+        Class userNameClass = Class.forName("UserName");
+        UserNameInt localName = (UserNameInt)userNameClass.newInstance();
+        
+        System.out.println("Trying to send a UserName...");
+        verifier.verifyName(localName);
 
-	    UserNameVerifier verifier = 
-                (UserNameVerifier) PortableRemoteObject.narrow(obj, 
-                                                               UserNameVerifier.class);
-            
-            System.out.println("Trying to send a UserName...");
-            verifier.verifyName(localName);
+        System.out.println("Requesting a name...");
+        UserNameInt testName = verifier.requestName();
+        Assert.assertTrue( testName != null && testName.validate());
+    }
 
-            System.out.println("PASSED");
-            System.out.println("Requesting a name...");
+    @Test
+    public void testUserNameRO() throws Exception {
+        Class userNameClass = Class.forName("UserNameRO");
+        UserNameInt localName = (UserNameInt)userNameClass.newInstance();
+        
+        System.out.println("Trying to send a UserName...");
+        verifier.verifyName(localName);
 
-            UserNameInt testName = verifier.requestName();
+        System.out.println("Requesting a name...");
+        UserNameInt testName = verifier.requestName();
+        Assert.assertTrue( testName != null && testName.validate());
+    }
 
-            if (testName == null || !testName.validate())
-                throw new Exception("Name returned from server was null or invalid");
+    @Test
+    public void testUserNameROD() throws Exception {
+        Class userNameClass = Class.forName("UserNameROD");
+        UserNameInt localName = (UserNameInt)userNameClass.newInstance();
+        
+        System.out.println("Trying to send a UserName...");
+        verifier.verifyName(localName);
 
-            System.out.println("PASSED");
+        System.out.println("Requesting a name...");
+        UserNameInt testName = verifier.requestName();
+        Assert.assertTrue( testName != null && testName.validate());
+    }
 
-        } catch (Throwable t) {
-            t.printStackTrace(System.out);
-            System.exit (1);
-        }
+    @Test
+    public void testFeatureInfo() throws Exception {
+        System.out.println( "Requesting a FeatureInfo" ) ;
+        FeatureInfo finfo = verifier.getFeatureInfo() ;
+
+        System.out.println("Validating the FeatureInfo" ) ;
+        Assert.assertTrue( verifier.validateFeatureInfo( finfo ) ) ;
+    }
+
+    private void setSerializationDebug( boolean flag ) {
+        // ((com.sun.corba.se.spi.orb.ORB)orb).cdrDebugFlag = flag ;
+        // ((com.sun.corba.se.spi.orb.ORB)orb).streamFormatVersionDebugFlag = flag ;
+        // ((com.sun.corba.se.spi.orb.ORB)orb).valueHandlerDebugFlag = flag ;
+    }
+
+    @Test
+    public void testBigDecimal() throws Exception {
+        System.out.println( "Testing BigDecimal interop" )  ;
+        BigDecimal orig = new BigDecimal( "123456789012345678901234567890.12312312312" ) ;
+
+        // setSerializationDebug( true ) ;
+        BigDecimal result = (BigDecimal)verifier.echo( orig ) ;
+        // setSerializationDebug( false ) ;
+        
+        Assert.assertEquals( orig, result ) ;
+    }
+
+    @Test
+    public void testWithoutPrimitives() throws Exception {
+        System.out.println( "Testing WithoutPrimitives interop" )  ;
+        WithoutPrimitives orig = new WithoutPrimitives() ;
+
+        // setSerializationDebug( true ) ;
+        WithoutPrimitives result = (WithoutPrimitives)verifier.echo( orig ) ;
+        // setSerializationDebug( false ) ;
+        
+        Assert.assertEquals( orig, result ) ;
+    }
+
+    public static void main(String args[]) {
+        /* Not in GFv2 ORB:
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
+        runner.systemExit() ;
+        */
+        TestNG tng = new TestNG() ;
+        Class[] cls = { Client.class } ;
+        tng.setTestClasses( cls ) ;
+        tng.run() ;
+        System.exit( tng.hasFailure() ? 1 : 0 ) ;
     }
 }

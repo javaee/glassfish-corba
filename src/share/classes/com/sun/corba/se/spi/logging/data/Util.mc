@@ -87,7 +87,10 @@
 	    (COULD_NOT_FIND_JDK_VALUE_HANDLER 13 WARNING
 	     "Could not find the expected Value Handler implementation in the JDK: Wrong JDK Version?")
 	    (HANDLE_SYSTEM_EXCEPTION 14 FINE
-	     " Bad Operation or Bad Invocation Order : The Servant has not been associated with an ORB instance"))
-
+	     " Bad Operation or Bad Invocation Order : The Servant has not been associated with an ORB instance")
+            (TEST_EXCEPTION 15 INFO
+             "This is a test exception with number {0}")
+            (SIMPLE_TEST_EXCEPTION 16 WARNING
+             "This is another test exception with no parameters"))
 	(UNKNOWN
 	    (UNKNOWN_SYSEX 1 WARNING "Unknown System Exception"))))

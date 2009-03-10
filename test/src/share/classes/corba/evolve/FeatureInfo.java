@@ -33,30 +33,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.evolve;
+package corba.evolve ;
 
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
-import mymath.BigDecimal ;
-
-/**
- * Simple interface to send an Object and get it as a reply.  (Sometimes
- * replies fail even when requests don't.)
- */
-public interface UserNameVerifier extends java.rmi.Remote 
-{
-    public void verifyName(UserNameInt input)
-        throws RemoteException;
-
-    public UserNameInt requestName() throws RemoteException;
-
-    public FeatureInfo getFeatureInfo() throws RemoteException ;
-
-    public boolean validateFeatureInfo( FeatureInfo info ) throws RemoteException ;
-
-    // public Object echo( Object obj ) throws RemoteException ;
-
-    public BigDecimal echo( BigDecimal obj ) throws RemoteException ;
-
-    public WithoutPrimitives echo( WithoutPrimitives obj ) throws RemoteException ;
+public interface FeatureInfo extends java.io.Serializable { 
+    public String getName() ;
+    public String getDescription() ;
 }

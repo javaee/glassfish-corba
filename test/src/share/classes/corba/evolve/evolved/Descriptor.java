@@ -33,30 +33,21 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package corba.evolve;
+import java.io.Serializable;
 
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
-import mymath.BigDecimal ;
-
-/**
- * Simple interface to send an Object and get it as a reply.  (Sometimes
- * replies fail even when requests don't.)
- */
-public interface UserNameVerifier extends java.rmi.Remote 
+public interface Descriptor extends Serializable, Cloneable
 {
-    public void verifyName(UserNameInt input)
-        throws RemoteException;
+    public Object getFieldValue(String fieldName) ;
 
-    public UserNameInt requestName() throws RemoteException;
+    public void setField(String fieldName, Object fieldValue) ;
 
-    public FeatureInfo getFeatureInfo() throws RemoteException ;
-
-    public boolean validateFeatureInfo( FeatureInfo info ) throws RemoteException ;
-
-    // public Object echo( Object obj ) throws RemoteException ;
-
-    public BigDecimal echo( BigDecimal obj ) throws RemoteException ;
-
-    public WithoutPrimitives echo( WithoutPrimitives obj ) throws RemoteException ;
+    public String[] getFields();
+    public String[] getFieldNames();
+    public Object[] getFieldValues(String... fieldNames);
+    public void removeField(String fieldName);
+    public void setFields(String[] fieldNames, Object[] fieldValues) ;
+    public Object clone() ;
+    public boolean isValid() ;
+    public boolean equals(Object obj);
+    public int hashCode();
 }

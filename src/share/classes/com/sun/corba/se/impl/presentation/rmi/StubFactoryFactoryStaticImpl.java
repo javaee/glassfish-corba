@@ -47,7 +47,7 @@ import com.sun.corba.se.impl.util.Utility;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 

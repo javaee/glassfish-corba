@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,45 +33,30 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.corba.se.spi.orbutil ;
 
-package com.sun.corba.se.impl.orbutil.codegen;
-
-import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
-
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-
-/** Class used to set and get the global class loader used
- * by the codegen library.  This is maintained in a ThreadLocal
- * to avoid concurrency problems.  All processing in the
- * codegen library takes place in the same thread in any case.
+/**
+ * Based on feedback from bug report 4452016, all class loading
+ * in the ORB is isolated here.  It is acceptable to use
+ * Class.forName only when one is certain that the desired class
+ * should come from the core JDK.
+ * <p>
+ * Note that this class must not depend on generated log wrappers! 
  */
-public class CurrentClassLoader {
-    private static ThreadLocal<ClassLoader> current = 
-	new ThreadLocal() {
-	    protected ClassLoader initialValue() {
-		return LibraryClassLoader.getClassLoader() ;
-	    }
-	} ;
-
-    public static ClassLoader get() {
-	return current.get() ;
+public class ORBClassLoader
+{
+    public static Class loadClass(String className) 
+        throws ClassNotFoundException
+    {
+        return getClassLoader().loadClass(className);
     }
 
-    public static void set( ClassLoader cl ) {
-	if (cl == null)
-	    cl = LibraryClassLoader.getClassLoader() ;
-	current.set( cl ) ;
-
-	// This is essential for propert operation of codegen when multiple
-	// ClassLoaders are in use.  The problem is that Type maintains a cache
-	// the maps class names to Types.  The same class name may of course refer
-	// to different classes in different ClassLoaders.  The Type interface
-	// supports access to ClassInfo, which in the case of a Type for a loaded
-	// class has a reflective implementation that includes all method and field
-	// information from the class.  Thus we can have the situation where the class
-	// name is mapped to a Type with ClassInfo from the wrong ClassLoader!
-	// See bug 6562360 and GlassFish issue 3134 for the app server impact of getting
-	// this wrong.
-	Type.clearCaches() ;
+    public static ClassLoader getClassLoader() 
+    {
+	ClassLoader ccl = Thread.currentThread().getContextClassLoader() ;
+        if (ccl != null)
+            return ccl; 
+        else
+            return ClassLoader.getSystemClassLoader();
     }
 }

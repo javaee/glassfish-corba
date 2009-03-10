@@ -72,7 +72,7 @@ import com.sun.corba.se.spi.orb.OperationFactoryExt ;
 import com.sun.corba.se.spi.orb.ParserData ;
 import com.sun.corba.se.spi.orb.ParserDataFactory ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;

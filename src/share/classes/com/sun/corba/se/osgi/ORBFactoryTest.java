@@ -44,6 +44,8 @@ import java.util.Properties ;
 
 import com.sun.corba.se.spi.orb.ORBFactory ;
 import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 
 public class ORBFactoryTest implements BundleActivator, ServiceListener {
     private ORB orb ;
@@ -53,7 +55,12 @@ public class ORBFactoryTest implements BundleActivator, ServiceListener {
         context.addServiceListener( this ) ;
         try {
             String[] args = {} ;
-            orb = ORBFactory.create( args, new Properties() ) ;
+            Properties props = new Properties() ;
+            props.setProperty( ORBConstants.RFM_PROPERTY, "dummy" ) ;
+            orb = ORBFactory.create( args, props ) ;
+            ReferenceFactoryManager rfm = 
+                (ReferenceFactoryManager)orb.resolve_initial_references(
+                    ORBConstants.REFERENCE_FACTORY_MANAGER ) ;
             System.out.println( "ORB successfully created" ) ;
         } catch (Exception exc) {
             exc.printStackTrace() ;

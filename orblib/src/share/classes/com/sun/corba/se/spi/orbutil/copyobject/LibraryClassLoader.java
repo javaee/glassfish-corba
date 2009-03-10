@@ -33,7 +33,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.orbutil.misc ;
+package com.sun.corba.se.spi.orbutil.copyobject ;
 
 /**
  * Based on feedback from bug report 4452016, all class loading
@@ -43,7 +43,7 @@ package com.sun.corba.se.spi.orbutil.misc ;
  * <p>
  * Note that this class must not depend on generated log wrappers! 
  */
-public class ORBClassLoader
+public class LibraryClassLoader
 {
     public static Class loadClass(String className) 
         throws ClassNotFoundException

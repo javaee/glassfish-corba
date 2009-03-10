@@ -114,7 +114,7 @@ import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.impl.io.ValueHandlerImpl;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;

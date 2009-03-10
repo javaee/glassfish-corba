@@ -170,7 +170,7 @@
         <property name="orb.groupId"                    value="com.sun.corba"/>
         <property name="maven.ant.file"                 value="maven-ant-tasks-2.0.9.jar"/>
         <property name="maven.ant.dir"                  value="http://apache.hoxt.com/maven/binaries"/>
-        <property name="repo.url"                       value="java-net:/maven2-repository/trunk/www/repository"/>
+        <property name="repo.url"                       value="java-net:/maven2-repository/trunk/repository"/>
         <property name="file.url"                       value="file:/tmp/maven"/>
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
 

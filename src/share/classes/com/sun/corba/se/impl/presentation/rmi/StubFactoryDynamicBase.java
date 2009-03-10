@@ -45,7 +45,7 @@ import com.sun.corba.se.spi.presentation.rmi.DynamicStub ;
 import com.sun.corba.se.spi.orbutil.proxy.InvocationHandlerFactory ;
 import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler ;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
 
 public abstract class StubFactoryDynamicBase extends StubFactoryBase  
 {

@@ -73,7 +73,7 @@ import corba.framework.TestCaseTools ;
 // import corba.framework.TimerUtils ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 import com.sun.corba.se.spi.orbutil.generic.Holder ;
 

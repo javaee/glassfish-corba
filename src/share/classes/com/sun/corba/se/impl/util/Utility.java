@@ -92,7 +92,7 @@ import com.sun.corba.se.impl.logging.UtilSystemException ;
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 

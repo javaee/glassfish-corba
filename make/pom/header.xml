@@ -56,8 +56,8 @@
     </organization>
     <licenses>
         <license>
-            <name>CDDL</name>
-            <url>https://glassfish.dev.java.net/public/CDDLv1.0.html</url>
+            <name>CDDL+GPL</name>
+            <url>https://glassfish.dev.java.net/public/CDDL+GPL.html</url>
         </license>
     </licenses>
     <issueManagement>

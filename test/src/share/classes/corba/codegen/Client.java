@@ -110,7 +110,7 @@ import static corba.codegen.ControlBase.moa ;
  * </UL>
  */
 public class Client extends TestCase {
-    private static final boolean DEBUG = false ;
+    private static final boolean DEBUG = true ;
 
     // Make sure that ControlBase is loaded in the ClassLoader
     // that loaded Client, otherwise it could first be
@@ -173,6 +173,26 @@ public class Client extends TestCase {
 	assertNotNull( cls ) ;
     }
 
+    public void testEJBRemoteGenerator() {
+        System.out.println( "Testing EJBRemote generator" ) ;
+	ClassGeneratorFactory factory = 
+	    ClassGeneratorFactoryRegistry.get( "corba.codegen.lib.Hello_Wrapper" ) ;
+
+	JavaCodeGenerator jgen = new JavaCodeGenerator( factory ) ;
+	ClassInfo jci = getClassInfo( jgen ) ;
+
+	ByteCodeGenerator bgen = new ByteCodeGenerator( factory, 
+	    GenerationTestSuiteBase.getByteCodeGenerationProperties( DEBUG )) ;
+	ClassInfo bci = getClassInfo( bgen ) ;
+
+	assertEquals( jci, bci ) ;
+
+        Class cls = bgen.generate( this.getClass().getClassLoader() ) ;
+
+        Constructor[] constructors = cls.getConstructors() ;
+        System.out.println( "Generated EJB adapter has " + constructors.length + " constructors" ) ;
+    }
+
     public void testConstantGeneration() {
 	ClassGeneratorFactory constantsFactory = 
 	    ClassGeneratorFactoryRegistry.get( "ConstantsImpl" ) ;
@@ -182,7 +202,7 @@ public class Client extends TestCase {
 	GenericClass<Constants> genClass = null ;
 
 	try {
-	    genClass = _generate( Constants.class, 
+            genClass = _generate( Constants.class,
 		GenerationTestSuiteBase.getByteCodeGenerationProperties( DEBUG )) ;
 	} catch (Exception exc) {
 	    fail( "Unexpected exception " + exc + " in _generate for Constants" ) ;

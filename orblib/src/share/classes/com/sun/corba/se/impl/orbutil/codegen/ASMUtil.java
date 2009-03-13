@@ -37,7 +37,6 @@
 package com.sun.corba.se.impl.orbutil.codegen;
 
 import java.util.Properties ;
-import java.util.List ;
 import java.util.HashSet ;
 import java.util.HashMap ;
 
@@ -47,22 +46,14 @@ import java.io.FileOutputStream ;
 import java.io.File ;
 
 import org.objectweb.asm.ClassWriter ;
+import org.objectweb.asm.ClassVisitor ;
+import org.objectweb.asm.MethodVisitor ;
+import org.objectweb.asm.ClassAdapter ;
+import org.objectweb.asm.MethodAdapter ;
 
 // Imports for verify method
 import org.objectweb.asm.ClassReader ;
-import org.objectweb.asm.Opcodes ;
-
-import org.objectweb.asm.tree.ClassNode ;
-import org.objectweb.asm.tree.MethodNode ;
-import org.objectweb.asm.tree.AbstractInsnNode ;
-
-import org.objectweb.asm.tree.analysis.Analyzer ;
-import org.objectweb.asm.tree.analysis.AnalyzerException ;
-import org.objectweb.asm.tree.analysis.SimpleVerifier ;
-import org.objectweb.asm.tree.analysis.Frame ;
-
 import org.objectweb.asm.util.CheckClassAdapter ;
-import org.objectweb.asm.util.TraceMethodVisitor ;
 // end of verify method imports
 
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
@@ -72,6 +63,7 @@ import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.Wrapper ;
+import java.io.PrintWriter;
 
 // import com.sun.corba.se.impl.orbutil.codegen.constantpool.ConstantPool ;
 
@@ -166,6 +158,39 @@ public class ASMUtil {
     }
 */
 
+    private static class FixStackSizeClassVisitor extends ClassAdapter {
+        public FixStackSizeClassVisitor( final ClassVisitor cv ) {
+            super( cv ) ;
+        }
+
+        public MethodVisitor visitMethod( final int access, final String name,
+            final String desc, final String signature, final String[] exceptions ) {
+            MethodVisitor mv = cv.visitMethod( access, name, desc, signature, exceptions ) ;
+            return mv == null ? null : new FixStackSizeMethodVisitor( mv ) ;
+        }
+    }
+
+    private static class FixStackSizeMethodVisitor extends MethodAdapter {
+        public FixStackSizeMethodVisitor( final MethodVisitor mv ) {
+            super( mv ) ;
+        }
+
+        public void visitMaxs( int maxStack, int maxLocals ) {
+            // Make ASM calculate the stack size
+            mv.visitMaxs( 0, 0 ) ;
+        }
+    }
+
+    private static byte[] fixStackSize( byte[] code ) {
+        // Debugging code: try to read/write it again to see what happens with
+        // max stack size
+        ClassReader cr = new ClassReader( code );
+        ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_MAXS ) ;
+        ClassVisitor visitor = new FixStackSizeClassVisitor( cw ) ;
+        cr.accept( visitor, 0 ) ;
+        return cw.toByteArray() ;
+    }
+
     /** Given a completed ClassGeneratorImpl, use ASM to construct
      * the byte array representing the compiled class.
      */
@@ -226,7 +251,7 @@ public class ASMUtil {
 	    debugOutput ) ;
 	cg.accept( v2 ) ;
 
-	byte[] result = cw.toByteArray() ;
+	byte[] result = fixStackSize( cw.toByteArray() ) ;
 
 	if (dumpConstantPool) {
 	    // readConstantPool( debugOutput, result ) ;
@@ -261,62 +286,11 @@ public class ASMUtil {
 	return result ;
     }
 
-    // Adapted from org.objectweb.asm.util.CheckClassAdapter.main,
-    // which contains the needed code, but for some reason does NOT
-    // expose the code, except by reading a file.  We don't want
-    // or need file system overhead here.
     private static void verify( final PrintStream ps, byte[] classData ) {
 	ClassReader cr = new ClassReader( classData ) ;
-
-	ClassNode cn = new ClassNode();
-	cr.accept(new CheckClassAdapter(cn), ClassReader.EXPAND_FRAMES );
-
-	List methods = cn.methods;
-	for (int i = 0; i < methods.size(); ++i) {
-	    MethodNode method = (MethodNode)methods.get(i);
-	    if (method.instructions.size() > 0) {
-		Analyzer a = new Analyzer(
-		    new SimpleVerifier(
-			org.objectweb.asm.Type.getType("L" + cn.name + ";"), 
-			org.objectweb.asm.Type.getType("L" + cn.superName + ";"), 
-			(cn.access & Opcodes.ACC_INTERFACE) != 0));
-
-		try {
-		    a.analyze(cn.name, method);
-		    continue;
-		} catch (AnalyzerException ae) {
-		    ps.println( "Possible problem detected while verifying " 
-			+ cn.name + "." + method.name + ": " + ae ) ;
-		    // Too much information in app server log: e.printStackTrace();
-		}
-
-		final Frame[] frames = a.getFrames();
-
-		ps.println(method.name + method.desc);
-		TraceMethodVisitor mv = new TraceMethodVisitor() {
-                    @Override
-		    public void visitMaxs (final int maxStack, final int maxLocals) {
-			for (int i = 0; i < text.size(); ++i) {
-			    String s = frames[i] == null ? "null" : frames[i].toString();
-			    while (s.length() < maxStack+maxLocals+1) {
-				s += " ";
-			    }
-
-			    ps.print( Integer.toString(i + 100000).substring(1) 
-				+ " " + s + " : " + text.get(i));
-			}
-
-			ps.println();
-		    }
-		};
-
-		for (int j = 0; j < method.instructions.size(); ++j) {
-		    ((AbstractInsnNode)method.instructions.get(j)).accept(mv);
-		}
-
-		mv.visitMaxs(method.maxStack, method.maxLocals);
-	    }
-	}
+        PrintWriter pw = new PrintWriter( ps ) ;
+        CheckClassAdapter.verify( cr, true, pw ) ;
+        // pw.close();
     }
 
     // Function used to initialize Attribute<MyLabel> instances.

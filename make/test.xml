@@ -86,6 +86,7 @@
     </sequential>
 </macrodef>
 
+
 <!-- Macro used to run junit tests directly. -->
 <macrodef name="run-junit-test">
     <element name="test-cases" optional="no"/>
@@ -180,7 +181,7 @@
 </target>
 
 <target name="clean-test-output">
-    <delete dir="${test.output}" quiet="true"/>
+    <delete dir="${test.output}" quiet="false"/>
 </target>
 
 <target name="test-rmi-iiop" depends="test-init">

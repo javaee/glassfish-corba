@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,49 +33,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package corba.codegen.lib ;
 
-package corba.codegen ;
+import java.rmi.Remote ;
+import java.rmi.RemoteException ;
 
-import java.util.Map ;
-import java.util.HashMap ;
+public interface HelloRemote extends Remote {
 
-// Import all of the code generators that implement ClassGeneratorFactory here.
-// These are used in the tests.
-// Every ClassGeneratorFactory must be imported here and registered below.
-import corba.codegen.test.MyRemote__Adapter_gen ;
-import corba.codegen.test.MyRemote__Adapter_Simplified_gen ;
-import corba.codegen.test.MyRemote_gen ;
-import corba.codegen.test._DImpl_Tie_gen ;
-import corba.codegen.test.Flow_gen ;
-import corba.codegen.test.Constants_gen ;
-import corba.codegen.test.DefaultPackageTest_gen ;
-import corba.codegen.test.EJBRemote_gen ;
-
-/** Registry that contains instances of all of the test class generators
- * used in this test.
- */
-public abstract class ClassGeneratorFactoryRegistry {
-    private ClassGeneratorFactoryRegistry() {}
-    
-    private static Map<String,ClassGeneratorFactory> map =
-	new HashMap<String,ClassGeneratorFactory>() ;
-
-    static {
-	register( new MyRemote_gen() ) ;
-	register( new MyRemote__Adapter_gen() ) ;
-	register( new MyRemote__Adapter_Simplified_gen() ) ;
-	register( new _DImpl_Tie_gen() ) ;
-	register( new Flow_gen() ) ;
-	register( new Constants_gen() ) ;
-	register( new DefaultPackageTest_gen() ) ;
-	register( new EJBRemote_gen() ) ;
-    }
-
-    private static void register( ClassGeneratorFactory tcg ) {
-	map.put( tcg.className(), tcg ) ;
-    }
-
-    public static ClassGeneratorFactory get( String name ) {
-	return map.get( name ) ;
-    }
+    void hello() throws RemoteException ;
 }
+

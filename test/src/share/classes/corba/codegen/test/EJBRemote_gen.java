@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,6 +37,9 @@ package corba.codegen.test ;
 
 import corba.codegen.ClassGeneratorFactory ;
 
+import corba.codegen.lib.Hello ;
+import corba.codegen.lib.HelloRemote ;
+
 import java.lang.reflect.Method;
 import java.io.*;
 import java.util.*;
@@ -57,8 +60,6 @@ public class EJBRemote_gen
     private String remoteClientPackageName;
     private String remoteClientSimpleName;
     private Method[] bizMethods;
-
-    private ClassLoader loader;
 
     public String getGeneratedClass() {
         return remoteClientClassName;
@@ -83,27 +84,26 @@ public class EJBRemote_gen
         return className.substring(dot+1);
     }
 
+    public EJBRemote_gen( ) {
+        this( Hello.class.getName(), HelloRemote.class.getName() ) ; 
+    }
+
     /**
      * Construct the Wrapper generator with the specified deployment
-     * descriptor and class loader.
+     * descriptor.
      */
-    public EJBRemote_gen(ClassLoader cl, String businessIntfName, String remoteIntfName)
-    {
-	    super();
-
+    protected EJBRemote_gen( String businessIntfName, String remoteIntfName) {
         remoteInterfaceName = remoteIntfName;
 
-        loader = cl;
-
-	    try {
-	        this.businessInterface = cl.loadClass(businessIntfName);
-	    } catch (ClassNotFoundException ex) {
-                throw new RuntimeException( businessIntfName + " not found " ) ;
-	        // throw new InvalidBean(
-		    // localStrings.getLocalString(
-		    // "generator.remote_interface_not_found",
-		    // "Business interface " + businessInterface + " not found "));
-	    }
+        try {
+            this.businessInterface = getClass().getClassLoader().loadClass(businessIntfName);
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException( businessIntfName + " not found " ) ;
+            // throw new InvalidBean(
+                // localStrings.getLocalString(
+                // "generator.remote_interface_not_found",
+                // "Business interface " + businessInterface + " not found "));
+        }
 
         if( javax.ejb.EJBObject.class.isAssignableFrom(businessInterface) ) {
             throw new RuntimeException("Invalid Remote Business Interface " +
@@ -156,6 +156,7 @@ public class EJBRemote_gen
 
         _end();
 
+        /* Not needed for test
         try {
             java.util.Properties p = new java.util.Properties();
             p.put("Wrapper.DUMP_AFTER_SETUP_VISITOR", "true");
@@ -166,6 +167,7 @@ public class EJBRemote_gen
             System.out.println("Got exception when generating byte code");
             e.printStackTrace();
         }
+        */
 
         return _classGenerator() ;
     }
@@ -244,7 +246,7 @@ public class EJBRemote_gen
                                  _t("java.lang.Throwable")), 
                               _v("nsoe")));
                 _throw(_v("r"));
-
+/* This exception apparently is never thrown, so let's comment it out for now
             _catch(_t("com.sun.ejb.containers.InternalEJBContainerException"),
                    "iejbcEx");
             // There's only one kind of InternalEJBContainerException, so
@@ -259,7 +261,7 @@ public class EJBRemote_gen
                 _expr(_call(_v("r"), "initCause", _s(_t("java.lang.Throwable"),
                         _t("java.lang.Throwable")), _v("paEx")));
                 _throw(_v("r"));
-
+*/
             _catch( _t("java.rmi.RemoteException"), "re");
             
                 _throw( _new( _t("javax.ejb.EJBException"), 

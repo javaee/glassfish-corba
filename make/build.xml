@@ -97,6 +97,8 @@
         <property name="jschemelogutil-jar"		value="${root.dir}/lib/jschemelogutil.jar"/>
         <property name="javatest-jar"		        value="${root.dir}/lib/javatest.jar"/>
         <property name="ejb-jar"			value="${root.dir}/lib/ejb-2_1-api.jar"/>
+        <property name="ejb3-jar"			value="${root.dir}/lib/javax.ejb.jar"/>
+        <property name="ejbcontainer-jar"		value="${root.dir}/lib/ejb-container.jar"/>
         <property name="junit-jar"			value="${root.dir}/lib/ant-junit.jar"/>
         <property name="ant-junit-jar"		        value="${root.dir}/lib/junit.jar"/>
         <property name="jmxri-jar"			value="${root.dir}/lib/jmxri.jar"/>
@@ -133,10 +135,10 @@
         <property name="experimentaltestclasses.dir"	value="experimental/test/build/classes"/>
 
         <!-- ORB Test directories -->
-        <property name="test.run.base"                  value="test/run"/>
+        <property name="test.run.base"                  value="${root.dir}/test/run"/>
         <property name="test.output"		        value="${test.run.base}/gen"/>
         <property name="junit.reports"		        value="${test.run.base}/junitreports"/>
-	<property name="test-build.dir"                 location="test/build"/>
+	<property name="test-build.dir"                 location="${root.dir}/test/build"/>
 	<property name="test-classes.dir"               location="${test-build.dir}/classes"/>
 	<property name="test-values1.dir"               location="${test-build.dir}/values1/classes"/>
 	<property name="test-values2.dir"               location="${test-build.dir}/values2/classes"/>
@@ -190,7 +192,9 @@
 	    <pathelement location="${jschemelogutil-jar}"/>
 	    <pathelement location="${ant-junit-jar}"/>
 	    <pathelement location="${junit-jar}"/>
+	    <pathelement location="${ejb3-jar}"/>
 	    <pathelement location="${ejb-jar}"/>
+	    <pathelement location="${ejbcontainer-jar}"/>
 	    <pathelement location="${testng-jar}"/>
 	    <pathelement location="${japex-jar}"/>
 	    <pathelement location="${test-classes.dir}"/>
@@ -839,6 +843,7 @@
         <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
         <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
         <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
+
         <make-bundle classpath="${classes.dir}" file="osgi-test"/>
     </target>
 

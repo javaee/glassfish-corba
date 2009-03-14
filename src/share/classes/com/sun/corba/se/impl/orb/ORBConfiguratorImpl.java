@@ -124,6 +124,12 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
     private ORBUtilSystemException wrapper ;
 
     public static class ConfigParser extends ParserImplBase {
+        private ORB orb ;
+
+        public ConfigParser( ORB orb ) {
+            this.orb = orb ;
+        } ;
+
 	public Class[] userConfigurators = null ;
 
 	public PropertyParser makeParser()
@@ -131,7 +137,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    PropertyParser parser = new PropertyParser() ;
 	    Operation action = OperationFactory.compose( 
 		OperationFactory.suffixAction(),
-		OperationFactory.classAction() 
+		OperationFactory.classAction( orb.classNameResolver() )
 	    ) ;
 	    parser.addPrefix( ORBConstants.USER_CONFIGURATOR_PREFIX, action, 
 		"userConfigurators", Class.class ) ;
@@ -171,7 +177,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	// Run any pluggable configurators.  This is a lot like 
 	// ORBInitializers, only it uses the internal ORB and has
 	// access to all data for parsing.  
-	ConfigParser parser = new ConfigParser()  ;
+	ConfigParser parser = new ConfigParser( orb )  ;
 	parser.init( collector ) ;
 	if (parser.userConfigurators != null) {
 	    for (int ctr=0; ctr<parser.userConfigurators.length; ctr++) {

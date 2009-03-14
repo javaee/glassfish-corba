@@ -478,7 +478,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     // Class that defines a parser that gets the name of the
     // ORBConfigurator class.
-    private static class ConfigParser extends ParserImplBase {
+    private class ConfigParser extends ParserImplBase {
 	// The default here is the ORBConfiguratorImpl that we define,
 	// but this can be replaced.
 	public Class configurator = ORBConfiguratorImpl.class ;
@@ -487,7 +487,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	{
 	    PropertyParser parser = new PropertyParser() ;
 	    parser.add( ORBConstants.SUN_PREFIX + "ORBConfigurator",
-		OperationFactory.classAction(), "configurator" ) ;
+		OperationFactory.classAction( classNameResolver() ),
+                "configurator" ) ;
 	    return parser ;
 	}
     }

@@ -39,7 +39,6 @@ package com.sun.corba.se.spi.orb;
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.Properties ;
-import java.util.WeakHashMap;
 
 import java.util.logging.Logger ;
 
@@ -58,13 +57,11 @@ import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory ;
 import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator ;
 import com.sun.corba.se.spi.protocol.PIHandler ;
 import com.sun.corba.se.spi.resolver.LocalResolver ;
 import com.sun.corba.se.spi.resolver.Resolver ;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory ;
 import com.sun.corba.se.spi.monitoring.MonitoringManager ;
-import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 
 import com.sun.corba.se.spi.ior.IdentifiableFactoryFinder ;
@@ -76,13 +73,6 @@ import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.TaggedProfile ;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
-import com.sun.corba.se.spi.orbutil.closure.Closure ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-
-import com.sun.corba.se.spi.orb.Operation ;
-import com.sun.corba.se.spi.orb.ORBData ;
-import com.sun.corba.se.spi.orb.ORBVersion ;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
@@ -129,8 +119,9 @@ import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.logging.LogWrapperTable ;
 import com.sun.corba.se.impl.logging.LogWrapperTableImpl ;
 import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
+import com.sun.corba.se.impl.orbutil.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
-import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
 
 public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     implements Broker, TypeCodeFactory
@@ -624,6 +615,25 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      */
     public boolean orbIsShutdown() {
         return true ;
+    }
+
+    private UnaryFunction<String,Class<?>> classNameResolver =
+        new UnaryFunction<String,Class<?>>() {
+            public Class<?> evaluate( String name ) {
+                try {
+                    return ORBClassLoader.getClassLoader().loadClass( name ) ;
+                } catch (ClassNotFoundException exc) {
+                    throw new RuntimeException( exc ) ;
+                }
+            }
+        } ;
+
+    public UnaryFunction<String,Class<?>> classNameResolver() {
+        return classNameResolver ;
+    }
+
+    public void classNameResolver( UnaryFunction<String,Class<?>> arg ) {
+        classNameResolver = arg ;
     }
 }
 

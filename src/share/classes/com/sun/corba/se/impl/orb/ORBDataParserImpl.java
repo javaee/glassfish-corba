@@ -476,7 +476,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public ORBDataParserImpl( ORB orb, DataCollector coll )
     {
-	super( ParserTable.get().getParserData() ) ;
+	super( ParserTable.get( orb ).getParserData() ) ;
 	this.orb = orb ;
 	wrapper = orb.getLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
 	init( coll ) ;

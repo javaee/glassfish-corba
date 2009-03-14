@@ -110,10 +110,16 @@ public class ParserTable {
 
     private ORBUtilSystemException wrapper ;
 
-    public static ParserTable get()
+    private Operation classAction ;
+
+    private ParserTable( ORB orb ) {
+        classAction = OperationFactory.classAction( orb.classNameResolver() ) ;
+    }
+
+    public static ParserTable get( ORB orb )
     {
 	// return myInstance ;
-        return new ParserTable() ;
+        return new ParserTable( orb ) ;
     }
 
     private ParserData[] parserData ;
@@ -357,7 +363,7 @@ public class ParserTable {
 		"serverIsORBActivated", Boolean.FALSE,
 		Boolean.TRUE, "true" ),
 	    ParserDataFactory.make( ORBConstants.BAD_SERVER_ID_HANDLER_CLASS_PROPERTY,  
-		OperationFactory.classAction(), 
+                classAction,
 		"badServerIdHandlerClass", null,
 		TestBadServerIdHandler.class, MY_CLASS_NAME + "$TestBadServerIdHandler" ),
 	    ParserDataFactory.make( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX,  
@@ -667,7 +673,7 @@ public class ParserTable {
 
 		try {
 		    Class legacySocketFactoryClass =
-			ORBClassLoader.loadClass(param);
+                        (Class)classAction.operate(param) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -697,7 +703,8 @@ public class ParserTable {
 		String param = (String)value ;
 
 		try {
-		    Class socketFactoryClass = ORBClassLoader.loadClass(param);
+		    Class socketFactoryClass =
+                        (Class)classAction.operate(param ) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -727,7 +734,8 @@ public class ParserTable {
 		String param = (String)value ;
 
 		try {
-		    Class iorToSocketInfoClass = ORBClassLoader.loadClass(param);
+		    Class iorToSocketInfoClass =
+                        (Class)classAction.operate(param ) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -756,7 +764,8 @@ public class ParserTable {
 		String param = (String)value ;
 
 		try {
-		    Class iiopPrimaryToContactInfoClass = ORBClassLoader.loadClass(param);
+		    Class iiopPrimaryToContactInfoClass =
+                        (Class)classAction.operate(param ) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -788,7 +797,7 @@ public class ParserTable {
 
 		try {
 		    Class contactInfoListFactoryClass =
-			ORBClassLoader.loadClass(param);
+                        (Class)classAction.operate(param ) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -923,9 +932,8 @@ public class ParserTable {
     }
 
     private Operation makeROIOperation() {
-	Operation clsop = OperationFactory.classAction() ;
 	Operation indexOp = OperationFactory.suffixAction() ;
-	Operation op1 = OperationFactory.compose( indexOp, clsop ) ;
+	Operation op1 = OperationFactory.compose( indexOp, classAction ) ;
 	Operation mop = OperationFactory.maskErrorAction( op1 ) ;
 
 	Operation mkinst = new Operation() {
@@ -1032,9 +1040,8 @@ public class ParserTable {
 
     // REVISIT - this is a cut and paste modification of makeROIOperation.
     private Operation makeAcceptorInstantiationOperation() {
-	Operation clsop = OperationFactory.classAction() ;
 	Operation indexOp = OperationFactory.suffixAction() ;
-	Operation op1 = OperationFactory.compose( indexOp, clsop ) ;
+	Operation op1 = OperationFactory.compose( indexOp, classAction ) ;
 	Operation mop = OperationFactory.maskErrorAction( op1 ) ;
 
 	Operation mkinst = new Operation() {

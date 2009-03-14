@@ -33,7 +33,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.osgi ;
+package com.sun.corba.se.impl.osgi.main ;
 
 import org.osgi.framework.BundleActivator ;
 import org.osgi.framework.ServiceListener ;
@@ -42,7 +42,7 @@ import org.osgi.framework.ServiceEvent ;
 
 import java.util.Properties ;
 
-import com.sun.corba.se.spi.orb.ORBFactory ;
+import com.sun.corba.se.spi.osgi.ORBFactory ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;

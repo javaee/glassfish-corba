@@ -34,8 +34,9 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orb;
+package com.sun.corba.se.spi.osgi;
 
+import com.sun.corba.se.spi.orb.ORB;
 import java.util.Properties ;
 
 import com.sun.corba.se.impl.orb.ORBImpl ;

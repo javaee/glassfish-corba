@@ -36,6 +36,7 @@
 package com.sun.corba.se.impl.osgi.loader ;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -67,6 +68,8 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     private static Map<String,Bundle> classNameMap =
         new HashMap<String,Bundle>() ;
 
+    private static final boolean DEBUG = Boolean.getBoolean( ORBConstants.DEBUG_OSGI_LISTENER ) ;
+
     private static synchronized void mapContents() {
         if (DEBUG) {
             msg( "Contents of classNameMap:" ) ;
@@ -76,8 +79,6 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             }
         }
     }
-
-    private static final boolean DEBUG = false ;
 
     private static void msg( String arg ) {
         ClassLoader cl = OSGIListener.class.getClassLoader() ;

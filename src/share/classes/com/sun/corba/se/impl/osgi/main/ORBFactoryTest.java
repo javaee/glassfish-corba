@@ -36,8 +36,9 @@
 package com.sun.corba.se.impl.osgi.main ;
 
 import org.osgi.framework.BundleActivator ;
-import org.osgi.framework.ServiceListener ;
+import org.osgi.framework.BundleEvent ;
 import org.osgi.framework.BundleContext ;
+import org.osgi.framework.SynchronousBundleListener ;
 import org.osgi.framework.ServiceEvent ;
 
 import java.util.Properties ;
@@ -47,51 +48,78 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 
-public class ORBFactoryTest implements BundleActivator, ServiceListener {
-    private ORB orb ;
+public class ORBFactoryTest implements BundleActivator, SynchronousBundleListener {
+    private ORB orb = null ;
+    
+    private static String getBundleEventType( int type ) {
+        if (type == BundleEvent.INSTALLED) 
+            return "INSTALLED" ;
+        else if (type == BundleEvent.LAZY_ACTIVATION)
+            return "LAZY_ACTIVATION" ;
+        else if (type == BundleEvent.RESOLVED)
+            return "RESOLVED" ;
+        else if (type == BundleEvent.STARTED)
+            return "STARTED" ;
+        else if (type == BundleEvent.STARTING)
+            return "STARTING" ;
+        else if (type == BundleEvent.STOPPED)
+            return "STOPPED" ;
+        else if (type == BundleEvent.STOPPING)
+            return "STOPPING" ;
+        else if (type == BundleEvent.UNINSTALLED)
+            return "UNINSTALLED" ;
+        else if (type == BundleEvent.UNRESOLVED)
+            return "UNRESOLVED" ;
+        else if (type == BundleEvent.UPDATED)
+            return "UPDATED" ;
+        else 
+            return "ILLEGAL-EVENT-TYPE" ;
+    }
+
+    private static void msg( String arg ) {
+        System.out.println( "ORBFactoryTest: " + arg ) ;
+    }
 
     public void start( BundleContext context ) {
-        System.out.println( "Starting ORBFactoryTest" ) ;
-        context.addServiceListener( this ) ;
-        try {
-            String[] args = {} ;
-            Properties props = new Properties() ;
-            props.setProperty( ORBConstants.RFM_PROPERTY, "dummy" ) ;
-            orb = ORBFactory.create( args, props ) ;
-            ReferenceFactoryManager rfm = 
-                (ReferenceFactoryManager)orb.resolve_initial_references(
-                    ORBConstants.REFERENCE_FACTORY_MANAGER ) ;
-            System.out.println( "ORB successfully created" ) ;
-        } catch (Exception exc) {
-            exc.printStackTrace() ;
-        }
+        msg( "Starting ORBFactoryTest" ) ;
+        context.addBundleListener( this ) ;
     }
 
     public void stop( BundleContext context ) {
-        System.out.println( "Stopping ORBFactoryTest" ) ;
-        orb.destroy() ;
-        System.out.println( "ORB destroyed" ) ;
-        context.removeServiceListener( this ) ;
+        msg( "Stopping ORBFactoryTest" ) ;
+        context.removeBundleListener( this ) ;
     }
 
-    /**
-     * Implements ServiceListener.serviceChangedi().
-     * Prints the details of any service event from the framework.
-     * @param event the fired service event.
-    **/
-    public void serviceChanged(ServiceEvent event) {
-        String[] objectClass = (String[])
-            event.getServiceReference().getProperty("objectClass");
+    public void bundleChanged(BundleEvent event) {
+        int type = event.getType() ;
+        String name = event.getBundle().getSymbolicName() ;
 
-        if (event.getType() == ServiceEvent.REGISTERED) {
-            System.out.println(
-                "Ex1: Service of type " + objectClass[0] + " registered.");
-        } else if (event.getType() == ServiceEvent.UNREGISTERING) {
-            System.out.println(
-                "Ex1: Service of type " + objectClass[0] + " unregistered.");
-        } else if (event.getType() == ServiceEvent.MODIFIED) {
-            System.out.println(
-                "Ex1: Service of type " + objectClass[0] + " modified.");
+        msg( "Received event type " 
+            + getBundleEventType( type ) + " for bundle " + name ) ;
+
+        // Only want to know when this bundle changes state, not the others.
+        if (!name.equals( "glassfish-corba-osgi-test" )) {
+            return ;
+        }
+
+        if ((type & (BundleEvent.STARTED | BundleEvent.STARTING)) != 0) {
+            try {
+                String[] args = {} ;
+                Properties props = new Properties() ;
+                props.setProperty( ORBConstants.RFM_PROPERTY, "dummy" ) ;
+                orb = ORBFactory.create( args, props, true ) ;
+                ReferenceFactoryManager rfm = 
+                    (ReferenceFactoryManager)orb.resolve_initial_references(
+                        ORBConstants.REFERENCE_FACTORY_MANAGER ) ;
+                msg( "ORB successfully created" ) ;
+            } catch (Exception exc) {
+                exc.printStackTrace() ;
+            }
+        } else if ((type & (BundleEvent.STOPPED | BundleEvent.STOPPING)) != 0) {
+            if (orb != null) {
+                orb.destroy() ;
+            }
+            msg( "ORB destroyed" ) ;
         }
     }
 }

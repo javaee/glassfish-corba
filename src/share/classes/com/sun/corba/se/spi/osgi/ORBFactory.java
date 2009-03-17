@@ -36,10 +36,11 @@
 
 package com.sun.corba.se.spi.osgi;
 
-import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.orb.*;
 import java.util.Properties ;
 
 import com.sun.corba.se.impl.orb.ORBImpl ;
+import com.sun.corba.se.impl.osgi.loader.OSGIListener;
 
 /** A simple factory for creating our ORB that avoids the ClassLoader
  * problems with org.omg.CORBA.ORB.init, which must load the ORB impl class.
@@ -49,8 +50,19 @@ import com.sun.corba.se.impl.orb.ORBImpl ;
 public class ORBFactory {   
     private ORBFactory() {} 
 
-    public static ORB create( String[] args, Properties props ) {
+    @SuppressWarnings("static-access")
+    public static ORB create( String[] args, Properties props, boolean useOSGi ) {
         ORB result = new ORBImpl() ;
+        if (useOSGi) {
+            result.classNameResolver(
+                result.makeCompositeClassNameResolver(
+                    OSGIListener.classNameResolver(),
+                    result.defaultClassNameResolver()
+                ) );
+
+            // System.out.println( "ORB ClassNameResolver= " + result.classNameResolver() ) ;
+        }
+
         result.setParameters( args, props ) ;
         return result ;
     }

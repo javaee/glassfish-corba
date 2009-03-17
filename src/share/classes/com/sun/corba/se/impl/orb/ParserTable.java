@@ -93,6 +93,7 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.ReferenceAddr ;
 import com.sun.corba.se.impl.transport.DefaultIORToSocketInfoImpl;
 import com.sun.corba.se.impl.transport.DefaultSocketFactoryImpl;
 import com.sun.corba.se.impl.transport.TcpTimeoutsImpl;
+import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 /** Initialize the parser data for the standard ORB parser.  This is used both
  * to implement ORBDataParserImpl and to provide the basic testing framework
@@ -112,14 +113,10 @@ public class ParserTable {
 
     private Operation classAction ;
 
-    private ParserTable( ORB orb ) {
-        classAction = OperationFactory.classAction( orb.classNameResolver() ) ;
-    }
-
-    public static ParserTable get( ORB orb )
+    public static ParserTable get( UnaryFunction<String,Class<?>> cnr )
     {
 	// return myInstance ;
-        return new ParserTable( orb ) ;
+        return new ParserTable( cnr ) ;
     }
 
     private ParserData[] parserData ;
@@ -129,7 +126,9 @@ public class ParserTable {
 	return parserData ;
     }
 
-    private ParserTable() {
+    private ParserTable( UnaryFunction<String,Class<?>> cnr ) {
+        classAction = OperationFactory.classAction( cnr ) ;
+
 	wrapper = ORB.getStaticLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
 
 	String codeSetTestString = 

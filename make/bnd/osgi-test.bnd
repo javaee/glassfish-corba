@@ -1,3 +1,0 @@
--include bnd.properties
-Bundle-Activator: com.sun.corba.se.osgi.ORBFactoryTest
-Private-Package: com.sun.corba.se.osgi.*

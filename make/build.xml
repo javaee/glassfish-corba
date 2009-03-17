@@ -77,7 +77,7 @@
 
 
     <!-- =================== START HERE =================================== -->
-    <target name="build" depends="init, prepare-dirs, compile, create-jars"/>
+    <target name="build" depends="init, prepare-dirs, compile"/>
 
     <target name="init">
         <property file="make/build.properties"/>
@@ -257,7 +257,6 @@
 	    <include name="com/sun/corba/se/impl/**"/>
 	    <include name="com/sun/corba/se/impl/**"/>
 	    <include name="com/sun/corba/se/tool/**"/>
-	    <include name="com/sun/corba/se/osgi/**"/>
 	    <include name="sun/corba/**"/>
 	    <include name="sun/rmi/rmic/**"/>
 	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
@@ -777,7 +776,7 @@
                     <arg value="@{classpath}"/>
                     <arg value="-output"/>
                     <arg value="${releaselib.dir}/bundles/${bundle.name.prefix}@{file}.jar"/>
-                    <arg value="make/bnd/@{file}.bnd"/>
+                    <arg value="make/bnd/glassfish-corba-@{file}.bnd"/>
                 </java>
             </sequential>
     </macrodef>

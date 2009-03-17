@@ -119,7 +119,7 @@ import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.logging.LogWrapperTable ;
 import com.sun.corba.se.impl.logging.LogWrapperTableImpl ;
 import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
-import com.sun.corba.se.impl.orbutil.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 
@@ -617,7 +617,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         return true ;
     }
 
-    private UnaryFunction<String,Class<?>> classNameResolver =
+    private static UnaryFunction<String,Class<?>> classNameResolver =
         new UnaryFunction<String,Class<?>>() {
             public Class<?> evaluate( String name ) {
                 try {
@@ -626,7 +626,35 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
                     throw new RuntimeException( exc ) ;
                 }
             }
+
+            public String toString() {
+                return "ORBClassNameResolver" ;
+            }
         } ;
+
+    public static UnaryFunction<String,Class<?>> defaultClassNameResolver() {
+        return classNameResolver ;
+    }
+
+    public UnaryFunction<String,Class<?>> makeCompositeClassNameResolver(
+        final UnaryFunction<String,Class<?>> first,
+        final UnaryFunction<String,Class<?>> second ) {
+
+        return new UnaryFunction<String,Class<?>>() {
+            public Class<?> evaluate( String className ) {
+                Class<?> result = first.evaluate( className ) ;
+                if (result == null) {
+                    return second.evaluate( className ) ;
+                } else {
+                    return result ;
+                }
+            }
+
+            public String toString() {
+                return "CompositeClassNameResolver[" + first + "," + second + "]" ;
+            }
+        } ;
+    }
 
     public UnaryFunction<String,Class<?>> classNameResolver() {
         return classNameResolver ;

@@ -74,13 +74,18 @@ public class ListenerThreadImpl
 	return acceptor;
     }
 
-    public void close()
+    public synchronized void close()
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".close: " + acceptor);
 	}
 
 	keepRunning = false;
+        acceptor.close() ;
+    }
+
+    private synchronized boolean isRunning() {
+        return keepRunning ;
     }
 
     ////////////////////////////////////////////////////
@@ -96,7 +101,7 @@ public class ListenerThreadImpl
 	    if (orb.transportDebugFlag) {
 		dprint(".doWork: Start ListenerThread: " + acceptor);
 	    }
-	    while (keepRunning) {
+	    while (isRunning()) {
 		try {
 		    if (orb.transportDebugFlag) {
 			dprint(".doWork: BEFORE ACCEPT CYCLE: " + acceptor);

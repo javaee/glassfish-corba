@@ -74,13 +74,18 @@ public class ReaderThreadImpl
 	return connection;
     }
 
-    public void close()
+    public synchronized void close()
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".close: " + connection);
 	}
 
 	keepRunning = false;
+        connection.close() ;
+    }
+
+    private synchronized boolean isRunning() {
+        return keepRunning ;
     }
 
     ////////////////////////////////////////////////////
@@ -95,7 +100,7 @@ public class ReaderThreadImpl
 	    if (orb.transportDebugFlag) {
 		dprint(".doWork: Start ReaderThread: " + connection);
 	    }
-	    while (keepRunning) {
+	    while (isRunning()) {
 		try {
 
 		    if (orb.transportDebugFlag) {

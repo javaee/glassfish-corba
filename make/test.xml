@@ -169,7 +169,7 @@
 
 <target name="test" depends="test-init, build-tests, test-all"/>
 
-<target name="test-all" depends="test-init, clean-test-output, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
+<target name="test-all" depends="init, clean-test-output, test-init, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
 
 <target name="archive-test-results" depends="test-init">
     <jar jarfile="${releaselib.dir}/test-results.jar">

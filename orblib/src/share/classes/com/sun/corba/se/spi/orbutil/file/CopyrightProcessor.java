@@ -93,25 +93,41 @@ public class CopyrightProcessor {
     private static boolean validate ;
     private static int verbose ;
 
+    // File processing configuration:
+    // Class:
+    //  JAVA
+    //  XML
+    //  JAVA_LINE
+    //  SCHEME
+    //  SHELL
+    //  SHELL_SCRIPT
+    //  IGNORE
+    // Each class has suffixes and file names
+    // Specified in a property file:
+    // cptool.<CLASS>.suffixes is a comma separated list (no spaces) of filename suffixes
+    // cptool.<CLASS>.filenames is a comma separated list of specific filenames
+
+    String[] PROCESSING_CLASS_NAMES = {
+        "JAVA", "XML", "JAVA_LINE", "SCHEME", "SHELL", "SHELL_SCRIPT", "IGNORE" } ;
+
+    /*
+    Map<String,Scanner.Action> actionMap ;
+    Map<String,List<String>> suffixMap ;
+    Map<String,List<String>> fileNameMap ;
+    */
+
+
     private static final String[] JAVA_LIKE_SUFFIXES = {
 	"c", "h", "java", "sjava", "idl" } ;
-    private static final String JAVA_COMMENT_START = "/*" ;
-    private static final String JAVA_COMMENT_PREFIX = " *" ;
-    private static final String JAVA_COMMENT_END = "*/" ; 
 
     private static final String[] XML_LIKE_SUFFIXES = {
 	"htm", "html", "xml", "dtd" } ;
-    private static final String XML_COMMENT_START = "<!--" ;
-    private static final String XML_COMMENT_PREFIX = " " ;
-    private static final String XML_COMMENT_END = "-->" ;
 
     private static final String[] JAVA_LINE_LIKE_SUFFIXES = {
 	"tdesc", "policy", "secure" } ;
-    private static final String JAVA_LINE_PREFIX = "// " ;
 
     private static final String[] SCHEME_LIKE_SUFFIXES = {
 	"mc", "mcd", "scm", "vthought" } ;
-    private static final String SCHEME_PREFIX = "; " ;
 
     // Shell scripts must always start with #! ..., others need not.
     private static final String[] SHELL_SCRIPT_LIKE_SUFFIXES = {
@@ -119,7 +135,6 @@ public class CopyrightProcessor {
     private static final String[] SHELL_LIKE_SUFFIXES = {
 	"classlist", "config", "jmk", "properties", "prp", "xjmk", "set",
 	"data", "txt", "text" } ;
-    private static final String SHELL_PREFIX = "# " ;
 
     // Files whose names match these also use the SHELL_PREFIX style line comment.
     private static final String[] MAKEFILE_NAMES = {
@@ -140,11 +155,6 @@ public class CopyrightProcessor {
     private static final String COPYRIGHT_BLOCK_TAG = "CopyrightBlock" ;
     private static final String SUN_COPYRIGHT_TAG = "SunCopyright" ;
     private static final String CORRECT_COPYRIGHT_TAG = "CorrectCopyright" ;
-    private static final String JAVA_FORMAT_TAG = "JavaFormat" ;
-    private static final String JAVA_LINE_FORMAT_TAG = "JavaLineFormat" ;
-    private static final String XML_FORMAT_TAG = "XmlFormat" ;
-    private static final String SCHEME_FORMAT_TAG = "SchemeFormat" ;
-    private static final String SHELL_FORMAT_TAG = "ShellFormat" ;
 
     private static void trace( String msg ) {
 	System.out.println( msg ) ;
@@ -431,6 +441,36 @@ public class CopyrightProcessor {
 	    }
 	} ;
     }
+
+    // Note: we could also make the block and line comment processors configurable,
+    // but that seems like overkill.
+    private static final String JAVA_COMMENT_START = "/*" ;
+    private static final String JAVA_COMMENT_PREFIX = " *" ;
+    // Note that the display form of JAVA_COMMENT_END adds a space to line up the *'s
+    private static final String JAVA_COMMENT_END = "*/" ; 
+
+    private static final boolean JAVA_AFTER_FIRST_BLOCK = false ;
+    private static final String JAVA_FORMAT_TAG = "JavaFormat" ;
+
+    private static final String XML_COMMENT_START = "<!--" ;
+    private static final String XML_COMMENT_PREFIX = " " ;
+    private static final String XML_COMMENT_END = "-->" ;
+    private static final boolean XML_AFTER_FIRST_BLOCK = true ;
+    private static final String XML_FORMAT_TAG = "XmlFormat" ;
+
+    private static final String JAVA_LINE_PREFIX = "// " ;
+    private static final boolean JAVA_LINE_AFTER_FIRST_BLOCK = false ;
+    private static final String JAVA_LINE_FORMAT_TAG = "JavaLineFormat" ;
+
+    private static final String SCHEME_PREFIX = "; " ;
+    private static final boolean SCHEME_AFTER_FIRST_BLOCK = false ;
+    private static final String SCHEME_FORMAT_TAG = "SchemeFormat" ;
+
+    private static final String SHELL_PREFIX = "# " ;
+    private static final boolean SHELL_AFTER_FIRST_BLOCK = true ;
+    private static final String SHELL_FORMAT_TAG = "ShellFormat" ;
+    // Note that there are actually 2 SHELL parsers for SHELL and SHELL_SCRIPT.
+    // The difference is that the SHELL_SCRIPT always starts with #!.
     
     public static void main(String[] strs) {
 	ArgParser<Arguments> ap = new ArgParser( Arguments.class ) ;
@@ -496,13 +536,13 @@ public class CopyrightProcessor {
 	    Scanner.Action skipAction = af.getSkipAction() ;
 
 	    Scanner.Action javaAction = makeCopyrightBlockAction( javaCopyrightText,
-		javaBlockParserCall, startYear, false ) ;
+		javaBlockParserCall, startYear, JAVA_AFTER_FIRST_BLOCK ) ;
 	    Scanner.Action xmlAction = makeCopyrightBlockAction( xmlCopyrightText,
-		xmlBlockParserCall, startYear, true ) ;
+		xmlBlockParserCall, startYear, XML_AFTER_FIRST_BLOCK ) ;
 	    Scanner.Action schemeAction = makeCopyrightBlockAction( schemeCopyrightText, 
-		schemeLineParserCall, startYear, false ) ;
+		schemeLineParserCall, startYear, SCHEME_AFTER_FIRST_BLOCK ) ;
 	    Scanner.Action javaLineAction = makeCopyrightBlockAction( javaLineCopyrightText, 
-		javaLineParserCall, startYear, false ) ;
+		javaLineParserCall, startYear, JAVA_LINE_AFTER_FIRST_BLOCK ) ;
 	    Scanner.Action shellAction = makeCopyrightBlockAction( shellCopyrightText, 
 		shellLineParserCall, startYear, false ) ;
 	    Scanner.Action shellScriptAction = makeCopyrightBlockAction( shellCopyrightText, 

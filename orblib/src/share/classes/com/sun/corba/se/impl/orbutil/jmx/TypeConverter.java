@@ -34,7 +34,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.jmx ;
+package com.sun.corba.se.impl.orbutil.jmx ;
 
 import java.lang.reflect.Type ;
 

@@ -72,8 +72,8 @@ import javax.management.openmbean.TabularData ;
 import javax.management.openmbean.TabularDataSupport ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import com.sun.corba.se.spi.orbutil.generic.Algorithms ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedData ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
@@ -81,7 +81,6 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
 /** A ManagedEntity is one of the pre-defined Open MBean types: SimpleType, ObjectName, 
  * TabularData, or CompositeData.
@@ -254,7 +253,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
      *
      * XXX Can we automate the handling of recursive types?
      */
-    public static TypeConverter makeTypeConverter( Type type, ManagedObjectManager mom ) {
+    public static TypeConverter makeTypeConverter( Type type, ManagedObjectManagerInternal mom ) {
 	OpenType stype = simpleTypeMap.get( type ) ;
 	if (stype != null) {
 	    return handleSimpleType( (Class)type, mom, stype ) ;
@@ -290,7 +289,21 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	} 
 	
 	if (type instanceof WildcardType) {
-	    throw new IllegalArgumentException( "WildcardType " + type + " not supported" ) ;
+            // Just treat this the same as its bound type
+            WildcardType wt = (WildcardType)type ;
+            Type[] upperBounds = wt.getUpperBounds() ;
+            Type[] lowerBounds = wt.getLowerBounds() ;
+            if (lowerBounds.length > 0)
+                throw new IllegalArgumentException( "WildcardType " + type 
+                    + " with lower bounds is not supported" ) ;
+            if (upperBounds.length == 0)
+                throw new IllegalArgumentException( "WildcardType " + type 
+                    + " with no bounds is not supported" ) ;
+            if (upperBounds.length > 1)
+                throw new IllegalArgumentException( "WildcardType " + type 
+                    + " with multiple upper bounds is not supported" ) ;
+
+            return makeTypeConverter( upperBounds[0], mom ) ;
 	} else {
 	    // this should not happen
 	    throw new IllegalArgumentException( "Unknown kind of Type " + type ) ;
@@ -298,7 +311,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleManagedObject( final Class type, 
-	final ManagedObjectManager mom, ManagedObject mo ) {
+	final ManagedObjectManagerInternal mom, ManagedObject mo ) {
 
 	return new TypeConverterImpl( type, SimpleType.OBJECTNAME ) {
 	    public Object toManagedEntity( Object obj ) {
@@ -318,7 +331,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleArrayType( final GenericArrayType type, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
 
 	final Type ctype = type.getGenericComponentType() ;
 	final TypeConverter ctypeTc = mom.getTypeConverter( ctype ) ;
@@ -378,7 +391,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleEnum( final Class cls, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
 
 	return new TypeConverterImpl( cls, SimpleType.STRING ) {
 	    public Object toManagedEntity( Object obj ) {
@@ -396,15 +409,17 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleAsString( final Class cls, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
 
 	Constructor cs = null ;
 	try {
 	    cs = cls.getDeclaredConstructor( String.class ) ;
 	} catch (Exception exc) {
-	    throw new IllegalArgumentException( 
-		"Error in obtaining (String) constructor for " 
-		+ cls, exc ) ;
+            // No exception here: if no constructor, then fromManagedEntity should
+            // throw an exception if it is ever called.
+	    // throw new IllegalArgumentException( 
+		// "Error in obtaining (String) constructor for " 
+		// + cls, exc ) ;
 	}
 	final Constructor cons = cs ;
 
@@ -434,7 +449,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleSimpleType( final Class cls, 
-	final ManagedObjectManager mom, final OpenType stype ) {
+	final ManagedObjectManagerInternal mom, final OpenType stype ) {
 
 	return new TypeConverterImpl( cls, stype ) {
 	    public Object toManagedEntity( Object obj ) {
@@ -453,60 +468,46 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	} ;
     }
     
-    private static List<AnnotationUtil.MethodInfo> analyzeManagedData( final Class<?> cls, 
-	final ManagedObjectManager mom ) {
-	
-	List<AnnotationUtil.MethodInfo> minfos = new ArrayList<AnnotationUtil.MethodInfo>() ;
+    private static List<AttributeDescriptor> analyzeManagedData( final Class<?> cls, 
+	final ManagedObjectManagerInternal mom ) {
+       
+        Pair<Class<?>,ClassAnalyzer> pair = AnnotationUtil.getClassAnalyzer( cls, ManagedData.class ) ;
 
-	InheritedAttribute[] ias = AnnotationUtil.getInheritedAttributes( cls ) ;
+        Class<?> annotatedClass = pair.first() ;
+        ClassAnalyzer ca = pair.second() ;
 	
+	List<AttributeDescriptor> ainfos = new ArrayList<AttributeDescriptor>() ;
+	InheritedAttribute[] ias = AnnotationUtil.getInheritedAttributes( annotatedClass ) ;
 	if (ias != null) {
 	    for (InheritedAttribute attr : ias) {
-		String name = attr.id() ;
-		String desc = attr.description() ;
-		
-		// Search for methods implementing this attribute in the superclasses of this class.
-		Method getter = AnnotationUtil.getGetterMethod( cls.getSuperclass(), name ) ;
+                AttributeDescriptor ainfo = AttributeDescriptor.findAttribute( mom, ca, 
+                    attr.id(), attr.description(), 
+                    AttributeDescriptor.AttributeType.GETTER ) ;
 
-		AnnotationUtil.MethodInfo minfo = 
-		    new AnnotationUtil.MethodInfo( mom, getter, name, desc ) ;
-		minfos.add( minfo ) ;
+		ainfos.add( ainfo ) ;
 	    }
-	}
-	
-	// Check for @IncludeSubclass annotation.  Scan subclasses for attributes.
-	final IncludeSubclass is = cls.getAnnotation( IncludeSubclass.class ) ;
-	if (is != null) {
-            // XXX Check that class is not annotated with ManagedData or ManagedObject
-
-            // process class, add its attributes 
-            for (Class klass : is.cls()) {
-                List<AnnotationUtil.MethodInfo> klassInfos = analyzeManagedData( klass, mom ) ;
-                minfos.addAll( klassInfos ) ;
-            }
 	}
 	
 	// Scan for all methods annotated with @ManagedAttribute, including inherited methods.
 	// Construct tables Map<String,Method> for getters (no setters in CompositeData, since
 	// CompositeData is immutable).
-	final List<Method> attributes = AnnotationUtil.getAnnotatedMethods( cls, ManagedAttribute.class ) ;
-
+	final List<Method> attributes = ca.findMethods( ca.forAnnotation( ManagedAttribute.class ) ) ;
 	for (Method m : attributes) {
-	    AnnotationUtil.MethodInfo minfo = new AnnotationUtil.MethodInfo( mom, m ) ;
+	    AttributeDescriptor ainfo = new AttributeDescriptor( mom, m ) ;
 
-	    if (minfo.atype() == AnnotationUtil.AttributeType.GETTER) {
-		minfos.add( minfo ) ;
+	    if (ainfo.atype() == AttributeDescriptor.AttributeType.GETTER) {
+		ainfos.add( ainfo ) ;
 	    } else {
 		throw new IllegalArgumentException( "Method " + m 
 		    + " is an illegal setter in a @ManagedData class" ) ;
 	    }
 	}
 
-	return minfos ;
+	return ainfos ;
     }
 
     private static CompositeType makeCompositeType( final Class cls, final ManagedData md,
-        List<AnnotationUtil.MethodInfo> minfos ) {
+        List<AttributeDescriptor> minfos ) {
 
 	String name = md.name() ;
 	if (name.equals( "" ))
@@ -520,7 +521,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
 	final OpenType[] attrOTypes = new OpenType[ length ] ;
 
 	int ctr = 0 ;
-	for (AnnotationUtil.MethodInfo minfo : minfos) {
+	for (AttributeDescriptor minfo : minfos) {
 	    attrNames[ctr] = minfo.id() ;
 	    attrDescriptions[ctr] = minfo.description() ;
 	    attrOTypes[ctr] = minfo.tc().getManagedType() ;
@@ -536,18 +537,23 @@ public abstract class TypeConverterImpl implements TypeConverter {
     }
 
     private static TypeConverter handleManagedData( final Class cls, 
-	final ManagedObjectManager mom, final ManagedData md ) {
+	final ManagedObjectManagerInternal mom, final ManagedData md ) {
 
-	final List<AnnotationUtil.MethodInfo> minfos = analyzeManagedData(
+	final List<AttributeDescriptor> minfos = analyzeManagedData(
 	    cls, mom ) ;
         final CompositeType myType = makeCompositeType( cls, md, minfos ) ;
 
 	return new TypeConverterImpl( cls, myType ) {
 	    public Object toManagedEntity( Object obj ) {
 		Map<String,Object> data = new HashMap<String,Object>() ;
-		for (AnnotationUtil.MethodInfo minfo : minfos ) {
+		for (AttributeDescriptor minfo : minfos ) {
                     if (minfo.isApplicable( obj )) {
-                        Object value = minfo.get( obj ) ;
+                        Object value = null ;
+                        try {
+                            value = minfo.get( obj ) ;
+                        } catch (Exception exc) {
+                            throw new RuntimeException(exc) ;
+                        }
                         data.put( minfo.id(), value ) ;
                     }
 		}
@@ -578,6 +584,30 @@ public abstract class TypeConverterImpl implements TypeConverter {
 
         public void remove() {
             throw new UnsupportedOperationException( "Remove is not supported" ) ;
+        }
+    }
+
+    // TypeConverter that throws exceptions for its methods.  Used as a 
+    // place holder to detect recursive types.
+    public static class TypeConverterPlaceHolderImpl implements TypeConverter {
+        public Type getDataType() {
+            throw new UnsupportedOperationException( "Recursive types are not supported" ) ;
+        }
+
+        public OpenType getManagedType() {
+            throw new UnsupportedOperationException( "Recursive types are not supported" ) ;
+        }
+
+        public Object toManagedEntity( Object obj ) {
+            throw new UnsupportedOperationException( "Recursive types are not supported" ) ;
+        }
+
+        public Object fromManagedEntity( Object entity ) {
+            throw new UnsupportedOperationException( "Recursive types are not supported" ) ;
+        }
+
+        public boolean isIdentity() {
+            throw new UnsupportedOperationException( "Recursive types are not supported" ) ;
         }
     }
 
@@ -730,7 +760,7 @@ public abstract class TypeConverterImpl implements TypeConverter {
     //    type is T<K,V>.  This maps to a TabularType, with key field named "key" of type
     //    mapping of K, and value field "value" of type mapping of V.
     private static TypeConverter handleParameterizedType( final ParameterizedType type, 
-	final ManagedObjectManager mom ) {
+	final ManagedObjectManagerInternal mom ) {
 
         TypeConverter result = null ;
 

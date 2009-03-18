@@ -60,9 +60,10 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
-public class ManagedObjectManagerImpl implements ManagedObjectManager {
+// XXX What about cleanup?  Probably want a close() method that unregisters
+// all registered objects and flushes caches.
+public class ManagedObjectManagerImpl implements ManagedObjectManagerInternal {
     private String domain ;
     private MBeanServer server ; 
     private Map<Object,ObjectName> objectMap ;
@@ -70,30 +71,40 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
     private Map<Class<?>,DynamicMBeanSkeleton> skeletonMap ;
     private Map<Type,TypeConverter> typeConverterMap ;
 
-    // XXX This is not correct: we also need to look up superclass and superinterfaces
-    // until we find a skeleton.  For example, we could have a subclass of a class annotated
-    // with @IncludeSubclass, or an interface with an implementation class.
+    private static final TypeConverter recursiveTypeMarker = 
+        new TypeConverterImpl.TypeConverterPlaceHolderImpl() ;
+
     public synchronized DynamicMBeanSkeleton getSkeleton( Class<?> cls ) {
-	List<Pair<Class<?>,ManagedObject>> mos = AnnotationUtil.getClassAnnotations(
-	    cls, ManagedObject.class ) ;
+	DynamicMBeanSkeleton result = skeletonMap.get( cls ) ;	
 
-	if (mos.size() == 0)
-	    throw new IllegalArgumentException( "Class " + cls + " is not a ManagedObject" ) ;
-
-	Pair<Class<?>,ManagedObject> pair = mos.get(0) ;
-	DynamicMBeanSkeleton result = skeletonMap.get( pair.first() ) ;	
 	if (result == null) {
-	    result = new DynamicMBeanSkeleton( cls, this ) ;
+            Pair<Class<?>,ClassAnalyzer> pair = AnnotationUtil.getClassAnalyzer( 
+                cls, ManagedObject.class ) ;
+            Class<?> annotatedClass = pair.first() ;
+            ClassAnalyzer ca = pair.second() ;
+
+            result = skeletonMap.get( annotatedClass ) ;
+            
+            if (result == null) {
+                result = new DynamicMBeanSkeleton( annotatedClass, ca, this ) ;
+            }
+
 	    skeletonMap.put( cls, result ) ;
 	}
+
 	return result ;
     }
 
     public synchronized TypeConverter getTypeConverter( Type type ) {
-        // XXX Beware of recursive types!
 	TypeConverter result = typeConverterMap.get( type ) ;	
 	if (result == null) {
+            // Store a TypeConverter impl that throws an exception when acessed.
+            // Used to detect recursive types.
+            typeConverterMap.put( type, recursiveTypeMarker ) ;
+
 	    result = TypeConverterImpl.makeTypeConverter( type, this ) ;
+
+            // Replace recursion marker with the constructed implementation
 	    typeConverterMap.put( type, result ) ;
 	}
 	return result ;
@@ -112,10 +123,11 @@ public class ManagedObjectManagerImpl implements ManagedObjectManager {
      * fixed properties to each ObjectName on the register call.
      * Each element in props must be in the "name=value" form.
      */
-    public static ManagedObjectManager makeDelegate( final ManagedObjectManager mom, 
+    public static ManagedObjectManager makeDelegate( 
+        final ManagedObjectManagerInternal mom, 
 	final String... props ) {
 
-	return new ManagedObjectManager() {
+	return new ManagedObjectManagerInternal() {
 	    final Properties savedProps = makeProps( props ) ;
 
 	    public void register( Object obj, String... mprops )  {

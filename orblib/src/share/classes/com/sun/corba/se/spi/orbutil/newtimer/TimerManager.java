@@ -40,6 +40,8 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
 
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+
 /** Provides access to timer facilities.
  * This is intended to make it easy to set up timing,
  * either for performance tests, or for adaptive policy management.
@@ -58,9 +60,13 @@ public class TimerManager<T> {
     /** Create a new TimerManager, with a TimerFactory registered under the given name
      * in the TimerFactoryBuilder, and a TimerEventController with the same name.
      */
-    public TimerManager( String name ) {
-	tf = TimerFactoryBuilder.make( name, name ) ;
+    public TimerManager( ManagedObjectManager mom, String name ) {
+	tf = TimerFactoryBuilder.make( mom, name, name ) ;
 	controller = tf.makeController( name ) ;
+    }
+
+    public TimerManager( String name ) {
+        this( null, name ) ;
     }
 
     /** Destroy this TimerManager by removing its TimerFactory from the

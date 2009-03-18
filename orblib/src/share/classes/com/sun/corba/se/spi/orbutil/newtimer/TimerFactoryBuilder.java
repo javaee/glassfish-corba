@@ -44,6 +44,8 @@ import java.util.ArrayList ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimerFactoryImpl ;
 
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+
 /** TimerFactoryBuilder creates independent
  * instances of the TimerFactory interface.
  * Guarantees that all TimerFactory instances have unique names.
@@ -52,15 +54,23 @@ public class TimerFactoryBuilder {
     private static Map<String,TimerFactory> fmap = 
 	new HashMap<String,TimerFactory>() ;
 
+    public synchronized static TimerFactory make( 
+        String name, String description ) {
+
+        return make( null, name, description ) ;
+    }
+
     /** Create a new TimerFactory.  No two TimerFactory instances
      * can have the same name.
      */
-    public synchronized static TimerFactory make( String name, String description ) {
+    public synchronized static TimerFactory make( ManagedObjectManager mom, 
+        String name, String description ) {
+
 	if (fmap.get( name ) != null)
 	    throw new IllegalArgumentException(
 		"There is currently a TimerFactory named " + name ) ;
 
-	TimerFactory result = new TimerFactoryImpl( name, description ) ;
+	TimerFactory result = new TimerFactoryImpl( mom, name, description ) ;
 	fmap.put( name, result ) ;
 	return result ;
     }

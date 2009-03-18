@@ -74,12 +74,8 @@ import javax.management.openmbean.OpenMBeanParameterInfo ;
 import javax.management.openmbean.OpenMBeanParameterInfoSupport ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
-import com.sun.corba.se.spi.orbutil.generic.BinaryVoidFunction ;
 import com.sun.corba.se.spi.orbutil.generic.BinaryFunction ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedData ;
 import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
@@ -87,57 +83,92 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttribute ;
 import com.sun.corba.se.spi.orbutil.jmx.InheritedAttributes ;
 import com.sun.corba.se.spi.orbutil.jmx.IncludeSubclass ;
-import com.sun.corba.se.spi.orbutil.jmx.TypeConverter ;
 
 // XXX What about open constructors and notifications?  Do we need them?
-//
-// XXX How do we handle @IncludeSubclass?  I think we should just directly add ALL
-// of the attributes and operations to the same structures (we'll need to have a
-// restricted find/filter for that purpose, and possibly re-factor some code).
-// Then we need to check (possibly in the Getter/Setter/Operation itself) whether or
-// not that method is applicable to the target object: if not, return null (Getter),
-// do nothing (Setter), or throw an exception? (Operation).
 class DynamicMBeanSkeleton {
+    // Object evaluate( Object, List<Object> ) (or Result evaluate( Target, ArgList ))
+    public interface Operation extends BinaryFunction<Object,List<Object>,Object> {} ;
+
     private String type ;
     private final MBeanInfo mbInfo ;
-    private final ManagedObjectManager mom ;
-    private final Map<String,AnnotationUtil.Setter> setterFunctions ;
-    private final Map<String,AnnotationUtil.Getter> getterFunctions ;
-    private final Map<String,Map<List<String>,AnnotationUtil.Operation>> operationFunctions ;
+    private final ManagedObjectManagerInternal mom ;
+    private final Map<String,AttributeDescriptor> setters ;
+    private final Map<String,AttributeDescriptor> getters ;
+    private final Map<String,Map<List<String>,Operation>> operations ;
     private final List<OpenMBeanAttributeInfo> mbeanAttributeInfoList ; 
     private final List<OpenMBeanOperationInfo> mbeanOperationInfoList ; 
  
     // This method should only be called when getter.id.equals( setter.id ) 
-    public void processAttribute( List<OpenMBeanAttributeInfo> list, 
-	AnnotationUtil.MethodInfo getter, AnnotationUtil.MethodInfo setter ) {
+    private void processAttribute( AttributeDescriptor getter, 
+        AttributeDescriptor setter ) {
 
-	String name = getter.id() ;
+        if ((setter == null) && (getter == null))
+            throw new IllegalArgumentException(
+                "At least one of getter and setter must not be null" ) ;
 
 	if ((setter != null) && (getter != null))
 	    if (!setter.type().equals( getter.type() ))
 		throw new IllegalArgumentException( 
-		    "Getter and setter types do not match for inherited attribute " + name ) ;
+		    "Getter and setter types do not match" ) ;
 
-	TypeConverter tc = mom.getTypeConverter( getter.type() ) ;
+        AttributeDescriptor nonNullDescriptor = (getter != null) ? getter : setter ;
+
+        String name = nonNullDescriptor.id() ;
+        String description = nonNullDescriptor.description() ;
+        TypeConverter tc = mom.getTypeConverter( nonNullDescriptor.type() ) ;
 
 	OpenMBeanAttributeInfo ainfo = new OpenMBeanAttributeInfoSupport( name, 
-	    getter.description(), tc.getManagedType(), 
+	    description, tc.getManagedType(), 
 	    getter != null, setter != null, false ) ;
 
-	if (setter != null) {
-	    AnnotationUtil.Setter setterFunction = AnnotationUtil.makeSetter( setter.method(), tc ) ;
-	    setterFunctions.put( name, setterFunction ) ;
-	}
-
-	if (getter != null) {
-	    AnnotationUtil.Getter getterFunction = AnnotationUtil.makeGetter( getter.method(), tc ) ;
-	    getterFunctions.put( name, getterFunction ) ;
-	}
-
-	list.add( ainfo ) ;
+	mbeanAttributeInfoList.add( ainfo ) ;
     }
 
-    public Pair<AnnotationUtil.Operation,OpenMBeanOperationInfo> makeOperation( final Method m ) {
+    private void analyzeInheritedAttributes( Class<?> annotatedClass, ClassAnalyzer ca ) {
+	// Check for @InheritedAttribute(s) annotation.  
+        // Find methods for these attributes in superclasses. 
+	final InheritedAttribute[] iaa = AnnotationUtil.getInheritedAttributes( annotatedClass ) ;
+	if (iaa != null) {
+	    for (InheritedAttribute attr : iaa) {
+		AttributeDescriptor setterInfo = AttributeDescriptor.findAttribute( 
+                    mom, ca, attr.id(), attr.description(), 
+                    AttributeDescriptor.AttributeType.SETTER ) ; 
+
+		AttributeDescriptor getterInfo = AttributeDescriptor.findAttribute( 
+                    mom, ca, attr.id(), attr.description(), 
+                    AttributeDescriptor.AttributeType.GETTER ) ; 
+
+		processAttribute( getterInfo, setterInfo ) ;
+	    }
+	}
+    }
+
+    private void analyzeAnnotatedAttributes( ClassAnalyzer ca ) {
+	final List<Method> attributes = ca.findMethods( ca.forAnnotation( ManagedAttribute.class ) ) ;
+
+	for (Method m : attributes) {
+	    AttributeDescriptor minfo = new AttributeDescriptor( mom, m ) ;
+
+	    if (minfo.atype() == AttributeDescriptor.AttributeType.GETTER) {
+		getters.put( minfo.id(), minfo ) ;
+	    } else {
+		setters.put( minfo.id(), minfo ) ;
+	    }
+	}
+
+	final Set<String> setterNames = new HashSet<String>( setters.keySet() ) ;
+	for (String str : getters.keySet()) {
+	    processAttribute( getters.get( str ), setters.get( str ) ) ;
+	    setterNames.remove( str ) ;
+	}
+
+	// Handle setters without getters
+	for (String str : setterNames) {
+	    processAttribute( null, setters.get( str ) ) ;
+	}
+    }
+
+    private Pair<Operation,OpenMBeanOperationInfo> makeOperation( final Method m ) {
 	ManagedOperation mo = m.getAnnotation( ManagedOperation.class ) ;
 	final String desc = mo.description() ;
 	final Type rtype = m.getGenericReturnType() ;
@@ -148,7 +179,7 @@ class DynamicMBeanSkeleton {
 	    atcs.add( mom.getTypeConverter( type ) ) ;
 	}
 
-	final AnnotationUtil.Operation oper = new AnnotationUtil.Operation() {
+	final Operation oper = new Operation() {
 	    public Object evaluate( Object target, List<Object> args ) {
 		try {
 		    Object[] margs = new Object[args.size()] ;
@@ -168,7 +199,7 @@ class DynamicMBeanSkeleton {
 		    else
 			return rtc.toManagedEntity( result ) ;
 		} catch (Exception exc) {
-		    throw new AnnotationUtil.WrappedException( exc ) ;
+		    throw new RuntimeException( exc ) ;
 		}
 	    }
 	} ;
@@ -182,139 +213,71 @@ class DynamicMBeanSkeleton {
 
 	// XXX Note that impact is always set to ACTION_INFO here.  If this is useful to set
 	// in general, we need to add impact to the ManagedOperation annotation.
+        // This is basically what JSR 255 does.
 	final OpenMBeanOperationInfo operInfo = new OpenMBeanOperationInfoSupport( m.getName(),
 	    desc, paramInfo, rtc.getManagedType(), MBeanOperationInfo.ACTION_INFO ) ;
 
-	return new Pair<AnnotationUtil.Operation,OpenMBeanOperationInfo>( oper, operInfo ) ;
+	return new Pair<Operation,OpenMBeanOperationInfo>( oper, operInfo ) ;
     }
 
-    public void processOperation( List<OpenMBeanOperationInfo> list, Method m ) {
-	final Pair<AnnotationUtil.Operation,OpenMBeanOperationInfo> data = makeOperation( m ) ;
-	final OpenMBeanOperationInfo info = data.second() ;
-	
-	final List<String> dataTypes = new ArrayList<String>() ;
-	for (MBeanParameterInfo pi : info.getSignature()) {
-	    dataTypes.add( pi.getType() ) ;
-	}
-	
-	Map<List<String>,AnnotationUtil.Operation> map = operationFunctions.get( m.getName() ) ;
-	if (map == null) {
-	    map = new HashMap<List<String>,AnnotationUtil.Operation>() ;
-	    operationFunctions.put( m.getName(), map ) ;
-	}
+    private void analyzeOperations( ClassAnalyzer ca ) {
+	// Scan for all methods annotation with @ManagedOperation, including inherited methods.
+	final List<Method> ops = ca.findMethods( ca.forAnnotation( ManagedOperation.class ) ) ;
+	for (Method m : ops) {
+            final Pair<Operation,OpenMBeanOperationInfo> data = makeOperation( m ) ;
+            final OpenMBeanOperationInfo info = data.second() ;
+            
+            final List<String> dataTypes = new ArrayList<String>() ;
+            for (MBeanParameterInfo pi : info.getSignature()) {
 
-	// XXX we might want to check and see if this was previously defined
-	map.put( dataTypes, data.first() ) ;
+                // Replace recursion marker with the constructed implementation
+                dataTypes.add( pi.getType() ) ;
+            }
+            
+            Map<List<String>,Operation> map = operations.get( m.getName() ) ;
+            if (map == null) {
+                map = new HashMap<List<String>,Operation>() ;
+                operations.put( m.getName(), map ) ;
+            }
 
-	list.add( info ) ;
+            // XXX we might want to check and see if this was previously defined
+            map.put( dataTypes, data.first() ) ;
+
+            mbeanOperationInfoList.add( info ) ;
+	}
     }
 
-    public DynamicMBeanSkeleton( final Class<?> cls, final ManagedObjectManager mom ) {
-	// This constructor analyzes the structure of cls.  It uses TypeConverters as necessary,
-	// updating the mapping based on the results of the analysis of cls.
+    public DynamicMBeanSkeleton( final Class<?> annotatedClass, final ClassAnalyzer ca,
+        final ManagedObjectManagerInternal mom ) {
 
 	this.mom = mom ;
 
-	// Get the @ManagedObject annotation.  This gives us the type and the description.
-	final ManagedObject mo = cls.getAnnotation( ManagedObject.class ) ;
-	if (mo == null)
-	    throw new IllegalArgumentException( "Class " + cls 
-		+ " does not have an @ManagedObject annotation: cannot construct dynamic MBean" ) ;
-
+        final ManagedObject mo = annotatedClass.getAnnotation( ManagedObject.class ) ;
+        
 	type = mo.type() ;
 	if (type.equals( "" ))
-	    type = cls.getName() ;
+	    type = annotatedClass.getName() ;
 
-	setterFunctions = new HashMap<String,AnnotationUtil.Setter>() ;
-	getterFunctions = new HashMap<String,AnnotationUtil.Getter>() ; 
-	operationFunctions = new HashMap<String,Map<List<String>,AnnotationUtil.Operation>>() ;
+	setters = new HashMap<String,AttributeDescriptor>() ;
+	getters = new HashMap<String,AttributeDescriptor>() ; 
+	operations = new HashMap<String,Map<List<String>,Operation>>() ;
 	mbeanAttributeInfoList = new ArrayList<OpenMBeanAttributeInfo>() ;
 	mbeanOperationInfoList = new ArrayList<OpenMBeanOperationInfo>() ;
 
-        analyzeClass( cls ) ;
-
+        analyzeInheritedAttributes( annotatedClass, ca ) ;
+        analyzeAnnotatedAttributes( ca ) ;
+        analyzeOperations( ca ) ;
+        
 	OpenMBeanAttributeInfo[] attrInfos = mbeanAttributeInfoList.toArray( 
 	    new OpenMBeanAttributeInfo[mbeanAttributeInfoList.size()] ) ;
 	OpenMBeanOperationInfo[] operInfos = mbeanOperationInfoList.toArray(
 	    new OpenMBeanOperationInfo[mbeanOperationInfoList.size() ] ) ;
 	mbInfo = new OpenMBeanInfoSupport( 
-	    cls.getName(), mo.description(), attrInfos, null, operInfos, null ) ;
+	    type, mo.description(), attrInfos, null, operInfos, null ) ;
     }
 
-    private void analyzeClass( Class<?> cls ) {
-	// Check for @InheritedAttribute(s) annotation.  Find methods for these attributes in superclasses. 
-	final InheritedAttribute[] iaa = AnnotationUtil.getInheritedAttributes( cls ) ;
-	
-	if (iaa != null) {
-	    for (InheritedAttribute attr : iaa) {
-		String name = attr.id() ;
-		String desc = attr.description() ;
-
-		// Search for methods implementing this attribute in the superclasses of this class.
-		Method setter = AnnotationUtil.getSetterMethod( cls.getSuperclass(), name ) ;
-		AnnotationUtil.MethodInfo setterInfo = new AnnotationUtil.MethodInfo( 
-		    mom, setter, name, desc ) ;
-
-		Method getter = AnnotationUtil.getGetterMethod( cls.getSuperclass(), name ) ;
-		AnnotationUtil.MethodInfo getterInfo = new AnnotationUtil.MethodInfo( 
-		    mom, getter, name, desc ) ;
-
-		processAttribute( mbeanAttributeInfoList, getterInfo, setterInfo ) ;
-	    }
-	}
-	
-	// Check for @IncludeSubclass annotation.  Scan subclasses for attributes.
-	final IncludeSubclass is = cls.getAnnotation( IncludeSubclass.class ) ;
-	if (is != null) {
-	    // XXX process is
-            // We should use a Graph with a Finder that traverses all IncludeSubclass references to
-            // generate the root set for the Finder in AnnotationUtils that traverses the inheritance
-            // graph.  First we expand the root set down the inheritance hierarchy, then up,
-            // then we process for attributes: no need for recursion here.
-	}
-	
-	// Scan for all methods annotated with @ManagedAttribute, including inherited methods.
-	// Construct tables Map<String,Method> for getters and setters
-	// Check types for getters and setters: must be the same
-	// Get open types for getter/setter type
-	// Construct OpenMBeanAttributeInfos and actual methods, and put into skeleton
-	final List<Method> attributes = AnnotationUtil.getAnnotatedMethods( 
-	    cls, ManagedAttribute.class ) ;
-	final Map<String,AnnotationUtil.MethodInfo> getters = 
-	    new HashMap<String,AnnotationUtil.MethodInfo>() ;
-	final Map<String,AnnotationUtil.MethodInfo> setters = 
-	    new HashMap<String,AnnotationUtil.MethodInfo>() ;
-
-	for (Method m : attributes) {
-	    AnnotationUtil.MethodInfo minfo = new AnnotationUtil.MethodInfo( mom, m ) ;
-
-	    if (minfo.atype() == AnnotationUtil.AttributeType.GETTER) {
-		getters.put( minfo.id(), minfo ) ;
-	    } else {
-		setters.put( minfo.id(), minfo ) ;
-	    }
-	}
-
-	final Set<String> setterNames = new HashSet<String>( setters.keySet() ) ;
-	for (String str : getters.keySet()) {
-	    processAttribute( mbeanAttributeInfoList, getters.get( str ), setters.get( str ) ) ;
-	    setterNames.remove( str ) ;
-	}
-
-	// Handle setters without getters
-	for (String str : setterNames) {
-	    processAttribute( mbeanAttributeInfoList, null, setters.get( str ) ) ;
-	}
-
-	// Scan for all methods annotation with @ManagedOperation, including inherited methods.
-	final List<Method> operations = AnnotationUtil.getAnnotatedMethods( 
-	    cls, ManagedOperation.class ) ;
-	for (Method m : operations) {
-	    processOperation( mbeanOperationInfoList, m ) ;
-	}
-    }
-
-
+    // The rest of the methods are used in the DynamicMBeanImpl code.
+    
     public String getType() {
 	return type ;
     }
@@ -322,15 +285,11 @@ class DynamicMBeanSkeleton {
     public Object getAttribute( Object obj, String name) throws AttributeNotFoundException,
 	MBeanException, ReflectionException {
 
-	AnnotationUtil.Getter getter = getterFunctions.get( name ) ;
+	AttributeDescriptor getter = getters.get( name ) ;
 	if (getter == null)
 	    throw new AttributeNotFoundException( "Could not find attribute " + name ) ;
 
-	try {
-	    return getter.evaluate( obj ) ;
-	} catch (AnnotationUtil.WrappedException exc) {
-	    throw new ReflectionException( exc.getCause() ) ;
-	}
+        return getter.get( obj ) ;
     }
     
     public void setAttribute(Object obj, Attribute attribute) throws AttributeNotFoundException,
@@ -338,15 +297,11 @@ class DynamicMBeanSkeleton {
 
 	String name = attribute.getName() ;
 	Object value = attribute.getValue() ;
-	AnnotationUtil.Setter setter = setterFunctions.get( name ) ;
+	AttributeDescriptor setter = setters.get( name ) ;
 	if (setter == null)
 	    throw new AttributeNotFoundException( "Could not find writable attribute " + name ) ;
 
-	try {
-	    setter.evaluate( obj, value ) ;
-	} catch (AnnotationUtil.WrappedException exc) {
-	    throw new ReflectionException( exc.getCause() ) ;
-	} 
+        setter.set( obj, value ) ;
     }
         
     public AttributeList getAttributes( Object obj, String[] attributes) {
@@ -379,20 +334,20 @@ class DynamicMBeanSkeleton {
     public Object invoke( Object obj, String actionName, Object params[], String signature[])
 	throws MBeanException, ReflectionException  {
 
-	Map<List<String>,AnnotationUtil.Operation> opMap = operationFunctions.get( actionName ) ;
+	Map<List<String>,Operation> opMap = operations.get( actionName ) ;
 	if (opMap == null)
 	    throw new IllegalArgumentException( "Could not find operation named " + actionName ) ;
 
 	List<String> sig = Arrays.asList( signature ) ;
-	AnnotationUtil.Operation op = opMap.get( sig ) ;
+	Operation op = opMap.get( sig ) ;
 	if (op == null)
 	    throw new IllegalArgumentException( "Could not find operation named " + actionName 
 		+ " with signature " + sig ) ;
 
 	try {
 	    return op.evaluate( obj, Arrays.asList( params ) ) ;
-	} catch (AnnotationUtil.WrappedException exc) {
-	    throw new ReflectionException( exc.getCause() ) ;
+	} catch (Exception exc) {
+	    throw new ReflectionException( exc ) ;
 	}
     }
     

@@ -122,8 +122,6 @@ import com.sun.corba.se.spi.orb.OperationFactory;
 import com.sun.corba.se.spi.orb.ORBVersion;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
-import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
-import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory;
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher;
@@ -146,9 +144,21 @@ import com.sun.corba.se.spi.monitoring.MonitoringManagerFactory;
 import com.sun.corba.se.spi.monitoring.MonitoringFactories;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
 import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
+
+import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
+
+import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
+
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility;
 import com.sun.corba.se.spi.orbutil.misc.StackImpl;
+
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
+
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManagerFactory ;
+
+import com.sun.corba.se.spi.orbutil.ORBConstants;
+
 import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
 
 import com.sun.corba.se.impl.corba.TypeCodeFactory;
@@ -172,7 +182,6 @@ import com.sun.corba.se.impl.oa.toa.TOAFactory;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.se.impl.oa.poa.DelegateImpl;
 import com.sun.corba.se.impl.oa.poa.POAFactory;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl;
 import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolManagerImpl;
@@ -244,6 +253,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private RequestDispatcherRegistry requestDispatcherRegistry ;
 
     private CopierManager copierManager ;
+
+    private ManagedObjectManager mom ;
 
     private TimerManager<TimingPoints> timerManager ;
 
@@ -548,14 +559,21 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    System.out.println( ObjectUtility.defaultObjectToString( configData ) ) ;
 	}
 
-	// Note that the TimerManager depends on getUniqueOrbId,
-	// which depends on configData, so this call must be after
-	// the configData init.  The TimerManager must also be
+        // The ORB id depends on config data, so this call must happen
+        // after the configData has been initialized.
+        String orbId = getUniqueOrbId() ;
+
+        ManagedObjectManager baseMom = ManagedObjectManagerFactory.create( "com.sun.corba" ) ;
+        // mom is set up to always include ORBId as one of the name/value pairs for
+        // MBean object names.
+        mom = ManagedObjectManagerFactory.create( baseMom, "ORBId=" + orbId ) ;
+
+	// The TimerManager must be
 	// initialized BEFORE the pihandler.initialize() call, in
 	// case we want to time interceptor setup.  Obviously we
 	// want to initialize the timerManager as early as possible
 	// so we can time parts of initialization if desired.
-	timerManager = makeTimerManager( getUniqueOrbId() ) ;
+	timerManager = makeTimerManager( mom, orbId ) ;
 
 	// This requires a valid TimerManager.
 	initializePrimitiveTypeCodeConstants() ;
@@ -2200,6 +2218,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}	  
 
 	return entry ;
+    }
+
+    public ManagedObjectManager mom() {
+        return mom ;
     }
 } // Class ORBImpl
 

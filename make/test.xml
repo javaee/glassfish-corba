@@ -86,6 +86,7 @@
     </sequential>
 </macrodef>
 
+
 <!-- Macro used to run junit tests directly. -->
 <macrodef name="run-junit-test">
     <element name="test-cases" optional="no"/>
@@ -180,7 +181,7 @@
 </target>
 
 <target name="clean-test-output">
-    <delete dir="${test.output}" quiet="true"/>
+    <delete dir="${test.output}" quiet="false"/>
 </target>
 
 <target name="test-rmi-iiop" depends="test-init">
@@ -200,7 +201,7 @@
     <run-junit-test>
         <test-cases>
             <test name="corba.codegen.Client" todir="${junit.reports}"/>
-            <test name="corba.messagetrace.Client" todir="${junit.reports}"/>
+            <!-- <test name="corba.messagetrace.Client" todir="${junit.reports}"/> -->
             <test name="corba.misc.Client" todir="${junit.reports}"/>
             <test name="corba.dynamicrmiiiop.Client" todir="${junit.reports}"/>
         </test-cases>

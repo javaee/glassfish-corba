@@ -53,8 +53,6 @@ import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
 
-import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
-
 import org.objectweb.asm.MethodVisitor ;
 import org.objectweb.asm.ClassWriter ;
 import org.objectweb.asm.Label ;
@@ -79,11 +77,11 @@ public final class ByteCodeUtility {
     private String methodSignature ;
 
     /** Construct an instance of ByteCodeUtility from an ASM ClassWriter
-     * and a codegen ClassGenerator.  If debug is true, debugText() can
+     * and a codegen ClassGeneratorImpl.  If debug is true, debugText() can
      * be called to get a text representation of the generated code for
      * debugging purposes.
      */
-    public ByteCodeUtility( ClassWriter cw, ClassGenerator cg, 
+    public ByteCodeUtility( ClassWriter cw, ClassGeneratorImpl cg,
 	boolean debug, PrintStream ps ) {
 
 	this.cw = cw ;
@@ -113,7 +111,7 @@ public final class ByteCodeUtility {
 	cw.visitField( arg.modifiers(), arg.name(), descriptor, null, null ) ;
     }
 
-    public ByteCodeUtility( ClassWriter cw, ClassGenerator cg ) {
+    public ByteCodeUtility( ClassWriter cw, ClassGeneratorImpl cg ) {
 	this( cw, cg, false, System.out ) ;
     }
 
@@ -133,7 +131,7 @@ public final class ByteCodeUtility {
 	// Get a List<Type> for parameter types
 	List<Type> types = new ArrayList<Type>() ;
 	for (Variable var : mg.arguments()) {
-	    types.add( var.type() ) ;
+	    types.add( ((VariableInternal)var).type() ) ;
 	}
 
 	methodName = mg.name() ;
@@ -186,7 +184,8 @@ public final class ByteCodeUtility {
 	    Label start ;
 	    Label end ;
 
-	    Statement stmt = var.getAncestor( Statement.class ) ;
+	    Statement stmt = ((VariableInternal)var).getAncestor(
+                Statement.class ) ;
 	    if (stmt == null) { // We must have a method argument
 		end = ASMUtil.returnLabel.get( mg ) ;
 
@@ -206,8 +205,9 @@ public final class ByteCodeUtility {
 		end = ASMUtil.statementEndLabel.get( stmt ) ;
 	    }
 
-	    int index = ASMUtil.stackFrameSlot.get( var ) ;
-	    mv.visitLocalVariable( var.ident(), var.type().signature(), null,
+            VariableInternal ivar = (VariableInternal)var ;
+	    int index = ASMUtil.stackFrameSlot.get( ivar ) ;
+	    mv.visitLocalVariable( ivar.ident(), ivar.type().signature(), null,
 		start, end, index ) ;
 	}
     }
@@ -229,13 +229,15 @@ public final class ByteCodeUtility {
 	    if (returnVariable != null) {
 		// We need the get emitter here.
 		EmitterFactory.Emitter emitter =
-		    ASMUtil.getEmitter.get( returnVariable ) ;
+		    ASMUtil.getEmitter.get( (VariableInternal)returnVariable ) ;
 		assert emitter != null ;
 		emitter.evaluate( mv ) ;
 	    }
 
 	    emitReturn( 
-		returnVariable == null ? Type._void() : returnVariable.type() ) ;
+		returnVariable == null
+                    ? Type._void()
+                    : ((VariableInternal)returnVariable).type() ) ;
 
 	    // Emit debug information, if present
 	    emitLineNumberTable( mg ) ;
@@ -273,10 +275,11 @@ public final class ByteCodeUtility {
     }
 
     public void emitRet( Variable var ) {
+        VariableInternal ivar = (VariableInternal)var ;
 	// We always use Object here, so check this.
-	assert var.type().equals( Type._Object() ) ;
+	assert ivar.type().equals( Type._Object() ) ;
 
-	Integer slot = ASMUtil.stackFrameSlot.get( var ) ;
+	Integer slot = ASMUtil.stackFrameSlot.get( ivar ) ;
 	assert slot != null ;
 
 	mv.visitVarInsn( RET, slot ) ;
@@ -796,7 +799,7 @@ public final class ByteCodeUtility {
 	// 3. Arithmetic.  These ops simply emit (i,l,f,d)(add,sub,mul,div,rem)
 	//    instructions.
 	//	    
-	Type type = arg.left().type() ;
+	Type type = ((ExpressionInternal)arg.left()).type() ;
 	ExpressionFactory.BinaryOperator op = arg.operator() ;
 	if (type.isPrimitive()) {
 	    mv.visitInsn( opInstructions.get(op).get(type) ) ;

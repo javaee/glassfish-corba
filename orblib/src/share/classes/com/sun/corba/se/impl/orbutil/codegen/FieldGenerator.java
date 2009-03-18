@@ -40,7 +40,8 @@ import java.lang.reflect.Modifier ;
 
 import java.util.List ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
+import com.sun.corba.se.impl.orbutil.codegen.ExpressionInternal ;
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 
 public class FieldGenerator extends FieldInfoImpl implements Node {
@@ -84,13 +85,13 @@ public class FieldGenerator extends FieldInfoImpl implements Node {
     }
     // END of NodeBase delegation
 
-    public FieldGenerator( ClassGenerator cinfo, int modifiers, Type type, String ident ) {
+    public FieldGenerator( ClassGeneratorImpl cinfo, int modifiers, Type type, String ident ) {
 	super( cinfo, modifiers, type, ident ) ;
 	nodeImpl = new NodeBase( cinfo ) ;
     }
 
     public Expression getExpression() {
-	ClassGenerator cg = (ClassGenerator)parent() ;
+	ClassGeneratorImpl cg = (ClassGeneratorImpl)parent() ;
 	ExpressionFactory ef = new ExpressionFactory( cg ) ;
 	if (Modifier.isStatic(modifiers())) {
 	    return ef.fieldAccess( cg.thisType(), name() ) ;

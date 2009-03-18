@@ -38,45 +38,12 @@ package com.sun.corba.se.impl.orbutil.codegen;
 
 import java.lang.reflect.Modifier ;
 
-import java.util.Map ;
-import java.util.Properties ;
 import java.util.List ;
-import java.util.Stack ;
 import java.util.ArrayList ;
 
-import org.objectweb.asm.ClassWriter ;
-import org.objectweb.asm.FieldVisitor ;
-import org.objectweb.asm.MethodVisitor ;
-import org.objectweb.asm.ClassWriter ;
-
-import static org.objectweb.asm.Opcodes.* ;
-
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 
-import com.sun.corba.se.impl.orbutil.codegen.AssignmentStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.CaseBranch ;
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.DefinitionStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
-import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.MethodGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.ReturnStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.BreakStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.Statement ;
-import com.sun.corba.se.impl.orbutil.codegen.SwitchStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ThrowStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalker ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalkerContext ;
-import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.FieldGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
-import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
 
 // Visitor that creates the labels given by the 
 // returnLabel .
@@ -182,7 +149,7 @@ public class ASMSetupVisitor extends TreeWalker {
     }
 
     @Override
-    public boolean preClassGenerator( ClassGenerator arg ) {
+    public boolean preClassGenerator( ClassGeneratorImpl arg ) {
 	return true ;
     }
 
@@ -194,7 +161,7 @@ public class ASMSetupVisitor extends TreeWalker {
     public boolean preMethodGenerator( MethodGenerator arg ) {
 	slotAllocator = new SlotAllocator() ;
 	for (Variable var : arg.arguments())
-	    ASMUtil.requiredEmitterType.set( var, 
+	    ASMUtil.requiredEmitterType.set( (VariableInternal)var,
 		ASMUtil.RequiredEmitterType.NONE ) ;
 	return !Modifier.isAbstract( arg.modifiers() ) ;
     }
@@ -256,27 +223,27 @@ public class ASMSetupVisitor extends TreeWalker {
     // emitStore/emitLoad attributes for each Variable 
     // definition.  
     @Override
-    public boolean classGeneratorBeforeFields( ClassGenerator arg ) {
+    public boolean classGeneratorBeforeFields( ClassGeneratorImpl arg ) {
 	return true ;
     }
 
     @Override
-    public void classGeneratorBeforeInitializer( ClassGenerator arg ) {
+    public void classGeneratorBeforeInitializer( ClassGeneratorImpl arg ) {
 	variableDefiningContext = VariableContext.REFERENCE ;
     }
 
     @Override
-    public void classGeneratorBeforeMethod( ClassGenerator arg ) {
+    public void classGeneratorBeforeMethod( ClassGeneratorImpl arg ) {
 	variableDefiningContext = VariableContext.REFERENCE ;
     }
 
     @Override
-    public void classGeneratorBeforeConstructor( ClassGenerator arg ) {
+    public void classGeneratorBeforeConstructor( ClassGeneratorImpl arg ) {
 	variableDefiningContext = VariableContext.REFERENCE ;
     }
 
     @Override
-    public void postClassGenerator( ClassGenerator arg ) {
+    public void postClassGenerator( ClassGeneratorImpl arg ) {
 	variableDefiningContext = VariableContext.REFERENCE ;
     }
 
@@ -305,10 +272,10 @@ public class ASMSetupVisitor extends TreeWalker {
     public boolean preDefinitionStatement( DefinitionStatement arg ) {
 	variableDefiningContext = VariableContext.DEFINE_LOCAL_DEFINITION ;
 	if (preparing()) {
-	    ASMUtil.requiredEmitterType.set( arg.var(), 
+	    ASMUtil.requiredEmitterType.set( (VariableInternal)arg.var(),
 		ASMUtil.RequiredEmitterType.SETTER ) ; 
 	} else {
-	    if (ASMUtil.requiredEmitterType.get(arg.var()) != 
+	    if (ASMUtil.requiredEmitterType.get( (VariableInternal)arg.var()) !=
 		ASMUtil.RequiredEmitterType.SETTER )
 		verificationError( arg, 
 		    "Variable of definition statement should have requiredEmitterType true" ) ;
@@ -353,7 +320,7 @@ public class ASMSetupVisitor extends TreeWalker {
     public void tryStatementBeforeBlock( TryStatement arg,
 	Type type, Variable var, BlockStatement block ) {
 
-	ASMUtil.requiredEmitterType.set( var, 
+	ASMUtil.requiredEmitterType.set( (VariableInternal)var,
 	    ASMUtil.RequiredEmitterType.NONE ) ;
 	defineLocalVariable( var ) ;
     }
@@ -369,9 +336,9 @@ public class ASMSetupVisitor extends TreeWalker {
 
     @Override
     public boolean preAssignmentStatement( AssignmentStatement arg ) {
-	Expression left = arg.left() ;
+	ExpressionInternal left = arg.left() ;
 	assert left.isAssignable() ;
-	Expression right = arg.right() ;
+	ExpressionInternal right = arg.right() ;
 
 	if (preparing()) {
 	    ASMUtil.requiredEmitterType.set( left,
@@ -467,7 +434,8 @@ public class ASMSetupVisitor extends TreeWalker {
 	}
     }
 
-    private void initializeVariableEmitter( Variable arg ) {
+    private void initializeVariableEmitter( Variable param ) {
+        VariableInternal arg = (VariableInternal)param ;
 	// Define the emitter attribute for this Variable.
 	EmitterFactory.Emitter em = null ;
 	ASMUtil.RequiredEmitterType ret = 
@@ -491,7 +459,9 @@ public class ASMSetupVisitor extends TreeWalker {
 	finishVariableDefinition( arg ) ;
     }
 
-    private void allocateLocalVariable( Variable arg ) {
+    private void allocateLocalVariable( Variable param ) {
+        VariableInternal arg = (VariableInternal)param ;
+
 	// Get a slot from the slot allocator and use it to
 	// set the getEmitter and setEmitter attributes.
 	assert slotAllocator != null ;
@@ -507,7 +477,9 @@ public class ASMSetupVisitor extends TreeWalker {
 	}
     }
 
-    private void finishVariableDefinition( Variable arg ) {
+    private void finishVariableDefinition( Variable param ) {
+        VariableInternal arg = (VariableInternal)param ;
+
 	// Either parent is class, and we can use the class info to 
 	// set the getEmitter and setEmitter attributes, or not, 
 	// in which case the stackFrameSlot attribute is set.  
@@ -537,7 +509,7 @@ public class ASMSetupVisitor extends TreeWalker {
 		// references are set to GETTER.  The setters are
 		// handled in those particular conxtexts where they
 		// occur.
-		ASMUtil.requiredEmitterType.set( arg,
+		ASMUtil.requiredEmitterType.set( (VariableInternal)arg,
 		    ASMUtil.RequiredEmitterType.GETTER ) ; 
 		
 		// Only variable references should be labelled

@@ -73,7 +73,7 @@ import corba.framework.TestCaseTools ;
 // import corba.framework.TimerUtils ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 import com.sun.corba.se.spi.orbutil.generic.Holder ;
 
@@ -96,7 +96,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 public abstract class Client extends TestCase

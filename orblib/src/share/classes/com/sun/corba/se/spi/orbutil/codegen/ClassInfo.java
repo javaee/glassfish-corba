@@ -40,9 +40,6 @@ import java.util.Set ;
 import java.util.List ;
 import java.util.Map ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
-
 /** An interface that provides information about classes.  This can be
  * used to describe both ClassGenerators that are used to generate code
  * and pre-existing Java classes.

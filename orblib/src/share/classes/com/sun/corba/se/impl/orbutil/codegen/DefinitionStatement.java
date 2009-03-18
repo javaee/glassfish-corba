@@ -38,8 +38,6 @@ package com.sun.corba.se.impl.orbutil.codegen;
 import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 
-import com.sun.corba.se.impl.orbutil.codegen.StatementBase ;
-
 public final class DefinitionStatement extends StatementBase {
     private Variable var ;
     private Expression expr ;
@@ -58,6 +56,7 @@ public final class DefinitionStatement extends StatementBase {
 	return this.expr ;
     }
 
+    @Override
     public void accept( Visitor visitor ) {
 	visitor.visitDefinitionStatement( this ) ;
     }

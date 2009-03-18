@@ -364,7 +364,7 @@ public class Client
 	expectResult( "This_is_a_string", stringAction, "This_is_a_string" ) ;
 
 	// test classAction
-	Operation classAction = OperationFactory.classAction() ;
+	Operation classAction = OperationFactory.classAction( ORB.defaultClassNameResolver() ) ;
 	expectResult( "com.sun.corba.se.spi.orb.ORB", classAction,
 	    com.sun.corba.se.spi.orb.ORB.class ) ;
 
@@ -1043,7 +1043,7 @@ public class Client
     // Make properties for testing ORBData
     private Properties makeORBDataProperties() 
     {
-	ParserData[] data = ParserTable.get().getParserData() ;
+	ParserData[] data = ParserTable.get(ORB.defaultClassNameResolver()).getParserData() ;
 	Properties result = new Properties() ;
 	for (int ctr=0; ctr<data.length; ctr++ )
 	    data[ctr].addToProperties( result ) ;

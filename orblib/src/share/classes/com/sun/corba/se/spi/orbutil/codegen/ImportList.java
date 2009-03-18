@@ -36,16 +36,9 @@
 
 package com.sun.corba.se.spi.orbutil.codegen ;
 
-import java.util.Collections ;
 import java.util.List ;
-import java.util.ArrayList ;
-import java.util.Map ;
-import java.util.HashMap ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryVoidFunction ;
-
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
 
 public interface ImportList {
     /** Return a copy of this ImportList.

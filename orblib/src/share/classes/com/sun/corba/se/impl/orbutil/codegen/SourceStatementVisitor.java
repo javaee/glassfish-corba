@@ -37,40 +37,15 @@
 package com.sun.corba.se.impl.orbutil.codegen;
 
 import java.util.Date ;
-import java.util.Map ;
-import java.util.List ;
 
 import java.lang.reflect.Modifier ;
 
-import com.sun.corba.se.spi.orbutil.generic.UnaryVoidFunction ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
 import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.FieldInfo ;
-
-import com.sun.corba.se.impl.orbutil.codegen.AssignmentStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.CaseBranch ;
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.DefinitionStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
-import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.MethodGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.ReturnStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.Statement ;
-import com.sun.corba.se.impl.orbutil.codegen.SwitchStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ThrowStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalker ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalkerContext ;
-import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
-import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
 
 public class SourceStatementVisitor extends TreeWalker {
     private ImportList imports ;
@@ -94,9 +69,9 @@ public class SourceStatementVisitor extends TreeWalker {
 	this.className = "" ;
     }
     
-    // ClassGenerator
+    // ClassGeneratorImpl
     @Override
-    public boolean preClassGenerator( final ClassGenerator arg ) {
+    public boolean preClassGenerator( final ClassGeneratorImpl arg ) {
 	// Write out the package (if any)
 	className = arg.className() ;
 
@@ -113,15 +88,15 @@ public class SourceStatementVisitor extends TreeWalker {
 	String lastPackage = "" ;
 	for (Pair<String,String> data : imports.getInOrderList()) {
 	    String packageName = data.first() ;
-	    String className = data.second() ;
+	    String lcName = data.second() ;
 	    if (!lastPackage.equals( packageName )) {
 		pr.nl() ;
 	    }
 	    
 	    if (packageName.equals( "" )) {
-		pr.nl().p( "import " + className + " ;" ) ;
+		pr.nl().p( "import " + lcName + " ;" ) ;
 	    } else {
-		pr.nl().p( "import " + packageName + "." + className + " ;" ) ;
+		pr.nl().p( "import " + packageName + "." + lcName + " ;" ) ;
 	    } 
 
 	    lastPackage = packageName ;
@@ -174,34 +149,35 @@ public class SourceStatementVisitor extends TreeWalker {
 	}
 
 	if (!arg.isInterface() && (arg.constructors().size() == 0))
-	    throw new IllegalStateException( "All classes must define at least one constructor" ) ;
+	    throw new IllegalStateException(
+                "All classes must define at least one constructor" ) ;
 
 	return true ;
     }
 
     @Override
-    public boolean classGeneratorBeforeFields( ClassGenerator arg ) {
+    public boolean classGeneratorBeforeFields( ClassGeneratorImpl arg ) {
 	// Do not visit Fields.
 	return false ;
     }
 
     @Override
-    public void classGeneratorBeforeInitializer( ClassGenerator arg ) {
+    public void classGeneratorBeforeInitializer( ClassGeneratorImpl arg ) {
 	pr.nl().p( "static {" ).in() ;
     }
 
     @Override
-    public void classGeneratorBeforeMethod( ClassGenerator arg ) {
+    public void classGeneratorBeforeMethod( ClassGeneratorImpl arg ) {
 	pr.nl() ;
     }
 
     @Override
-    public void classGeneratorBeforeConstructor( ClassGenerator arg ) {
+    public void classGeneratorBeforeConstructor( ClassGeneratorImpl arg ) {
 	pr.nl() ;
     }
 
     @Override
-    public void postClassGenerator( ClassGenerator arg ) {
+    public void postClassGenerator( ClassGeneratorImpl arg ) {
 	pr.out().nl().p( "}" ).nl() ;
     }
     
@@ -213,7 +189,7 @@ public class SourceStatementVisitor extends TreeWalker {
 
     @Override
     public boolean preMethodGenerator( MethodGenerator arg ) {
-	ClassGenerator parent = ClassGenerator.class.cast( arg.parent() ) ;
+	ClassGeneratorImpl parent = ClassGeneratorImpl.class.cast( arg.parent() ) ;
 
 	if (arg.isConstructor()) 
 	    pr.nl().p(Modifier.toString(arg.modifiers())).p(" ")
@@ -226,9 +202,10 @@ public class SourceStatementVisitor extends TreeWalker {
 
 	int ctr = 0 ;
 	for (Variable var : arg.arguments()) {
+            VariableInternal ivar = (VariableInternal)var ;
 	    if (ctr > 0)
 		pr.p(", ") ;
-	    pr.p(typeName(var.type())).p(" ").p(var.ident()) ;
+	    pr.p(typeName(ivar.type())).p(" ").p(ivar.ident()) ;
 	    ctr++ ;
 	}
 	pr.p(")") ;
@@ -360,8 +337,10 @@ public class SourceStatementVisitor extends TreeWalker {
     public void postDefinitionStatement( DefinitionStatement arg ) {
 	SourceExpressionVisitor sev = 
 	    SourceExpressionVisitor.class.cast(context.pop()) ;
-	pr.nl(arg).p(typeName(arg.var().type())).p(" ")
-	    .p(arg.var().ident()).p(" = ").p(sev.value()).p(" ;") ;
+        VariableInternal ivar = (VariableInternal)arg.var() ;
+
+	pr.nl(arg).p(typeName(ivar.type())).p(" ")
+	    .p(ivar.ident()).p(" = ").p(sev.value()).p(" ;") ;
     }
 
     // IfStatement
@@ -459,7 +438,8 @@ public class SourceStatementVisitor extends TreeWalker {
     @Override
     public void tryStatementBeforeBlock( TryStatement arg,
 	Type type, Variable var, BlockStatement block ) {
-	pr.p(" catch (").p(typeName(type)).p(" ").p(var.ident()).p(") {").in() ;
+        VariableInternal ivar = (VariableInternal)var ;
+	pr.p(" catch (").p(typeName(type)).p(" ").p(ivar.ident()).p(") {").in() ;
     }
 
     @Override
@@ -496,9 +476,9 @@ public class SourceStatementVisitor extends TreeWalker {
 	// NO-OP
     }
     
-    // Expression
+    // ExpressionInternal
     @Override
-    public boolean preExpression( Expression arg ) {
+    public boolean preExpression( ExpressionInternal arg ) {
 	SourceExpressionVisitor sev = new SourceExpressionVisitor( context, imports ) ;
 	arg.accept( context.current() ) ;
 	context.pop() ;
@@ -507,7 +487,7 @@ public class SourceStatementVisitor extends TreeWalker {
     }
 
     @Override
-    public void postExpression( Expression arg ) {
+    public void postExpression( ExpressionInternal arg ) {
 	// NO-OP
     }
 }

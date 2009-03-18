@@ -73,7 +73,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
 import com.sun.corba.se.spi.orbutil.newtimer.LogEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
 

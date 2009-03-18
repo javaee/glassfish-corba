@@ -78,7 +78,7 @@ import corba.framework.TestCaseTools ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicStub ;
@@ -175,7 +175,7 @@ public class Client extends TestCase
 	// It is part of the optional ORB build.
 	String testName = "corba.dynamicrmiiiop.TestCodegenProxyCreator" ;
 	try {
-	    Class cls = ORBClassLoader.loadClass( testName ) ;
+	    Class cls = LibraryClassLoader.loadClass( testName ) ;
 	    ts.addTest( (TestSuite)TestCaseTools.makeTestSuite( cls ) ) ;
 	} catch (ClassNotFoundException exc) {
 	    // Test not available: no op

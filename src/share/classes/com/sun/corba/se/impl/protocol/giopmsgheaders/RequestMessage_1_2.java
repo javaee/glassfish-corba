@@ -49,7 +49,7 @@ import com.sun.corba.se.impl.encoding.CDROutputStream_1_2;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 
 /**
  * This implements the GIOP 1.2 Request header.

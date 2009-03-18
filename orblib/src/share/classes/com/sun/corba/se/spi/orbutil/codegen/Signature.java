@@ -36,6 +36,7 @@
 
 package com.sun.corba.se.spi.orbutil.codegen;
 
+import com.sun.corba.se.impl.orbutil.codegen.ExpressionInternal;
 import java.lang.reflect.Modifier ;
 
 import java.io.StringWriter ;
@@ -46,9 +47,6 @@ import java.util.Set ;
 import java.util.HashSet ;
 import java.util.ArrayList ;
 import java.util.Iterator ;
-
-import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.Immutable ;
 
@@ -177,8 +175,8 @@ public final class Signature {
 
     static List<Type> getExprTypes( List<Expression> exprs ) {
 	List<Type> result = new ArrayList<Type>() ;
-	for (Expression ex : exprs ) 
-	    result.add( ex.type() ) ;
+	for (Expression ex : exprs )
+	    result.add( ((ExpressionInternal)ex).type() ) ;
 	return result ;
     }
 

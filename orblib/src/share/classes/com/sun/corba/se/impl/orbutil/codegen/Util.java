@@ -41,40 +41,11 @@ import java.io.PrintStream ;
 import java.util.Set ;
 import java.util.Map ;
 import java.util.IdentityHashMap ;
-import java.util.List ;
 
 import java.lang.reflect.Modifier ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
-
-import com.sun.corba.se.impl.orbutil.codegen.AssignmentStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.CaseBranch ;
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.DefinitionStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
-import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.MethodGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.ReturnStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.BreakStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.Statement ;
-import com.sun.corba.se.impl.orbutil.codegen.SwitchStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ThrowStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalker ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalkerContext ;
-import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
-import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
-
-import com.sun.corba.se.impl.orbutil.codegen.Printer ;
-import com.sun.corba.se.impl.orbutil.codegen.Attribute ;
-
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 public final class Util {
     private Util() {}
@@ -97,14 +68,14 @@ public final class Util {
 		if (stmt instanceof DefinitionStatement) {
 		    DefinitionStatement ds = 
 			DefinitionStatement.class.cast( stmt ) ;
-		    ds.var().close() ;
+		    ((VariableInternal)ds.var()).close() ;
 		}
 	    }
 	  
 	    @Override
 	    public void visitMethodGenerator( MethodGenerator arg ) {
 		for (Variable var : arg.arguments()) {
-		    var.close() ;
+		    ((VariableInternal)var).close() ;
 		}
 	    }
 
@@ -112,23 +83,23 @@ public final class Util {
 	    public void tryStatementBeforeBlock( TryStatement arg,
 		Type type, Variable var, BlockStatement block ) {
 
-		var.close() ;
+		((VariableInternal)var).close() ;
 	    }
 	} ;
 	context.push( visitor ) ;
 	node.accept( visitor ) ;
     }
 
-    /** Throw an exception if any Expression reachable
+    /** Throw an exception if any ExpressionInternal reachable
      * from expr contains a Variable that is out of scope.
      * Note that this is only useful for Expressions.
      */
-    public static void checkScope( Expression expr ) {
+    public static void checkScope( ExpressionInternal expr ) {
 	TreeWalkerContext context = new TreeWalkerContext() ;
 	Visitor visitor = new TreeWalker( context ) {
 	    @Override
 	    public boolean preVariable( Variable arg ) {
-		if (!arg.isAvailable())
+		if (!((VariableInternal)arg).isAvailable())
 		    throw new IllegalStateException( arg + " is no longer in scope" ) ;
 		return false ;
 	    }
@@ -228,7 +199,7 @@ public final class Util {
 	    }
 
 	    @Override
-	    public boolean preClassGenerator( ClassGenerator arg ) {
+	    public boolean preClassGenerator( ClassGeneratorImpl arg ) {
 		pr.nl().p("ClassGenerator").p(getNodeIdString(arg))
 		    .p("[").p(Modifier.toString(arg.modifiers()))
 		    .p(" ").p((arg.isInterface() ? "interface" : "class"))
@@ -331,9 +302,10 @@ public final class Util {
 	    @Override
 	    public void tryStatementBeforeBlock( TryStatement arg,
 		Type type, Variable var, BlockStatement block ) {
+                VariableInternal ivar = (VariableInternal)var ;
 		pr.out().nl().p("TryStatement:catch[").p("type=").p(type.name())
-		    .p(",var=").p(var.ident()).p("]").in() ;
-		var.accept( this ) ;
+		    .p(",var=").p(ivar.ident()).p("]").in() ;
+		ivar.accept( this ) ;
 	    }
 
 	    @Override
@@ -353,7 +325,7 @@ public final class Util {
 	    @Override
 	    // All Expressions define a usable toString, so they all
 	    // can be handled by this method.
-	    public boolean preExpression( Expression arg ) {
+	    public boolean preExpression( ExpressionInternal arg ) {
 		pr.nl().p(arg.toString()) ;
 
 		return done( arg ) ;

@@ -36,9 +36,7 @@
 
 package com.sun.corba.se.impl.orbutil.codegen;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
-
-import com.sun.corba.se.impl.orbutil.codegen.StatementBase ;
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 
 /**
  *

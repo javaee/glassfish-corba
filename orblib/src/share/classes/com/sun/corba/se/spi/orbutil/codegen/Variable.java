@@ -36,25 +36,14 @@
 
 package com.sun.corba.se.spi.orbutil.codegen;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-
 public interface Variable extends Expression {
-    /** Return the type of this variable.
-     */
-    Type type() ;
-
     /** Return the name of this variable.
      */
     String ident() ;
 
-    /** Returns true if this variable is still in scope.
-     * Only variables still in scope may be referenced in
-     * expressions.
+    /** Return the type of this variable.
+     *
+     * @return The variable type.
      */
-    boolean isAvailable() ;
-
-    /** Mark the variable so that it is no longer in scope.
-     */
-    void close() ;
+    Type type() ;
 }

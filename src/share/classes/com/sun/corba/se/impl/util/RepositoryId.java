@@ -290,6 +290,16 @@ public class RepositoryId {
 	    java.lang.String.class);
 	kSpecialCasesClasses.put("javax.rmi.CORBA.ClassDesc", 
 	    java.lang.Class.class);
+
+        // 6793820: need to handle classes of primitive types!
+        kSpecialCasesClasses.put( "boolean", boolean.class ) ;
+        kSpecialCasesClasses.put( "byte", byte.class ) ;
+        kSpecialCasesClasses.put( "char", char.class ) ;
+        kSpecialCasesClasses.put( "short", short.class ) ;
+        kSpecialCasesClasses.put( "int", int.class ) ;
+        kSpecialCasesClasses.put( "long", long.class ) ;
+        kSpecialCasesClasses.put( "float", float.class ) ;
+        kSpecialCasesClasses.put( "double", double.class ) ;
     }
 
     public static final Hashtable kSpecialCasesArrayPrefix = new Hashtable();
@@ -600,7 +610,19 @@ public class RepositoryId {
 
     public final Class getClassFromType(String url) 
 	throws ClassNotFoundException, MalformedURLException {
-	return Util.getInstance().loadClass(getClassName(), url, null);
+        
+        // 6793820: check special cases BEFORE going to ClassLoader.
+        if (clazz != null)
+            return clazz;
+
+        Class specialCase = (Class)kSpecialCasesClasses.get(getClassName());
+
+        if (specialCase != null) {
+            clazz = specialCase;
+            return specialCase;
+        } else {
+            return Util.getInstance().loadClass(getClassName(), url, null);
+        }
     }
 
     public final String toString() {

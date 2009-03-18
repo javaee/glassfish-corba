@@ -45,18 +45,9 @@ import java.util.Properties ;
 import java.util.Map ;
 import java.util.HashMap ;
 
-import javax.ejb.EJBException ;
-
-import java.rmi.RemoteException ;
-
 import junit.framework.TestCase ;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
-
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.Util ;
-
+import com.sun.corba.se.spi.orbutil.codegen.ClassGenerator;
 import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
 
 /** Base class used to define code generator test suites.
@@ -92,11 +83,11 @@ public class GenerationTestSuiteBase extends TestCase {
 
     /** Utility method used to aid in formatting the display of an AST.
      */
-    public static void displayNode( String msg, Node node ) {
+    public static void displayAST( String msg, ClassGenerator cg ) {
 	System.out.println( ) ;
 	System.out.println( "=======================================================" ) ;
 	System.out.println( msg ) ;
-	Util.display( node, System.out ) ;	
+        _displayAST( cg, System.out ) ;
 	System.out.println() ;
 	System.out.println( "=======================================================" ) ;
     }
@@ -152,7 +143,7 @@ public class GenerationTestSuiteBase extends TestCase {
     private Class<?> doGeneration( SimpleCodeGenerator gen ) { 
 	if (debug) {
 	    ClassGenerator cg = _classGenerator() ;
-	    displayNode( "Generated AST for class " + cg.name(), cg ) ;
+	    displayAST( "Generated AST for class " + cg.name(), cg ) ;
 	}
 
 	try {

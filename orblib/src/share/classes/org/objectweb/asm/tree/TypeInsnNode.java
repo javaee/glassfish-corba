@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.tree;
+
+import java.util.Map;
 
 import org.objectweb.asm.MethodVisitor;
 
@@ -38,46 +39,46 @@ import org.objectweb.asm.MethodVisitor;
  * 
  * @author Eric Bruneton
  */
-
 public class TypeInsnNode extends AbstractInsnNode {
 
-  /**
-   * The operand of this instruction. This operand is a type descriptor (see
-   * {@link Type}).
-   */
+    /**
+     * The operand of this instruction. This operand is an internal name (see
+     * {@link org.objectweb.asm.Type}).
+     */
+    public String desc;
 
-  public String desc;
+    /**
+     * Constructs a new {@link TypeInsnNode}.
+     * 
+     * @param opcode the opcode of the type instruction to be constructed. This
+     *        opcode must be NEW, ANEWARRAY, CHECKCAST or INSTANCEOF.
+     * @param desc the operand of the instruction to be constructed. This
+     *        operand is an internal name (see {@link org.objectweb.asm.Type}).
+     */
+    public TypeInsnNode(final int opcode, final String desc) {
+        super(opcode);
+        this.desc = desc;
+    }
 
-  /**
-   * Constructs a new {@link TypeInsnNode}.
-   *
-   * @param opcode the opcode of the type instruction to be constructed. This
-   *      opcode must be NEW, NEWARRAY, ANEWARRAY, CHECKCAST or INSTANCEOF.
-   * @param desc the operand of the instruction to be constructed. This operand
-   *      is a type descriptor (see {@link Type}).
-   */
+    /**
+     * Sets the opcode of this instruction.
+     * 
+     * @param opcode the new instruction opcode. This opcode must be NEW,
+     *        ANEWARRAY, CHECKCAST or INSTANCEOF.
+     */
+    public void setOpcode(final int opcode) {
+        this.opcode = opcode;
+    }
 
-  public TypeInsnNode (final int opcode, final String desc) {
-    super(opcode);
-    this.desc = desc;
-  }
+    public int getType() {
+        return TYPE_INSN;
+    }
 
-  /**
-   * Sets the opcode of this instruction.
-   *
-   * @param opcode the new instruction opcode. This opcode must be
-   *      NEW, ANEWARRAY, CHECKCAST or INSTANCEOF.
-   */
+    public void accept(final MethodVisitor mv) {
+        mv.visitTypeInsn(opcode, desc);
+    }
 
-  public void setOpcode (final int opcode) {
-    this.opcode = opcode;
-  }
-
-  public void accept (final MethodVisitor mv) {
-    mv.visitTypeInsn(opcode, desc);
-  }
-  
-  public int getType () {
-    return TYPE_INSN;
-  }
+    public AbstractInsnNode clone(final Map labels) {
+        return new TypeInsnNode(opcode, desc);
+    }
 }

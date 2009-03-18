@@ -44,7 +44,7 @@ import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
 
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+import com.sun.corba.se.spi.orbutil.codegen.ClassGenerator ;
 
 import corba.codegen.ClassGeneratorFactory ;
 
@@ -128,7 +128,7 @@ public class _DImpl_Tie_gen implements ClassGeneratorFactory {
 	    _method( PUBLIC, _void(), "deactivate" ) ;
 	    _body() ;
 		_try() ;
-		    NullaryFunction<Expression> mpc = 
+		    NullaryFunction<Expression> mpc =
 			new NullaryFunction<Expression>() {
 			    public Expression evaluate() {
 				return _call( _this(), "_poa", _s(_t("POA"))) ;

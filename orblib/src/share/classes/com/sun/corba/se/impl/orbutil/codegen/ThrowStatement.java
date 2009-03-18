@@ -38,12 +38,12 @@ package com.sun.corba.se.impl.orbutil.codegen;
 
 import com.sun.corba.se.impl.orbutil.codegen.StatementBase ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
+import com.sun.corba.se.impl.orbutil.codegen.ExpressionInternal ;
 
 public final class ThrowStatement extends StatementBase {
-    private Expression expr ;
+    private ExpressionInternal expr ;
 
-    ThrowStatement( Node parent, Expression expr ) {
+    ThrowStatement( Node parent, ExpressionInternal expr ) {
 	super( parent ) ;
 	this.expr = expr ;
     }
@@ -52,7 +52,7 @@ public final class ThrowStatement extends StatementBase {
 	this( parent, null ) ;
     }
 
-    public Expression expr() {
+    public ExpressionInternal expr() {
 	return expr ;
     }
    

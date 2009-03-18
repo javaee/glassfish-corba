@@ -44,19 +44,13 @@ package com.sun.corba.se.impl.activation;
  * @since       JDK1.2
  */
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.omg.CORBA.OBJECT_NOT_EXIST;
-import org.omg.CORBA.SystemException;
-
 import com.sun.corba.se.spi.activation.EndPointInfo;
-import com.sun.corba.se.spi.activation.IIOP_CLEAR_TEXT;
 import com.sun.corba.se.spi.activation.ORBPortInfo;
 import com.sun.corba.se.spi.activation.Repository;
 import com.sun.corba.se.spi.activation.LocatorPackage.ServerLocation;
@@ -94,8 +88,6 @@ import com.sun.corba.se.impl.logging.ActivationSystemException ;
 
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.util.Utility;
 
 public class ServerManagerImpl extends _ServerManagerImplBase
     implements BadServerIdHandler

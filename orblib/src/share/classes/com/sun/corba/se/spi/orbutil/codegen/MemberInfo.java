@@ -36,16 +36,6 @@
 
 package com.sun.corba.se.spi.orbutil.codegen;
 
-import java.util.List ;
-import java.util.ArrayList ;
-
-import java.lang.reflect.Method ;
-import java.lang.reflect.Constructor ;
-
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Variable ;
-
 /** An interface that provides information common to all kinds of class
  * members.  This includes data members (represented by FieldInfo) and
  * methods and constructors (represented by MethodInfo).  This can be

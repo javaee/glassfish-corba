@@ -186,6 +186,9 @@ public class ORBConstants {
     // All of our proprietary properties must start with com.sun.corba.se
     public static final String SUN_PREFIX = "com.sun.corba.se." ;
 
+    // special property (system only) for enabling OSGIListener debug
+    public static final String DEBUG_OSGI_LISTENER = SUN_PREFIX + "ORBDebugOSGIListener" ;
+
     // general properties
     public static final String ALLOW_LOCAL_OPTIMIZATION		= SUN_PREFIX + "ORBAllowLocalOptimization" ;
     public static final String SERVER_PORT_PROPERTY		= SUN_PREFIX + "ORBServerPort" ;

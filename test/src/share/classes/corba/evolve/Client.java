@@ -49,15 +49,17 @@ import org.testng.annotations.BeforeSuite ;
 import org.testng.Assert ;
 
 import corba.framework.TestngRunner ;
+import mymath.BigDecimal ;
 
 public class Client
 {
     private UserNameVerifier verifier ;
+    private ORB orb ;
 
     @BeforeSuite 
     public void setup() throws Exception {
         String[] args = new String[0] ;
-        ORB orb = ORB.init(args, System.getProperties());
+        orb = ORB.init(args, System.getProperties());
 
         org.omg.CORBA.Object objRef = 
             orb.resolve_initial_references("NameService");
@@ -118,6 +120,36 @@ public class Client
 
         System.out.println("Validating the FeatureInfo" ) ;
         Assert.assertTrue( verifier.validateFeatureInfo( finfo ) ) ;
+    }
+
+    private void setSerializationDebug( boolean flag ) {
+        ((com.sun.corba.se.spi.orb.ORB)orb).cdrDebugFlag = flag ;
+        ((com.sun.corba.se.spi.orb.ORB)orb).streamFormatVersionDebugFlag = flag ;
+        ((com.sun.corba.se.spi.orb.ORB)orb).valueHandlerDebugFlag = flag ;
+    }
+
+    @Test
+    public void testBigDecimal() throws Exception {
+        System.out.println( "Testing BigDecimal interop" )  ;
+        BigDecimal orig = new BigDecimal( "123456789012345678901234567890.12312312312" ) ;
+
+        // setSerializationDebug( true ) ;
+        BigDecimal result = (BigDecimal)verifier.echo( orig ) ;
+        // setSerializationDebug( false ) ;
+        
+        Assert.assertEquals( orig, result ) ;
+    }
+
+    @Test
+    public void testWithoutPrimitives() throws Exception {
+        System.out.println( "Testing WithoutPrimitives interop" )  ;
+        WithoutPrimitives orig = new WithoutPrimitives() ;
+
+        // setSerializationDebug( true ) ;
+        WithoutPrimitives result = (WithoutPrimitives)verifier.echo( orig ) ;
+        // setSerializationDebug( false ) ;
+        
+        Assert.assertEquals( orig, result ) ;
     }
 
     public static void main(String args[]) {

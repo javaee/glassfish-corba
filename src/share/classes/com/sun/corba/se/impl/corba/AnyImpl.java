@@ -71,7 +71,7 @@ import com.sun.corba.se.impl.io.ValueUtility;
 import com.sun.corba.se.impl.orbutil.RepositoryIdFactory;
 import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
 // subclasses must provide a matching helper class

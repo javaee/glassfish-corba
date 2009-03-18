@@ -42,7 +42,7 @@ import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
 
 import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
 
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+import com.sun.corba.se.impl.orbutil.codegen.ClassGeneratorImpl ;
 
 public abstract class CodeGeneratorBase implements SimpleCodeGenerator {
     private String className ;
@@ -53,7 +53,7 @@ public abstract class CodeGeneratorBase implements SimpleCodeGenerator {
 
 	long start = System.nanoTime() ;
 	try {
-	    // Create the ClassGenerator as a side effect of this
+	    // Create the ClassGeneratorImpl as a side effect of this
 	    // call.  It is available through the Wrapper API.
 	    cgf.evaluate() ;
 	} finally {

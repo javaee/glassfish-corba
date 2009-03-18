@@ -60,10 +60,7 @@ public class WorkQueueImpl implements WorkQueue
     private ThreadPool workerThreadPool;
 
     private long workItemsAdded = 0;
-
-    // Initialized to 1 to avoid divide by zero in averageTimeInQueue()
-    private long workItemsDequeued = 1;
-
+    private long workItemsDequeued = 0;
     private long totalTimeInQueue = 0;
 
     // Name of the work queue
@@ -212,7 +209,10 @@ public class WorkQueueImpl implements WorkQueue
             }
         }
         
-        return queue.poll();
+        Work work = queue.poll();
+        workItemsDequeued++ ;
+        totalTimeInQueue += System.currentTimeMillis() - work.getEnqueueTime() ;
+        return work ;
     }
 
     private synchronized boolean isQueueEmpty() {
@@ -247,7 +247,11 @@ public class WorkQueueImpl implements WorkQueue
      * to be processed.
      */
     public synchronized long averageTimeInQueue() {
-        return (totalTimeInQueue/workItemsDequeued);
+        if (workItemsDequeued == 0) {
+            return 0 ;
+        } else { 
+            return (totalTimeInQueue/workItemsDequeued);
+        }
     }
 
     public String getName() {

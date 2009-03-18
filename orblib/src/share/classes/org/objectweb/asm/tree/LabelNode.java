@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.tree;
+
+import java.util.Map;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -36,21 +37,39 @@ import org.objectweb.asm.MethodVisitor;
 /**
  * An {@link AbstractInsnNode} that encapsulates a {@link Label}.
  */
-
 public class LabelNode extends AbstractInsnNode {
 
-  public Label label;
-  
-  public LabelNode (final Label label) {
-    super(-1);
-    this.label = label;
-  }
+    private Label label;
 
-  public void accept (final MethodVisitor cv) {
-    cv.visitLabel(label);
-  }
+    public LabelNode() {
+        super(-1);
+    }
 
-  public int getType () {
-    return LABEL;
-  }
+    public LabelNode(final Label label) {
+        super(-1);
+        this.label = label;
+    }
+
+    public int getType() {
+        return LABEL;
+    }
+
+    public Label getLabel() {
+        if (label == null) {
+            label = new Label();
+        }
+        return label;
+    }
+
+    public void accept(final MethodVisitor cv) {
+        cv.visitLabel(getLabel());
+    }
+
+    public AbstractInsnNode clone(final Map labels) {
+        return (LabelNode) labels.get(this);
+    }
+
+    public void resetLabel() {
+        label = null;
+    }
 }

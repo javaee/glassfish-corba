@@ -189,8 +189,11 @@ public class SelectorImpl
 
 	if (eventHandler.shouldUseSelectThreadToWait()) {
 	    SelectionKey selectionKey = eventHandler.getSelectionKey();
-	    selectionKey.cancel();
-	    selector.wakeup();
+            if (selectionKey != null) {
+                selectionKey.cancel();
+                selector.wakeup();
+            }
+
 	    return;
 	}
 

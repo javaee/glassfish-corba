@@ -77,7 +77,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 // import corba.framework.TimerUtils ;

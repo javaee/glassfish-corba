@@ -55,6 +55,12 @@ public class UserORBConfiguratorImpl
     public static String propertyName = "userConfigProperty";
 
     private static class ConfigParser extends ParserImplBase {
+        private ORB orb ;
+
+        public ConfigParser( ORB orb ) {
+            this.orb = orb ;
+        }
+
 	public Class testclass = 
 	    corba.orbconfigappserv.UserORBConfiguratorImpl.class;
 
@@ -62,14 +68,14 @@ public class UserORBConfiguratorImpl
 	{
 	    PropertyParser parser = new PropertyParser() ;
 	    parser.add( propertyName,
-			OperationFactory.classAction(), 
+			OperationFactory.classAction(orb.classNameResolver()), 
 			"testclass" ) ;
 	    return parser ;
 	}
     }
 
     public void configure( DataCollector dc, ORB orb ) {
-	ConfigParser parser = new ConfigParser();
+	ConfigParser parser = new ConfigParser( orb );
 	parser.init( dc );
 	Class theTestclass = parser.testclass;
 

@@ -42,20 +42,17 @@ import java.util.HashSet ;
 import java.util.IdentityHashMap ;
 import java.util.Arrays ;
 import java.util.ArrayList ;
-import java.util.Map ;
-import java.util.HashMap ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Signature ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 import com.sun.corba.se.spi.orbutil.codegen.FieldInfo ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.Copy ;
 import com.sun.corba.se.spi.orbutil.copyobject.CopyType ;
 
-import com.sun.corba.se.impl.orbutil.codegen.NodeBase ;
 
 /** Used to create all expressions.  BlockStatement is used as the
  * factory for creating instances of ExpressionFactory.  All statements
@@ -86,18 +83,22 @@ public final class ExpressionFactory {
      * This may be the only way this can be done, since there
      * is no way to create a List<Expression>.class constant
      * to pass to a T copy( Class<T> ) call on NodeBase.
-     * A cast to List<Expression> is not type safe, so it 
+     * A cast to List<Expression> is not type safe, so it
      * would create a compiler warning, although never would 
      * result in a runtime exception.
      */
     static List<Expression> copyExpressionList( Node newParent, List<Expression> exprs ) {
 	List<Expression> result = new ArrayList<Expression>() ;
 	for (Expression expr : exprs)
-	    result.add( expr.copy(newParent, Expression.class) ) ;
+	    result.add( ((ExpressionInternal)expr).copy(
+                (ExpressionInternal)newParent,
+                ExpressionInternal.class) ) ;
 	return result ;
     }
 
-    public static abstract class ExpressionBase extends NodeBase implements Expression {
+    public static abstract class ExpressionBase extends NodeBase
+        implements ExpressionInternal {
+
 	@Copy( CopyType.IDENTITY ) 
 	private ExpressionFactory expressionFactory ;
 
@@ -175,47 +176,47 @@ public final class ExpressionFactory {
 	}
     }
 
-    public Expression _null() {
+    public ExpressionInternal _null() {
 	return new ConstantExpression( this, Type._null(), null ) ;
     }
 
-    public Expression _const( boolean c ) {
+    public ExpressionInternal _const( boolean c ) {
 	return new ConstantExpression( this, Type._boolean(), c ) ;
     }
 
-    public Expression _const( char c ) {
+    public ExpressionInternal _const( char c ) {
 	return new ConstantExpression( this, Type._char(), c ) ;
     }
 
-    public Expression _const( byte c ) {
+    public ExpressionInternal _const( byte c ) {
 	return new ConstantExpression( this, Type._byte(), c ) ;
     }
 
-    public Expression _const( short c ) {
+    public ExpressionInternal _const( short c ) {
 	return new ConstantExpression( this, Type._short(), c ) ;
     }
 
-    public Expression _const( int c ) {
+    public ExpressionInternal _const( int c ) {
 	return new ConstantExpression( this, Type._int(), c ) ;
     }
 
-    public Expression _const( long c ) {
+    public ExpressionInternal _const( long c ) {
 	return new ConstantExpression( this, Type._long(), c ) ;
     }
 
-    public Expression _const( float c ) {
+    public ExpressionInternal _const( float c ) {
 	return new ConstantExpression( this, Type._float(), c ) ;
     }
 
-    public Expression _const( double c ) {
+    public ExpressionInternal _const( double c ) {
 	return new ConstantExpression( this, Type._double(), c ) ;
     }
 
-    public Expression _const( String c ) {
+    public ExpressionInternal _const( String c ) {
 	return new ConstantExpression( this, Type._String(), c ) ;
     }
 
-    public Expression _const( Type c ) {
+    public ExpressionInternal _const( Type c ) {
 	return new ConstantExpression( this, Type._Class(), c ) ;
     }
 
@@ -244,7 +245,7 @@ public final class ExpressionFactory {
 	}
     }
 
-    public Expression _void() {
+    public ExpressionInternal _void() {
 	return new VoidExpression( this );
     }
 
@@ -262,7 +263,7 @@ public final class ExpressionFactory {
 	    // we should type it as the static type of the defining
 	    // class.  This can be determined by walking up the
 	    // parent chain until we find the class. 
-	    ClassGenerator cg = getAncestor( ClassGenerator.class ) ;
+	    ClassGeneratorImpl cg = getAncestor( ClassGeneratorImpl.class ) ;
 	    if (cg == null)
 		throw new IllegalStateException(
 		    "No ClassGenerator found!" ) ;
@@ -282,7 +283,7 @@ public final class ExpressionFactory {
 	}
     }
 
-    public Expression _this() {
+    public ExpressionInternal _this() {
 	return new ThisExpression( this ) ;
     }
 
@@ -291,7 +292,7 @@ public final class ExpressionFactory {
     /** Representation of any sort of method call other than a 
      * constructor invocation.  There are two main cases here:
      * static calls, represented by CallExpression<Type>, and
-     * non-static calls, represented by CallExpression<Expression>.
+     * non-static calls, represented by CallExpression<ExpressionInternal>.
      * This abstract base class has two concrete subclasses, one
      * for static, and one for non-static calls.
      * <P>
@@ -379,7 +380,9 @@ public final class ExpressionFactory {
 	NonStaticCallExpression( ExpressionFactory ef, Expression target, String ident,
 	    Signature signature, List<Expression> args ) {
 	    super( ef, ident, signature, args ) ;
-	    target( target.copy( this, Expression.class ) ) ;
+	    target( 
+                ((ExpressionInternal)target).copy( this,
+                    ExpressionInternal.class ) ) ;
 	}
 
 	@Override
@@ -402,9 +405,10 @@ public final class ExpressionFactory {
 
     /** Construct a representation of a non-static method invocation.
      */
-    public Expression call( Expression target, String ident, Signature signature, 
+    public Expression call( Expression target, String ident, Signature signature,
 	List<Expression> exprs ) {
-	signature.checkCompatibility( target.type(), ident, exprs ) ;
+	signature.checkCompatibility( ((ExpressionInternal)target).type(),
+            ident, exprs ) ;
 	return new NonStaticCallExpression( this, target, ident, signature, exprs ) ; 
     }
 
@@ -412,15 +416,16 @@ public final class ExpressionFactory {
      * on the types of the expressions in exprs.  Can probably be used in most
      * circumstances.
      */
-    public Expression call( Expression target, String ident, 
+    public Expression call( Expression target, String ident,
 	List<Expression> exprs ) {
-	Signature sig = Signature.fromCall( target.type(), ident, exprs ) ;
+	Signature sig = Signature.fromCall( ((ExpressionInternal)target).type(),
+            ident, exprs ) ;
 	return new NonStaticCallExpression( this, target, ident, sig, exprs ) ; 
     }
 
     /** Construct a representation of a static method invocation.
      */
-    public Expression staticCall( Type target, String ident, Signature signature, 
+    public Expression staticCall( Type target, String ident, Signature signature,
 	List<Expression> exprs ) {
 
 	signature.checkStaticCompatibility( target, ident, exprs ) ;
@@ -435,7 +440,7 @@ public final class ExpressionFactory {
      * on the types of the expressions in exprs.  Can probably be used in most
      * circumstances.
      */
-    public Expression staticCall( Type target, String ident, 
+    public Expression staticCall( Type target, String ident,
 	List<Expression> exprs ) {
 	if (target.isPrimitive() || target.isArray())
 	    throw new IllegalArgumentException(
@@ -455,9 +460,10 @@ public final class ExpressionFactory {
     public enum UnaryOperator{ 
 	NOT( "!" ) {
 	    public void checkType( Expression arg ) {
-		if (arg.type() != Type._boolean())
+                Type type = ((ExpressionInternal)arg).type() ;
+		if (type != Type._boolean())
 		    throw new IllegalArgumentException( 
-			"! expects a boolean type, found " + arg.type() ) ;
+			"! expects a boolean type, found " + type ) ;
 	    }
 	} ;
 
@@ -484,7 +490,8 @@ public final class ExpressionFactory {
 	UnaryOperatorExpression( ExpressionFactory ef, UnaryOperator op, Expression expr ) {
 	    super( ef ) ;
 	    this.op = op ;
-	    this.expr = expr.copy(this, Expression.class);
+	    this.expr = ((ExpressionInternal)expr).copy( this,
+                ExpressionInternal.class);
 	}
 
 	public UnaryOperator operator() {
@@ -531,67 +538,72 @@ public final class ExpressionFactory {
      */
     public enum BinaryOperator{ 
 	PLUS( "+" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
 	    }
 
+            @Override
 	    public BinaryOperatorKind kind() {
 		return BinaryOperatorKind.NUMERIC ;
 	    }
 	},
 
 	TIMES( "*" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
 	    }
 
+            @Override
 	    public BinaryOperatorKind kind() {
 		return BinaryOperatorKind.NUMERIC ;
 	    }
 	},
 
 	DIV( "/" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
 	    }
 
+            @Override
 	    public BinaryOperatorKind kind() {
 		return BinaryOperatorKind.NUMERIC ;
 	    }
 	},
 
 	MINUS( "-" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
 	    }
 
+            @Override
 	    public BinaryOperatorKind kind() {
 		return BinaryOperatorKind.NUMERIC ;
 	    }
 	},
 
 	REM( "%" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
 	    }
 
+            @Override
 	    public BinaryOperatorKind kind() {
 		return BinaryOperatorKind.NUMERIC ;
 	    }
 	},
 
 	GT( ">" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
@@ -599,7 +611,7 @@ public final class ExpressionFactory {
 	},
 
 	GE( ">=" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
@@ -607,7 +619,7 @@ public final class ExpressionFactory {
 	},
 
 	LT( "<" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
@@ -615,7 +627,7 @@ public final class ExpressionFactory {
 	},
 
 	LE( "<=" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createNumericExpression( this, ef, left, right ) ;
@@ -623,7 +635,7 @@ public final class ExpressionFactory {
 	},
 
 	EQ( "==" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createEqualityExpression( this, ef, left, right ) ;
@@ -631,7 +643,7 @@ public final class ExpressionFactory {
 	},
 
 	NE( "!=" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		return createEqualityExpression( this, ef, left, right ) ;
@@ -639,7 +651,7 @@ public final class ExpressionFactory {
 	},
 
 	AND( "&&" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		if ((left != Type._boolean()) || (right != Type._boolean()))
@@ -649,13 +661,14 @@ public final class ExpressionFactory {
 		return new IfExpression( ef, left, right, ef._const( false ) ) ;
 	    }
 
+            @Override
 	    public BinaryOperatorKind kind() {
 		return BinaryOperatorKind.BOOLEAN ;
 	    }
 	},
 
 	OR( "||" ) {
-	    public Expression create( ExpressionFactory ef, 
+	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
 		if ((left != Type._boolean()) || (right != Type._boolean()))
@@ -665,6 +678,7 @@ public final class ExpressionFactory {
 		return ef.ifExpression( left, ef._const( true ), right ) ;
 	    }
 
+            @Override
 	    public BinaryOperatorKind kind() {
 		return BinaryOperatorKind.BOOLEAN ;
 	    }
@@ -672,31 +686,34 @@ public final class ExpressionFactory {
 
 	private final String javaRepresentation ;
 
-	private static Expression createNumericExpression( 
+	private static Expression createNumericExpression(
 	    final BinaryOperator op,
 	    final ExpressionFactory ef,
 	    final Expression left, final Expression right ) {
 
 	    Expression lb = left ;
-	    Expression rb = right ;
+            Type ltype = ((ExpressionInternal)left).type() ;
 
-	    Type ctype = left.type().binaryPromotion( right.type() ) ;
-	    if (!ctype.equals( left.type() ))
+	    Expression rb = right ;
+            Type rtype = ((ExpressionInternal)right).type() ;
+
+	    Type ctype = ltype.binaryPromotion( rtype ) ;
+	    if (!ctype.equals( ltype ))
 		lb = ef.cast( ctype, lb ) ;
-	    if (!ctype.equals( right.type() ))
+	    if (!ctype.equals( rtype ))
 		rb = ef.cast( ctype, rb ) ;
 
 	    return new BinaryOperatorExpression( ef, ctype, lb, op, rb ) ;
 	}
 
 	// See JLS 15.20
-	private static Expression createEqualityExpression( 
+	private static Expression createEqualityExpression(
 	    final BinaryOperator op,
 	    final ExpressionFactory ef,
 	    final Expression left, final Expression right ) {
 
-	    Type ltype = left.type() ;
-	    Type rtype = right.type() ;
+	    Type ltype = ((ExpressionInternal)left).type() ;
+	    Type rtype = ((ExpressionInternal)right).type() ;
 
 	    if (rtype.equals(Type._boolean()) &&
 	        ltype.equals(Type._boolean())) {
@@ -706,10 +723,10 @@ public final class ExpressionFactory {
 		Expression lb = left ;
 		Expression rb = right ;
 
-		Type ctype = left.type().binaryPromotion( right.type() ) ;
-		if (!ctype.equals( left.type() ))
+		Type ctype = ltype.binaryPromotion( rtype ) ;
+		if (!ctype.equals( ltype ))
 		    lb = ef.cast( ctype, lb ) ;
-		if (!ctype.equals( right.type() ))
+		if (!ctype.equals( rtype ))
 		    rb = ef.cast( ctype, rb ) ;
 
 		return new BinaryOperatorExpression( ef, Type._boolean(), 
@@ -758,9 +775,11 @@ public final class ExpressionFactory {
 
 	    super( ef ) ;
 	    this.type = type ;
-	    this.left = left.copy(this, Expression.class);
+	    this.left = ((ExpressionInternal)left).copy(this,
+                ExpressionInternal.class);
 	    this.op = op ;
-	    this.right = right.copy(this, Expression.class);
+	    this.right = ((ExpressionInternal)right).copy(this,
+                ExpressionInternal.class);
 	}
 
 	public BinaryOperator operator() {
@@ -805,7 +824,8 @@ public final class ExpressionFactory {
 	CastExpression( ExpressionFactory ef, Type type, Expression expr ) {
 	    super( ef ) ;
 	    this.type = type ;
-	    this.expr = expr.copy(this, Expression.class);
+	    this.expr = ((ExpressionInternal)expr).copy(this,
+                ExpressionInternal.class);
 	}
 
 	public Expression expr() {
@@ -840,7 +860,8 @@ public final class ExpressionFactory {
 
 	InstofExpression( ExpressionFactory ef, Expression expr, Type type ) {
 	    super( ef ) ;
-	    this.expr = expr.copy(this, Expression.class);
+	    this.expr = ((ExpressionInternal)expr).copy(this,
+                ExpressionInternal.class);
 	    this.itype = type ;
 	}
 
@@ -932,11 +953,12 @@ public final class ExpressionFactory {
 	private Expression size ;
 	private List<Expression> exprs ;
 
-	NewArrExpression( ExpressionFactory ef, Type ctype, Expression size, 
+	NewArrExpression( ExpressionFactory ef, Type ctype, Expression size,
 	    List<Expression> exprs ) {
 	    super( ef ) ;
 	    this.ctype = ctype ;
-	    this.size = size.copy( this, Expression.class ) ;
+	    this.size = ((ExpressionInternal)size).copy( this,
+                ExpressionInternal.class ) ;
 	    this.exprs = copyExpressionList( this, exprs ) ;
 	}
 
@@ -1020,13 +1042,13 @@ public final class ExpressionFactory {
 	}
     }
 
-    public Expression superCall( String ident, Signature signature, 
+    public Expression superCall( String ident, Signature signature,
 	List<Expression> exprs ) {
 	return new SuperCallExpression( this, ident, signature, exprs ) ;
     }
 
     public Expression superCall( String ident, List<Expression> exprs ) {
-	ClassGenerator cg = efparent().getAncestor(ClassGenerator.class) ;
+	ClassGeneratorImpl cg = efparent().getAncestor(ClassGeneratorImpl.class) ;
 	if (cg == null)
 	    throw new IllegalStateException(
 		"No ClassGenerator found!" ) ;
@@ -1083,7 +1105,7 @@ public final class ExpressionFactory {
      * from the Expression list exprs.
      */
     public Expression superObj( List<Expression> exprs ) {
-	ClassGenerator cg = efparent().getAncestor(ClassGenerator.class) ;
+	ClassGeneratorImpl cg = efparent().getAncestor(ClassGeneratorImpl.class) ;
 	if (cg == null)
 	    throw new IllegalStateException(
 		"No ClassGenerator found!" ) ;
@@ -1140,7 +1162,7 @@ public final class ExpressionFactory {
      * from the Expression list exprs.
      */
     public Expression thisObj( List<Expression> exprs ) {
-	ClassGenerator cg = efparent().getAncestor(ClassGenerator.class) ;
+	ClassGeneratorImpl cg = efparent().getAncestor(ClassGeneratorImpl.class) ;
 	if (cg == null)
 	    throw new IllegalStateException(
 		"No ClassGenerator found!" ) ;
@@ -1160,6 +1182,7 @@ public final class ExpressionFactory {
 	    this.fieldName = fieldName ;
 	}
 
+        @Override
 	public boolean isAssignable() {
 	    // XXX What if this field is final?  
 	    return true ;
@@ -1189,7 +1212,7 @@ public final class ExpressionFactory {
 		    "Type " + targetType().name() + " does not contain field " +
 		    fieldName ) ;
 
-	    ClassGenerator defClass = getAncestor( ClassGenerator.class ) ;
+	    ClassGeneratorImpl defClass = getAncestor( ClassGeneratorImpl.class ) ;
 
 	    if (fld.isAccessibleInContext( defClass, cinfo ))
 		return fld.type()  ;
@@ -1203,10 +1226,11 @@ public final class ExpressionFactory {
     public static final class NonStaticFieldAccessExpression extends 
 	FieldAccessExpressionBase<Expression> {
 
-	NonStaticFieldAccessExpression( ExpressionFactory ef, Expression target, 
+	NonStaticFieldAccessExpression( ExpressionFactory ef, Expression target,
 	    String fieldName ) {
 	    super( ef, fieldName ) ;
-	    target( target.copy(this, Expression.class) ) ;
+	    target( ((ExpressionInternal)target).copy(this,
+                ExpressionInternal.class) ) ;
 	}
 
 	@Override
@@ -1216,7 +1240,7 @@ public final class ExpressionFactory {
 
 	@Override
 	public Type targetType() {
-	    return target().type() ;
+	    return ((ExpressionInternal)target()).type() ;
 	}
 
 	@Override
@@ -1279,10 +1303,13 @@ public final class ExpressionFactory {
 
 	ArrayIndexExpression( ExpressionFactory ef, Expression expr, Expression index ) {
 	    super( ef ) ;
-	    this.expr = expr.copy(this, Expression.class);
-	    this.index = index.copy(this, Expression.class);
+	    this.expr = ((ExpressionInternal)expr).copy(this,
+                ExpressionInternal.class);
+	    this.index = ((ExpressionInternal)index).copy(this,
+                ExpressionInternal.class);
 	}
 
+        @Override
 	public boolean isAssignable() {
 	    return true ;
 	}
@@ -1296,7 +1323,7 @@ public final class ExpressionFactory {
 	}
 
 	public Type type() {
-	    Type atype = expr.type().memberType() ;
+	    Type atype = ((ExpressionInternal)expr).type().memberType() ;
 	    return atype ;
 	}
 
@@ -1323,7 +1350,8 @@ public final class ExpressionFactory {
 
 	ArrayLengthExpression( ExpressionFactory ef, Expression expr ) {
 	    super( ef ) ;
-	    this.expr = expr.copy(this, Expression.class);
+	    this.expr = ((ExpressionInternal)expr).copy(this,
+                ExpressionInternal.class);
 	}
 
 	public Expression expr() {
@@ -1358,17 +1386,20 @@ public final class ExpressionFactory {
 	private Expression falsePart ;
 	private Type type ;
 
-	IfExpression( final ExpressionFactory ef, final Expression condition, 
+	IfExpression( final ExpressionFactory ef, final Expression condition,
 	    final Expression truePart, final Expression falsePart ) {
 
 	    super( ef ) ;
-	    this.condition = condition.copy( this, Expression.class ) ;
-	    this.truePart = truePart.copy( this, Expression.class ) ;
-	    this.falsePart = falsePart.copy( this, Expression.class ) ;
+	    this.condition = ((ExpressionInternal)condition).copy( this,
+                ExpressionInternal.class ) ;
+	    this.truePart = ((ExpressionInternal)truePart).copy( this,
+                ExpressionInternal.class ) ;
+	    this.falsePart = ((ExpressionInternal)falsePart).copy( this,
+                ExpressionInternal.class ) ;
 
 	    // See section 15.24 to compute the type of the conditional expression
-	    final Type ttype = truePart.type() ;
-	    final Type ftype = falsePart.type() ;
+	    final Type ttype = ((ExpressionInternal)truePart).type() ;
+	    final Type ftype = ((ExpressionInternal)falsePart).type() ;
 	    if (ttype.equals( ftype )) {
 		type = ttype ;
 	    } else if (ttype.isNumber() && ftype.isNumber()) {
@@ -1437,7 +1468,7 @@ public final class ExpressionFactory {
 //
     public static final class VariableImpl 
 	extends ExpressionFactory.ExpressionBase 
-	implements Variable {
+	implements VariableInternal {
 
 	private Type type ;
 	private String ident ;
@@ -1483,7 +1514,7 @@ public final class ExpressionFactory {
 	    if (obj == this) 
 		return true ;
 
-	    Variable other = Variable.class.cast( obj ) ;
+	    VariableInternal other = VariableInternal.class.cast( obj ) ;
 
 	    return type.equals(other.type()) &&
 		ident.equals(other.ident()) ; 

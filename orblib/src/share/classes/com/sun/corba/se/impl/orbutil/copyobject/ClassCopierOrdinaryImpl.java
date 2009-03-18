@@ -62,7 +62,7 @@ import com.sun.corba.se.spi.orbutil.copyobject.CopyInterceptor ;
 
 import static com.sun.corba.se.spi.orbutil.copyobject.CopyType.* ;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 // General Object: use proper constructor, iterate over fields,
 // get/set fields using Unsafe or reflection.  This also handles readResolve,
@@ -1050,7 +1050,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		new CodegenCopierGenerator( className, cls ) ;
 	    final ProtectionDomain pd = cls.getProtectionDomain() ;
 	    final Class<?> copierClass = generator.create( pd, 
-		ORBClassLoader.getClassLoader() ) ;
+		LibraryClassLoader.getClassLoader() ) ;
 
 	    try {
 		cons = copierClass.getDeclaredConstructor( 

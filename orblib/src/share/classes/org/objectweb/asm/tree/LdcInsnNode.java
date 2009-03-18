@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,46 +27,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.tree;
+
+import java.util.Map;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
  * A node that represents an LDC instruction.
- *
+ * 
  * @author Eric Bruneton
  */
-
 public class LdcInsnNode extends AbstractInsnNode {
 
-  /**
-   * The constant to be loaded on the stack. This parameter must be a non null
-   * {@link Integer}, a {@link Float}, a {@link Long}, a {@link Double}, a
-   * {@link String} or a {@link Type}.
-   */
+    /**
+     * The constant to be loaded on the stack. This parameter must be a non null
+     * {@link Integer}, a {@link Float}, a {@link Long}, a {@link Double}, a
+     * {@link String} or a {@link org.objectweb.asm.Type}.
+     */
+    public Object cst;
 
-  public Object cst;
+    /**
+     * Constructs a new {@link LdcInsnNode}.
+     * 
+     * @param cst the constant to be loaded on the stack. This parameter must be
+     *        a non null {@link Integer}, a {@link Float}, a {@link Long}, a
+     *        {@link Double} or a {@link String}.
+     */
+    public LdcInsnNode(final Object cst) {
+        super(Opcodes.LDC);
+        this.cst = cst;
+    }
 
-  /**
-   * Constructs a new {@link LdcInsnNode}.
-   *
-   * @param cst the constant to be loaded on the stack. This parameter must be
-   *      a non null {@link Integer}, a {@link Float}, a {@link Long}, a
-   *      {@link Double} or a {@link String}.
-   */
+    public int getType() {
+        return LDC_INSN;
+    }
 
-  public LdcInsnNode (final Object cst) {
-    super(Opcodes.LDC);
-    this.cst = cst;
-  }
+    public void accept(final MethodVisitor mv) {
+        mv.visitLdcInsn(cst);
+    }
 
-  public void accept (final MethodVisitor mv) {
-    mv.visitLdcInsn(cst);
-  }
-
-  public int getType () {
-    return LDC_INSN;
-  }
+    public AbstractInsnNode clone(final Map labels) {
+        return new LdcInsnNode(cst);
+    }
 }

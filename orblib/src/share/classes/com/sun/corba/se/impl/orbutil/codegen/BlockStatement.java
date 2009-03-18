@@ -36,16 +36,15 @@
 
 package com.sun.corba.se.impl.orbutil.codegen;
 
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 import java.util.List ;
 import java.util.ArrayList ;
 import java.util.Map ;
 import java.util.HashMap ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 
-import com.sun.corba.se.impl.orbutil.codegen.StatementBase ;
 
 /** Main factory for creating statements.  Represents a block
  * of statements which also defines a scope for local variable
@@ -122,11 +121,13 @@ public class BlockStatement extends StatementBase {
      */
     public void addReturn( Expression expr ) {
 	// XXX check that expr.type() matches the return type of this method
-        body.add( new ReturnStatement( this, expr.copy(this, Expression.class) )) ;
+        body.add( new ReturnStatement( this, 
+            ((ExpressionInternal)expr).copy(this, ExpressionInternal.class) )) ;
     }
     
     public IfStatement addIf( Expression cond ) {
-	IfStatement result = new IfStatement( this, cond.copy(this, Expression.class) ) ;
+	IfStatement result = new IfStatement( this, 
+            ((ExpressionInternal)cond).copy(this, ExpressionInternal.class) ) ;
 	body.add( result ) ;
 	return result ;
     }
@@ -138,7 +139,8 @@ public class BlockStatement extends StatementBase {
     }
     
     public void addThrow( Expression expr ) {
-        body.add( new ThrowStatement( this, expr.copy(this, Expression.class) )) ;
+        body.add( new ThrowStatement( this, 
+            ((ExpressionInternal)expr).copy(this, ExpressionInternal.class) )) ;
     }
    
     private void checkSwitchExpressionType( Type type ) {
@@ -148,39 +150,46 @@ public class BlockStatement extends StatementBase {
     }
 
     public SwitchStatement addSwitch( Expression value ) {
-	checkSwitchExpressionType( value.type() ) ;
-        SwitchStatement result = new SwitchStatement( this, value.copy(this, Expression.class) ) ;
+	checkSwitchExpressionType( ((ExpressionInternal)value).type() ) ;
+        SwitchStatement result = new SwitchStatement( this, 
+            ((ExpressionInternal)value).copy(this, ExpressionInternal.class) ) ;
         body.add( result ) ;
         return result ;
     }
     
     public WhileStatement addWhile( Expression expr ) {
-        WhileStatement result = new WhileStatement( this, expr.copy(this, Expression.class) ) ;
+        WhileStatement result = new WhileStatement( this, 
+            ((ExpressionInternal)expr).copy(this, ExpressionInternal.class) ) ;
         body.add( result ) ;
         return result ;
     }
     
     public void addExpression( Expression expr ) {
-        body.add( expr.copy(this, Expression.class) ) ;
+        body.add( ((ExpressionInternal)expr).copy(this,
+            ExpressionInternal.class) ) ;
     }
     
     public void addAssign( Expression left, Expression right ) {
         body.add(new AssignmentStatement( this, 
-	    left.copy(this, Expression.class), right.copy(this, Expression.class))) ;
+	    ((ExpressionInternal)left).copy(this, ExpressionInternal.class),
+            ((ExpressionInternal)right).copy(this, ExpressionInternal.class))) ;
     }
     
-    public Expression addDefinition( Type type, String ident, Expression value ) {
+    public Expression addDefinition( Type type, String ident,
+        Expression value ) {
+
 	if (definitions.containsKey( ident ))
 	    throw new IllegalArgumentException( 
 		"This scope already contains a variable named " + ident ) ;
 	Variable var = efactory.variable( type, ident ) ;
 	DefinitionStatement ds = new DefinitionStatement( this, var, 
-	    value.copy(this, Expression.class) ) ;
+	    ((ExpressionInternal)value).copy(this, ExpressionInternal.class) ) ;
 	body.add( ds ) ;
 	definitions.put( ident, ds ) ;
 	return var ;
     }
     
+    @Override
     public void accept( Visitor visitor ) {
 	visitor.visitBlockStatement( this ) ;
     }

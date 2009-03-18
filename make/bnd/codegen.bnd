@@ -1,3 +1,0 @@
--include bnd.properties
-Export-Package: com.sun.corba.se.spi.orbutil.codegen, com.sun.corba.se.spi.orbutil.copyobject, com.sun.corba.se.impl.orbutil.copyobject
-Private-Package: com.sun.corba.se.impl.orbutil.codegen

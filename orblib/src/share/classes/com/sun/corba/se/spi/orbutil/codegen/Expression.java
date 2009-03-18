@@ -36,20 +36,13 @@
 
 package com.sun.corba.se.spi.orbutil.codegen;
 
-import com.sun.corba.se.impl.orbutil.codegen.Statement ;
-
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-
-/**
+/** Simple marker interface for an Expression.  Expressions can be manipulated
+ * only through the Wrapper interface.
+ *
+ * XXX could consider extending this for convenience, e.g.
+ * exp1.or( exp2 ) instead of _or( exp1, exp2 ).
  *
  * @author ken
  */
-public interface Expression extends Statement {
-    // Return true iff this expression represents a variable,
-    // data member, or array index operation that may appear
-    // on the left side of an assignment.
-    boolean isAssignable() ;
-
-    // Return the type of this expression.
-    Type type() ;
+public interface Expression {
 }

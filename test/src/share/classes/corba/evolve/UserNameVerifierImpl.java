@@ -38,6 +38,7 @@ package corba.evolve;
 import java.rmi.RemoteException ;
 import javax.rmi.PortableRemoteObject;
 import java.lang.reflect.Constructor;
+import mymath.BigDecimal ;
 
 public class UserNameVerifierImpl 
     extends PortableRemoteObject implements UserNameVerifier
@@ -92,5 +93,19 @@ public class UserNameVerifierImpl
     public boolean validateFeatureInfo( FeatureInfo info ) throws RemoteException {
         return info.getName().equals( FEATURE_NAME ) &&
             info.getDescription().equals( FEATURE_DESCRIPTION ) ;
+    }
+
+    /*
+    public Object echo( Object obj ) {
+        return obj ;
+    }
+    */
+
+    public BigDecimal echo( BigDecimal obj ) {
+        return obj ;
+    }
+
+    public WithoutPrimitives echo( WithoutPrimitives obj ) {
+        return obj ;
     }
 }

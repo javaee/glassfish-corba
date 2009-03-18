@@ -1,0 +1,2 @@
+#! /bin/sh
+djava -Dcom.sun.corba.se.ORBDebugOSGIListener=${DEBUG_OSGI_LISTENER:-false} -Dfelix.config.properties=file:conf/config.properties -jar ../lib/felix.jar

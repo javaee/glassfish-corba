@@ -49,6 +49,7 @@ import corba.codegen.test._DImpl_Tie_gen ;
 import corba.codegen.test.Flow_gen ;
 import corba.codegen.test.Constants_gen ;
 import corba.codegen.test.DefaultPackageTest_gen ;
+import corba.codegen.test.EJBRemote_gen ;
 
 /** Registry that contains instances of all of the test class generators
  * used in this test.
@@ -67,6 +68,7 @@ public abstract class ClassGeneratorFactoryRegistry {
 	register( new Flow_gen() ) ;
 	register( new Constants_gen() ) ;
 	register( new DefaultPackageTest_gen() ) ;
+	register( new EJBRemote_gen() ) ;
     }
 
     private static void register( ClassGeneratorFactory tcg ) {

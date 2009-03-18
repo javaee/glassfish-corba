@@ -83,7 +83,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
 import com.sun.corba.se.spi.orbutil.copyobject.Copy;
 import com.sun.corba.se.spi.orbutil.copyobject.CopyType;
 
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
 // no chance of subclasses, so no problems with runtime helper lookup
 public final class TypeCodeImpl extends TypeCode 

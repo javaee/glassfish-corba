@@ -63,25 +63,25 @@ import com.sun.corba.se.impl.orbutil.codegen.ASMUtil ;
 public final class CodeGenerator {
     private CodeGenerator() {} 
 
-    /** Define a ClassGenerator for a class.
+    /** Define a ClassGeneratorImpl for a class.
      */
-    public static ClassGenerator defineClass( int modifiers, String name,
+    public static ClassGeneratorImpl defineClass( int modifiers, String name,
 	Type superType, List<Type> impls ) {
-	return new ClassGenerator( modifiers, name, superType,
+	return new ClassGeneratorImpl( modifiers, name, superType,
 	    impls ) ;
     }
 
-    /** Define a ClassGenerator for an interface.
+    /** Define a ClassGeneratorImpl for an interface.
      */
-    public static ClassGenerator defineInterface( int modifiers, String name,
+    public static ClassGeneratorImpl defineInterface( int modifiers, String name,
 	List<Type> impls ) {
-	return new ClassGenerator( modifiers, name, impls ) ;
+	return new ClassGeneratorImpl( modifiers, name, impls ) ;
     }
 
-    /** Convert the Java class or interface defined by ClassGenerator into an array
+    /** Convert the Java class or interface defined by ClassGeneratorImpl into an array
      * of bytecodes.
      */
-    public static byte[] generateBytecode( ClassGenerator cg, ClassLoader cl, 
+    public static byte[] generateBytecode( ClassGeneratorImpl cg, ClassLoader cl,
 	ImportList imports, Properties options, PrintStream debugOutput ) {
 
 	return ASMUtil.generate( cl, cg, imports, options, debugOutput ) ;
@@ -91,7 +91,7 @@ public final class CodeGenerator {
      * cg to the PrintStream ps.
      */
     public static void generateSourceCode( PrintStream ps, 
-	ClassGenerator cg, ImportList imports, 
+	ClassGeneratorImpl cg, ImportList imports,
 	Properties options ) throws IOException {
 
 	ASMUtil.generateSourceCode( ps, cg, imports, options ) ;
@@ -101,7 +101,7 @@ public final class CodeGenerator {
      * cg to a file in the SOURCE_GENERATION_DIRECTORY specified in options.
      */
     public static void generateSourceCode( String sdir, 
-	ClassGenerator cg, ImportList imports, 
+	ClassGeneratorImpl cg, ImportList imports,
 	Properties options ) throws IOException {
 
 	ASMUtil.generateSourceCode( sdir, cg, imports, options ) ;

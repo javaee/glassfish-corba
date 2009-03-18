@@ -39,7 +39,6 @@ import org.osgi.framework.BundleActivator ;
 import org.osgi.framework.BundleEvent ;
 import org.osgi.framework.BundleContext ;
 import org.osgi.framework.SynchronousBundleListener ;
-import org.osgi.framework.ServiceEvent ;
 
 import java.util.Properties ;
 

@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/osgi/loader/OSGIListener.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/osgi/main/ORBFactoryTest.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/spi/orb/ORB.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/spi/orb/ORBFactory.java</file>
-    </open-files>
 </project-private>
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.

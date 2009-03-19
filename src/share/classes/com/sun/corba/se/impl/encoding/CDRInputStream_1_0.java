@@ -82,7 +82,7 @@ import org.omg.CORBA.portable.StreamableValue;
 import org.omg.CORBA_2_3.portable.InputStream;
 
 
-import javax.rmi.CORBA.EnumDesc;
+import com.sun.corba.se.impl.javax.rmi.CORBA.EnumDesc;
 import javax.rmi.CORBA.ProxyDesc;
 import java.rmi.server.RMIClassLoader;
 import java.lang.reflect.Proxy;

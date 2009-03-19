@@ -34,7 +34,7 @@
  * holder.
  */
 
-package javax.rmi.CORBA ;
+package com.sun.corba.se.impl.javax.rmi.CORBA ;
 
 /** Class used to describe how a Java Enum is marshaled over
  * RMI-IIOP.  This is taken from the approved resolution to

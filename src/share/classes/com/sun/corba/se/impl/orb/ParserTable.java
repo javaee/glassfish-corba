@@ -501,7 +501,7 @@ public class ParserTable {
 		Boolean.TRUE, "TRUE"),
 	    ParserDataFactory.make( ORBConstants.USE_ENUM_DESC,
 		OperationFactory.booleanAction(),
-		"useEnumDesc", Boolean.FALSE,
+		"useEnumDesc", Boolean.TRUE,
 		Boolean.TRUE, "TRUE")
 	} ;
 

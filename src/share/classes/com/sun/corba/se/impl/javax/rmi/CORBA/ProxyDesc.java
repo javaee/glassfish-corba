@@ -34,7 +34,7 @@
  * holder.
  */
 
-package javax.rmi.CORBA;
+package com.sun.corba.se.impl.javax.rmi.CORBA;
 
 /**
  * This class is used to marshal java.lang.Proxy objects over IIOP.

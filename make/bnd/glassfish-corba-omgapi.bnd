@@ -1,2 +1,2 @@
 -include bnd.properties
-Export-Package: javax.rmi, javax.rmi.CORBA, javax.activity, javax.transaction, org.omg.CosTransactions, org.omg.SendingContext, org.omg.stub.java.rmi, org.omg.CosNaming.*, org.omg.Messaging, org.omg.PortableServer.*, org.omg.DynamicAny.*, org.omg.CORBA_2_3.*, org.omg.PortableInterceptor.*, org.omg.CosTSInteroperation, org.omg.CosTSPortability, org.omg.CORBA.*, org.omg.Dynamic, org.omg.IOP.*, com.sun.corba.se.org.omg.CORBA, com.sun.corba.se.spi.costransactions, com.sun.corba.se.impl.txpoa
+Export-Package: javax.activity, javax.transaction, org.omg.CosTransactions, org.omg.CosTSInteroperation, org.omg.CosTSPortability, com.sun.corba.se.org.omg.CORBA, com.sun.corba.se.spi.costransactions, com.sun.corba.se.impl.txpoa

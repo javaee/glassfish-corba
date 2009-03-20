@@ -84,8 +84,10 @@
         <echo message="Version is ${release.version}-${build.version}"/>
         <!-- environmental dependencies -->
         <property environment="env"/>
-        <property name="java.home"                  value="${env.JAVA_HOME}"/>
+        <property name="java.home"                      value="${env.JAVA_HOME}"/>
         <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
+        <property name="local.maven"                    value="${env.HOME}/.m2"/>
+        <echo message="local.maven=${local.maven}"/> 
 
         <property name="root.dir"			value="${basedir}"/>
 
@@ -174,6 +176,7 @@
         <property name="maven.ant.dir"                  value="http://apache.hoxt.com/maven/binaries"/>
         <property name="repo.url"                       value="java-net:/maven2-repository/trunk/repository"/>
         <property name="file.url"                       value="file:/tmp/maven"/>
+        <property name="local.url"                      value="file:${local.maven}"/>
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
 
 	<path id="classpath.master">
@@ -1204,5 +1207,9 @@
     &test;
     &emma;
     &maven;
+
+    <target name="do-rename" depends="clean, orb-library, rename"/>
+
+    <target name="do-release" depends="clean, build, make-bundles, release-local"/>
 </project>
 

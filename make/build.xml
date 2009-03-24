@@ -1136,8 +1136,16 @@
       -->
 
     <!-- <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/> -->
-    
-    <target name="findbugs" depends="init"> 
+   
+    <target name="prepare-findbugs" depends="init">
+        <chmod perm="+x" type="file">
+            <fileset dir="lib/findbugs-1.3.3/bin">
+                <include name="**"/>
+            </fileset>
+        </chmod>
+    </target>
+
+    <target name="findbugs" depends="init, prepare-findbugs"> 
 	<mkdir dir="${findbugs.dir}"/>
 	<exec executable="${findbugs.home}/bin/findbugs">
 	    <arg value="-textui"/>
@@ -1148,15 +1156,18 @@
 	    <arg file="${findbugs.exclude.file}"/>
 	    <arg value="-sourcepath"/>
 	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
-	    <arg file="${releaselib.dir}/omgapi.jar"/>
-	    <!-- <arg file="${releaselib.dir}/idlj.jar"/> -->
-	    <arg file="${releaselib.dir}/orblib.jar"/>
-	    <arg file="${releaselib.dir}/peorb.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-dynamicany.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-naming.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
 	    <!-- <arg file="${test-classes.dir}"/> -->
 	</exec>
     </target>
 
-    <target name="findbugs-xml" depends="init"> 
+    <target name="findbugs-xml" depends="init, prepare-findbugs"> 
 	<mkdir dir="${findbugs.dir}"/>
 	<exec executable="${findbugs.home}/bin/findbugs">
 	    <arg value="-textui"/>
@@ -1167,10 +1178,13 @@
 	    <arg file="${findbugs.exclude.file}"/>
 	    <arg value="-sourcepath"/>
 	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
-	    <arg file="${releaselib.dir}/omgapi.jar"/>
-	    <!-- <arg file="${releaselib.dir}/idlj.jar"/> -->
-	    <arg file="${releaselib.dir}/orblib.jar"/>
-	    <arg file="${releaselib.dir}/peorb.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-dynamicany.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-naming.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
 	    <!-- <arg file="${test-classes.dir}"/> -->
 	</exec>
     </target>

@@ -636,6 +636,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	DataCollector dataCollector = 
 	    DataCollectorFactory.create( props, getLocalHostName() ) ;
 	postInit( null, dataCollector ) ;
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), "initialization complete" ) ;
+        }
     }
 
     protected void set_parameters(Applet app, Properties props)
@@ -1384,6 +1387,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 		    }
                 }
 	    } else {
+                if (orbLifecycleDebugFlag) {
+                    wrapper.orbLifecycleTrace( getORBData().getORBId(), "starting shutdown" ) ;
+                }
+                
                 // perform the actual shutdown
 		shutdownServants(wait_for_completion);
 
@@ -1492,6 +1499,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             }
         }
 
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), "starting destruction" ) ;
+        }
 
         ThreadPoolManager tpToClose = null ;
         synchronized (threadPoolManagerAccessLock) {

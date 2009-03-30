@@ -171,7 +171,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean cdrDebugFlag = false ;
     public boolean streamFormatVersionDebugFlag = false ;
     public boolean valueHandlerDebugFlag = false ;
-    public boolean orbLifecycleDebugFlag = true ;           // XXX temporary for testing; should normally be false
+    public boolean orbLifecycleDebugFlag = false ;
     
     private LogWrapperTable logWrapperTable ;
 

@@ -89,6 +89,8 @@ public class GameSurrogate
 
     private String                  fName = "";
 
+    private InitialContext context ;
+
     public GameSurrogate (String name)
     {
 	fName = name;
@@ -117,7 +119,7 @@ public class GameSurrogate
 
 		Hashtable<String,?> env = new Hashtable<String,String> ();
 
-		InitialContext context = new InitialContext (env);
+		context = new InitialContext (env);
 		Object o = context.lookup ("SpaceConquest");
 		server = (SpaceConquest)PortableRemoteObject.narrow (o,SpaceConquest.class);
 		System.out.println ("Connected to server.");

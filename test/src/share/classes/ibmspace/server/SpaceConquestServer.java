@@ -165,6 +165,8 @@ public class SpaceConquestServer extends PortableRemoteObject implements SpaceCo
 	return planets[index];
     }
 
+    private InitialContext context ;
+
     public static void main (String[] args)
     {
 	int numPlayers = 1;
@@ -184,7 +186,7 @@ public class SpaceConquestServer extends PortableRemoteObject implements SpaceCo
 		// Pass system properties with -D option of java command, e.g.
 		// -Djava.naming.factory.initial=com.sun.jndi.cosnaming.CNCtxFactory
 
-		InitialContext context = new InitialContext ();
+		context = new InitialContext ();
 		context.rebind ("SpaceConquest", obj);
 		System.out.println ("SpaceConquest server bound in registry");
 	    }

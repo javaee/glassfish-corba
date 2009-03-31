@@ -42,10 +42,12 @@ import java.util.*;
 
 public class Server
 {
+    private static InitialContext rootContext ;
+
     public static void main(String[] args) {
 	try {
 
-            Context rootContext = new InitialContext();
+            rootContext = new InitialContext();
 
             TesterImpl testerImpl = new TesterImpl();
             rootContext.rebind(testerImpl.getDescription(),

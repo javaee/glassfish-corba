@@ -72,6 +72,8 @@ public class Client
 
     private static int errorCount = 0 ;
 
+    private static InitialContext ic ;
+
     public static void main(String[] av)
     {
 	try {
@@ -85,7 +87,7 @@ public class Client
 
 	    Hashtable env = new Hashtable() ;
 	    env.put( "java.naming.corba.orb", orb ) ;
-	    InitialContext ic = new InitialContext(env);
+	    ic = new InitialContext(env);
 
 	    System.out.println( "Getting test reference" ) ;
 	    Test ref  = (Test)lookupAndNarrow(Common.ReferenceName, 

@@ -57,10 +57,12 @@ public class Client
         }
     }
 
+    private static InitialContext rootContext ;
+
     public static void main(String[] args) {
         try {
             
-            Context rootContext = new InitialContext();
+            rootContext = new InitialContext();
 
             for (int i = 0; i < Versions.testableVersions.length; i++) {
                 

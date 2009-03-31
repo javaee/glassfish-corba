@@ -165,7 +165,7 @@ public class SpaceConquestServer extends PortableRemoteObject implements SpaceCo
 	return planets[index];
     }
 
-    private InitialContext context ;
+    private static InitialContext context ;
 
     public static void main (String[] args)
     {

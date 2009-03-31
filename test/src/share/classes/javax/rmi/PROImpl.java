@@ -71,7 +71,7 @@ public class PROImpl extends PortableRemoteObject implements PROHello {
 	PortableRemoteObject.unexportObject(this);
     }
     
-    private InitialContext context ;
+    private static InitialContext context ;
 
     public static void main (String[] args) {
         

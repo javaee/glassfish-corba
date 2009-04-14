@@ -78,6 +78,11 @@ import javax.transaction.TransactionRequiredException;
 import javax.transaction.TransactionRolledbackException;
 import javax.transaction.InvalidTransactionException;
 
+// These classes only exist in Java SE 6 and later.
+import javax.activity.ActivityRequiredException ;
+import javax.activity.ActivityCompletedException ;
+import javax.activity.InvalidActivityException ;
+
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
@@ -311,53 +316,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
             return new MarshalException(message,inner);
         } else if (ex instanceof ACTIVITY_REQUIRED) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.ActivityRequiredException");
-                Class[] params = new Class[2];
-                params[0] = java.lang.String.class;
-                params[1] = java.lang.Throwable.class;
-                Constructor cr = cl.getConstructor(params);
-                Object[] args = new Object[2];
-                args[0] = message;
-                args[1] = ex;
-                return (RemoteException) cr.newInstance(args);                
-	    } catch (Throwable e) {
-                utilWrapper.classNotFound(
-                              e, "javax.activity.ActivityRequiredException");
-            }
+            return new ActivityRequiredException( message, ex ) ;
         } else if (ex instanceof ACTIVITY_COMPLETED) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.ActivityCompletedException");
-		Class[] params = new Class[2];
-		params[0] = java.lang.String.class;
-		params[1] = java.lang.Throwable.class;
-		Constructor cr = cl.getConstructor(params);
-		Object[] args = new Object[2];
-		args[0] = message;
-		args[1] = ex;
-		return (RemoteException) cr.newInstance(args);
-              } catch (Throwable e) {
-                  utilWrapper.classNotFound(
-                                e, "javax.activity.ActivityCompletedException");
-              }
+            return new ActivityCompletedException( message, ex ) ;
         } else if (ex instanceof INVALID_ACTIVITY) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.InvalidActivityException");
-		Class[] params = new Class[2];
-		params[0] = java.lang.String.class;
-		params[1] = java.lang.Throwable.class;
-		Constructor cr = cl.getConstructor(params);
-		Object[] args = new Object[2];
-		args[0] = message;
-		args[1] = ex;
-		return (RemoteException) cr.newInstance(args);
-              } catch (Throwable e) {
-                  utilWrapper.classNotFound(
-                                e, "javax.activity.InvalidActivityException");
-              }
+            return new InvalidActivityException( message, ex ) ;
 	}
 
         // Just map to a generic RemoteException...

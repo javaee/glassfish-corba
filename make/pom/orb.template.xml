@@ -14,16 +14,6 @@
         </dependency>
         <dependency>
             <groupId>@groupId@</groupId>
-            <artifactId>glassfish-corba-dynamicany</artifactId>
-            <version>@version@</version>
-        </dependency>
-        <dependency>
-            <groupId>@groupId@</groupId>
-            <artifactId>glassfish-corba-naming</artifactId>
-            <version>@version@</version>
-        </dependency>
-        <dependency>
-            <groupId>@groupId@</groupId>
             <artifactId>glassfish-corba-newtimer</artifactId>
             <version>@version@</version>
         </dependency>

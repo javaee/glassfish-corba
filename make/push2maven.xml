@@ -118,17 +118,15 @@ Variables in templates:
 naming conventions:
 The modules             (and their dependencies):
     asm                 -
-    codegen             asm orbgeneric
-    csiv2-idl           omgapi
-    dynamicany          omgapi orb
-    naming              omgapi orb
-    newtimer            orbgeneric codegen 
-    omgapi              -
-    orb                 codegen dynamicany naming newtimer omgapi orbgeneric
     orbgeneric          -
+    codegen             asm orbgeneric
+    omgapi              -
+    csiv2-idl           omgapi
+    newtimer            orbgeneric codegen 
+    orb                 codegen newtimer omgapi orbgeneric
 
     for each module m:
-        bnd file:           ${root.dir}/make/bnd/${m}.bnd
+        bnd file:           ${root.dir}/make/bnd/gflassfish-corba-${m}.bnd
         pom template:       ${root.dir}/make/pom/${m}.template.pom
         resulting jar:      ${releaselib.dir}/bundles/glassfish-corba-${m}.jar
 -->
@@ -198,8 +196,6 @@ Section: Producing Multiple JARs from a single POM (maven limitations)
         <push-to-maven destination="@{destination}" module="asm" description="ASM version used in the ORB"/>
         <push-to-maven destination="@{destination}" module="codegen" description="Dynamic code generation library"/>
         <push-to-maven destination="@{destination}" module="csiv2-idl" description="IDL generated definitions for CSIv2"/>
-        <push-to-maven destination="@{destination}" module="dynamicany" description="Dynamic Any support"/>
-        <push-to-maven destination="@{destination}" module="naming" description="CosNaming service code"/>
         <push-to-maven destination="@{destination}" module="newtimer" description="ORB timer library"/>
         <push-to-maven destination="@{destination}" module="omgapi" description="OMG standard APIs"/>
         <push-to-maven destination="@{destination}" module="orb" description="The ORB implementation"/>

@@ -639,6 +639,8 @@
                 <include name="com/sun/corba/se/impl/servicecontext/**"/>
                 <include name="com/sun/corba/se/impl/transport/**"/>
                 <include name="com/sun/corba/se/impl/util/**"/>
+                <include name="com/sun/corba/se/impl/dynamicany/**"/>
+                <include name="com/sun/corba/se/impl/naming/**"/>
 	    </fileset>
 	</jar>
 	<jar jarfile="${releaselib.dir}/omgapi-extension.jar"
@@ -665,18 +667,6 @@
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
                 <include name="com/sun/corba/se/org/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/naming.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-                <include name="com/sun/corba/se/impl/naming/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/dynamicany.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-                <include name="com/sun/corba/se/impl/dynamicany/**"/>
 	    </fileset>
 	</jar>
         <!-- Don't really need this in GFv3
@@ -837,8 +827,6 @@
 
         <make-bundle classpath="${classes.dir}" file="orb"/>
         <make-bundle classpath="${classes.dir}" file="omgapi"/>
-        <make-bundle classpath="${classes.dir}" file="naming"/>
-        <make-bundle classpath="${classes.dir}" file="dynamicany"/>
         <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>
 
         <make-bundle classpath="${orblib.classes.dir}" file="codegen"/>
@@ -1158,8 +1146,6 @@
 	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-dynamicany.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-naming.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
@@ -1180,8 +1166,6 @@
 	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-dynamicany.jar"/>
-	    <arg file="${releaselib.dir}/bundles/glassfish-corba-naming.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>

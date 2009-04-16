@@ -49,8 +49,8 @@
             <!-- add this to debug use of JUnitReportHelper:
             <jvmarg value="-Dcorba.test.junit.helper.debug=true"/>
             -->
-	    <jvmarg value="-Dhttp.server.port=9090"/>
-	    <jvmarg value="-Djava.rmi.server.codebase=http://localhost:9090/"/>
+	    <jvmarg value="-Dhttp.server.port=${http.server.port}"/>
+	    <jvmarg value="-Djava.rmi.server.codebase=http://localhost:${http.server.port}/"/>
 	    <jvmarg value="-Dhttp.server.root.directory=../build/values2/classes"/>
 	    <jvmarg value="-Djava.security.policy=../src/share/classes/test.policy"/>
 	    <jvmarg value="-Djava.security.debug=debug"/>
@@ -98,8 +98,8 @@
 	    <sysproperty key="javax.rmi.CORBA.StubClass" value="com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
 	    <sysproperty key="javax.rmi.CORBA.PortableRemoteObjectClass" value="com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
 	    <sysproperty key="corba.test.orb.classpath" value="${classes.dir}:${orblib.classes.dir}"/>
-	    <sysproperty key="http.server.port" value="9090"/>
-	    <sysproperty key="java.rmi.server.codebase" value="http://localhost:9090/"/>
+	    <sysproperty key="http.server.port" value="${http.server.port}"/>
+	    <sysproperty key="java.rmi.server.codebase" value="http://localhost:${http.server.port}/"/>
 	    <sysproperty key="http.server.root.directory" value="../build/values2/classes"/>
 	    <sysproperty key="java.security.policy" value="../src/share/classes/test.policy"/>
 	    <sysproperty key="java.security.debug" value="debug"/>
@@ -155,11 +155,19 @@
 
     <mkdir dir="${test.output}"/>
     <mkdir dir="${junit.reports}"/>
+    
+    <!-- RMI_IIOP_WEB_SERVER is set in Hudson job to guarantee a free port. -->
+    <property name="set.http.server.port" value="${env.RMI_IIOP_WEB_SERVER}"/>
+
+    <condition property="http.server.port" value="9090" else="${set.http.server.port}">
+        <matches string="${set.http.server.port}" pattern="env.RMI_IIOP_WEB_SERVER"/>
+    </condition>
 
     <echo message="debug.args=${debug.args}"/>
     <echo message="use.dynamic.stub=${use.dynamic.stub}"/>
     <echo message="use.java.serialization=${use.java.serialization}"/>
     <echo message="use.codegen.copyobject=${use.codegen.copyobject}"/>
+    <echo message="http.server.port=${http.server.port}"/>
 </target>
 
 <target name="run-test-target" depends="test-init">

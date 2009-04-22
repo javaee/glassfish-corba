@@ -1199,15 +1199,17 @@
     </target>
 
 
-<target name="increment-build" depends="init">
+   <target name="increment-build" depends="init">
     <propertyfile file="${root.dir}/make/build.properties">
        <entry key="corba.major.version" value="3"/>
        <entry key="corba.minor.version" value="0"/>
        <entry key="corba.update.version" value="0"/>
-       <entry key="build.version" type="int" value="1" operation="+"/>
+       <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
     </propertyfile>
+        
 </target>
 
+    
     &src-idl;
     &jscheme;
     &test-idl;

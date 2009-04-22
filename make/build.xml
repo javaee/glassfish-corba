@@ -1200,7 +1200,7 @@
 
 
 <target name="increment-build" depends="init">
-    <propertyfile file="${root.dir}/make/build.properties>
+    <propertyfile file="${root.dir}/make/build.properties">
        <entry key="corba.major.version" value="3"/>
        <entry key="corba.minor.version" value="0"/>
        <entry key="corba.update.version" value="0"/>

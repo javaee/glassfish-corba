@@ -1199,17 +1199,23 @@
     </target>
 
 
-   <target name="increment-build" depends="init">
+   <target name="increment-build" depends="init,make-bundles">
     <propertyfile file="${root.dir}/make/build.properties">
        <entry key="corba.major.version" value="3"/>
        <entry key="corba.minor.version" value="0"/>
        <entry key="corba.update.version" value="0"/>
-       <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
-    </propertyfile>
-        
-</target>
+       <entry key="build.int" type="int" pattern="000" operation="+" value="1"/>
+     </propertyfile>
+      
+   </target>
 
-    
+   <target name="generate-bnd" depends="init,make-bundles">
+     <propertyfile file="${root.dir}/make/bnd/bnd.properties">
+     <entry key="Build.Version" value="${release.version}-${build.version}"/>
+     </propertyfile>
+   </target> 
+
+
     &src-idl;
     &jscheme;
     &test-idl;

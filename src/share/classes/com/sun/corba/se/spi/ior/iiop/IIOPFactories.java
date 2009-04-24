@@ -62,6 +62,7 @@ import com.sun.corba.se.impl.ior.iiop.ORBTypeComponentImpl ;
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileImpl ;
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileTemplateImpl ;
 import com.sun.corba.se.impl.ior.iiop.RequestPartitioningComponentImpl ;
+import com.sun.corba.se.impl.ior.iiop.LoadBalancingComponentImpl ;
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 
@@ -93,10 +94,29 @@ public abstract class IIOPFactories {
         };
     } 
 
-    public static RequestPartitioningComponent makeRequestPartitioningComponent(
+    public static LoadBalancingComponent makeRequestPartitioningComponent(
 	    int threadPoolToUse)
     {
-	return new RequestPartitioningComponentImpl(threadPoolToUse);
+	return new LoadBalancingComponentImpl(threadPoolToUse);
+    }
+
+    public static IdentifiableFactory makeLoadBalancingComponentFactory()
+    {
+        return new EncapsulationFactoryBase(ORBConstants.TAG_REQUEST_PARTITIONING_ID) {
+            public Identifiable readContents(InputStream in)
+	    {
+		int loadBalancingValue = in.read_ulong();
+		Identifiable comp = 
+		    new LoadBalancingComponentImpl(loadBalancingValue);
+		return comp;
+	    }
+        };
+    } 
+
+    public static LoadBalancingComponent makeLoadBalancingComponent(
+	    int loadBalancingValue)
+    {
+	return new LoadBalancingComponentImpl(loadBalancingValue);
     }
 
     public static IdentifiableFactory makeAlternateIIOPAddressComponentFactory()

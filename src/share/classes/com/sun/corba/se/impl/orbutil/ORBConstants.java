@@ -96,6 +96,9 @@ public class ORBConstants {
     // Introduced in AS 9.0
     public static final int FOLB_MEMBERSHIP_LABEL_TAGGED_COMPONENT_ID =
 	SUN_TAGGED_COMPONENT_ID_BASE + 4;
+    // Introduced in GFv2.1
+    public static final int TAG_LOAD_BALANCING_ID = 
+	SUN_TAGGED_COMPONENT_ID_BASE + 5;
 
     ////////////////////////////////////////////////////
     //
@@ -124,6 +127,7 @@ public class ORBConstants {
     public static final int COPY_OBJECT_POLICY	        = SUNVMCID.value + 2 ;
     public static final int REQUEST_PARTITIONING_POLICY = SUNVMCID.value + 3 ;
     public static final int REFERENCE_MANAGER_POLICY    = SUNVMCID.value + 4 ;
+    public static final int LOAD_BALANCING_POLICY       = SUNVMCID.value + 5 ;
 
     // These are the subcontract IDs for various qualities of
     // service/implementation.
@@ -256,6 +260,12 @@ public class ORBConstants {
     // Request partitioning maximum and minimum thread pool id constants.
     public static final int REQUEST_PARTITIONING_MIN_THREAD_POOL_ID =  0;
     public static final int REQUEST_PARTITIONING_MAX_THREAD_POOL_ID = 63;
+
+    // Load balancing polices: integer to avoid issues with Enum encoding
+    public static final int FIRST_LOAD_BALANCING_VALUE      = 0 ;
+    public static final int NO_LOAD_BALANCING               = FIRST_LOAD_BALANCING_VALUE + 0 ;
+    public static final int PER_REQUEST_LOAD_BALANCING      = FIRST_LOAD_BALANCING_VALUE + 1 ;
+    public static final int LAST_LOAD_BALANCING_VALUE       = PER_REQUEST_LOAD_BALANCING ;
 
     // transport read tcp timeout property, colon separated property
     // with syntax <initial time to wait:max wait time

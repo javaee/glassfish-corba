@@ -45,6 +45,9 @@ import com.sun.corba.se.pept.transport.ContactInfo;
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent ;
+import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
+import com.sun.corba.se.spi.ior.TaggedComponent ;
 import com.sun.corba.se.spi.oa.ObjectAdapterFactory;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher;
@@ -70,6 +73,7 @@ public class CorbaContactInfoListImpl
     protected IOR effectiveTargetIOR;
     protected List<CorbaContactInfo> effectiveTargetIORContactInfoList;
     protected ContactInfo primaryContactInfo;
+    private boolean usePerRequestLoadBalancing = false ;
 
     // XREVISIT - is this used?
     public CorbaContactInfoListImpl(ORB orb)
@@ -91,9 +95,16 @@ public class CorbaContactInfoListImpl
     public synchronized Iterator<CorbaContactInfo> iterator()
     {
 	createContactInfoList();
-	return new CorbaContactInfoListIteratorImpl(
+	Iterator<CorbaContactInfo> result = new CorbaContactInfoListIteratorImpl(
             orb, this, primaryContactInfo, 
 	    effectiveTargetIORContactInfoList);
+
+        if (usePerRequestLoadBalancing) {
+            CorbaContactInfo head = effectiveTargetIORContactInfoList.remove(0) ;
+            effectiveTargetIORContactInfoList.add( head ) ;
+        }
+
+        return result ;
     }
 
     ////////////////////////////////////////////////////
@@ -124,6 +135,18 @@ public class CorbaContactInfoListImpl
 	}
 	primaryContactInfo = null;
 	setLocalSubcontract();
+
+        // Set the per request load balancing flag.
+        IIOPProfile prof = effectiveTargetIOR.getProfile() ;
+        TaggedProfileTemplate temp = prof.getTaggedProfileTemplate() ;
+        Iterator<TaggedComponent> lbcomps = 
+            temp.iteratorById( ORBConstants.TAG_LOAD_BALANCING_ID ) ;
+        if (lbcomps.hasNext()) {
+            LoadBalancingComponent lbcomp = null ;
+            lbcomp = (LoadBalancingComponent)(lbcomps.next()) ;
+            usePerRequestLoadBalancing = 
+                lbcomp.getLoadBalancingValue() == ORBConstants.PER_REQUEST_LOAD_BALANCING ; 
+        }
     }
 
     public synchronized IOR getEffectiveTargetIOR()

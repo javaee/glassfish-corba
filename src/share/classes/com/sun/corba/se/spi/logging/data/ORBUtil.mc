@@ -199,6 +199,12 @@
 	     30 WARNING "{0} is not a valid positive decimal integer for {1}")
 	    (BAD_TIMEOUT_DATA_LENGTH
 	     31 WARNING "Timeout data must be 3 or 4 positive decimal integers separated by :")
+	    (INVALID_LOAD_BALANCING_POLICY_VALUE 
+	     32 WARNING "Load balancing value specified, {0}, is outside supported range, {1} - {2}")
+	    (INVALID_LOAD_BALANCING_COMPONENT_VALUE 
+	     33 WARNING "Could not set load balancing component value to {0}, valid values are {1} - {2}")
+	    (INVALID_LOAD_BALANCING_ID
+	     34 WARNING "Invalid request partitioning id {0}, valid values are {1} - {2}")
 	    )
 	(BAD_INV_ORDER 
 	    (DSIMETHOD_NOTCALLED 

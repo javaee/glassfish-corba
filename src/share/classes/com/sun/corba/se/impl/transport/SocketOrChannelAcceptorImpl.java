@@ -60,6 +60,7 @@ import com.sun.corba.se.pept.transport.InboundConnectionCache;
 import com.sun.corba.se.pept.transport.Selector;
 
 import com.sun.corba.se.spi.extension.RequestPartitioningPolicy;
+import com.sun.corba.se.spi.extension.LoadBalancingPolicy;
 import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
@@ -404,6 +405,7 @@ public class SocketOrChannelAcceptorImpl
 	if (version.supportsIORIIOPProfileComponents()) {
 	    iiopProfile.add(IIOPFactories.makeCodeSetsComponent(orb));
 	    iiopProfile.add(IIOPFactories.makeMaxStreamFormatVersionComponent());
+
 	    RequestPartitioningPolicy rpPolicy = (RequestPartitioningPolicy)
 		policies.get_effective_policy(
 				  ORBConstants.REQUEST_PARTITIONING_POLICY);
@@ -412,9 +414,20 @@ public class SocketOrChannelAcceptorImpl
 		     IIOPFactories.makeRequestPartitioningComponent(
 			 rpPolicy.getValue()));
 	    }
+
+	    LoadBalancingPolicy lbPolicy = (LoadBalancingPolicy)
+		policies.get_effective_policy(
+				  ORBConstants.LOAD_BALANCING_POLICY);
+	    if (lbPolicy != null) {
+		iiopProfile.add(
+		     IIOPFactories.makeLoadBalancingComponent(
+			 lbPolicy.getValue()));
+	    }
+
 	    if (codebase != null && !codebase.equals("")) {
 		iiopProfile.add(IIOPFactories. makeJavaCodebaseComponent(codebase));
 	    }
+
 	    if (orb.getORBData().isJavaSerializationEnabled()) {
 		iiopProfile.add(
 		       IIOPFactories.makeJavaSerializationComponent());

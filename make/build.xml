@@ -1198,18 +1198,68 @@
 	</java>
     </target>
 
-
    <target name="increment-build" depends="init">
-    <propertyfile file="${root.dir}/make/build.properties">
-       <entry key="corba.major.version" value="3"/>
-       <entry key="corba.minor.version" value="0"/>
-       <entry key="corba.update.version" value="0"/>
-       <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
-    </propertyfile>
-        
-</target>
+        <propertyfile file="${root.dir}/make/build.properties">
+           <entry key="corba.major.version" value="3"/>
+           <entry key="corba.minor.version" value="0"/>
+           <entry key="corba.update.version" value="0"/>
+           <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
+        </propertyfile>
+    </target>
+  
+    <taskdef name="java2html"
+        classname="de.java2html.anttasks.Java2HtmlTask"
+        classpath="${lib.dir}/java2html.jar"
+    />
 
-    
+    <target name="copy-idl" depends="init">
+        <copy todir="www/sources/orb">
+            <fileset dir="${src.dir}">
+                <include name="**/*.idl"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="source-to-html" depends="init,copy-idl">
+        <mkdir dir="www/sources"/>
+        <java2html
+            srcdir="${src.dir}"
+            destdir="www/sources/orb"
+            includes="**/*.java"
+            showLineNumbers="true"
+            style="kawa"
+            outputFormat="html"
+            overwrite="true"
+        />
+        <java2html
+            srcdir="${orblib.src.dir}"
+            destdir="www/sources/orblib"
+            includes="**/*.java"
+            showLineNumbers="true"
+            style="kawa"
+            outputFormat="html"
+            overwrite="true"
+        />
+        <java2html
+            srcdir="${gensrc.dir}"
+            destdir="www/sources/generated"
+            includes="**/*.java"
+            showLineNumbers="true"
+            style="kawa"
+            outputFormat="html"
+            overwrite="true"
+        />
+        <java2html
+            srcdir="${test.src.dir}"
+            destdir="www/sources/test"
+            includes="**/*.java"
+            showLineNumbers="true"
+            style="kawa"
+            outputFormat="html"
+            overwrite="true"
+        />
+    </target>
+
     &src-idl;
     &jscheme;
     &test-idl;

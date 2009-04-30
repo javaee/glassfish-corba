@@ -1198,14 +1198,22 @@
 	</java>
     </target>
 
-   <target name="increment-build" depends="init">
+    <target name="increment-build-version" depends="init">
         <propertyfile file="${root.dir}/make/build.properties">
-           <entry key="corba.major.version" value="3"/>
-           <entry key="corba.minor.version" value="0"/>
-           <entry key="corba.update.version" value="0"/>
-           <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
+            <entry key="corba.major.version" value="3"/>
+            <entry key="corba.minor.version" value="0"/>
+            <entry key="corba.update.version" value="0"/>
+            <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
         </propertyfile>
     </target>
+
+    <target name="generate-bnd-properties" depends="init">
+        <propertyfile file="${root.dir}/make/bnd/bnd.properties">
+            <entry key="Bundle-Version" value="${release.version}-${build.version}"/>
+        </propertyfile>
+    </target> 
+
+    <target name="update-build" depends="increment-build-version,generate-bnd-properties"/>
   
     <taskdef name="java2html"
         classname="de.java2html.anttasks.Java2HtmlTask"

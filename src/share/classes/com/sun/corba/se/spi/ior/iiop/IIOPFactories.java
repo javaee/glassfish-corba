@@ -94,10 +94,10 @@ public abstract class IIOPFactories {
         };
     } 
 
-    public static LoadBalancingComponent makeRequestPartitioningComponent(
+    public static RequestPartitioningComponent makeRequestPartitioningComponent(
 	    int threadPoolToUse)
     {
-	return new LoadBalancingComponentImpl(threadPoolToUse);
+	return new RequestPartitioningComponentImpl(threadPoolToUse);
     }
 
     public static IdentifiableFactory makeLoadBalancingComponentFactory()

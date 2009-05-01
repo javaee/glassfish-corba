@@ -24,6 +24,9 @@ import org.junit.Test;
  * @author daraniramu
  */
 public class TravelMuseJUnitTest {
+     Properties p = new Properties();
+     org.omg.CORBA.ORB orb;
+     com.sun.corba.ee.spi.orb.ORB myOrb;
 
     public TravelMuseJUnitTest() {
     }
@@ -38,26 +41,27 @@ public class TravelMuseJUnitTest {
 
     @Before
     public void setUp() {
+
+        p.put("org.omg.CORBA.ORBClass", "com.sun.corba.ee.impl.orb.ORBImpl");
+        p.put("com.sun.corba.ee.ORBDebug","cdr,streamFormatVersion,valueHandler");
+        orb=  com.sun.corba.ee.spi.orb.ORB.init(new String[0],p);
+        myOrb = (com.sun.corba.ee.spi.orb.ORB)orb ;
+        myOrb.cdrDebugFlag = true ;
+        myOrb.streamFormatVersionDebugFlag = true ;
+        myOrb.valueHandlerDebugFlag = true ;
     }
 
     @After
     public void tearDown() {
+
+        orb.destroy();
+        myOrb.destroy();
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
+   
      @Test
      public void travelMuse() throws FileNotFoundException,IOException, ClassNotFoundException {
-        Properties p = new Properties();
-        p.put("org.omg.CORBA.ORBClass", "com.sun.corba.ee.impl.orb.ORBImpl");
-        p.put("com.sun.corba.ee.ORBDebug","cdr,streamFormatVersion,valueHandler");
-        org.omg.CORBA.ORB orb=  com.sun.corba.ee.spi.orb.ORB.init(new String[0],p);
-        com.sun.corba.ee.spi.orb.ORB myOrb = (com.sun.corba.ee.spi.orb.ORB)orb ;
-        myOrb.cdrDebugFlag = true ;
-        myOrb.streamFormatVersionDebugFlag = true ;
-        myOrb.valueHandlerDebugFlag = true ;
-        
+              
         CorbaTransportManager ctm = (CorbaTransportManager) myOrb.getCorbaTransportManager() ;
         InputStream inputFile ;
         inputFile = new FileInputStream("C:/Users/daraniramu/Desktop/mtm.out");

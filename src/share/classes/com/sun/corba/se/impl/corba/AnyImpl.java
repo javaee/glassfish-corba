@@ -607,7 +607,8 @@ public class AnyImpl extends Any
 		java.lang.Object[] objholder = new java.lang.Object[1];
 		objholder[0] = object;
 		long[] longholder = new long[1];
-		TCUtility.unmarshalIn(in, typeCode, longholder, objholder);
+                // Fix for bug 5036554/4712731: realType() instead of typecode
+		TCUtility.unmarshalIn(in, realType(), longholder, objholder);
 		value = longholder[0];
 		object = objholder[0];
 		stream = null;

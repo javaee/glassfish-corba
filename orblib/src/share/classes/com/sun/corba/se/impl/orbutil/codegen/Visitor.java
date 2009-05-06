@@ -37,7 +37,7 @@
 package com.sun.corba.se.impl.orbutil.codegen;
 
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
+import com.sun.corba.se.impl.orbutil.codegen.ExpressionInternal ;
 import com.sun.corba.se.spi.orbutil.codegen.Signature ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 
@@ -46,7 +46,7 @@ import com.sun.corba.se.spi.orbutil.codegen.Variable ;
  * @author Ken Cavanaugh
  */
 public interface Visitor {
-    void visitClassGenerator( ClassGenerator arg ) ;
+    void visitClassGenerator( ClassGeneratorImpl arg ) ;
 
     void visitMethodGenerator( MethodGenerator arg ) ;
 
@@ -78,7 +78,7 @@ public interface Visitor {
     
     void visitWhileStatement( WhileStatement arg ) ;
     
-    void visitExpression( Expression arg ) ;
+    void visitExpression( ExpressionInternal arg ) ;
 
     void visitVariable( Variable arg ) ;
 

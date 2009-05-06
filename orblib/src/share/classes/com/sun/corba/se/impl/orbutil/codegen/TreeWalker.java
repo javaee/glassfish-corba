@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.impl.orbutil.codegen;
 
-import java.util.Stack ;
 import java.util.Map ;
 
 import java.lang.reflect.Modifier ;
@@ -44,7 +43,7 @@ import java.lang.reflect.Modifier ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 
 /** This is a general purpose utility that does a complete traversal
@@ -118,32 +117,32 @@ public abstract class TreeWalker implements Visitor {
 	}
     }
 
-    // ClassGenerator
-    public boolean preClassGenerator( ClassGenerator arg ) {
+    // ClassGeneratorImpl
+    public boolean preClassGenerator( ClassGeneratorImpl arg ) {
 	return preNode( arg ) ;
     }
 
     // This allows for simple visitors that always perform the same action 
     // on a variable.  More complex visitors should simply return false
     // and handle class variables in preClassGenerator.
-    public boolean classGeneratorBeforeFields( ClassGenerator arg ) {
+    public boolean classGeneratorBeforeFields( ClassGeneratorImpl arg ) {
 	return true ;
     }
 
-    public void classGeneratorBeforeInitializer( ClassGenerator arg ) {
+    public void classGeneratorBeforeInitializer( ClassGeneratorImpl arg ) {
     }
 
-    public void classGeneratorBeforeMethod( ClassGenerator arg ) {
+    public void classGeneratorBeforeMethod( ClassGeneratorImpl arg ) {
     }
 
-    public void classGeneratorBeforeConstructor( ClassGenerator arg ) {
+    public void classGeneratorBeforeConstructor( ClassGeneratorImpl arg ) {
     }
 
-    public void postClassGenerator( ClassGenerator arg ) {
+    public void postClassGenerator( ClassGeneratorImpl arg ) {
 	postNode( arg ) ;
     }
     
-    public void visitClassGenerator( ClassGenerator arg ) {
+    public void visitClassGenerator( ClassGeneratorImpl arg ) {
 	if (preClassGenerator( arg )) {
 	    try {
 		if (!arg.isInterface()) {
@@ -205,7 +204,7 @@ public abstract class TreeWalker implements Visitor {
 	    try {
 		if (methodGeneratorBeforeArguments( arg )) {
 		    for (Variable var : arg.arguments()) {
-			var.accept( context.current() ) ;
+			((VariableInternal)var).accept( context.current() ) ;
 		    }
 		}
 
@@ -343,10 +342,10 @@ public abstract class TreeWalker implements Visitor {
     public void visitDefinitionStatement( DefinitionStatement arg ) {
 	if (preDefinitionStatement( arg )) {
 	    try {
-		arg.var().accept( context.current() ) ;
+		((VariableInternal)arg.var()).accept( context.current() ) ;
 
 		if (definitionStatementBeforeExpr( arg )) 
-		    arg.expr().accept( context.current() ) ;
+		    ((ExpressionInternal)arg.expr()).accept( context.current() ) ;
 	    } finally {
 		postDefinitionStatement( arg ) ;
 	    }
@@ -372,7 +371,8 @@ public abstract class TreeWalker implements Visitor {
     public void visitIfStatement( IfStatement arg ) {
 	if (preIfStatement( arg )) {
 	    try {
-		arg.condition().accept( context.current() ) ;
+		((ExpressionInternal)arg.condition()).accept(
+                    context.current() ) ;
 		ifStatementBeforeTruePart( arg ) ;
 	        arg.truePart().accept( context.current() ) ;
 		if (ifStatementBeforeFalsePart( arg )) 
@@ -505,7 +505,8 @@ public abstract class TreeWalker implements Visitor {
     public void visitWhileStatement( WhileStatement arg ) {
 	if (preWhileStatement( arg )) {
 	    try {
-		arg.condition().accept( context.current() ) ;
+		((ExpressionInternal)arg.condition()).accept(
+                    context.current() ) ;
 		whileStatementBeforeBody( arg ) ;
 		arg.body().accept( context.current() ) ;
 	    } finally {
@@ -514,16 +515,16 @@ public abstract class TreeWalker implements Visitor {
 	}
     }
     
-    // Expression
-    public boolean preExpression( Expression arg ) {
+    // ExpressionInternal
+    public boolean preExpression( ExpressionInternal arg ) {
 	return preStatement( arg ) ;
     }
 
-    public void postExpression( Expression arg ) {
+    public void postExpression( ExpressionInternal arg ) {
 	postStatement( arg ) ;
     }
 
-    public void visitExpression( Expression arg ) {
+    public void visitExpression( ExpressionInternal arg ) {
 	if (preExpression( arg )) {
 	    postExpression( arg ) ;
 	}
@@ -531,11 +532,11 @@ public abstract class TreeWalker implements Visitor {
 
     // Variable
     public boolean preVariable( Variable arg ) {
-	return preExpression( arg ) ;
+	return preExpression( (VariableInternal)arg ) ;
     }
 
     public void postVariable( Variable arg ) {
-	postExpression( arg ) ;
+	postExpression( (VariableInternal)arg ) ;
     }
 
     public final void visitVariable( Variable arg ) {
@@ -600,7 +601,7 @@ public abstract class TreeWalker implements Visitor {
     public void visitUnaryOperatorExpression( ExpressionFactory.UnaryOperatorExpression arg ) {
 	if (preUnaryOperatorExpression( arg )) {
 	    try {
-		arg.expr().accept( context.current() ) ;
+		((ExpressionInternal)arg.expr()).accept( context.current() ) ;
 	    } finally {
 		postUnaryOperatorExpression( arg ) ;
 	    }
@@ -623,9 +624,9 @@ public abstract class TreeWalker implements Visitor {
     public void visitBinaryOperatorExpression( ExpressionFactory.BinaryOperatorExpression arg ) {
 	if (preBinaryOperatorExpression( arg )) {
 	    try {
-		arg.left().accept( context.current() ) ;
+		((ExpressionInternal)arg.left()).accept( context.current() ) ;
 		binaryOperatorExpressionBeforeRight( arg ) ;
-		arg.right().accept( context.current() ) ;
+		((ExpressionInternal)arg.right()).accept( context.current() ) ;
 	    } finally {
 		postBinaryOperatorExpression( arg ) ;
 	    }
@@ -644,7 +645,7 @@ public abstract class TreeWalker implements Visitor {
     public void visitCastExpression( ExpressionFactory.CastExpression arg ) {
 	if (preCastExpression( arg )) {
 	    try {
-		arg.expr().accept( context.current() ) ;
+		((ExpressionInternal)arg.expr()).accept( context.current() ) ;
 	    } finally {
 		postCastExpression( arg ) ;
 	    }
@@ -663,7 +664,7 @@ public abstract class TreeWalker implements Visitor {
     public void visitInstofExpression( ExpressionFactory.InstofExpression arg ) {
 	if (preInstofExpression( arg )) {
 	    try {
-		arg.expr().accept( context.current() ) ;
+		((ExpressionInternal)arg.expr()).accept( context.current() ) ;
 	    } finally {
 		postInstofExpression( arg ) ;
 	    }
@@ -687,7 +688,7 @@ public abstract class TreeWalker implements Visitor {
 	    try {
 		for (Expression expr : arg.args()) {
 		    staticCallExpressionBeforeArg( arg ) ;
-		    expr.accept( context.current() ) ;
+		    ((ExpressionInternal)expr).accept( context.current() ) ;
 		}
 	    } finally {
 		postStaticCallExpression( arg ) ;
@@ -710,10 +711,10 @@ public abstract class TreeWalker implements Visitor {
     public void visitNonStaticCallExpression( ExpressionFactory.NonStaticCallExpression arg ) {
 	if (preNonStaticCallExpression( arg )) {
 	    try {
-		arg.target().accept( context.current() ) ;
+		((ExpressionInternal)arg.target()).accept( context.current() ) ;
 		for (Expression expr : arg.args()) {
 		    nonStaticCallExpressionBeforeArg( arg ) ;
-		    expr.accept( context.current() ) ;
+		    ((ExpressionInternal)expr).accept( context.current() ) ;
 		}
 	    } finally {
 		postNonStaticCallExpression( arg ) ;
@@ -738,7 +739,7 @@ public abstract class TreeWalker implements Visitor {
 	    try {
 		for (Expression expr : arg.args()) {
 		    newObjExpressionBeforeArg( arg ) ;
-		    expr.accept( context.current() ) ;
+		    ((ExpressionInternal)expr).accept( context.current() ) ;
 		}
 	    } finally {
 		postNewObjExpression( arg ) ;
@@ -767,12 +768,12 @@ public abstract class TreeWalker implements Visitor {
     public void visitNewArrExpression( ExpressionFactory.NewArrExpression arg ) {
 	if (preNewArrExpression( arg )) {
 	    try {
-		arg.size().accept( context.current() ) ;
+		((ExpressionInternal)arg.size()).accept( context.current() ) ;
 		newArrExpressionAfterSize( arg ) ;
 
 		for (Expression expr : arg.exprs()) {
 		    newArrExpressionBeforeExpression( arg ) ;
-		    expr.accept( context.current() ) ;
+		    ((ExpressionInternal)expr).accept( context.current() ) ;
 		    newArrExpressionAfterExpression( arg ) ;
 		}
 	    } finally {
@@ -798,7 +799,7 @@ public abstract class TreeWalker implements Visitor {
 	    try {
 		for (Expression expr : arg.exprs()) {
 		    superCallExpressionBeforeArg( arg ) ;
-		    expr.accept( context.current() ) ;
+		    ((ExpressionInternal)expr).accept( context.current() ) ;
 		}
 	    } finally {
 		postSuperCallExpression( arg ) ;
@@ -823,7 +824,7 @@ public abstract class TreeWalker implements Visitor {
 	    try {
 		for (Expression expr : arg.exprs()) {
 		    superObjExpressionBeforeArg( arg ) ;
-		    expr.accept( context.current() ) ;
+		    ((ExpressionInternal)expr).accept( context.current() ) ;
 		}
 	    } finally {
 		postSuperObjExpression( arg ) ;
@@ -848,7 +849,7 @@ public abstract class TreeWalker implements Visitor {
 	    try {
 		for (Expression expr : arg.exprs()) {
 		    thisObjExpressionBeforeArg( arg ) ;
-		    expr.accept( context.current() ) ;
+		    ((ExpressionInternal)expr).accept( context.current() ) ;
 		}
 	    } finally {
 		postThisObjExpression( arg ) ;
@@ -871,7 +872,7 @@ public abstract class TreeWalker implements Visitor {
 	ExpressionFactory.NonStaticFieldAccessExpression arg ) {
 	if (preNonStaticFieldAccessExpression( arg )) {
 	    try {
-		arg.target().accept( context.current() ) ;
+		((ExpressionInternal)arg.target()).accept( context.current() ) ;
 	    } finally {
 		postNonStaticFieldAccessExpression( arg ) ;
 	    }
@@ -911,9 +912,9 @@ public abstract class TreeWalker implements Visitor {
     public void visitArrayIndexExpression( ExpressionFactory.ArrayIndexExpression arg ) {
 	if (preArrayIndexExpression( arg )) {
 	    try {
-		arg.index().accept( context.current() ) ;
+		((ExpressionInternal)arg.index()).accept( context.current() ) ;
 		arrayIndexExpressionBeforeExpr( arg ) ;
-		arg.expr().accept( context.current() ) ;
+		((ExpressionInternal)arg.expr()).accept( context.current() ) ;
 	    } finally {
 		postArrayIndexExpression( arg ) ;
 	    }
@@ -932,7 +933,7 @@ public abstract class TreeWalker implements Visitor {
     public void visitArrayLengthExpression( ExpressionFactory.ArrayLengthExpression arg ) {
 	if (preArrayLengthExpression( arg )) {
 	    try {
-		arg.expr().accept( context.current() ) ;
+		((ExpressionInternal)arg.expr()).accept( context.current() ) ;
 	    } finally {
 		postArrayLengthExpression( arg ) ;
 	    }
@@ -958,11 +959,11 @@ public abstract class TreeWalker implements Visitor {
     public void visitIfExpression( ExpressionFactory.IfExpression arg ) {
 	if (preIfExpression( arg )) {
 	    try {
-		arg.condition().accept( context.current() ) ;
+		((ExpressionInternal)arg.condition()).accept( context.current() ) ;
 		ifExpressionBeforeTruePart( arg ) ;
-	        arg.truePart().accept( context.current() ) ;
+	        ((ExpressionInternal)arg.truePart()).accept( context.current() ) ;
 		if (ifExpressionBeforeFalsePart( arg )) 
-		    arg.falsePart().accept( context.current() ) ;
+		    ((ExpressionInternal)arg.falsePart()).accept( context.current() ) ;
 	    } finally {
 		postIfExpression( arg ) ;
 	    }

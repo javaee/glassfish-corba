@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.impl.orbutil.newtimer ;
 
-import java.io.IOException ;
 import java.io.File ;
 import java.io.PrintStream ;
 
@@ -46,16 +45,12 @@ import org.xml.sax.Attributes ;
 import org.xml.sax.helpers.DefaultHandler ;
 
 import javax.xml.parsers.SAXParserFactory ;
-import javax.xml.parsers.ParserConfigurationException ;
 import javax.xml.parsers.SAXParser ;
 
 import java.util.List ;
 import java.util.ArrayList ;
 import java.util.Map ;
 import java.util.LinkedHashMap ;
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.Collections ;
 import java.util.Properties ;
 
 import java.io.IOException ;
@@ -71,9 +66,8 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.impl.orbutil.codegen.Identifier ;
 import com.sun.corba.se.impl.orbutil.codegen.ASMUtil ;
 
+import com.sun.corba.se.spi.orbutil.codegen.Expression;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
 import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
 
 import static java.lang.reflect.Modifier.* ;
@@ -517,7 +511,7 @@ public class TimerPointSourceGenerator {
     private static void generateConstructor( TimerFactory tf ) {
 	_constructor( PUBLIC ) ;
 	    Expression tfe = _arg( TimerFactory, "tf" ) ;
-	    Expression controller = _arg( TimerEventController, 
+	    Expression controller = _arg( TimerEventController,
 		"controller" ) ;
 	_body() ;
 

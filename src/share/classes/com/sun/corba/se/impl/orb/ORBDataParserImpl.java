@@ -42,7 +42,7 @@ import java.net.InetAddress;
 import org.omg.CORBA.CompletionStatus ;
 import org.omg.PortableInterceptor.ORBInitializer ;
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.pept.transport.Acceptor;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.spi.orb.DataCollector ;
@@ -103,7 +103,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private Pair<String,String>[] orbInitialReferences ; 
     private String defaultInitRef ;
     private String[] debugFlags ;
-    private CorbaAcceptor[] acceptors;
+    private Acceptor[] acceptors;
     private CorbaContactInfoListFactory corbaContactInfoListFactory;
     private String acceptorSocketType;
     private boolean acceptorSocketUseSelectThreadToWait;
@@ -213,6 +213,11 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public int getHighWaterMark() 
     { 
 	return highWaterMark; 
+    }
+
+    public int getLowWaterMark() 
+    { 
+	return lowWaterMark; 
     }
 
     public int getNumberToReclaim() 
@@ -361,7 +366,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 	return debugFlags ;
     }
 
-    public CorbaAcceptor[] getAcceptors()
+    public Acceptor[] getAcceptors()
     {
 	return acceptors;
     }
@@ -471,7 +476,8 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public ORBDataParserImpl( ORB orb, DataCollector coll )
     {
-	super( ParserTable.get().getParserData() ) ;
+	super( ParserTable.get( 
+            orb.defaultClassNameResolver() ).getParserData() ) ;
 	this.orb = orb ;
 	wrapper = orb.getLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
 	init( coll ) ;

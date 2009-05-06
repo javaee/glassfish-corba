@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,27 +27,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.util;
 
 import org.objectweb.asm.FieldVisitor;
 
 /**
- * A {@link FieldVisitor} that prints the ASM code that generates the fields 
- * it visits.
- *
- * @author Eric Bruneton 
+ * A {@link FieldVisitor} that prints the ASM code that generates the fields it
+ * visits.
+ * 
+ * @author Eric Bruneton
  */
-
-public class ASMifierFieldVisitor extends ASMifierAbstractVisitor 
-  implements FieldVisitor 
+public class ASMifierFieldVisitor extends ASMifierAbstractVisitor implements
+        FieldVisitor
 {
-  
-  /**
-   * Constructs a new {@link ASMifierFieldVisitor}.
-   */
-  
-  public ASMifierFieldVisitor () {
-    super("fv");
-  }
+
+    /**
+     * Constructs a new {@link ASMifierFieldVisitor}.
+     */
+    public ASMifierFieldVisitor() {
+        super("fv");
+    }
 }

@@ -36,18 +36,12 @@
 
 package com.sun.corba.se.spi.orbutil.codegen;
 
-import java.lang.reflect.Modifier ;
-
 import java.io.PrintStream ;
 import java.io.IOException ;
 
 import java.util.Properties ;
 import java.util.List ;
-import java.util.Map ;
-import java.util.HashMap ;
-import java.util.LinkedHashMap ;
 import java.util.Stack ;
-import java.util.Collections ;
 
 import static java.util.Arrays.asList ;
 
@@ -66,18 +60,9 @@ import com.sun.corba.se.spi.orbutil.fsm.FSMImpl ;
 import com.sun.corba.se.spi.orbutil.fsm.Runner ;
 import com.sun.corba.se.spi.orbutil.fsm.StateEngine ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Variable ;
-import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.FieldInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
-
 import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
+import com.sun.corba.se.impl.orbutil.codegen.ClassGeneratorImpl ;
 import com.sun.corba.se.impl.orbutil.codegen.CurrentClassLoader ;
-
-// Visible in interface
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-
 import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
 import com.sun.corba.se.impl.orbutil.codegen.CodeGeneratorUtil ;
 import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
@@ -85,11 +70,11 @@ import com.sun.corba.se.impl.orbutil.codegen.Identifier ;
 import com.sun.corba.se.impl.orbutil.codegen.ImportListImpl ;
 import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.MethodGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Statement ;
 import com.sun.corba.se.impl.orbutil.codegen.SwitchStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
 import com.sun.corba.se.impl.orbutil.codegen.Util ;
 import com.sun.corba.se.impl.orbutil.codegen.FieldGenerator ;
+import com.sun.corba.se.impl.orbutil.codegen.VariableInternal;
 import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
 
 /** Main API for runtime code generation.
@@ -271,10 +256,10 @@ import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
  * Any attempt to use an Expression that references a Variable that is out of scope
  * will result in an IllegalStateException.
  * <P>
- * The _classGenerator() method is used here to get the ClassGenerator,
+ * The _classGenerator() method is used here to get the ClassGeneratorImpl,
  * which can then be used in the CodeGenerator API to create source
  * code or byte code directly.  Also note that Util.display can be used
- * to dump the contents of the ClassGenerator for debugging purposes.
+ * to dump the contents of the ClassGeneratorImpl for debugging purposes.
  * <p>
  *  For convenience, methods are provided to display the AST (@see _displayAST),
  *  generate source code (@see _sourceCode), and generate byteCode 
@@ -532,13 +517,13 @@ public final class Wrapper {
     // Context used for _class until
     // we start defining methods or static initializers.
     private static class ClassContext extends Context {
-	private final ClassGenerator cg ;
+	private final ClassGeneratorImpl cg ;
 
-	public ClassGenerator classGenerator() {
+	public ClassGeneratorImpl classGenerator() {
 	    return cg ;
 	}
 
-	public ClassContext( Stack<Context> contexts, ClassGenerator cg ) {
+	public ClassContext( Stack<Context> contexts, ClassGeneratorImpl cg ) {
 	    super( contexts, S_CLASS ) ;
 	    this.cg = cg ;
 	}
@@ -569,6 +554,7 @@ public final class Wrapper {
 	// case of a variable lookup that resolves to a static or
 	// non-static field access expression.  This just finds the field;
 	// access checks are handled elsewhere.
+        @Override
 	protected Expression alternateLookup( String ident ) {
 	    FieldInfo fld = cg.findFieldInfo(ident) ;
 
@@ -579,6 +565,7 @@ public final class Wrapper {
 	    return FieldGenerator.class.cast(fld).getExpression() ;
 	}
 
+        @Override
 	public void _end() {
 	    super._end() ;
 	    // end of no-codegen copier
@@ -608,17 +595,19 @@ public final class Wrapper {
 	    setBlockStatement( mg.body() ) ;
 	}
 
+        @Override
 	protected Expression alternateLookup( String ident ) {
 	    for (Variable var : mg.arguments())
-		if (ident.equals( var.ident()))
+		if (ident.equals( ((VariableInternal)var).ident()))
 		    return var ;
 
 	    return null ;
 	}
 
+        @Override
 	public void _end() {
 	    super._end() ;
-	    ClassGenerator cg = ClassGenerator.class.cast( mg.parent() ) ;
+	    ClassGeneratorImpl cg = ClassGeneratorImpl.class.cast( mg.parent() ) ;
 	    cg.methodComplete( mg ) ;
 	}
     }
@@ -692,14 +681,17 @@ public final class Wrapper {
 	    currentCaseVariable = null ;
 	}
 
+        @Override
 	protected Expression alternateLookup( String ident ) {
 	    if (currentCaseVariable != null)
-		if (ident.equals( currentCaseVariable.ident()))
+		if (ident.equals( 
+                    ((VariableInternal)currentCaseVariable).ident()))
 		    return currentCaseVariable ;
 
 	    return null ;
 	}
 
+        @Override
 	public void _end() {
 	    super._end() ;
 	    if (trystmt.catches().entrySet().isEmpty() &&
@@ -727,7 +719,7 @@ public final class Wrapper {
 	private Stack<Context> contexts ;
 	private ImportList imports ;
 	private String _package ;
-	private ClassGenerator root ;
+	private ClassGeneratorImpl root ;
 
 	public ImportList imports() {
 	    return imports ;
@@ -763,7 +755,7 @@ public final class Wrapper {
 	    return contexts.peek().getVariable( name ) ;
 	}
 	
-	public ClassGenerator classGenerator() {
+	public ClassGeneratorImpl classGenerator() {
 	    return root ;
 	}
 
@@ -825,7 +817,7 @@ public final class Wrapper {
 	    Type superClass, List<Type> impls ) {
 	    checkState( Operation.CLASS ) ;
 	    String cname = name ;
-	    if (_package != "")
+	    if (!_package.equals(""))
 		cname = _package + "." + name ;
 	    root = CodeGenerator.defineClass( modifiers,
 		cname, superClass, impls ) ;
@@ -836,7 +828,7 @@ public final class Wrapper {
 	    List<Type> impls ) {
 	    checkState( Operation.CLASS ) ;
 	    String cname = name ;
-	    if (_package != "")
+	    if (!_package.equals(""))
 		cname = _package + "." + name ;
 	    root = CodeGenerator.defineInterface( modifiers,
 		cname, impls ) ;
@@ -940,6 +932,7 @@ public final class Wrapper {
     // This ThreadLocal maintains the environment for using the
     // Wrapper methods in a thread.
     private static ThreadLocal<Environment> tl = new ThreadLocal<Environment>() {
+        @Override
         protected Environment initialValue() {
             return new Environment() ;
         }
@@ -951,7 +944,7 @@ public final class Wrapper {
     
 //-------------------- Public API starts here -------------------------------
 
-    /** Obtain the ClassGenerator that is constructed by the Wrapper
+    /** Obtain the ClassGeneratorImpl that is constructed by the Wrapper
      * methods.  This is only needed for using Wrapper with custom
      * vistors.
      */
@@ -1014,11 +1007,25 @@ public final class Wrapper {
      * to other classes.  options may be used
      * to control some aspects of the code generation, such as
      * debugging options.  Supported options include
-     * DUMP_AFTER_SETUP_VISITOR, TRACE_BYTE_CODE_GENERATION, 
+     * DUMP_AFTER_SETUP_VISITOR, TRACE_BYTE_CODE_GENERATION,
      * USE_ASM_VERIFIER.
      */
     public static byte[] _byteCode( ClassLoader cl, Properties options ) {
-	ClassGenerator cg = env().classGenerator() ;
+        return _byteCode( env().classGenerator(), cl, options ) ;
+    }
+
+    /** Generate byte codes for the ClassGenerator.
+     * cl is used to resolve any references
+     * to other classes.  options may be used
+     * to control some aspects of the code generation, such as
+     * debugging options.  Supported options include
+     * DUMP_AFTER_SETUP_VISITOR, TRACE_BYTE_CODE_GENERATION, 
+     * USE_ASM_VERIFIER.
+     */
+    public static byte[] _byteCode( ClassGenerator cgen, ClassLoader cl,
+        Properties options ) {
+
+	ClassGeneratorImpl cg = env().classGenerator() ;
 	ImportList imports = env().imports() ;
 	return CodeGenerator.generateBytecode( cg, cl, imports, options,
 	    System.out ) ;
@@ -1036,18 +1043,47 @@ public final class Wrapper {
     /** Generate a class for the current ClassGenerator.
      * Basically equivalent to _byteCode followed by _makeClass.
      * cl is used to resolve any references
+     * to other classes and to load the class given by
+     * the current ClassGenerator.  options may be used
+     * to control some aspects of the code generation, such as
+     * debugging options.
+     */
+    public static Class<?> _generate( ClassLoader cl, ProtectionDomain pd,
+	Properties props, PrintStream debugOutput ) {
+	ClassGenerator cg = env().classGenerator() ;
+
+        return _generate( cg, cl, pd, props, debugOutput ) ;
+    }
+
+    /** Generate a class for the ClassGenerator.
+     * Basically equivalent to _byteCode followed by _makeClass.
+     * cl is used to resolve any references
      * to other classes and to load the class given by 
      * the current ClassGenerator.  options may be used
      * to control some aspects of the code generation, such as
      * debugging options.  
      */
-    public static Class<?> _generate( ClassLoader cl, ProtectionDomain pd,
-	Properties props, PrintStream debugOutput ) {
-	ClassGenerator cg = env().classGenerator() ;
+    public static Class<?> _generate( ClassGenerator cg, ClassLoader cl,
+        ProtectionDomain pd, Properties props, PrintStream debugOutput ) {
+
 	ImportList imports = env().imports() ;
-	byte[] data = CodeGenerator.generateBytecode( cg, cl, imports, props,
-	    debugOutput ) ;
+	byte[] data = CodeGenerator.generateBytecode( (ClassGeneratorImpl)cg,
+            cl, imports, props, debugOutput ) ;
 	return CodeGeneratorUtil.makeClass( cg.name(), data, pd, cl ) ;
+    }
+
+    /** Generate a class for the current ClassGenerator.
+     * Basically equivalent to _byteCode followed by _makeClass.
+     * cl is used to resolve any references
+     * to other classes and to load the class given by
+     * the current ClassGenerator.  options may be used
+     * to control some aspects of the code generation, such as
+     * debugging options.
+     */
+    public static Class<?> _generate( ClassLoader cl, ProtectionDomain pd,
+	Properties props ) {
+	ClassGenerator cg = env().classGenerator() ;
+        return _generate( cg, cl, pd, props ) ;
     }
 
     /** Generate a class for the current ClassGenerator.
@@ -1058,12 +1094,11 @@ public final class Wrapper {
      * to control some aspects of the code generation, such as
      * debugging options.  
      */
-    public static Class<?> _generate( ClassLoader cl, ProtectionDomain pd,
-	Properties props ) {
-	ClassGenerator cg = env().classGenerator() ;
+    public static Class<?> _generate( ClassGenerator cg, ClassLoader cl,
+        ProtectionDomain pd, Properties props ) {
 	ImportList imports = env().imports() ;
-	byte[] data = CodeGenerator.generateBytecode( cg, cl, imports, props,
-	    System.out ) ;
+	byte[] data = CodeGenerator.generateBytecode( (ClassGeneratorImpl)cg,
+            cl, imports, props, System.out ) ;
 	return CodeGeneratorUtil.makeClass( cg.name(), data, pd, cl ) ;
     }
 
@@ -1086,13 +1121,25 @@ public final class Wrapper {
      * where the context ClassLoader and associated ProtectionDomain are all that
      * is needed.
      */
-    public static <T> GenericClass<T> _generate( Class<T> cls, 
+    public static <T> GenericClass<T> _generate( Class<T> cls,
 	Properties props ) throws ClassNotFoundException {
+
+	ClassGenerator cg = env().classGenerator() ;
+        return _generate( cg, cls, props ) ;
+    }
+
+    /** Return a GenericClass instance so that we can easily create an instance
+     * of the generated class.  This form should be used as an abbreviation,
+     * where the context ClassLoader and associated ProtectionDomain are all that
+     * is needed.
+     */
+    public static <T> GenericClass<T> _generate( ClassGenerator cg,
+        Class<T> cls, Properties props ) throws ClassNotFoundException {
 
 	ClassLoader cl = CurrentClassLoader.get() ;
 	ProtectionDomain pd = getCurrentProtectionDomain( cls ) ;
 
-	Class<?> implClass = _generate( cl, pd, props ) ;
+	Class<?> implClass = _generate( cg, cl, pd, props ) ;
 	GenericClass<T> gc = new GenericClass<T>( cls, implClass ) ;
 	return gc ;
     }
@@ -1102,11 +1149,23 @@ public final class Wrapper {
      * of the formatting of the source code, but no options are currently
      * defined.  The generate source code is written to the PrintStream.
      */
-    public static void _sourceCode( PrintStream ps, 
+    public static void _sourceCode( PrintStream ps,
 	Properties options ) throws IOException {
+
 	ClassGenerator cg = env().classGenerator() ;
+        _sourceCode( cg, ps, options ) ;
+    }
+
+    /** Generate the Java source code for the ClassGenerator.
+     * options may be used to control some aspects
+     * of the formatting of the source code, but no options are currently
+     * defined.  The generate source code is written to the PrintStream.
+     */
+    public static void _sourceCode( ClassGenerator cg, PrintStream ps,
+	Properties options ) throws IOException {
 	ImportList imports = env().imports() ;
-	CodeGenerator.generateSourceCode( ps, cg, imports, options ) ;
+	CodeGenerator.generateSourceCode( ps,
+            (ClassGeneratorImpl)cg, imports, options ) ;
     }
 
     /** Generate source code into a specified output directory.
@@ -1115,6 +1174,16 @@ public final class Wrapper {
      */
     public static void _sourceCode( Properties options ) throws IOException {
 	ClassGenerator cg = env().classGenerator() ;
+        _sourceCode( cg, options ) ;
+    }
+
+    /** Generate source code into a specified output directory.
+     * options must set SOURCE_GENERATION_DIRECTORY to the name
+     * of the output directory.
+     */
+    public static void _sourceCode( ClassGenerator cg,
+        Properties options ) throws IOException {
+
 	ImportList imports = env().imports() ;
 	String sourceGenDir = options.getProperty( 
 	    Wrapper.SOURCE_GENERATION_DIRECTORY ) ;
@@ -1122,7 +1191,8 @@ public final class Wrapper {
 	    throw new IllegalArgumentException( 
 		"options must specify SOURCE_GENERATION_DIRECTORY" ) ;
 	} else {
-	    CodeGenerator.generateSourceCode( sourceGenDir, cg, imports, 
+	    CodeGenerator.generateSourceCode( sourceGenDir,
+                (ClassGeneratorImpl)cg, imports,
 		options ) ;
 	}
     }
@@ -1132,7 +1202,14 @@ public final class Wrapper {
      */
     public static void _displayAST( PrintStream ps ) {
 	ClassGenerator cg = env().classGenerator() ;
-	Util.display( cg, ps ) ;
+        _displayAST( cg, ps ) ;
+    }
+
+    /** Dump the contents of the AST for the current Class defined
+     * by Wrapper calls.  The AST is dumped to the PrintStream.
+     */
+    public static void _displayAST( ClassGenerator cg, PrintStream ps ) {
+	Util.display( (ClassGeneratorImpl)cg, ps ) ;
     }
 
     /** Discard the current Class generated by Wrapper calls, so that
@@ -1455,7 +1532,9 @@ public final class Wrapper {
     /** Indicates the introduction of a new local variable initialized to
      * the given expression.
      */
-    public static final Expression _define( Type type, String name, Expression expr ) {
+    public static final Expression _define( Type type, String name,
+        Expression expr ) {
+
 	return env().bs().addDefinition( type, name, expr ) ;
     }
     
@@ -1651,7 +1730,7 @@ public final class Wrapper {
     /** Generate a call to an instance method.  The full signature
      * must be specified.
      */
-    public static final Expression _call( Expression target, String ident, 
+    public static final Expression _call( Expression target, String ident,
 	Signature signature, Expression... args )  {
 	return env().ef().call( target, ident, signature, asList(args) ) ;
     }
@@ -1659,7 +1738,7 @@ public final class Wrapper {
     /** Generate a call to an instance method.  The full signature
      * must be specified.
      */
-    public static final Expression _call( Expression target, String ident, 
+    public static final Expression _call( Expression target, String ident,
 	Signature signature, List<Expression> args )  {
 	return env().ef().call( target, ident, signature, args ) ;
     }
@@ -1667,7 +1746,7 @@ public final class Wrapper {
     /** Generate a call to an instance method, using the Java method 
      * overload resolution algorithm to determine the signature.
      */
-    public static final Expression _call( Expression target, String ident, 
+    public static final Expression _call( Expression target, String ident,
 	Expression... args )  {
 	return env().ef().call( target, ident, asList(args) ) ;
     }
@@ -1675,7 +1754,7 @@ public final class Wrapper {
     /** Generate a call to an instance method, using the Java method 
      * overload resolution algorithm to determine the signature.
      */
-    public static final Expression _call( Expression target, String ident, 
+    public static final Expression _call( Expression target, String ident,
 	List<Expression> args )  {
 	return env().ef().call( target, ident, args ) ;
     }
@@ -1683,7 +1762,7 @@ public final class Wrapper {
     /** Generate a call to a static method.  The full signature
      * must be specified.
      */
-    public static final Expression _call( Type target, String ident, 
+    public static final Expression _call( Type target, String ident,
 	Signature signature, Expression... args )  {
 	return env().ef().staticCall( target, ident, signature, asList(args) ) ;
     }
@@ -1691,7 +1770,7 @@ public final class Wrapper {
     /** Generate a call to a static method.  The full signature
      * must be specified.
      */
-    public static final Expression _call( Type target, String ident, 
+    public static final Expression _call( Type target, String ident,
 	Signature signature, List<Expression> args )  {
 	return env().ef().staticCall( target, ident, signature, args ) ;
     }
@@ -1699,7 +1778,7 @@ public final class Wrapper {
     /** Generate a call to a static method, using the Java method 
      * overload resolution algorithm to determine the signature.
      */
-    public static final Expression _call( Type target, String ident, 
+    public static final Expression _call( Type target, String ident,
 	Expression... args )  {
 	return env().ef().staticCall( target, ident, asList(args) ) ;
     }
@@ -1707,7 +1786,7 @@ public final class Wrapper {
     /** Generate a call to a static method, using the Java method 
      * overload resolution algorithm to determine the signature.
      */
-    public static final Expression _call( Type target, String ident, 
+    public static final Expression _call( Type target, String ident,
 	List<Expression> args )  {
 	return env().ef().staticCall( target, ident, args ) ;
     }
@@ -1715,7 +1794,7 @@ public final class Wrapper {
     /** Generate a call to an instance method in the current super
      * class.  The full signature must be specified.
      */
-    public static final Expression _super( String ident, 
+    public static final Expression _super( String ident,
 	Signature signature, Expression... exprs ) {
 	return env().ef().superCall( ident, signature, asList(exprs) ) ;
     }
@@ -1723,7 +1802,7 @@ public final class Wrapper {
     /** Generate a call to an instance method in the current super
      * class.  The full signature must be specified.
      */
-    public static final Expression _super( String ident, 
+    public static final Expression _super( String ident,
 	Signature signature, List<Expression> exprs ) {
 	return env().ef().superCall( ident, signature, exprs ) ;
     }
@@ -1732,7 +1811,7 @@ public final class Wrapper {
      * class using the Java method overload resolution algorithm to
      * determine the signature.  
      */
-    public static final Expression _super( String ident, 
+    public static final Expression _super( String ident,
 	Expression... exprs )  {
 	return env().ef().superCall( ident, asList(exprs) ) ;
     }
@@ -1741,7 +1820,7 @@ public final class Wrapper {
      * class using the Java method overload resolution algorithm to
      * determine the signature.  
      */
-    public static final Expression _super( String ident, 
+    public static final Expression _super( String ident,
 	List<Expression> exprs )  {
 	return env().ef().superCall( ident, exprs ) ;
     }
@@ -1753,7 +1832,7 @@ public final class Wrapper {
      * in a constructor.  Every constructor must begin with
      * either a super(...) call or a this(...) call.
      */
-    public static final Expression _super( Signature signature, 
+    public static final Expression _super( Signature signature,
 	Expression... exprs )  {
 	return env().ef().superObj( signature, asList(exprs) ) ;
     }
@@ -1765,7 +1844,7 @@ public final class Wrapper {
      * in a constructor.  Every constructor must begin with
      * either a super(...) call or a this(...) call.
      */
-    public static final Expression _super( Signature signature, 
+    public static final Expression _super( Signature signature,
 	List<Expression> exprs )  {
 	return env().ef().superObj( signature, exprs ) ;
     }
@@ -1799,7 +1878,7 @@ public final class Wrapper {
      * in a constructor.  Every constructor must begin with
      * either a super(...) call or a this(...) call.
      */
-    public static final Expression _this( Signature signature, 
+    public static final Expression _this( Signature signature,
 	Expression... exprs )  {
 	return env().ef().thisObj( signature, asList(exprs) ) ;
     }
@@ -1811,7 +1890,7 @@ public final class Wrapper {
      * in a constructor.  Every constructor must begin with
      * either a super(...) call or a this(...) call.
      */
-    public static final Expression _this( Signature signature, 
+    public static final Expression _this( Signature signature,
 	List<Expression> exprs )  {
 	return env().ef().thisObj( signature, exprs ) ;
     }
@@ -1841,7 +1920,7 @@ public final class Wrapper {
     /** Create an expression representing the application of the
      * unary operator op to the given expression.
      */
-    private static final Expression _unary( ExpressionFactory.UnaryOperator op, 
+    private static final Expression _unary( ExpressionFactory.UnaryOperator op,
 	Expression expr )  {
 	return env().ef().unaryOp( op, expr ) ;
     }
@@ -1850,7 +1929,7 @@ public final class Wrapper {
 	return _unary( ExpressionFactory.UnaryOperator.NOT, expr ) ;
     }
 
-    private static final Expression _binary( Expression left, 
+    private static final Expression _binary( Expression left,
 	ExpressionFactory.BinaryOperator op, Expression right )  {
 	return env().ef().binaryOperator( left, op, right ) ;
     }
@@ -1861,7 +1940,7 @@ public final class Wrapper {
      * + operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _add( Expression left, 
+    public static final Expression _add( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.PLUS,
 	    right ) ;
@@ -1871,7 +1950,7 @@ public final class Wrapper {
      * + operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _sub( Expression left, 
+    public static final Expression _sub( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.MINUS,
 	    right ) ;
@@ -1881,7 +1960,7 @@ public final class Wrapper {
      * + operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _mul( Expression left, 
+    public static final Expression _mul( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.TIMES,
 	    right ) ;
@@ -1891,7 +1970,7 @@ public final class Wrapper {
      * + operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _div( Expression left, 
+    public static final Expression _div( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.DIV,
 	    right ) ;
@@ -1901,7 +1980,7 @@ public final class Wrapper {
      * + operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _rem( Expression left, 
+    public static final Expression _rem( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.REM,
 	    right ) ;
@@ -1911,7 +1990,7 @@ public final class Wrapper {
      * < operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _lt( Expression left, 
+    public static final Expression _lt( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.LT,
 	    right ) ;
@@ -1921,7 +2000,7 @@ public final class Wrapper {
      * > operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _gt( Expression left, 
+    public static final Expression _gt( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.GT,
 	    right ) ;
@@ -1931,7 +2010,7 @@ public final class Wrapper {
      * <= operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _le( Expression left, 
+    public static final Expression _le( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.LE,
 	    right ) ;
@@ -1941,7 +2020,7 @@ public final class Wrapper {
      * >= operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _ge( Expression left, 
+    public static final Expression _ge( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.GE,
 	    right ) ;
@@ -1951,7 +2030,7 @@ public final class Wrapper {
      * == operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _eq( Expression left, 
+    public static final Expression _eq( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.EQ,
 	    right ) ;
@@ -1961,7 +2040,7 @@ public final class Wrapper {
      * != operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _ne( Expression left, 
+    public static final Expression _ne( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.NE,
 	    right ) ;
@@ -1971,7 +2050,7 @@ public final class Wrapper {
      * && operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _and( Expression left, 
+    public static final Expression _and( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.AND,
 	    right ) ;
@@ -1981,7 +2060,7 @@ public final class Wrapper {
      * || operator to the left and right expressions in the
      * form (left op right).
      */
-    public static final Expression _or( Expression left, 
+    public static final Expression _or( Expression left,
 	Expression right ) {
 	return _binary( left, ExpressionFactory.BinaryOperator.OR,
 	    right ) ;
@@ -2005,7 +2084,7 @@ public final class Wrapper {
      * new instance of the given type using the constructor with the
      * given signature and the list of expressions as arguments.
      */
-    public static final Expression _new( Type type, 
+    public static final Expression _new( Type type,
 	Signature signature, Expression... args ) {
 	return env().ef().newObj( type, signature, asList(args) ) ;
     }
@@ -2014,7 +2093,7 @@ public final class Wrapper {
      * new instance of the given type using the constructor with the
      * given signature and the list of expressions as arguments.
      */
-    public static final Expression _new( Type type, 
+    public static final Expression _new( Type type,
 	Signature signature, List<Expression> args ) {
 	return env().ef().newObj( type, signature, args ) ;
     }
@@ -2024,7 +2103,7 @@ public final class Wrapper {
      * signature determined by the Java method overload resolution
      * algorithm and the list of expressions as arguments.
      */
-    public static final Expression _new( Type type, 
+    public static final Expression _new( Type type,
 	Expression... args )  {
 	return env().ef().newObj( type, asList(args) ) ;
     }
@@ -2034,7 +2113,7 @@ public final class Wrapper {
      * signature determined by the Java method overload resolution
      * algorithm and the list of expressions as arguments.
      */
-    public static final Expression _new( Type type, 
+    public static final Expression _new( Type type,
 	List<Expression> args )  {
 	return env().ef().newObj( type, args ) ;
     }
@@ -2045,7 +2124,7 @@ public final class Wrapper {
      * support single dimensional arrays here.  The size of the
      * resulting array is the number of expressions given here.
      */
-    public static final Expression _new_array_init( Type type, 
+    public static final Expression _new_array_init( Type type,
 	Expression... args )  {
 	return env().ef().newArrInit( type, asList(args) ) ;
     }
@@ -2057,7 +2136,7 @@ public final class Wrapper {
      * resulting array is the number of expressions given here.
      * Equivalent to new A[] = { exprList }.
      */
-    public static final Expression _new_array_init( Type type, 
+    public static final Expression _new_array_init( Type type,
 	List<Expression> args )  {
 	return env().ef().newArrInit( type, args ) ;
     }
@@ -2068,6 +2147,7 @@ public final class Wrapper {
      */
     public static final Expression _new_array( Type type, Expression size )  {
 	return env().ef().newArr( type, size ) ;
+
     }
 
     /** Return the type of the current class.

@@ -158,9 +158,12 @@ public class ORBSingleton extends ORB
     private TimerManager timerManager ;
 
     public ORBSingleton() {
-	timerManager = makeTimerManager( null ) ;
-        createORBManagedObjectManager() ;
+	timerManager = makeTimerManager( getUniqueOrbId() ) ;
 	initializePrimitiveTypeCodeConstants() ;
+    }
+
+    public void setParameters( String params[], Properties props ) {
+	// this is never called by ORB.init() 
     }
 
     public void set_parameters( Properties props ) {
@@ -453,7 +456,7 @@ public class ORBSingleton extends ORB
         throw new SecurityException("ORBSingleton: access denied");
     }
 
-    public CorbaTransportManager getTransportManager()
+    public TransportManager getTransportManager()
     {
         throw new SecurityException("ORBSingleton: access denied");
     }
@@ -602,6 +605,10 @@ public class ORBSingleton extends ORB
     }
 
     public int getHighWaterMark(){
+        throw new SecurityException("ORBSingleton: access denied");
+    }
+
+    public int getLowWaterMark(){
         throw new SecurityException("ORBSingleton: access denied");
     }
 

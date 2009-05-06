@@ -63,7 +63,7 @@ import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 
 // REVISIT: create a unit test for this class.
 

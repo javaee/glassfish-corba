@@ -37,23 +37,23 @@ package com.sun.corba.se.impl.orbutil.codegen;
 
 import com.sun.corba.se.impl.orbutil.codegen.StatementBase ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
+import com.sun.corba.se.impl.orbutil.codegen.ExpressionInternal ;
 
 public final class AssignmentStatement extends StatementBase {
-    private Expression left ;
-    private Expression right ;
+    private ExpressionInternal left ;
+    private ExpressionInternal right ;
 
-    AssignmentStatement( Node parent, Expression left, Expression right ) {
+    AssignmentStatement( Node parent, ExpressionInternal left, ExpressionInternal right ) {
 	super( parent ) ;
 	this.left = left ;
 	this.right = right ;
     }
 
-    public Expression right() {
+    public ExpressionInternal right() {
 	return this.right ;
     }
 	
-    public Expression left() {
+    public ExpressionInternal left() {
 	return this.left ;
     }
 

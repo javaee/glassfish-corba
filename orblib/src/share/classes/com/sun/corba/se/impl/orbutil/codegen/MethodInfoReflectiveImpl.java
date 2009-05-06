@@ -39,14 +39,9 @@ package com.sun.corba.se.impl.orbutil.codegen;
 import java.lang.reflect.Method ;
 import java.lang.reflect.Constructor ;
 
-import java.util.List ;
-import java.util.ArrayList ;
-
 import com.sun.corba.se.spi.orbutil.copyobject.Immutable ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Variable ;
-import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
 
 /** Implementation of MethodInfo interface for actual Method.
@@ -90,12 +85,14 @@ public class MethodInfoReflectiveImpl extends MethodInfoBase {
 	int ctr = 0 ;
 	for (Class<?> cls : arguments){
 	    String name = "arg" + ctr++ ;
-	    Variable var = ef.variable( Type.type(cls), name ) ;
+	    VariableInternal var = (VariableInternal)ef.variable(
+                Type.type(cls), name ) ;
 	    var.close() ;
 	    this.arguments.add( var ) ;
 	}
     }
 
+    @Override
     public Method getMethod() {
 	if (isConstructor())
 	    throw new IllegalStateException( 
@@ -103,6 +100,7 @@ public class MethodInfoReflectiveImpl extends MethodInfoBase {
 	return method ;
     }
 
+    @Override
     public Constructor getConstructor() {
 	if (!isConstructor())
 	    throw new IllegalStateException( 

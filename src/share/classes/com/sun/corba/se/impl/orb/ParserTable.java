@@ -56,6 +56,7 @@ import com.sun.corba.se.pept.broker.Broker;
 import com.sun.corba.se.pept.encoding.InputObject;
 import com.sun.corba.se.pept.encoding.OutputObject;
 import com.sun.corba.se.pept.protocol.MessageMediator;
+import com.sun.corba.se.pept.transport.Acceptor;
 import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.pept.transport.ContactInfo;
 import com.sun.corba.se.pept.transport.EventHandler;
@@ -81,7 +82,6 @@ import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.TcpTimeouts;
 import com.sun.corba.se.spi.transport.TransportDefault;
-
 import com.sun.corba.se.impl.oa.poa.Policies;
 
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
@@ -96,21 +96,30 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.ReferenceAddr ;
 import com.sun.corba.se.impl.transport.DefaultIORToSocketInfoImpl;
 import com.sun.corba.se.impl.transport.DefaultSocketFactoryImpl;
 import com.sun.corba.se.impl.transport.TcpTimeoutsImpl;
+import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 /** Initialize the parser data for the standard ORB parser.  This is used both
  * to implement ORBDataParserImpl and to provide the basic testing framework
  * for ORBDataParserImpl.
  */
 public class ParserTable {
+    // There is a serious problem here with the DefaultSocketFactory.
+    // It is NOT immutable: in particular is has a setORB method, so instances
+    // of DefaultSocketFactoryImpl CANNOT be shared across ORBs.
+    // To clean this up, we'll simply create a new ParserTable for each call to
+    // get.
     private static String MY_CLASS_NAME = ParserTable.class.getName() ;
 
-    private static final ParserTable myInstance = new ParserTable() ;
+    // private static final ParserTable myInstance = new ParserTable() ;
 
     private ORBUtilSystemException wrapper ;
 
-    public static ParserTable get()
+    private Operation classAction ;
+
+    public static ParserTable get( UnaryFunction<String,Class<?>> cnr )
     {
-	return myInstance ;
+	// return myInstance ;
+        return new ParserTable( cnr ) ;
     }
 
     private ParserData[] parserData ;
@@ -120,7 +129,9 @@ public class ParserTable {
 	return parserData ;
     }
 
-    private ParserTable() {
+    private ParserTable( UnaryFunction<String,Class<?>> cnr ) {
+        classAction = OperationFactory.classAction( cnr ) ;
+
 	wrapper = ORB.getStaticLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
 
 	String codeSetTestString = 
@@ -158,7 +169,7 @@ public class ParserTable {
 	    new Pair<String,String>( MY_CLASS_NAME + "$TestORBInitializer1", "dummy" ),
 	    new Pair<String,String>( MY_CLASS_NAME + "$TestORBInitializer2", "dummy" ) } ;
 
-	CorbaAcceptor[] TestAcceptors =
+	Acceptor[] TestAcceptors =
 	    { null, 
 	      new TestAcceptor2(), 
 	      new TestAcceptor1()
@@ -354,7 +365,7 @@ public class ParserTable {
 		"serverIsORBActivated", Boolean.FALSE,
 		Boolean.TRUE, "true" ),
 	    ParserDataFactory.make( ORBConstants.BAD_SERVER_ID_HANDLER_CLASS_PROPERTY,  
-		OperationFactory.classAction(), 
+                classAction,
 		"badServerIdHandlerClass", null,
 		TestBadServerIdHandler.class, MY_CLASS_NAME + "$TestBadServerIdHandler" ),
 	    ParserDataFactory.make( ORBConstants.PI_ORB_INITIALIZER_CLASS_PREFIX,  
@@ -363,8 +374,8 @@ public class ParserTable {
 		TestORBInitializers, TestORBInitData, ORBInitializer.class ),
 	    ParserDataFactory.make( ORBConstants.ACCEPTOR_CLASS_PREFIX_PROPERTY,  
 		makeAcceptorInstantiationOperation(), 
-		"acceptors", new CorbaAcceptor[0],
-		TestAcceptors, TestAcceptorData, CorbaAcceptor.class ),
+		"acceptors", new Acceptor[0],
+		TestAcceptors, TestAcceptorData, Acceptor.class ),
 
 	    //
 	    // Socket/Channel control
@@ -493,7 +504,7 @@ public class ParserTable {
 		Boolean.TRUE, "TRUE"),
 	    ParserDataFactory.make( ORBConstants.USE_ENUM_DESC,
 		OperationFactory.booleanAction(),
-		"useEnumDesc", Boolean.FALSE,
+		"useEnumDesc", Boolean.TRUE,
 		Boolean.TRUE, "TRUE")
 	} ;
 
@@ -580,7 +591,7 @@ public class ParserTable {
 	    return null ;
 	}
 
-	public void setAcceptedSocketOptions(CorbaAcceptor acceptor,
+	public void setAcceptedSocketOptions(Acceptor acceptor,
 					     ServerSocket serverSocket,
 					     Socket socket)
 	{
@@ -664,7 +675,7 @@ public class ParserTable {
 
 		try {
 		    Class legacySocketFactoryClass =
-			ORBClassLoader.loadClass(param);
+                        (Class)classAction.operate(param) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -694,7 +705,8 @@ public class ParserTable {
 		String param = (String)value ;
 
 		try {
-		    Class socketFactoryClass = ORBClassLoader.loadClass(param);
+		    Class socketFactoryClass =
+                        (Class)classAction.operate(param ) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -724,7 +736,8 @@ public class ParserTable {
 		String param = (String)value ;
 
 		try {
-		    Class iorToSocketInfoClass = ORBClassLoader.loadClass(param);
+		    Class iorToSocketInfoClass =
+                        (Class)classAction.operate(param ) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -753,7 +766,8 @@ public class ParserTable {
 		String param = (String)value ;
 
 		try {
-		    Class iiopPrimaryToContactInfoClass = ORBClassLoader.loadClass(param);
+		    Class iiopPrimaryToContactInfoClass =
+                        (Class)classAction.operate(param ) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -785,7 +799,7 @@ public class ParserTable {
 
 		try {
 		    Class contactInfoListFactoryClass =
-			ORBClassLoader.loadClass(param);
+                        (Class)classAction.operate(param ) ;
 		    // For security reasons avoid creating an instance if
 		    // this socket factory class is not one that would fail
 		    // the class cast anyway.
@@ -920,9 +934,8 @@ public class ParserTable {
     }
 
     private Operation makeROIOperation() {
-	Operation clsop = OperationFactory.classAction() ;
 	Operation indexOp = OperationFactory.suffixAction() ;
-	Operation op1 = OperationFactory.compose( indexOp, clsop ) ;
+	Operation op1 = OperationFactory.compose( indexOp, classAction ) ;
 	Operation mop = OperationFactory.maskErrorAction( op1 ) ;
 
 	Operation mkinst = new Operation() {
@@ -972,7 +985,7 @@ public class ParserTable {
     }
 
     public static final class TestAcceptor1
-	implements CorbaAcceptor
+	implements Acceptor
     {
 	public boolean equals( Object other )
 	{
@@ -1005,7 +1018,7 @@ public class ParserTable {
     }
 
     public static final class TestAcceptor2
-	implements CorbaAcceptor
+	implements Acceptor
     {
 	public boolean equals( Object other )
 	{
@@ -1039,9 +1052,8 @@ public class ParserTable {
 
     // REVISIT - this is a cut and paste modification of makeROIOperation.
     private Operation makeAcceptorInstantiationOperation() {
-	Operation clsop = OperationFactory.classAction() ;
 	Operation indexOp = OperationFactory.suffixAction() ;
-	Operation op1 = OperationFactory.compose( indexOp, clsop ) ;
+	Operation op1 = OperationFactory.compose( indexOp, classAction ) ;
 	Operation mop = OperationFactory.maskErrorAction( op1 ) ;
 
 	Operation mkinst = new Operation() {
@@ -1054,18 +1066,18 @@ public class ParserTable {
 		// For security reasons avoid creating an instance 
 		// if this class is one that would fail the class cast 
 		// to ORBInitializer anyway.
-		if( CorbaAcceptor.class.isAssignableFrom( initClass ) ) {
+		if( Acceptor.class.isAssignableFrom( initClass ) ) {
 		    // Now that we have a class object, instantiate one and
 		    // remember it:
-		    CorbaAcceptor acceptor = null ; 
+		    Acceptor acceptor = null ; 
 
 		    try {
-			acceptor = AccessController.doPrivileged(
-			    new PrivilegedExceptionAction<CorbaAcceptor>() {
-				public CorbaAcceptor run() 
+			acceptor = (Acceptor)AccessController.doPrivileged(
+			    new PrivilegedExceptionAction() {
+				public Object run() 
 				    throws InstantiationException, IllegalAccessException 
 				{
-				    return (CorbaAcceptor)initClass.newInstance() ;
+				    return initClass.newInstance() ;
 				}
 			    } 
 			) ;

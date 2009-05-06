@@ -78,6 +78,11 @@ import javax.transaction.TransactionRequiredException;
 import javax.transaction.TransactionRolledbackException;
 import javax.transaction.InvalidTransactionException;
 
+// These classes only exist in Java SE 6 and later.
+import javax.activity.ActivityRequiredException ;
+import javax.activity.ActivityCompletedException ;
+import javax.activity.InvalidActivityException ;
+
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
@@ -114,7 +119,7 @@ import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.impl.io.ValueHandlerImpl;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -153,19 +158,17 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
     static {
 	final String vendor = System.getProperty( "java.vendor" ) ;
-	String vhName = null ;
+	String vhName = "com.sun.corba.se.impl.io.ValueHandlerImpl" ;
 
-	if (vendor.equals( SUN_JAVA_VENDOR ))
+	if (vendor.equals( SUN_JAVA_VENDOR )) {
+            // GFv3: remove this for now (and maybe forever)
 	    // We are running with Sun's JDK, so use the ValueHandler in the JDK.
 	    // This is needed in GlassFish for compatibility with embedded use of
 	    // WebLogic.  The string concat is essential: it prevents the code 
 	    // from being affected by the ORB rename. The same reason makes it impossible
 	    // to just call new.
-	    vhName = "com.sun.corba." + "se.impl.io.ValueHandlerImpl" ;
-	else
-	    // This is NOT Sun's JDK, so allow the rename, which forces use of the
-	    // ValueHandler in the renamed ORB used in GlassFish.
-	    vhName = "com.sun.corba.se.impl.io.ValueHandlerImpl" ;
+	    // XXX vhName = "com.sun.corba." + "se.impl.io.ValueHandlerImpl" ;
+        }
 
 	try {
 	    valueHandlerSingleton = (ValueHandler) Class.forName(vhName).newInstance() ;
@@ -313,53 +316,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
             return new MarshalException(message,inner);
         } else if (ex instanceof ACTIVITY_REQUIRED) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.ActivityRequiredException");
-                Class[] params = new Class[2];
-                params[0] = java.lang.String.class;
-                params[1] = java.lang.Throwable.class;
-                Constructor cr = cl.getConstructor(params);
-                Object[] args = new Object[2];
-                args[0] = message;
-                args[1] = ex;
-                return (RemoteException) cr.newInstance(args);                
-	    } catch (Throwable e) {
-                utilWrapper.classNotFound(
-                              e, "javax.activity.ActivityRequiredException");
-            }
+            return new ActivityRequiredException( message, ex ) ;
         } else if (ex instanceof ACTIVITY_COMPLETED) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.ActivityCompletedException");
-		Class[] params = new Class[2];
-		params[0] = java.lang.String.class;
-		params[1] = java.lang.Throwable.class;
-		Constructor cr = cl.getConstructor(params);
-		Object[] args = new Object[2];
-		args[0] = message;
-		args[1] = ex;
-		return (RemoteException) cr.newInstance(args);
-              } catch (Throwable e) {
-                  utilWrapper.classNotFound(
-                                e, "javax.activity.ActivityCompletedException");
-              }
+            return new ActivityCompletedException( message, ex ) ;
         } else if (ex instanceof INVALID_ACTIVITY) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.InvalidActivityException");
-		Class[] params = new Class[2];
-		params[0] = java.lang.String.class;
-		params[1] = java.lang.Throwable.class;
-		Constructor cr = cl.getConstructor(params);
-		Object[] args = new Object[2];
-		args[0] = message;
-		args[1] = ex;
-		return (RemoteException) cr.newInstance(args);
-              } catch (Throwable e) {
-                  utilWrapper.classNotFound(
-                                e, "javax.activity.InvalidActivityException");
-              }
+            return new InvalidActivityException( message, ex ) ;
 	}
 
         // Just map to a generic RemoteException...

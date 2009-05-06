@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.util;
 
 import java.io.FileInputStream;
+import java.io.PrintWriter;
 import java.util.List;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -42,354 +42,439 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.TryCatchBlockNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.SimpleVerifier;
 import org.objectweb.asm.tree.analysis.Frame;
 
 /**
- * A {@link ClassAdapter} that checks that its methods are properly
- * used. More precisely this class adapter checks each method call individually,
- * based <i>only</i> on its arguments, but does <i>not</i> check the
- * <i>sequence</i> of method calls. For example, the invalid sequence
+ * A {@link ClassAdapter} that checks that its methods are properly used. More
+ * precisely this class adapter checks each method call individually, based
+ * <i>only</i> on its arguments, but does <i>not</i> check the <i>sequence</i>
+ * of method calls. For example, the invalid sequence
  * <tt>visitField(ACC_PUBLIC, "i", "I", null)</tt> <tt>visitField(ACC_PUBLIC,
- * "i", "D", null)</tt> will <i>not</i> be detected by this class adapter.
- *
+ * "i", "D", null)</tt>
+ * will <i>not</i> be detected by this class adapter.
+ * 
+ * <p><code>CheckClassAdapter</code> can be also used to verify bytecode
+ * transformations in order to make sure transformed bytecode is sane. For
+ * example:
+ * 
+ * <pre>
+ *   InputStream is = ...; // get bytes for the source class
+ *   ClassReader cr = new ClassReader(is);
+ *   ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS);
+ *   ClassVisitor cv = new <b>MyClassAdapter</b>(new CheckClassAdapter(cw));
+ *   cr.accept(cv, 0);
+ * 
+ *   StringWriter sw = new StringWriter();
+ *   PrintWriter pw = new PrintWriter(sw);
+ *   CheckClassAdapter.verify(new ClassReader(cw.toByteArray()), false, pw);
+ *   assertTrue(sw.toString(), sw.toString().length()==0);
+ * </pre>
+ * 
+ * Above code runs transformed bytecode trough the
+ * <code>CheckClassAdapter</code>. It won't be exactly the same verification
+ * as JVM does, but it run data flow analysis for the code of each method and
+ * checks that expectations are met for each method instruction.
+ * 
+ * <p>If method bytecode has errors, assertion text will show the erroneous
+ * instruction number and dump of the failed method with information about
+ * locals and stack slot for each instruction. For example (format is -
+ * insnNumber locals : stack):
+ * 
+ * <pre>
+ * org.objectweb.asm.tree.analysis.AnalyzerException: Error at instruction 71: Expected I, but found .
+ *   at org.objectweb.asm.tree.analysis.Analyzer.analyze(Analyzer.java:289)
+ *   at org.objectweb.asm.util.CheckClassAdapter.verify(CheckClassAdapter.java:135)
+ * ...
+ * remove()V
+ * 00000 LinkedBlockingQueue$Itr . . . . . . . .  :
+ *   ICONST_0
+ * 00001 LinkedBlockingQueue$Itr . . . . . . . .  : I
+ *   ISTORE 2
+ * 00001 LinkedBlockingQueue$Itr <b>.</b> I . . . . . .  :
+ * ...
+ * 
+ * 00071 LinkedBlockingQueue$Itr <b>.</b> I . . . . . .  : 
+ *   ILOAD 1
+ * 00072 <b>?</b>                
+ *   INVOKESPECIAL java/lang/Integer.<init> (I)V
+ * ...
+ * </pre>
+ * 
+ * In the above output you can see that variable 1 loaded by
+ * <code>ILOAD 1</code> instruction at position <code>00071</code> is not
+ * initialized. You can also see that at the beginning of the method (code
+ * inserted by the transformation) variable 2 is initialized.
+ * 
+ * <p>Note that when used like that, <code>CheckClassAdapter.verify()</code>
+ * can trigger additional class loading, because it is using
+ * <code>SimpleVerifier</code>.
+ * 
  * @author Eric Bruneton
  */
-
 public class CheckClassAdapter extends ClassAdapter {
 
-  /**
-   * <tt>true</tt> if the visit method has been called.
-   */
+    /**
+     * <tt>true</tt> if the visit method has been called.
+     */
+    private boolean start;
 
-  private boolean start;
+    /**
+     * <tt>true</tt> if the visitSource method has been called.
+     */
+    private boolean source;
 
-  /**
-   * <tt>true</tt> if the visitEnd method has been called.
-   */
+    /**
+     * <tt>true</tt> if the visitOuterClass method has been called.
+     */
+    private boolean outer;
 
-  private boolean end;
+    /**
+     * <tt>true</tt> if the visitEnd method has been called.
+     */
+    private boolean end;
 
-  /**
-   * Checks a given class.
-   * <p>
-   * Usage: CheckClassAdapter
-   * &lt;fully qualified class name or class file name&gt;
-   *
-   * @param args the command line arguments.
-   *
-   * @throws Exception if the class cannot be found, or if an IO exception
-   *      occurs.
-   */
-
-  public static void main (final String[] args) throws Exception {
-    if (args.length != 1) {
-      System.err.println("Verifies the given class.");
-      System.err.println("Usage: CheckClassAdapter " +
-                         "<fully qualified class name or class file name>");
-      System.exit(-1);
-    }
-    ClassReader cr;
-    if (args[0].endsWith(".class")) {
-      cr = new ClassReader(new FileInputStream(args[0]));
-    } else {
-      cr = new ClassReader(args[0]);
-    }
-
-    ClassNode cn = new ClassNode();
-    cr.accept(new CheckClassAdapter(cn), true);
-
-    List methods = cn.methods;
-    for (int i = 0; i < methods.size(); ++i) {
-      MethodNode method = (MethodNode)methods.get(i);
-      if (method.instructions.size() > 0) {
-        Analyzer a = new Analyzer(
-          new SimpleVerifier(
-            Type.getType("L" + cn.name + ";"), 
-            Type.getType("L" + cn.superName + ";"), 
-            (cn.access & Opcodes.ACC_INTERFACE) != 0));
-        try {
-          a.analyze(cn.name, method);
-          continue;
-        } catch (Exception e) {
-          e.printStackTrace();
+    /**
+     * Checks a given class. <p> Usage: CheckClassAdapter &lt;fully qualified
+     * class name or class file name&gt;
+     * 
+     * @param args the command line arguments.
+     * 
+     * @throws Exception if the class cannot be found, or if an IO exception
+     *         occurs.
+     */
+    public static void main(final String[] args) throws Exception {
+        if (args.length != 1) {
+            System.err.println("Verifies the given class.");
+            System.err.println("Usage: CheckClassAdapter "
+                    + "<fully qualified class name or class file name>");
+            return;
         }
-        final Frame[] frames = a.getFrames();
+        ClassReader cr;
+        if (args[0].endsWith(".class")) {
+            cr = new ClassReader(new FileInputStream(args[0]));
+        } else {
+            cr = new ClassReader(args[0]);
+        }
 
-        System.out.println(method.name + method.desc);
-        TraceMethodVisitor mv = new TraceMethodVisitor() {
-          public void visitMaxs (final int maxStack, final int maxLocals) {
-            for (int i = 0; i < text.size(); ++i) {
-              String s = frames[i] == null ? "null" : frames[i].toString();
-              while (s.length() < maxStack+maxLocals+1) {
-                s += " ";
-              }
-              System.out.print(
-                  Integer.toString(i + 100000).substring(1) + " " + s + " : "
-                  + text.get(i));
+        verify(cr, false, new PrintWriter(System.err));
+    }
+
+    /**
+     * Checks a given class
+     * 
+     * @param cr a <code>ClassReader</code> that contains bytecode for the
+     *        analysis.
+     * @param dump true if bytecode should be printed out not only when errors
+     *        are found.
+     * @param pw write where results going to be printed
+     */
+    public static void verify(
+        final ClassReader cr,
+        final boolean dump,
+        final PrintWriter pw)
+    {
+        ClassNode cn = new ClassNode();
+        cr.accept(new CheckClassAdapter(cn), ClassReader.SKIP_DEBUG);
+
+        Type syperType = cn.superName == null
+                ? null
+                : Type.getObjectType(cn.superName);
+        List methods = cn.methods;
+        for (int i = 0; i < methods.size(); ++i) {
+            MethodNode method = (MethodNode) methods.get(i);
+            Analyzer a = new Analyzer(new SimpleVerifier(Type.getObjectType(cn.name),
+                    syperType,
+                    false));
+            try {
+                a.analyze(cn.name, method);
+                if (!dump) {
+                    continue;
+                }
+            } catch (Exception e) {
+                e.printStackTrace(pw);
             }
-            System.out.println();
-          }
-        };
-        for (int j = 0; j < method.instructions.size(); ++j) {
-          ((AbstractInsnNode)method.instructions.get(j)).accept(mv);
+            Frame[] frames = a.getFrames();
+
+            TraceMethodVisitor mv = new TraceMethodVisitor();
+
+            pw.println(method.name + method.desc);
+            for (int j = 0; j < method.instructions.size(); ++j) {
+                method.instructions.get(j).accept(mv);
+
+                StringBuffer s = new StringBuffer();
+                Frame f = frames[j];
+                if (f == null) {
+                    s.append('?');
+                } else {
+                    for (int k = 0; k < f.getLocals(); ++k) {
+                        s.append(getShortName(f.getLocal(k).toString()))
+                                .append(' ');
+                    }
+                    s.append(" : ");
+                    for (int k = 0; k < f.getStackSize(); ++k) {
+                        s.append(getShortName(f.getStack(k).toString()))
+                                .append(' ');
+                    }
+                }
+                while (s.length() < method.maxStack + method.maxLocals + 1) {
+                    s.append(' ');
+                }
+                pw.print(Integer.toString(j + 100000).substring(1));
+                pw.print(" " + s + " : " + mv.buf); // mv.text.get(j));
+            }
+            for (int j = 0; j < method.tryCatchBlocks.size(); ++j) {
+                ((TryCatchBlockNode) method.tryCatchBlocks.get(j)).accept(mv);
+                pw.print(" " + mv.buf);
+            }
+            pw.println();
         }
-        mv.visitMaxs(method.maxStack, method.maxLocals);
-      }
+        pw.flush();
     }
-  }
 
-  /**
-   * Constructs a new {@link CheckClassAdapter}.
-   *
-   * @param cv the class visitor to which this adapter must delegate calls.
-   */
+    private static String getShortName(final String name) {
+        int n = name.lastIndexOf('/');
+        int k = name.length();
+        if (name.charAt(k - 1) == ';') {
+            k--;
+        }
+        return n == -1 ? name : name.substring(n + 1, k);
+    }
 
-  public CheckClassAdapter (final ClassVisitor cv) {
-    super(cv);
-  }
+    /**
+     * Constructs a new {@link CheckClassAdapter}.
+     * 
+     * @param cv the class visitor to which this adapter must delegate calls.
+     */
+    public CheckClassAdapter(final ClassVisitor cv) {
+        super(cv);
+    }
 
-  // --------------------------------------------------------------------------
-  // Implementation of the ClassVisitor interface
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Implementation of the ClassVisitor interface
+    // ------------------------------------------------------------------------
 
-  public void visit (
-    final int version,
-    final int access,
-    final String name,
-    final String signature,
-    final String superName,
-    final String[] interfaces)
-  {
-    if (start) {
-      throw new IllegalStateException("visit must be called only once");
-    } else {
-      start = true;
+    public void visit(
+        final int version,
+        final int access,
+        final String name,
+        final String signature,
+        final String superName,
+        final String[] interfaces)
+    {
+        if (start) {
+            throw new IllegalStateException("visit must be called only once");
+        }
+        start = true;
+        checkState();
+        checkAccess(access, Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL
+                + Opcodes.ACC_SUPER + Opcodes.ACC_INTERFACE
+                + Opcodes.ACC_ABSTRACT + Opcodes.ACC_SYNTHETIC
+                + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ENUM
+                + Opcodes.ACC_DEPRECATED);
+        if (name == null || !name.endsWith("package-info")) {
+            CheckMethodAdapter.checkInternalName(name, "class name");
+        }
+        if ("java/lang/Object".equals(name)) {
+            if (superName != null) {
+                throw new IllegalArgumentException("The super class name of the Object class must be 'null'");
+            }
+        } else {
+            CheckMethodAdapter.checkInternalName(superName, "super class name");
+        }
+        if (signature != null) {
+            CheckMethodAdapter.checkClassSignature(signature);
+        }
+        if ((access & Opcodes.ACC_INTERFACE) != 0) {
+            if (!"java/lang/Object".equals(superName)) {
+                throw new IllegalArgumentException("The super class name of interfaces must be 'java/lang/Object'");
+            }
+        }
+        if (interfaces != null) {
+            for (int i = 0; i < interfaces.length; ++i) {
+                CheckMethodAdapter.checkInternalName(interfaces[i],
+                        "interface name at index " + i);
+            }
+        }
+        cv.visit(version, access, name, signature, superName, interfaces);
     }
-    checkState();
-    checkAccess(
-      access,
-      Opcodes.ACC_PUBLIC +
-      Opcodes.ACC_FINAL +
-      Opcodes.ACC_SUPER +
-      Opcodes.ACC_INTERFACE +
-      Opcodes.ACC_ABSTRACT +
-      Opcodes.ACC_SYNTHETIC +
-      Opcodes.ACC_ANNOTATION +
-      Opcodes.ACC_ENUM +
-      Opcodes.ACC_DEPRECATED);
-    CheckMethodAdapter.checkInternalName(name, "class name");
-    if (name.equals("java/lang/Object")) {
-      if (superName != null) {
-        throw new IllegalArgumentException(
-          "The super class name of the Object class must be 'null'");
-      }
-    } else {
-      CheckMethodAdapter.checkInternalName(superName, "super class name");
-    }
-    if (signature != null) {
-      // TODO
-    }
-    if ((access & Opcodes.ACC_INTERFACE) != 0) {
-      if (!superName.equals("java/lang/Object")) {
-        throw new IllegalArgumentException(
-          "The super class name of interfaces must be 'java/lang/Object'");
-      }
-    }
-    if (interfaces != null) {
-      for (int i = 0; i < interfaces.length; ++i) {
-        CheckMethodAdapter.checkInternalName(
-          interfaces[i], "interface name at index " + i);
-      }
-    }
-    cv.visit(version, access, name, signature, superName, interfaces);
-  }
 
-  public void visitSource (final String file, final String debug) {
-    // TODO check called only once, after visit()
-    cv.visitSource(file, debug);
-  }
-
-  public void visitOuterClass (
-    final String owner,
-    final String name,
-    final String desc)
-  {
-    // TODO check called only once, after visit(); check arguments
-    cv.visitOuterClass(owner, name, desc);
-  }
-
-  public void visitInnerClass (
-    final String name,
-    final String outerName,
-    final String innerName,
-    final int access)
-  {
-    checkState();
-    CheckMethodAdapter.checkInternalName(name, "class name");
-    if (outerName != null) {
-      CheckMethodAdapter.checkInternalName(outerName, "outer class name");
+    public void visitSource(final String file, final String debug) {
+        checkState();
+        if (source) {
+            throw new IllegalStateException("visitSource can be called only once.");
+        }
+        source = true;
+        cv.visitSource(file, debug);
     }
-    if (innerName != null) {
-      CheckMethodAdapter.checkIdentifier(innerName, "inner class name");
-    }
-    checkAccess(
-      access,
-      Opcodes.ACC_PUBLIC +
-      Opcodes.ACC_PRIVATE +
-      Opcodes.ACC_PROTECTED +
-      Opcodes.ACC_STATIC +
-      Opcodes.ACC_FINAL +
-      Opcodes.ACC_INTERFACE +
-      Opcodes.ACC_ABSTRACT +
-      Opcodes.ACC_SYNTHETIC +
-      Opcodes.ACC_ANNOTATION +
-      Opcodes.ACC_ENUM);
-    cv.visitInnerClass(name, outerName, innerName, access);
-  }
 
-  public FieldVisitor visitField (
-    final int access,
-    final String name,
-    final String desc,
-    final String signature,
-    final Object value)
-  {
-    checkState();
-    checkAccess(
-      access,
-      Opcodes.ACC_PUBLIC +
-      Opcodes.ACC_PRIVATE +
-      Opcodes.ACC_PROTECTED +
-      Opcodes.ACC_STATIC +
-      Opcodes.ACC_FINAL +
-      Opcodes.ACC_VOLATILE +
-      Opcodes.ACC_TRANSIENT +
-      Opcodes.ACC_SYNTHETIC +
-      Opcodes.ACC_ENUM +
-      Opcodes.ACC_DEPRECATED);
-    CheckMethodAdapter.checkIdentifier(name, "field name");
-    CheckMethodAdapter.checkDesc(desc, false);
-    if (signature != null) {
-      // TODO
+    public void visitOuterClass(
+        final String owner,
+        final String name,
+        final String desc)
+    {
+        checkState();
+        if (outer) {
+            throw new IllegalStateException("visitOuterClass can be called only once.");
+        }
+        outer = true;
+        if (owner == null) {
+            throw new IllegalArgumentException("Illegal outer class owner");
+        }
+        if (desc != null) {
+            CheckMethodAdapter.checkMethodDesc(desc);
+        }
+        cv.visitOuterClass(owner, name, desc);
     }
-    if (value != null) {
-      CheckMethodAdapter.checkConstant(value);
-    }
-    FieldVisitor av = cv.visitField(access, name, desc, signature, value);
-    // TODO return checkadapter(av)
-    return av;
-  }
 
-  public MethodVisitor visitMethod (
-    final int access,
-    final String name,
-    final String desc,
-    final String signature,
-    final String[] exceptions)
-  {
-    checkState();
-    checkAccess(
-      access,
-      Opcodes.ACC_PUBLIC +
-      Opcodes.ACC_PRIVATE +
-      Opcodes.ACC_PROTECTED +
-      Opcodes.ACC_STATIC +
-      Opcodes.ACC_FINAL +
-      Opcodes.ACC_SYNCHRONIZED +
-      Opcodes.ACC_BRIDGE +
-      Opcodes.ACC_VARARGS +
-      Opcodes.ACC_NATIVE +
-      Opcodes.ACC_ABSTRACT +
-      Opcodes.ACC_STRICT +
-      Opcodes.ACC_SYNTHETIC +
-      Opcodes.ACC_DEPRECATED);
-    CheckMethodAdapter.checkMethodIdentifier(name, "method name");
-    CheckMethodAdapter.checkMethodDesc(desc);
-    if (signature != null) {
-      // TODO
+    public void visitInnerClass(
+        final String name,
+        final String outerName,
+        final String innerName,
+        final int access)
+    {
+        checkState();
+        CheckMethodAdapter.checkInternalName(name, "class name");
+        if (outerName != null) {
+            CheckMethodAdapter.checkInternalName(outerName, "outer class name");
+        }
+        if (innerName != null) {
+            CheckMethodAdapter.checkIdentifier(innerName, "inner class name");
+        }
+        checkAccess(access, Opcodes.ACC_PUBLIC + Opcodes.ACC_PRIVATE
+                + Opcodes.ACC_PROTECTED + Opcodes.ACC_STATIC
+                + Opcodes.ACC_FINAL + Opcodes.ACC_INTERFACE
+                + Opcodes.ACC_ABSTRACT + Opcodes.ACC_SYNTHETIC
+                + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ENUM);
+        cv.visitInnerClass(name, outerName, innerName, access);
     }
-    if (exceptions != null) {
-      for (int i = 0; i < exceptions.length; ++i) {
-        CheckMethodAdapter.checkInternalName(
-          exceptions[i], "exception name at index " + i);
-      }
+
+    public FieldVisitor visitField(
+        final int access,
+        final String name,
+        final String desc,
+        final String signature,
+        final Object value)
+    {
+        checkState();
+        checkAccess(access, Opcodes.ACC_PUBLIC + Opcodes.ACC_PRIVATE
+                + Opcodes.ACC_PROTECTED + Opcodes.ACC_STATIC
+                + Opcodes.ACC_FINAL + Opcodes.ACC_VOLATILE
+                + Opcodes.ACC_TRANSIENT + Opcodes.ACC_SYNTHETIC
+                + Opcodes.ACC_ENUM + Opcodes.ACC_DEPRECATED);
+        CheckMethodAdapter.checkIdentifier(name, "field name");
+        CheckMethodAdapter.checkDesc(desc, false);
+        if (signature != null) {
+            CheckMethodAdapter.checkFieldSignature(signature);
+        }
+        if (value != null) {
+            CheckMethodAdapter.checkConstant(value);
+        }
+        FieldVisitor av = cv.visitField(access, name, desc, signature, value);
+        return new CheckFieldAdapter(av);
     }
-    return new CheckMethodAdapter(
-      cv.visitMethod(access, name, desc, signature, exceptions));
-  }
 
-  public AnnotationVisitor visitAnnotation (
-    final String desc,
-    final boolean visible)
-  {
-    // TODO
-    return cv.visitAnnotation(desc, visible);
-  }
-
-  public void visitAttribute (final Attribute attr) {
-    checkState();
-    if (attr == null) {
-      throw new IllegalArgumentException(
-        "Invalid attribute (must not be null)");
+    public MethodVisitor visitMethod(
+        final int access,
+        final String name,
+        final String desc,
+        final String signature,
+        final String[] exceptions)
+    {
+        checkState();
+        checkAccess(access, Opcodes.ACC_PUBLIC + Opcodes.ACC_PRIVATE
+                + Opcodes.ACC_PROTECTED + Opcodes.ACC_STATIC
+                + Opcodes.ACC_FINAL + Opcodes.ACC_SYNCHRONIZED
+                + Opcodes.ACC_BRIDGE + Opcodes.ACC_VARARGS + Opcodes.ACC_NATIVE
+                + Opcodes.ACC_ABSTRACT + Opcodes.ACC_STRICT
+                + Opcodes.ACC_SYNTHETIC + Opcodes.ACC_DEPRECATED);
+        CheckMethodAdapter.checkMethodIdentifier(name, "method name");
+        CheckMethodAdapter.checkMethodDesc(desc);
+        if (signature != null) {
+            CheckMethodAdapter.checkMethodSignature(signature);
+        }
+        if (exceptions != null) {
+            for (int i = 0; i < exceptions.length; ++i) {
+                CheckMethodAdapter.checkInternalName(exceptions[i],
+                        "exception name at index " + i);
+            }
+        }
+        return new CheckMethodAdapter(cv.visitMethod(access,
+                name,
+                desc,
+                signature,
+                exceptions));
     }
-  }
 
-  public void visitEnd () {
-    checkState();
-    end = true;
-    cv.visitEnd();
-  }
-
-  // --------------------------------------------------------------------------
-  // Utility methods
-  // --------------------------------------------------------------------------
-
-  /**
-   * Checks that the visit method has been called and that visitEnd has not been
-   * called.
-   */
-
-  private void checkState () {
-    if (!start) {
-      throw new IllegalStateException(
-        "Cannot visit member before visit has been called.");
+    public AnnotationVisitor visitAnnotation(
+        final String desc,
+        final boolean visible)
+    {
+        checkState();
+        CheckMethodAdapter.checkDesc(desc, false);
+        return new CheckAnnotationAdapter(cv.visitAnnotation(desc, visible));
     }
-    if (end) {
-      throw new IllegalStateException(
-        "Cannot visit member after visitEnd has been called.");
-    }
-  }
 
-  /**
-   * Checks that the given access flags do not contain invalid flags. This
-   * method also checks that mutually incompatible flags are not set
-   * simultaneously.
-   *
-   * @param access the access flags to be checked
-   * @param possibleAccess the valid access flags.
-   */
+    public void visitAttribute(final Attribute attr) {
+        checkState();
+        if (attr == null) {
+            throw new IllegalArgumentException("Invalid attribute (must not be null)");
+        }
+        cv.visitAttribute(attr);
+    }
 
-  static void checkAccess (final int access, final int possibleAccess) {
-    if ((access & ~possibleAccess) != 0) {
-      throw new IllegalArgumentException("Invalid access flags: " + access);
+    public void visitEnd() {
+        checkState();
+        end = true;
+        cv.visitEnd();
     }
-    int pub = ((access & Opcodes.ACC_PUBLIC) != 0 ? 1 : 0);
-    int pri = ((access & Opcodes.ACC_PRIVATE) != 0 ? 1 : 0);
-    int pro = ((access & Opcodes.ACC_PROTECTED) != 0 ? 1 : 0);
-    if (pub + pri + pro > 1) {
-      throw new IllegalArgumentException(
-        "public private and protected are mutually exclusive: " + access);
+
+    // ------------------------------------------------------------------------
+    // Utility methods
+    // ------------------------------------------------------------------------
+
+    /**
+     * Checks that the visit method has been called and that visitEnd has not
+     * been called.
+     */
+    private void checkState() {
+        if (!start) {
+            throw new IllegalStateException("Cannot visit member before visit has been called.");
+        }
+        if (end) {
+            throw new IllegalStateException("Cannot visit member after visitEnd has been called.");
+        }
     }
-    int fin = ((access & Opcodes.ACC_FINAL) != 0 ? 1 : 0);
-    int abs = ((access & Opcodes.ACC_ABSTRACT) != 0 ? 1 : 0);
-    if (fin + abs > 1) {
-      throw new IllegalArgumentException(
-        "final and abstract are mutually exclusive: " + access);
+
+    /**
+     * Checks that the given access flags do not contain invalid flags. This
+     * method also checks that mutually incompatible flags are not set
+     * simultaneously.
+     * 
+     * @param access the access flags to be checked
+     * @param possibleAccess the valid access flags.
+     */
+    static void checkAccess(final int access, final int possibleAccess) {
+        if ((access & ~possibleAccess) != 0) {
+            throw new IllegalArgumentException("Invalid access flags: "
+                    + access);
+        }
+        int pub = (access & Opcodes.ACC_PUBLIC) == 0 ? 0 : 1;
+        int pri = (access & Opcodes.ACC_PRIVATE) == 0 ? 0 : 1;
+        int pro = (access & Opcodes.ACC_PROTECTED) == 0 ? 0 : 1;
+        if (pub + pri + pro > 1) {
+            throw new IllegalArgumentException("public private and protected are mutually exclusive: "
+                    + access);
+        }
+        int fin = (access & Opcodes.ACC_FINAL) == 0 ? 0 : 1;
+        int abs = (access & Opcodes.ACC_ABSTRACT) == 0 ? 0 : 1;
+        if (fin + abs > 1) {
+            throw new IllegalArgumentException("final and abstract are mutually exclusive: "
+                    + access);
+        }
     }
-  }
 }

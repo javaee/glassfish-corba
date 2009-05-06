@@ -35,24 +35,20 @@
  */
 package com.sun.corba.se.spi.orb ;
 
-import java.io.PrintStream ;
 
 import java.util.StringTokenizer ;
 
 import java.lang.reflect.Array ;
-import java.lang.reflect.Constructor ;
 
 import java.net.URL ;
 import java.net.MalformedURLException ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 /** This is a static factory class for commonly used operations
 * for property parsing.  The following operations are supported:
@@ -265,22 +261,26 @@ public abstract class OperationFactory {
 
     private static class ClassAction extends OperationBase 
     {
+        private UnaryFunction<String,Class<?>> resolver ;
+
+        public ClassAction( UnaryFunction<String,Class<?>> resolver ) {
+            this.resolver = resolver ;
+        }
+
 	public Object operate( Object value ) 
 	{
 	    String className = getString( value ) ;
 
 	    try {
-		Class result = ORBClassLoader.loadClass( className ) ;
+		Class result = resolver.evaluate( className ) ;
 		return result ;
 	    } catch (Exception exc) {
 		throw wrapper.classActionException( exc, className ) ;
 	    }
 	} 
 
-	public String toString() { return "classAction" ; }
+	public String toString() { return "classAction[" + resolver + "]" ; }
     }
-
-    private static Operation classActionImpl = new ClassAction() ;
 
     private static class SetFlagAction extends OperationBase
     {
@@ -341,9 +341,10 @@ public abstract class OperationFactory {
 	return stringActionImpl ;
     }
 
-    public static Operation classAction()
+    public static Operation classAction(
+        final UnaryFunction<String,Class<?>> resolver )
     {
-	return classActionImpl ;
+	return new ClassAction( resolver ) ;
     }
 
     public static Operation setFlagAction()

@@ -36,7 +36,7 @@
 
 package corba.codegen.test ;
 
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+import com.sun.corba.se.spi.orbutil.codegen.ClassGenerator ;
 
 import corba.codegen.ClassGeneratorFactory ;
 

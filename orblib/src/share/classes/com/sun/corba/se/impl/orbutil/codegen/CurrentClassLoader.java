@@ -36,7 +36,7 @@
 
 package com.sun.corba.se.impl.orbutil.codegen;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 
@@ -49,7 +49,7 @@ public class CurrentClassLoader {
     private static ThreadLocal<ClassLoader> current = 
 	new ThreadLocal() {
 	    protected ClassLoader initialValue() {
-		return ORBClassLoader.getClassLoader() ;
+		return LibraryClassLoader.getClassLoader() ;
 	    }
 	} ;
 
@@ -59,7 +59,7 @@ public class CurrentClassLoader {
 
     public static void set( ClassLoader cl ) {
 	if (cl == null)
-	    cl = ORBClassLoader.getClassLoader() ;
+	    cl = LibraryClassLoader.getClassLoader() ;
 	current.set( cl ) ;
 
 	// This is essential for propert operation of codegen when multiple

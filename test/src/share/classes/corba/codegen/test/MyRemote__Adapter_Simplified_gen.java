@@ -36,7 +36,7 @@
 
 package corba.codegen.test ;
 
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+import com.sun.corba.se.spi.orbutil.codegen.ClassGenerator ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
@@ -91,7 +91,7 @@ public class MyRemote__Adapter_Simplified_gen implements ClassGeneratorFactory {
 		_try() ;
 		    _return( _call( myRemote, "doSomethingElse")) ;
 		Expression re = _catch( RemoteException, "re" ) ;
-		    Expression exc = _define( EJBException, "exc", 
+		    Expression exc = _define( EJBException, "exc",
 			_new( EJBException )) ;
 		    _expr( _call( exc, "initCause", re )) ;
 		    _throw( exc ) ;

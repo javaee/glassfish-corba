@@ -113,6 +113,8 @@ public class Client
         }
     }
 
+    private static InitialContext rootContext ;
+
     public static void main(String args[])
     {
 	try {
@@ -120,7 +122,7 @@ public class Client
 
             Client.tryLoadingClasses();
 
-            Context rootContext = new InitialContext();
+            rootContext = new InitialContext();
             Tester tester 
                 = (Tester)PortableRemoteObject.narrow(rootContext.lookup("Tester"), Tester.class);
             

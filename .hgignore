@@ -26,3 +26,4 @@ NORENAME
 .rename.*
 make/scripts/pkgrename/sed_pattern_file.version
 webrev*
+felix/felix-cache

@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.tree;
+
+import java.util.Map;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.MethodVisitor;
@@ -38,39 +39,40 @@ import org.objectweb.asm.MethodVisitor;
  * 
  * @author Eric Bruneton
  */
-
 public class MultiANewArrayInsnNode extends AbstractInsnNode {
 
-  /**
-   * An array type descriptor (see {@link Type}).
-   */
+    /**
+     * An array type descriptor (see {@link org.objectweb.asm.Type}).
+     */
+    public String desc;
 
-  public String desc;
+    /**
+     * Number of dimensions of the array to allocate.
+     */
+    public int dims;
 
-  /**
-   * Number of dimensions of the array to allocate.
-   */
+    /**
+     * Constructs a new {@link MultiANewArrayInsnNode}.
+     * 
+     * @param desc an array type descriptor (see {@link org.objectweb.asm.Type}).
+     * @param dims number of dimensions of the array to allocate.
+     */
+    public MultiANewArrayInsnNode(final String desc, final int dims) {
+        super(Opcodes.MULTIANEWARRAY);
+        this.desc = desc;
+        this.dims = dims;
+    }
 
-  public int dims;
+    public int getType() {
+        return MULTIANEWARRAY_INSN;
+    }
 
-  /**
-   * Constructs a new {@link MultiANewArrayInsnNode}.
-   *
-   * @param desc an array type descriptor (see {@link Type}).
-   * @param dims number of dimensions of the array to allocate.
-   */
+    public void accept(final MethodVisitor mv) {
+        mv.visitMultiANewArrayInsn(desc, dims);
+    }
 
-  public MultiANewArrayInsnNode (final String desc, final int dims) {
-    super(Opcodes.MULTIANEWARRAY);
-    this.desc = desc;
-    this.dims = dims;
-  }
+    public AbstractInsnNode clone(final Map labels) {
+        return new MultiANewArrayInsnNode(desc, dims);
+    }
 
-  public void accept (final MethodVisitor mv) {
-    mv.visitMultiANewArrayInsn(desc, dims);
-  }
-
-  public int getType () {
-    return MULTIANEWARRAY_INSN;
-  }
 }

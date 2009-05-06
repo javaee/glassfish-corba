@@ -49,6 +49,9 @@ import org.testng.Assert ;
 import corba.framework.TestngRunner ;
 
 public class Client { 
+    // Important: put the initialContext here so that is does NOT get GCed and finalized
+    // while the test is running!
+    private InitialContext rootContext ;
     private Tester tester ;
 
     /* Using a byte array in front and behind the main
@@ -492,7 +495,7 @@ public class Client {
     @BeforeSuite
     public void setup() throws Exception {
         System.out.println("Finding tester...");
-        InitialContext rootContext = new InitialContext();
+        rootContext = new InitialContext();
 
         System.out.println("Looking up tester...");
         java.lang.Object tst = rootContext.lookup("Tester");

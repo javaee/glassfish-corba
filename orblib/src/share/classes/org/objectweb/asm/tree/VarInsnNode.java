@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.tree;
+
+import java.util.Map;
 
 import org.objectweb.asm.MethodVisitor;
 
@@ -39,47 +40,48 @@ import org.objectweb.asm.MethodVisitor;
  * 
  * @author Eric Bruneton
  */
-
 public class VarInsnNode extends AbstractInsnNode {
 
-  /**
-   * The operand of this instruction. This operand is the index of a local
-   * variable.
-   */
+    /**
+     * The operand of this instruction. This operand is the index of a local
+     * variable.
+     */
+    public int var;
 
-  public int var;
+    /**
+     * Constructs a new {@link VarInsnNode}.
+     * 
+     * @param opcode the opcode of the local variable instruction to be
+     *        constructed. This opcode must be ILOAD, LLOAD, FLOAD, DLOAD,
+     *        ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE or RET.
+     * @param var the operand of the instruction to be constructed. This operand
+     *        is the index of a local variable.
+     */
+    public VarInsnNode(final int opcode, final int var) {
+        super(opcode);
+        this.var = var;
+    }
 
-  /**
-   * Constructs a new {@link VarInsnNode}.
-   *
-   * @param opcode the opcode of the local variable instruction to be
-   *      constructed. This opcode must be ILOAD, LLOAD, FLOAD, DLOAD, ALOAD,
-   *      ISTORE, LSTORE, FSTORE, DSTORE, ASTORE or RET.
-   * @param var the operand of the instruction to be constructed. This operand
-   *      is the index of a local variable.
-   */
+    /**
+     * Sets the opcode of this instruction.
+     * 
+     * @param opcode the new instruction opcode. This opcode must be ILOAD,
+     *        LLOAD, FLOAD, DLOAD, ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE
+     *        or RET.
+     */
+    public void setOpcode(final int opcode) {
+        this.opcode = opcode;
+    }
 
-  public VarInsnNode (final int opcode, final int var) {
-    super(opcode);
-    this.var = var;
-  }
+    public int getType() {
+        return VAR_INSN;
+    }
 
-  /**
-   * Sets the opcode of this instruction.
-   *
-   * @param opcode the new instruction opcode. This opcode must be ILOAD, LLOAD,
-   *      FLOAD, DLOAD, ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE or RET.
-   */
+    public void accept(final MethodVisitor mv) {
+        mv.visitVarInsn(opcode, var);
+    }
 
-  public void setOpcode (final int opcode) {
-    this.opcode = opcode;
-  }
-
-  public void accept (final MethodVisitor mv) {
-    mv.visitVarInsn(opcode, var);
-  }
-
-  public int getType () {
-    return VAR_INSN;
-  }
+    public AbstractInsnNode clone(final Map labels) {
+        return new VarInsnNode(opcode, var);
+    }
 }

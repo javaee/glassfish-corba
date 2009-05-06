@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.optimizer;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -35,46 +34,43 @@ import org.objectweb.asm.Attribute;
 import org.objectweb.asm.FieldVisitor;
 
 /**
- * A {@link FieldVisitor} that collects the {@link Constant}s of the fields it 
+ * A {@link FieldVisitor} that collects the {@link Constant}s of the fields it
  * visits.
  * 
- * @author Eric Bruneton 
+ * @author Eric Bruneton
  */
-
 public class FieldConstantsCollector implements FieldVisitor {
 
-  private FieldVisitor fv;
-  
-  private ConstantPool cp;
-  
-  public FieldConstantsCollector (
-    final FieldVisitor fv, 
-    final ConstantPool cp) 
-  {
-    this.fv = fv;
-    this.cp = cp;
-  }
-  
-  public AnnotationVisitor visitAnnotation (
-    final String desc, 
-    final boolean visible) 
-  {
-    cp.newUTF8(desc);
-    if (visible) {
-      cp.newUTF8("RuntimeVisibleAnnotations");
-    } else {
-      cp.newUTF8("RuntimeInvisibleAnnotations");
-    }    
-    return 
-      new AnnotationConstantsCollector(fv.visitAnnotation(desc, visible), cp);
-  }
+    private final FieldVisitor fv;
 
-  public void visitAttribute (final Attribute attr) {
-    // can do nothing
-    fv.visitAttribute(attr);
-  }
+    private final ConstantPool cp;
 
-  public void visitEnd () {
-    fv.visitEnd();
-  }
+    public FieldConstantsCollector(final FieldVisitor fv, final ConstantPool cp)
+    {
+        this.fv = fv;
+        this.cp = cp;
+    }
+
+    public AnnotationVisitor visitAnnotation(
+        final String desc,
+        final boolean visible)
+    {
+        cp.newUTF8(desc);
+        if (visible) {
+            cp.newUTF8("RuntimeVisibleAnnotations");
+        } else {
+            cp.newUTF8("RuntimeInvisibleAnnotations");
+        }
+        return new AnnotationConstantsCollector(fv.visitAnnotation(desc,
+                visible), cp);
+    }
+
+    public void visitAttribute(final Attribute attr) {
+        // can do nothing
+        fv.visitAttribute(attr);
+    }
+
+    public void visitEnd() {
+        fv.visitEnd();
+    }
 }

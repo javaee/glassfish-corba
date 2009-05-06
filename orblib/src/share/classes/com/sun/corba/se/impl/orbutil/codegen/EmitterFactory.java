@@ -44,15 +44,11 @@ import java.util.Iterator ;
 import com.sun.corba.se.spi.orbutil.generic.UnaryVoidFunction ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.FieldInfo ;
 
-import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
-
 import org.objectweb.asm.MethodVisitor ;
-import org.objectweb.asm.ClassWriter ;
 
 import static org.objectweb.asm.Opcodes.* ;
 
@@ -363,14 +359,17 @@ public final class EmitterFactory {
 	    // Does nothing.
 	}
 
+        @Override
 	public String toString() {
 	    return "NullEmitter[]" ;
 	}
 
+        @Override
 	public int hashCode() {
 	    return 0 ;
 	}
 
+        @Override
 	public boolean equals( Object obj ) {
 	    if (obj == this)
 		return true ;
@@ -396,6 +395,7 @@ public final class EmitterFactory {
 		e.evaluate( mv ) ;
 	}
 
+        @Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder() ;
 	    sb.append( "CompoundEmitter[" ) ;
@@ -411,6 +411,7 @@ public final class EmitterFactory {
 	    return sb.toString() ;
 	}
 
+        @Override
 	public int hashCode() {
 	    int hash = 0 ;
 	    for (Emitter e : emitters) 
@@ -418,6 +419,7 @@ public final class EmitterFactory {
 	    return hash ;
 	}
 
+        @Override
 	public boolean equals( Object obj ) {
 	    if (obj == this)
 		return true ;
@@ -452,10 +454,12 @@ public final class EmitterFactory {
 	    mv.visitInsn( opcode ) ;
 	}
 
+        @Override
 	public String toString() {
 	    return "SimpleEmitter[" + opcodeNames[opcode] + "]" ;
 	}
 
+        @Override
 	public int hashCode() {
 	    return opcode ;
 	}
@@ -498,7 +502,7 @@ public final class EmitterFactory {
 	    } else {
 		assert visitVarInsnSet.get( opcode ) ;
 		mv.visitVarInsn( opcode, arg ) ;
-	    } ;
+	    }
 	}
 
 	public String toString() {
@@ -648,9 +652,10 @@ public final class EmitterFactory {
      * attribute.
      */
     public static Emitter makeEmitter( Variable var, boolean isStore ) {
-	Integer slot = ASMUtil.stackFrameSlot.get( var ) ;
+        VariableInternal ivar = (VariableInternal)var ;
+	Integer slot = ASMUtil.stackFrameSlot.get( ivar ) ;
 	assert slot != null ;
-	return new IntOperandEmitter( getVarInsnOpcode( var.type(), isStore ),
+	return new IntOperandEmitter( getVarInsnOpcode( ivar.type(), isStore ),
 	    slot ) ;
     }
 
@@ -665,7 +670,7 @@ public final class EmitterFactory {
 	ExpressionFactory.NonStaticFieldAccessExpression expr,
 	boolean isStore ) {
 
-	Type targetType = expr.target().type() ;	
+	Type targetType = ((ExpressionInternal)expr.target()).type() ;
 
 	ClassInfo cinfo = targetType.classInfo() ;
 	FieldInfo fld = cinfo.fieldInfo().get( expr.fieldName() ) ;

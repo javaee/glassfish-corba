@@ -1,0 +1,2 @@
+-include bnd.properties
+Export-Package: org.omg.CosTransactions, org.omg.CosTSInteroperation, org.omg.CosTSPortability, com.sun.corba.se.org.omg.CORBA, com.sun.corba.se.spi.costransactions, com.sun.corba.se.impl.txpoa, org.omg.CORBA, org.omg.CORBA.TSIdentificationPackage

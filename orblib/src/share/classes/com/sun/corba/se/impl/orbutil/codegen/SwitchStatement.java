@@ -39,7 +39,7 @@ package com.sun.corba.se.impl.orbutil.codegen;
 import java.util.Map ;
 import java.util.LinkedHashMap ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
+import com.sun.corba.se.impl.orbutil.codegen.ExpressionInternal ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
@@ -53,7 +53,7 @@ public final class SwitchStatement extends StatementBase {
     // Note that this map must maintain insertion order!
     private Map<Integer,CaseBranch> cases ;
     private BlockStatement defaultCase ;
-    private Expression expr ;
+    private ExpressionInternal expr ;
 
     public Map<Integer,CaseBranch> cases() {
 	return cases ;
@@ -63,11 +63,11 @@ public final class SwitchStatement extends StatementBase {
         return defaultCase ;
     }
     
-    public Expression expr() {
+    public ExpressionInternal expr() {
 	return expr ;
     }
 
-    SwitchStatement( Node parent, Expression expr ) {
+    SwitchStatement( Node parent, ExpressionInternal expr ) {
         super( parent ) ;
         this.expr = expr ;
         cases = new LinkedHashMap<Integer,CaseBranch>() ;

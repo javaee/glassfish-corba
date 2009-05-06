@@ -1,6 +1,6 @@
 /***
  * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2005 INRIA, France Telecom
+ * Copyright (c) 2000-2007 INRIA, France Telecom
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.objectweb.asm.tree;
+
+import java.util.Map;
 
 import org.objectweb.asm.MethodVisitor;
 
@@ -37,44 +38,44 @@ import org.objectweb.asm.MethodVisitor;
  * 
  * @author Eric Bruneton
  */
-
 public class IntInsnNode extends AbstractInsnNode {
 
-  /**
-   * The operand of this instruction.
-   */
+    /**
+     * The operand of this instruction.
+     */
+    public int operand;
 
-  public int operand;
+    /**
+     * Constructs a new {@link IntInsnNode}.
+     * 
+     * @param opcode the opcode of the instruction to be constructed. This
+     *        opcode must be BIPUSH, SIPUSH or NEWARRAY.
+     * @param operand the operand of the instruction to be constructed.
+     */
+    public IntInsnNode(final int opcode, final int operand) {
+        super(opcode);
+        this.operand = operand;
+    }
 
-  /**
-   * Constructs a new {@link IntInsnNode}.
-   *
-   * @param opcode the opcode of the instruction to be constructed. This opcode
-   *      must be BIPUSH, SIPUSH or NEWARRAY.
-   * @param operand the operand of the instruction to be constructed.
-   */
+    /**
+     * Sets the opcode of this instruction.
+     * 
+     * @param opcode the new instruction opcode. This opcode must be BIPUSH,
+     *        SIPUSH or NEWARRAY.
+     */
+    public void setOpcode(final int opcode) {
+        this.opcode = opcode;
+    }
 
-  public IntInsnNode (final int opcode, final int operand) {
-    super(opcode);
-    this.operand = operand;
-  }
+    public int getType() {
+        return INT_INSN;
+    }
 
-  /**
-   * Sets the opcode of this instruction.
-   *
-   * @param opcode the new instruction opcode. This opcode must be BIPUSH,
-   *      SIPUSH or NEWARRAY.
-   */
+    public void accept(final MethodVisitor mv) {
+        mv.visitIntInsn(opcode, operand);
+    }
 
-  public void setOpcode (final int opcode) {
-    this.opcode = opcode;
-  }
-
-  public void accept (final MethodVisitor mv) {
-    mv.visitIntInsn(opcode, operand);
-  }
-
-  public int getType () {
-    return INT_INSN;
-  }
+    public AbstractInsnNode clone(final Map labels) {
+        return new IntInsnNode(opcode, operand);
+    }
 }

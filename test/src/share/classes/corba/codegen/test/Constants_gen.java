@@ -42,8 +42,7 @@ import java.util.Set ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
 import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
-
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+import com.sun.corba.se.spi.orbutil.codegen.ClassGenerator ;
 
 import corba.codegen.ClassGeneratorFactory ;
 

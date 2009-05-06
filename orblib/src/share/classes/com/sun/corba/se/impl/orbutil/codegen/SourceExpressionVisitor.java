@@ -38,36 +38,14 @@ package com.sun.corba.se.impl.orbutil.codegen;
 
 import java.util.List ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
-import com.sun.corba.se.spi.orbutil.codegen.Signature ;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.Variable ;
 import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
 
-import com.sun.corba.se.impl.orbutil.codegen.AssignmentStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.BlockStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.CaseBranch ;
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.CodeGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.ExpressionFactory ;
-import com.sun.corba.se.impl.orbutil.codegen.IfStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.MethodGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Node ;
-import com.sun.corba.se.impl.orbutil.codegen.ReturnStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.BreakStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.Statement ;
-import com.sun.corba.se.impl.orbutil.codegen.SwitchStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.ThrowStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalker ;
-import com.sun.corba.se.impl.orbutil.codegen.TreeWalkerContext ;
-import com.sun.corba.se.impl.orbutil.codegen.TryStatement ;
-import com.sun.corba.se.impl.orbutil.codegen.FieldGenerator ;
-import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
-import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
 
 /** A Visitor that generates Java source for an expression.
  * All expression are converted into a simple Java String.
- * This visitor operates only on Expression nodes. It ignores all 
+ * This visitor operates only on ExpressionInternal nodes. It ignores all
  * Statements as well as the top level generators.
  * <P>
  * This visitor compile complex expressions by applying another
@@ -108,7 +86,7 @@ public class SourceExpressionVisitor extends TreeWalker {
 
     @Override
     public boolean preVariable( Variable arg ) {
-	sb.append( arg.ident() ) ;
+	sb.append( ((VariableInternal)arg).ident() ) ;
 	return false ;
     }
 

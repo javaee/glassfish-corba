@@ -1,0 +1,33 @@
+Testing load balancing
+    Test:
+        Multiple client invoking against multiple servers, each gives
+            equal distribution with PRLB
+        server fails, clients continue with equal distr.
+        server added, client continue with equal distr.
+
+interface
+
+public interface PRLBTest extends Remote {
+    int myId() ;
+
+    void invoke( int clientId ) ;
+
+    Map<Integer,Integer> getAndClearCounts() ;
+
+    shutdown() ;
+}
+
+2 clients, 3-5 servers
+
+Each client, server has a unique id of the form (instance num, incarnation num)
+
+Each client:
+    invokes a simple ping() method repeatedly (possibly with a wait time?)
+    may be configured to make:w
+    some number of invocations, then cause server to shutdown
+    configured with an identity
+
+Each server:
+    configured with identity
+    controlled by clients
+    each uses identical code to configure remote object

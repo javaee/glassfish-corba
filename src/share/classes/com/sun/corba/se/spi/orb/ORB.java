@@ -105,9 +105,9 @@ import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPoints ;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsDisabledImpl ;
-import com.sun.corba.se.impl.orbutil.newtimer.TimingPointsEnabledImpl ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsDisabledImpl ;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsEnabledImpl ;
 
 // XXX needs an SPI or else it does not belong here
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;
@@ -128,6 +128,8 @@ import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.logging.LogWrapperTable ;
 import com.sun.corba.se.impl.logging.LogWrapperTableImpl ;
 import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
 
@@ -193,6 +195,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean mbeanDebugFlag = false ;
     public boolean mbeanFineDebugFlag = false ;
     public boolean mbeanRuntimeDebugFlag = false ;
+    public boolean orbLifecycleDebugFlag = false ;
 
     private LogWrapperTable logWrapperTable ;
 
@@ -385,6 +388,10 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // the system properties and orb.properties files as
     // with the standard ORB.init methods.
     public abstract void set_parameters( Properties props ) ;
+
+    // Added to provide an API for creating an ORB that avoids the org.omg.CORBA.ORB API
+    // to get around an OSGi problem.
+    public abstract void setParameters( String[] args, Properties props ) ;
 
     // ORB versioning
     @ManagedAttribute
@@ -682,11 +689,63 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	return null ;
     }
 
+    /** Return whether or not the ORB is shutdown.  A shutdown ORB cannot process
+     * incoming requests.
+     */
+    public boolean orbIsShutdown() {
+        return true ;
+    }
+
+    private static UnaryFunction<String,Class<?>> classNameResolver =
+        new UnaryFunction<String,Class<?>>() {
+            public Class<?> evaluate( String name ) {
+                try {
+                    return ORBClassLoader.getClassLoader().loadClass( name ) ;
+                } catch (ClassNotFoundException exc) {
+                    throw new RuntimeException( exc ) ;
+                }
+            }
+
+            public String toString() {
+                return "ORBClassNameResolver" ;
+            }
+        } ;
+
+    public static UnaryFunction<String,Class<?>> defaultClassNameResolver() {
+        return classNameResolver ;
+    }
+
+    public UnaryFunction<String,Class<?>> makeCompositeClassNameResolver(
+        final UnaryFunction<String,Class<?>> first,
+        final UnaryFunction<String,Class<?>> second ) {
+
+        return new UnaryFunction<String,Class<?>>() {
+            public Class<?> evaluate( String className ) {
+                Class<?> result = first.evaluate( className ) ;
+                if (result == null) {
+                    return second.evaluate( className ) ;
+                } else {
+                    return result ;
+                }
+            }
+
+            public String toString() {
+                return "CompositeClassNameResolver[" + first + "," + second + "]" ;
+            }
+        } ;
+    }
+
+    public UnaryFunction<String,Class<?>> classNameResolver() {
+        return classNameResolver ;
+    }
+
+    public void classNameResolver( UnaryFunction<String,Class<?>> arg ) {
+        classNameResolver = arg ;
+    }
     public ManagedObjectManager mom() {
         return mom ;
     }
 
-    public abstract CorbaTransportManager getTransportManager() ;
 }
 
 // End of file.

@@ -36,6 +36,8 @@
 
 package com.sun.corba.se.spi.orbutil.codegen;
 
+import com.sun.corba.se.impl.orbutil.codegen.ExpressionInternal;
+
 import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
 
 public class Primitives {
@@ -45,7 +47,7 @@ public class Primitives {
     // If expr.type() is a primitive, return an expression
     // that wraps expr in the appropriate primitive wrapper class.
     public static Expression wrap( Expression expr ) {
-	Type etype = expr.type() ;
+	Type etype = ExpressionInternal.class.cast(expr).type() ;
 	Signature sig = _s(_void(),etype) ;
 
 	if (etype.equals( _boolean() ) )
@@ -93,7 +95,7 @@ public class Primitives {
     // If expr.type() is not a primitive wrapper,
     // return it.
     public static Expression unwrap( Expression expr ) {
-	Type etype = expr.type() ;
+	Type etype = ExpressionInternal.class.cast(expr).type() ;
 
 	if (etype.equals( _t("java.lang.Boolean")))
 	    return _call( expr, "booleanValue", _s(_boolean()) ) ;

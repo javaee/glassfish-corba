@@ -61,7 +61,7 @@ public final class MethodGenerator extends MethodInfoBase implements Node {
 
     /** Construct a MethodGenerator that represents a constructor.
      */
-    MethodGenerator( ClassGenerator parent, int modifiers, 
+    MethodGenerator( ClassGeneratorImpl parent, int modifiers,
 	List<Type> exceptions ) {
 	super( parent, modifiers ) ;
 	nodeImpl = new NodeBase( parent ) ;
@@ -74,7 +74,7 @@ public final class MethodGenerator extends MethodInfoBase implements Node {
 
     /** Construct a MethodGenerator that represents a method.
      */
-    MethodGenerator( ClassGenerator parent, int modifiers, Type rtype, String name,
+    MethodGenerator( ClassGeneratorImpl parent, int modifiers, Type rtype, String name,
 	List<Type> exceptions ) {
 	super( parent, modifiers, rtype, name ) ;
 	nodeImpl = new NodeBase( parent ) ;

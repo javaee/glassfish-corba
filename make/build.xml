@@ -76,13 +76,17 @@
     </description>
 
     <!-- =================== START HERE =================================== -->
-    <target name="build" depends="init, prepare-dirs, compile, create-jars"/>
+    <target name="build" depends="init, prepare-dirs, compile"/>
 
     <target name="init">
+        <property file="make/build.properties"/>
+        <echo message="Version is ${release.version}-${build.version}"/>
         <!-- environmental dependencies -->
         <property environment="env"/>
-        <property name="java.home"                  value="${env.JAVA_HOME}"/>
+        <property name="java.home"                      value="${env.JAVA_HOME}"/>
         <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
+        <property name="local.maven"                    value="${env.HOME}/.m2"/>
+        <echo message="local.maven=${local.maven}"/> 
 
         <property name="root.dir"			value="${basedir}"/>
 
@@ -94,6 +98,8 @@
         <property name="jschemelogutil-jar"		value="${root.dir}/lib/jschemelogutil.jar"/>
         <property name="javatest-jar"		        value="${root.dir}/lib/javatest.jar"/>
         <property name="ejb-jar"			value="${root.dir}/lib/ejb-2_1-api.jar"/>
+        <property name="ejb3-jar"			value="${root.dir}/lib/javax.ejb.jar"/>
+        <property name="ejbcontainer-jar"		value="${root.dir}/lib/ejb-container.jar"/>
         <property name="junit-jar"			value="${root.dir}/lib/ant-junit.jar"/>
         <property name="ant-junit-jar"		        value="${root.dir}/lib/junit.jar"/>
         <property name="jmxri-jar"			value="${root.dir}/lib/jmxri.jar"/>
@@ -101,7 +107,7 @@
         <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
         <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
         <property name="gmbal-jar"                      value="${root.dir}/lib/gmbal.jar"/>
-
+        <property name="felix-jar"                        value="${root.dir}/lib/felix.jar"/>
 
         <!-- Places where the build puts things -->
 	<property name="build.dir"                      location="build"/>
@@ -131,10 +137,10 @@
         <property name="experimentaltestclasses.dir"	value="experimental/test/build/classes"/>
 
         <!-- ORB Test directories -->
-        <property name="test.run.base"                  value="test/run"/>
+        <property name="test.run.base"                  value="${root.dir}/test/run"/>
         <property name="test.output"		        value="${test.run.base}/gen"/>
         <property name="junit.reports"		        value="${test.run.base}/junitreports"/>
-	<property name="test-build.dir"                 location="test/build"/>
+	<property name="test-build.dir"                 location="${root.dir}/test/build"/>
 	<property name="test-classes.dir"               location="${test-build.dir}/classes"/>
 	<property name="test-values1.dir"               location="${test-build.dir}/values1/classes"/>
 	<property name="test-values2.dir"               location="${test-build.dir}/values2/classes"/>
@@ -157,7 +163,7 @@
 	<!-- properties needed for updating and validating copyright headers -->
 	<property name="copyright.file"                 value="${root.dir}/make/copyright-information/copyright.txt"/>
 	<property name="copyright.roots"                value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/> 
-	<property name="copyright.skip"                 value="SCCS,.hg,.cvs,Codemgr_wsdata,deleted_files,copyright-information,freezepoint,apache,objectweb,build,webrev,test-output,gen,lib"/>
+	<property name="copyright.skip"                 value="SCCS,.hg,.cvs,Codemgr_wsdata,deleted_files,copyright-information,freezepoint,apache,objectweb,build,webrev,test-output,gen,lib,pom"/>
 
         <!-- properties needed for pushing jar to maven repository -->
         <property name="release.dir"                    value="build/release"/>
@@ -168,8 +174,9 @@
         <property name="orb.groupId"                    value="com.sun.corba"/>
         <property name="maven.ant.file"                 value="maven-ant-tasks-2.0.9.jar"/>
         <property name="maven.ant.dir"                  value="http://apache.hoxt.com/maven/binaries"/>
-        <property name="repo.url"                       value="java-net:/maven2-repository/trunk/www/repository"/>
+        <property name="repo.url"                       value="java-net:/maven2-repository/trunk/repository"/>
         <property name="file.url"                       value="file:/tmp/maven"/>
+        <property name="local.url"                      value="file:${local.maven}"/>
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
 
 	<path id="classpath.master">
@@ -178,6 +185,7 @@
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${tools-jar}"/>
 	    <pathelement location="${emma-jar}"/>
+	    <pathelement location="${felix-jar}"/>
 	    <pathelement location="${gmbal-jar}"/>
 	</path>
 
@@ -188,7 +196,9 @@
 	    <pathelement location="${jschemelogutil-jar}"/>
 	    <pathelement location="${ant-junit-jar}"/>
 	    <pathelement location="${junit-jar}"/>
+	    <pathelement location="${ejb3-jar}"/>
 	    <pathelement location="${ejb-jar}"/>
+	    <pathelement location="${ejbcontainer-jar}"/>
 	    <pathelement location="${testng-jar}"/>
 	    <pathelement location="${japex-jar}"/>
 	    <pathelement location="${test-classes.dir}"/>
@@ -583,7 +593,7 @@
         The split jar packaging splits the ORB code into a number of smaller
         jar files containing closely related packages.  The OSGi package 
         (see make-bundles) closely follows this packaging, except that only
-        those classes acutally needs in GFv3 are packaged as bundles.
+        those classes actually needed in GFv3 are packaged as bundles.
     -->
 
     <target name="orb-split" depends="init">
@@ -630,6 +640,8 @@
                 <include name="com/sun/corba/se/impl/servicecontext/**"/>
                 <include name="com/sun/corba/se/impl/transport/**"/>
                 <include name="com/sun/corba/se/impl/util/**"/>
+                <include name="com/sun/corba/se/impl/dynamicany/**"/>
+                <include name="com/sun/corba/se/impl/naming/**"/>
 	    </fileset>
 	</jar>
 	<jar jarfile="${releaselib.dir}/omgapi-extension.jar"
@@ -656,18 +668,6 @@
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
                 <include name="com/sun/corba/se/org/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/naming.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-                <include name="com/sun/corba/se/impl/naming/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/dynamicany.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-                <include name="com/sun/corba/se/impl/dynamicany/**"/>
 	    </fileset>
 	</jar>
         <!-- Don't really need this in GFv3
@@ -710,11 +710,6 @@
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
 		<include name="com/sun/corba/se/spi/orbutil/generic/**"/>
-	    </fileset>
-	</jar>
-	<jar jarfile="${releaselib.dir}/orbmisc.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
 		<include name="com/sun/corba/se/spi/orbutil/closure/**"/>
 		<include name="com/sun/corba/se/impl/orbutil/closure/**"/>
 		<include name="com/sun/corba/se/spi/orbutil/proxy/**"/>
@@ -775,10 +770,23 @@
                     <arg value="@{classpath}"/>
                     <arg value="-output"/>
                     <arg value="${releaselib.dir}/bundles/${bundle.name.prefix}@{file}.jar"/>
-                    <arg value="make/bnd/@{file}.bnd"/>
+                    <arg value="make/bnd/glassfish-corba-@{file}.bnd"/>
                 </java>
             </sequential>
     </macrodef>
+    <target name="make-src-bundle" depends="init">
+        <jar jarfile="${releaselib.dir}/bundles/glassfish-corba-source.jar" duplicate="fail">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${gensrc.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${orblib.src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </jar>
+    </target>
 
     <!-- ========================= OSGi bundle packaging ==================== 
         The ORB as delivered into GFv3 contains 9 OSGi bundles.
@@ -786,7 +794,7 @@
         bnd and the various .bnd files.
     -->
 
-    <target name="make-bundles" depends="init">
+    <target name="make-bundles" depends="init,make-src-bundle">
         <!-- we are not generating bundles for activation or rmic-iiop
              because they are not used in GFv3.
         -->
@@ -819,14 +827,13 @@
 
         <make-bundle classpath="${classes.dir}" file="orb"/>
         <make-bundle classpath="${classes.dir}" file="omgapi"/>
-        <make-bundle classpath="${classes.dir}" file="naming"/>
-        <make-bundle classpath="${classes.dir}" file="dynamicany"/>
         <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>
 
         <make-bundle classpath="${orblib.classes.dir}" file="codegen"/>
         <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
         <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
         <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
+        <make-bundle classpath="${classes.dir}" file="osgi-test"/>
     </target>
 
     <!-- ========================= Build the ORB library ====================  -->
@@ -850,7 +857,7 @@
 
     <target name="check-timing-file-changed" depends="init">
         <property name="tsrcfile" value="${src.dir}/com/sun/tools/corba/se/timer/timing.xml"/>
-        <property name="tjavafile" value="${gensrc.dir}/com/sun/corba/se/impl/orbutil/newtimer/TimingPoints.java"/>
+        <property name="tjavafile" value="${gensrc.dir}/com/sun/corba/se/impl/orbutil/newtimer/generated/TimingPoints.java"/>
 	<condition property="timing-file-changed">
 	    <or>
 		<not>
@@ -1116,8 +1123,16 @@
       -->
 
     <!-- <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/> -->
-    
-    <target name="findbugs" depends="init"> 
+   
+    <target name="prepare-findbugs" depends="init">
+        <chmod perm="+x" type="file">
+            <fileset dir="lib/findbugs-1.3.3/bin">
+                <include name="**"/>
+            </fileset>
+        </chmod>
+    </target>
+
+    <target name="findbugs" depends="init, prepare-findbugs"> 
 	<mkdir dir="${findbugs.dir}"/>
 	<exec executable="${findbugs.home}/bin/findbugs">
 	    <arg value="-textui"/>
@@ -1128,15 +1143,16 @@
 	    <arg file="${findbugs.exclude.file}"/>
 	    <arg value="-sourcepath"/>
 	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
-	    <arg file="${releaselib.dir}/omgapi.jar"/>
-	    <!-- <arg file="${releaselib.dir}/idlj.jar"/> -->
-	    <arg file="${releaselib.dir}/orblib.jar"/>
-	    <arg file="${releaselib.dir}/peorb.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
 	    <!-- <arg file="${test-classes.dir}"/> -->
 	</exec>
     </target>
 
-    <target name="findbugs-xml" depends="init"> 
+    <target name="findbugs-xml" depends="init, prepare-findbugs"> 
 	<mkdir dir="${findbugs.dir}"/>
 	<exec executable="${findbugs.home}/bin/findbugs">
 	    <arg value="-textui"/>
@@ -1147,10 +1163,11 @@
 	    <arg file="${findbugs.exclude.file}"/>
 	    <arg value="-sourcepath"/>
 	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
-	    <arg file="${releaselib.dir}/omgapi.jar"/>
-	    <!-- <arg file="${releaselib.dir}/idlj.jar"/> -->
-	    <arg file="${releaselib.dir}/orblib.jar"/>
-	    <arg file="${releaselib.dir}/peorb.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orb.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-orbgeneric.jar"/>
 	    <!-- <arg file="${test-classes.dir}"/> -->
 	</exec>
     </target>
@@ -1180,6 +1197,76 @@
 	</java>
     </target>
 
+    <target name="increment-build-version" depends="init">
+        <propertyfile file="${root.dir}/make/build.properties">
+            <entry key="corba.major.version" value="3"/>
+            <entry key="corba.minor.version" value="0"/>
+            <entry key="corba.update.version" value="0"/>
+            <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
+        </propertyfile>
+    </target>
+
+    <target name="generate-bnd-properties" depends="init">
+        <propertyfile file="${root.dir}/make/bnd/bnd.properties">
+            <entry key="Bundle-Version" value="${release.version}-${build.version}"/>
+        </propertyfile>
+    </target> 
+
+    <target name="update-build" depends="increment-build-version,generate-bnd-properties"/>
+  
+    <taskdef name="java2html"
+        classname="de.java2html.anttasks.Java2HtmlTask"
+        classpath="${lib.dir}/java2html.jar"
+    />
+
+    <target name="copy-idl" depends="init">
+        <copy todir="www/sources/orb">
+            <fileset dir="${src.dir}">
+                <include name="**/*.idl"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="source-to-html" depends="init,copy-idl">
+        <mkdir dir="www/sources"/>
+        <java2html
+            srcdir="${src.dir}"
+            destdir="www/sources/orb"
+            includes="**/*.java"
+            showLineNumbers="true"
+            style="kawa"
+            outputFormat="html"
+            overwrite="true"
+        />
+        <java2html
+            srcdir="${orblib.src.dir}"
+            destdir="www/sources/orblib"
+            includes="**/*.java"
+            showLineNumbers="true"
+            style="kawa"
+            outputFormat="html"
+            overwrite="true"
+        />
+        <java2html
+            srcdir="${gensrc.dir}"
+            destdir="www/sources/generated"
+            includes="**/*.java"
+            showLineNumbers="true"
+            style="kawa"
+            outputFormat="html"
+            overwrite="true"
+        />
+        <java2html
+            srcdir="${test.src.dir}"
+            destdir="www/sources/test"
+            includes="**/*.java"
+            showLineNumbers="true"
+            style="kawa"
+            outputFormat="html"
+            overwrite="true"
+        />
+    </target>
+
     &src-idl;
     &jscheme;
     &test-idl;
@@ -1187,5 +1274,8 @@
     &test;
     &emma;
     &maven;
+    <target name="do-rename" depends="clean, orb-library, rename"/>
+
+    <target name="do-release" depends="clean, build, make-bundles, release-local"/>
 </project>
 

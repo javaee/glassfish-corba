@@ -53,7 +53,7 @@ import com.sun.corba.se.impl.presentation.rmi.PresentationManagerImpl ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
 
 public abstract class PresentationDefaults
 {

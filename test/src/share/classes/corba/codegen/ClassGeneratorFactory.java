@@ -37,8 +37,7 @@
 package corba.codegen ;
 
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
-
-import com.sun.corba.se.impl.orbutil.codegen.ClassGenerator ;
+import com.sun.corba.se.spi.orbutil.codegen.ClassGenerator ;
 
 /** Convenience interface that defines a factory for ClassGenerator instances.
  * It puts the class name of the generated class in a single place.

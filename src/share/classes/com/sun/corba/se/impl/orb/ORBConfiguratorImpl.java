@@ -49,7 +49,7 @@ import org.omg.CORBA.CompletionStatus ;
 import org.omg.CORBA.portable.ValueFactory ;
 
 import com.sun.corba.se.pept.protocol.ClientRequestDispatcher ;
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.pept.transport.Acceptor;
 
 import com.sun.corba.se.spi.activation.Locator ;
 import com.sun.corba.se.spi.activation.Activator ;
@@ -124,6 +124,12 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
     private ORBUtilSystemException wrapper ;
 
     public static class ConfigParser extends ParserImplBase {
+        private ORB orb ;
+
+        public ConfigParser( ORB orb ) {
+            this.orb = orb ;
+        } ;
+
 	public Class[] userConfigurators = null ;
 
 	public PropertyParser makeParser()
@@ -131,7 +137,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    PropertyParser parser = new PropertyParser() ;
 	    Operation action = OperationFactory.compose( 
 		OperationFactory.suffixAction(),
-		OperationFactory.classAction() 
+		OperationFactory.classAction( orb.classNameResolver() )
 	    ) ;
 	    parser.addPrefix( ORBConstants.USER_CONFIGURATOR_PREFIX, action, 
 		"userConfigurators", Class.class ) ;
@@ -171,7 +177,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	// Run any pluggable configurators.  This is a lot like 
 	// ORBInitializers, only it uses the internal ORB and has
 	// access to all data for parsing.  
-	ConfigParser parser = new ConfigParser()  ;
+	ConfigParser parser = new ConfigParser( orb )  ;
 	parser.init( collector ) ;
 	if (parser.userConfigurators != null) {
 	    for (int ctr=0; ctr<parser.userConfigurators.length; ctr++) {
@@ -250,7 +256,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 
 	CorbaContactInfoListFactory contactInfoListFactory =
 	    od.getCorbaContactInfoListFactory();
-	CorbaAcceptor[] acceptors = od.getAcceptors();
+	Acceptor[] acceptors = od.getAcceptors();
 
 	// BEGIN Legacy
 	ORBSocketFactory legacySocketFactory = od.getLegacySocketFactory();
@@ -360,7 +366,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 					   ORBSocketFactory legacySocketFactory,
 					   int port, String name, String type)
     {
-	CorbaAcceptor acceptor;
+	Acceptor acceptor;
 	if (legacySocketFactory == null) {
 	    acceptor =
 		new SocketOrChannelAcceptorImpl(orb, port, name, type);
@@ -368,7 +374,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    acceptor =
 		new SocketFactoryAcceptorImpl(orb, port, name, type);
 	}
-	orb.getCorbaTransportManager().registerAcceptor(acceptor);
+	orb.getTransportManager().registerAcceptor(acceptor);
     }
 
     private void setLegacySocketFactoryORB(

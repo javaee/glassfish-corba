@@ -53,7 +53,7 @@ import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
@@ -92,7 +92,7 @@ public class Server
             rRootPOA = U.getRootPOA(orb);
             rRootPOA.the_POAManager().activate();
 
-	    Acceptor acceptor;
+	    CorbaAcceptor acceptor;
 
 	    acceptor = 
 	        new SOAPAcceptor(

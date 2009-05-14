@@ -45,7 +45,7 @@ import com.sun.corba.se.pept.broker.Broker;
 import com.sun.corba.se.pept.encoding.InputObject;
 import com.sun.corba.se.pept.encoding.OutputObject;
 import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.pept.transport.ConnectionCache;
 import com.sun.corba.se.pept.transport.ContactInfo;
@@ -128,7 +128,7 @@ public class ConnectionImpl
 	return SelectionKey.OP_READ;
     }
 
-    public Acceptor getAcceptor()
+    public CorbaAcceptor getAcceptor()
     {
 	return null;
     }

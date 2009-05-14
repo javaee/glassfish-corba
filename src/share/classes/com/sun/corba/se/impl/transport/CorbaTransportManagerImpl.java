@@ -111,6 +111,7 @@ public class CorbaTransportManagerImpl
 	outboundConnectionCaches = new HashMap<String,OutboundConnectionCache>();
 	inboundConnectionCaches = new HashMap<String,InboundConnectionCache>();
 	selector = new SelectorImpl(orb);
+        orb.mom().register( orb, this ) ;
     }
 
     ////////////////////////////////////////////////////
@@ -201,7 +202,7 @@ public class CorbaTransportManagerImpl
 	return selector;
     }
 
-    public synchronized void registerAcceptor(CorbaAcceptor acceptor) 
+    public synchronized void registerAcceptor(CorbaAcceptor acceptor)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".registerAcceptor->: " + acceptor);

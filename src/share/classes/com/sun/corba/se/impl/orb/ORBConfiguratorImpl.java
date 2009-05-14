@@ -49,7 +49,6 @@ import org.omg.CORBA.CompletionStatus ;
 import org.omg.CORBA.portable.ValueFactory ;
 
 import com.sun.corba.se.pept.protocol.ClientRequestDispatcher ;
-import com.sun.corba.se.pept.transport.Acceptor;
 
 import com.sun.corba.se.spi.activation.Locator ;
 import com.sun.corba.se.spi.activation.Activator ;
@@ -119,6 +118,8 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 // XXX This needs an SPI
 import com.sun.corba.se.impl.dynamicany.DynAnyFactoryImpl ;
+
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 public class ORBConfiguratorImpl implements ORBConfigurator {
     private ORBUtilSystemException wrapper ;
@@ -256,7 +257,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 
 	CorbaContactInfoListFactory contactInfoListFactory =
 	    od.getCorbaContactInfoListFactory();
-	Acceptor[] acceptors = od.getAcceptors();
+	CorbaAcceptor[] acceptors = od.getAcceptors();
 
 	// BEGIN Legacy
 	ORBSocketFactory legacySocketFactory = od.getLegacySocketFactory();
@@ -366,7 +367,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 					   ORBSocketFactory legacySocketFactory,
 					   int port, String name, String type)
     {
-	Acceptor acceptor;
+	CorbaAcceptor acceptor;
 	if (legacySocketFactory == null) {
 	    acceptor =
 		new SocketOrChannelAcceptorImpl(orb, port, name, type);
@@ -374,7 +375,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    acceptor =
 		new SocketFactoryAcceptorImpl(orb, port, name, type);
 	}
-	orb.getTransportManager().registerAcceptor(acceptor);
+	orb.getCorbaTransportManager().registerAcceptor(acceptor);
     }
 
     private void setLegacySocketFactoryORB(

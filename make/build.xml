@@ -1216,7 +1216,7 @@
   
     <taskdef name="java2html"
         classname="de.java2html.anttasks.Java2HtmlTask"
-        classpath="${lib.dir}/java2html.jar"
+        classpath="lib/java2html.jar"
     />
 
     <target name="copy-idl" depends="init">

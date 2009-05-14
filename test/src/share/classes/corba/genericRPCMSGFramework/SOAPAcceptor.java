@@ -42,7 +42,6 @@ package corba.genericRPCMSGFramework;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -51,10 +50,7 @@ import com.sun.corba.se.pept.broker.Broker;
 import com.sun.corba.se.pept.protocol.MessageMediator;
 import com.sun.corba.se.pept.encoding.InputObject;
 import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.transport.Acceptor;
 import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.EventHandler;
 
 import com.sun.corba.se.spi.orb.ORB;
 

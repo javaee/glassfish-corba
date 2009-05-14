@@ -60,7 +60,7 @@ import com.sun.org.omg.SendingContext.CodeBase;
 import com.sun.corba.se.pept.encoding.InputObject;
 import com.sun.corba.se.pept.encoding.OutputObject;
 import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.pept.transport.ConnectionCache;
 import com.sun.corba.se.pept.transport.ContactInfo;
@@ -130,7 +130,7 @@ public class SocketOrChannelConnectionImpl
     // REVISIT:
     // protected for test: genericRPCMSGFramework.IIOPConnection constructor.
     protected CorbaContactInfo contactInfo;
-    protected Acceptor acceptor;
+    protected CorbaAcceptor acceptor;
     protected ConnectionCache connectionCache;
         
     //
@@ -279,7 +279,7 @@ public class SocketOrChannelConnectionImpl
 
     // Server-side constructor.
     public SocketOrChannelConnectionImpl(ORB orb,
-					 Acceptor acceptor, 
+					 CorbaAcceptor acceptor,
 					 Socket socket,
 					 boolean useSelectThreadToWait,
 					 boolean useWorkerThread)
@@ -311,7 +311,7 @@ public class SocketOrChannelConnectionImpl
 
     // Server-side convenience
     public SocketOrChannelConnectionImpl(ORB orb,
-					 Acceptor acceptor, 
+					 CorbaAcceptor acceptor,
 					 Socket socket)
     {
 	this(orb, acceptor, socket,
@@ -906,7 +906,7 @@ public class SocketOrChannelConnectionImpl
         }
     }
 
-    public Acceptor getAcceptor()
+    public CorbaAcceptor getAcceptor()
     {
 	return acceptor;
     }

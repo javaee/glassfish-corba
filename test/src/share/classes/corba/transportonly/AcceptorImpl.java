@@ -37,6 +37,8 @@
 
 package corba.transportonly;
 
+import com.sun.corba.se.impl.oa.poa.Policies;
+import com.sun.corba.se.spi.ior.IORTemplate;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -49,7 +51,7 @@ import com.sun.corba.se.pept.broker.Broker;
 import com.sun.corba.se.pept.encoding.InputObject;
 import com.sun.corba.se.pept.encoding.OutputObject;
 import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.pept.transport.EventHandler;
 import com.sun.corba.se.pept.transport.InboundConnectionCache;
@@ -64,7 +66,7 @@ public class AcceptorImpl
     extends
 	EventHandlerBase
     implements
-	Acceptor,
+	CorbaAcceptor,
 	Work
 {
     private ServerSocketChannel serverSocketChannel;
@@ -142,7 +144,7 @@ public class AcceptorImpl
 				   shouldUseSelectThreadForConnections(),
 				   !shouldUseSelectThreadForConnections(),
 				   false);
-	    Selector selector = orb.getTransportManager().getSelector(0);
+	    Selector selector = orb.getCorbaTransportManager().getSelector(0);
 	    selector.registerForEvent(connection);
 	    System.out.println("connection registered.");
 	} catch (IOException e) {
@@ -202,7 +204,7 @@ public class AcceptorImpl
 	return SelectionKey.OP_ACCEPT;
     }
 
-    public Acceptor getAcceptor()
+    public CorbaAcceptor getAcceptor()
     {
 	return this;
     }
@@ -267,6 +269,22 @@ public class AcceptorImpl
 					   MessageMediator messageMediator)
     {
 	throw new RuntimeException("NO");
+    }
+
+    public String getObjectAdapterId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getObjectAdapterManagerId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void addToIORTemplate(IORTemplate iorTemplate, Policies policies, String codebase) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getMonitoringName() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
 

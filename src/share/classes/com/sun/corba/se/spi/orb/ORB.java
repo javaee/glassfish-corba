@@ -133,17 +133,19 @@ import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
 
+import java.lang.reflect.Field;
 import org.glassfish.gmbal.ManagedObjectManager ;
 import org.glassfish.gmbal.ManagedObjectManagerFactory ;
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedOperation ;
 import org.glassfish.gmbal.AMXMetadata ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.NameValue ;
 
 @ManagedObject
 @Description( "The Main ORB Implementation object" ) 
-@AMXMetadata( pathPart="ORB-Root", isLeaf=false ) 
+@AMXMetadata( type="ORB-Root" )
 public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     implements Broker, TypeCodeFactory
 {   
@@ -197,6 +199,48 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean mbeanRuntimeDebugFlag = false ;
     public boolean orbLifecycleDebugFlag = false ;
 
+    @ManagedAttribute
+    @Description( "The current settings of the ORB debug flags" )
+    private Map<String,Boolean> getDebugFlags() {
+        Map<String,Boolean> result = new HashMap<String,Boolean>() ;
+        for (Field fld : this.getClass().getDeclaredFields()) {
+            if (fld.getName().endsWith("DebugFlag")) {
+                Boolean value = false ;
+                try {
+                    value = fld.getBoolean( this );
+                    result.put( fld.getName(), value ) ;
+                } catch (Exception exc) {
+                }
+            }
+        }
+
+        return result ;
+    }
+
+    private enum DebugFlagResult { OK, BAD_NAME }
+
+    @ManagedOperation
+    @Description( "Enable debugging for a particular ORB debug flag")
+    private DebugFlagResult setDebugFlag( String name ) {
+        return setDebugFlag( name, true ) ;
+    }
+
+    @ManagedOperation
+    @Description( "Disable debugging for a particular ORB debug flag")
+    private DebugFlagResult clearDebugFlag( String name ) {
+        return setDebugFlag( name, false ) ;
+    }
+   
+    private DebugFlagResult setDebugFlag( String name, boolean value ) {
+        try {
+            Field fld = this.getClass().getField( name + "DebugFlag" ) ;
+            fld.set( this, value ) ;
+            return DebugFlagResult.OK ;
+        } catch (Exception exc) {
+            return DebugFlagResult.BAD_NAME ;
+        }
+    }
+
     private LogWrapperTable logWrapperTable ;
 
     private static LogWrapperTable staticLogWrapperTable = 
@@ -235,7 +279,10 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public abstract void pushInvocationInfo( OAInvocationInfo info ) ;
     public abstract OAInvocationInfo popInvocationInfo() ;
 
+    @ManagedAttribute
+    @Description( "The ORB's transport manager" ) 
     public abstract CorbaTransportManager getCorbaTransportManager();
+
     public abstract LegacyServerSocketManager getLegacyServerSocketManager();
 
     // There is only one instance of the PresentationManager
@@ -258,6 +305,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     /** Get the single instance of the PresentationManager
      */
+    @ManagedAttribute
+    @Description( "The presentation manager, which handles stub creation" ) 
     public static PresentationManager getPresentationManager() 
     {
 	return globalPM ;
@@ -397,6 +446,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     @ManagedAttribute
     @Description( "The implementation version of the ORB" )
     public abstract ORBVersion getORBVersion() ;
+
     public abstract void setORBVersion( ORBVersion version ) ;
 
     // XXX This needs a better name
@@ -474,6 +524,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     /** Get the resolver used in this ORB.  This resolver will be used for list_initial_services
      * and resolve_initial_references.
      */
+    @ManagedAttribute
+    @Description( "ORB Name resolver" ) 
     public abstract Resolver getResolver() ;
 
     /** Set the LocalResolver used in this ORB.  This LocalResolver is used for 
@@ -484,6 +536,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     /** Get the LocalResolver used in this ORB.  This LocalResolver is used for 
      * register_initial_reference only.
      */
+    @ManagedAttribute
+    @Description( "ORB Local Name resolver" ) 
     public abstract LocalResolver getLocalResolver() ;
 
     /** Set the operation used in string_to_object calls.  The Operation must expect a
@@ -505,13 +559,24 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     /** Factory finders for the various parts of the IOR: tagged components, tagged
      * profiles, and tagged profile templates.
      */
+    @ManagedAttribute
+    @Description( "Finder of Factories for TaggedComponents of IORs" )
     public abstract TaggedComponentFactoryFinder getTaggedComponentFactoryFinder() ;
+
+    @ManagedAttribute
+    @Description( "Finder of Factories for TaggedProfiles of IORs" )
     public abstract IdentifiableFactoryFinder<TaggedProfile> 
 	getTaggedProfileFactoryFinder() ;
+
+    @ManagedAttribute
+    @Description( "Finder of Factories for TaggedProfileTemplates of IORs" )
     public abstract IdentifiableFactoryFinder<TaggedProfileTemplate> 
 	getTaggedProfileTemplateFactoryFinder() ;
 
+    @ManagedAttribute
+    @Description( "Factory for creating ObjectKeys" )
     public abstract ObjectKeyFactory getObjectKeyFactory() ;
+
     public abstract void setObjectKeyFactory( ObjectKeyFactory factory ) ;
 
     // Logging SPI
@@ -551,6 +616,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // NOTE: ByteBuffer pool must be unique per ORB, not per process.
     //       There can be more than one ORB per process.
     //       This method must also be inherited by both ORB and ORBSingleton.
+    @ManagedAttribute
+    @Description( "The ByteBuffer pool used in the ORB" ) 
     public ByteBufferPool getByteBufferPool()
     {
         if (byteBufferPool == null)
@@ -565,8 +632,12 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     public abstract void setThreadPoolManager(ThreadPoolManager mgr);
 
+    @ManagedAttribute
+    @Description( "The ORB's threadpool manager" ) 
     public abstract ThreadPoolManager getThreadPoolManager();
 
+    @ManagedAttribute
+    @Description( "The ORB's object copier manager" ) 
     public abstract CopierManager getCopierManager() ;
 
     /** Returns a name for this ORB that is based on the ORB id (if any)
@@ -598,6 +669,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         mom.stripPrefix( "com.sun.corba.se", "com.sun.corba.se.spi", "com.sun.corba.se.spi.orb", 
             "com.sun.corba.se.impl", "com.sun.corba.se.spi.orbutil", 
             "com.sun.corba.se.impl.orbutil" ) ;
+
+        mom.suspendJMXRegistration() ;
 
         mom.createRoot( this, getUniqueOrbId() ) ;
     }

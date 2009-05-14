@@ -420,7 +420,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     private void initManagedObjectManager() {
         createORBManagedObjectManager() ;
-
         mom.registerAtRoot( configData ) ;
 
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedObject.class ) ) ;
@@ -648,6 +647,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         super.getByteBufferPool();
 	serviceContextsCache = new ServiceContextsCache(this);
 
+        // Now the ORB is ready, so finish all of the MBean registration
+        mom.resumeJMXRegistration() ;
     }
 
     private synchronized POAFactory getPOAFactory() 
@@ -1628,6 +1629,12 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         invocationInterceptor = null ;
         objectKeyCache = null ; 
         objectKeyCacheLock = null ;
+
+        try {
+            mom.close() ;
+        } catch (IOException exc) {
+            // ignore: stupid close exception
+        }
     }
 
     /**

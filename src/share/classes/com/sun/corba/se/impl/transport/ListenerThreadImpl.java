@@ -35,11 +35,9 @@
  */
 package com.sun.corba.se.impl.transport;
 
-import java.io.IOException;
 
-import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.pept.transport.ListenerThread;
-import com.sun.corba.se.pept.transport.Selector;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
@@ -54,12 +52,12 @@ public class ListenerThreadImpl
 	Work
 {
     private ORB orb;
-    private Acceptor acceptor;
+    private CorbaAcceptor acceptor;
     private boolean keepRunning;
     private long enqueueTime;
     private ORBUtilSystemException wrapper ;
 
-    public ListenerThreadImpl(ORB orb, Acceptor acceptor)
+    public ListenerThreadImpl(ORB orb, CorbaAcceptor acceptor)
     {
 	this.orb = orb;
 	this.acceptor = acceptor;
@@ -72,7 +70,7 @@ public class ListenerThreadImpl
     // ListenerThread methods.
     //
 
-    public Acceptor getAcceptor()
+    public CorbaAcceptor getAcceptor()
     {
 	return acceptor;
     }

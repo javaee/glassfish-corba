@@ -118,6 +118,10 @@ public class IDLJavaSerializationOutputStream extends CDROutputStreamBase {
     private static final List<IDLByteArrayOutputStream> outputStreamPool = 
 	new LinkedList<IDLByteArrayOutputStream>();
 
+    void printBuffer() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     /**
      * This implementation is an alternative to the ByteArrayOutputStream.
      *

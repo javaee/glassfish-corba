@@ -36,6 +36,7 @@
 
 package com.sun.corba.se.impl.orb ;
 
+import java.net.SocketException;
 import java.net.URL ;
 import java.net.InetSocketAddress;
 import java.net.Socket ;
@@ -56,7 +57,6 @@ import com.sun.corba.se.pept.broker.Broker;
 import com.sun.corba.se.pept.encoding.InputObject;
 import com.sun.corba.se.pept.encoding.OutputObject;
 import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Acceptor;
 import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.pept.transport.ContactInfo;
 import com.sun.corba.se.pept.transport.EventHandler;
@@ -73,7 +73,7 @@ import com.sun.corba.se.spi.orb.OperationFactoryExt ;
 import com.sun.corba.se.spi.orb.ParserData ;
 import com.sun.corba.se.spi.orb.ParserDataFactory ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader ;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
@@ -169,7 +169,7 @@ public class ParserTable {
 	    new Pair<String,String>( MY_CLASS_NAME + "$TestORBInitializer1", "dummy" ),
 	    new Pair<String,String>( MY_CLASS_NAME + "$TestORBInitializer2", "dummy" ) } ;
 
-	Acceptor[] TestAcceptors =
+	CorbaAcceptor[] TestAcceptors =
 	    { null, 
 	      new TestAcceptor2(), 
 	      new TestAcceptor1()
@@ -374,8 +374,8 @@ public class ParserTable {
 		TestORBInitializers, TestORBInitData, ORBInitializer.class ),
 	    ParserDataFactory.make( ORBConstants.ACCEPTOR_CLASS_PREFIX_PROPERTY,  
 		makeAcceptorInstantiationOperation(), 
-		"acceptors", new Acceptor[0],
-		TestAcceptors, TestAcceptorData, Acceptor.class ),
+		"acceptors", new CorbaAcceptor[0],
+		TestAcceptors, TestAcceptorData, CorbaAcceptor.class ),
 
 	    //
 	    // Socket/Channel control
@@ -591,11 +591,9 @@ public class ParserTable {
 	    return null ;
 	}
 
-	public void setAcceptedSocketOptions(Acceptor acceptor,
-					     ServerSocket serverSocket,
-					     Socket socket)
-	{
-	}
+        public void setAcceptedSocketOptions(CorbaAcceptor acceptor, ServerSocket serverSocket, Socket socket) throws SocketException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     public static final class TestIORToSocketInfo
@@ -985,7 +983,7 @@ public class ParserTable {
     }
 
     public static final class TestAcceptor1
-	implements Acceptor
+	implements CorbaAcceptor
     {
 	public boolean equals( Object other )
 	{
@@ -1018,7 +1016,7 @@ public class ParserTable {
     }
 
     public static final class TestAcceptor2
-	implements Acceptor
+	implements CorbaAcceptor
     {
 	public boolean equals( Object other )
 	{
@@ -1066,13 +1064,13 @@ public class ParserTable {
 		// For security reasons avoid creating an instance 
 		// if this class is one that would fail the class cast 
 		// to ORBInitializer anyway.
-		if( Acceptor.class.isAssignableFrom( initClass ) ) {
+		if( CorbaAcceptor.class.isAssignableFrom( initClass ) ) {
 		    // Now that we have a class object, instantiate one and
 		    // remember it:
-		    Acceptor acceptor = null ; 
+		    CorbaAcceptor acceptor = null ;
 
 		    try {
-			acceptor = (Acceptor)AccessController.doPrivileged(
+			acceptor = (CorbaAcceptor)AccessController.doPrivileged(
 			    new PrivilegedExceptionAction() {
 				public Object run() 
 				    throws InstantiationException, IllegalAccessException 

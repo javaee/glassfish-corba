@@ -76,11 +76,11 @@ public class WorkspaceRename {
 	"sxc", "sxi", "sxw", "odp", "gif", "png", "jar", "zip", "jpg", "pom",
 	"pdf", "doc", "mif", "fm", "book", "zargo", "zuml", "cvsignore", 
 	"hgignore", "list", "old", "orig", "rej", "hgtags", "xsl", "bat", "css",
-        "icns"
+        "icns", "bin"
     } ;
 
     private static final String[] IGNORE_SUFFIXES = {
-	"swo", "swp", "class", "o" 
+	"swo", "swp", "class", "o"
     } ;
 
     private static final String[] IGNORE_NAMES = {

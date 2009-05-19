@@ -605,6 +605,11 @@ public class ORBConstants {
     // testing.
     public static final String USE_ENUM_DESC = SUN_PREFIX 
         + "ORBUseEnumDesc" ;
+
+    // Specify an AMXv3-compliant ObjectName (as a string) for the parent of the
+    // ORB's gmbal root.
+    public static final String GMBAL_ROOT_PARENT_NAME = SUN_PREFIX 
+        + "ORBGmbalRootParentName" ;
 }
 
 // End of file.

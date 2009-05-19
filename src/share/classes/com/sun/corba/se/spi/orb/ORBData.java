@@ -36,6 +36,7 @@
 
 package com.sun.corba.se.spi.orb ;
 
+import javax.management.ObjectName ;
 
 import org.omg.PortableInterceptor.ORBInitializer ;
 
@@ -378,6 +379,10 @@ public interface ORBData {
     @ManagedAttribute
     @Description( "DESC" ) 
     public boolean useEnumDesc() ;
+
+    @ManagedAttribute
+    @Description( "The AMX parent ObjectName of the gmbal root of the orb" ) 
+    public ObjectName gmbalRootParentName() ;
 }
 
 // End of file.

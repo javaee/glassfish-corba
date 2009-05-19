@@ -50,6 +50,8 @@ import java.security.AccessController ;
 import java.security.PrivilegedExceptionAction ;
 import java.security.PrivilegedActionException ;
 
+import javax.management.ObjectName ;
+
 import org.omg.PortableInterceptor.ORBInitializer ;
 import org.omg.PortableInterceptor.ORBInitInfo ;
 
@@ -127,6 +129,19 @@ public class ParserTable {
     public ParserData[] getParserData() 
     {
 	return parserData ;
+    }
+
+    public static ObjectName testGmbalRootParentName ;
+
+    public final static String TEST_GMBAL_ROOT_PARENT_NAME = 
+        "test:pp=\"/\",type=\"Foo\",name=\"1\"" ;
+
+    static {
+        try {
+            testGmbalRootParentName = new ObjectName( TEST_GMBAL_ROOT_PARENT_NAME ) ;
+        } catch (Exception exc) {
+            testGmbalRootParentName = null ;
+        }
     }
 
     private ParserTable( UnaryFunction<String,Class<?>> cnr ) {
@@ -505,7 +520,12 @@ public class ParserTable {
 	    ParserDataFactory.make( ORBConstants.USE_ENUM_DESC,
 		OperationFactory.booleanAction(),
 		"useEnumDesc", Boolean.TRUE,
-		Boolean.TRUE, "TRUE")
+		Boolean.TRUE, "TRUE"),
+            ParserDataFactory.make( ORBConstants.GMBAL_ROOT_PARENT_NAME,
+                OperationFactory.maskErrorAction( 
+                    OperationFactoryExt.convertAction( ObjectName.class ) ),
+                "gmbalRootParentName", null,
+                testGmbalRootParentName, TEST_GMBAL_ROOT_PARENT_NAME )
 	} ;
 
 	parserData = pd ;

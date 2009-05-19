@@ -397,34 +397,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         orbVersionThreadLocal.set(verObj);
     }
 
-    // Interfaces used only to define InheritedAttributes for other classes
-    // If we register a class that has Servant in its inheritance, it will
-    // pick up these InheritedAttributes.
-    @ManagedObject
-    @Description( "A servant, which implements a remote object in the server" )
-    @InheritedAttributes( {
-        @InheritedAttribute( methodName="_get_delegate", id="delegate", 
-            description="Delegate that implements this servant" ),
-        @InheritedAttribute( methodName="_orb", id="orb",
-            description="The ORB for this Servant" ),
-        @InheritedAttribute( methodName="toString", id="representation",
-            description="Representation of this Servant" ),
-        @InheritedAttribute( methodName="_all_interfaces", id="typeIds",
-            description="The types implemented by this Servant" ) } 
-    )
-    public interface DummyServant{}
-
-    // DummyDelegate
-    // DummyORB
-    // DummyPOA
 
     private void initManagedObjectManager() {
         createORBManagedObjectManager() ;
         mom.registerAtRoot( configData ) ;
-
-        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedObject.class ) ) ;
-        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( Description.class ) ) ;
-        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( InheritedAttributes.class ) ) ;
     }
 
 /****************************************************************************

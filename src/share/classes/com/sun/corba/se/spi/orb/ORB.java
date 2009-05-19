@@ -48,6 +48,8 @@ import java.security.PrivilegedAction ;
 
 import org.omg.CORBA.TCKind ;
 
+import org.omg.PortableServer.Servant ;
+
 import org.omg.CORBA.portable.ObjectImpl;
 
 import com.sun.corba.se.pept.broker.Broker ;
@@ -137,6 +139,9 @@ import java.lang.reflect.Field;
 import org.glassfish.gmbal.ManagedObjectManager ;
 import org.glassfish.gmbal.ManagedObjectManagerFactory ;
 import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.InheritedAttributes ;
+import org.glassfish.gmbal.InheritedAttribute ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.ManagedOperation ;
 import org.glassfish.gmbal.AMXMetadata ;
@@ -649,6 +654,27 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public String getUniqueOrbId()  {
 	return "###DEFAULT_UNIQUE_ORB_ID###" ;
     }
+    
+    // Interfaces used only to define InheritedAttributes for other classes
+    // If we register a class that has Servant in its inheritance, it will
+    // pick up these InheritedAttributes.
+    @ManagedObject
+    @Description( "A servant, which implements a remote object in the server" )
+    @InheritedAttributes( {
+        @InheritedAttribute( methodName="_get_delegate", id="delegate", 
+            description="Delegate that implements this servant" ),
+        @InheritedAttribute( methodName="_orb", id="orb",
+            description="The ORB for this Servant" ),
+        @InheritedAttribute( methodName="toString", id="representation",
+            description="Representation of this Servant" ),
+        @InheritedAttribute( methodName="_all_interfaces", id="typeIds",
+            description="The types implemented by this Servant" ) } 
+    )
+    public interface DummyServant{}
+
+    // DummyDelegate
+    // DummyORB
+    // DummyPOA
 
     public void createORBManagedObjectManager() {
         // XXX createStandalone should be replaced by createFederated if running
@@ -663,6 +689,10 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         } else {
             mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.NONE ) ;
         }
+
+        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedObject.class ) ) ;
+        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( Description.class ) ) ;
+        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( InheritedAttributes.class ) ) ;
 
         mom.setRuntimeDebug( mbeanRuntimeDebugFlag ) ;
 

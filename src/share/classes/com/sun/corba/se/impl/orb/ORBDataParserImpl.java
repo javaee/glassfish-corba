@@ -39,6 +39,8 @@ package com.sun.corba.se.impl.orb ;
 import java.net.URL ;
 import java.net.InetAddress;
 
+import javax.management.ObjectName ;
+
 import org.omg.CORBA.CompletionStatus ;
 import org.omg.PortableInterceptor.ORBInitializer ;
 
@@ -128,6 +130,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private boolean blockingReadCheckMessageParser;
     private boolean timingPointsEnabled;
     private boolean useEnumDesc ;
+    private ObjectName gmbalRootParentName ;
 
     // This is not initialized from ParserTable.
     private CodeSetComponentInfo codesets ;
@@ -471,6 +474,11 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public boolean blockingReadCheckMessageParser() {
         return blockingReadCheckMessageParser;
     }
+
+    public ObjectName gmbalRootParentName() {
+        return gmbalRootParentName ;
+    }
+
     // ====== Methods for constructing and initializing this object =========
 
     public ORBDataParserImpl( ORB orb, DataCollector coll )

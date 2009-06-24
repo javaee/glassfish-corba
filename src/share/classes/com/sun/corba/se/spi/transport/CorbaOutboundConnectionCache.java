@@ -34,19 +34,19 @@
  * holder.
  */
 
-package com.sun.corba.se.pept.transport;
+package com.sun.corba.se.spi.transport;
 
 /**
  * @author Harold Carr
  */
-public interface OutboundConnectionCache 
-    extends ConnectionCache
+public interface CorbaOutboundConnectionCache extends CorbaConnectionCache
 {
-    public Connection get(ContactInfo contactInfo);
+    public CorbaConnection get(CorbaContactInfo contactInfo);
 
-    public void put(ContactInfo contactInfo, Connection connection);
+    public void put(CorbaContactInfo contactInfo, CorbaConnection connection);
 
-    public void remove(ContactInfo contactInfo);
+    public void remove(CorbaContactInfo contactInfo);
 }
 
 // End of file.
+

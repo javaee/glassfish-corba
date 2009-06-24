@@ -40,9 +40,7 @@
 
 package com.sun.corba.se.impl.folb;
 
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_PARAM;
@@ -72,7 +70,6 @@ import com.sun.corba.se.spi.folb.GroupInfoServiceBase;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 
 import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.IORFactories;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.orb.DataCollector ;
 import com.sun.corba.se.spi.orb.ORB;
@@ -100,8 +97,6 @@ import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
 
 import org.omg.CosNaming.NamingContext ;
 import org.omg.CosNaming.NamingContextHelper ;
-import org.omg.CosNaming.NamingContextExt ;
-import org.omg.CosNaming.NamingContextExtHelper ;
 import org.omg.CosNaming.NameComponent ;
 
 import javax.rmi.PortableRemoteObject ;

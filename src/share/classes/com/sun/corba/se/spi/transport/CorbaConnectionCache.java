@@ -42,6 +42,24 @@ package com.sun.corba.se.spi.transport;
 public interface CorbaConnectionCache
 {
     public String getMonitoringName();
+
+    public String getCacheType();
+
+    public void stampTime(Connection connection);
+
+    public long numberOfConnections();
+
+    public long numberOfIdleConnections();
+
+    public long numberOfBusyConnections();
+
+    public boolean reclaim();
+
+    /** Close all connections in the connection cache.
+     * This is used as a final cleanup, and will result
+     * in abrupt termination of any pending communications.
+     */
+    public void close() ;
 }
 
 // End of file.

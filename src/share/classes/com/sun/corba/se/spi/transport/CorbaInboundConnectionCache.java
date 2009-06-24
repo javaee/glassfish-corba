@@ -34,19 +34,19 @@
  * holder.
  */
 
-package com.sun.corba.se.pept.transport;
+package com.sun.corba.se.spi.transport;
 
 /**
  * @author Harold Carr
  */
-public interface InboundConnectionCache 
-    extends ConnectionCache
+public interface CorbaInboundConnectionCache extends CorbaConnectionCache
 {
-    public Connection get(Acceptor acceptor); // REVISIT
+    public CorbaConnection get(CorbaAcceptor acceptor); // REVISIT
 
-    public void put(Acceptor acceptor, Connection connection);
+    public void put(CorbaAcceptor acceptor, CorbaConnection connection);
 
-    public void remove(Connection connection);
+    public void remove(CorbaConnection connection);
 }
 
 // End of file.
+

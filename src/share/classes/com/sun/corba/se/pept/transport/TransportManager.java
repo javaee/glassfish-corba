@@ -46,13 +46,6 @@ public interface TransportManager
 {
     public ByteBufferPool getByteBufferPool(int id);
 
-    public OutboundConnectionCache getOutboundConnectionCache(
-        ContactInfo contactInfo);
-
-    public Collection getOutboundConnectionCaches();
-
-    public InboundConnectionCache getInboundConnectionCache(Acceptor acceptor);
-
     public Selector getSelector(int id);
 
     public void close();

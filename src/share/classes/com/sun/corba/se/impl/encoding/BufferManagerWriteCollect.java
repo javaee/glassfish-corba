@@ -35,20 +35,12 @@
  */
 package com.sun.corba.se.impl.encoding;
 
-import java.nio.ByteBuffer;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.LinkedList;
 
-import com.sun.corba.se.impl.encoding.BufferQueue;
-import com.sun.corba.se.impl.encoding.BufferManagerWrite;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.pept.transport.Connection;
 import com.sun.corba.se.pept.transport.ByteBufferPool;

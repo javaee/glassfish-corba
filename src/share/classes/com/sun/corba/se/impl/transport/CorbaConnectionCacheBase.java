@@ -39,10 +39,6 @@ package com.sun.corba.se.impl.transport;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaConnectionCache;
@@ -55,7 +51,6 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
  */
 public abstract class CorbaConnectionCacheBase
     implements
-	ConnectionCache,
 	CorbaConnectionCache
 {
     protected ORB orb;
@@ -85,7 +80,7 @@ public abstract class CorbaConnectionCacheBase
 	return cacheType;
     }
 
-    public synchronized void stampTime(Connection c)
+    public synchronized void stampTime(CorbaConnection c)
     {
 	// _REVISIT_ Need to worry about wrap around some day
         c.setTimeStamp(timestamp++);

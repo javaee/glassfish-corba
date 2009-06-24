@@ -39,11 +39,6 @@ package com.sun.corba.se.impl.transport;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-
 import com.sun.corba.se.spi.monitoring.LongMonitoredAttributeBase;
 import com.sun.corba.se.spi.monitoring.MonitoringConstants;
 import com.sun.corba.se.spi.monitoring.MonitoringFactories;
@@ -61,7 +56,7 @@ public class CorbaInboundConnectionCacheImpl
     extends
 	CorbaConnectionCacheBase
     implements
-	InboundConnectionCache
+	CorbaInboundConnectionCache
 {
     protected Collection connectionCache;
 

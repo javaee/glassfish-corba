@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,43 +33,26 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.orbutil;
 
-import java.io.*;
-import java.util.Hashtable;
+package com.sun.corba.se.spi.orb;
 
-/**
- * Implements legacy behavior from Ladybird to maintain
- * backwards compatibility.
- */
-public class IIOPOutputStream_1_3_1 extends com.sun.corba.se.impl.io.IIOPOutputStream
-{
-    // We can't assume that the superclass's putFields
-    // member will be non-private.  We must allow
-    // the RI to run on JDK 1.3.1 FCS as well as
-    // the JDK 1.3.1_01 patch.
-    private ObjectOutputStream.PutField putFields_1_3_1;
-
-    public IIOPOutputStream_1_3_1()
-    	throws java.io.IOException {
-        super();
-    }
-
-    /**
-     * Before JDK 1.3.1_01, the PutField/GetField implementation
-     * actually sent a Hashtable.
+public interface ClassCodeBaseHandler {
+    /** Returns some sort of codebase for the given class, or null.
+     * It is expected that, if str is the result of getCodeBase( cls ), 
+     * then loadClass( str, cls.getClassName() ) will return cls.
+     * <return>A codebase to use with this handler, or null if this handler
+     * does not apply to this class.
      */
-    public ObjectOutputStream.PutField putFields()
-	throws IOException {
+    String getCodeBase( Class cls ) ;
 
-	putFields_1_3_1 = new LegacyHookPutFields();
-	return putFields_1_3_1;
-    }
-
-    public void writeFields()
-	throws IOException {
-
-	putFields_1_3_1.write(this);
-    }
+    /** load a class given the classname and a codebase.
+     * The className will always satisfy cls.getClassName().equals( className ) 
+     * if the call succeeds and returns a Class.
+     * <param>codebase A string that somehow describes which ClassLoader to use.
+     * For example, the string could be an ordinary URL that a URL ClassLoader can use,
+     * or something more specialized, such as a description of an OSGi bundles and version.
+     * <param>className The name of the class to load.
+     * <return>The loaded class, or null if the class could not be loaded.
+     */
+    Class loadClass( String codebase, String className ) ;
 }
-

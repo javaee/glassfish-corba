@@ -217,6 +217,9 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     private static final PresentationManager globalPM = 
 	PresentationDefaults.makeOrbPresentationManager() ;
 
+    private UnaryFunction<String,Class<?>> classNameResolver = defaultClassNameResolver ;
+    private ClassCodeBaseHandler ccbHandler = null ;
+
     public void destroy() {
         logWrapperTable = null ;
         wrapper = null ;
@@ -618,7 +621,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         return true ;
     }
 
-    private static UnaryFunction<String,Class<?>> classNameResolver =
+    private static UnaryFunction<String,Class<?>> defaultClassNameResolver =
         new UnaryFunction<String,Class<?>>() {
             public Class<?> evaluate( String name ) {
                 try {
@@ -634,7 +637,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         } ;
 
     public static UnaryFunction<String,Class<?>> defaultClassNameResolver() {
-        return classNameResolver ;
+        return defaultClassNameResolver ;
     }
 
     public UnaryFunction<String,Class<?>> makeCompositeClassNameResolver(
@@ -663,6 +666,14 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     public void classNameResolver( UnaryFunction<String,Class<?>> arg ) {
         classNameResolver = arg ;
+    }
+
+    public ClassCodeBaseHandler classCodeBaseHandler() {
+        return ccbHandler ;
+    }
+
+    public void classCodeBaseHandler( ClassCodeBaseHandler ccbh ) {
+        ccbHandler = ccbh ;
     }
 }
 

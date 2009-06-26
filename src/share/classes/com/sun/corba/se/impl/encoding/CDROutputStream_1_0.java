@@ -88,6 +88,7 @@ import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactories;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
+import com.sun.corba.se.spi.orb.ClassCodeBaseHandler;
 
 import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.encoding.CodeSetConversion;
@@ -817,6 +818,18 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	startValueChunk(mustChunk) ;
         write_wstring(string);
 	endValueChunk(mustChunk) ; 
+    }
+
+    private String getCodebase( Class cls ) {
+        ClassCodeBaseHandler ccbh = orb.classCodeBaseHandler() ;
+        if (ccbh != null) {
+            String result = ccbh.getCodeBase( cls ) ;
+            if (result != null) {
+                return result ;
+            }
+        }
+
+        return Util.getInstance().getCodebase(cls) ;
     }
 
     @CDR

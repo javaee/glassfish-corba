@@ -62,11 +62,8 @@ import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import com.sun.corba.se.impl.transport.EventHandlerBase;
 
 public class AcceptorImpl
-    extends
-	EventHandlerBase
-    implements
-	CorbaAcceptor,
-	Work
+    extends EventHandlerBase
+    implements CorbaAcceptor, Work
 {
     private ServerSocketChannel serverSocketChannel;
     private ServerSocket serverSocket;
@@ -247,11 +244,6 @@ public class AcceptorImpl
 	return enqueueTime;
     }
 
-    //////////////////////////////////////////////////
-    //
-    //
-    //
-
     public CorbaMessageMediator createMessageMediator(ORB xbroker,
 						 CorbaConnection xconnection)
     {
@@ -284,6 +276,10 @@ public class AcceptorImpl
 
     public String getMonitoringName() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public ServerSocket getServerSocket() {
+        return null ;
     }
 }
 

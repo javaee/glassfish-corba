@@ -52,5 +52,6 @@ grant {
     permission sun.corba.BridgePermission "getBridge";
     permission com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission "access";
     permission java.lang.management.ManagementPermission "monitor";
+    permission javax.management.MBeanServerPermission "createMBeanServer";
 };
 

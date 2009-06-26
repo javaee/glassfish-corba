@@ -36,14 +36,7 @@
 
 package com.sun.corba.se.impl.orb ;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaConnection;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaConnection;
 import java.net.SocketException;
-import java.net.URL ;
 import java.net.InetSocketAddress;
 import java.net.Socket ;
 import java.net.ServerSocket ;
@@ -67,7 +60,6 @@ import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.EventHandler;
-import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.IORTemplate ;
@@ -80,7 +72,6 @@ import com.sun.corba.se.spi.orb.OperationFactoryExt ;
 import com.sun.corba.se.spi.orb.ParserData ;
 import com.sun.corba.se.spi.orb.ParserDataFactory ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
@@ -88,7 +79,6 @@ import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.TcpTimeouts;
-import com.sun.corba.se.spi.transport.TransportDefault;
 import com.sun.corba.se.impl.oa.poa.Policies;
 
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
@@ -1039,6 +1029,10 @@ public class ParserTable {
         public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
                                      String codebase) { }
         public String getMonitoringName() { return null ; }
+
+        public ServerSocket getServerSocket() {
+            return null ;
+        }
     }
 
     public static final class TestAcceptor2
@@ -1072,6 +1066,9 @@ public class ParserTable {
         public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
                                      String codebase) { }
         public String getMonitoringName() { return null ; }
+        public ServerSocket getServerSocket() {
+            return null ;
+        }
     }
 
     // REVISIT - this is a cut and paste modification of makeROIOperation.

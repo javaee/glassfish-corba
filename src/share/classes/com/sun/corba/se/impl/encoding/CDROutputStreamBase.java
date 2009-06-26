@@ -47,17 +47,17 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB;
 
 /**
- * Describes CDROutputStream delegates and provides some
+ * Describes CDROutputObject delegates and provides some
  * implementation.  Non-default constructors are avoided in
  * the delegation to separate instantiation from initialization,
  * so we use init methods.
  */
 abstract class CDROutputStreamBase extends java.io.OutputStream
 {
-    protected CDROutputStream parent;
+    protected CDROutputObject parent;
 
-    // Required by parent CDROutputStream
-    public void setParent(CDROutputStream parent) {
+    // Required by parent CDROutputObject
+    public void setParent(CDROutputObject parent) {
         this.parent = parent;
     }
 

@@ -48,7 +48,7 @@ import java.util.Iterator ;
 import org.omg.CORBA.CompletionStatus ;
 import org.omg.CORBA.portable.ValueFactory ;
 
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
 
 import com.sun.corba.se.spi.activation.Locator ;
 import com.sun.corba.se.spi.activation.Activator ;
@@ -534,7 +534,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
 
 	// register client subcontracts
-	ClientRequestDispatcher csub = 
+	CorbaClientRequestDispatcher csub =
 	    RequestDispatcherDefault.makeClientRequestDispatcher() ;
 	scr.registerClientRequestDispatcher( csub, 
 	    ORBConstants.TOA_SCID ) ;

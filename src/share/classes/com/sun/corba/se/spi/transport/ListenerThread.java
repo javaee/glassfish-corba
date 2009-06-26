@@ -33,17 +33,23 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//
-// Created       : 2001 Nov 15 (Thu) 08:45:02 by Harold Carr.
-// Last Modified : 2002 Apr 24 (Wed) 15:38:19 by Harold Carr.
-//
+package com.sun.corba.se.spi.transport;
 
-package corba.genericRPCMSGFramework;
-
-public interface SOAPParameterSerializer
+/**
+ * @author Harold Carr
+ */
+public interface ListenerThread 
 {
-    public String getName(); // For debug.
-    public SOAPSerializer getSerializer();
+    public CorbaAcceptor getAcceptor();
+    public void close();
 }
 
 // End of file.
+
+
+
+
+
+
+
+

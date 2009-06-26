@@ -57,14 +57,13 @@ import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.RemarshalException;
 import org.omg.CORBA.portable.ServantObject;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.ClientInvocationInfo;
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.ContactInfoList;
-import com.sun.corba.se.pept.transport.ContactInfoListIterator;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
 
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.ior.IOR;
@@ -110,12 +109,12 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     // framework.subcontract.Delegate
     //
 
-    public Broker getBroker()
+    public ORB getBroker()
     {
 	return orb;
     }
 
-    public ContactInfoList getContactInfoList()
+    public CorbaContactInfoList getContactInfoList()
     {
 	return contactInfoList;
     }
@@ -170,7 +169,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 			tp.exit_hasNextNext() ;
 		    }
 
-		    ClientRequestDispatcher subcontract =
+		    CorbaClientRequestDispatcher subcontract =
 		        contactInfo.getClientRequestDispatcher();
 		    // Remember chosen subcontract for invoke and releaseReply.
 		    // 
@@ -215,20 +214,20 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    ApplicationException,
 	    RemarshalException 
     {
-	ClientRequestDispatcher subcontract = getClientRequestDispatcher();
+	CorbaClientRequestDispatcher subcontract = getClientRequestDispatcher();
 	return (InputStream)
-	    subcontract.marshalingComplete((Object)self, (OutputObject)output);
+	    subcontract.marshalingComplete((Object)self, (CDROutputObject)output);
     }
     
     public void releaseReply(org.omg.CORBA.Object self, InputStream input) 
     {
 	try {
 	    // NOTE: InputStream may be null (e.g., exception request from PI).
-	    ClientRequestDispatcher subcontract = getClientRequestDispatcher();
+	    CorbaClientRequestDispatcher subcontract = getClientRequestDispatcher();
 	    if (subcontract != null) {
 		// Important: avoid an NPE.
 		// ie: Certain errors may happen before a subcontract is selected.
-		subcontract.endRequest(orb, self, (InputObject)input);
+		subcontract.endRequest(orb, self, (CDRInputObject)input);
 	    }
 	    orb.releaseOrDecrementInvocationInfo();
 	} finally {
@@ -236,9 +235,9 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	}
     }
 
-    private ClientRequestDispatcher getClientRequestDispatcher()
+    private CorbaClientRequestDispatcher getClientRequestDispatcher()
     {
-        return (ClientRequestDispatcher)
+        return (CorbaClientRequestDispatcher)
             ((CorbaInvocationInfo)orb.getInvocationInfo())
 	    .getClientRequestDispatcher();
     }

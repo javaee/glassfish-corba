@@ -48,10 +48,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.ListenerThread;
-import com.sun.corba.se.pept.transport.ReaderThread;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.EventHandler;
+import com.sun.corba.se.spi.transport.ListenerThread;
+import com.sun.corba.se.spi.transport.ReaderThread;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
@@ -75,7 +75,7 @@ public class SelectorImpl
     extends
 	Thread
     implements
-	com.sun.corba.se.pept.transport.Selector
+	com.sun.corba.se.spi.transport.Selector
 {
     private ORB orb;
     private Selector selector;
@@ -562,7 +562,7 @@ public class SelectorImpl
 	if (orb.transportDebugFlag) {
 	    dprint(".createReaderThread: " + eventHandler);
 	}
-	Connection connection = eventHandler.getConnection();
+	CorbaConnection connection = eventHandler.getConnection();
 	ReaderThread readerThread = 
 	    new ReaderThreadImpl(orb, connection );
         synchronized (this) {

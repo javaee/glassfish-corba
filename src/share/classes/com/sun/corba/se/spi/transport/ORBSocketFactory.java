@@ -42,7 +42,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.ServerSocket;
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.orb.ORB;
 
 /**

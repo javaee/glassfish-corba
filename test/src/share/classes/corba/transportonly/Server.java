@@ -41,7 +41,7 @@ package corba.transportonly;
  */
 
 
-import com.sun.corba.se.pept.transport.EventHandler;
+import com.sun.corba.se.spi.transport.EventHandler;
 
 import com.sun.corba.se.spi.orb.ORB;
 

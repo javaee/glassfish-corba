@@ -58,12 +58,11 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 import org.omg.IOP.ExceptionDetailMessage;
 import org.omg.IOP.TAG_RMI_CUSTOM_MAX_STREAM_FORMAT;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.protocol.ProtocolHandler;
-import com.sun.corba.se.pept.transport.Connection;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.CorbaProtocolHandler;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.ObjectKey;
@@ -165,7 +164,7 @@ public class CorbaMessageMediatorImpl
 
     protected boolean cancelRequestAlreadySent = false;
 
-    protected ProtocolHandler protocolHandler;
+    protected CorbaProtocolHandler protocolHandler;
     protected boolean _executeReturnServantInResponseConstructor = false;
     protected boolean _executeRemoveThreadInfoInResponseConstructor = false;
     protected boolean _executePIInResponseConstructor = false;
@@ -183,7 +182,7 @@ public class CorbaMessageMediatorImpl
 
     public CorbaMessageMediatorImpl(ORB orb,
 				    CorbaContactInfo contactInfo,
-				    Connection connection,
+				    CorbaConnection connection,
 				    GIOPVersion giopVersion,
 				    IOR ior,
 				    int requestId,
@@ -227,7 +226,7 @@ public class CorbaMessageMediatorImpl
     //
 
     public CorbaMessageMediatorImpl(ORB orb,
-				    Connection connection) 
+				    CorbaConnection connection)
     {
 	this.orb = orb;
 	this.connection = (CorbaConnection)connection;
@@ -259,7 +258,7 @@ public class CorbaMessageMediatorImpl
     // MessageMediator
     //
 
-    public Broker getBroker() 
+    public ORB getBroker()
     {
 	return orb;
     }
@@ -269,7 +268,7 @@ public class CorbaMessageMediatorImpl
 	return contactInfo;
     }
 
-    public Connection getConnection()
+    public CorbaConnection getConnection()
     {
 	return connection;
     }
@@ -285,7 +284,7 @@ public class CorbaMessageMediatorImpl
         outputObject.finishSendingMessage();
     }
 
-    public InputObject waitForResponse()
+    public CDRInputObject waitForResponse()
     {
 	if (getRequestHeader().isResponseExpected()) {
 	    return connection.waitForResponse(this);
@@ -293,22 +292,22 @@ public class CorbaMessageMediatorImpl
 	return null;
     }
 
-    public void setOutputObject(OutputObject outputObject)
+    public void setOutputObject(CDROutputObject outputObject)
     {
 	this.outputObject = (CDROutputObject) outputObject;
     }
 
-    public OutputObject getOutputObject()
+    public CDROutputObject getOutputObject()
     {
 	return outputObject;
     }
 
-    public void setInputObject(InputObject inputObject)
+    public void setInputObject(CDRInputObject inputObject)
     {
 	this.inputObject = (CDRInputObject) inputObject;
     }
 
-    public InputObject getInputObject()
+    public CDRInputObject getInputObject()
     {
 	return inputObject;
     }
@@ -795,12 +794,7 @@ public class CorbaMessageMediatorImpl
 
     protected boolean isThreadDone = false;
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.protocol.ProtocolHandler
-    //
-
-    public boolean handleRequest(MessageMediator messageMediator)
+    public boolean handleRequest(CorbaMessageMediator messageMediator)
     {
 	try {
 	    byte encodingVersion = dispatchHeader.getEncodingVersion();
@@ -969,7 +963,7 @@ public class CorbaMessageMediatorImpl
 	// the original request instead of the current mediator (which
 	// need to be constructed to hold the dispatchBuffer and connection).
 	connection.getResponseWaitingRoom()
-	    .responseReceived((InputObject)inputObject);
+	    .responseReceived(inputObject);
     }
 
     // This handles message types for which we don't create classes.
@@ -1385,7 +1379,7 @@ public class CorbaMessageMediatorImpl
 	    }
 	    try {
 		messageHeader = header;
-		MessageMediator mediator = null;
+		CorbaMessageMediator mediator = null;
 		CDRInputObject inputObject = null;
 
 		if (connection.isServer()) {
@@ -1459,8 +1453,8 @@ public class CorbaMessageMediatorImpl
 			   + ": " + header);
 		}
 
-		MessageMediator mediator = null;
-		InputObject inputObject = null;
+		CorbaMessageMediator mediator = null;
+		CDRInputObject inputObject = null;
 
 		if (connection.isServer()) {
 		    mediator =
@@ -1630,7 +1624,7 @@ public class CorbaMessageMediatorImpl
         // InputStream. Try out the 1.1 and 1.2 cases.
 
         // was the request 1.2 ?
-	MessageMediator mediator = connection.serverRequestMapGet(cancelReqId);
+	CorbaMessageMediator mediator = connection.serverRequestMapGet(cancelReqId);
 	int requestId ;
         if (mediator == null) { 
 	    // was the request 1.1 ?
@@ -1795,11 +1789,11 @@ public class CorbaMessageMediatorImpl
         // release NIO ByteBuffers to ByteBufferPool
 
         try {
-            OutputObject outputObj = messageMediator.getOutputObject();
+            CDROutputObject outputObj = messageMediator.getOutputObject();
             if (outputObj != null) {
 		outputObj.close();
             }
-            InputObject inputObj = messageMediator.getInputObject();
+            CDRInputObject inputObj = messageMediator.getInputObject();
             if (inputObj != null) {
 		inputObj.close();
             }
@@ -1949,19 +1943,15 @@ public class CorbaMessageMediatorImpl
 	if (msg.getGIOPVersion().lessThan(GIOPVersion.V1_2)) {
 	    // locate msgs 1.0 & 1.1 :=> grow, 
 	    // REVISIT - build from factory
-	    outputObject = new CDROutputObject(
-		             (ORB) messageMediator.getBroker(),
-			     this,
+	    outputObject = new CDROutputObject( messageMediator.getBroker(), this,
 			     GIOPVersion.V1_0,
-			     (CorbaConnection) messageMediator.getConnection(),
+			     messageMediator.getConnection(),
 			     reply,
 			     ORBConstants.STREAM_FORMAT_VERSION_1);
 	} else {
 	    // 1.2 :=> stream
 	    // REVISIT - build from factory
-	    outputObject = new CDROutputObject(
-		             (ORB) messageMediator.getBroker(),
-			     messageMediator,
+	    outputObject = new CDROutputObject( messageMediator.getBroker(), messageMediator,
 			     reply,
 			     ORBConstants.STREAM_FORMAT_VERSION_1);
 	}
@@ -2119,10 +2109,10 @@ public class CorbaMessageMediatorImpl
 	    
 	    // REVISIT: via acceptor factory.
 	    CDROutputObject outputObject = new CDROutputObject(
-                (ORB)messageMediator.getBroker(),
+                messageMediator.getBroker(),
 		this,
 		messageMediator.getGIOPVersion(),
-		(CorbaConnection)messageMediator.getConnection(),
+		messageMediator.getConnection(),
 		replyHeader,
 		ORBConstants.STREAM_FORMAT_VERSION_1);
 	    messageMediator.setOutputObject(outputObject);
@@ -2220,7 +2210,7 @@ public class CorbaMessageMediatorImpl
 		((CorbaConnection)messageMediator.getConnection())
 		.serverRequestMapGet(messageMediator.getRequestId());
 
-	    OutputObject existingOutputObject = null;
+	    CDROutputObject existingOutputObject = null;
 	    if (mediator != null) {
 		existingOutputObject = mediator.getOutputObject();
 	    }
@@ -2361,7 +2351,7 @@ public class CorbaMessageMediatorImpl
 		      
 	messageMediator.setReplyHeader(reply);
 
-	OutputObject replyOutputObject;
+	CDROutputObject replyOutputObject;
 	// REVISIT = do not use null.
 	// 
 	if (messageMediator.getConnection() == null) {

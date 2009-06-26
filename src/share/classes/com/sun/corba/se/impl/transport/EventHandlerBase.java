@@ -37,7 +37,7 @@ package com.sun.corba.se.impl.transport;
 
 import java.nio.channels.SelectionKey;
 
-import com.sun.corba.se.pept.transport.EventHandler;
+import com.sun.corba.se.spi.transport.EventHandler;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;

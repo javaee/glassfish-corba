@@ -67,11 +67,11 @@ import org.omg.CORBA.PolicyError;
 
 import org.omg.CORBA.portable.OutputStream;
 
-import com.sun.corba.se.pept.protocol.ClientInvocationInfo ;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-import com.sun.corba.se.pept.transport.Selector ;
-import com.sun.corba.se.pept.transport.TransportManager;
+import com.sun.corba.se.spi.protocol.ClientInvocationInfo ;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.CorbaConnectionCache;
+import com.sun.corba.se.spi.transport.Selector ;
+import com.sun.corba.se.spi.transport.CorbaTransportManager;
 
 import com.sun.corba.se.spi.orb.ORBData;
 import com.sun.corba.se.spi.orb.Operation;
@@ -435,7 +435,7 @@ public class ORBSingleton extends ORB
         throw new SecurityException("ORBSingleton: access denied");
     }
 
-    public TransportManager getTransportManager()
+    public CorbaTransportManager getTransportManager()
     {
         throw new SecurityException("ORBSingleton: access denied");
     }
@@ -752,7 +752,7 @@ public class ORBSingleton extends ORB
 	return null ;
     }
 
-    public ConnectionCache getConnectionCache(ContactInfo contactInfo) 
+    public CorbaConnectionCache getConnectionCache(CorbaContactInfo contactInfo)
     {
 	return null;
     }

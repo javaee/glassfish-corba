@@ -79,7 +79,6 @@ import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
-import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
@@ -88,6 +87,7 @@ import com.sun.corba.se.impl.logging.ActivationSystemException ;
 
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 public class ServerManagerImpl extends _ServerManagerImplBase
     implements BadServerIdHandler
@@ -121,7 +121,7 @@ public class ServerManagerImpl extends _ServerManagerImplBase
 	    orb.getLegacyServerSocketManager()
 	        .legacyGetEndpoint(LegacyServerSocketEndPointInfo.BOOT_NAMING);
 
-	initialPort = ((SocketOrChannelAcceptor)endpoint)
+	initialPort = ((CorbaAcceptor)endpoint)
 	    .getServerSocket().getLocalPort();
         serverTable = new HashMap<Integer,ServerTableEntry>();
 

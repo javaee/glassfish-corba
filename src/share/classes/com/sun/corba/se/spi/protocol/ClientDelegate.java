@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,28 +33,34 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//
-// Created       : 2003 Apr 10 (Thu) 11:30:38 by Harold Carr.
-// Last Modified : 2003 Aug 11 (Mon) 18:36:43 by Harold Carr.
-//
 
-package corba.pept;
+package com.sun.corba.se.spi.protocol;
 
-import java.rmi.Remote; 
-import java.rmi.RemoteException; 
+import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 
-public interface rmiiI
-    extends 
-	Remote 
-{ 
-    String m(String x)
-	throws
-	    RemoteException; 
+/**
+ * <p>The presentation block interacts with the PEPt architecture
+ * via the <code>ClientDelegate</code>.</p>
+ *
+ * @author Harold Carr
+ */
+public interface ClientDelegate 
+{
+    /**
+     * The ORB associated * with an invocation.
+     *
+     * @return ORB
+     */
+    public ORB getBroker();
 
-    void throwCommFailure()
-	throws
-	    RemoteException;
+    /**
+     * Get the CorbaContactInfoList which represents they encoding/protocol/transport 
+     * combinations that may be used to contact the service.
+     *
+     * @return CorbaContactInfoList
+     */
+    public CorbaContactInfoList getContactInfoList();
 }
 
 // End of file.
-

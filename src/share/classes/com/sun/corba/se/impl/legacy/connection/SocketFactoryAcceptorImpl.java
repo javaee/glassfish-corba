@@ -67,11 +67,6 @@ public class SocketFactoryAcceptorImpl
 	super(orb, port, name, type);
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept Acceptor
-    //
-
     public boolean initialize()
     {
 	if (initialized) {

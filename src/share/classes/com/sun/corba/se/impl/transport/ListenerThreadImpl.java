@@ -37,7 +37,7 @@ package com.sun.corba.se.impl.transport;
 
 
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.pept.transport.ListenerThread;
+import com.sun.corba.se.spi.transport.ListenerThread;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;

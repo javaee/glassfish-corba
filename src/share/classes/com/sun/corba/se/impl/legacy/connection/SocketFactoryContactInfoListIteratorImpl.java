@@ -39,7 +39,7 @@ package com.sun.corba.se.impl.legacy.connection;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 import com.sun.corba.se.spi.orb.ORB;
@@ -91,13 +91,8 @@ public class SocketFactoryContactInfoListIteratorImpl
 	}
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.ContactInfoListIterator
-    //
-
     @Override
-    public boolean reportException(ContactInfo contactInfo, 
+    public boolean reportException(CorbaContactInfo contactInfo,
 				   RuntimeException ex)
     {
 	this.failureException = ex;

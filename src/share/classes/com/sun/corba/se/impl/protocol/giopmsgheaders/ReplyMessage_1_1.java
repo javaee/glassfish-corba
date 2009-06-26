@@ -52,7 +52,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.IOR;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.encoding.CDRInputStream;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
@@ -165,7 +165,7 @@ public final class ReplyMessage_1_1 extends Message_1_1
         } else if (this.reply_status == USER_EXCEPTION) {
             // do nothing. The client stub will read the exception from body.
         } else if (this.reply_status == LOCATION_FORWARD) {
-            CDRInputStream cdr = (CDRInputStream) istream;
+            CDRInputObject cdr = (CDRInputObject) istream;
 	    this.ior = IORFactories.makeIOR(orb, (InputStream)cdr) ;
         }
     }

@@ -36,25 +36,90 @@
 
 package com.sun.corba.se.spi.transport;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.ior.IORTemplate;
 
 // REVISIT - impl/poa specific:
 import com.sun.corba.se.impl.oa.poa.Policies;
+import com.sun.corba.se.spi.orb.ORB;
+import java.net.ServerSocket;
 
 /**
  * @author Harold Carr
  */
-public interface CorbaAcceptor
-    extends
-	Acceptor
+public abstract interface CorbaAcceptor
 {
     public String getObjectAdapterId();
     public String getObjectAdapterManagerId();
     public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
 				 String codebase);
     public String getMonitoringName();
+
+    /**
+     * Used to initialize an <code>Acceptor</code>.
+     *
+     * For example, initialization may mean to create a
+     * {@link java.nio.channels.ServerSocketChannel ServerSocketChannel}.
+     *
+     * Note: this must be prepared to be be called multiple times.
+     *
+     * @return <code>true</code> when it performs initializatin
+     * actions (typically the first call.
+     */
+    public boolean initialize();
+
+    /**
+     * Used to determine if an <code>Acceptor</code> has been initialized.
+     *
+     * @return <code>true</code. if the <code>Acceptor</code> has been
+     * initialized.
+     */
+    public boolean initialized();
+
+    public String getConnectionCacheType();
+
+    public void setConnectionCache(CorbaInboundConnectionCache connectionCache);
+
+    public CorbaInboundConnectionCache getConnectionCache();
+
+    /**
+     * Used to determine if the <code>Acceptor</code> should register
+     * with a Selector to handle accept events.
+     *
+     * For example, this may be <em>false</em> in the case of Solaris Doors
+     * which do not actively listen.
+     *
+     * @return <code>true</code> if the <code>Acceptor</code> should be
+     * registered with a Selector.
+     */
+    public boolean shouldRegisterAcceptEvent();
+
+    /**
+     * Accept a connection request.
+     *
+     * This is called either when the selector gets an accept event
+     * for this <code>Acceptor</code> or by a ListenerThread.
+     *
+     * It results in a CorbaConnection being created.
+     */
+    public void accept();
+
+    /**
+     * Close the <code>Acceptor</code>.
+     */
+    public void close();
+
+    public EventHandler getEventHandler();
+
+    public CorbaMessageMediator createMessageMediator(ORB xbroker, CorbaConnection xconnection);
+
+    public CDRInputObject createInputObject(ORB broker, CorbaMessageMediator messageMediator);
+
+    public CDROutputObject createOutputObject(ORB broker, CorbaMessageMediator messageMediator);
+    
+    public ServerSocket getServerSocket();
 }
 
 // End of file.

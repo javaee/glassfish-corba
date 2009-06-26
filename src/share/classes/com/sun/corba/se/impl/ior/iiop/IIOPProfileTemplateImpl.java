@@ -49,8 +49,6 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplateBase ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.ior.ObjectId ;
-import com.sun.corba.se.spi.ior.IdentifiableContainerBase ;
-import com.sun.corba.se.spi.ior.IdentifiableBase ;
 
 import com.sun.corba.se.impl.ior.EncapsulationUtility ;
 
@@ -60,7 +58,7 @@ import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 
 import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 
-import com.sun.corba.se.impl.encoding.CDROutputStream ;
+import com.sun.corba.se.impl.encoding.CDROutputObject ;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.spi.orb.ORB ;
@@ -148,7 +146,7 @@ public class IIOPProfileTemplateImpl extends TaggedProfileTemplateBase
 
         // Use the byte order of the given stream
         OutputStream encapsulatedOS = new EncapsOutputStream( (ORB)os.orb(),
-	    ((CDROutputStream)os).isLittleEndian() ) ;
+	    ((CDROutputObject)os).isLittleEndian() ) ;
 
 	okeyTemplate.write( id, encapsulatedOS ) ;
 	EncapsulationUtility.writeOutputStream( encapsulatedOS, os ) ;

@@ -84,30 +84,21 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.NON_EXISTENT ;
 
-import org.omg.IOP.TAG_INTERNET_IOP ;
 
 import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.oa.OADestroyed ;
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
 import com.sun.corba.se.spi.oa.ObjectAdapterBase ;
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.ior.ObjectId ;
 import com.sun.corba.se.spi.ior.ObjectAdapterId ;
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.IORFactories ;
-import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.IORTemplateList ;
 import com.sun.corba.se.spi.ior.TaggedProfile ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.ForwardException ;
-import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 
 import com.sun.corba.se.impl.ior.POAObjectKeyTemplate ;
 import com.sun.corba.se.impl.ior.ObjectAdapterIdArray ;

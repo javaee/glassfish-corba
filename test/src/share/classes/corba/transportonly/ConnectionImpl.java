@@ -35,32 +35,40 @@
  */
 package corba.transportonly;
 
+import com.sun.corba.se.impl.encoding.CodeSetComponentInfo.CodeSetContext;
+import com.sun.corba.se.spi.ior.IOR;
+import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.se.spi.protocol.CorbaRequestId;
+import com.sun.corba.se.spi.transport.CorbaResponseWaitingRoom;
+import com.sun.org.omg.SendingContext.CodeBase;
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.EventHandler;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.CorbaConnectionCache;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.EventHandler;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
 import com.sun.corba.se.impl.transport.EventHandlerBase;
+import java.util.Queue;
+import org.omg.CORBA.SystemException;
 
 public class ConnectionImpl
     extends
 	EventHandlerBase
     implements
-	Connection,
+	CorbaConnection,
 	Work
 {
     SocketChannel socketChannel;
@@ -133,7 +141,7 @@ public class ConnectionImpl
 	return null;
     }
 
-    public Connection getConnection()
+    public CorbaConnection getConnection()
     {
 	return this;
     }
@@ -197,12 +205,12 @@ public class ConnectionImpl
 	throw new RuntimeException("NOT READY YET");
     }
 
-    public ContactInfo getContactInfo()
+    public CorbaContactInfo getContactInfo()
     {
 	throw new RuntimeException("NOT READY YET");
     }
     
-    public OutputObject createOutputObject(MessageMediator messageMediator)
+    public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator)
     {
 	throw new RuntimeException("NOT READY YET");
     }
@@ -271,34 +279,182 @@ public class ConnectionImpl
     {
 	throw new RuntimeException("NOT READY YET");
     }
-    public void sendWithoutLock(OutputObject outputObject)
+    public void sendWithoutLock(CDROutputObject outputObject)
     {
 	throw new RuntimeException("NOT READY YET");
     }
 
-    public void registerWaiter(MessageMediator messageMediator)
+    public void registerWaiter(CorbaMessageMediator messageMediator)
     {
 	throw new RuntimeException("NOT READY YET");
     }
 
-    public void unregisterWaiter(MessageMediator messageMediator)
+    public void unregisterWaiter(CorbaMessageMediator messageMediator)
     {
 	throw new RuntimeException("NOT READY YET");
     }
 
-    public InputObject waitForResponse(MessageMediator messageMediator)
+    public CDRInputObject waitForResponse(CorbaMessageMediator messageMediator)
     {
 	throw new RuntimeException("NOT READY YET");
     }
 
-    public void setConnectionCache(ConnectionCache connectionCache)
+    public void setConnectionCache(CorbaConnectionCache connectionCache)
     {
 	throw new RuntimeException();
     }
 
-    public ConnectionCache getConnectionCache()
+    public CorbaConnectionCache getConnectionCache()
     {
 	throw new RuntimeException();
+    }
+
+    public boolean shouldUseDirectByteBuffers() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public ByteBuffer read(int size, int offset, int length) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public ByteBuffer read(ByteBuffer byteBuffer, int offset, int length) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void write(ByteBuffer byteBuffer) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void dprint(String msg) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getNextRequestId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public ORB getBroker() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public CodeSetContext getCodeSetContext() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setCodeSetContext(CodeSetContext csc) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public CorbaMessageMediator clientRequestMapGet(int requestId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void clientReply_1_1_Put(CorbaMessageMediator x) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public CorbaMessageMediator clientReply_1_1_Get() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void clientReply_1_1_Remove() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void serverRequest_1_1_Put(CorbaMessageMediator x) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public CorbaMessageMediator serverRequest_1_1_Get() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void serverRequest_1_1_Remove() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean isPostInitialContexts() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setPostInitialContexts() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void purgeCalls(SystemException systemException, boolean die, boolean lockHeld) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setCodeBaseIOR(IOR ior) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public IOR getCodeBaseIOR() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public CodeBase getCodeBase() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void sendCloseConnection(GIOPVersion giopVersion) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void sendMessageError(GIOPVersion giopVersion) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void sendCancelRequest(GIOPVersion giopVersion, int requestId) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void sendCancelRequestWithLock(GIOPVersion giopVersion, int requestId) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public CorbaResponseWaitingRoom getResponseWaitingRoom() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void serverRequestMapPut(int requestId, CorbaMessageMediator messageMediator) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public CorbaMessageMediator serverRequestMapGet(int requestId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void serverRequestMapRemove(int requestId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Queue<CorbaMessageMediator> getFragmentList(CorbaRequestId corbaRequestId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void removeFragmentList(CorbaRequestId corbaRequestId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public SocketChannel getSocketChannel() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void serverRequestProcessingBegins() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void serverRequestProcessingEnds() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void closeConnectionResources() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Socket getSocket() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
 

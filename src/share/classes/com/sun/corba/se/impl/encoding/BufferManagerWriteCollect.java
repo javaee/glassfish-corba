@@ -42,9 +42,9 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
-import com.sun.corba.se.pept.encoding.OutputObject;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.ByteBufferPool;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
 
 /**
  * Collect buffer manager.
@@ -114,8 +114,8 @@ public class BufferManagerWriteCollect extends BufferManagerWrite
 
         Iterator bufs = iterator();
 
-        Connection conn = 
-                          ((OutputObject)outputObject).getMessageMediator().
+        CorbaConnection conn =
+                          ((CDROutputObject)outputObject).getMessageMediator().
                                                        getConnection();
 
         // With the collect strategy, we must lock the connection

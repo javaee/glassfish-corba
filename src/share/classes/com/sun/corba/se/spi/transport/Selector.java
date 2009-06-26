@@ -33,50 +33,27 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//
-// Created       : 2003 Apr 10 (Thu) 11:38:12 by Harold Carr.
-// Last Modified : 2003 Aug 11 (Mon) 18:39:12 by Harold Carr.
-//
+package com.sun.corba.se.spi.transport;
 
-package corba.pept;
-
-import java.rmi.RemoteException;
-import javax.rmi.PortableRemoteObject;
-
-import corba.hcks.U;
-
-public class rmiiIServantConnect
-    extends 
-	PortableRemoteObject
-    implements 
-	rmiiI
+/**
+ * @author Harold Carr
+ */
+public interface Selector
 {
-    public static final String baseMsg = rmiiIServantConnect.class.getName();
-
-    public rmiiIServantConnect ()
-	throws
-	    RemoteException 
-    {
-        super();
-    }
-
-    public String m(String x)
-	throws
-	    RemoteException
-    {
-	String result = Server.filter(x, baseMsg);
-	U.sop(result);
-	return result;
-    }
-
-    public void throwCommFailure()
-	throws
-	    RemoteException
-    {
-	throw new org.omg.CORBA.COMM_FAILURE();
-    }
-
+    public void setTimeout(long timeout);
+    public long getTimeout();
+    public void registerInterestOps(EventHandler eventHandler);
+    public void registerForEvent(EventHandler eventHander);
+    public void unregisterForEvent(EventHandler eventHandler);
+    public void close();
 }
 
 // End of file.
+
+
+
+
+
+
+
 

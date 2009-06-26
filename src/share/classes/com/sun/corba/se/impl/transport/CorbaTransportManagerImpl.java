@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.impl.transport;
 
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,22 +45,13 @@ import java.util.Map;
 import java.nio.ByteBuffer ;
 import java.io.IOException ;
 
-import org.omg.CORBA.INITIALIZE;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
-
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-import com.sun.corba.se.pept.transport.OutboundConnectionCache;
-import com.sun.corba.se.pept.transport.Selector;
+import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.ObjectAdapterId;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.transport.ByteBufferPool;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
@@ -72,17 +62,17 @@ import com.sun.corba.se.spi.transport.MessageTraceManager;
 import com.sun.corba.se.impl.oa.poa.Policies;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.BufferManagerRead;
-
-import com.sun.corba.se.impl.transport.BufferConnectionImpl;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message_1_2;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
+import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
@@ -100,36 +90,31 @@ public class CorbaTransportManagerImpl
 {
     protected ORB orb;
     protected List<CorbaAcceptor> acceptors;
-    protected Map<String,OutboundConnectionCache> outboundConnectionCaches;
-    protected Map<String,InboundConnectionCache> inboundConnectionCaches;
+    protected Map<String,CorbaOutboundConnectionCache> outboundConnectionCaches;
+    protected Map<String,CorbaInboundConnectionCache> inboundConnectionCaches;
     protected Selector selector;
     
     public CorbaTransportManagerImpl(ORB orb) 
     {
 	this.orb = orb;
 	acceptors = new ArrayList<CorbaAcceptor>();
-	outboundConnectionCaches = new HashMap<String,OutboundConnectionCache>();
-	inboundConnectionCaches = new HashMap<String,InboundConnectionCache>();
+	outboundConnectionCaches = new HashMap<String,CorbaOutboundConnectionCache>();
+	inboundConnectionCaches = new HashMap<String,CorbaInboundConnectionCache>();
 	selector = new SelectorImpl(orb);
         orb.mom().register( orb, this ) ;
     }
-
-    ////////////////////////////////////////////////////
-    //
-    // pept TransportManager
-    //
 
     public ByteBufferPool getByteBufferPool(int id)
     {
 	throw new RuntimeException(); 
     }
 
-    public OutboundConnectionCache getOutboundConnectionCache(
-        ContactInfo contactInfo) 
+    public CorbaOutboundConnectionCache getOutboundConnectionCache(
+        CorbaContactInfo contactInfo)
     {
 	synchronized (contactInfo) {
 	    if (contactInfo.getConnectionCache() == null) {
-		OutboundConnectionCache connectionCache = null;
+		CorbaOutboundConnectionCache connectionCache = null;
 		synchronized (outboundConnectionCaches) {
 		    connectionCache = outboundConnectionCaches.get(
                         contactInfo.getConnectionCacheType());
@@ -152,7 +137,7 @@ public class CorbaTransportManagerImpl
 
     @ManagedAttribute
     @Description( "Outbound Connection Cache (client initiated connections)" )
-    public Collection<OutboundConnectionCache> getOutboundConnectionCaches()
+    public Collection<CorbaOutboundConnectionCache> getOutboundConnectionCaches()
     {
 	return outboundConnectionCaches.values();
     }
@@ -160,17 +145,17 @@ public class CorbaTransportManagerImpl
     // Only used for MBeans
     @ManagedAttribute
     @Description( "Inbound Connection Cache (server accepted connections)" )
-    public Collection<InboundConnectionCache> getInboundConnectionCaches()
+    public Collection<CorbaInboundConnectionCache> getInboundConnectionCaches()
     {
 	return inboundConnectionCaches.values();
     }
 
-    public InboundConnectionCache getInboundConnectionCache(
-        Acceptor acceptor) 
+    public CorbaInboundConnectionCache getInboundConnectionCache(
+        CorbaAcceptor acceptor)
     {
 	synchronized (acceptor) {
 	    if (acceptor.getConnectionCache() == null) {
-		InboundConnectionCache connectionCache = null;
+		CorbaInboundConnectionCache connectionCache = null;
 		synchronized (inboundConnectionCaches) {
 		    connectionCache = inboundConnectionCaches.get(
                             acceptor.getConnectionCacheType());
@@ -224,10 +209,10 @@ public class CorbaTransportManagerImpl
 	    if (orb.transportDebugFlag) {
 		dprint(".close->");
 	    }
-            for (OutboundConnectionCache cc : outboundConnectionCaches.values()) {
+            for (CorbaOutboundConnectionCache cc : outboundConnectionCaches.values()) {
                 cc.close() ;
             }
-            for (InboundConnectionCache cc : inboundConnectionCaches.values()) {
+            for (CorbaInboundConnectionCache cc : inboundConnectionCaches.values()) {
                 cc.close() ;
             }
 	    getSelector(0).close();
@@ -256,7 +241,7 @@ public class CorbaTransportManagerImpl
 
 	// REVISIT - initialization will be moved to OA.
 	// Lazy initialization of acceptors.
-        for (Acceptor acc : acceptors) {
+        for (CorbaAcceptor acc : acceptors) {
 	    if (acc.initialize()) {
 		if (acc.shouldRegisterAcceptEvent()) {
 		    orb.getTransportManager().getSelector(0)
@@ -353,7 +338,7 @@ public class CorbaTransportManagerImpl
 
 	return new MessageData() {
 	   public Message[] getMessages() { return messages ; }
-	   public CDRInputStream getStream() { return resultObj ; }
+	   public CDRInputObject getStream() { return resultObj ; }
 	} ;
     }
 

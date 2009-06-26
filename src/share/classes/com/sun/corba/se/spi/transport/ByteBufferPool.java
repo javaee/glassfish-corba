@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,38 +34,25 @@
  * holder.
  */
 
-package com.sun.corba.se.pept.protocol;
+package com.sun.corba.se.spi.transport;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
-import java.util.Iterator;
+import java.nio.ByteBuffer;
 
 /**
- * @author Harold Carr
+ * @author Charlie Hunt
  */
-public interface ClientInvocationInfo 
+public interface ByteBufferPool
 {
-    public Iterator getContactInfoListIterator();
-    
-    public void setContactInfoListIterator(Iterator contactInfoListIterator);
-    
-    public boolean isRetryInvocation();
-    
-    public void setIsRetryInvocation(boolean isRetryInvocation);
-    
-    public int getEntryCount();
-    
-    public void incrementEntryCount();
-    
-    public void decrementEntryCount();
-
-    public void setClientRequestDispatcher(ClientRequestDispatcher clientRequestDispatcher);
-
-    public ClientRequestDispatcher getClientRequestDispatcher();
-
-    public void setMessageMediator(MessageMediator messageMediator);
-
-    public MessageMediator getMessageMediator();
+    public ByteBuffer getByteBuffer(int theSize);
+    public void releaseByteBuffer(ByteBuffer thebb);
+    public int activeCount();
+    /**
+     * Return a new <code>ByteBuffer</code> of at least <code>minimumSize</code>
+     * and copy any bytes in the <code>oldByteBuffer</code> starting at
+     * <code>oldByteBuffer.position()</code> up to <code>oldByteBuffer.limit()</code>
+     * into the returned <code>ByteBuffer</code>.
+     */
+    public ByteBuffer reAllocate(ByteBuffer oldByteBuffer, int minimumSize);
 }
 
 // End of file.

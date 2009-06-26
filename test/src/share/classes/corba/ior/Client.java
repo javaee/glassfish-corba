@@ -43,7 +43,6 @@ import java.util.List ;
 import java.util.LinkedList ;
 import java.util.Iterator ;
 import java.util.StringTokenizer ;
-import java.util.Arrays ;
 import java.util.ArrayList ;
 
 import org.omg.PortableServer.POA ;
@@ -63,7 +62,6 @@ import org.omg.IOP.TAG_JAVA_CODEBASE ;
 import org.omg.IOP.TAG_ORB_TYPE ;
 import org.omg.IOP.TAG_INTERNET_IOP ;
 
-import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 
 import com.sun.corba.se.spi.ior.Identifiable ;
 import com.sun.corba.se.spi.ior.IdentifiableFactory ;
@@ -87,7 +85,6 @@ import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
-import com.sun.corba.se.spi.ior.ObjectKeyFactory ;
 
 import com.sun.corba.se.spi.activation.POANameHelper ;
 
@@ -118,13 +115,12 @@ import com.sun.corba.se.impl.ior.ObjectAdapterIdNumber ;
 import com.sun.corba.se.impl.ior.ObjectReferenceTemplateImpl ;
 import com.sun.corba.se.impl.ior.ObjectKeyFactoryImpl ;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream ;
-import com.sun.corba.se.impl.encoding.CDROutputStream ;
+import com.sun.corba.se.impl.encoding.CDRInputObject ;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 import org.testng.annotations.Test ;
 import org.testng.Assert ;
@@ -208,27 +204,27 @@ public class Client
 
     private byte[] getBytes( OutputStream os ) 
     {
-	CDROutputStream cos = (CDROutputStream)os ;
+	CDROutputObject cos = (CDROutputObject)os ;
 	byte[] bytes = cos.toByteArray() ;
 	return bytes ;
     }
 
     private byte[] getBytes( InputStream is )
     {
-	CDRInputStream cis = (CDRInputStream)is ;
+	CDRInputObject cis = (CDRInputObject)is ;
 	int len = cis.getBufferLength() ;
 	byte[] result = new byte[ len ] ;
 	cis.read_octet_array( result, 0, len ) ;
 	return result ;
     }
 
-    private CDRInputStream makeInputStream( OutputStream os ) 
+    private CDRInputObject makeInputStream( OutputStream os )
     {
 	byte[] bytes = getBytes( os ) ;
 	return makeInputStream( bytes ) ;
     }
 
-    private CDRInputStream makeInputStream( byte[] data ) 
+    private CDRInputObject makeInputStream( byte[] data )
     {
 	return new EncapsInputStream( orb, data, data.length ) ;
     }
@@ -1237,7 +1233,7 @@ public class Client
 	byte[] fullKey = generator.makeKey( 
 	    ObjectKeyFactoryImpl.JAVAMAGIC_NEWER ) ;
 	OctetSeqHolder osh = new OctetSeqHolder() ;
-	CDRInputStream is = makeInputStream( fullKey ) ;
+	CDRInputObject is = makeInputStream( fullKey ) ;
 	int magic = is.read_long() ;
 	scid = is.read_long() ;
 	temp = new JIDLObjectKeyTemplate( orb, magic, scid, is, osh ) ;
@@ -1815,7 +1811,7 @@ public class Client
 	byte[] fullKey = generator.makeKey( 
 	    ObjectKeyFactoryImpl.JAVAMAGIC_NEWER ) ;
 	OctetSeqHolder osh = new OctetSeqHolder() ;
-	CDRInputStream is = makeInputStream( fullKey ) ;
+	CDRInputObject is = makeInputStream( fullKey ) ;
 	int magic = is.read_long() ;
 	scid = is.read_long() ;
 	temp = new POAObjectKeyTemplate( orb, magic, scid, is, osh ) ;
@@ -1920,7 +1916,7 @@ public class Client
 	out.println( "Testing WireObjectTemplate" ) ;
 
 	byte[] okey = { 0x12, 0x42, 0x36, 0x72, 0x44 } ;
-	CDRInputStream is = new EncapsInputStream( orb, okey, okey.length ) ;
+	CDRInputObject is = new EncapsInputStream( orb, okey, okey.length ) ;
 	OctetSeqHolder osh = new OctetSeqHolder() ;
 
 	WireObjectKeyTemplate temp = new WireObjectKeyTemplate(orb);

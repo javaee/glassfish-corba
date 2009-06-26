@@ -36,33 +36,24 @@
 package com.sun.corba.se.impl.interceptors;
 
 import java.util.*;
-import java.io.IOException;
              
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.BAD_POLICY;
-import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.COMM_FAILURE;
 import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.NVList;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
-import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.UserException;
-import org.omg.CORBA.UNKNOWN;
 
 import org.omg.CORBA.portable.ApplicationException;
 import org.omg.CORBA.portable.RemarshalException;
 
 import org.omg.IOP.CodecFactory;
 
-import org.omg.PortableInterceptor.ForwardRequest;
 import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.Interceptor;
 import org.omg.PortableInterceptor.LOCATION_FORWARD;
 import org.omg.PortableInterceptor.ORBInitializer;
-import org.omg.PortableInterceptor.ORBInitInfo;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.omg.PortableInterceptor.SUCCESSFUL;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
@@ -71,7 +62,6 @@ import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.omg.PortableInterceptor.PolicyFactory;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 
-import com.sun.corba.se.pept.encoding.OutputObject;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
@@ -81,14 +71,12 @@ import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.protocol.PIHandler;
-import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 
 import com.sun.corba.se.impl.logging.InterceptorsSystemException;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.OMGSystemException;
 import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 
 /** 

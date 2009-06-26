@@ -38,17 +38,17 @@ package com.sun.corba.se.impl.transport;
 
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import com.sun.corba.se.spi.monitoring.LongMonitoredAttributeBase;
 import com.sun.corba.se.spi.monitoring.MonitoringConstants;
 import com.sun.corba.se.spi.monitoring.MonitoringFactories;
 import com.sun.corba.se.spi.monitoring.MonitoredObject;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 
 /**
  * @author Harold Carr
@@ -61,30 +61,25 @@ public class CorbaOutboundConnectionCacheImpl
 {
     protected Hashtable connectionCache;
 
-    public CorbaOutboundConnectionCacheImpl(ORB orb, ContactInfo contactInfo) 
+    public CorbaOutboundConnectionCacheImpl(ORB orb, CorbaContactInfo contactInfo)
     {
 	super(orb, contactInfo.getConnectionCacheType(),
 	      ((CorbaContactInfo)contactInfo).getMonitoringName());
 	this.connectionCache = new Hashtable();
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.OutboundConnectionCache
-    //
-    
-    public Connection get(ContactInfo contactInfo) 
+    public CorbaConnection get(CorbaContactInfo contactInfo)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".get: " + contactInfo + " " + contactInfo.hashCode());
 	}
 	synchronized (backingStore()) {
 	    dprintStatistics();
-	    return (Connection) connectionCache.get(contactInfo);
+	    return (CorbaConnection) connectionCache.get(contactInfo);
 	}
     }
     
-    public void put(ContactInfo contactInfo, Connection connection) 
+    public void put(CorbaContactInfo contactInfo, CorbaConnection connection)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".put: " + contactInfo + " " + contactInfo.hashCode() + " "
@@ -97,7 +92,7 @@ public class CorbaOutboundConnectionCacheImpl
 	}
     }
 
-    public void remove(ContactInfo contactInfo)
+    public void remove(CorbaContactInfo contactInfo)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".remove: " + contactInfo + " " + contactInfo.hashCode());
@@ -207,6 +202,7 @@ public class CorbaOutboundConnectionCacheImpl
 	thisMO.addAttribute(attribute);
     }
 
+    @Override
     public String toString()
     {
 	return "CorbaOutboundConnectionCacheImpl["
@@ -214,6 +210,7 @@ public class CorbaOutboundConnectionCacheImpl
 	    + "]";
     }
 
+    @Override
     protected void dprint(String msg)
     {
 	ORBUtility.dprint("CorbaOutboundConnectionCacheImpl", msg);

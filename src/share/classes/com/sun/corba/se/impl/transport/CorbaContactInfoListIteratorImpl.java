@@ -43,12 +43,11 @@ import java.util.HashSet ;
 
 import org.omg.CORBA.COMM_FAILURE;
 import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TRANSIENT;
 
-import com.sun.corba.se.pept.transport.ContactInfo ;
-import com.sun.corba.se.pept.transport.ContactInfoList ;
+import com.sun.corba.se.spi.transport.CorbaContactInfo ;
+import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.orb.ORB ;
@@ -60,7 +59,6 @@ import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
@@ -85,18 +83,18 @@ public class CorbaContactInfoListIteratorImpl
     protected boolean isAddrDispositionRetry;
     protected boolean retryWithPreviousContactInfo;
     protected IIOPPrimaryToContactInfo primaryToContactInfo;
-    protected ContactInfo primaryContactInfo;
+    protected CorbaContactInfo primaryContactInfo;
     protected List<CorbaContactInfo> listOfContactInfos;
     protected TcpTimeouts.Waiter waiter ;
     // Set of endpoints that have failed since the last successful communication
     // with the IOR.
-    protected Set<ContactInfo> failedEndpoints ;
+    protected Set<CorbaContactInfo> failedEndpoints ;
     // End ITERATOR state
 
     public CorbaContactInfoListIteratorImpl(
         ORB orb,
 	CorbaContactInfoList corbaContactInfoList,
-	ContactInfo primaryContactInfo,
+	CorbaContactInfo primaryContactInfo,
 	List listOfContactInfos)
     {
 	this.orb = orb;
@@ -121,7 +119,7 @@ public class CorbaContactInfoListIteratorImpl
 	this.failureException = null;
 
 	this.waiter = tcpTimeouts.waiter() ;
-	this.failedEndpoints = new HashSet<ContactInfo>() ;
+	this.failedEndpoints = new HashSet<CorbaContactInfo>() ;
 
 	primaryToContactInfo = orb.getORBData().getIIOPPrimaryToContactInfo();
     }
@@ -249,17 +247,12 @@ public class CorbaContactInfoListIteratorImpl
 	throw new UnsupportedOperationException();
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // com.sun.corba.se.pept.transport.ContactInfoListIterator
-    //
-
-    public ContactInfoList getContactInfoList()
+    public CorbaContactInfoList getContactInfoList()
     {
 	return contactInfoList;
     }
 
-    public void reportSuccess(ContactInfo contactInfo)
+    public void reportSuccess(CorbaContactInfo contactInfo)
     {
 	if (debug) {
 	    dprint(".reportSuccess: " + contactInfo);
@@ -268,7 +261,7 @@ public class CorbaContactInfoListIteratorImpl
 	waiter.reset() ; // not strictly necessary
     }
 
-    public boolean reportException(ContactInfo contactInfo, 
+    public boolean reportException(CorbaContactInfo contactInfo,
 				   RuntimeException ex) {
 	boolean result = false;
 	try {

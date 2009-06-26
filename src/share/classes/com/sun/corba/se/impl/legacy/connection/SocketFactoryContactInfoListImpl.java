@@ -61,11 +61,6 @@ public class SocketFactoryContactInfoListImpl
 	super(orb, targetIOR);
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ContactInfoList
-    //
-
     public Iterator iterator()
     {
 	return new SocketFactoryContactInfoListIteratorImpl(orb, this);

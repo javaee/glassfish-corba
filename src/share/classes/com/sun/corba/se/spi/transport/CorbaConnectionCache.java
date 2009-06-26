@@ -45,7 +45,7 @@ public interface CorbaConnectionCache
 
     public String getCacheType();
 
-    public void stampTime(Connection connection);
+    public void stampTime(CorbaConnection connection);
 
     public long numberOfConnections();
 

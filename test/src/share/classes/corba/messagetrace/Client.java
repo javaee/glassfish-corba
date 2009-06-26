@@ -91,7 +91,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message ;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream ;
+import com.sun.corba.se.impl.encoding.CDRInputObject ;
 
 public class Client extends TestCase
 {
@@ -697,7 +697,7 @@ public class Client extends TestCase
 	{
             try {
                 init() ;
-                CDRInputStream str = sentMD.getStream() ;
+                CDRInputObject str = sentMD.getStream() ;
                 byte[] arr1 = (byte[])str.read_value( byte[].class ) ;
                 assertTrue( "First array is not the same as the original",
                     equalArrays( data1, arr1 ) ) ;

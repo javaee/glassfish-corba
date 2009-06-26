@@ -82,7 +82,7 @@ import org.omg.PortableServer.ServantRetentionPolicyValue;
 //import org.omg.PortableServer.CurrentHelper; REVISIT
 
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.pept.transport.Connection;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
@@ -587,7 +587,7 @@ public class U
 			((com.sun.corba.se.impl.transport.CorbaConnectionCacheBase)transportManager.getInboundConnectionCache(acceptor)).values();
 		    i = connections.iterator();
 		    while (i.hasNext()) {
-			Connection connection = (Connection) i.next();
+			CorbaConnection connection = (CorbaConnection) i.next();
 			CloseThread closeThread = new CloseThread(connection);
 			closeThread.start();
 		    }
@@ -822,8 +822,8 @@ public class U
 
 class CloseThread extends Thread
 {
-    Connection connection;
-    CloseThread(Connection connection)
+    CorbaConnection connection;
+    CloseThread(CorbaConnection connection)
     {
 	this.connection = connection;
     }

@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
 
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
@@ -68,7 +68,7 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
                              // This happens when invoking a foreign IOR.
 
     private DenseIntMapImpl<CorbaServerRequestDispatcher> SDRegistry ;
-    private DenseIntMapImpl<ClientRequestDispatcher> CSRegistry ;
+    private DenseIntMapImpl<CorbaClientRequestDispatcher> CSRegistry ;
     private DenseIntMapImpl<ObjectAdapterFactory> OAFRegistry ;	
     private DenseIntMapImpl<LocalClientRequestDispatcherFactory> LCSFRegistry ;	
     private Set<ObjectAdapterFactory> objectAdapterFactories ;	
@@ -80,7 +80,7 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
 	this.orb = orb;
         this.defaultId = defaultId;
         SDRegistry = new DenseIntMapImpl<CorbaServerRequestDispatcher>() ;
-        CSRegistry = new DenseIntMapImpl<ClientRequestDispatcher>() ;
+        CSRegistry = new DenseIntMapImpl<CorbaClientRequestDispatcher>() ;
 	OAFRegistry = new DenseIntMapImpl<ObjectAdapterFactory>() ;
 	LCSFRegistry = new DenseIntMapImpl<LocalClientRequestDispatcherFactory>() ;
 	objectAdapterFactories = new HashSet<ObjectAdapterFactory>() ;
@@ -89,7 +89,7 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
     }
 
     public synchronized void registerClientRequestDispatcher( 
-	ClientRequestDispatcher csc, int scid)
+	CorbaClientRequestDispatcher csc, int scid)
     {
 	CSRegistry.set( scid, csc ) ;
     }
@@ -161,9 +161,9 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
 	return factory ;
     }
 
-    public ClientRequestDispatcher getClientRequestDispatcher( int scid )
+    public CorbaClientRequestDispatcher getClientRequestDispatcher( int scid )
     {
-	ClientRequestDispatcher subcontract = CSRegistry.get(scid) ;
+	CorbaClientRequestDispatcher subcontract = CSRegistry.get(scid) ;
 	if (subcontract == null) {
 	    subcontract = CSRegistry.get(defaultId) ;
 	}

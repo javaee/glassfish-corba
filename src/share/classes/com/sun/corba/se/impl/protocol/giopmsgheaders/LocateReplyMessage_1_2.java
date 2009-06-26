@@ -48,8 +48,7 @@ import com.sun.corba.se.spi.ior.IORFactories;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
@@ -155,7 +154,7 @@ public final class LocateReplyMessage_1_2 extends Message_1_2
             }
         } else if ( (this.reply_status == OBJECT_FORWARD) ||
                 (this.reply_status == OBJECT_FORWARD_PERM) ){
-            CDRInputStream cdr = (CDRInputStream) istream;
+            CDRInputObject cdr = (CDRInputObject) istream;
 	    this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
         }  else if (this.reply_status == LOC_NEEDS_ADDRESSING_MODE) {
             // read GIOP::AddressingDisposition from body and resend the

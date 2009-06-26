@@ -34,12 +34,12 @@
  * holder.
  */
 
-package com.sun.corba.se.pept.protocol;
+package com.sun.corba.se.spi.protocol;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 /**
  * <code>ClientRequestDispatcher</code> coordinates the request (and possible
@@ -47,41 +47,34 @@ import com.sun.corba.se.pept.transport.ContactInfo;
  *
  * @author Harold Carr
  */
-public interface ClientRequestDispatcher
+public interface CorbaClientRequestDispatcher
 {
     /**
      * At the beginning of a request the presentation block uses this
-     * to obtain an
-     * {@link com.sun.corba.se.pept.encoding.OutputObject OutputObject}
-     * to set data to be sent on a message.
+     * to obtain an OutputObject to set data to be sent on a message.
      *
      * @param self -
      * @param methodName - the remote method name
      * @param isOneWay - <code>true</code> if the message is asynchronous
-     * @param contactInfo - the
-     * {@link com.sun.corba.se.pept.transport.ContactInfo ContactInfo}
+     * @param contactInfo - the CorbaContactInfo
      * which which created/chose this <code>ClientRequestDispatcher</code>
      *
-     * @return
-     * {@link com.sun.corba.se.pept.encoding.OutputObject OutputObject}
+     * @return OutputObject
      */
-    public OutputObject beginRequest(Object self,
+    public CDROutputObject beginRequest(Object self,
 				     String methodName,
 				     boolean isOneWay,
-				     ContactInfo contactInfo);
+				     CorbaContactInfo contactInfo);
 
     /**
-     * After the presentation block has set data on the
-     * {@link com.sun.corba.se.pept.encoding.OutputObject OutputObject}
+     * After the presentation block has set data on the CDROutputObject
      * it signals the PEPt runtime to send the encoded data by calling this
      * method.
      *
      * @param self -
      * @param outputObject
      *
-     * @return
-     * {@link com.sun.corba.se.pept.encoding.InputObject InputObject}
-     * if the message is synchronous.
+     * @return CDRInputObject if the message is synchronous.
      *
      * @throws
      * {@link org.omg.CORBA.portable.ApplicationException ApplicationException}
@@ -91,8 +84,8 @@ public interface ClientRequestDispatcher
      * {@link org.omg.CORBA.portable.RemarshalException RemarshalException}
      * if the PEPt runtime would like the presentation block to start over.
      */
-    public InputObject marshalingComplete(java.lang.Object self,
-					  OutputObject outputObject)
+    public CDRInputObject marshalingComplete(java.lang.Object self,
+					  CDROutputObject outputObject)
     // REVISIT EXCEPTIONS
 	throws
 	    org.omg.CORBA.portable.ApplicationException, 
@@ -108,9 +101,9 @@ public interface ClientRequestDispatcher
      * @param broker -
      * @param inputObject -
      */
-    public void endRequest(Broker broker,
+    public void endRequest(ORB broker,
 			   java.lang.Object self, 
-			   InputObject inputObject);
+			   CDRInputObject inputObject);
 }
 
 // End of file.

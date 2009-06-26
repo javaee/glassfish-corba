@@ -36,18 +36,11 @@
 
 package com.sun.corba.se.impl.servicecontext;
 
-import java.lang.reflect.InvocationTargetException ;
-import java.lang.reflect.Modifier ;
-import java.lang.reflect.Field ;
-import java.lang.reflect.Constructor ;
-import java.util.Iterator ;
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.concurrent.atomic.AtomicInteger ;
 
 import org.omg.CORBA.OctetSeqHelper;
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 import org.omg.CORBA_2_3.portable.InputStream ;
@@ -64,13 +57,11 @@ import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
 import com.sun.corba.se.spi.servicecontext.ServiceContext ;
 import com.sun.corba.se.spi.servicecontext.ServiceContexts ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
-import com.sun.corba.se.spi.servicecontext.UnknownServiceContext ;
 import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext ;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.impl.util.Utility ;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 public class ServiceContextsImpl implements ServiceContexts 
@@ -204,13 +195,13 @@ public class ServiceContextsImpl implements ServiceContexts
 	    // to the CodeBase for unmarshaling possible
 	    // RMI-IIOP valuetype data within an encapsulation.
 	    // (Known case: UnknownExceptionInfo)
-	    codeBase = ((CDRInputStream)s).getCodeBase();
+	    codeBase = ((CDRInputObject)s).getCodeBase();
 
 
 	    createMapFromInputStream(s);
 
 	    // Fix for bug 4904723
-	    giopVersion = ((CDRInputStream)s).getGIOPVersion();
+	    giopVersion = ((CDRInputObject)s).getGIOPVersion();
 	} finally {
 	    if (orb.serviceContextDebugFlag) {
 		dprint( "<- <init>(InputStream)" ) ;

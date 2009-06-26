@@ -50,10 +50,8 @@ import com.sun.corba.se.spi.servicecontext.ServiceContexts;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
-import com.sun.corba.se.impl.encoding.CDRInputStream_1_2;
-import com.sun.corba.se.impl.encoding.CDROutputStream_1_2;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
@@ -156,7 +154,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
 	    // Ensures that the first read operation called from the stub code,
 	    // during body deconstruction, would skip the header padding, that was
 	    // inserted to ensure that the body was aligned on an 8-octet boundary.
-	    ((CDRInputStream)istream).setHeaderPadding(true);
+	    ((CDRInputObject)istream).setHeaderPadding(true);
 
 	    // The code below reads the reply body in some cases
 	    // SYSTEM_EXCEPTION & LOCATION_FORWARD & LOCATION_FORWARD_PERM &
@@ -187,7 +185,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
 		// do nothing. The client stub will read the exception from body.
 	    } else if ( (this.reply_status == LOCATION_FORWARD) ||
 		    (this.reply_status == LOCATION_FORWARD_PERM) ){
-		CDRInputStream cdr = (CDRInputStream) istream;
+		CDRInputObject cdr = (CDRInputObject) istream;
 		this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
 	    }  else if (this.reply_status == NEEDS_ADDRESSING_MODE) {
 		// read GIOP::AddressingDisposition from body and resend the
@@ -218,7 +216,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
 	    // Ensures that the first write operation called from the stub code,
 	    // during body construction, would insert a header padding, such that
 	    // the body is aligned on an 8-octet boundary.
-	    ((CDROutputStream)ostream).setHeaderPadding(true);
+	    ((CDROutputObject)ostream).setHeaderPadding(true);
 	} finally {
 	    tp.exit_giopHeaderReadReply() ;
 	}

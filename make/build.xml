@@ -89,6 +89,7 @@
         <echo message="local.maven=${local.maven}"/> 
 
         <property name="root.dir"			value="${basedir}"/>
+        <property name="test.lib.dir"                   value="${root.dir}/lib"/>
 
         <!-- Required JAR files -->
         <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
@@ -107,7 +108,7 @@
         <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
         <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
         <property name="gmbal-jar"                      value="${root.dir}/lib/gmbal.jar"/>
-        <property name="felix-jar"                        value="${root.dir}/lib/felix.jar"/>
+        <property name="felix-jar"                      value="${root.dir}/lib/felix.jar"/>
 
         <!-- Places where the build puts things -->
 	<property name="build.dir"                      location="build"/>
@@ -180,13 +181,13 @@
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
 
 	<path id="classpath.master">
+	    <pathelement location="${gmbal-jar}"/>
 	    <pathelement location="${emma.classes.dir}"/>
 	    <pathelement location="${orblib.classes.dir}"/>
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${tools-jar}"/>
 	    <pathelement location="${emma-jar}"/>
 	    <pathelement location="${felix-jar}"/>
-	    <pathelement location="${gmbal-jar}"/>
 	</path>
 
 	<path id="test-classpath.master">

@@ -39,8 +39,6 @@ import java.util.Iterator ;
 
 import org.omg.CORBA.SystemException ;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
-
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.ObjectKey ;
 import com.sun.corba.se.spi.orb.ORB ;
@@ -84,7 +82,7 @@ public class BootstrapServerRequestDispatcher
      * Dispatch is called by the ORB and will serve get(key) and list()
      * invocations on the initial object key.
      */
-    public void dispatch(MessageMediator messageMediator)
+    public void dispatch(CorbaMessageMediator messageMediator)
     {
 	CorbaMessageMediator request = (CorbaMessageMediator) messageMediator;
 	CorbaMessageMediator response = null;

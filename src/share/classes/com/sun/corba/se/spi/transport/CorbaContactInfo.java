@@ -36,24 +36,83 @@
 
 package com.sun.corba.se.spi.transport;
 
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
 
-import com.sun.corba.se.pept.transport.ContactInfo ;
+import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 
 /**
  * @author Harold Carr
  */
-public interface CorbaContactInfo
-    extends ContactInfo, SocketInfo 
+public abstract interface CorbaContactInfo extends SocketInfo
 {
-    public CorbaContactInfoList getContactInfoList() ; // covariant override!
+    public CorbaContactInfoList getContactInfoList() ;
     public IOR getTargetIOR();
     public IOR getEffectiveTargetIOR();
     public IIOPProfile getEffectiveProfile(); // REVISIT - type
     public void setAddressingDisposition(short addressingDisposition);
     public short getAddressingDisposition();
     public String getMonitoringName();
+
+    public ORB getBroker();
+
+    public CorbaClientRequestDispatcher getClientRequestDispatcher();
+
+    /**
+     * Used to determine if a CorbaConnection
+     * will be present in an invocation.
+     *
+     * For example, it may be
+     * <code>false</code> in the case of shared-memory
+     * <code>Input/OutputObjects</code>.
+     *
+     * @return <code>true</code> if a CorbaConnection
+     * will be used for an invocation.
+     */
+    public boolean isConnectionBased();
+
+    /**
+     * Used to determine if the CorbaConnection
+     * used for a request should be cached.
+     *
+     * If <code>true</code> then the ORB will attempt to reuse an existing
+     * CorbaConnection. If
+     * one is not found it will create a new one and cache it for future use.
+     *
+     *
+     * @return <code>true</code> if a CorbaConnection
+     * created by this <code>ContactInfo</code> should be cached.
+     */
+    public boolean shouldCacheConnection();
+
+    public String getConnectionCacheType();
+
+    public void setConnectionCache(CorbaOutboundConnectionCache connectionCache);
+
+    public CorbaOutboundConnectionCache getConnectionCache();
+
+    public CorbaConnection createConnection();
+
+    public CorbaMessageMediator createMessageMediator(ORB broker, 
+        CorbaContactInfo contactInfo, CorbaConnection connection, 
+        String methodName, boolean isOneWay);
+
+    public CorbaMessageMediator createMessageMediator(ORB broker, CorbaConnection connection);
+
+    public CDRInputObject createInputObject(ORB broker, CorbaMessageMediator messageMediator);
+
+    public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator);
+
+    /**
+     * Used to lookup artifacts associated with this <code>ContactInfo</code>.
+     *
+     * @return the hash value.
+     */
+    public int hashCode();
 }
 
 // End of file.

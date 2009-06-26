@@ -45,7 +45,7 @@ public interface CorbaInboundConnectionCache extends CorbaConnectionCache
 
     public void put(CorbaAcceptor acceptor, CorbaConnection connection);
 
-    public void remove(CorbaConnection connection);
+    public void remove( CorbaConnection connection ) ;
 }
 
 // End of file.

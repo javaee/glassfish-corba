@@ -36,20 +36,28 @@
 
 package com.sun.corba.se.spi.transport;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.ResponseWaitingRoom;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import org.omg.CORBA.SystemException;
 
 /**
  * @author Harold Carr
  */
-public interface CorbaResponseWaitingRoom
-    extends
-	ResponseWaitingRoom
-{
+public interface CorbaResponseWaitingRoom{
+    public void registerWaiter(CorbaMessageMediator messageMediator);
+
+    // REVISIT: maybe return void (or MessageMediator).
+    public CDRInputObject waitForResponse(CorbaMessageMediator messageMediator);
+
+    public void responseReceived(CDRInputObject inputObject);
+
+    public void unregisterWaiter(CorbaMessageMediator messageMediator);
+
+    public int numberRegistered();
+
     public void signalExceptionToAllWaiters(SystemException systemException);
 
-    public MessageMediator getMessageMediator(int requestId);
+    public CorbaMessageMediator getMessageMediator(int requestId);
 }
 
 // End of file.

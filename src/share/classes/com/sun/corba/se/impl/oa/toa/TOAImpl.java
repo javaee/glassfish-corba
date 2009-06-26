@@ -42,7 +42,7 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ACTIVE;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
-import com.sun.corba.se.pept.protocol.ClientDelegate ;
+import com.sun.corba.se.spi.protocol.ClientDelegate ;
 
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;

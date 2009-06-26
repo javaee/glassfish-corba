@@ -51,7 +51,7 @@ import corba.framework.Options;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.pept.transport.TransportManager;
+import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.impl.legacy.connection.LegacyServerSocketManagerImpl;
 
@@ -70,7 +70,7 @@ public class Server
 
     public static ORB orb;
     public static InitialContext initialContext;
-    public static TransportManager transportManager;
+    public static CorbaTransportManager transportManager;
     public static POA rootPOA;
     public static POA slPOA;
 

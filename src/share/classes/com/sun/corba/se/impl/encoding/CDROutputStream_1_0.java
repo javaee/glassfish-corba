@@ -80,8 +80,8 @@ import org.omg.CORBA.portable.StreamableValue;
 import org.omg.CORBA.portable.BoxedValueHelper;
 import org.omg.CORBA.portable.ValueBase;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.ByteBufferPool;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.IOR;
@@ -1996,7 +1996,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
         if (getByteBufferWithInfo() != null && getByteBuffer() != null)
         {
-            MessageMediator messageMediator = parent.getMessageMediator();
+            CorbaMessageMediator messageMediator = parent.getMessageMediator();
             if (messageMediator != null)
             {
                 CDRInputObject inputObj = 

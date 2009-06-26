@@ -57,18 +57,14 @@ import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.SystemException;
 
 import com.sun.org.omg.SendingContext.CodeBase;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-import com.sun.corba.se.pept.transport.OutboundConnectionCache;
-import com.sun.corba.se.pept.transport.ResponseWaitingRoom;
-import com.sun.corba.se.pept.transport.Selector;
+import com.sun.corba.se.spi.transport.CorbaConnectionCache;
+import com.sun.corba.se.spi.transport.EventHandler;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
+import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
+import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
@@ -85,7 +81,6 @@ import com.sun.corba.se.spi.transport.CorbaResponseWaitingRoom;
 import com.sun.corba.se.spi.transport.TcpTimeouts;
 
 import com.sun.corba.se.impl.encoding.CachedCodeBase;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
@@ -131,7 +126,7 @@ public class SocketOrChannelConnectionImpl
     // protected for test: genericRPCMSGFramework.IIOPConnection constructor.
     protected CorbaContactInfo contactInfo;
     protected CorbaAcceptor acceptor;
-    protected ConnectionCache connectionCache;
+    protected CorbaConnectionCache connectionCache;
         
     //
     // From iiop.Connection.java
@@ -373,7 +368,7 @@ public class SocketOrChannelConnectionImpl
 		dprint(".readBits->: " + this);
 	    }
 
-	    MessageMediator messageMediator;
+	    CorbaMessageMediator messageMediator;
 	    // REVISIT - use common factory base class.
 	    if (contactInfo != null) {
 		messageMediator =
@@ -911,7 +906,7 @@ public class SocketOrChannelConnectionImpl
 	return acceptor;
     }
 
-    public ContactInfo getContactInfo()
+    public CorbaContactInfo getContactInfo()
     {
 	return contactInfo;
     }
@@ -921,7 +916,7 @@ public class SocketOrChannelConnectionImpl
 	return this;
     }
 
-    public OutputObject createOutputObject(MessageMediator messageMediator)
+    public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator)
     {
 	// REVISIT - remove this method from Connection and all it subclasses.
 	throw new RuntimeException("*****SocketOrChannelConnectionImpl.createOutputObject - should not be called.");
@@ -1104,7 +1099,7 @@ public class SocketOrChannelConnectionImpl
 
     // Assumes the caller handles writeLock and writeUnlock
     // NOTE: This method can throw a connection rebind SystemException.
-    public void sendWithoutLock(OutputObject outputObject)
+    public void sendWithoutLock(CDROutputObject outputObject)
     {
         // Don't we need to check for CloseConnection
         // here?  REVISIT
@@ -1139,27 +1134,27 @@ public class SocketOrChannelConnectionImpl
         }
     }
 
-    public void registerWaiter(MessageMediator messageMediator)
+    public void registerWaiter(CorbaMessageMediator messageMediator)
     {
         responseWaitingRoom.registerWaiter(messageMediator);
     }
 
-    public void unregisterWaiter(MessageMediator messageMediator)
+    public void unregisterWaiter(CorbaMessageMediator messageMediator)
     {
         responseWaitingRoom.unregisterWaiter(messageMediator);
     }
 
-    public InputObject waitForResponse(MessageMediator messageMediator)
+    public CDRInputObject waitForResponse(CorbaMessageMediator messageMediator)
     {
 	return responseWaitingRoom.waitForResponse(messageMediator);
     }
 
-    public void setConnectionCache(ConnectionCache connectionCache)
+    public void setConnectionCache(CorbaConnectionCache connectionCache)
     {
 	this.connectionCache = connectionCache;
     }
 
-    public ConnectionCache getConnectionCache()
+    public CorbaConnectionCache getConnectionCache()
     {
 	return connectionCache;	
     }
@@ -1186,7 +1181,7 @@ public class SocketOrChannelConnectionImpl
 
     //    public Acceptor getAcceptor() - already defined above.
 
-    public Connection getConnection()
+    public CorbaConnection getConnection()
     {
 	return this;
     }
@@ -1249,7 +1244,7 @@ public class SocketOrChannelConnectionImpl
     // spi.transport.CorbaConnection.
     //
 
-    public ResponseWaitingRoom getResponseWaitingRoom()
+    public CorbaResponseWaitingRoom getResponseWaitingRoom()
     {
 	return responseWaitingRoom;
     }
@@ -1353,19 +1348,19 @@ public class SocketOrChannelConnectionImpl
     // new fragments.  Only the ReaderThread touches the clientReplyMap,
     // so it doesn't incur synchronization overhead.
 
-    public MessageMediator clientRequestMapGet(int requestId)
+    public CorbaMessageMediator clientRequestMapGet(int requestId)
     {
 	return responseWaitingRoom.getMessageMediator(requestId);
     }
 
-    protected MessageMediator clientReply_1_1;
+    protected CorbaMessageMediator clientReply_1_1;
 
-    public void clientReply_1_1_Put(MessageMediator x)
+    public void clientReply_1_1_Put(CorbaMessageMediator x)
     {
 	clientReply_1_1 = x;
     }
 
-    public MessageMediator clientReply_1_1_Get()
+    public CorbaMessageMediator clientReply_1_1_Get()
     {
 	return 	clientReply_1_1;
     }
@@ -1375,14 +1370,14 @@ public class SocketOrChannelConnectionImpl
 	clientReply_1_1 = null;
     }
 
-    protected MessageMediator serverRequest_1_1;
+    protected CorbaMessageMediator serverRequest_1_1;
 
-    public void serverRequest_1_1_Put(MessageMediator x)
+    public void serverRequest_1_1_Put(CorbaMessageMediator x)
     {
 	serverRequest_1_1 = x;
     }
 
-    public MessageMediator serverRequest_1_1_Get()
+    public CorbaMessageMediator serverRequest_1_1_Get()
     {
 	return 	serverRequest_1_1;
     }
@@ -1499,10 +1494,10 @@ public class SocketOrChannelConnectionImpl
 	    responseWaitingRoom.signalExceptionToAllWaiters(systemException);
 
 	    if (contactInfo != null) {
-		((OutboundConnectionCache)getConnectionCache()).remove(contactInfo);
+		((CorbaOutboundConnectionCache)connectionCache).remove(contactInfo);
 	    } else if (acceptor != null) {
-		((InboundConnectionCache)getConnectionCache()).remove(this);
-	    }
+                ((CorbaInboundConnectionCache)connectionCache).remove(this) ;
+            }
 
 	    //
 	    // REVISIT: Stop the reader thread

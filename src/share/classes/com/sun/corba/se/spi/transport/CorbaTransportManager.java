@@ -38,12 +38,9 @@ package com.sun.corba.se.spi.transport;
 
 import java.util.Collection;
 
-import com.sun.corba.se.pept.transport.TransportManager;
 import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.ObjectAdapterId;
 
-import com.sun.corba.se.spi.transport.MessageData;
-import com.sun.corba.se.spi.transport.MessageTraceManager;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message ;
 //
 // REVISIT - impl/poa specific:
@@ -52,10 +49,14 @@ import com.sun.corba.se.impl.oa.poa.Policies;
 /**
  * @author Harold Carr
  */
-public interface CorbaTransportManager
-    extends
-	TransportManager
-{
+public interface CorbaTransportManager {
+
+    public ByteBufferPool getByteBufferPool(int id);
+
+    public Selector getSelector(int id);
+
+    public void close();
+
     public static final String SOCKET_OR_CHANNEL_CONNECTION_CACHE =
 	"SocketOrChannelConnectionCache";
 
@@ -105,9 +106,18 @@ public interface CorbaTransportManager
      */
     MessageTraceManager getMessageTraceManager() ;
 
-    void registerAcceptor( CorbaAcceptor acceptor ) ;
+    public CorbaOutboundConnectionCache getOutboundConnectionCache(
+        CorbaContactInfo contactInfo);
 
-    void unregisterAcceptor( CorbaAcceptor acceptor ) ;
+    public Collection<CorbaOutboundConnectionCache> getOutboundConnectionCaches();
+
+    public CorbaInboundConnectionCache getInboundConnectionCache(CorbaAcceptor acceptor);
+
+    public Collection<CorbaInboundConnectionCache> getInboundConnectionCaches();
+
+    public void registerAcceptor(CorbaAcceptor acceptor);
+
+    public void unregisterAcceptor(CorbaAcceptor acceptor);
 }
     
 // End of file.

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,65 +33,37 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//
-// Created       : 2001 Sep 18 (Tue) 11:16:00 by Harold Carr.
-// Last Modified : 2002 Apr 25 (Thu) 16:45:11 by Harold Carr.
-//
 
-package corba.genericRPCMSGFramework;
+package com.sun.corba.se.spi.protocol;
 
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
+import java.util.Iterator;
 
-public class Constants
+/**
+ * @author Harold Carr
+ */
+public interface ClientInvocationInfo 
 {
-    public static final String Header1 = "Header1";
-    public static final String Header2 = "Header2";
-    public static final String Header3 = "Header3";
+    public Iterator getContactInfoListIterator();
+    
+    public void setContactInfoListIterator(Iterator contactInfoListIterator);
+    
+    public boolean isRetryInvocation();
+    
+    public void setIsRetryInvocation(boolean isRetryInvocation);
+    
+    public int getEntryCount();
+    
+    public void incrementEntryCount();
+    
+    public void decrementEntryCount();
 
-    public static final String BasePort1 = "BasePort1";
-    public static final String BasePort2 = "BasePort2";
-    public static final String BasePort3 = "BasePort3";  
+    public void setClientRequestDispatcher(CorbaClientRequestDispatcher clientRequestDispatcher);
 
-    public static boolean jdkIsHopperOrGreater() 
-    {
-        // Should probably use Merlin's new perl-like
-        // feature.
+    public CorbaClientRequestDispatcher getClientRequestDispatcher();
 
-        try {
+    public void setMessageMediator(CorbaMessageMediator messageMediator);
 
-            String version
-                = System.getProperty("java.version");
-
-            System.out.println(" JDK version: " + version);
-
-            StringTokenizer stok
-                = new StringTokenizer(version, ". -_b", false);
-
-            int major = Integer.parseInt(stok.nextToken());
-            if (major > 1)
-                return true;
-
-            if (!stok.hasMoreTokens())
-                return false;
-
-            int dot1 = Integer.parseInt(stok.nextToken());
-            if (dot1 > 4)
-                return true;
-
-            if (!stok.hasMoreTokens())
-                return false;
-
-            int dot2 = Integer.parseInt(stok.nextToken());
-            if (dot2 == 0)
-                return false;
-
-            return true;
-
-        } catch (Exception e) {
-	    throw new RuntimeException(e.toString());
-	}
-    } 
+    public CorbaMessageMediator getMessageMediator();
 }
 
-// End of file
+// End of file.

@@ -42,13 +42,11 @@ import com.sun.corba.se.spi.ior.IOR ;
 
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 
-import com.sun.corba.se.pept.transport.ContactInfoList ;
 
 /**
  * @author Harold Carr
  */
-public interface CorbaContactInfoList
-    extends ContactInfoList
+public abstract interface CorbaContactInfoList
 {
     public Iterator<CorbaContactInfo> iterator() ; // covariant override
     public void setTargetIOR(IOR ior);

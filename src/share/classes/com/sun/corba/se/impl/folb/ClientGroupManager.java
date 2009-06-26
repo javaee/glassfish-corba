@@ -60,7 +60,7 @@ import org.omg.PortableInterceptor.ForwardRequestHelper;
 import org.omg.PortableInterceptor.ORBInitializer;
 import org.omg.PortableInterceptor.ORBInitInfo;
 
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.folb.CSIv2SSLTaggedComponentHandler;
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
@@ -77,6 +77,7 @@ import com.sun.corba.se.spi.orb.ORBConfigurator ;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.impl.interceptors.ClientRequestInfoImpl;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
@@ -375,7 +376,7 @@ public class ClientGroupManager
 
     private Map map = new HashMap();
 
-    public synchronized void reset(ContactInfo primary)
+    public synchronized void reset(CorbaContactInfo primary)
     {
 	initialize();
 	try {
@@ -396,8 +397,8 @@ public class ClientGroupManager
 	}
     }
 
-    public synchronized boolean hasNext(ContactInfo primary,
-					ContactInfo previous,
+    public synchronized boolean hasNext(CorbaContactInfo primary,
+					CorbaContactInfo previous,
 					List contactInfos)
     {
 	initialize();
@@ -452,8 +453,8 @@ public class ClientGroupManager
 	}
     }
 
-    public synchronized ContactInfo next(ContactInfo primary,
-					 ContactInfo previous,
+    public synchronized CorbaContactInfo next(CorbaContactInfo primary,
+					 CorbaContactInfo previous,
 					 List contactInfos)
     {
 	initialize();
@@ -527,7 +528,7 @@ public class ClientGroupManager
 	    if (debug) {
 		dprint(debugMsg + result);
 	    }
-	    return (ContactInfo) result;
+	    return (CorbaContactInfo) result;
 	} catch (Throwable t) {
             dprint("Problem in " + baseMsg + ".next", t);
 	    RuntimeException rte =
@@ -537,7 +538,7 @@ public class ClientGroupManager
 	}
     }
 
-    private Object getKey(ContactInfo contactInfo)
+    private Object getKey(CorbaContactInfo contactInfo)
     {
 	if (((SocketInfo)contactInfo).getPort() == 0) {
 	    // When CSIv2 is used the primary will have a zero port.
@@ -551,7 +552,7 @@ public class ClientGroupManager
     }
 
     private String formatKeyPreviousList(Object key,
-					 ContactInfo previous, List list)
+					 CorbaContactInfo previous, List list)
     {
 	String result =
 	      "\n  key     : " + key

@@ -52,9 +52,8 @@ import org.omg.PortableServer.Servant ;
 
 import org.omg.CORBA.portable.ObjectImpl;
 
-import com.sun.corba.se.pept.broker.Broker ;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
-import com.sun.corba.se.pept.transport.ContactInfoList;
+import com.sun.corba.se.spi.transport.ByteBufferPool;
+import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory ;
@@ -135,6 +134,7 @@ import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
 
+import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
 import java.lang.reflect.Field;
 import org.glassfish.gmbal.ManagedObjectManager ;
 import org.glassfish.gmbal.ManagedObjectManagerFactory ;
@@ -152,7 +152,7 @@ import org.glassfish.gmbal.NameValue ;
 @Description( "The Main ORB Implementation object" ) 
 @AMXMetadata( type="ORB-Root" )
 public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
-    implements Broker, TypeCodeFactory
+    implements TypeCodeFactory
 {   
     // As much as possible, this class should be stateless.  However,
     // there are a few reasons why it is not:
@@ -726,7 +726,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
 	    if (del instanceof CorbaClientDelegate) {
 		CorbaClientDelegate cdel = (CorbaClientDelegate)del ;
-		ContactInfoList cil = cdel.getContactInfoList() ;
+		CorbaContactInfoList cil = cdel.getContactInfoList() ;
 
 		if (cil instanceof CorbaContactInfoList) {
 		    CorbaContactInfoList ccil = (CorbaContactInfoList)cil ;
@@ -849,6 +849,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         return mom ;
     }
 
+    public abstract ClientInvocationInfo createOrIncrementInvocationInfo() ;
+    public abstract ClientInvocationInfo getInvocationInfo();
+    public abstract void releaseOrDecrementInvocationInfo();
+
+    public abstract CorbaTransportManager getTransportManager();
 }
 
 // End of file.

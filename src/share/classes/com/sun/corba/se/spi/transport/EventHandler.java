@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,28 +33,53 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.corba.se.spi.transport;
 
-package com.sun.corba.se.pept.transport;
+import java.nio.channels.SelectableChannel;
+import java.nio.channels.SelectionKey;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.encoding.InputObject;
+import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
 /**
  * @author Harold Carr
+ *
+ * This should only be registered with ONE selector.
  */
-public interface ResponseWaitingRoom 
+public interface EventHandler 
 {
-    public void registerWaiter(MessageMediator messageMediator);
+    public void setUseSelectThreadToWait(boolean x);
+    public boolean shouldUseSelectThreadToWait();
 
-    // REVISIT: maybe return void (or MessageMediator).
-    public InputObject waitForResponse(MessageMediator messageMediator);
-    
-    public void responseReceived(InputObject inputObject);
+    public SelectableChannel getChannel();
 
-    public void unregisterWaiter(MessageMediator messageMediator);
+    public int getInterestOps();
 
-    public int numberRegistered();
+    public void setSelectionKey(SelectionKey selectionKey);
+    public SelectionKey getSelectionKey();
+
+    public void handleEvent();
+
+    // NOTE: if there is more than one interest op this does not
+    // allow discrimination between different ops and how threading
+    // is handled.
+    public void setUseWorkerThreadForEvent(boolean x);
+    public boolean shouldUseWorkerThreadForEvent();
+
+    public void setWork(Work work);
+    public Work getWork();
+
+    // REVISIT: need base class with two derived.
+    public CorbaAcceptor getAcceptor();
+    public CorbaConnection getConnection();
+
 }
 
 // End of file.
+
+
+
+
+
+
+
 

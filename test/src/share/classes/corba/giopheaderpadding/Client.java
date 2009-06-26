@@ -41,7 +41,6 @@
 package corba.giopheaderpadding;
 
 import javax.naming.InitialContext;
-import javax.rmi.CORBA.Util;
 import org.omg.CORBA.ORB;
 
 import corba.framework.Controller;
@@ -49,8 +48,6 @@ import corba.hcks.C;
 import corba.hcks.U;
 
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
-import com.sun.corba.se.impl.encoding.CDRInputStream;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.lang.reflect.*;
 import org.omg.PortableInterceptor.*;

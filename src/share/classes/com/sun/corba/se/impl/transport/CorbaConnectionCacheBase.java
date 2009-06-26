@@ -70,11 +70,6 @@ public abstract class CorbaConnectionCacheBase
 	dprintCreation();
     }
     
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ConnectionCache
-    //
-    
     public String getCacheType()
     {
 	return cacheType;
@@ -107,7 +102,7 @@ public abstract class CorbaConnectionCacheBase
 	synchronized (backingStore()) {
 	    Iterator connections = values().iterator();
 	    while (connections.hasNext()) {
-		if (! ((Connection)connections.next()).isBusy()) {
+		if (! ((CorbaConnection)connections.next()).isBusy()) {
 		    count++;
 		}
 	    }
@@ -121,7 +116,7 @@ public abstract class CorbaConnectionCacheBase
 	synchronized (backingStore()) {
 	    Iterator connections = values().iterator();
 	    while (connections.hasNext()) {
-		if (((Connection)connections.next()).isBusy()) {
+		if (((CorbaConnection)connections.next()).isBusy()) {
 		    count++;
 		}
 	    }
@@ -171,13 +166,13 @@ public abstract class CorbaConnectionCacheBase
 	         //           algorithm could be investigated.
 
 		for (int i=0; i < orb.getORBData().getNumberToReclaim(); i++) {
-		    Connection toClose = null;
+		    CorbaConnection toClose = null;
 		    long lru = java.lang.Long.MAX_VALUE;
 		    Iterator iterator = values().iterator();
 		    
 		    // Find least recently used and not busy connection in cache
 		    while ( iterator.hasNext() ) {
-			Connection c = (Connection) iterator.next();
+			CorbaConnection c = (CorbaConnection) iterator.next();
 			if ( !c.isBusy() && c.getTimeStamp() < lru ) {
 			    toClose = c; 
 			    lru = c.getTimeStamp();

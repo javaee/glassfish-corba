@@ -71,8 +71,6 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.encoding.CodeSetConversion;
-import com.sun.corba.se.impl.encoding.CDRInputStream;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
 
 public interface TypeCodeReader extends MarshalInputStream {
     public void addTypeCodeAtPosition(TypeCodeImpl tc, int position);

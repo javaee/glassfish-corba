@@ -149,7 +149,7 @@ public class Client
 	if (false) {
 	    com.sun.corba.se.spi.ior.IOR ior =
 		((com.sun.corba.se.spi.transport.CorbaContactInfoList)
-		 ((com.sun.corba.se.pept.protocol.ClientDelegate)
+		 ((com.sun.corba.se.spi.protocol.ClientDelegate)
 		  StubAdapter.getDelegate( result )).
 		  getContactInfoList()).getTargetIOR();
 

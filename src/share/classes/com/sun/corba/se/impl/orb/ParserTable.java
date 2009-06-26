@@ -36,6 +36,12 @@
 
 package com.sun.corba.se.impl.orb ;
 
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 import java.net.SocketException;
 import java.net.URL ;
 import java.net.InetSocketAddress;
@@ -55,14 +61,13 @@ import javax.management.ObjectName ;
 import org.omg.PortableInterceptor.ORBInitializer ;
 import org.omg.PortableInterceptor.ORBInitInfo ;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.EventHandler;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.IORTemplate ;
@@ -99,6 +104,7 @@ import com.sun.corba.se.impl.transport.DefaultIORToSocketInfoImpl;
 import com.sun.corba.se.impl.transport.DefaultSocketFactoryImpl;
 import com.sun.corba.se.impl.transport.TcpTimeoutsImpl;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 
 /** Initialize the parser data for the standard ORB parser.  This is used both
  * to implement ORBDataParserImpl and to provide the basic testing framework
@@ -633,19 +639,19 @@ public class ParserTable {
     public static final class TestIIOPPrimaryToContactInfo
 	implements IIOPPrimaryToContactInfo
     {
-	public void reset(ContactInfo primary)
+	public void reset(CorbaContactInfo primary)
 	{
 	}
 
-	public boolean hasNext(ContactInfo primary,
-			       ContactInfo previous,
+	public boolean hasNext(CorbaContactInfo primary,
+			       CorbaContactInfo previous,
 			       List contactInfos)
 	{
 	    return true;
 	}
 
-	public ContactInfo next(ContactInfo primary,
-				ContactInfo previous,
+	public CorbaContactInfo next(CorbaContactInfo primary,
+				CorbaContactInfo previous,
 				List contactInfos)
 	{
 	    return null;
@@ -1012,8 +1018,8 @@ public class ParserTable {
 	public boolean initialize() { return true; }
 	public boolean initialized() { return true; }
 	public String getConnectionCacheType() { return "FOO"; }
-	public void setConnectionCache(InboundConnectionCache connectionCache){}
-	public InboundConnectionCache getConnectionCache() { return null; }
+	public void setConnectionCache(CorbaInboundConnectionCache connectionCache){}
+	public CorbaInboundConnectionCache getConnectionCache() { return null; }
 	public boolean shouldRegisterAcceptEvent() { return true; }
 	public void setUseSelectThreadForConnections(boolean x) { }
 	public boolean shouldUseSelectThreadForConnections() { return true; }
@@ -1022,12 +1028,12 @@ public class ParserTable {
 	public void accept() { }
 	public void close() { }
 	public EventHandler getEventHandler() { return null; }
-	public MessageMediator createMessageMediator(
-            Broker xbroker, Connection xconnection) { return null; }
-	public InputObject createInputObject(
-            Broker broker, MessageMediator messageMediator) { return null; }
-	public OutputObject createOutputObject(
-            Broker broker, MessageMediator messageMediator) { return null; }
+	public CorbaMessageMediator createMessageMediator(
+            ORB xbroker, CorbaConnection xconnection) { return null; }
+	public CDRInputObject createInputObject(
+            ORB broker, CorbaMessageMediator messageMediator) { return null; }
+	public CDROutputObject createOutputObject(
+            ORB broker, CorbaMessageMediator messageMediator) { return null; }
         public String getObjectAdapterId() { return null ; }
         public String getObjectAdapterManagerId() { return null ; }
         public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
@@ -1045,8 +1051,8 @@ public class ParserTable {
 	public boolean initialize() { return true; }
 	public boolean initialized() { return true; }
 	public String getConnectionCacheType() { return "FOO"; }
-	public void setConnectionCache(InboundConnectionCache connectionCache){}
-	public InboundConnectionCache getConnectionCache() { return null; }
+	public void setConnectionCache(CorbaInboundConnectionCache connectionCache){}
+	public CorbaInboundConnectionCache getConnectionCache() { return null; }
 	public boolean shouldRegisterAcceptEvent() { return true; }
 	public void setUseSelectThreadForConnections(boolean x) { }
 	public boolean shouldUseSelectThreadForConnections() { return true; }
@@ -1055,12 +1061,12 @@ public class ParserTable {
 	public void accept() { }
 	public void close() { }
 	public EventHandler getEventHandler() { return null; }
-	public MessageMediator createMessageMediator(
-            Broker xbroker, Connection xconnection) { return null; }
-	public InputObject createInputObject(
-            Broker broker, MessageMediator messageMediator) { return null; }
-	public OutputObject createOutputObject(
-            Broker broker, MessageMediator messageMediator) { return null; }
+	public CorbaMessageMediator createMessageMediator(
+            ORB xbroker, CorbaConnection xconnection) { return null; }
+	public CDRInputObject createInputObject(
+            ORB broker, CorbaMessageMediator messageMediator) { return null; }
+	public CDROutputObject createOutputObject(
+            ORB broker, CorbaMessageMediator messageMediator) { return null; }
         public String getObjectAdapterId() { return null ; }
         public String getObjectAdapterManagerId() { return null ; }
         public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,

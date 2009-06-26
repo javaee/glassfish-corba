@@ -47,15 +47,14 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-import com.sun.corba.se.pept.transport.Selector;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.EventHandler;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
+import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
@@ -118,12 +117,12 @@ public class AcceptorImpl
 	throw new RuntimeException();
     }
 
-    public void setConnectionCache(InboundConnectionCache connectionCache)
+    public void setConnectionCache(CorbaInboundConnectionCache connectionCache)
     {
 	throw new RuntimeException();
     }
 
-    public InboundConnectionCache getConnectionCache()
+    public CorbaInboundConnectionCache getConnectionCache()
     {
 	throw new RuntimeException();
     }
@@ -209,7 +208,7 @@ public class AcceptorImpl
 	return this;
     }
 
-    public Connection getConnection()
+    public CorbaConnection getConnection()
     {
 	return null;
     }
@@ -253,20 +252,20 @@ public class AcceptorImpl
     //
     //
 
-    public MessageMediator createMessageMediator(Broker xbroker,
-						 Connection xconnection)
+    public CorbaMessageMediator createMessageMediator(ORB xbroker,
+						 CorbaConnection xconnection)
     {
 	throw new RuntimeException("NO.");
     }
 
-    public InputObject createInputObject(Broker broker,
-					 MessageMediator messageMediator)
+    public CDRInputObject createInputObject(ORB broker,
+					 CorbaMessageMediator messageMediator)
     {
 	throw new RuntimeException("NO");
     }
 
-    public OutputObject createOutputObject(Broker broker,
-					   MessageMediator messageMediator)
+    public CDROutputObject createOutputObject(ORB broker,
+					   CorbaMessageMediator messageMediator)
     {
 	throw new RuntimeException("NO");
     }

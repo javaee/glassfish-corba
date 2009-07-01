@@ -157,6 +157,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         private static final String PREFIX = "osgi://" ;
 
         public String getCodeBase( Class cls ) {
+            if (cls == null) {
+                return null ;
+            }
+
             Bundle bundle = pkgAdmin.getBundle( cls ) ;
             if (bundle == null) {
                 wrapper.classNotFoundInBundle( cls ) ;
@@ -179,7 +183,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
 
         public Class loadClass( String codebase, String className ) {
-            if (codebase.startsWith( PREFIX )) {
+            if (codebase != null && codebase.startsWith( PREFIX )) {
                 String rest = codebase.substring( PREFIX.length() ) ;
                 int index = rest.indexOf( "/" ) ;
                 if (index > 0) {
@@ -191,7 +195,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                         // I think this is the highest available version
                         try {
                             wrapper.foundClassInBundleVersion( className, name, version ) ;
-                            defBundles[0].loadClass( className ) ;
+                            return defBundles[0].loadClass( className ) ;
                         } catch (ClassNotFoundException cnfe) {
                             wrapper.classNotFoundInBundleVersion( className, name, version ) ;
                             // fall through to return null

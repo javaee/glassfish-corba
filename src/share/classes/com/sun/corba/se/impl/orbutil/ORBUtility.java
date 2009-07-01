@@ -272,8 +272,6 @@ public final class ORBUtility {
 
     private static ValueHandler vhandler = 
         new ValueHandlerImpl() ;
-    private static ValueHandler vhandler_1_3_1 = 
-        new ValueHandlerImpl_1_3_1() ;
 
     /**
      * Creates the correct ValueHandler for the given ORB, 
@@ -282,18 +280,6 @@ public final class ORBUtility {
      * Util.createValueHandler.
      */
     public static ValueHandler createValueHandler(ORB orb) {
-
-        if (orb == null)
-	    return vhandler;
-
-        ORBVersion version = orb.getORBVersion();
-
-        if (version == null)
-            return vhandler;
-
-        if (version.equals(ORBVersionFactory.getNEW()))
-            return vhandler_1_3_1;
-
         return vhandler;
     }
 

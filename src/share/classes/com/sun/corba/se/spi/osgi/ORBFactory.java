@@ -39,7 +39,10 @@ package com.sun.corba.se.spi.osgi;
 import com.sun.corba.se.spi.orb.*;
 import java.util.Properties ;
 
+import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
+
 import com.sun.corba.se.impl.orb.ORBImpl ;
+
 import com.sun.corba.se.impl.osgi.loader.OSGIListener;
 
 /** A simple factory for creating our ORB that avoids the ClassLoader
@@ -60,7 +63,8 @@ public class ORBFactory {
                     result.defaultClassNameResolver()
                 ) );
 
-            // System.out.println( "ORB ClassNameResolver= " + result.classNameResolver() ) ;
+            ClassCodeBaseHandler ccbh = OSGIListener.classCodeBaseHandler() ;
+            result.classCodeBaseHandler( ccbh ) ;
         }
 
         result.setParameters( args, props ) ;

@@ -102,7 +102,7 @@ public abstract class IIOPFactories {
 
     public static IdentifiableFactory makeLoadBalancingComponentFactory()
     {
-        return new EncapsulationFactoryBase(ORBConstants.TAG_REQUEST_PARTITIONING_ID) {
+        return new EncapsulationFactoryBase(ORBConstants.TAG_LOAD_BALANCING_ID) {
             public Identifiable readContents(InputStream in)
 	    {
 		int loadBalancingValue = in.read_ulong();

@@ -191,7 +191,13 @@
 	</path>
 
 	<path id="test-classpath.master">
-            <path refid="classpath.master"/>
+	    <pathelement location="${gmbal-jar}"/>
+	    <pathelement location="${emma.classes.dir}"/>
+	    <pathelement location="${orblib.classes.dir}"/>
+	    <pathelement location="${classes.dir}"/>
+	    <pathelement location="${tools-jar}"/>
+	    <pathelement location="${emma-jar}"/>
+	    <pathelement location="${felix-jar}"/>
 
 	    <pathelement location="${jscheme-jar}"/>
 	    <pathelement location="${jschemelogutil-jar}"/>

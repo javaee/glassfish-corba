@@ -111,11 +111,10 @@
         <property name="ejbcontainer-jar"		value="${root.dir}/lib/ejb-container.jar"/>
         <property name="junit-jar"			value="${root.dir}/lib/ant-junit.jar"/>
         <property name="ant-junit-jar"		        value="${root.dir}/lib/junit.jar"/>
-        <property name="jmxri-jar"			value="${root.dir}/lib/jmxri.jar"/>
         <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
         <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
         <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
-        <property name="felix-jar"                        value="${root.dir}/lib/felix.jar"/>
+        <property name="felix-jar"                      value="${root.dir}/lib/felix.jar"/>
 
         <!-- Places where the build puts things -->
         <property name="build.dir"                      location="build"/>
@@ -184,6 +183,8 @@
         <property name="file.url"                       value="file:/tmp/maven"/>
         <property name="local.url"                      value="file:${local.maven}"/>
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
+
+        <property name="bnd.properties.file"            value="make/bnd/bnd.properties"/>
 
 	<path id="classpath.master">
 	    <pathelement location="${emma.classes.dir}"/>
@@ -752,13 +753,6 @@
 		<include name="com/sun/corba/se/impl/orbutil/concurrent/**"/>
 	    </fileset>
 	</jar>
-   	<jar jarfile="${releaselib.dir}/orbjmx.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="com/sun/corba/se/spi/orbutil/jmx/**"/>
-		<include name="com/sun/corba/se/impl/orbutil/jmx/**"/>
-	    </fileset>
-	</jar>
     </target>
 
     <macrodef name="make-bundle">
@@ -800,7 +794,7 @@
         bnd and the various .bnd files.
     -->
 
-    <target name="make-bundles" depends="init,make-src-bundle">
+    <target name="make-bundles" depends="init,generate-bnd-properties,make-src-bundle">
         <!-- we are not generating bundles for activation or rmic-iiop
              because they are not used in GFv3.
         -->
@@ -1008,6 +1002,7 @@
     
     <!-- ========================= CLEAN ========================= -->
     <target name="clean" depends="init,clean-emma,clean-tests,clean-experimental">
+        <delete file="${bnd.properties.file}"/>
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
 	<delete dir="${test-build.dir}"/>
@@ -1214,7 +1209,7 @@
     </target>
 
     <target name="generate-bnd-properties" depends="init">
-        <propertyfile file="${root.dir}/make/bnd/bnd.properties">
+        <propertyfile file="${bnd.properties.file}">
             <entry key="Bundle-Version" value="${release.version}-${build.version}"/>
         </propertyfile>
     </target> 

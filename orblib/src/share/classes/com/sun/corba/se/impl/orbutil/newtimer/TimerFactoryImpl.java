@@ -55,8 +55,6 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.NamedBase ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
-
 // TimerFactory is a TimerGroup containing all timers and timer groups 
 // that it creates
 // 
@@ -142,8 +140,6 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    + " must be between 0 and " + (nextIndex - 1)) ;
     }
 
-    @ManagedObject( 
-	description="A simple TimerEventHandler that just displays TimerEvents as they occur" ) 
     public static class TracingEventHandler 
 	extends NamedBase 
 	implements TimerEventHandler {

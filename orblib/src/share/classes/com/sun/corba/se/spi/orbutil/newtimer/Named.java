@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.spi.orbutil.newtimer ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
 
 /** A simple interface used to provide access to the name and the
  * factory that created this instance.  All types that are
@@ -45,11 +44,9 @@ import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
 public interface Named {
     /** Return the TimerFactory that created this Named.
      */
-    @ManagedAttribute( description="TimerFactory that created this Timer or TimerGroup" ) 
     TimerFactory factory() ;
 
     /** A short name for this Controllable.
      */
-    @ManagedAttribute( description="Name of this Timer or TimerGroup" ) 
     String name() ;
 }

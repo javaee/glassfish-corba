@@ -47,6 +47,13 @@ import org.osgi.framework.BundleActivator ;
 import org.osgi.framework.SynchronousBundleListener ;
 import org.osgi.framework.BundleContext ;
 import org.osgi.framework.BundleEvent ;
+import org.osgi.framework.ServiceReference ;
+
+import org.osgi.service.packageadmin.PackageAdmin ;
+
+import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
+
+import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 /** OSGi class that monitors which bundles provide classes that the ORB
  * needs to instantiate for initialization.  This class is part of the
@@ -63,7 +70,12 @@ import org.osgi.framework.BundleEvent ;
  * @author ken
  */
 public class OSGIListener implements BundleActivator, SynchronousBundleListener {
+    private static ORBUtilSystemException wrapper =
+        com.sun.corba.se.spi.orb.ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
+
     private static final String ORB_PROVIDER_KEY = "ORB-Class-Provider" ;
+
+    private static PackageAdmin pkgAdmin ;
 
     private static Map<String,Bundle> classNameMap =
         new HashMap<String,Bundle>() ;
@@ -114,27 +126,18 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         UnaryFunction<String,Class<?>> {
 
         public Class<?> evaluate(String arg) {
-            if (DEBUG) {
-                msg( "Looking for class \"" + arg + "\"" ) ;
-            }
-
             Bundle bundle = getBundleForClass( arg ) ;
             if (bundle == null) {
-                if (DEBUG) {
-                    msg( "Class not found" ) ;
-                }
-
+                wrapper.classNotFoundInBundle( arg ) ;
                 return null ;
             } else {
-                if (DEBUG) {
-                    msg( "Found class in bundle " + bundle ) ;
-                }
+                wrapper.foundClassInBundle( arg, bundle ) ;
             }
 
             try {
                 return bundle.loadClass(arg);
             } catch (ClassNotFoundException ex) {
-                throw new RuntimeException( ex ) ;
+                throw wrapper.bundleCouldNotLoadClass( ex, arg, bundle ) ;
             }
         }
 
@@ -150,6 +153,67 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         return classNameResolver ;
     }
 
+    private static class ClassCodeBaseHandlerImpl implements ClassCodeBaseHandler {
+        private static final String PREFIX = "osgi://" ;
+
+        public String getCodeBase( Class cls ) {
+            if (cls == null) {
+                return null ;
+            }
+
+            Bundle bundle = pkgAdmin.getBundle( cls ) ;
+            if (bundle == null) {
+                wrapper.classNotFoundInBundle( cls ) ;
+                return null ;
+            }
+            
+            String name = bundle.getSymbolicName() ;
+
+            Dictionary headers = bundle.getHeaders() ;
+            String version = "0.0.0" ;
+            if (headers != null) {
+                String hver = (String)headers.get( "Bundle-Version" ) ;
+                if (hver != null)
+                    version = hver ;
+            }
+
+            wrapper.foundClassInBundleVersion( cls, name, version ) ;
+
+            return PREFIX + name + "/" + version ;
+        }
+
+        public Class loadClass( String codebase, String className ) {
+            if (codebase != null && codebase.startsWith( PREFIX )) {
+                String rest = codebase.substring( PREFIX.length() ) ;
+                int index = rest.indexOf( "/" ) ;
+                if (index > 0) {
+                    String name = rest.substring( 0, index ) ;
+                    String version = rest.substring( index+1 ) ;
+                    // version is a version range
+                    Bundle[] defBundles = pkgAdmin.getBundles( name, version ) ;
+                    if (defBundles != null) {
+                        // I think this is the highest available version
+                        try {
+                            wrapper.foundClassInBundleVersion( className, name, version ) ;
+                            return defBundles[0].loadClass( className ) ;
+                        } catch (ClassNotFoundException cnfe) {
+                            wrapper.classNotFoundInBundleVersion( className, name, version ) ;
+                            // fall through to return null
+                        }
+                    }
+                }
+            }
+
+            return null ;
+        }
+    }
+
+    private static ClassCodeBaseHandler ccbHandler = new ClassCodeBaseHandlerImpl() ;
+
+    public static ClassCodeBaseHandler classCodeBaseHandler() {
+        return ccbHandler ;
+    }
+
     private static synchronized void insertORBProviders( Bundle bundle ) {
         Dictionary dict = bundle.getHeaders() ;
         String name = bundle.getSymbolicName() ;
@@ -157,10 +221,8 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
             if (orbProvider != null) {
                 for (String className : orbProvider.split(",") ) {
-                    if (DEBUG) {
-                        msg( "Inserting: Bundle " + name + " provides ORB class \"" + className + "\"" ) ;
-                    }
                     classNameMap.put( className, bundle ) ;
+                    wrapper.insertOrbProvider( className, name ) ;
                 }
             }
         }
@@ -174,9 +236,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             if (orbProvider != null) {
                 for (String className : orbProvider.split(",") ) {
                     classNameMap.remove( className ) ;
-                    if (DEBUG) {
-                        msg( "Removing: Bundle " + name + " provides ORB class \"" + className + "\"" ) ;
-                    }
+                    wrapper.removeOrbProvider( className, name ) ;
                 }
             }
         }
@@ -189,13 +249,14 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     public void start( BundleContext context ) {
         context.addBundleListener(this);
         // Probe all existing bundles for ORB providers
-        if (DEBUG) {
-            msg( "Starting up: probing all existing bundles for providers" ) ;
-        }
+        wrapper.probeBundlesForProviders() ;
         for (Bundle bundle : context.getBundles()) {
             insertORBProviders( bundle ) ;
         }
         mapContents() ;
+
+        ServiceReference sref = context.getServiceReference( "org.osgi.service.packageadmin.PackageAdmin" ) ;
+        pkgAdmin = (PackageAdmin)context.getService( sref ) ;
     }
 
     public void stop( BundleContext context ) {
@@ -209,10 +270,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         Bundle bundle = event.getBundle() ;
         String name = bundle.getSymbolicName() ;
 
-        if (DEBUG) {
-            msg( "Event type " + getBundleEventType( type ) 
-                + " on bundle " + name ) ;
-        }
+        wrapper.receivedBundleEvent( getBundleEventType( type ), name ) ;
 
         if (type == Bundle.INSTALLED) {
             insertORBProviders( bundle ) ;

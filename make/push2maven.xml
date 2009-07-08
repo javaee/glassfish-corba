@@ -46,43 +46,11 @@
 </tstamp>
 
 <!-- ================================================================== -->
-<!--      Bootstrap - a task getting here the Maven-Ant library         -->
-<!-- ================================================================== -->
-<target name="bootstrap" 
-	description="Fetch Maven library - needed only the first time.">
-   <get
-       src="${maven.ant.dir}/${maven.ant.file}"
-       dest="${lib.dir}/${maven.ant.file}"
-       verbose="true"
-       usetimestamp="true"/>
-</target>
-
-<!-- ================================================================== -->
-<target name="testAntJar"
-    description="Check if the mavn-ant-tasks jar is already present in the lib dir.. .">
-    <condition property="maven.lib.present">
-       <available file="${lib.dir}/${maven.ant.file}"/>
-    </condition>
-</target>
-
-<!-- ================================================================== -->
-<target name="checkmaven" depends="testAntJar"  unless="maven.lib.present">
-     <echo message="fetching ${maven.int.file}"/>
-     <antcall target="bootstrap"/>
-</target>
-
-<!-- ================================================================== -->
-<target name="mavenize" depends="init, checkmaven" description="initialize maven ">
-    <path id="maven-ant-tasks.classpath" 
-	  path="${lib.dir}/${maven.ant.file}" />
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" 
-        uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath">
-    </typedef>
-    <!-- ============Download the SVN provider ====================== -->
+<target name="mavenize" depends="init" description="initialize maven ">
+    <!-- Download the SVN provider-->
     <artifact:install-provider artifactId="wagon-svn" groupId="org.jvnet.wagon-svn" version="1.7">
-    <artifact:remoteRepository id="java.net.maven2.repository" url="http://download.java.net/maven/2/" />
-    <!-- store the provider in temp local repository-->
-    <artifact:localRepository path="/tmp/test"/>
+        <artifact:remoteRepository id="java.net.maven2.repository" url="http://download.java.net/maven/2/" />
+        <!-- store the provider in temp local repository-->
     </artifact:install-provider>
 </target>
 

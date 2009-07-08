@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,30 +33,28 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.orbutil;
 
-import java.io.*;
-import java.util.Hashtable;
+package corba.travelmuse;
 
-/**
- * Implements legacy behavior from Ladybird to maintain
- * backwards compatibility.
- */
-public class IIOPInputStream_1_3_1 extends com.sun.corba.se.impl.io.IIOPInputStream
+import test.Test;
+import corba.framework.*;
+import java.util.*;
+
+public class TravelMuseTest extends CORBATest
 {
-    public IIOPInputStream_1_3_1()
-    	throws java.io.IOException {
-        super();
-    }
 
-    /**
-     * Before JDK 1.3.1_01, the PutField/GetField implementation
-     * actually sent a Hashtable.
-     */
-    public ObjectInputStream.GetField readFields()
-    	throws IOException, ClassNotFoundException, NotActiveException {
+    protected void doTest() throws Throwable
+    {
+	Controller client = createClient( "corba.travelmuse.Client" ) ;
 
-	Hashtable fields = (Hashtable)readObject();
-	return new LegacyHookGetFields(fields);
+	client.start();
+
+	// Wait for the client to finish for up to 2 minutes, then
+	// throw an exception.
+	client.waitFor(120000);
+
+	// Make sure all the processes are shut down.
+	client.stop();
     }
 }
+

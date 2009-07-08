@@ -80,7 +80,7 @@ public class WorkspaceRename {
     } ;
 
     private static final String[] IGNORE_SUFFIXES = {
-	"swo", "swp", "class", "o" 
+	"swo", "swp", "class", "o"
     } ;
 
     private static final String[] IGNORE_NAMES = {

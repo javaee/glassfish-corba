@@ -70,10 +70,21 @@
 	Deliver: not delivered.
 -->
 
-<project name="GlassFish CORBA" default="all" basedir=".." xmlns:artifact="urn:maven-artifact-ant">
+<project name="GlassFish CORBA" default="all" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
     <description>
 	This is the Ant file that builds the PEORB.
     </description>
+
+    <property name="root.dir"			value="${basedir}"/>
+    <property name="maven.ant.file"                 value="maven-ant-tasks-2.0.10.jar"/>
+
+    <!-- set up for the maven ant tasks -->
+    <path id="maven-ant-tasks.classpath" path="${root.dir}/lib/${maven.ant.file}" />
+
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" 
+        uri="antlib:org.apache.maven.artifact.ant" 
+        classpathref="maven-ant-tasks.classpath">
+    </typedef>
 
     <!-- =================== START HERE =================================== -->
     <target name="build" depends="init, prepare-dirs, compile"/>
@@ -88,9 +99,6 @@
         <property name="local.maven"                    value="${env.HOME}/.m2"/>
         <echo message="local.maven=${local.maven}"/> 
 
-        <property name="root.dir"			value="${basedir}"/>
-        <property name="test.lib.dir"                   value="${root.dir}/lib"/>
-
         <!-- Required JAR files -->
         <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
         <property name="rt.jar"			        value="${java.home}/lib/rt.jar"/>
@@ -103,7 +111,6 @@
         <property name="ejbcontainer-jar"		value="${root.dir}/lib/ejb-container.jar"/>
         <property name="junit-jar"			value="${root.dir}/lib/ant-junit.jar"/>
         <property name="ant-junit-jar"		        value="${root.dir}/lib/junit.jar"/>
-        <property name="jmxri-jar"			value="${root.dir}/lib/jmxri.jar"/>
         <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
         <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
         <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
@@ -111,10 +118,10 @@
         <property name="felix-jar"                      value="${root.dir}/lib/felix.jar"/>
 
         <!-- Places where the build puts things -->
-	<property name="build.dir"                      location="build"/>
-	<property name="findbugs.dir"                   location="build/findbugs"/>
+        <property name="build.dir"                      location="build"/>
+        <property name="lib.dir"                        location="${build.dir}/lib"/>
+        <property name="findbugs.dir"                   location="build/findbugs"/>
 	<property name="gensrc.dir"                     location="${build.dir}/gensrc"/>
-	<property name="lib.dir"                        location="${build.dir}/lib"/>
 	<property name="classes.dir"                    location="${build.dir}/classes"/>
 
 	<property name="releaselib.dir"                 location="${build.dir}/release/lib"/>   
@@ -173,12 +180,11 @@
         <property name="glassfish.cvsroot"              value=":pserver:${glassfish.cvs.username}@cvs.dev.java.net:/cvs"/>
         <property name="orb.version"                    value="${release.version}-${build.version}"/>
         <property name="orb.groupId"                    value="com.sun.corba"/>
-        <property name="maven.ant.file"                 value="maven-ant-tasks-2.0.9.jar"/>
-        <property name="maven.ant.dir"                  value="http://apache.hoxt.com/maven/binaries"/>
         <property name="repo.url"                       value="java-net:/maven2-repository/trunk/repository"/>
         <property name="file.url"                       value="file:/tmp/maven"/>
         <property name="local.url"                      value="file:${local.maven}"/>
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
+        <property name="bnd.properties.file"            value="make/bnd/bnd.properties"/>
 
 	<path id="classpath.master">
 	    <pathelement location="${gmbal-jar}"/>
@@ -191,13 +197,7 @@
 	</path>
 
 	<path id="test-classpath.master">
-	    <pathelement location="${gmbal-jar}"/>
-	    <pathelement location="${emma.classes.dir}"/>
-	    <pathelement location="${orblib.classes.dir}"/>
-	    <pathelement location="${classes.dir}"/>
-	    <pathelement location="${tools-jar}"/>
-	    <pathelement location="${emma-jar}"/>
-	    <pathelement location="${felix-jar}"/>
+            <path refid="classpath.master"/>
 
 	    <pathelement location="${jscheme-jar}"/>
 	    <pathelement location="${jschemelogutil-jar}"/>
@@ -754,13 +754,6 @@
 		<include name="com/sun/corba/se/impl/orbutil/concurrent/**"/>
 	    </fileset>
 	</jar>
-   	<jar jarfile="${releaselib.dir}/orbjmx.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="com/sun/corba/se/spi/orbutil/jmx/**"/>
-		<include name="com/sun/corba/se/impl/orbutil/jmx/**"/>
-	    </fileset>
-	</jar>
     </target>
 
     <macrodef name="make-bundle">
@@ -801,7 +794,7 @@
         bnd and the various .bnd files.
     -->
 
-    <target name="make-bundles" depends="init,make-src-bundle">
+    <target name="make-bundles" depends="init,generate-bnd-properties,make-src-bundle">
         <!-- we are not generating bundles for activation or rmic-iiop
              because they are not used in GFv3.
         -->
@@ -1008,6 +1001,7 @@
     
     <!-- ========================= CLEAN ========================= -->
     <target name="clean" depends="init,clean-emma,clean-tests,clean-experimental">
+        <delete file="${bnd.properties.file}"/>
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
 	<delete dir="${test-build.dir}"/>
@@ -1214,7 +1208,7 @@
     </target>
 
     <target name="generate-bnd-properties" depends="init">
-        <propertyfile file="${root.dir}/make/bnd/bnd.properties">
+        <propertyfile file="${bnd.properties.file}">
             <entry key="Bundle-Version" value="${release.version}-${build.version}"/>
         </propertyfile>
     </target> 

@@ -47,7 +47,6 @@ import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
 import org.omg.CORBA.TCKind ;
-
 import org.omg.PortableServer.Servant ;
 
 import org.omg.CORBA.portable.ObjectImpl;
@@ -297,6 +296,9 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // must be global.  It is initialized here as well.
     private static final PresentationManager globalPM = 
 	PresentationDefaults.makeOrbPresentationManager() ;
+
+    private UnaryFunction<String,Class<?>> classNameResolver = defaultClassNameResolver ;
+    private ClassCodeBaseHandler ccbHandler = null ;
 
     public void destroy() {
         logWrapperTable = null ;
@@ -845,8 +847,17 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public void classNameResolver( UnaryFunction<String,Class<?>> arg ) {
         classNameResolver = arg ;
     }
+
     public ManagedObjectManager mom() {
         return mom ;
+    }
+
+    public ClassCodeBaseHandler classCodeBaseHandler() {
+        return ccbHandler ;
+    }
+
+    public void classCodeBaseHandler( ClassCodeBaseHandler ccbh ) {
+        ccbHandler = ccbh ;
     }
 
     public abstract ClientInvocationInfo createOrIncrementInvocationInfo() ;

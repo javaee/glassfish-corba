@@ -101,6 +101,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
+import com.sun.corba.se.spi.orb.ClassCodeBaseHandler;
 
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
@@ -2314,6 +2315,16 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         RepositoryIdInterface repositoryID 
             = repIdStrs.getFromString(repositoryIDString);
 
+        ClassCodeBaseHandler ccbh = orb.classCodeBaseHandler() ;
+        if (ccbh != null) {
+            String className = repositoryID.getClassName() ;
+            Class result = ccbh.loadClass( codebaseURL, className ) ;
+
+            if (result != null) {
+                return result ;
+            }
+        }
+
         try {
             try {
                 // First try to load the class locally, then use
@@ -2351,61 +2362,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         }
     }
 
-    /**
-     * Attempts to find the class described by the given
-     * repository ID string.  At most, three attempts are made:
-     * Try to find it locally, through the provided URL, and
-     * finally, via a URL from the remote CodeBase.
-     */
-    private Class getClassFromString(String repositoryIDString,
-                                     String codebaseURL)
-    {
-        RepositoryIdInterface repositoryID 
-            = repIdStrs.getFromString(repositoryIDString);
-
-        for (int i = 0; i < 3; i++) {
-
-            try {
-
-                switch (i) 
-                {
-                    case 0:
-                        // First try to load the class locally
-                        return Return.value(repositoryID.getClassFromType());
-                    case 1:
-                        // Try to load the class using the provided
-                        // codebase URL (falls out below)
-                        break;
-                    case 2:
-                        // Try to load the class using a URL from the
-                        // remote CodeBase
-                        codebaseURL = getCodeBase().implementation(repositoryIDString);
-                        break;
-                }
-
-                // Don't bother if the codebaseURL is null
-                if (codebaseURL == null)
-                    continue;
-
-                return Return.value(repositoryID.getClassFromType(codebaseURL));
-
-            } catch(ClassNotFoundException cnfe) {
-                // Will ultimately return null if all three
-                // attempts fail, but don't do anything here.
-            } catch (MalformedURLException mue) {
-		throw wrapper.malformedUrl( CompletionStatus.COMPLETED_MAYBE,
-		    mue, repositoryIDString, codebaseURL ) ;
-            }
-        }
-
-        // If we get here, we have failed to load the class
-        dprint("getClassFromString failed with rep id "
-	       + repositoryIDString
-	       + " and codebase "
-	       + codebaseURL);
-        
-        return Return.value(null);
-    }
 
     // Utility method used to get chars from bytes
     char[] getConvertedChars(int numBytes,

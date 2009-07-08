@@ -36,12 +36,8 @@
 
 package com.sun.corba.se.spi.orbutil.newtimer ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedData ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
-
 /** A simple read-only holder for accumulated statistics.
  */
-@ManagedData( description="Statistics recorded for a series of time intervals" )
 public class Statistics {
     private final long count ;
     private final double min ;
@@ -61,29 +57,24 @@ public class Statistics {
 
     /** Return the number of data points recorded.
      */
-    @ManagedAttribute( description="Total number of intervals recorded" ) 
     public long count() { return count ; }
 
     /** Return the minimum value of call data points records.
      */
-    @ManagedAttribute( description="Minimum interval duration recorded" ) 
     public double min() { return min ; }
 
     /** Return the maximum value of call data points records.
      */
-    @ManagedAttribute( description="Maximum interval duration recorded" ) 
     public double max() { return max ; }
 
     /** Return the current average of the data, or -1 if there is no
      * data.
      */
-    @ManagedAttribute( description="Average interval duration recorded" ) 
     public double average() { return average ; }
 
     /** Return the standard deviation of the data, or -1 if there is
      * no data.
      */
-    @ManagedAttribute( description="Standard deviation of all durations recorded" ) 
     public double standardDeviation() { return standardDeviation ; }
 
     public boolean equals( Object obj ) {

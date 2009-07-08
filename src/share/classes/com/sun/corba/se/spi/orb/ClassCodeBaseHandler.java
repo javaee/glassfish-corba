@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,49 +33,26 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.orbutil.jmx ;
 
-import java.lang.annotation.Documented ;
-import java.lang.annotation.Target ;
-import java.lang.annotation.ElementType ;
-import java.lang.annotation.Retention ;
-import java.lang.annotation.RetentionPolicy ;
+package com.sun.corba.se.spi.orb;
 
-/** This annotation defines an attribute in open MBean (ManagedObject) or 
- * CompositeData (ManagedData).  It is useful in cases where the parent class 
- * cannot be annotated (for example, Object.toString(), or a framework class 
- * that must be extended
- * but cannot be modified).  The attribute id is defined in the annotation, and 
- * it is implemented by the methods inherited by the Managed entity. 
- * <p>
- * An example of a use of this is to handle @ManagedData that inherits from
- * Collection<X>, and it is desired to display a read-only attribute containing
- * the elements of the Collection.  Simple add the annotation
- * <p>
- * @InheritedAttribute( methodName="iterator" )
- * <p>
- * to handle this case.  Note that this only supports read-only attributes.
- */
-@Documented 
-@Target(ElementType.TYPE) 
-@Retention(RetentionPolicy.RUNTIME)
-public @interface InheritedAttribute {
-    /** The description of the attribute.  Should be a key to a resource
-     * bundle for I18N support.
+public interface ClassCodeBaseHandler {
+    /** Returns some sort of codebase for the given class, or null.
+     * It is expected that, if str is the result of getCodeBase( cls ), 
+     * then loadClass( str, cls.getClassName() ) will return cls.
+     * <return>A codebase to use with this handler, or null if this handler
+     * does not apply to this class.
      */
-    String description() default "" ;
+    String getCodeBase( Class cls ) ;
 
-    /** The name of the attribute,  This class must inherit a method whose name
-     * corresponds to this id in one of the standard ways.
+    /** load a class given the classname and a codebase.
+     * The className will always satisfy cls.getClassName().equals( className ) 
+     * if the call succeeds and returns a Class.
+     * <param>codebase A string that somehow describes which ClassLoader to use.
+     * For example, the string could be an ordinary URL that a URL ClassLoader can use,
+     * or something more specialized, such as a description of an OSGi bundles and version.
+     * <param>className The name of the class to load.
+     * <return>The loaded class, or null if the class could not be loaded.
      */
-    String id() default "" ;
-
-    /** The name of the method implementing this attribute.  At least one of
-     * id and methodName must not be empty.  If only one is given, the other
-     * is derived according to the extended attribute name rules.
-     */
-    String methodName() default "" ;
+    Class loadClass( String codebase, String className ) ;
 }
-
-
-

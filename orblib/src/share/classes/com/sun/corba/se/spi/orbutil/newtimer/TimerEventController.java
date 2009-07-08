@@ -38,14 +38,10 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import java.util.Set ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObject ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
-
 /** Creates timer events and sends them to all registered event
  * handlers.  Multiple controllers may be created from the
  * same TimerFactory.
  */
-@ManagedObject( description="Controls entering and exiting Timers" ) 
 public class TimerEventController extends TimerEventControllerBase {
 
     public TimerEventController( TimerFactory factory, String name ) {
@@ -57,7 +53,6 @@ public class TimerEventController extends TimerEventControllerBase {
      * TimerEventHandlers.  An event is only generated in
      * case timer.isActivated() is true.
      */
-    @ManagedOperation( description="Enter a particular Timer" ) 
     public void enter( Timer timer ) {
 	handle( timer, TimerEvent.TimerEventType.ENTER ) ;
     }
@@ -67,7 +62,6 @@ public class TimerEventController extends TimerEventControllerBase {
      * TimerEventHandlers.  An event is only generated in
      * case timer.isActivated() is true.
      */
-    @ManagedOperation( description="Exit a particular Timer" ) 
     public void exit( Timer timer ) {
 	handle( timer, TimerEvent.TimerEventType.EXIT ) ;
     }

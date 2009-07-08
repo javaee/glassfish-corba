@@ -137,6 +137,24 @@
 	     59 WARNING "Exception in ConvertAction operation")
             (IO_EXCEPTION_ON_CLOSE
              60 FINE "Useless exception on call to Closeable.close()")
+            (CLASS_NOT_FOUND_IN_BUNDLE
+             61 FINE "Bundle not found for class {0}")
+            (FOUND_CLASS_IN_BUNDLE
+             62 FINE "Class {0} found in bundle {1}")
+            (BUNDLE_COULD_NOT_LOAD_CLASS
+             63 FINE "Class {0} could not be loaded by bundle {1}")
+            (FOUND_CLASS_IN_BUNDLE_VERSION
+             64 FINE "Class {0} found in bundle {1} with version {2}")
+            (CLASS_NOT_FOUND_IN_BUNDLE_VERSION
+             65 FINE "Class {0} not found in bundle {1} with version {2}")
+            (INSERT_ORB_PROVIDER
+             66 FINE "Inserting ORB provider class {0} from bundle {1}")
+            (REMOVE_ORB_PROVIDER
+             67 FINE "Inserting ORB provider class {0} from bundle {1}")
+            (RECEIVED_BUNDLE_EVENT
+             68 FINE "Received bundle event of type {0} on bundle {1}")
+            (PROBE_BUNDLES_FOR_PROVIDERS
+             69 FINE "Probing all bundles for ORB class providers")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 

@@ -41,40 +41,26 @@ import java.lang.reflect.Method ;
 import java.lang.reflect.InvocationTargetException ;
 
 import java.util.Map ;
-import java.util.HashMap ;
 
 import org.omg.PortableInterceptor.ForwardRequest;
 import org.omg.PortableInterceptor.InvalidSlot;
 import org.omg.PortableInterceptor.RequestInfo;
-import org.omg.PortableInterceptor.LOCATION_FORWARD;
-import org.omg.IOP.TaggedProfile;
-import org.omg.IOP.TaggedComponent;
 import org.omg.IOP.ServiceContextHelper;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.omg.CORBA.ParameterMode;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.Context;
-import org.omg.CORBA.ContextList;
-import org.omg.CORBA.CTX_RESTRICT_SCOPE;
-import org.omg.CORBA.ExceptionList;
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.NamedValue;
-import org.omg.CORBA.NO_IMPLEMENT;
-import org.omg.CORBA.NO_RESOURCES;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.Object;
-import org.omg.CORBA.Policy;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.UNKNOWN;
 import org.omg.CORBA.UserException;
 import org.omg.CORBA.portable.ApplicationException;
-import org.omg.CORBA.portable.Delegate;
 import org.omg.CORBA.portable.InputStream;
              
 import org.omg.Dynamic.Parameter;
@@ -95,10 +81,10 @@ import com.sun.corba.se.spi.servicecontext.UnknownServiceContext;
 
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream_1_0;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.orbutil.DprintUtil;
 
 import com.sun.corba.se.impl.util.RepositoryId;
 
@@ -121,6 +107,7 @@ public abstract class RequestInfoImpl
 
     // The ORB from which to get PICurrent and other info
     protected ORB myORB;
+    protected DprintUtil dputil ;
     protected InterceptorsSystemException wrapper ;
     protected OMGSystemException stdWrapper ;
 
@@ -199,7 +186,8 @@ public abstract class RequestInfoImpl
         startingPointCall = 0;
         intermediatePointCall = 0;
         endingPointCall = 0;
-        replyStatus = UNINITIALIZED;
+        // 6763340
+        setReplyStatus( UNINITIALIZED ) ;
         currentExecutionPoint = EXECUTION_POINT_STARTING;
         alreadyExecuted = false;
 	connection = null;
@@ -249,6 +237,7 @@ public abstract class RequestInfoImpl
         super();
         
         this.myORB = myORB;
+        dputil = new DprintUtil(this) ;
 	wrapper = myORB.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
 	stdWrapper = myORB.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
 

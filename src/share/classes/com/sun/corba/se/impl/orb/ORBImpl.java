@@ -1948,7 +1948,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    }
 	    clientInvocationInfo.decrementEntryCount();
 	    entryCount = clientInvocationInfo.getEntryCount();
-	    if (clientInvocationInfo.getEntryCount() == 0) {
+	    if (clientInvocationInfo.getEntryCount() == 0 
+                // 6763340: don't pop if this is a retry!
+                && !clientInvocationInfo.isRetryInvocation()) {
+
 		invocationInfoStack.pop();
 		if (subcontractDebugFlag) {
 		    dprint(".releaseOrDecrementInvocationInfo: pop");

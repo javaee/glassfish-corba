@@ -120,6 +120,8 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
+import com.sun.corba.se.impl.orbutil.DprintUtil;
+
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ProfileAddr;
@@ -137,6 +139,8 @@ public class CorbaClientRequestDispatcherImpl
 {
     // Used for locking
     private Object lock = new Object();
+    private DprintUtil dputil = new DprintUtil( this ) ;
+
     private ORBVersionServiceContext ovsc = 
                    ServiceContextDefaults.makeORBVersionServiceContext();
 
@@ -147,26 +151,21 @@ public class CorbaClientRequestDispatcherImpl
     public OutputObject beginRequest(Object self, String opName, 
 	boolean isOneWay, ContactInfo contactInfo) {
 
-	ORB orb = null;
-	TimingPoints tp = null ;
+        final CorbaContactInfo corbaContactInfo = (CorbaContactInfo) contactInfo;
+        final ORB orb = (ORB)contactInfo.getBroker();
+
+        if (orb.subcontractDebugFlag) {
+            dputil.enter("beginRequest", "op", opName, "isOneWay", isOneWay, 
+                "contactInfo", contactInfo );
+        }
+
+	final TimingPoints tp = orb.getTimerManager().points() ;
 	try {
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo) contactInfo;
-	    orb = (ORB)contactInfo.getBroker();
-	    tp = orb.getTimerManager().points() ;
 	    tp.enter_totalRequest() ;
 
-	    if (orb.subcontractDebugFlag) {
-		dprint(".beginRequest->: op/" + opName);
-	    }
-
-	    //
 	    // Portable Interceptor initialization.
-	    //
 	    orb.getPIHandler().initiateClientPIRequest( false );
 
-	    //
-	    // Connection.
-	    //
 	    CorbaConnection connection = null;
 
 	    // This locking is done so that multiple connections are not created
@@ -174,7 +173,6 @@ public class CorbaClientRequestDispatcherImpl
 	    synchronized (lock) {
 		if (contactInfo.isConnectionBased()) {
 		    try {
-
 			tp.enter_connectionSetup();
 
 			if (contactInfo.shouldCacheConnection()) {
@@ -184,22 +182,23 @@ public class CorbaClientRequestDispatcherImpl
 
 			if (connection != null) {
 			    if (orb.subcontractDebugFlag) {
-				dprint(".beginRequest: op/" + opName 
-				    + ": Using cached connection: " + connection);
+				dputil.info( "Using cached connection", connection);
 			    }
 			} else {
 			    connection = (CorbaConnection)
 			    contactInfo.createConnection();
 			    if (orb.subcontractDebugFlag) {
-				dprint(".beginRequest: op/" + opName
-				    + ": Using created connection: " + connection);
+				dputil.info( "Using created connection", connection);
 			    }
 
 			    if (connection.shouldRegisterReadEvent()) {
-				// REVISIT: cast
 				orb.getTransportManager().getSelector(0)
 				    .registerForEvent(connection.getEventHandler());
 				connection.setState("ESTABLISHED");
+
+                                if (orb.subcontractDebugFlag) {
+                                    dputil.info( "connection registered" ) ;
+                                }
 			    }
 
 			    // Do not do connection reclaim here since the connections
@@ -211,22 +210,24 @@ public class CorbaClientRequestDispatcherImpl
 					    .getOutboundConnectionCache(contactInfo);
 				connectionCache.stampTime(connection);
 				connectionCache.put(contactInfo, connection);
-			    //		    connectionCache.reclaim();
-			    }
-			}
-		    } finally {
+
+                                if (orb.subcontractDebugFlag) {
+                                    dputil.info( "connection cached" ) ;
+                                }
+                            }
+                        } 
+                    } finally {
 			tp.exit_connectionSetup();
 		    }
-		}
-	    }
+                }
+            }
 
 	    CorbaMessageMediator messageMediator = 
 		(CorbaMessageMediator)contactInfo.createMessageMediator(
 		    orb, contactInfo, connection, opName, isOneWay);
 
 	    if (orb.subcontractDebugFlag) {
-		dprint(".beginRequest: " + opAndId(messageMediator)
-		+ ": created message mediator: " +  messageMediator);
+		dputil.info( "created message mediator", messageMediator);
 	    }
 
 	    // NOTE: Thread data so we can get the mediator in release reply
@@ -252,10 +253,8 @@ public class CorbaClientRequestDispatcherImpl
 	    OutputObject outputObject = contactInfo.createOutputObject(messageMediator);
 
 	    if (orb.subcontractDebugFlag) {
-		dprint(".beginRequest: " + opAndId(messageMediator)
-		+ ": created output object: " + outputObject);
+		dputil.info( "created output object", outputObject );
 	    }
-
 
 	    // NOTE: Not necessary for oneways, but useful for debugging.
 	    // This must be done BEFORE message initialization since fragments
@@ -266,6 +265,9 @@ public class CorbaClientRequestDispatcherImpl
 	    synchronized (lock) {
 		if (contactInfo.isConnectionBased()) {
 		    if (contactInfo.shouldCacheConnection()) {
+                        if (orb.subcontractDebugFlag) {
+                            dputil.info( "reclaiming connections" );
+                        }
 			OutboundConnectionCache connectionCache = orb.getTransportManager()
 			    .getOutboundConnectionCache(contactInfo);
 			connectionCache.reclaim();
@@ -281,8 +283,7 @@ public class CorbaClientRequestDispatcherImpl
 		orb.getPIHandler().invokeClientPIStartingPoint();
 	    } catch( RemarshalException e ) {
 		if (orb.subcontractDebugFlag) {
-		    dprint(".beginRequest: " + opAndId(messageMediator)
-			+ ": Remarshal");
+		    dputil.info( "Remarshal" ) ;
 		}
 
 		// NOTE: We get here because an interceptor raised ForwardRequest
@@ -300,8 +301,21 @@ public class CorbaClientRequestDispatcherImpl
 		// Want to move that update to here.
 		if (getContactInfoListIterator(orb).hasNext()) {
 		    contactInfo = (ContactInfo)getContactInfoListIterator(orb).next();
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "RemarshalException: hasNext true", 
+                            "contact info", contactInfo ) ;
+                    }
+
+                    // Fix for 6763340: Complete the first attempt before starting another.
+                    orb.getPIHandler().makeCompletedClientRequest( 
+                        ReplyMessage.LOCATION_FORWARD, null ) ;
+                    orb.getPIHandler().cleanupClientPIRequest() ;
+
 		    return beginRequest(self, opName, isOneWay, contactInfo);
 		} else {
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "RemarshalException: hasNext false" ) ;
+                    }
 		    ORBUtilSystemException wrapper = 
 			orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ; 
 		    throw wrapper.remarshalWithNowhereToGo();
@@ -310,8 +324,7 @@ public class CorbaClientRequestDispatcherImpl
 
 	    messageMediator.initializeMessage();
 	    if (orb.subcontractDebugFlag) {
-		dprint(".beginRequest: " + opAndId(messageMediator)
-		    + ": initialized message");
+		dputil.info( "initialized message");
 	    }
 
 	    tp.enter_clientEncoding();
@@ -320,7 +333,7 @@ public class CorbaClientRequestDispatcherImpl
 
 	} finally {
 	    if (orb.subcontractDebugFlag) {
-		dprint(".beginRequest<-: op/" + opName);
+                dputil.exit() ;
 	    }
 	}
     }
@@ -331,28 +344,22 @@ public class CorbaClientRequestDispatcherImpl
 	    ApplicationException, 
 	    org.omg.CORBA.portable.RemarshalException
     {
-	ORB orb = null;
-	TimingPoints tp = null;
-	CorbaMessageMediator messageMediator = null;
+        CorbaMessageMediator messageMediator = (CorbaMessageMediator)
+            outputObject.getMessageMediator();
+        ORB orb = (ORB) messageMediator.getBroker();
+        TimingPoints tp = orb.getTimerManager().points() ;
+        if (orb.subcontractDebugFlag) {
+            dputil.enter( "marshalingComplete", "self", self,
+                opAndId( messageMediator ) ) ;
+        }
+
 	try {
-	    messageMediator = (CorbaMessageMediator)
-		outputObject.getMessageMediator();
-
-	    orb = (ORB) messageMediator.getBroker();
-	    tp = orb.getTimerManager().points() ;
-
 	    tp.exit_clientEncoding();
-
-
-	    if (orb.subcontractDebugFlag) {
-		dprint(".marshalingComplete->: " + opAndId(messageMediator));
-	    }
-
 	    tp.enter_clientTransportAndWait();
+
 	    InputObject inputObject = null ;
 	    try {
-		inputObject = 
-		    marshalingComplete1(orb, messageMediator);
+		inputObject = marshalingComplete1(orb, messageMediator);
 	    } finally {
 		tp.exit_clientTransportAndWait();
 	    }
@@ -364,7 +371,7 @@ public class CorbaClientRequestDispatcherImpl
 	    tp.enter_clientDecoding() ;
 
 	    if (orb.subcontractDebugFlag) {
-		dprint(".marshalingComplete<-: " + opAndId(messageMediator));
+		dputil.exit();
 	    }
 	}
     }
@@ -375,21 +382,17 @@ public class CorbaClientRequestDispatcherImpl
 	    ApplicationException, 
 	    org.omg.CORBA.portable.RemarshalException
     {
+        if (orb.subcontractDebugFlag) {
+            dputil.enter("marshalingComplete1", opAndId(messageMediator) ) ;
+        }
+
 	try {
 	    messageMediator.finishSendingRequest();
 
-	    if (orb.subcontractDebugFlag) {
-		dprint(".marshalingComplete: " + opAndId(messageMediator)
-		       + ": finished sending request");
-	    }
-
 	    return messageMediator.waitForResponse();
-
 	} catch (RuntimeException e) {
-
 	    if (orb.subcontractDebugFlag) {
-		dprint(".marshalingComplete: " + opAndId(messageMediator)
-		       + ": exception: " + e.toString());
+		dputil.info( "exception", e.toString());
 	    }
 
 	    boolean retry  =
@@ -404,22 +407,44 @@ public class CorbaClientRequestDispatcherImpl
 
 	    if (retry) {
 		if (newException == e) {
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "Retry true; same exception" ) ;
+                    }
+
 		    continueOrThrowSystemOrRemarshal(messageMediator,
 						     new RemarshalException());
 		} else {
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "Retry true; new exception" ) ;
+                    }
+
 		    continueOrThrowSystemOrRemarshal(messageMediator,
 						     newException);
 		}
 	    } else {
 		// NOTE: Interceptor ending point will run in releaseReply.
-		if (newException instanceof RuntimeException)
+		if (newException instanceof RuntimeException) {
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "Retry false; RuntimeException" ) ;
+                    }
+
 		    throw (RuntimeException)newException ;
-		else 
+		} else {
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "Retry false; other exception" ) ;
+                    }
+
 		    // XXX Not sure what to do in this case, or if it is even possible.
 		    throw e ;
-	    }
+                }
+	    } 
+
 	    return null; // for compiler
-	}
+	} finally {
+            if (orb.subcontractDebugFlag) {
+                dputil.exit();
+            }
+        }
     }
 
     protected InputObject processResponse(ORB orb, 
@@ -434,8 +459,7 @@ public class CorbaClientRequestDispatcherImpl
 	    orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
 	if (orb.subcontractDebugFlag) {
-	    dprint(".processResponse: " + opAndId(messageMediator)
-		   + ": response received");
+	    dputil.enter("processResponse", opAndId(messageMediator) ) ;
 	}
 
 	tp.enter_processResponse() ;
@@ -443,6 +467,9 @@ public class CorbaClientRequestDispatcherImpl
 	    // We know for sure now that we've sent a message.
 	    // So OK to not send initial again.
 	    if (messageMediator.getConnection() != null) {
+                if (orb.subcontractDebugFlag) {
+                    dputil.info( "Non-null connection" ) ;
+                }
 		((CorbaConnection)messageMediator.getConnection())
 		    .setPostInitialContexts();
 	    }
@@ -455,11 +482,17 @@ public class CorbaClientRequestDispatcherImpl
 	    Exception exception = null;
 
 	    if (messageMediator.isOneWay()) {
+                if (orb.subcontractDebugFlag) {
+                    dputil.info( "One way request" ) ;
+                }
 		getContactInfoListIterator(orb)
 		    .reportSuccess(messageMediator.getContactInfo());
 		// Invoke Portable Interceptors with receive_other
 		exception = orb.getPIHandler().invokeClientPIEndingPoint(
 		    ReplyMessage.NO_EXCEPTION, exception );
+                if (orb.subcontractDebugFlag) {
+                    dputil.info( "One way request", "exception", exception ) ;
+                }
 		continueOrThrowSystemOrRemarshal(messageMediator, exception);
 		return null;
 	    }
@@ -472,12 +505,9 @@ public class CorbaClientRequestDispatcherImpl
 	    ((CDRInputObject)inputObject).performORBVersionSpecificInit();
 
 	    if (messageMediator.isSystemExceptionReply()) {
-
 		SystemException se = messageMediator.getSystemExceptionReply();
-
 		if (orb.subcontractDebugFlag) {
-		    dprint(".processResponse: " + opAndId(messageMediator)
-			   + ": received system exception: " + se);
+		    dputil.info( "received system exception", se);
 		}
 
 		boolean doRemarshal =
@@ -485,6 +515,9 @@ public class CorbaClientRequestDispatcherImpl
 			.reportException(messageMediator.getContactInfo(), se);
 
 		if (doRemarshal) {
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "Do remarshal", se);
+                    }
 			
 		    // Invoke Portable Interceptors with receive_exception:
 		    exception = orb.getPIHandler().invokeClientPIEndingPoint(
@@ -493,6 +526,9 @@ public class CorbaClientRequestDispatcherImpl
 		    // If PI did not change the exception, throw a
 		    // Remarshal.
 		    if( se == exception ) {
+                        if (orb.subcontractDebugFlag) {
+                            dputil.info( "Do remarshal: same exception");
+                        }
 			// exception = null is to maintain symmetry with
 			// GenericPOAClientSC.
 			exception = null;
@@ -500,6 +536,9 @@ public class CorbaClientRequestDispatcherImpl
 							 new RemarshalException());
 			throw wrapper.statementNotReachable1() ;
 		    } else {
+                        if (orb.subcontractDebugFlag) {
+                            dputil.info( "Do remarshal: new exception", exception );
+                        }
 			//  Otherwise, throw the exception PI wants thrown.
 			continueOrThrowSystemOrRemarshal(messageMediator,
 							 exception);
@@ -508,6 +547,9 @@ public class CorbaClientRequestDispatcherImpl
 		}
 
 		// No retry, so see if was unknown.
+                if (orb.subcontractDebugFlag) {
+                    dputil.info( "NO remarshal", se);
+                }
 
 		ServiceContexts contexts = 
 		    messageMediator.getReplyServiceContexts();
@@ -520,9 +562,19 @@ public class CorbaClientRequestDispatcherImpl
 			Throwable unknown = usc.getUE() ;
 			UnknownException ue = new UnknownException(unknown);
 
+                        if (orb.subcontractDebugFlag) {
+                            dputil.info( "NO remarshal: UserException available", 
+                                unknown );
+                        }
+
 			// Invoke Portable Interceptors with receive_exception:
 			exception = orb.getPIHandler().invokeClientPIEndingPoint(
 			    ReplyMessage.SYSTEM_EXCEPTION, ue );
+
+                        if (orb.subcontractDebugFlag) {
+                            dputil.info( "NO remarshal: UserException available: PI exception ", 
+                                exception );
+                        }
 
 			continueOrThrowSystemOrRemarshal(messageMediator, exception);
 			throw wrapper.statementNotReachable3() ;
@@ -531,10 +583,17 @@ public class CorbaClientRequestDispatcherImpl
 
 		// It was not a comm failure nor unknown.
 		// This is the general case.
+                if (orb.subcontractDebugFlag) {
+                    dputil.info( "general exception", se);
+                }
 
 		// Invoke Portable Interceptors with receive_exception:
 		exception = orb.getPIHandler().invokeClientPIEndingPoint(
 		    ReplyMessage.SYSTEM_EXCEPTION, se );
+
+                if (orb.subcontractDebugFlag) {
+                    dputil.info( "general exception: PI exception", exception );
+                }
 
 		continueOrThrowSystemOrRemarshal(messageMediator, exception);
 
@@ -542,16 +601,14 @@ public class CorbaClientRequestDispatcherImpl
 		// we should assert in case exception is null somehow.
 		throw wrapper.statementNotReachable4() ;
 	    } else if (messageMediator.isUserExceptionReply()) {
-
-		if (orb.subcontractDebugFlag) {
-		    dprint(".processResponse: " + opAndId(messageMediator)
-			   + ": received user exception");
-		}
-
 		getContactInfoListIterator(orb)
 		    .reportSuccess(messageMediator.getContactInfo());
 
 		String exceptionRepoId = peekUserExceptionId(inputObject);
+		if (orb.subcontractDebugFlag) {
+		    dputil.info( "received user exception", "exceptionRepoId", exceptionRepoId );
+		}
+
 		Exception newException = null;
 
 		if (messageMediator.isDIIRequest()) {
@@ -560,15 +617,24 @@ public class CorbaClientRequestDispatcherImpl
 		    newException = orb.getPIHandler().invokeClientPIEndingPoint(
 				       ReplyMessage.USER_EXCEPTION, exception );
 		    messageMediator.setDIIException(newException);
-		    
+
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "received user exception (DII)", "exception", exception,
+                            "newException", newException );
+                    }
 		} else {
-		    ApplicationException appException =
-			new ApplicationException(
-			    exceptionRepoId,
-			    (org.omg.CORBA.portable.InputStream)inputObject);
+		    ApplicationException appException = new ApplicationException(
+                        exceptionRepoId, (org.omg.CORBA.portable.InputStream)inputObject);
+
 		    exception = appException;
+
 		    newException = orb.getPIHandler().invokeClientPIEndingPoint(
 				       ReplyMessage.USER_EXCEPTION, appException );
+
+                    if (orb.subcontractDebugFlag) {
+                        dputil.info( "received user exception (not DII)", "exception", exception,
+                            "newException", newException );
+                    }
 		}
 
 		if (newException != exception) {
@@ -583,10 +649,8 @@ public class CorbaClientRequestDispatcherImpl
 		return inputObject;
 
 	    } else if (messageMediator.isLocationForwardReply()) {
-
 		if (orb.subcontractDebugFlag) {
-		    dprint(".processResponse: " + opAndId(messageMediator)
-			   + ": received location forward");
+		    dputil.info( "received location forward");
 		}
 		
 		// NOTE: Expects iterator to update target IOR
@@ -613,10 +677,8 @@ public class CorbaClientRequestDispatcherImpl
 		throw wrapper.statementNotReachable5() ;
 
 	    } else if (messageMediator.isDifferentAddrDispositionRequestedReply()){
-
 		if (orb.subcontractDebugFlag) {
-		    dprint(".processResponse: " + opAndId(messageMediator)
-			   + ": received different addressing dispostion request");
+		    dputil.info( "received different addressing dispostion request");
 		}
 
 		// Set the desired target addressing disposition.
@@ -643,10 +705,8 @@ public class CorbaClientRequestDispatcherImpl
 						 new RemarshalException());
 		throw wrapper.statementNotReachable6() ;
 	    } else /* normal response */ {
-
 		if (orb.subcontractDebugFlag) {
-		    dprint(".processResponse: " + opAndId(messageMediator)
-			   + ": received normal response");
+		    dputil.info( "received normal response");
 		}
 
 		getContactInfoListIterator(orb)
@@ -665,6 +725,9 @@ public class CorbaClientRequestDispatcherImpl
 	    }
         } finally {
 	    tp.exit_processResponse() ;
+            if (orb.subcontractDebugFlag) {
+                dputil.exit() ;
+            }
 	}
     }
 
@@ -673,68 +736,64 @@ public class CorbaClientRequestDispatcherImpl
     // of one of these two types.  This is a utility method for
     // the above invoke code which must do this numerous times.
     // If the exception is null, no exception is thrown.
-    //
     // Note that this code is duplicated in GenericPOAClientSC.java
     protected void continueOrThrowSystemOrRemarshal(
         CorbaMessageMediator messageMediator, Exception exception)
         throws 
 	    SystemException, RemarshalException
     {
+        final ORB orb = (ORB) messageMediator.getBroker();
 
-	ORB orb = (ORB) messageMediator.getBroker();
+        if (orb.subcontractDebugFlag) {
+            dputil.enter( "continueOrThrowSystemOrRemarshal", "exception", exception ) ;
+        }
 
-        if( exception == null ) {
+        try {
+            if ( exception == null ) {
+                // do nothing.
+            } else if( exception instanceof RemarshalException ) {
+                // REVISIT - unify with PI handling
+                orb.getInvocationInfo().setIsRetryInvocation(true);
 
-            // do nothing.
+                // NOTE - We must unregister the waiter NOW for this request
+                // since the retry will result in a new request id.  Therefore
+                // the old request id would be lost and we would have a memory
+                // leak in the responseWaitingRoom.
+                unregisterWaiter(orb);
 
-        } else if( exception instanceof RemarshalException ) {
+                if (orb.subcontractDebugFlag) {
+                    dputil.info( "throwing Remarshal" );
+                }
 
-	    // REVISIT - unify with PI handling
-	    orb.getInvocationInfo().setIsRetryInvocation(true);
+                throw (RemarshalException)exception;
 
-	    // NOTE - We must unregister the waiter NOW for this request
-	    // since the retry will result in a new request id.  Therefore
-	    // the old request id would be lost and we would have a memory
-	    // leak in the responseWaitingRoom.
-	    unregisterWaiter(orb);
+            } else {
+                if (orb.subcontractDebugFlag) {
+                    dputil.info( "throwing exception", exception);
+                }
 
-	    if (orb.subcontractDebugFlag) {
-		dprint(".continueOrThrowSystemOrRemarshal: "
-		       + opAndId(messageMediator)
-		       + ": throwing Remarshal");
-	    }
-
-            throw (RemarshalException)exception;
-
-        } else {
-
-	    if (orb.subcontractDebugFlag) {
-		dprint(".continueOrThrowSystemOrRemarshal: "
-		       + opAndId(messageMediator)
-		       + ": throwing sex:" 
-		       + exception);
-	    }
-
-            throw (SystemException)exception;
+                throw (SystemException)exception;
+            }
+        } finally {
+            if (orb.subcontractDebugFlag) {
+                dputil.exit() ;
+            }
         }
     }
 
-    protected CorbaContactInfoListIterator  getContactInfoListIterator(ORB orb)
-    {
+    protected CorbaContactInfoListIterator  getContactInfoListIterator(ORB orb) {
 	return (CorbaContactInfoListIterator)
 	    ((CorbaInvocationInfo)orb.getInvocationInfo())
 	        .getContactInfoListIterator();
     }
 
-    protected void registerWaiter(CorbaMessageMediator messageMediator)
-    {
+    protected void registerWaiter(CorbaMessageMediator messageMediator) {
 	if (messageMediator.getConnection() != null) {
 	    messageMediator.getConnection().registerWaiter(messageMediator);
 	}
     }
 
-    protected void unregisterWaiter(ORB orb)
-    {
+    protected void unregisterWaiter(ORB orb) {
 	MessageMediator messageMediator =
 	    orb.getInvocationInfo().getMessageMediator();
 	if (messageMediator!=null && messageMediator.getConnection() != null) {
@@ -745,8 +804,7 @@ public class CorbaClientRequestDispatcherImpl
 	}
     }
 
-    protected void addServiceContexts(CorbaMessageMediator messageMediator)
-    {
+    protected void addServiceContexts(CorbaMessageMediator messageMediator) {
 	ORB orb = (ORB)messageMediator.getBroker();
 	CorbaConnection c = (CorbaConnection) messageMediator.getConnection();
 	GIOPVersion giopVersion = messageMediator.getGIOPVersion();
@@ -887,11 +945,9 @@ public class CorbaClientRequestDispatcherImpl
 	TimingPoints tp = orb.getTimerManager().points() ;
 
 	try {
-
 	    tp.exit_clientDecoding();
-
 	    if (orb.subcontractDebugFlag) {
-		dprint(".endRequest->:");
+		dputil.enter("endRequest");
 	    }
 
 	    // Note: the inputObject may be null if an error occurs
@@ -900,12 +956,10 @@ public class CorbaClientRequestDispatcherImpl
 
 	    MessageMediator messageMediator =
 		orb.getInvocationInfo().getMessageMediator();
-	    if (messageMediator != null)
-            {
+	    if (messageMediator != null) {
 		ORBUtility.popEncVersionFromThreadLocalState();
 
-                if (messageMediator.getConnection() != null) 
-                {
+                if (messageMediator.getConnection() != null) {
                     ((CorbaMessageMediator)messageMediator)
                               .sendCancelRequestIfFinalFragmentNotSent();
                 }
@@ -945,20 +999,18 @@ public class CorbaClientRequestDispatcherImpl
 	} catch (IOException ex) { 
             // See CDRInput/OutputObject.close() for more info.
             // This won't result in a Corba error if an IOException happens.
-	    if (orb.subcontractDebugFlag)
-            {
-	        dprint(".endRequest: ignoring IOException - " + ex.toString());
+	    if (orb.subcontractDebugFlag) {
+	        dputil.info("ignoring IOException", ex );
             }
 	} finally {
 	    tp.exit_totalRequest() ;
 	    if (orb.subcontractDebugFlag) {
-		dprint(".endRequest<-:");
+		dputil.exit() ;
 	    }
 	}
     }
 
-    protected void performCodeSetNegotiation(CorbaMessageMediator messageMediator)
-    {
+    protected void performCodeSetNegotiation(CorbaMessageMediator messageMediator) {
 	CorbaConnection conn = (CorbaConnection) messageMediator.getConnection();
         if (conn == null)
             return ;
@@ -1003,9 +1055,8 @@ public class CorbaClientRequestDispatcherImpl
         }
     }
 
-    protected void addCodeSetServiceContext(CorbaConnection conn,
-                                          ServiceContexts ctxs,
-                                          GIOPVersion giopVersion) {
+    protected void addCodeSetServiceContext(CorbaConnection conn, 
+        ServiceContexts ctxs, GIOPVersion giopVersion) {
 
         // REVISIT.  OMG issue 3318 concerning sending the code set
         // service context more than once was deemed too much for the
@@ -1035,6 +1086,7 @@ public class CorbaClientRequestDispatcherImpl
             // Get the negotiated code sets (if any) out of the connection
             codeSetCtx = conn.getCodeSetContext();
         }
+        
         // Either we shouldn't send the code set service context, or
         // for some reason, the connection doesn't have its code sets.
         // Perhaps the server didn't include them in the IOR.  Uses
@@ -1047,8 +1099,7 @@ public class CorbaClientRequestDispatcherImpl
 	ctxs.put(cssc);
     }    
 
-    protected String peekUserExceptionId(InputObject inputObject)
-    {
+    protected String peekUserExceptionId(InputObject inputObject) {
 	CDRInputObject cdrInputObject = (CDRInputObject) inputObject;
 	// REVISIT - need interface for mark/reset
         cdrInputObject.mark(Integer.MAX_VALUE);
@@ -1057,13 +1108,7 @@ public class CorbaClientRequestDispatcherImpl
         return result;
     }                     
 
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaClientRequestDispatcherImpl", msg);
-    }
-
-    protected String opAndId(CorbaMessageMediator mediator)
-    {
+    protected String opAndId(CorbaMessageMediator mediator) {
 	return ORBUtility.operationNameAndRequestId(mediator);
     }
 }

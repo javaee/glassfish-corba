@@ -120,6 +120,12 @@ public class PINoOpHandlerImpl implements PIHandler
     {
         return null;
     }
+
+    public Exception makeCompletedClientRequest(
+        int replyStatus, Exception exception )
+    {
+        return null;
+    }
     
     public void initiateClientPIRequest( boolean diiRequest ) {
     }

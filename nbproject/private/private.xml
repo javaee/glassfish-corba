@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/space/ws/mercurial/CORBA/corba-6763340/src/share/classes/com/sun/corba/se/impl/orbutil/ORBUtility.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-6763340/src/share/classes/com/sun/corba/se/impl/orbutil/RepositoryIdFactory.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-6763340/src/share/classes/com/sun/corba/se/impl/orbutil/RepIdDelegator.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-6763340/src/share/classes/com/sun/corba/se/impl/orbutil/RepositoryIdInterface.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-6763340/src/share/classes/com/sun/corba/se/impl/orbutil/RepositoryIdStrings.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-6763340/src/share/classes/com/sun/corba/se/impl/orbutil/RepositoryIdUtility.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-6763340/src/share/classes/com/sun/corba/se/impl/encoding/CDROutputStream_1_0.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-6763340/src/share/classes/com/sun/corba/se/impl/encoding/CDRInputStream_1_0.java</file>
+    </open-files>
 </project-private>
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.

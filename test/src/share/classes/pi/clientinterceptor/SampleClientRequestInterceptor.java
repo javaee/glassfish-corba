@@ -179,7 +179,7 @@ public class SampleClientRequestInterceptor
     {
 	// Ending points have the print/call statements reverse intentionally.
 	printPointEntry("receive_reply", ri);
-	callCounter--; 	// Ending point - subtract
+	callCounter--; 	// Ending point - subtracm
 
 	if( !enabled ) return;
 

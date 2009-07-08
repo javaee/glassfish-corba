@@ -36,14 +36,10 @@
 
 package com.sun.corba.se.impl.orbutil;
 
-import com.sun.corba.se.spi.orb.ORBVersion;
 import com.sun.corba.se.spi.orb.ORB;
 
 public abstract class RepositoryIdFactory
 {
-    private static final RepIdDelegator_1_3_1 ladybirdDelegator
-        = new RepIdDelegator_1_3_1();
-
     private static final RepIdDelegator currentDelegator
         = new RepIdDelegator();
 
@@ -61,19 +57,7 @@ public abstract class RepositoryIdFactory
      */
     public static RepositoryIdStrings getRepIdStringsFactory(ORB orb)
     {
-        if (orb != null) {
-            switch (orb.getORBVersion().getORBType()) {
-                case ORBVersion.NEWER:
-                case ORBVersion.FOREIGN:
-                case ORBVersion.JDK1_3_1_01:
-                    return currentDelegator;
-                case ORBVersion.NEW:
-                    return ladybirdDelegator;
-                default:
-                    return currentDelegator;
-            }
-        } else
-            return currentDelegator;
+        return currentDelegator;
     }
 
     /**
@@ -90,18 +74,6 @@ public abstract class RepositoryIdFactory
      */
     public static RepositoryIdUtility getRepIdUtility(ORB orb)
     {
-        if (orb != null) {
-            switch (orb.getORBVersion().getORBType()) {
-                case ORBVersion.NEWER:
-                case ORBVersion.FOREIGN:
-                case ORBVersion.JDK1_3_1_01:
-                    return currentDelegator;
-                case ORBVersion.NEW:
-                    return ladybirdDelegator;
-                default:
-                    return currentDelegator;
-            }
-        } else
-            return currentDelegator;
+        return currentDelegator;
     }
 }

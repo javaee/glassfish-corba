@@ -209,18 +209,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     private final void createRepositoryIdHandlers()
     {
-        if (orb != null) {
-            // Get the appropriate versions based on the ORB version.  The
-            // ORB versioning info is only in the core ORB.
-            repIdUtil 
-                = RepositoryIdFactory.getRepIdUtility(orb);
-            repIdStrs 
-                = RepositoryIdFactory.getRepIdStringsFactory(orb);
-        } else {
-            // Get the latest versions
-            repIdUtil = RepositoryIdFactory.getRepIdUtility();
-            repIdStrs = RepositoryIdFactory.getRepIdStringsFactory();
-        }
+        repIdUtil = RepositoryIdFactory.getRepIdUtility();
+        repIdStrs = RepositoryIdFactory.getRepIdStringsFactory();
     }
 
     public BufferManagerWrite getBufferManager()

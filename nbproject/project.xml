@@ -133,12 +133,6 @@
             </export>
             <export>
                 <type>folder</type>
-                <location>build/classes</location>
-                <script>${ant.script}</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
                 <location>experimental/build/classes</location>
                 <script>${ant.script}</script>
                 <build-target>build</build-target>
@@ -261,51 +255,19 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
             <compilation-unit>
                 <package-root>src/share/classes</package-root>
-                <classpath mode="compile">build/classes:orblib/build/classes:lib/jscheme.jar:lib/felix.jar</classpath>
-                <built-to>build/classes</built-to>
-                <source-level>1.5</source-level>
-            </compilation-unit>
-            <compilation-unit>
                 <package-root>orblib/src/share/classes</package-root>
-                <classpath mode="compile">orblib/build/classes</classpath>
-                <built-to>orblib/build/classes</built-to>
-                <source-level>1.5</source-level>
-            </compilation-unit>
-            <compilation-unit>
                 <package-root>test/src/share/classes</package-root>
-                <classpath mode="compile">orblib/build/classes:build/classes:test/build/classes:lib/junit.jar:lib/testng.jar:lib/ejb-2_1-api.jar</classpath>
-                <built-to>test/build/classes</built-to>
-                <source-level>1.5</source-level>
-            </compilation-unit>
-            <compilation-unit>
                 <package-root>build/gensrc</package-root>
-                <classpath mode="compile">orblib/build/classes:build/classes</classpath>
-                <built-to>build/classes</built-to>
-                <source-level>1.5</source-level>
-            </compilation-unit>
-            <compilation-unit>
                 <package-root>test/src/share/classes/test12</package-root>
-                <classpath mode="compile">test/build/classes:build/classes:orblib/build/classes</classpath>
-                <source-level>1.5</source-level>
-            </compilation-unit>
-            <compilation-unit>
                 <package-root>test/src/share/classes/values1</package-root>
-                <classpath mode="compile">orblib/build/classes:build/classes:test/build/classes</classpath>
-                <source-level>1.5</source-level>
-            </compilation-unit>
-            <compilation-unit>
                 <package-root>test/src/share/classes/values2</package-root>
-                <classpath mode="compile">test/build/classes:build/classes:orblib/build/classes</classpath>
-                <source-level>1.5</source-level>
-            </compilation-unit>
-            <compilation-unit>
                 <package-root>experimental/src/share/classes</package-root>
-                <classpath mode="compile">orblib/build/classes</classpath>
-                <built-to>experimental/build/classes</built-to>
-                <source-level>1.5</source-level>
-            </compilation-unit>
-            <compilation-unit>
                 <package-root>experimental/test/src/share/classes</package-root>
+                <classpath mode="compile">build/classes:orblib/build/classes:lib/jscheme.jar:lib/felix.jar:test/build/classes:lib/junit.jar:lib/testng.jar:lib/ejb-2_1-api.jar</classpath>
+                <built-to>build/classes</built-to>
+                <built-to>orblib/build/classes</built-to>
+                <built-to>test/build/classes</built-to>
+                <built-to>experimental/build/classes</built-to>
                 <built-to>experimental/test/build/classes</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>

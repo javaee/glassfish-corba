@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,43 +33,31 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.impl.orbutil;
 
-import java.io.*;
-import java.util.Hashtable;
+package com.sun.corba.se.spi.protocol ;
 
-/**
- * Implements legacy behavior from Ladybird to maintain
- * backwards compatibility.
- */
-public class IIOPOutputStream_1_3_1 extends com.sun.corba.se.impl.io.IIOPOutputStream
-{
-    // We can't assume that the superclass's putFields
-    // member will be non-private.  We must allow
-    // the RI to run on JDK 1.3.1 FCS as well as
-    // the JDK 1.3.1_01 patch.
-    private ObjectOutputStream.PutField putFields_1_3_1;
+// Introduce more information about WHY we are re-trying a request
+// so we can properly handle the two cases:
+// - BEFORE_RESPONSE means that the retry is caused by 
+//   something that happened BEFORE the message was sent: either 
+//   an exception from the SocketFactory, or one from the 
+//   Client side send_request interceptor point.
+// - AFTER_RESPONSE means that the retry is a result either of the
+//   request sent to the server (from the response), or from the
+//   Client side receive_xxx interceptor point.
+public enum RetryType { 
+    NONE( false ),
+    BEFORE_RESPONSE( true ),
+    AFTER_RESPONSE( true ) ;
 
-    public IIOPOutputStream_1_3_1()
-    	throws java.io.IOException {
-        super();
+    private final boolean isRetry ;
+
+    RetryType( boolean isRetry ) {
+        this.isRetry = isRetry ;
     }
 
-    /**
-     * Before JDK 1.3.1_01, the PutField/GetField implementation
-     * actually sent a Hashtable.
-     */
-    public ObjectOutputStream.PutField putFields()
-	throws IOException {
-
-	putFields_1_3_1 = new LegacyHookPutFields();
-	return putFields_1_3_1;
+    public boolean isRetry() {
+        return this.isRetry ;
     }
-
-    public void writeFields()
-	throws IOException {
-
-	putFields_1_3_1.write(this);
-    }
-}
+} ;
 

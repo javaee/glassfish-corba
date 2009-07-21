@@ -43,9 +43,10 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.oa.OADestroyed ;
-
 import com.sun.corba.se.spi.ior.IORTemplate ;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedObject;
 
 // REVISIT: What should the order be?  enter/push...pop/exit?
 
@@ -169,6 +170,8 @@ import com.sun.corba.se.spi.ior.IORTemplate ;
 * </ol>
 * XXX fast local should not call returnServant: what is correct here?
 */
+@ManagedObject
+@Description( "ObjectAdapter used to dispatch requests and manage servants")
 public interface ObjectAdapter 
 {
     ////////////////////////////////////////////////////////////////////////////
@@ -187,6 +190,8 @@ public interface ObjectAdapter
     * Note that the server ID, ORB ID, and adapter name are all available
     * from the IOR template.
     */
+    @ManagedAttribute
+    @Description( "The IORTemplate used to create Object References")
     IORTemplate getIORTemplate() ;
 
     ////////////////////////////////////////////////////////////////////////////
@@ -195,6 +200,8 @@ public interface ObjectAdapter
 
     /** Return the ID of the AdapterManager for this object adapter.
     */
+    @ManagedAttribute
+    @Description( "The identifier for the AdapterManager that manages this ObjectAdapter")
     int getManagerId() ;
 
     /** Return the current state of this object adapter (see 
@@ -202,8 +209,12 @@ public interface ObjectAdapter
     */
     short getState() ;
 
+    @ManagedAttribute
+    @Description( "The adapter template" )
     ObjectReferenceTemplate getAdapterTemplate() ;
 
+    @ManagedAttribute
+    @Description( "The current object reference factory" )
     ObjectReferenceFactory getCurrentFactory() ;
 
     /** Change the current factory.  This may only be called during the

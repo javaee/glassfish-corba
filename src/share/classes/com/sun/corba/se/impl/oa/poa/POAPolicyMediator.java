@@ -36,6 +36,9 @@
 
 package com.sun.corba.se.impl.oa.poa ;
 
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedData;
 import org.omg.PortableServer.Servant ;
 import org.omg.PortableServer.ServantManager ;
 import org.omg.PortableServer.ForwardRequest ;
@@ -54,10 +57,14 @@ import org.omg.PortableServer.POAPackage.ObjectNotActive ;
  * do any concurrency control, except as noted.  The POA is responsible
  * for concurrency control.
  */
+@ManagedData
+@Description( "Handles the Policy-specific parts of the POA")
 public interface POAPolicyMediator {
     /** Return the policies object that was used to create this
     * POAPolicyMediator.
     */
+    @ManagedAttribute
+    @Description( "The policies of this POA")
     Policies getPolicies() ;
 
     /** Return the subcontract ID to use in the IIOP profile in IORs
@@ -65,6 +72,8 @@ public interface POAPolicyMediator {
     * according to the policies and the POA used to construct this
     * POAPolicyMediator in the POAPolicyMediatorFactory.
     */
+    @ManagedAttribute
+    @Description( "This POA's subcontract ID")
     int getScid() ;
 
     /** Return the server ID to use in the IIOP profile in IORs
@@ -72,6 +81,8 @@ public interface POAPolicyMediator {
     * according to the policies and the POA used to construct this
     * POAPolicyMediator in the POAPolicyMediatorFactory.
     */
+    @ManagedAttribute
+    @Description( "This POA's server ID")
     int getServerId() ;
 
     /** Get the servant to use for an invocation with the 

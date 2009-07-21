@@ -62,15 +62,18 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.orbutil.closure.ClosureFactory ;
 
-import com.sun.corba.se.spi.protocol.PIHandler ;
-
 import com.sun.corba.se.impl.logging.POASystemException ;
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import java.util.HashMap;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedObject;
+import org.glassfish.gmbal.ManagedObjectManager;
 
-import com.sun.corba.se.impl.oa.poa.POAManagerImpl ;
-
+@ManagedObject
+@Description( "The factory for all POAs and POAManagers")
 public class POAFactory implements ObjectAdapterFactory 
 {
     // Maps servants to POAs for deactivating servants when unexportObject is called.
@@ -86,6 +89,7 @@ public class POAFactory implements ObjectAdapterFactory
     private POASystemException wrapper ;
     private OMGSystemException omgWrapper ;
     private boolean isShuttingDown = false ;
+    private ManagedObjectManager mom ;
 
     public POASystemException getWrapper() 
     {
@@ -94,7 +98,7 @@ public class POAFactory implements ObjectAdapterFactory
 
     /** All object adapter factories must have a no-arg constructor.
     */
-    public POAFactory() 
+    public POAFactory( )
     {
 	poaManagers = Collections.synchronizedSet(new HashSet<POAManager>(4));
 	poaManagerId = 0 ;
@@ -102,6 +106,36 @@ public class POAFactory implements ObjectAdapterFactory
 	rootPOA = null ;
 	delegateImpl = null ;
 	orb = null ;
+    }
+
+    @ManagedAttribute
+    @Description( "The servants managed by a particular POA" )
+    private synchronized Map<Servant,POA> getExportedServants() {
+        return new HashMap<Servant,POA>( exportedServantsToPOA ) ;
+    }
+
+    @ManagedAttribute
+    @Description( "The POAManagers")
+    private synchronized Set<POAManager> getPOAManagers() {
+        return new HashSet<POAManager>( poaManagers ) ;
+    }
+
+    @ManagedAttribute
+    @Description( "The last allocated POAManager id")
+    private synchronized int getPOAManagerId() {
+        return poaManagerId ;
+    }
+
+    @ManagedAttribute
+    @Description( "The last allocated POAManager id")
+    private synchronized int getPOAId() {
+        return poaId ;
+    }
+
+    @ManagedAttribute( id = "RootPOA" )
+    @Description( "The root POA")
+    private synchronized POAImpl getDisplayRootPOA() {
+        return rootPOA ;
     }
 
     public synchronized POA lookupPOA (Servant servant) 
@@ -132,6 +166,8 @@ public class POAFactory implements ObjectAdapterFactory
 	POACurrent poaCurrent = new POACurrent(orb);
 	orb.getLocalResolver().register( ORBConstants.POA_CURRENT_NAME, 
 	    ClosureFactory.makeConstant( poaCurrent ) ) ;
+        this.mom = orb.mom() ;
+        mom.registerAtRoot( this ) ;
     }
 
     public ObjectAdapter find( ObjectAdapterId oaid )
@@ -190,11 +226,13 @@ public class POAFactory implements ObjectAdapterFactory
     public synchronized void removePoaManager( POAManager manager ) 
     {
         poaManagers.remove(manager);
+        mom.unregister( manager ) ;
     }
 
     public synchronized void addPoaManager( POAManager manager ) 
     {
         poaManagers.add(manager);
+        mom.register( this, manager ) ;
     }
 
     synchronized public int newPOAManagerId()

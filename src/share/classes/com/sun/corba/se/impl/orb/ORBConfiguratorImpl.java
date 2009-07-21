@@ -38,15 +38,12 @@ package com.sun.corba.se.impl.orb ;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetAddress ;
-import java.security.PrivilegedAction ;
 import java.security.PrivilegedExceptionAction ;
 import java.security.AccessController ;
 import java.util.Collection ;
 import java.util.Iterator ;
 
 import org.omg.CORBA.CompletionStatus ;
-import org.omg.CORBA.portable.ValueFactory ;
 
 import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
 
@@ -69,7 +66,6 @@ import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
 
 import com.sun.corba.se.spi.oa.OADefault ;
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
 import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
 
 import com.sun.corba.se.spi.orb.Operation ;
@@ -101,7 +97,6 @@ import com.sun.corba.se.spi.transport.TransportDefault ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
-import com.sun.corba.se.spi.servicecontext.ServiceContext ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;

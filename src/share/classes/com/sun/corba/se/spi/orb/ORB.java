@@ -801,7 +801,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         return true ;
     }
 
-    private static UnaryFunction<String,Class<?>> classNameResolver =
+    private static UnaryFunction<String,Class<?>> defaultClassNameResolver =
         new UnaryFunction<String,Class<?>>() {
             public Class<?> evaluate( String name ) {
                 try {
@@ -817,7 +817,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         } ;
 
     public static UnaryFunction<String,Class<?>> defaultClassNameResolver() {
-        return classNameResolver ;
+        return defaultClassNameResolver ;
     }
 
     public UnaryFunction<String,Class<?>> makeCompositeClassNameResolver(

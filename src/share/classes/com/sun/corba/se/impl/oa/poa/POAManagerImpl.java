@@ -36,12 +36,9 @@
 
 package com.sun.corba.se.impl.oa.poa;
 
-import java.util.Iterator;
-import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 
-import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.CompletionStatus ;
 
 import org.omg.PortableServer.POAManager;
@@ -74,14 +71,18 @@ import org.glassfish.gmbal.ParameterNames ;
  */
 
 @ManagedObject
+@Description( "A POAManager which controls invocations of its POAs")
 public class POAManagerImpl extends org.omg.CORBA.LocalObject implements 
     POAManager
 {
+    private static final long serialVersionUID = -751471445699682659L;
+
     private final POAFactory factory ;	// factory which contains global state 
 					// for all POAManagers 
     private PIHandler pihandler ;	// for adapterManagerStateChanged
     private State state;		// current state of this POAManager
-    private Set poas = new HashSet(4) ; // all poas controlled by this POAManager
+    private Set<POAImpl> poas =
+        new HashSet<POAImpl>(4) ;       // all poas controlled by this POAManager
     private int nInvocations=0;		// Number of invocations in progress
     private int nWaiters=0;		// Number of threads waiting for 
 					// invocations to complete
@@ -92,6 +93,12 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 					// discard_request, or deactivate is called.
 
     private static final boolean AM_DEBUG = false ;
+
+    @ManagedAttribute
+    @Description( "The set of POAs managed by this POAManager" )
+    Set<POAImpl> getManagedPOAs() {
+        return new HashSet<POAImpl>( poas ) ;
+    }
 
     @ManagedAttribute
     @Description( "Number of active invocations executing in this POAManager" )
@@ -167,11 +174,13 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	return "State[UNKNOWN]" ;
     }
 
+    @Override
     public int hashCode() 
     {
 	return myId ;
     }
 
+    @Override
     public boolean equals( Object obj ) 
     {
 	if (obj == this) {
@@ -187,6 +196,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	return other.myId == myId ;
     }
 
+    @Override
     public synchronized String toString()
     {
 	return "POAManagerImpl[" + myId + 
@@ -270,12 +280,12 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    throw wrapper.addPoaInactive( CompletionStatus.COMPLETED_NO ) ;
 	}
 	    
-        poas.add(poa);
+        poas.add( (POAImpl)poa );
     }
 
     synchronized void removePOA(POA poa)
     {
-        poas.remove(poa);
+        poas.remove( (POAImpl)poa );
         if ( poas.isEmpty() ) {
             factory.removePoaManager(this);
 	}
@@ -490,7 +500,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     private class POAManagerDeactivator implements Runnable
     {
 	private boolean etherealize_objects ;
-	private POAManagerImpl pmi ;
+	private final POAManagerImpl pmi ;
 	private boolean debug ;
 
 	POAManagerDeactivator( POAManagerImpl pmi, boolean etherealize_objects,
@@ -517,7 +527,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 		}
 
 		if (etherealize_objects) {
-		    Iterator iterator = null ;
+                    Set<POAImpl> copyOfPOAs ;
 
 		    // Make sure that poas cannot change while we copy it!
 		    synchronized (pmi) {
@@ -527,15 +537,18 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 				pmi ) ;
 			}
 
-			iterator = (new HashSet(pmi.poas)).iterator();
+                        copyOfPOAs = new HashSet<POAImpl>( pmi.poas ) ;
 		    } 
 
-		    while (iterator.hasNext()) {
+                    for (POAImpl poa : copyOfPOAs) {
 			// Each RETAIN+USE_SERVANT_MGR poa
 			// must call etherealize for all its objects
-			((POAImpl)iterator.next()).etherealizeAll();
-		    }
+                        poa.etherealizeAll();
+                    }
 
+                    // XXX What if a new POA is created here before 
+                    // etherealization completes?  We would fail to call 
+                    // etherealize!
 		    synchronized (pmi) {
 			if (debug) {
 			    ORBUtility.dprint( this,

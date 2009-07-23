@@ -76,6 +76,7 @@ import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.AMXMetadata ;
 
 /**
  * @author Harold Carr
@@ -84,6 +85,7 @@ import org.glassfish.gmbal.Description ;
 // one CorbaTransportManager per ORB.
 @ManagedObject
 @Description( "The Transport Manager for the ORB" )
+@AMXMetadata( isSingleton=true ) 
 public class CorbaTransportManagerImpl 
     implements
 	CorbaTransportManager

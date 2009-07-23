@@ -71,9 +71,11 @@ import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.ManagedObjectManager;
+import org.glassfish.gmbal.AMXMetadata;
 
 @ManagedObject
 @Description( "The factory for all POAs and POAManagers")
+@AMXMetadata( isSingleton=true )
 public class POAFactory implements ObjectAdapterFactory 
 {
     // Maps servants to POAs for deactivating servants when unexportObject is called.
@@ -232,7 +234,6 @@ public class POAFactory implements ObjectAdapterFactory
     public synchronized void addPoaManager( POAManager manager ) 
     {
         poaManagers.add(manager);
-        mom.register( this, manager ) ;
     }
 
     synchronized public int newPOAManagerId()

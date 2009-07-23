@@ -1705,6 +1705,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     /** This is the implementation of the public API used to connect
      *  a servant-skeleton to the ORB.
      */
+    @Override
     public synchronized void connect(org.omg.CORBA.Object servant)
     {
         checkShutdownState();
@@ -1719,6 +1720,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         }
     }
 
+    @Override
     public synchronized void disconnect(org.omg.CORBA.Object obj)
     {
         checkShutdownState();

@@ -110,6 +110,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.NameValue;
 
 /**
@@ -121,6 +122,7 @@ import org.glassfish.gmbal.NameValue;
  * Specific comments have been added where 3.0 applies, but note that
  * we do not have the new 3.0 APIs yet.
  */
+@ManagedObject
 public class POAImpl extends ObjectAdapterBase implements POA 
 {
     private static final long serialVersionUID = -1746388801294205323L;
@@ -296,11 +298,16 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    getObjectAdapterFactory( ORBConstants.TRANSIENT_SCID ) ;
     }
 
+    private static void registerMBean( ORB orb, Object obj ) {
+        orb.mom().register( getPOAFactory( orb ), obj ) ;
+    }
+
     // package private so that POAFactory can access it.
     static POAImpl makeRootPOA( ORB orb )
     {
 	POAManagerImpl poaManager = new POAManagerImpl( getPOAFactory( orb ), 
 	    orb.getPIHandler() ) ;
+        registerMBean( orb, poaManager ) ;
 
 	POAImpl result = new POAImpl( ORBConstants.ROOT_POA_NAME, 
 	    null, orb, STATE_START ) ;
@@ -312,7 +319,6 @@ public class POAImpl extends ObjectAdapterBase implements POA
     // package private so that POAPolicyMediatorBase can access it.
     @ManagedAttribute()
     @Description( "The unique ID for this POA")
-    @NameValue
     int getPOAId()
     {
 	return uniquePOAId ;
@@ -401,6 +407,21 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		return Boolean.FALSE;
 	    }
 	};
+    }
+
+    @NameValue
+    private String getName() {
+        StringBuilder sb = new StringBuilder() ;
+        boolean first = true ;
+        for (String str : poaId.getAdapterName() ) {
+            if (first) {
+                first = false ;
+            } else {
+                sb.append( '.' ) ;
+            }
+            sb.append( str ) ;
+        }
+        return sb.toString() ;
     }
 
     // The POA lock must be held when this method is called.
@@ -604,6 +625,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    }
 	}
 
+        @Override
 	public void run() 
 	{
 	    Set destroyedPOATemplates = new HashSet() ;
@@ -827,7 +849,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	    if (poa == null) {
 		poa = new POAImpl( name, this, getORB(), STATE_START ) ;
-                getORB().mom().register( getPOAFactory(getORB()), poa ) ;
+                registerMBean( getORB(), poa ) ;
 	    }
 
 	    try {
@@ -842,9 +864,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		    throw new AdapterAlreadyExists();
 
 		POAManagerImpl newManager = (POAManagerImpl)theManager ;
-		if (newManager == null)
+		if (newManager == null) {
 		    newManager = new POAManagerImpl( manager.getFactory(),
 			manager.getPIHandler() );
+                    registerMBean( getORB(), newManager ) ;
+                }
 
 		int defaultCopierId = 
 		    getORB().getCopierManager().getDefaultId() ;
@@ -1110,7 +1134,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
      * <code>the_parent</code>
      * <b>Section 3.3.8.7</b>
      */
-    @ManagedAttribute( id="Parent")
+    @ManagedAttribute( id="POAParent")
     @Description( "The parent of this POA")
     public POA the_parent() 
     {
@@ -1126,7 +1150,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     /**
      * <code>the_children</code>
      */
-    @ManagedAttribute( id="Children")
+    @ManagedAttribute( id="POAChildren")
     @Description( "The children of this POA")
     private List<POAImpl> children() {
         try {

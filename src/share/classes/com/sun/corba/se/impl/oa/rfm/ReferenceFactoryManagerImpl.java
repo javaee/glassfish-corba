@@ -69,15 +69,21 @@ import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 import com.sun.corba.se.impl.logging.POASystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedObject;
 
+@ManagedObject
+@Description( "The ReferenceFactoryManager, used to handle dynamic cluster membership updates")
 public class ReferenceFactoryManagerImpl 
     extends org.omg.CORBA.LocalObject
     implements ReferenceFactoryManager
 {
+    private static final long serialVersionUID = -6689846523143143228L;
+
     private enum RFMState { READY, SUSPENDED } ;
 
     private static final String PARENT_POA_NAME = 
-	"#INTERNAL#ReferenceFactoryManagerBase#INTERNAL#" ;
+	"#INTERNAL#RFMBase#INTERNAL#" ;
 
     // Initialized in the constructor
     private RFMState state ;
@@ -106,6 +112,8 @@ public class ReferenceFactoryManagerImpl
 	extends LocalObject 
 	implements AdapterActivator 
     {
+        private static final long serialVersionUID = 7922226881290146012L;
+
 	public boolean unknown_adapter( POA parent, String name ) {
 	    dprint(".unknown_adapter->: " + parent + " " + name);
 	    // lock.lock() ;
@@ -152,6 +160,7 @@ public class ReferenceFactoryManagerImpl
 	implements Policy 
     {
 	private static Policy thisPolicy = new ReferenceManagerPolicy() ;
+        private static final long serialVersionUID = -4780983694679451387L;
 
 	public static Policy getPolicy() {
 	    return thisPolicy ;

@@ -37,34 +37,32 @@
 package com.sun.corba.se.impl.oa.toa ;
 
 import org.omg.CORBA.Policy ;
-import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ACTIVE;
-import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
 import com.sun.corba.se.spi.protocol.ClientDelegate ;
 
 import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.spi.oa.OADestroyed ;
 import com.sun.corba.se.spi.oa.ObjectAdapterBase ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 
 import com.sun.corba.se.impl.ior.JIDLObjectKeyTemplate ;
 import com.sun.corba.se.impl.oa.NullServantImpl;
 import com.sun.corba.se.impl.oa.poa.Policies;
-import com.sun.corba.se.impl.oa.toa.TransientObjectManager ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.protocol.JIDLLocalCRDImpl ;
+import java.util.concurrent.atomic.AtomicLong;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedObject;
+import org.glassfish.gmbal.NameValue;
 
 /** The Transient Object Adapter (TOA) represents the OA for purely transient
 * objects.  It is used for standard RMI-IIOP as well as backwards compatible
@@ -85,14 +83,39 @@ import com.sun.corba.se.impl.protocol.JIDLLocalCRDImpl ;
 * an adapter state changes that is not due to an adapter manager state change.</LI>
 * </UL>
 */
+@ManagedObject
+@Description( "The Transient Object Adapter")
 public class TOAImpl extends ObjectAdapterBase implements TOA 
 {
+    private static AtomicLong currentId = new AtomicLong( 0 );
+
     private TransientObjectManager servants ;
+    private long id ;
+    private String codebase ;
+
+    @NameValue
+    private long getId() {
+        return id ;
+    }
+
+    @ManagedAttribute
+    @Description( "The codebase used to create this TOA")
+    private String getCodebase() {
+        return codebase ;
+    }
+
+    @ManagedAttribute
+    @Description( "The TransientObjectManager")
+    private TransientObjectManager getTransientObjectManager() {
+        return servants ;
+    }
 
     public TOAImpl( ORB orb, TransientObjectManager tom, String codebase ) 
     {
 	super( orb ) ;
 	servants = tom ;
+        this.codebase = codebase ;
+        id = currentId.getAndIncrement() ;
 
 	// Make the object key template
 	int serverid = ((ORB)getORB()).getTransientServerId();

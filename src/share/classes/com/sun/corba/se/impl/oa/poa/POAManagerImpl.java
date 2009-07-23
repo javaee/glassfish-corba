@@ -64,6 +64,7 @@ import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.ManagedOperation ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.ParameterNames ;
+import org.glassfish.gmbal.NameValue ;
 
 /** POAManagerImpl is the implementation of the POAManager interface.
  *  Its public methods are activate(), hold_requests(), discard_requests()
@@ -251,6 +252,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     }
 
     @ManagedAttribute
+    @NameValue
     @Description( "The ID of this POAManager" )
     public int getManagerId() 
     {

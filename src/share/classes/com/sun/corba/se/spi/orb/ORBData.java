@@ -55,6 +55,7 @@ import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.AMXMetadata ;
 
 // Which attributes should become setters?  NOT everything, but only
 // those that we think might actually be useful to set.  This may change
@@ -62,6 +63,7 @@ import org.glassfish.gmbal.Description ;
 
 @ManagedObject
 @Description( "ORB Configuration data" ) 
+@AMXMetadata( isSingleton=true ) 
 public interface ORBData {
     @ManagedAttribute
     @Description( "Value of ORBInitialHost, the host name of the remote name service" ) 

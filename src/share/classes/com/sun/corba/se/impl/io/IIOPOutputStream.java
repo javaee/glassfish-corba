@@ -561,7 +561,7 @@ public class IIOPOutputStream
     	 */
     	if (currentClassDesc.isExternalizable()) {
 	    // Write format version
-	    orbStream.write_octet(streamFormatVersion);
+            orbStream.write_octet(streamFormatVersion);
 
     	    Externalizable ext = (Externalizable)obj;
 	    // Fix for issue 5161: need to save and restore state around

@@ -1017,7 +1017,7 @@ public class IIOPInputStream
 
                         // Store this object and its beginning position
                         // since there might be indirections to it while
-                        // it's been unmarshalled.
+                        // it is being unmarshalled.
                         activeRecursionMgr.addObject(offset, currentObject);
 
                         // Read format version

@@ -67,6 +67,7 @@ public class CorbanameURL extends INSURLBase
         } else {
             corbalocString = "corbaloc:" + url ;
         }
+
         try {
             // Check the corbaloc grammar and set the returned corbaloc
             // object to the CorbaName Object

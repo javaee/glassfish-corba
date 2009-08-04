@@ -97,7 +97,8 @@ public class CorbaContactInfoListImpl
 	createContactInfoList();
 	Iterator<CorbaContactInfo> result = new CorbaContactInfoListIteratorImpl(
             orb, this, primaryContactInfo, 
-	    effectiveTargetIORContactInfoList);
+	    effectiveTargetIORContactInfoList,
+            usePerRequestLoadBalancing );
 
         if (usePerRequestLoadBalancing) {
             CorbaContactInfo head = effectiveTargetIORContactInfoList.remove(0) ;

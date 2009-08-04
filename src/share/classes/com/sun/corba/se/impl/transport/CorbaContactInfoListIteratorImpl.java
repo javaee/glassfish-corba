@@ -97,7 +97,8 @@ public class CorbaContactInfoListIteratorImpl
         ORB orb,
 	CorbaContactInfoList corbaContactInfoList,
 	ContactInfo primaryContactInfo,
-	List listOfContactInfos)
+	List listOfContactInfos,
+        boolean usePerRequestLoadBalancing )
     {
 	this.orb = orb;
 	this.tp = orb.getTimerManager().points() ;
@@ -123,7 +124,12 @@ public class CorbaContactInfoListIteratorImpl
 	this.waiter = tcpTimeouts.waiter() ;
 	this.failedEndpoints = new HashSet<ContactInfo>() ;
 
-	primaryToContactInfo = orb.getORBData().getIIOPPrimaryToContactInfo();
+        if (usePerRequestLoadBalancing) {
+            // We certainly DON'T want sticky behavior if we are using PRLB.
+            primaryToContactInfo = null ;
+        } else {
+            primaryToContactInfo = orb.getORBData().getIIOPPrimaryToContactInfo();
+        }
     }
 
     ////////////////////////////////////////////////////

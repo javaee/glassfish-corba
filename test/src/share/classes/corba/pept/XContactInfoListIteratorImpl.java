@@ -60,7 +60,7 @@ public class XContactInfoListIteratorImpl
         ORB orb,
 	CorbaContactInfoList corbaContactInfoList)
     {
-	super(orb, corbaContactInfoList, null, null);
+	super(orb, corbaContactInfoList, null, null, false);
     }
 
     public boolean reportCommFailure(ContactInfo contactInfo, 

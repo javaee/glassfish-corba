@@ -101,8 +101,12 @@ public class CorbaContactInfoListImpl
             usePerRequestLoadBalancing );
 
         if (usePerRequestLoadBalancing) {
-            CorbaContactInfo head = effectiveTargetIORContactInfoList.remove(0) ;
-            effectiveTargetIORContactInfoList.add( head ) ;
+            // Copy the list, otherwise we will get a ConcurrentModificationException as
+            // soon as next() is called on the iterator.
+            List<CorbaContactInfo> newList = new ArrayList( effectiveTargetIORContactInfoList ) ;
+            CorbaContactInfo head = newList.remove(0) ;
+            newList.add( head ) ;
+            effectiveTargetIORContactInfoList = newList ;
         }
 
         return result ;
@@ -182,7 +186,7 @@ public class CorbaContactInfoListImpl
     // Implementation
     //
 
-    protected void createContactInfoList()
+    private void createContactInfoList()
     {
 	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
 
@@ -237,7 +241,7 @@ public class CorbaContactInfoListImpl
 	}
     }
 
-    protected void addRemoteContactInfos(
+    private void addRemoteContactInfos(
         IOR  effectiveTargetIOR,
 	List<CorbaContactInfo> effectiveTargetIORContactInfoList)
     {

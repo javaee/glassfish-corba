@@ -567,6 +567,7 @@ public class IIOPOutputStream
 	    // Fix for issue 5161: need to save and restore state around
 	    // writeExternal call.
 	    WriteObjectState oldState = writeObjectState ;
+            setState( NOT_IN_WRITE_OBJECT ) ;
 	    try {
     	        ext.writeExternal(this);
 	    } finally {

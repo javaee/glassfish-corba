@@ -39,12 +39,17 @@ package corba.misc ;
 import java.util.Properties ;
 import java.util.Random ;
 import java.util.Stack ;
+import java.util.Date ;
 
 import java.nio.ByteBuffer ;
 
+import java.io.ObjectOutputStream ;
 import java.io.Serializable ;
+import java.io.IOException ;
 import java.io.PrintStream ;
 import java.io.ByteArrayOutputStream ;
+
+import javax.jdo.identity.LongIdentity ;
 
 import org.omg.CORBA_2_3.portable.OutputStream ;
 import org.omg.CORBA_2_3.portable.InputStream ;
@@ -965,5 +970,145 @@ public class Client extends TestCase
         double elapsed = (time - System.currentTimeMillis())/1000 ;
         System.out.println( 
             "OperationTracer test complete in " + elapsed + " milliseconds" ) ;
+    }
+
+    public void test5161() {
+        System.out.println( "Running test for issue 5161" ) ;
+        BuckPasserAL bpal = new BuckPasserAL() ;
+        bpal.add( new Buck( "The Buck" ) ) ;
+        BuckPasserV bpv = new BuckPasserV() ;
+        bpv.add( new Buck( "The Buck" ) ) ;
+
+        OutputStream out = (OutputStream)orb.create_output_stream();
+
+	out.write_value(bpal) ;
+	out.write_value(bpv) ;
+
+	InputStream in = (InputStream)out.create_input_stream();
+
+        BuckPasserAL bpal2 = (BuckPasserAL)in.read_value() ;
+        BuckPasserV bpv2 = (BuckPasserV)in.read_value() ;
+
+        assertTrue( bpal2.equals( bpal ) ) ;
+        assertTrue( bpv2.equals( bpv ) ) ;
+    }
+
+    public void testClassMarshaling() {
+        System.out.println( "Running test for serialization of primitive classes" ) ;
+
+        Object[] arr = {
+            boolean.class,
+            byte.class,
+            Byte.class,
+            short.class,
+            int.class,
+            float.class,
+            long.class,
+            double.class,
+            char.class,
+            this.getClass() 
+        } ;
+
+        OutputStream out = (OutputStream)orb.create_output_stream();
+        out.write_value( arr ) ;
+        InputStream in = (InputStream)out.create_input_stream() ;
+        Object[] result = (Object[])in.read_value() ;
+
+        int errorCount = 0 ;
+        for (int ctr=0; ctr<arr.length; ctr++) {
+            if (!arr[ctr].equals( result[ctr] )) {
+                System.out.printf( "Error: expected class %s but read %s\n",
+                    arr[ctr].toString(), result[ctr].toString() ) ;
+                errorCount++ ;
+            }
+        }
+
+        if (errorCount > 0) {
+            fail( "Class marshaling test failed with " + errorCount + " errors" ) ;
+        }
+    }
+
+    public static abstract class WebContent implements Serializable {
+        long id = 42 ;
+
+        java.util.Set extractFieldSet = null ;
+        java.util.Set linkSet = null ;
+        Object stats = null ;
+        java.lang.Long wcmsNodeId = Long.valueOf(716368 ) ;
+        java.lang.String wcmsPath = "/tag/destination/US/CA/075/san-francisco.xml" ;
+
+        private final void writeObject(java.io.ObjectOutputStream os ) throws IOException {
+            os.defaultWriteObject() ;
+        }
+    }
+
+    public static class Trip extends WebContent {
+        int clientId = 2 ;
+        long id = 23900 ;
+        boolean isActive = false ;
+        int lengthDays = 12 ;
+        int version = 232 ;
+        char visibilityCode = 'A' ;
+
+        Date createData = new Date() ;
+        String description = "a description of the trip" ;
+        Destination dest = new Destination() ;
+        String destinationText = "some airport and hotel" ;
+        String name = "John Doe" ;
+        Object member = null ;
+        Object stats = null ;
+        Date startDate = new Date() ;
+        Date updatedDate = new Date() ;
+        Object updatedBy = null ;
+
+        private final void writeObject( ObjectOutputStream os ) throws IOException {
+           os.defaultWriteObject() ;
+        }
+    }
+    
+    public static class Destination implements Serializable {
+        int typeCode = 4 ;
+        Object airport = null ;
+        String featuresCode = "a Feature" ;
+        String fullName = "Full name" ;
+        Point geoPoint = new Point() ;
+        Object[] jdoDetachedState = {
+            new LongIdentity( this.getClass(), 0x123458275374573L ), 
+            null, null, null } ;
+        String name = "name" ;
+
+        private final void writeObject( ObjectOutputStream os ) throws IOException {
+            os.defaultWriteObject() ;
+        }
+    }
+
+    public static class Geometry implements Serializable {
+        int dimension = 2 ;
+        boolean haveMeasure = true ;
+        int srid ;
+        int type = 1 ;
+    }
+
+    public static class Point extends Geometry {
+        double m = 1.0 ;
+        double x = -23.343 ;
+        double y = 102.2325446 ;
+        double z = 100.23 ;
+    }
+
+    public void testTrip() {
+        try {
+            System.out.println( "test case testTrip" ) ;          
+            Trip trip = new Trip() ;
+
+            OutputStream os = (OutputStream)orb.create_output_stream() ;
+            os.write_value( trip ) ;
+            InputStream is = (InputStream)os.create_input_stream() ;
+            Trip newTrip = (Trip)is.read_value() ;
+            //Assert.assertEquals( lid, newLid ) ;
+        } catch (Exception exc) {
+            exc.printStackTrace() ;
+            fail( exc.toString() ) ;
+        }
     }
 }

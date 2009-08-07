@@ -133,6 +133,7 @@
     <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
     <property name="root.dir"			value="${basedir}"/>
     <property name="emma-jar"			value="${root.dir}/lib/emma.jar"/>
+    <property name="jdo-jar"			value="${root.dir}/lib/jdo2-api-2.3-SNAPSHOT.jar"/>
     <property name="jscheme-jar"		value="${root.dir}/lib/jscheme.jar"/>
     <property name="jschemelogutil-jar"		value="${root.dir}/lib/jschemelogutil.jar"/>
     <property name="javatest-jar"		value="${root.dir}/lib/javatest.jar"/>
@@ -186,9 +187,11 @@
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${tools-jar}"/>
 	    <pathelement location="${emma-jar}"/>
+	    <pathelement location="${jdo-jar}"/>
 	    <pathelement location="${optionalclasses.dir}"/>
 	</path>
 	<path id="test-classpath.master">
+	    <pathelement location="${jdo-jar}"/>
 	    <pathelement location="${jdom-jar}"/>
 	    <pathelement location="${xerces-jar}"/>
 	    <pathelement location="${jscheme-jar}"/>

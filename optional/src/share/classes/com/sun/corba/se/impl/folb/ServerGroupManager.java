@@ -99,8 +99,6 @@ public class ServerGroupManager
 {
     private static final String baseMsg = ServerGroupManager.class.getName();
 
-    private boolean debug = false;
-
     private ORB orb;
     private GroupInfoService gis;
     private CSIv2SSLTaggedComponentHandler csiv2SSLTaggedComponentHandler;
@@ -125,7 +123,7 @@ public class ServerGroupManager
 
 	try {
 
-	    if (debug) { dprint(".initialize->:"); }
+	    if (orb.folbDebugFlag) { dprint(".initialize->:"); }
 	
 	    initialized = true;
 
@@ -157,7 +155,7 @@ public class ServerGroupManager
                         ORBConstants.CSI_V2_SSL_TAGGED_COMPONENT_HANDLER);
 	    } catch (InvalidName e) {
 		csiv2SSLTaggedComponentHandler = null;
-		if (debug) { 
+		if (orb.folbDebugFlag) { 
 		    dprint(".initialize: not found: "
 			   + ORBConstants.CSI_V2_SSL_TAGGED_COMPONENT_HANDLER);
 		}
@@ -169,7 +167,7 @@ public class ServerGroupManager
 	    // REVISIT - error string
 	    dprint(".initialize: " + e);
 	} finally {
-	    if (debug) { dprint(".initialize<-:"); }
+	    if (orb.folbDebugFlag) { dprint(".initialize<-:"); }
 	}
     }
 
@@ -195,7 +193,7 @@ public class ServerGroupManager
     public void establish_components(IORInfo iorInfo)
     {
 	try {
-	    if (debug) { dprint(".establish_components->:"); }
+	    if (orb.folbDebugFlag) { dprint(".establish_components->:"); }
 
 	    initialize();
 
@@ -212,20 +210,20 @@ public class ServerGroupManager
 	    String[] adapterName = ((com.sun.corba.se.spi.legacy.interceptor.IORInfoExt)iorInfo)
 	            .getObjectAdapter().getAdapterTemplate().adapter_name();
 	    */
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".establish_components: adapterName: ", adapterName);
 	    }
 
 	    ReferenceFactory rf = referenceFactoryManager.find(adapterName);
 	    if (rf == null) {
 	        if (gis.shouldAddAddressesToNonReferenceFactory(adapterName)) {
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 		        dprint(".establish_components: "
 			       + "not managed by ReferenceFactory but adding addresses:",
 			       adapterName);
 		    }
 		} else {
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 		        dprint(".establish_components: "
 			       + "not managed by ReferenceFactory:",
 			       adapterName);
@@ -259,7 +257,7 @@ public class ServerGroupManager
 	    //
 
 	    for (ClusterInstanceInfo clusterInstanceInfo : info) {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(".establish_components: adding instance info for: " 
 			   + clusterInstanceInfo.name 
 			   + "; " + clusterInstanceInfo.weight 
@@ -273,7 +271,7 @@ public class ServerGroupManager
 		    if (clusterInstanceInfo.endpoints[i].type.startsWith(SSL)){
 			// NOTE: The standalone ORB test depends on accepting
 			// types such as "t0", "W", etc.
-			if (debug) {
+			if (orb.folbDebugFlag) {
 			    dprint(".establish_components: skipping: "
 				   +       clusterInstanceInfo.endpoints[i].type
 				   + "/" + clusterInstanceInfo.endpoints[i].host
@@ -281,7 +279,7 @@ public class ServerGroupManager
 			}
 			continue;
 		    }
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			dprint(".establish_components: "
 			       +       clusterInstanceInfo.endpoints[i].type
 			       + "/" + clusterInstanceInfo.endpoints[i].host
@@ -324,14 +322,14 @@ public class ServerGroupManager
                     ORBConstants.FOLB_MEMBERSHIP_LABEL_TAGGED_COMPONENT_ID,
 		    membershipLabel.getBytes());
 
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(".establish_components: adding membership label: "
 			   + membershipLabel);
 		}
 
 		iorInfo.add_ior_component(tc);
 	    } else {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(".establish_components: NOT adding membership label");
 		}
 	    }
@@ -342,7 +340,7 @@ public class ServerGroupManager
 
 	} finally { 
 
-	    if (debug) { dprint(".establish_components<-:"); }
+	    if (orb.folbDebugFlag) { dprint(".establish_components<-:"); }
 
 	}
     }
@@ -368,7 +366,7 @@ public class ServerGroupManager
     public void membershipChange()
     {
 	try {
-	    if (debug) { dprint(".membershipChange->:"); }
+	    if (orb.folbDebugFlag) { dprint(".membershipChange->:"); }
 
 	    synchronized (this) {
 		if (membershipChangeState == MembershipChangeState.IDLE) {
@@ -376,7 +374,7 @@ public class ServerGroupManager
 		} else {
 		    // State is DOING_WORK or RETRY_REQUIRED.
 		    membershipChangeState = MembershipChangeState.RETRY_REQUIRED;
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			dprint(".membershipChange: already changing");
 		    }
 		    return;
@@ -396,11 +394,11 @@ public class ServerGroupManager
 			// One or more notifies arrived while processing
 			// this notify.  Therefore do the restart again.
 			loop = true;
-			if (debug) { dprint(".membershipChange: looping"); }
+			if (orb.folbDebugFlag) { dprint(".membershipChange: looping"); }
 		    } else if (membershipChangeState == MembershipChangeState.DOING_WORK) {
 			membershipChangeState = MembershipChangeState.IDLE;
 		    } else if (membershipChangeState == MembershipChangeState.IDLE) {
-			if (debug) { 
+			if (orb.folbDebugFlag) { 
 			    dprint(".membershipChange: unexpected state: " 
 				   + membershipChangeState); 
 			}
@@ -418,7 +416,7 @@ public class ServerGroupManager
 		membershipChangeState = MembershipChangeState.IDLE;
 	    }
 	} finally {
-	    if (debug) { dprint(".membershipChange<-:"); }
+	    if (orb.folbDebugFlag) { dprint(".membershipChange<-:"); }
 	}
     }
 
@@ -448,32 +446,32 @@ public class ServerGroupManager
 	Thread worker = new Thread() {
             public void run() {
 		try {
-		    if (debug) { dprint(".membershipChange: rfm.suspend"); }
+		    if (orb.folbDebugFlag) { dprint(".membershipChange: rfm.suspend"); }
 		    rfm.suspend();
 		
 		    // Requests have drained so update label.
 		    // IMPORTANT: do not update label until requests
 		    // have drained.  Otherwise responses will compare
 		    // against wrong label.
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			dprint(".membershipChange: "
 			       + "updating membership label");
 		    }
 		    updateMembershipLabel();
 		    
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			dprint(".membershipChange: rfm.restartFactories");
 		    }
 		    rfm.restartFactories();
 		    
 		} finally {
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			dprint(".membershipChange: rfm.resume");
 		    }
 		    rfm.resume();
 		}
 		
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(".membershipChange: done with rfm");
 		}
 	    }
@@ -481,7 +479,7 @@ public class ServerGroupManager
 	
 	worker.start();
 	
-	if (debug) {
+	if (orb.folbDebugFlag) {
 	    dprint(".membershipChange: waiting for worker to terminate");
 	}
 
@@ -499,14 +497,14 @@ public class ServerGroupManager
 	    }
 	} while (tryAgain);
 
-	if (debug) {
+	if (orb.folbDebugFlag) {
 	    dprint(".membershipChange: done waiting for termination");
 	}
     }
 
     private void updateMembershipLabel()
     {
-	if (debug) { dprint(".updateMembershipLabel->:"); }
+	if (orb.folbDebugFlag) { dprint(".updateMembershipLabel->:"); }
 
 	UID uid = new UID();
 	String hostAddress = null;
@@ -516,14 +514,14 @@ public class ServerGroupManager
 	    // Not necessary but easier to debug.
 	    hostAddress = InetAddress.getLocalHost().getHostAddress();
 	    membershipLabel = hostAddress + ":::" + uid;
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".updateMembershipLabel: " + membershipLabel);
 	    }
 	} catch (UnknownHostException e) {
 	    // REVISIT - error string
 	    dprint(".updateMembershipLabel: " + e);
 	} finally {
-	    if (debug) { dprint(".updateMembershipLabel<-:"); }
+	    if (orb.folbDebugFlag) { dprint(".updateMembershipLabel<-:"); }
 	}
     }
 
@@ -534,22 +532,22 @@ public class ServerGroupManager
 
     public void receive_request_service_contexts(ServerRequestInfo ri)
     {
-	if (debug) {
+	if (orb.folbDebugFlag) {
 	    dprint(".receive_request_service_contexts->: " + ri.operation());
 	}
 	initialize();
-	if (debug) {
+	if (orb.folbDebugFlag) {
 	    dprint(".receive_request_service_contexts<-: " + ri.operation());
 	}
     }
 
     public void receive_request(ServerRequestInfo ri)
     {
-	if (debug) {
+	if (orb.folbDebugFlag) {
 	    dprint(".receive_request->: " + ri.operation());
 	}
 	initialize();
-	if (debug) {
+	if (orb.folbDebugFlag) {
 	    dprint(".receive_request<-: " + ri.operation());
 	}
     }
@@ -579,12 +577,12 @@ public class ServerGroupManager
 	try {
 	    adapterName = ri.adapter_name();
 
-	    if (debug) { dprint(point + "->:", adapterName); }
+	    if (orb.folbDebugFlag) { dprint(point + "->:", adapterName); }
 
 	    if (referenceFactoryManager.getState().value() == 
 		org.omg.PortableServer.POAManagerPackage.State._HOLDING) 
             {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(point + ": RFM in HOLDING - therefore no action");
 		}
 		return;
@@ -598,7 +596,7 @@ public class ServerGroupManager
 	    //
 
 	    if (referenceFactory == null) {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(point + ": not managed by ReferenceFactory", 
 			   adapterName);
 		}
@@ -619,17 +617,17 @@ public class ServerGroupManager
 		    requestMembershipLabel = new String(data);
 
 		    if (membershipLabel.equals(requestMembershipLabel)) {
-			if (debug) {
+			if (orb.folbDebugFlag) {
 			    dprint(point + ": membership labels EQUAL", adapterName);
 			}
 			return;
 		    }
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			dprint(point + ": membership labels NOT equal", adapterName);
 		    }
 		}
 	    } catch (BAD_PARAM e) {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(point + ": membership label not present", adapterName);
 		}
 		// REVISIT: CHECK: if not our ORB then return.  --
@@ -643,7 +641,7 @@ public class ServerGroupManager
 	    // Therefore send an updated IOR.
 	    //
 
-	    if (debug) { dprint(point + ": sending updated IOR", adapterName);}
+	    if (orb.folbDebugFlag) { dprint(point + ": sending updated IOR", adapterName);}
 	    
 	    byte[] objectId = ri.object_id();
 	    org.omg.CORBA.Object ref = 
@@ -664,9 +662,9 @@ public class ServerGroupManager
                 ORBConstants.FOLB_IOR_UPDATE_SERVICE_CONTEXT_ID, data);
 	    ri.add_reply_service_context(sc, false);
 	} catch (RuntimeException e) {
-	    if (debug) { dprint(point + ": exception: " + e, adapterName); }
+	    if (orb.folbDebugFlag) { dprint(point + ": exception: " + e, adapterName); }
 	} finally {
-	    if (debug) { dprint(point + "<-:", adapterName); }
+	    if (orb.folbDebugFlag) { dprint(point + "<-:", adapterName); }
 	}
     }
 
@@ -680,7 +678,7 @@ public class ServerGroupManager
     }
 
     public void post_init(ORBInitInfo info) {
-	if (debug) { dprint(".post_init->:"); }
+	if (orb.folbDebugFlag) { dprint(".post_init->:"); }
 	try {
 	    info.add_ior_interceptor(this);
 	    info.add_server_request_interceptor(this);
@@ -688,7 +686,7 @@ public class ServerGroupManager
 	    // REVISIT - error string
 	    dprint(".post_init: " + e);
 	}
-	if (debug) { dprint(".post_init<-:"); }
+	if (orb.folbDebugFlag) { dprint(".post_init<-:"); }
     }
 
     ////////////////////////////////////////////////////
@@ -698,11 +696,8 @@ public class ServerGroupManager
 
     public void configure(DataCollector collector, ORB orb) 
     {
-	debug = debug || orb.transportDebugFlag;
-
-	if (debug) { dprint(".configure->:"); }
-
 	this.orb = orb;
+	if (orb.folbDebugFlag) { dprint(".configure->:"); }
 
 	//
 	// Setup for IOR and ServerRequest Interceptors
@@ -710,7 +705,7 @@ public class ServerGroupManager
 
 	orb.getORBData().addORBInitializer(this);
 
-	if (debug) { dprint(".configure<-:"); }
+	if (orb.folbDebugFlag) { dprint(".configure<-:"); }
     }
 
     ////////////////////////////////////////////////////

@@ -166,6 +166,9 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 			}
 			contactInfo = (CorbaContactInfo)
 			    contactInfoListIterator.next();
+                        if (orb.folbDebugFlag) {
+                            dprint( ".request: op/" + operation + " contactInfo/" + contactInfo ) ;
+                        }
 		    } finally {
 			tp.exit_hasNextNext() ;
 		    }

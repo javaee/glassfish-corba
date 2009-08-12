@@ -127,8 +127,6 @@ public class ClientGroupManager
 {
     public final String baseMsg = ClientGroupManager.class.getName();
 
-    private boolean debug = false;
-
     public static boolean sentMemberShipLabel = false; // For test.
     public static boolean receivedIORUpdate   = false; // For test.
 
@@ -152,7 +150,7 @@ public class ClientGroupManager
 	}
 
 	try {
-	    if (debug) { dprint(".initialize->"); }
+	    if (orb.folbDebugFlag) { dprint(".initialize->"); }
 	    
 	    initialized = true;
 
@@ -181,7 +179,7 @@ public class ClientGroupManager
 	    // REVISIT: error string
 	    dprint(".initialize: " + e);
 	} finally {
-	    if (debug) { dprint(".initialize<-"); }
+	    if (orb.folbDebugFlag) { dprint(".initialize<-"); }
 	}
     }
 
@@ -194,7 +192,7 @@ public class ClientGroupManager
     {
 	initialize();
         try {
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".getSocketInfo->:");
 	    }
 
@@ -208,12 +206,12 @@ public class ClientGroupManager
 		}
 	    }
 
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".getSocketInfo: handling non SSL socketInfo");
 	    }
 
 	    if (! previous.isEmpty()) {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(".getSocketInfo: returning previous socketInfo: "
 			   + previous);
 		}
@@ -293,7 +291,7 @@ public class ClientGroupManager
 	    rte.initCause(e);
             throw rte;
         } finally {
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".getSocketInfo<-:");
 	    }
 	}
@@ -323,7 +321,7 @@ public class ClientGroupManager
 					final String host,
 					final int port) 
     {
-	if (debug) {
+	if (orb.folbDebugFlag) {
 	    dprint(".getSocketInfo: address from: "
 		   + msg
 		   + "; type/address/port: "
@@ -380,7 +378,7 @@ public class ClientGroupManager
     {
 	initialize();
 	try {
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".reset->: " + getKey(primary));
 	    }
 	    map.remove(getKey(primary));
@@ -391,7 +389,7 @@ public class ClientGroupManager
 	    rte.initCause(t);
 	    throw rte;
 	} finally {
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".reset<-: " + getKey(primary));
 	    }
 	}
@@ -403,7 +401,7 @@ public class ClientGroupManager
     {
 	initialize();
 	try {
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".hasNext->: " 
 		       + formatKeyPreviousList(getKey(primary),
 					       previous,
@@ -415,7 +413,7 @@ public class ClientGroupManager
 	    } else {
 		int previousIndex = contactInfos.indexOf(previous);
 		int contactInfosSize = contactInfos.size();
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(".hasNext: " 
 			   + previousIndex + " " + contactInfosSize);
 		}
@@ -439,7 +437,7 @@ public class ClientGroupManager
 		    result = (contactInfosSize - 1) > previousIndex;
 		}
 	    }
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".hasNext<-: " + result);
 	    }
 	    return result;
@@ -461,7 +459,7 @@ public class ClientGroupManager
 	try {
 	    String debugMsg = null;
 
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		debugMsg = "";
 		dprint(".next->: " 
 		       + formatKeyPreviousList(getKey(primary),
@@ -476,7 +474,7 @@ public class ClientGroupManager
 		// This is NOT a retry.
 		result = map.get(getKey(primary));
 		if (result == null) {
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			debugMsg = ".next<-: initialize map: ";
 		    }
 		    // NOTE: do not map primary to primary.
@@ -484,7 +482,7 @@ public class ClientGroupManager
 		    result = contactInfos.get(0);
 		    map.put(getKey(primary), result);
 		} else {
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			dprint(".next: primary mapped to: " + result);
 		    }
 		    int position = contactInfos.indexOf(result);
@@ -493,7 +491,7 @@ public class ClientGroupManager
 			// took place on SharedCDR, then a corbaloc to 
 			// same location uses a SocketOrChannelContactInfo
 			// and vice versa.
-			if (debug) {
+			if (orb.folbDebugFlag) {
 			    dprint(".next: cannot find mapped entry in current list.  Removing mapped entry and trying .next again.");
 			}
 			reset(primary);
@@ -505,7 +503,7 @@ public class ClientGroupManager
 		    // return that ContactInfo.  Otherwise you will potentially
 		    // return a ContactInfo pointing to an incorrect IOR.
 		    result = contactInfos.get(position);
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			debugMsg = ".next<-: mapped: ";
 		    }
 		}
@@ -516,15 +514,15 @@ public class ClientGroupManager
 		result = contactInfos.get(contactInfos.indexOf(previous) + 1);
 		map.put(getKey(primary), result);
 
-		if (debug) { dprint("IIOP failover to: " + result); }
+		if (orb.folbDebugFlag) { dprint("IIOP failover to: " + result); }
 
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    debugMsg = ".next<-: update map: " 
 			+ " " + contactInfos.indexOf(previous)
 			+ " " + contactInfos.size() + " ";
 		}
 	    }
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(debugMsg + result);
 	    }
 	    return (ContactInfo) result;
@@ -600,7 +598,7 @@ public class ClientGroupManager
 					InitialGroupInfoService.InitialGIS.class);
 	  return initGIS.getClusterInstanceInfo();
 	} catch (Exception e) {
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 	        dprint("Exception in InitialGroupInfoService.getClusterInstanceInfo() ==> ", e);
 	    }
 	    return null;
@@ -696,7 +694,7 @@ public class ClientGroupManager
     public void send_request(ClientRequestInfo ri)
     {
 	try {
-	    if (debug) { dprint(".send_request->: " + ri.operation()); }
+	    if (orb.folbDebugFlag) { dprint(".send_request->: " + ri.operation()); }
 	    initialize(); // REVISIT - remove this one later?
 
 	    org.omg.CORBA.Object ref = ri.effective_target();
@@ -710,7 +708,7 @@ public class ClientGroupManager
 		    ((com.sun.corba.se.spi.ior.TaggedComponent)iterator.next())
 		        .getIOPComponent(orb);
 		byte[] data = membershipLabelTaggedComponent.component_data;
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    sentMemberShipLabel = true; // For test
 		    dprint(".send_request: " + ri.operation()
 			   + ": sending membership label: "
@@ -721,20 +719,20 @@ public class ClientGroupManager
 		    data);
 		ri.add_request_service_context(sc, false);
 	    } else {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    sentMemberShipLabel = false; // For test
 		    dprint(".send_request: " + ri.operation()
 			   + ": no membership label");
 		}
 	    }
 	} catch (RuntimeException e) {
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(".send_request: " + ri.operation()
 		       + ": exception: " + e);
 	    }
 	    throw e;
 	} finally {
-	    if (debug) { dprint(".send_request<-: " + ri.operation()); }
+	    if (orb.folbDebugFlag) { dprint(".send_request<-: " + ri.operation()); }
 	}
     }
 
@@ -760,7 +758,7 @@ public class ClientGroupManager
     private void receive_star(String point, ClientRequestInfo ri)
     {
 	try {
-	    if (debug) { dprint(point + "->: " + ri.operation()); }
+	    if (orb.folbDebugFlag) { dprint(point + "->: " + ri.operation()); }
 	    ServiceContext iorServiceContext = null;
 	    try {
 		iorServiceContext = 
@@ -772,14 +770,14 @@ public class ClientGroupManager
 	    }
 
 	    if (iorServiceContext == null) {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(point + ": " + ri.operation() + ": no IOR update");
 		    receivedIORUpdate = false; // For testing.
 		}
 		return;
 	    }
 
-	    if (debug) {
+	    if (orb.folbDebugFlag) {
 		dprint(point + ": " + ri.operation() + ": received IOR update");
 		receivedIORUpdate = true; // For testing.
 	    }
@@ -808,7 +806,7 @@ public class ClientGroupManager
 	    ((ClientRequestInfoImpl)ri).setLocatedIOR(ior);
 
 	} finally {
-	    if (debug) { dprint(point + "<-: " + ri.operation()); }
+	    if (orb.folbDebugFlag) { dprint(point + "<-: " + ri.operation()); }
 	}
     }
 
@@ -822,14 +820,14 @@ public class ClientGroupManager
     }
 
     public void post_init(ORBInitInfo info) {
-	if (debug) { dprint(".post_init->:"); }
+	if (orb.folbDebugFlag) { dprint(".post_init->:"); }
 	try {
 	    info.add_client_request_interceptor(this);
 	} catch (Exception e) {
 	    // REVISIT - error string
 	    dprint(".post_init: " + e);
 	}
-	if (debug) { dprint(".post_init<-:"); }
+	if (orb.folbDebugFlag) { dprint(".post_init<-:"); }
     }
 
     ////////////////////////////////////////////////////
@@ -839,14 +837,13 @@ public class ClientGroupManager
 
     public void configure(DataCollector collector, ORB orb) 
     {
-	debug = debug || orb.transportDebugFlag;
-
-	if (debug) { dprint(".configure->:"); }
-
 	this.orb = orb;
+	if (orb.folbDebugFlag) { dprint(".configure->:"); }
+
 	orb.getORBData().addORBInitializer(this);
 	orb.getORBData().setIIOPPrimaryToContactInfo(this);
 	orb.getORBData().setIORToSocketInfo(this);
+        
 	// So the load-balancer register to get get updates.
 	try {
 	    orb.register_initial_reference(
@@ -857,7 +854,7 @@ public class ClientGroupManager
 	    dprint(".configure: " + e);
 	}
 
-	if (debug) { dprint(".configure<-:"); }
+	if (orb.folbDebugFlag) { dprint(".configure<-:"); }
     }
 
     ////////////////////////////////////////////////////

@@ -39,6 +39,7 @@ package com.sun.corba.se.impl.transport;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
 
 import com.sun.corba.se.pept.transport.ContactInfo;
 
@@ -55,6 +56,7 @@ import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
 
 import com.sun.corba.se.impl.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -74,6 +76,55 @@ public class CorbaContactInfoListImpl
     protected List<CorbaContactInfo> effectiveTargetIORContactInfoList;
     protected ContactInfo primaryContactInfo;
     private boolean usePerRequestLoadBalancing = false ;
+
+    private int startCount = 0 ;
+
+    private UnaryBooleanFunction<CorbaContactInfo> testPred =
+        new UnaryBooleanFunction<CorbaContactInfo>() {
+            public boolean evaluate( CorbaContactInfo arg ) {
+                return !arg.getType().equals( SocketInfo.IIOP_CLEAR_TEXT ) ;
+            }
+        } ;
+
+    private <T> List<T> filter( List<T> arg, UnaryBooleanFunction<T> pred ) {
+        List<T> result = new ArrayList<T>() ;
+        for (T elem : arg ) {
+            if (pred.evaluate( elem )) {
+                result.add( elem ) ;
+            }
+        }
+
+        return result ;
+    }
+
+    // Move the first startCount elements of the list to the end, so that
+    // the list starts at the startCount'th element and continues
+    // through all elements.  Each time we rotate, increment
+    // startCount for load balancing.
+    private synchronized List<CorbaContactInfo> rotate( List<CorbaContactInfo> arg ) {
+        if (usePerRequestLoadBalancing) {
+            // XXX For testing only!
+            // LinkedList<CorbaContactInfo> tempList = 
+                // new LinkedList<CorbaContactInfo>( filter( arg, testPred ) ) ;
+            LinkedList<CorbaContactInfo> tempList = 
+                new LinkedList<CorbaContactInfo>( arg ) ;
+
+            if (startCount >= tempList.size()) {
+                startCount = 0 ;
+            }
+
+            for (int ctr=0; ctr<startCount; ctr++) {
+                CorbaContactInfo element = tempList.removeLast() ;
+                tempList.addFirst( element ) ;
+            }
+
+            startCount++ ;
+        
+            return tempList ;
+        } else {
+            return arg ;
+        }
+    }
 
     // XREVISIT - is this used?
     public CorbaContactInfoListImpl(ORB orb)
@@ -97,9 +148,14 @@ public class CorbaContactInfoListImpl
 	createContactInfoList();
 	Iterator<CorbaContactInfo> result = new CorbaContactInfoListIteratorImpl(
             orb, this, primaryContactInfo, 
-	    effectiveTargetIORContactInfoList,
+	    rotate( effectiveTargetIORContactInfoList ),
             usePerRequestLoadBalancing );
 
+        /* This doesn't work due to some strange behavior in FOLB: we are getting far
+         * too many IOR updates.  Updates are received even when the cluster shape has not changed.
+         * XXX This should be found and fixed at some point.
+         */
+        /*
         if (usePerRequestLoadBalancing) {
             // Copy the list, otherwise we will get a ConcurrentModificationException as
             // soon as next() is called on the iterator.
@@ -108,6 +164,7 @@ public class CorbaContactInfoListImpl
             newList.add( head ) ;
             effectiveTargetIORContactInfoList = newList ;
         }
+        */
 
         return result ;
     }
@@ -239,6 +296,11 @@ public class CorbaContactInfoListImpl
 		}
 	    }
 	}
+
+        if (orb.folbDebugFlag) {
+            dprint( ".createContactInfoList: effectiveTargetIORContactInfoList = " +
+                effectiveTargetIORContactInfoList ) ;
+        }
     }
 
     private void addRemoteContactInfos(

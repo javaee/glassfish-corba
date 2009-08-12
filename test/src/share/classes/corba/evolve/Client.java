@@ -51,6 +51,8 @@ import org.testng.TestNG ;
 
 import mymath.BigDecimal ;
 
+import com.sun.corba.se.impl.orbutil.ORBConstants ;
+
 public class Client
 {
     private UserNameVerifier verifier ;
@@ -59,6 +61,11 @@ public class Client
     @BeforeSuite 
     public void setup() throws Exception {
         String[] args = new String[0] ;
+
+        // XXX Why is this needed here, but not everywhere else?
+        System.getProperties().setProperty( ORBConstants.INITIAL_PORT_PROPERTY, 
+            "1049" ) ;
+
         orb = ORB.init(args, System.getProperties());
 
         org.omg.CORBA.Object objRef = 

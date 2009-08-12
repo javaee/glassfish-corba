@@ -37,6 +37,7 @@
 package com.sun.corba.se.impl.transport;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set ;
 import java.util.HashSet ;
@@ -76,6 +77,7 @@ public class CorbaContactInfoListIteratorImpl
     protected RuntimeException failureException;
     protected ORBUtilSystemException wrapper;
     private TimingPoints tp ;
+    private boolean usePRLB ;
     protected TcpTimeouts tcpTimeouts ;
     protected boolean debug;
 
@@ -91,7 +93,35 @@ public class CorbaContactInfoListIteratorImpl
     // Set of endpoints that have failed since the last successful communication
     // with the IOR.
     protected Set<ContactInfo> failedEndpoints ;
-    // End ITERATOR state
+    // End ITERATOR stater
+
+    private static int startCount = 0 ;
+
+    // Move the first startCount elements of the list to the end, so that
+    // the iterator starts at the startCount'th element and continues
+    // through all elements.  Each time we make an iterator, increment
+    // startCount for load balancing.
+    private synchronized <T> Iterator<T> makeIterator( List<T> arg ) {
+        /*
+        if (usePRLB) {
+            LinkedList<T> tempList = new LinkedList<T>( arg ) ;
+            if (startCount >= tempList.size()) {
+                startCount = 0 ;
+            }
+
+            for (int ctr=0; ctr<startCount; ctr++) {
+                T element = tempList.removeLast() ;
+                tempList.addFirst( element ) ;
+            }
+
+            startCount++ ;
+
+            return tempList.iterator() ;
+        } else {
+        */
+            return arg.iterator() ;
+        // }
+    }
 
     public CorbaContactInfoListIteratorImpl(
         ORB orb,
@@ -110,7 +140,9 @@ public class CorbaContactInfoListIteratorImpl
 	if (listOfContactInfos != null) {
 	    // listOfContactInfos is null when used by the legacy
 	    // socket factory.  In that case this iterator is NOT used.
-	    this.effectiveTargetIORIterator = listOfContactInfos.iterator();
+            
+            // Argela:
+	    this.effectiveTargetIORIterator = makeIterator( listOfContactInfos );
 	}
 	// List is immutable so no need to synchronize access.
 	this.listOfContactInfos = listOfContactInfos;
@@ -123,6 +155,8 @@ public class CorbaContactInfoListIteratorImpl
 
 	this.waiter = tcpTimeouts.waiter() ;
 	this.failedEndpoints = new HashSet<ContactInfo>() ;
+
+        this.usePRLB = usePerRequestLoadBalancing ;
 
         if (usePerRequestLoadBalancing) {
             // We certainly DON'T want sticky behavior if we are using PRLB.
@@ -189,7 +223,8 @@ public class CorbaContactInfoListIteratorImpl
 		if (primaryToContactInfo != null) {
 		    primaryToContactInfo.reset(primaryContactInfo);
 		} else {
-		    effectiveTargetIORIterator = listOfContactInfos.iterator();
+                    // Argela:
+		    effectiveTargetIORIterator = makeIterator( listOfContactInfos );
 		}
 
 		result = hasNext();

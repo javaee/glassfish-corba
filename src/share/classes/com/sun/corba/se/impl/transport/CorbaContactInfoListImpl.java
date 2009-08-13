@@ -97,30 +97,66 @@ public class CorbaContactInfoListImpl
         return result ;
     }
 
+    private static ThreadLocal<Boolean> skipRotate = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false ;
+        }
+    } ;
+
+    // This is an ugly hack to avoid rotating the iterator when the
+    // ClientGroupManager decides to update the iterator, which is only
+    // supposed to happen when the cluster shape changes.  Unfortunately it
+    // is happening on EVERY REQUEST, at least in the Argela test.
+    // XXX Fix the wrong behavior and remove this hack!
+    public static void setSkipRotate() {
+        skipRotate.set( true ) ;
+    }
+
     // Move the first startCount elements of the list to the end, so that
     // the list starts at the startCount'th element and continues
     // through all elements.  Each time we rotate, increment
     // startCount for load balancing.
     private synchronized List<CorbaContactInfo> rotate( List<CorbaContactInfo> arg ) {
+        if (skipRotate.get()) {
+            skipRotate.set( false ) ;
+            return arg ;
+        }
+
         if (usePerRequestLoadBalancing) {
-            // XXX For testing only!
-            // LinkedList<CorbaContactInfo> tempList = 
-                // new LinkedList<CorbaContactInfo>( filter( arg, testPred ) ) ;
-            LinkedList<CorbaContactInfo> tempList = 
-                new LinkedList<CorbaContactInfo>( arg ) ;
-
-            if (startCount >= tempList.size()) {
-                startCount = 0 ;
+            if (orb.folbDebugFlag) {
+                dprint( ".rotate->: arg = " + arg + " startCount = " + startCount ) ;
             }
 
-            for (int ctr=0; ctr<startCount; ctr++) {
-                CorbaContactInfo element = tempList.removeLast() ;
-                tempList.addFirst( element ) ;
-            }
+            LinkedList<CorbaContactInfo> tempList = null ; 
 
-            startCount++ ;
-        
-            return tempList ;
+            try {
+                // XXX  This may be the best way to support PRLB for now.
+                // The GIS will return types like "iiop-listener-1", but we also get
+                // IIOP_CLEAR_TEXT for some, for both SSL and non-SSL ports.  Invoking
+                // clear on an SSL port leads to bad failures that are not retryable.
+                tempList = new LinkedList<CorbaContactInfo>( filter( arg, testPred ) ) ;
+
+                // XXX Really should just be this:
+                // tempList = new LinkedList<CorbaContactInfo>( arg ) ;
+
+                if (startCount >= tempList.size()) {
+                    startCount = 0 ;
+                }
+
+                for (int ctr=0; ctr<startCount; ctr++) {
+                    CorbaContactInfo element = tempList.removeLast() ;
+                    tempList.addFirst( element ) ;
+                }
+
+                startCount++ ;
+            
+                return tempList ;
+            } finally {
+                if (orb.folbDebugFlag) {
+                    dprint( ".rotate<-: result = " + tempList ) ;
+                }
+            }
         } else {
             return arg ;
         }

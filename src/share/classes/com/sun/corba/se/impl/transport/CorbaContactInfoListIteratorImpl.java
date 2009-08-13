@@ -444,6 +444,13 @@ public class CorbaContactInfoListIteratorImpl
 	// ensure that the request dispatchers get their iterator from the 
 	// InvocationStack (i.e., ThreadLocal). That way if the list iterator
 	// needs a complete update it happens right here.
+
+        // Ugly hack for Argela: avoid rotating the iterator in this case,
+        // or we rotate the iterator twice on every request.
+        // XXX remove this hack once we figure out why we get all of the
+        // membership changes when the cluster shape does not change.
+        CorbaContactInfoListImpl.setSkipRotate() ;
+
 	((CorbaInvocationInfo)orb.getInvocationInfo())
 	    .setContactInfoListIterator(contactInfoList.iterator());
     }

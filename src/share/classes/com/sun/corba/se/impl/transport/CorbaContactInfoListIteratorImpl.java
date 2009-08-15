@@ -95,34 +95,6 @@ public class CorbaContactInfoListIteratorImpl
     protected Set<ContactInfo> failedEndpoints ;
     // End ITERATOR stater
 
-    private static int startCount = 0 ;
-
-    // Move the first startCount elements of the list to the end, so that
-    // the iterator starts at the startCount'th element and continues
-    // through all elements.  Each time we make an iterator, increment
-    // startCount for load balancing.
-    private synchronized <T> Iterator<T> makeIterator( List<T> arg ) {
-        /*
-        if (usePRLB) {
-            LinkedList<T> tempList = new LinkedList<T>( arg ) ;
-            if (startCount >= tempList.size()) {
-                startCount = 0 ;
-            }
-
-            for (int ctr=0; ctr<startCount; ctr++) {
-                T element = tempList.removeLast() ;
-                tempList.addFirst( element ) ;
-            }
-
-            startCount++ ;
-
-            return tempList.iterator() ;
-        } else {
-        */
-            return arg.iterator() ;
-        // }
-    }
-
     public CorbaContactInfoListIteratorImpl(
         ORB orb,
 	CorbaContactInfoList corbaContactInfoList,
@@ -141,8 +113,7 @@ public class CorbaContactInfoListIteratorImpl
 	    // listOfContactInfos is null when used by the legacy
 	    // socket factory.  In that case this iterator is NOT used.
             
-            // Argela:
-	    this.effectiveTargetIORIterator = makeIterator( listOfContactInfos );
+	    this.effectiveTargetIORIterator = listOfContactInfos.iterator() ;
 	}
 	// List is immutable so no need to synchronize access.
 	this.listOfContactInfos = listOfContactInfos;
@@ -224,7 +195,7 @@ public class CorbaContactInfoListIteratorImpl
 		    primaryToContactInfo.reset(primaryContactInfo);
 		} else {
                     // Argela:
-		    effectiveTargetIORIterator = makeIterator( listOfContactInfos );
+		    effectiveTargetIORIterator = listOfContactInfos.iterator() ;
 		}
 
 		result = hasNext();

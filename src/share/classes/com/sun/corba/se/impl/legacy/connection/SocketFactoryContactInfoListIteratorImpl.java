@@ -39,8 +39,6 @@ package com.sun.corba.se.impl.legacy.connection;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-
 import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
@@ -68,11 +66,13 @@ public class SocketFactoryContactInfoListIteratorImpl
     // java.util.Iterator
     //
 
+    @Override
     public boolean hasNext()
     {
 	return true;
     }
 
+    @Override
     public CorbaContactInfo next()
     {
 	if (contactInfoList.getEffectiveTargetIOR().getProfile().isLocal()){

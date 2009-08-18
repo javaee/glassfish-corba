@@ -90,10 +90,12 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
     private Map<String,TimerEventHandler> timerEventHandlers ;
     private Map<String,TimerEventControllerBase> timerEventControllers ;
 
+    private boolean doGmbalRegistration ;
+
     private void manage( Named obj ) {
         // Note that no extra parameters are needed here, because Named.getName
         // is an ObjectNameKey.
-        if (mom != null)  {
+        if ((mom != null) && doGmbalRegistration) {
             // System.out.println( "Registering " + obj ) ;
             mom.registerAtRoot( obj ) ;
         }
@@ -102,18 +104,20 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
     private void manage( Named parent, Named obj ) {
         // Note that no extra parameters are needed here, because Named.getName
         // is an ObjectNameKey.
-        if (mom != null)  {
+        if ((mom != null) && doGmbalRegistration){
             // System.out.println( "Registering " + obj ) ;
             mom.register( parent, obj ) ;
         }
     }
 
     private void unmanage( Named obj ) {
-        if (mom != null) 
+        if ((mom != null) && doGmbalRegistration) {
             mom.unregister( obj ) ;
+        }
     }
 
-    public TimerFactoryImpl( ManagedObjectManager mom, String name, String description ) {
+    public TimerFactoryImpl( ManagedObjectManager mom, String name, String description,
+        boolean doGmbalRegistration ) {
 	super( 0, null, name, description ) ;
         this.mom = mom ;
 	setFactory( this ) ;
@@ -134,6 +138,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
 	timerEventHandlers = new HashMap<String,TimerEventHandler>() ;
 	timerEventControllers = new HashMap<String,TimerEventControllerBase>() ;
+        this.doGmbalRegistration = doGmbalRegistration ;
         manage( this ) ;
     }
 

@@ -42,7 +42,6 @@ import java.util.Iterator ;
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.IORTemplateList ;
 import com.sun.corba.se.spi.ior.ObjectId ;
 import com.sun.corba.se.spi.ior.IORTemplate ;
@@ -72,6 +71,7 @@ public class IORTemplateListImpl extends FreezableList<IORTemplate>
 	makeImmutable() ;
     }
 
+    @Override
     public void makeImmutable()
     {
 	makeElementsImmutable() ;

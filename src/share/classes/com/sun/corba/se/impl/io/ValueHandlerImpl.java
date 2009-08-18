@@ -44,24 +44,17 @@
 
 package com.sun.corba.se.impl.io;
 
-import javax.rmi.PortableRemoteObject;
 
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.Collections ;
 import java.io.IOException;
 
-import com.sun.corba.se.impl.util.Utility;
-import com.sun.corba.se.impl.io.IIOPInputStream;
-import com.sun.corba.se.impl.io.IIOPOutputStream;
 import com.sun.corba.se.impl.util.RepositoryId;
 import com.sun.corba.se.impl.util.Utility;
 
 import org.omg.CORBA.TCKind;
 
-import org.omg.CORBA.MARSHAL;
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.portable.IndirectionException;
 import com.sun.org.omg.SendingContext.CodeBase;
 import com.sun.org.omg.SendingContext.CodeBaseHelper;
@@ -73,7 +66,6 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.btrace.* ;
  
-import com.sun.corba.se.impl.io.IIOPInputStream.ActiveRecursionManager;
 
 import com.sun.corba.se.impl.logging.OMGSystemException;
 import com.sun.corba.se.impl.logging.UtilSystemException;

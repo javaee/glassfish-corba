@@ -60,8 +60,6 @@ import org.omg.PortableInterceptor.ForwardRequestHelper;
 import org.omg.PortableInterceptor.ORBInitializer;
 import org.omg.PortableInterceptor.ORBInitInfo;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-
 import com.sun.corba.se.spi.folb.CSIv2SSLTaggedComponentHandler;
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
 import com.sun.corba.se.spi.folb.ClusterInstanceInfoHelper;
@@ -121,6 +119,7 @@ public class ClientGroupManager
 	ORBConfigurator,
 	ORBInitializer
 {
+    private static final long serialVersionUID = 7849660203226017842L;
     public final String baseMsg = ClientGroupManager.class.getName();
 
     private boolean debug = false;
@@ -134,7 +133,7 @@ public class ClientGroupManager
     private boolean initialized = false;
 
     private IOR lastIOR;  // Initially null, thus the separate lock object.
-    private Object lastIORLock = new Object();
+    private final Object lastIORLock = new Object();
     private CSIv2SSLTaggedComponentHandler csiv2SSLTaggedComponentHandler;
     private transient GIS gis = new GIS();
 
@@ -339,6 +338,7 @@ public class ClientGroupManager
                     return port;
                 }
 
+                @Override
 		public boolean equals(Object o) {
 		    if (o == null) {
 			return false;
@@ -359,10 +359,12 @@ public class ClientGroupManager
 		    return true;
 		}
 
+                @Override
 		public String toString() {
 		    return "SocketInfo[" + type + " " + host + " " + port +"]";
 		}
 
+                @Override
                 public int hashCode() {
                     return port ^ host.hashCode() ^ type.hashCode() ;
                 }

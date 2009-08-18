@@ -46,6 +46,8 @@ import java.util.logging.Logger ;
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
+import javax.management.ObjectName ;
+
 import org.omg.CORBA.TCKind ;
 import org.omg.PortableServer.Servant ;
 
@@ -361,11 +363,14 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
         String orbId = getUniqueOrbId() ;
 
+        final boolean timingsPointsEnabled = getORBData() != null 
+            && getORBData().timingPointsEnabled() ;
+
 	TimerManager<TimingPoints> timerManager = 
-	    new TimerManager<TimingPoints>( mom, orbId ) ;
+	    new TimerManager<TimingPoints>( mom, orbId, timingsPointsEnabled ) ;
 
 	TimingPoints tp = null ;
-	if ((getORBData() != null) && getORBData().timingPointsEnabled()) {
+        if (timingsPointsEnabled) {
 	    tp = new TimingPointsEnabledImpl( timerManager.factory(), 
 		timerManager.controller() ) ;
 	} else {
@@ -678,11 +683,21 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // DummyORB
     // DummyPOA
 
+    private ObjectName rootParentObjectName = null ;
+
+    public void setRootParentObjectName( ObjectName oname ) {
+        rootParentObjectName = oname ;
+    }
+
     public void createORBManagedObjectManager() {
         // XXX createStandalone should be replaced by createFederated if running
         // as part of GlassFish v3 or later.  An extension to the SPI is needed for
         // this.
-        mom = ManagedObjectManagerFactory.createStandalone( "com.sun.corba" ) ;
+        if (rootParentObjectName == null) {
+            mom = ManagedObjectManagerFactory.createStandalone( "com.sun.corba" ) ;
+        } else {
+            mom = ManagedObjectManagerFactory.createFederated( rootParentObjectName ) ;
+        }
 
         if (mbeanFineDebugFlag) {
             mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.FINE ) ;

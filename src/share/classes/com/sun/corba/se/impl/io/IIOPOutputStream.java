@@ -66,7 +66,6 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.btrace.* ;
 
-import com.sun.corba.se.impl.io.ObjectStreamClass;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.RepositoryId;
 
@@ -303,15 +302,18 @@ public class IIOPOutputStream
     }
 
 
+    @Override
     protected final void annotateClass(Class<?> cl) throws IOException{
 	// XXX I18N, Logging needed.
         throw new IOException("Method annotateClass not supported");
     }
 
+    @Override
     public final void close() throws IOException{
         // no op
     }
 
+    @Override
     protected final void drain() throws IOException{
         // no op
     }
@@ -569,6 +571,7 @@ public class IIOPOutputStream
 	}
     }
 
+    @Override
     protected final void writeStreamHeader() throws IOException{
         // no op
     }

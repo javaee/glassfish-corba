@@ -503,7 +503,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
      */
     public boolean is_local(org.omg.CORBA.Object self) 
     {
-	// XXX this need to check isNextCallValid
+	// XXX this needs to check isNextCallValid
         return contactInfoList.getEffectiveTargetIOR().getProfile().
 	    isLocal();
     }

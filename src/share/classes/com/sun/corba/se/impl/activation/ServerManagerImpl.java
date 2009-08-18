@@ -92,6 +92,7 @@ import com.sun.corba.se.spi.transport.CorbaAcceptor;
 public class ServerManagerImpl extends _ServerManagerImplBase
     implements BadServerIdHandler
 {
+    private static final long serialVersionUID = -8150406906204281113L;
     // Using HashMap, since synchronization should be done by the calling
     // routines
     Map<Integer,ServerTableEntry> serverTable;

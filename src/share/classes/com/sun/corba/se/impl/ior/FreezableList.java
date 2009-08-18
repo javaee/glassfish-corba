@@ -36,11 +36,8 @@
 
 package com.sun.corba.se.impl.ior ;
 
-import java.util.Collection ;
 import java.util.List ;
 import java.util.AbstractList ;
-import java.util.ListIterator ;
-import java.util.Iterator ;
 
 import com.sun.corba.se.spi.ior.MakeImmutable ;
 
@@ -55,6 +52,7 @@ public class FreezableList<E> extends AbstractList<E> {
     private List<E> delegate = null ;
     private boolean immutable = false ;
 
+    @Override
     public boolean equals( Object obj )
     {
 	if (obj == null)
@@ -69,6 +67,7 @@ public class FreezableList<E> extends AbstractList<E> {
 	    (immutable == other.immutable) ;
     }
 
+    @Override
     public int hashCode()
     {
 	return delegate.hashCode() ;
@@ -117,6 +116,7 @@ public class FreezableList<E> extends AbstractList<E> {
 	return delegate.get(index) ;
     }
 
+    @Override
     public E set(int index, E element)
     {
 	if (immutable)
@@ -125,6 +125,7 @@ public class FreezableList<E> extends AbstractList<E> {
 	return delegate.set(index, element) ;
     }
 
+    @Override
     public void add(int index, E element)
     {
 	if (immutable)
@@ -133,6 +134,7 @@ public class FreezableList<E> extends AbstractList<E> {
 	delegate.add(index, element) ;
     }
 
+    @Override
     public E remove(int index)
     {
 	if (immutable)
@@ -142,6 +144,7 @@ public class FreezableList<E> extends AbstractList<E> {
     }
 
     // We also override subList so that the result is a FreezableList.
+    @Override
     public List<E> subList(int fromIndex, int toIndex)
     {
 	List<E> list = delegate.subList(fromIndex, toIndex) ;

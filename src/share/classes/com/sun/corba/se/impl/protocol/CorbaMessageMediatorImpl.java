@@ -58,12 +58,6 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 import org.omg.IOP.ExceptionDetailMessage;
 import org.omg.IOP.TAG_RMI_CUSTOM_MAX_STREAM_FORMAT;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.protocol.CorbaProtocolHandler;
-import com.sun.corba.se.spi.transport.CorbaConnection;
-
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
@@ -127,9 +121,6 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage_1_0 ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage_1_1 ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage_1_2 ;
-
-// REVISIT: make sure no memory leaks in client/server request/reply maps.
-// REVISIT: normalize requestHeader, replyHeader, messageHeader.
 
 /**
  * @author Harold Carr
@@ -320,7 +311,7 @@ public class CorbaMessageMediatorImpl
     public void setReplyHeader(LocateReplyOrReplyMessage header)
     {
 	this.replyHeader = header;
-	this.replyIOR = header.getIOR(); // REVISIT - need separate field?
+	this.replyIOR = header.getIOR(); 
     }
 
     public LocateReplyMessage getLocateReplyHeader()
@@ -363,8 +354,6 @@ public class CorbaMessageMediatorImpl
 	return getRequestHeader().getRequestId();
     }
 
-    // REVISIT: The use of requestIdInteger should be removed and use Java's
-    //          autoboxing instead.
     public Integer getRequestIdInteger()
     {
 	if (requestIdInteger == null) {
@@ -436,8 +425,6 @@ public class CorbaMessageMediatorImpl
 			   e);
 		}
 
-		// REVISIT: we could attempt to send a final incomplete
-		// fragment in this case.
 		throw interceptorWrapper.ioexceptionDuringCancelRequest(
 		    CompletionStatus.COMPLETED_MAYBE, e );
 	    } finally {
@@ -594,8 +581,6 @@ public class CorbaMessageMediatorImpl
 		}
 	    }
 	    connection.purgeCalls(wrapper.connectionAbort(ex), false, false);
-	    // REVISIT
-	    //keepRunning = false;
 	} finally {
 	    if (transportDebug()) {
 		dprint(".dispatch<-: " + this.connection);
@@ -802,7 +787,6 @@ public class CorbaMessageMediatorImpl
 	    dispatchHeader.callback(this);
 	} catch (IOException e) {
 	    // REVISIT - this should be handled internally.
-	    ;
 	} finally {
 	    ORBUtility.popEncVersionFromThreadLocalState();
 	}
@@ -1380,7 +1364,7 @@ public class CorbaMessageMediatorImpl
 	    try {
 		messageHeader = header;
 		CorbaMessageMediator mediator = null;
-		CDRInputObject inputObject = null;
+		CDRInputObject inObj = null;
 
 		if (connection.isServer()) {
 		    mediator = connection.serverRequest_1_1_Get();
@@ -1388,7 +1372,7 @@ public class CorbaMessageMediatorImpl
 		    mediator = connection.clientReply_1_1_Get();
 		}
 		if (mediator != null) {
-		    inputObject = (CDRInputObject) mediator.getInputObject();
+		    inObj = (CDRInputObject) mediator.getInputObject();
 		}
 
 		// If no input stream available, then discard the fragment.
@@ -1400,7 +1384,7 @@ public class CorbaMessageMediatorImpl
 		// Note: In the case of early replies, the fragments received
 		// during the request processing (which are never unmarshaled),
 		// will eventually be discarded by the GC.
-		if (inputObject == null) {
+		if (inObj == null) {
 		    if (transportDebug()) 
 			dprint(".FRAGMENT 1.1: ++++DISCARDING++++: " + header);
                     // need to release dispatchByteBuffer to pool if
@@ -1409,7 +1393,7 @@ public class CorbaMessageMediatorImpl
 		    return;
 		}
 
-		inputObject.getBufferManager()
+		inObj.getBufferManager()
 		    .processFragment(dispatchByteBuffer, header);
 
 		if (! header.moreFragmentsToFollow()) {
@@ -1454,7 +1438,7 @@ public class CorbaMessageMediatorImpl
 		}
 
 		CorbaMessageMediator mediator = null;
-		CDRInputObject inputObject = null;
+		CDRInputObject inObj = null;
 
 		if (connection.isServer()) {
 		    mediator =
@@ -1464,10 +1448,10 @@ public class CorbaMessageMediatorImpl
 			connection.clientRequestMapGet(header.getRequestId());
 		}
 		if (mediator != null) {
-		    inputObject = mediator.getInputObject();
+		    inObj = mediator.getInputObject();
 		}
 		// See 1.1 comments.
-		if (inputObject == null) {
+		if (inObj == null) {
 		    if (transportDebug()) {
 			dprint(".FRAGMENT 1.2: id/"
 			       + header.getRequestId()
@@ -1479,8 +1463,7 @@ public class CorbaMessageMediatorImpl
                     releaseByteBufferToPool();
 		    return;
 		}
-		((CDRInputObject)inputObject)
-		    .getBufferManager().processFragment(
+		inObj.getBufferManager().processFragment(
                                      dispatchByteBuffer, header);
 
 		// REVISIT: but if it is a server don't you have to remove the
@@ -1739,8 +1722,8 @@ public class CorbaMessageMediatorImpl
 
     private void beginRequest(CorbaMessageMediator messageMediator)
     {
-	ORB orb = (ORB) messageMediator.getBroker();
-	if (orb.subcontractDebugFlag) {
+	ORB myOrb = messageMediator.getBroker();
+	if (myOrb.subcontractDebugFlag) {
 	    dprint(".handleRequest->:");
 	}
 	connection.serverRequestProcessingBegins();
@@ -1769,21 +1752,21 @@ public class CorbaMessageMediatorImpl
             return ;
 
 	// REVISIT - type and location
-	CDROutputObject outputObject = (CDROutputObject)
+	CDROutputObject outObj = (CDROutputObject)
 	    messageMediator.getOutputObject();
-	if (outputObject != null) {
+	if (outObj != null) {
 	    // REVISIT - can be null for TRANSIENT below.
-	    outputObject.finishSendingMessage();
+	    outObj.finishSendingMessage();
 	}
     }
 
     private void endRequest(CorbaMessageMediator messageMediator)
     {
-	ORB orb = (ORB) messageMediator.getBroker();
-	if (orb.subcontractDebugFlag) {
+	ORB myOrb = (ORB) messageMediator.getBroker();
+	if (myOrb.subcontractDebugFlag) {
 	    dprint(".handleRequest<-: " + opAndId(messageMediator));
 	}
-        if (orb.orbIsShutdown())
+        if (myOrb.orbIsShutdown())
             return ;
 
         // release NIO ByteBuffers to ByteBufferPool
@@ -1801,7 +1784,7 @@ public class CorbaMessageMediatorImpl
             // Given what close() does, this catch shouldn't ever happen.
             // See CDRInput/OutputObject.close() for more info.
             // It also won't result in a Corba error if an IOException happens.
-	    if (orb.subcontractDebugFlag) {
+	    if (myOrb.subcontractDebugFlag) {
                 dprint(".endRequest: IOException:" + ex.getMessage(), ex);
 	    }
         } finally {
@@ -1814,20 +1797,20 @@ public class CorbaMessageMediatorImpl
 	// Does nothing if already unmarshaled.
 	((CDRInputObject)messageMediator.getInputObject()).unmarshalHeader();
 
-        ORB orb = (ORB)messageMediator.getBroker();
-        if (orb.orbIsShutdown())
+        ORB myOrb = (ORB)messageMediator.getBroker();
+        if (myOrb.orbIsShutdown())
             return ;
 
 	ObjectKey okey = messageMediator.getObjectKeyCacheEntry().getObjectKey();
-        if (orb.subcontractDebugFlag) {
+        if (myOrb.subcontractDebugFlag) {
 	    ObjectKeyTemplate oktemp = okey.getTemplate() ;
 	    dprint( ".handleRequest: " + opAndId(messageMediator)
 		    + ": dispatching to scid: " + oktemp.getSubcontractId());
 	}
 
-	CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher(orb);
+	CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher(myOrb);
 
-	if (orb.subcontractDebugFlag) {
+	if (myOrb.subcontractDebugFlag) {
 	    dprint(".handleRequest: " + opAndId(messageMediator)
 		   + ": dispatching to sc: " + sc);
 	}
@@ -1844,16 +1827,16 @@ public class CorbaMessageMediatorImpl
 	//messageMediator.setProtocolHandler(this);
 
         try {
-            orb.startingDispatch();
+            myOrb.startingDispatch();
 	    sc.dispatch(messageMediator);
         } finally {
-            orb.finishedDispatch();
+            myOrb.finishedDispatch();
         }
     }
 
     protected void handleLocateRequest(CorbaMessageMediator messageMediator)
     {
-	ORB orb = (ORB)messageMediator.getBroker();
+	ORB myOrb = (ORB)messageMediator.getBroker();
 	LocateRequestMessage msg = (LocateRequestMessage)
 	    messageMediator.getDispatchHeader();
 	IOR ior = null;
@@ -1863,7 +1846,8 @@ public class CorbaMessageMediatorImpl
 	try {
 	    ((CDRInputObject)messageMediator.getInputObject()).unmarshalHeader();
 	    ObjectKey okey = msg.getObjectKeyCacheEntry().getObjectKey() ;
-	    CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher( orb ) ;
+	    CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher(
+                myOrb ) ;
 	    if (sc == null) {
 		return;
 	    }
@@ -1872,14 +1856,14 @@ public class CorbaMessageMediatorImpl
 
 	    if ( ior == null ) {
 		reply = MessageBase.createLocateReply(
-		            orb, msg.getGIOPVersion(),
+		            myOrb, msg.getGIOPVersion(),
 			    msg.getEncodingVersion(), 
                             msg.getRequestId(),
 			    LocateReplyMessage.OBJECT_HERE, null);
 
 	    } else {
 		reply = MessageBase.createLocateReply(
-		            orb, msg.getGIOPVersion(),
+		            myOrb, msg.getGIOPVersion(),
 			    msg.getEncodingVersion(),
                             msg.getRequestId(),
 			    LocateReplyMessage.OBJECT_FORWARD, ior);
@@ -1892,7 +1876,7 @@ public class CorbaMessageMediatorImpl
 	    // addressing disposition.
 	    
 	    reply = MessageBase.createLocateReply(
-		        orb, msg.getGIOPVersion(),
+		        myOrb, msg.getGIOPVersion(),
 			msg.getEncodingVersion(),
                         msg.getRequestId(),
 			LocateReplyMessage.LOC_NEEDS_ADDRESSING_MODE, null);
@@ -1912,25 +1896,24 @@ public class CorbaMessageMediatorImpl
 	    // the subcontract or obj manager. Send back UNKNOWN_OBJECT.
 
 	    reply = MessageBase.createLocateReply(
-		        orb, msg.getGIOPVersion(),
+		        myOrb, msg.getGIOPVersion(),
 			msg.getEncodingVersion(),
 			msg.getRequestId(),
 			LocateReplyMessage.UNKNOWN_OBJECT, null);
 	}
 
-	CDROutputObject outputObject =
-	    createAppropriateOutputObject(messageMediator,
-					  msg, reply);
-	messageMediator.setOutputObject(outputObject);
-	outputObject.setMessageMediator(messageMediator);
+	CDROutputObject outObj = createAppropriateOutputObject(
+            messageMediator, msg, reply);
+	messageMediator.setOutputObject(outObj);
+	outObj.setMessageMediator(messageMediator);
 
-	reply.write(outputObject);
+	reply.write(outObj);
 	// outputObject.setMessage(reply); // REVISIT - not necessary
 	if (ior != null) {
-	    ior.write(outputObject);
+	    ior.write(outObj);
 	}
 	if (addrDisp != -1) {
-	    AddressingDispositionHelper.write(outputObject, addrDisp);
+	    AddressingDispositionHelper.write(outObj, addrDisp);
 	}
     }
 
@@ -1938,12 +1921,12 @@ public class CorbaMessageMediatorImpl
         CorbaMessageMediator messageMediator,
 	Message msg, LocateReplyMessage reply)
     {
-	CDROutputObject outputObject;
+	CDROutputObject outObj;
 
 	if (msg.getGIOPVersion().lessThan(GIOPVersion.V1_2)) {
 	    // locate msgs 1.0 & 1.1 :=> grow, 
 	    // REVISIT - build from factory
-	    outputObject = new CDROutputObject( messageMediator.getBroker(), this,
+	    outObj = new CDROutputObject( messageMediator.getBroker(), this,
 			     GIOPVersion.V1_0,
 			     messageMediator.getConnection(),
 			     reply,
@@ -1951,11 +1934,11 @@ public class CorbaMessageMediatorImpl
 	} else {
 	    // 1.2 :=> stream
 	    // REVISIT - build from factory
-	    outputObject = new CDROutputObject( messageMediator.getBroker(), messageMediator,
+	    outObj = new CDROutputObject( messageMediator.getBroker(), messageMediator,
 			     reply,
 			     ORBConstants.STREAM_FORMAT_VERSION_1);
 	}
-	return outputObject;
+	return outObj;
     }
 
     public void handleThrowableDuringServerDispatch(
@@ -2069,7 +2052,7 @@ public class CorbaMessageMediatorImpl
 	// NOTE: We do not trap ThreadDeath above Throwable.
 	// There is no reason to stop the thread.  It is
 	// just a worker thread.  The ORB never throws
-	// ThreadDeath.  Client code may (e.g., in ServantManagers,
+	// ThreadDeath.  Client code may (e.g., in ServanoutputObjecttManagers,
 	// interceptors, or servants) but that should not
 	// effect the ORB threads.  So it is just handled
 	// generically.
@@ -2098,27 +2081,27 @@ public class CorbaMessageMediatorImpl
                     
 	switch (messageMediator.getRequestHeader().getType()) {
 	case Message.GIOPRequest :
-	    ORB orb = (ORB)messageMediator.getBroker() ;
+	    ORB myOrb = (ORB)messageMediator.getBroker() ;
 
-	    ReplyMessage replyHeader = MessageBase.createReply( orb, 
+	    ReplyMessage repHdr = MessageBase.createReply( myOrb,
 		messageMediator.getGIOPVersion(), 
 		messageMediator.getEncodingVersion(), 
 		messageMediator.getRequestId(), 
 		ReplyMessage.NEEDS_ADDRESSING_MODE, 
-		ServiceContextDefaults.makeServiceContexts(orb), null);
+		ServiceContextDefaults.makeServiceContexts(myOrb), null);
 	    
 	    // REVISIT: via acceptor factory.
-	    CDROutputObject outputObject = new CDROutputObject(
+	    CDROutputObject outObj = new CDROutputObject(
                 messageMediator.getBroker(),
 		this,
 		messageMediator.getGIOPVersion(),
 		messageMediator.getConnection(),
-		replyHeader,
+		repHdr,
 		ORBConstants.STREAM_FORMAT_VERSION_1);
-	    messageMediator.setOutputObject(outputObject);
-	    outputObject.setMessageMediator(messageMediator);
-	    replyHeader.write(outputObject);
-	    AddressingDispositionHelper.write(outputObject,
+	    messageMediator.setOutputObject(outObj);
+	    outObj.setMessageMediator(messageMediator);
+	    repHdr.write(outObj);
+	    AddressingDispositionHelper.write(outObj,
 					      ex.expectedAddrDisp());
 	    return;
 
@@ -2134,19 +2117,19 @@ public class CorbaMessageMediatorImpl
 	    addrDisp = ex.expectedAddrDisp();
 
 	    // REVISIT: via acceptor factory.
-	    outputObject = 
+	    outObj =
 		createAppropriateOutputObject(messageMediator,
 					      messageMediator.getRequestHeader(),
 					      locateReplyHeader);
-	    messageMediator.setOutputObject(outputObject);
-	    outputObject.setMessageMediator(messageMediator);
-	    locateReplyHeader.write(outputObject);
+	    messageMediator.setOutputObject(outObj);
+	    outObj.setMessageMediator(messageMediator);
+	    locateReplyHeader.write(outObj);
 	    IOR ior = null;
 	    if (ior != null) {
-		ior.write(outputObject);
+		ior.write(outObj);
 	    }
 	    if (addrDisp != -1) {
-		AddressingDispositionHelper.write(outputObject, addrDisp);
+		AddressingDispositionHelper.write(outObj, addrDisp);
 	    }
 	    return;
 	}
@@ -2387,7 +2370,7 @@ public class CorbaMessageMediatorImpl
 	// to construct a reply for that exception.  The internal logic
 	// of returnServant makes sure that postinvoke is only called once.
 	// REVISIT: instead of instanceof, put method on all orbs.
-	ORB orb = null;
+	ORB myOrb = null;
 	// This flag is to deal with BootstrapServer use of reply streams,
 	// with ServerRequestDispatcher's use of reply streams, etc.
 	if (messageMediator.executeReturnServantInResponseConstructor()) {
@@ -2400,8 +2383,8 @@ public class CorbaMessageMediatorImpl
 	    messageMediator.setExecuteRemoveThreadInfoInResponseConstructor(true);
 
 	    try {
-		orb = (ORB)messageMediator.getBroker();
-		OAInvocationInfo info = orb.peekInvocationInfo() ;
+		myOrb = (ORB)messageMediator.getBroker();
+		OAInvocationInfo info = myOrb.peekInvocationInfo() ;
 		ObjectAdapter oa = info.oa();
 		try {
 		    oa.returnServant() ;
@@ -2539,10 +2522,10 @@ public class CorbaMessageMediatorImpl
     }
 
     public void cancelRequest() {
-	CDRInputObject inputObject = (CDRInputObject) getInputObject();
-	if (inputObject != null) {
+	CDRInputObject inObj = (CDRInputObject) getInputObject();
+	if (inObj != null) {
 	    BufferManagerReadStream bufferManager =
-		(BufferManagerReadStream) inputObject.getBufferManager();
+		(BufferManagerReadStream) inObj.getBufferManager();
 	    bufferManager.cancelProcessing(getRequestId());
 	}
     }

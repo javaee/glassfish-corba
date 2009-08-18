@@ -90,8 +90,6 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.orb.ClassCodeBaseHandler;
 
-import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
 import com.sun.corba.se.impl.corba.TypeCodeImpl;
 import com.sun.corba.se.impl.orbutil.CacheTable;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -1437,7 +1435,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     public ByteBuffer getByteBuffer() {
-        ByteBuffer result = null;;
+        ByteBuffer result = null;
         if (bbwi != null) {
             result = bbwi.getByteBuffer();
         }
@@ -1991,6 +1989,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
     }
 
+    @Override
     public void close() throws IOException
     {
         // tell BufferManagerWrite to release any ByteBuffers

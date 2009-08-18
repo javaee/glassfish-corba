@@ -33,60 +33,77 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//
-// Created       : 2003 Apr 19 (Sat) 07:31:40 by Harold Carr.
-// Last Modified : 2004 Jun 06 (Sun) 08:05:22 by Harold Carr.
-//
+package com.sun.corba.se.impl.ior.iiop;
 
-package corba.pept;
+import org.omg.CORBA_2_3.portable.OutputStream;
 
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.INTERNAL;
+import com.sun.corba.se.spi.ior.TaggedComponentBase;
+import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent;
 
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.impl.orbutil.ORBConstants;
 
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
-
-public class XContactInfoListIteratorImpl
-    extends CorbaContactInfoListIteratorImpl
+public class LoadBalancingComponentImpl extends TaggedComponentBase 
+    implements LoadBalancingComponent
 {
-    public XContactInfoListIteratorImpl(
-        ORB orb,
-	CorbaContactInfoList corbaContactInfoList)
+
+    private static ORBUtilSystemException wrapper = 
+	ORB.getStaticLogWrapperTable().get_OA_IOR_ORBUtil() ;
+
+    private int loadBalancingValue;
+
+    public boolean equals(Object obj)
     {
-	super(orb, corbaContactInfoList, null, null, false);
+	if (!(obj instanceof LoadBalancingComponentImpl))
+	    return false ;
+
+	LoadBalancingComponentImpl other = 
+	    (LoadBalancingComponentImpl)obj ;
+
+	return loadBalancingValue == other.loadBalancingValue ;
     }
 
-    public boolean reportCommFailure(ContactInfo contactInfo, 
-				     RuntimeException ex)
+    public int hashCode()
     {
-	throw new RuntimeException("NO.");
+	return loadBalancingValue;
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // java.util.Iterator
-    //
-
-    public boolean hasNext()
+    public String toString()
     {
-	return true;
+	return "LoadBalancingComponentImpl[loadBalancingValue=" + loadBalancingValue + "]" ;
     }
 
-    public CorbaContactInfo next()
+    public LoadBalancingComponentImpl()
     {
-	return new XContactInfoImpl(
-	    orb, contactInfoList,
-	    contactInfoList.getEffectiveTargetIOR(),
-	    orb.getORBData().getGIOPAddressDisposition(),
-	    null /*endPointInfoCookie*/);
+        loadBalancingValue = 0;
+    }
+
+    public LoadBalancingComponentImpl(int theLoadBalancingValue) {
+	if (theLoadBalancingValue < ORBConstants.FIRST_LOAD_BALANCING_VALUE ||
+	    theLoadBalancingValue > ORBConstants.LAST_LOAD_BALANCING_VALUE) {
+	    throw wrapper.invalidLoadBalancingComponentValue(
+		  new Integer(theLoadBalancingValue),
+		  new Integer(ORBConstants.FIRST_LOAD_BALANCING_VALUE),
+		  new Integer(ORBConstants.LAST_LOAD_BALANCING_VALUE));
+	}
+        loadBalancingValue = theLoadBalancingValue;
+    }
+
+    public int getLoadBalancingValue()
+    {
+	return loadBalancingValue;
+    }
+
+    public void writeContents(OutputStream os) 
+    {
+        os.write_ulong(loadBalancingValue);
+    }
+    
+    public int getId() 
+    {
+	return ORBConstants.TAG_LOAD_BALANCING_ID;
     }
 }
 
-// End of file.

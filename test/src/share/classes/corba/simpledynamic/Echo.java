@@ -48,6 +48,7 @@ public interface Echo extends Remote {
 
     String name() throws RemoteException ;
 
+    Object testExceptionContext() throws RemoteException ;
     /** Can send enough data to force fragmentation
      */
     int[] echo( int[] arg ) throws RemoteException ;

@@ -219,8 +219,14 @@
 	     30 WARNING "{0} is not a valid positive decimal integer for {1}")
 	    (BAD_TIMEOUT_DATA_LENGTH
 	     31 WARNING "Timeout data must be 3 or 4 positive decimal integers separated by :")
+	    (INVALID_LOAD_BALANCING_POLICY_VALUE 
+	     32 WARNING "Load balancing value specified, {0}, is outside supported range, {1} - {2}")
+	    (INVALID_LOAD_BALANCING_COMPONENT_VALUE 
+	     33 WARNING "Could not set load balancing component value to {0}, valid values are {1} - {2}")
+	    (INVALID_LOAD_BALANCING_ID
+	     34 WARNING "Invalid request partitioning id {0}, valid values are {1} - {2}")
             (CODE_BASE_UNAVAILABLE 
-             32 FINE "CodeBase unavailable on connection {0}")
+             35 FINE "CodeBase unavailable on connection {0}")
 	    )
 	(BAD_INV_ORDER 
 	    (DSIMETHOD_NOTCALLED 
@@ -600,7 +606,7 @@
 	    (WORKER_THREAD_FORGOT_CLASSLOADER_RESET
 	     107 FINE "Worker thread {0} context ClassLoader was changed to {1}; will attempt a reset to its initial ClassLoader {2}.")
 	    (WORKER_THREAD_RESET_CONTEXT_CLASSLOADER_FAILED
-	     108 WARNING "Unable to set worker thread {0} context ClassLoader; cause {1}; check security policy file, must grant 'setContextClassLoader' runtime permission, or reset the thread context ClassLoader before returning the worker thread to the thread pool.")
+	     108 WARNING "Unable to set worker thread {0} context ClassLoader; check security policy file, must grant 'setContextClassLoader' runtime permission, or reset the thread context ClassLoader before returning the worker thread to the thread pool.")
             	    (WORKER_THREAD_THROWABLE_FROM_REQUEST_WORK
              	     109 FINE "Worker thread {0} caught throwable when requesting work from work queue {1}.")
             (WORKER_THREAD_NOT_NEEDED

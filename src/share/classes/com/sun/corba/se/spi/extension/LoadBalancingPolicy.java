@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,60 +33,62 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//
-// Created       : 2003 Apr 19 (Sat) 07:31:40 by Harold Carr.
-// Last Modified : 2004 Jun 06 (Sun) 08:05:22 by Harold Carr.
-//
 
-package corba.pept;
+package com.sun.corba.se.spi.extension ;
 
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.INTERNAL;
+import org.omg.CORBA.Policy ;
+import org.omg.CORBA.LocalObject ;
 
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.impl.orbutil.ORBConstants ;
 
-import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
-
-public class XContactInfoListIteratorImpl
-    extends CorbaContactInfoListIteratorImpl
+/** Policy used to support the request partitioning feature and to
+ *  specify the partition to use.
+*/
+public class LoadBalancingPolicy extends LocalObject implements Policy
 {
-    public XContactInfoListIteratorImpl(
-        ORB orb,
-	CorbaContactInfoList corbaContactInfoList)
+    private static ORBUtilSystemException wrapper = 
+	ORB.getStaticLogWrapperTable().get_OA_IOR_ORBUtil() ;
+    private final int value;
+
+    public LoadBalancingPolicy( int value ) 
     {
-	super(orb, corbaContactInfoList, null, null, false);
+	if (value < ORBConstants.FIRST_LOAD_BALANCING_VALUE ||
+	    value > ORBConstants.LAST_LOAD_BALANCING_VALUE) {
+	    throw wrapper.invalidLoadBalancingPolicyValue(
+		  new Integer(value),
+	          new Integer(
+		      ORBConstants.FIRST_LOAD_BALANCING_VALUE),
+	          new Integer(
+		      ORBConstants.LAST_LOAD_BALANCING_VALUE));
+	}
+	this.value = value;
     }
 
-    public boolean reportCommFailure(ContactInfo contactInfo, 
-				     RuntimeException ex)
+    public int getValue()
     {
-	throw new RuntimeException("NO.");
+	return value;
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // java.util.Iterator
-    //
-
-    public boolean hasNext()
+    public int policy_type()
     {
-	return true;
+	return ORBConstants.LOAD_BALANCING_POLICY ;
     }
 
-    public CorbaContactInfo next()
+    public org.omg.CORBA.Policy copy()
     {
-	return new XContactInfoImpl(
-	    orb, contactInfoList,
-	    contactInfoList.getEffectiveTargetIOR(),
-	    orb.getORBData().getGIOPAddressDisposition(),
-	    null /*endPointInfoCookie*/);
+	return this;
+    }
+
+    public void destroy()
+    {
+	// NO-OP
+    }
+
+    public String toString() 
+    {
+	return "LoadBalancingPolicy[" + value + "]" ;
     }
 }
-
-// End of file.

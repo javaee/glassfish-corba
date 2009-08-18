@@ -100,6 +100,8 @@ import java.util.*;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
+import com.sun.corba.se.impl.orbutil.OperationTracer;
+
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.logging.UtilSystemException ;
 
@@ -456,6 +458,8 @@ public class IIOPInputStream
 
             simpleReadDepth++;	// Entering
             Object obj = null;
+
+        OperationTracer.startReadValue( clz.getName() ) ;
 
             /*
              * Check for reset, handle it before reading an object.
@@ -1119,7 +1123,7 @@ public class IIOPInputStream
                     if (currentObject != null) {
                         // Store this object and its beginning position
                         // since there might be indirections to it while
-                        // it's been unmarshalled.
+                        // it is being unmarshalled.
                         activeRecursionMgr.addObject(offset, currentObject);
 
                         // Read format version
@@ -1940,6 +1944,8 @@ public class IIOPInputStream
 	throws InvalidClassException, StreamCorruptedException,
 	       ClassNotFoundException, IOException
     {
+        OperationTracer.readingField( "<<readObject>>" ) ;
+
         if (valueHandlerDebug())
             dputil.enter( "invokeObjectReader" ) ;
 
@@ -2321,6 +2327,7 @@ public class IIOPInputStream
 
 	try {
 	    for (int i = 0; i < fields.length; i++) {
+                OperationTracer.readingField( fields[i].name ) ;
                 if (valueHandlerDebug()) {
                     dputil.info( "Field", i, displayValueMember( fields[i] ) ) ;
                 }
@@ -2415,7 +2422,6 @@ public class IIOPInputStream
 
         // Handle the primitives first
         for (int i = 0; i < primFields; ++i) {
-
             switch (fields[i].getTypeCode()) {
                 case 'B':
                     byte byteValue = orbStream.read_octet();
@@ -2466,6 +2472,8 @@ public class IIOPInputStream
 	/* Read and set object fields from the input stream. */
 	if (currentClassDesc.objFields > 0) {
 	    for (int i = primFields; i < fields.length; i++) {
+                OperationTracer.readingField( fields[i].getName() ) ;
+
                 Object objectValue = null;
                 try {
                     objectValue = inputObjectField(fields[i]);
@@ -2515,6 +2523,7 @@ public class IIOPInputStream
 
             if (o != null) {
                 for (int i = 0; i < primFields; ++i) {
+  		    OperationTracer.readingField( fields[i].getName() ) ;
                     if (fields[i].getField() == null)
                         continue;
 
@@ -2525,6 +2534,7 @@ public class IIOPInputStream
             /* Read and set object fields from the input stream. */
             if (currentClassDesc.objFields > 0) {
                 for (int i = primFields; i < fields.length; i++) {
+		    OperationTracer.readingField( fields[i].getName() ) ;
                     Object objectValue = null;
 
                     try {
@@ -2609,6 +2619,8 @@ public class IIOPInputStream
 
 	try {
 	    for (int i = 0; i < fields.length; ++i) {
+                OperationTracer.readingField( fields[i].name ) ;
+
                 if (valueHandlerDebug()) {
                     dputil.info( "Reading field", i, "type is", 
                         displayValueMember( fields[i] ) ) ;
@@ -2764,6 +2776,7 @@ public class IIOPInputStream
 	ClassNotFoundException, IOException {
 
 	for (int i = 0; i < fields.length; ++i) {
+            OperationTracer.readingField( fields[i].name ) ;	
 	    try {
 		switch (fields[i].type.kind().value()) {
 		case TCKind._tk_octet:

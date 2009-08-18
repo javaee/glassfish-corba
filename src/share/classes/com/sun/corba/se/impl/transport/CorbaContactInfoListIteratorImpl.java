@@ -37,6 +37,7 @@
 package com.sun.corba.se.impl.transport;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set ;
 import java.util.HashSet ;
@@ -76,6 +77,7 @@ public class CorbaContactInfoListIteratorImpl
     protected RuntimeException failureException;
     protected ORBUtilSystemException wrapper;
     private TimingPoints tp ;
+    private boolean usePRLB ;
     protected TcpTimeouts tcpTimeouts ;
     protected boolean debug;
 
@@ -91,13 +93,14 @@ public class CorbaContactInfoListIteratorImpl
     // Set of endpoints that have failed since the last successful communication
     // with the IOR.
     protected Set<ContactInfo> failedEndpoints ;
-    // End ITERATOR state
+    // End ITERATOR stater
 
     public CorbaContactInfoListIteratorImpl(
         ORB orb,
 	CorbaContactInfoList corbaContactInfoList,
 	ContactInfo primaryContactInfo,
-	List listOfContactInfos)
+	List listOfContactInfos,
+        boolean usePerRequestLoadBalancing )
     {
 	this.orb = orb;
 	this.tp = orb.getTimerManager().points() ;
@@ -109,7 +112,8 @@ public class CorbaContactInfoListIteratorImpl
 	if (listOfContactInfos != null) {
 	    // listOfContactInfos is null when used by the legacy
 	    // socket factory.  In that case this iterator is NOT used.
-	    this.effectiveTargetIORIterator = listOfContactInfos.iterator();
+            
+	    this.effectiveTargetIORIterator = listOfContactInfos.iterator() ;
 	}
 	// List is immutable so no need to synchronize access.
 	this.listOfContactInfos = listOfContactInfos;
@@ -123,7 +127,14 @@ public class CorbaContactInfoListIteratorImpl
 	this.waiter = tcpTimeouts.waiter() ;
 	this.failedEndpoints = new HashSet<ContactInfo>() ;
 
-	primaryToContactInfo = orb.getORBData().getIIOPPrimaryToContactInfo();
+        this.usePRLB = usePerRequestLoadBalancing ;
+
+        if (usePerRequestLoadBalancing) {
+            // We certainly DON'T want sticky behavior if we are using PRLB.
+            primaryToContactInfo = null ;
+        } else {
+            primaryToContactInfo = orb.getORBData().getIIOPPrimaryToContactInfo();
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -183,7 +194,8 @@ public class CorbaContactInfoListIteratorImpl
 		if (primaryToContactInfo != null) {
 		    primaryToContactInfo.reset(primaryContactInfo);
 		} else {
-		    effectiveTargetIORIterator = listOfContactInfos.iterator();
+                    // Argela:
+		    effectiveTargetIORIterator = listOfContactInfos.iterator() ;
 		}
 
 		result = hasNext();
@@ -403,6 +415,13 @@ public class CorbaContactInfoListIteratorImpl
 	// ensure that the request dispatchers get their iterator from the 
 	// InvocationStack (i.e., ThreadLocal). That way if the list iterator
 	// needs a complete update it happens right here.
+
+        // Ugly hack for Argela: avoid rotating the iterator in this case,
+        // or we rotate the iterator twice on every request.
+        // XXX remove this hack once we figure out why we get all of the
+        // membership changes when the cluster shape does not change.
+        CorbaContactInfoListImpl.setSkipRotate() ;
+
 	((CorbaInvocationInfo)orb.getInvocationInfo())
 	    .setContactInfoListIterator(contactInfoList.iterator());
     }

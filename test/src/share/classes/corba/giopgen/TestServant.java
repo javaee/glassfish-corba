@@ -44,6 +44,19 @@ import java.rmi.RemoteException;
 import javax.rmi.PortableRemoteObject;
 
 import java.util.Map ;
+import java.util.HashMap ;
+
+import java.io.Serializable ;
+
+import javax.rmi.PortableRemoteObject ;
+
+import org.omg.CORBA.CompletionStatus ;
+
+import com.sun.corba.se.spi.orb.ORB ;
+
+import com.sun.corba.se.spi.orbutil.generic.SPair ;
+
+import com.sun.corba.se.impl.logging.UtilSystemException ;
 
 public class TestServant
     extends PortableRemoteObject
@@ -61,6 +74,58 @@ public class TestServant
     {
 	System.out.println(baseMsg + ".echo: " + x);
         return x;
+    }
+
+    private static UtilSystemException wrapper = 
+        ORB.getStaticLogWrapperTable().get_UTIL_Util() ;
+    
+    private static class ThrowsSysEx implements Serializable {
+        private void readObject( java.io.ObjectInputStream is ) {
+            throw wrapper.testException( 42 ) ;
+        }
+    }
+
+    private static class ThrowsSimpleSysEx implements Serializable {
+        private void readObject( java.io.ObjectInputStream is ) {
+            throw wrapper.simpleTestException( CompletionStatus.COMPLETED_MAYBE, new Exception() ) ;
+        }
+    }
+
+    private static class Foo implements Serializable {
+        private Map m ;
+
+        public Foo( Object... args ) {
+            m = new HashMap() ;
+            boolean atKey = true ;
+            Object key = null ;
+            Object value = null ;
+            for (Object obj : args) {
+                if (atKey) {
+                    key = obj ;
+                } else {
+                    value = obj ;
+                    m.put( key, value ) ;
+                }
+
+                atKey = !atKey ;
+            }
+        }
+    }
+
+    public Object testExceptionContext() throws RemoteException {
+        Object d1 = new SPair<String,String>( "foo", "bar" ) ;
+        Object d2 = new SPair<String,ThrowsSysEx>( "baz", new ThrowsSysEx() ) ;
+        Foo f1 = new Foo( "d1", d1, "d2", d2 ) ;
+        SPair<String,Foo> result = new SPair<String,Foo>( "f1", f1 ) ;
+        return result ;
+    }
+
+    public Object testSimpleExceptionContext() throws RemoteException {
+        Object d1 = new SPair<String,String>( "foo", "bar" ) ;
+        Object d2 = new SPair<String,ThrowsSimpleSysEx>( "baz", new ThrowsSimpleSysEx() ) ;
+        Foo f1 = new Foo( "d1", d1, "d2", d2 ) ;
+        SPair<String,Foo> result = new SPair<String,Foo>( "f1", f1 ) ;
+        return result ;
     }
 }
 

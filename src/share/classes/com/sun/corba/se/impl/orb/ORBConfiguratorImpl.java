@@ -520,6 +520,8 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    IIOPFactories.makeRequestPartitioningComponentFactory() ) ;
 	compFinder.registerFactory(
 	    IIOPFactories.makeJavaSerializationComponentFactory());
+	compFinder.registerFactory(
+	    IIOPFactories.makeLoadBalancingComponentFactory());
 
 	// Register the ValueFactory instances for ORT
 	IORFactories.registerValueFactories( orb ) ;

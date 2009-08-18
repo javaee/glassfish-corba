@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,60 +33,12 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//
-// Created       : 2003 Apr 19 (Sat) 07:31:40 by Harold Carr.
-// Last Modified : 2004 Jun 06 (Sun) 08:05:22 by Harold Carr.
-//
+package com.sun.corba.se.spi.ior.iiop;
 
-package corba.pept;
+import com.sun.corba.se.spi.ior.TaggedComponent;
 
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.INTERNAL;
-
-import com.sun.corba.se.pept.transport.ContactInfo;
-
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
-
-import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
-
-public class XContactInfoListIteratorImpl
-    extends CorbaContactInfoListIteratorImpl
+public interface LoadBalancingComponent extends TaggedComponent
 {
-    public XContactInfoListIteratorImpl(
-        ORB orb,
-	CorbaContactInfoList corbaContactInfoList)
-    {
-	super(orb, corbaContactInfoList, null, null, false);
-    }
-
-    public boolean reportCommFailure(ContactInfo contactInfo, 
-				     RuntimeException ex)
-    {
-	throw new RuntimeException("NO.");
-    }
-
-    ////////////////////////////////////////////////////
-    //
-    // java.util.Iterator
-    //
-
-    public boolean hasNext()
-    {
-	return true;
-    }
-
-    public CorbaContactInfo next()
-    {
-	return new XContactInfoImpl(
-	    orb, contactInfoList,
-	    contactInfoList.getEffectiveTargetIOR(),
-	    orb.getORBData().getGIOPAddressDisposition(),
-	    null /*endPointInfoCookie*/);
-    }
+    public int getLoadBalancingValue();
 }
 
-// End of file.

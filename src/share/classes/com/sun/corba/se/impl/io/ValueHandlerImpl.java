@@ -71,7 +71,9 @@ import java.security.PrivilegedAction;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.btrace.* ;
+import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
+
+import com.sun.corba.se.impl.orbutil.OperationTracer;
  
 import com.sun.corba.se.impl.io.IIOPInputStream.ActiveRecursionManager;
 
@@ -645,6 +647,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 		return null;
 	    }
 			
+            OperationTracer.startReadArray( sequence.getName(), length ) ;
+
 	    Class componentType = sequence.getComponentType();
 	    Class actualType = componentType;
 	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( 
@@ -699,6 +703,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                 for (i = 0; i < length; i++) {
                     Object objectValue = null;
                     try {
+                        OperationTracer.readingIndex( i ) ;
                         objectValue = Util.getInstance().readAny(in);
                     } catch(IndirectionException cdrie) {
                         try {
@@ -781,6 +786,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                 for (i = 0; i < length; i++) {
                     
                     try {
+                        OperationTracer.readingIndex( i ) ;
+
                         switch (callType) {
                         case kRemoteType: 
                             if (!narrow) {
@@ -829,6 +836,10 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             // CDR level.  The ActiveRecursionManager only deals with
             // objects currently being deserialized.
             bridge.activeRecursionMgr.removeObject(offset);
+
+            if (sequence != null) {
+                OperationTracer.endReadArray() ;
+            }
         }
     }
 

@@ -48,6 +48,8 @@ import java.util.concurrent.locks.ReentrantLock ;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.ObjectName ;
+
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.SystemException ;
 
@@ -251,6 +253,9 @@ public class POAImpl extends ObjectAdapterBase implements POA
     // POA.destroy().
     protected ThreadLocal isDestroying ;
 
+    // Used for synchronized access to the ManagedObjectManager.
+    private static final Object momLock = new Object() ;
+
     // This includes the most important information for debugging
     // POA problems.
     @Override
@@ -299,6 +304,10 @@ public class POAImpl extends ObjectAdapterBase implements POA
     }
 
     private static void registerMBean( ORB orb, Object obj ) {
+        if (orb.poaDebugFlag) {
+            ORBUtility.dprint( POAImpl.class.getName(), 
+                "Registering MBean for " + obj ) ;
+        }
         orb.mom().register( getPOAFactory( orb ), obj ) ;
     }
 
@@ -640,8 +649,10 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		orts[ index++ ] = (ObjectReferenceTemplate)iter.next();
 
             ORB myORB = thePoa.getORB() ;
-	    myORB.getPIHandler().adapterStateChanged( orts, NON_EXISTENT.value ) ;
-            myORB.mom().unregister( thePoa );
+
+            if (destroyedPOATemplates.size() > 0) {
+                myORB.getPIHandler().adapterStateChanged( orts, NON_EXISTENT.value ) ;
+            }
         }
     
 	// Returns true if destruction must be completed, false 
@@ -780,6 +791,25 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		    parent.children.remove( poa.name ) ;
 
 		destroyedPOATemplates.add( poa.getAdapterTemplate() ) ;
+
+                synchronized (momLock) {
+                    // Only unregister if the poa is still registered: we may get
+                    // here because another thread concurrently destroyed this POA.
+                    // XXX This may not be necessary now.
+                    ObjectName oname = poa.getORB().mom().getObjectName( poa ) ; 
+                    if (oname != null) {
+                        if (debug) {
+                            ORBUtility.dprint( this, "Unregistering MBean " + oname
+                                + " for object " + poa ) ;
+                        }
+
+                        poa.getORB().mom().unregister( poa );
+                    } else {
+                        if (debug) {
+                            ORBUtility.dprint( this, "No MBean found for object " + poa ) ;
+                        }
+                    }
+                }
 	    } catch (Throwable thr) {
 		if (thr instanceof ThreadDeath)
 		    throw (ThreadDeath)thr ;
@@ -1117,7 +1147,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
      * <code>the_name</code>
      * <b>Section 3.3.8.6</b>
      */
-    @ManagedAttribute( id="Name")
+    @ManagedAttribute( id="POAName")
     @Description( "The name of this POA")
     public String the_name() 
     {

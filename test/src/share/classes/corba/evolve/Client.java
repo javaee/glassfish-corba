@@ -51,7 +51,7 @@ import org.testng.TestNG ;
 
 import mymath.BigDecimal ;
 
-import com.sun.corba.se.impl.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 
 import corba.framework.TestngRunner ;
@@ -134,12 +134,6 @@ public class Client
         Assert.assertTrue( verifier.validateFeatureInfo( finfo ) ) ;
     }
 
-    private void setSerializationDebug( boolean flag ) {
-        // ((com.sun.corba.se.spi.orb.ORB)orb).cdrDebugFlag = flag ;
-        // ((com.sun.corba.se.spi.orb.ORB)orb).streamFormatVersionDebugFlag = flag ;
-        // ((com.sun.corba.se.spi.orb.ORB)orb).valueHandlerDebugFlag = flag ;
-    }
-
     @Test
     public void testBigDecimal() throws Exception {
         System.out.println( "Testing BigDecimal interop" )  ;
@@ -164,47 +158,10 @@ public class Client
         Assert.assertEquals( orig, result ) ;
     }
 
-    public static void main(String args[]) {
-        /* Not in GFv2 ORB:
-        TestngRunner runner = new TestngRunner() ;
-        runner.registerClass( Client.class ) ;
-        runner.run() ;
-        runner.systemExit() ;
-        */
-        TestNG tng = new TestNG() ;
-        Class[] cls = { Client.class } ;
-        tng.setTestClasses( cls ) ;
-        tng.run() ;
-        System.exit( tng.hasFailure() ? 1 : 0 ) ;
-    }
     private void setSerializationDebug( boolean flag ) {
         ((com.sun.corba.se.spi.orb.ORB)orb).cdrDebugFlag = flag ;
         ((com.sun.corba.se.spi.orb.ORB)orb).streamFormatVersionDebugFlag = flag ;
         ((com.sun.corba.se.spi.orb.ORB)orb).valueHandlerDebugFlag = flag ;
-    }
-
-    @Test
-    public void testBigDecimal() throws Exception {
-        System.out.println( "Testing BigDecimal interop" )  ;
-        BigDecimal orig = new BigDecimal( "123456789012345678901234567890.12312312312" ) ;
-
-        // setSerializationDebug( true ) ;
-        BigDecimal result = (BigDecimal)verifier.echo( orig ) ;
-        // setSerializationDebug( false ) ;
-        
-        Assert.assertEquals( orig, result ) ;
-    }
-
-    @Test
-    public void testWithoutPrimitives() throws Exception {
-        System.out.println( "Testing WithoutPrimitives interop" )  ;
-        WithoutPrimitives orig = new WithoutPrimitives() ;
-
-        // setSerializationDebug( true ) ;
-        WithoutPrimitives result = (WithoutPrimitives)verifier.echo( orig ) ;
-        // setSerializationDebug( false ) ;
-        
-        Assert.assertEquals( orig, result ) ;
     }
 
     public static void main(String args[]) {

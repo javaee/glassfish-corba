@@ -355,6 +355,7 @@ public class CorbaClientRequestDispatcherImpl
 
 	try {
 	    tp.exit_clientEncoding();
+
 	    tp.enter_clientTransportAndWait();
 
 	    InputObject inputObject = null ;

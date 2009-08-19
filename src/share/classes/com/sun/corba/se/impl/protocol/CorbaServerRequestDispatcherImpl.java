@@ -103,6 +103,7 @@ import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.orbutil.OperationTracer;
 import com.sun.corba.se.impl.protocol.RequestCanceledException;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.POASystemException;
@@ -618,6 +619,9 @@ public class CorbaServerRequestDispatcherImpl
 	byte[] objectId, ObjectAdapter objectAdapter) 
     {
 	try {
+            OperationTracer.enable() ;
+            OperationTracer.begin( "Dispatch to servant" ) ;
+
 	    if (orb.subcontractDebugFlag) {
 		dprint(".dispatchToServant->: " + opAndId(req) 
 		       + ": " + servantInfo(servant));
@@ -684,11 +688,8 @@ public class CorbaServerRequestDispatcherImpl
 
 		OutputStream stream = null;
 		try {
-		    stream =
-			(OutputStream)invhandle._invoke(
-                          operation, 
-		          (org.omg.CORBA.portable.InputStream)req.getInputObject(),
-			  req);
+		    stream = (OutputStream)invhandle._invoke( operation, 
+                        (org.omg.CORBA.portable.InputStream)req.getInputObject(), req);
 		} catch (BAD_OPERATION e) {
 		    wrapper.badOperationFromInvoke(e, operation);
 		    throw e;
@@ -703,6 +704,9 @@ public class CorbaServerRequestDispatcherImpl
 		dprint(".dispatchToServant<-: " + opAndId(req)
 		       + ": " + servantInfo(servant));
 	    }
+
+            OperationTracer.disable() ;
+            OperationTracer.finish( ) ;
 	}
     }
 

@@ -66,6 +66,7 @@ import com.sun.corba.se.impl.orbutil.copyobject.ClassCopierFactory ;
 import com.sun.corba.se.impl.orbutil.copyobject.PipelineClassCopierFactory ;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.orbutil.OperationTracer ;
 
 // XXX Not good to be importing this, but seems to be necessary.
 import com.sun.corba.se.impl.util.Utility ;
@@ -188,6 +189,7 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 	if (obj == null)
 	    return null ;
 
+        OperationTracer.begin( "ReflectObjectCopierImpl" ) ;
 	Class cls = obj.getClass() ;
 	ClassCopier copier = ccf.getClassCopier( cls ) ;
 

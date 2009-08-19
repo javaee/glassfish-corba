@@ -71,7 +71,7 @@ import java.security.PrivilegedAction;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.misc.ORBClassLoader;
+import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 
 import com.sun.corba.se.impl.orbutil.OperationTracer;
  
@@ -84,6 +84,11 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 import com.sun.corba.se.impl.orbutil.DprintUtil ;
+
+import com.sun.corba.se.spi.btrace.Traceable ;
+import com.sun.corba.se.spi.btrace.ValueHandlerWrite ;
+import com.sun.corba.se.spi.btrace.ValueHandlerRead ;
+import com.sun.corba.se.spi.btrace.TraceValueHandler ;
 
 @Traceable
 public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat {

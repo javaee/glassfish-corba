@@ -71,8 +71,8 @@ public class Client {
     @Configuration( beforeTest=true ) 
     public void setUp() {
         msg( "Configuring ORB" ) ;
-        p.put("org.omg.CORBA.ORBClass", "com.sun.corba.ee.impl.orb.ORBImpl");
-        p.put("com.sun.corba.ee.ORBDebug","cdr,streamFormatVersion,valueHandler");
+        p.put("org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl");
+        p.put("com.sun.corba.se.ORBDebug","cdr,streamFormatVersion,valueHandler");
         orb=  com.sun.corba.se.spi.orb.ORB.init(new String[0],p);
         myOrb = (com.sun.corba.se.spi.orb.ORB)orb ;
         myOrb.cdrDebugFlag = true ;

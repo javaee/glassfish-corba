@@ -41,7 +41,7 @@ import com.sun.corba.se.spi.ior.TaggedComponentBase;
 import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.spi.orb.ORB ;
 

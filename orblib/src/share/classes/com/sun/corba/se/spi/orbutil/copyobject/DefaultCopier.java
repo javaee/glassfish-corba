@@ -44,7 +44,6 @@ import com.sun.corba.se.impl.orbutil.copyobject.JavaStreamObjectCopierImpl ;
 import com.sun.corba.se.impl.orbutil.copyobject.FallbackObjectCopierImpl ;
 
 public class DefaultCopier {
-    // XXX still need fallback to JavaStream
     private DefaultCopier() {}
 
     public static Object copy( Object obj ) {

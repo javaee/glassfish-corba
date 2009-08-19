@@ -73,15 +73,18 @@ import com.sun.corba.se.spi.protocol.CorbaClientDelegate ;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
 import com.sun.corba.se.impl.util.JDKBridge;
+
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
+
+import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.orbutil.OperationTracer ;
 
 // implements com.sun.corba.se.impl.core.ClientRequestDispatcher
 // so RMI-IIOP Util.isLocal can call ClientRequestDispatcher.useLocalInvocation.
@@ -210,6 +213,10 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
        	    if (orb.subcontractDebugFlag) {
 	        dprint(".request<- op/" + operation);
 	    }
+
+            // Enable operation tracing for argument marshaling
+            OperationTracer.enable() ;
+            OperationTracer.begin( "client argument marshaling:op=" + operation ) ;
 	}
     }
     
@@ -218,9 +225,19 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    ApplicationException,
 	    RemarshalException 
     {
+        // Disable operation tracing for argment marshaling
+        OperationTracer.disable() ;
+        OperationTracer.finish() ;
+
 	ClientRequestDispatcher subcontract = getClientRequestDispatcher();
-	return (InputStream)
-	    subcontract.marshalingComplete((Object)self, (OutputObject)output);
+        try {
+            return (InputStream)
+                subcontract.marshalingComplete((Object)self, (OutputObject)output);
+        } finally {
+            // Enable operation tracing for result unmarshaling
+            OperationTracer.enable() ;
+            OperationTracer.begin( "client result unmarshaling" ) ;
+        }
     }
     
     public void releaseReply(org.omg.CORBA.Object self, InputStream input) 
@@ -236,6 +253,10 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    orb.releaseOrDecrementInvocationInfo();
 	} finally {
 	    tp.exit_totalInvocation() ;
+        
+            // Disable operation tracing for result unmarshaling
+            OperationTracer.disable() ;
+            OperationTracer.finish() ;
 	}
     }
 

@@ -41,7 +41,7 @@ import java.util.ArrayList ;
 
 
 public class OperationTracer {
-    private static boolean enabled = true ;
+    private static boolean enabled = false ;
 
 
     public static void enable() {

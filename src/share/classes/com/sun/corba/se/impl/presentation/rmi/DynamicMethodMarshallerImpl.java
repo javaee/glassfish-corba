@@ -288,7 +288,6 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
     {
 	public Object read( InputStream is ) 
 	{
-            OperationTracer.begin( this.toString() ) ;
             try {
                 return Util.getInstance().readAny(is) ;
             } finally {
@@ -307,7 +306,6 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
     {
 	public Object read( InputStream is ) 
 	{
-            OperationTracer.begin( this.toString() ) ;
             try {
                 return is.read_abstract_interface() ;
             } finally {
@@ -381,7 +379,6 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	{
 	    public Object read( InputStream is ) 
 	    {
-                OperationTracer.begin( this.toString() ) ;
                 try {
                     return is.read_value(cls) ;
                 } finally {

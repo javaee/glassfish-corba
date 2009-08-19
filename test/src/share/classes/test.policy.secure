@@ -57,6 +57,8 @@ grant CodeBase "file:${com.sun.corba.se.ORBBase}/build/-" {
     permission sun.corba.BridgePermission "getBridge";
     permission com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission "access";
     permission java.lang.management.ManagementPermission "monitor";
+    permission javax.management.MBeanPermission "*" ;
+
 };
 
 // The permissions here must be identical to the permissions specified above,

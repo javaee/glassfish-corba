@@ -40,21 +40,25 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 
 import org.omg.CORBA.Policy ;
 
-import org.omg.PortableInterceptor.ACTIVE ;
-
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.ObjectAdapterId;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
-import com.sun.corba.se.spi.oa.OADestroyed ;
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.PIHandler ;
 
 import com.sun.corba.se.impl.logging.POASystemException ;
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.oa.poa.Policies;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.omg.PortableInterceptor.ACTIVE;
+import org.omg.PortableInterceptor.ACTIVE;
+import org.omg.PortableInterceptor.DISCARDING;
+import org.omg.PortableInterceptor.HOLDING;
+import org.omg.PortableInterceptor.INACTIVE;
+import org.omg.PortableInterceptor.NON_EXISTENT;
 
 abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject 
     implements ObjectAdapter
@@ -170,6 +174,20 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
     abstract public int getManagerId() ;
 
     abstract public short getState() ; 
+
+    @ManagedAttribute( id="State" )
+    @Description( "The current Adapter state")
+    private String getDisplayState( ) {
+        final short state = getState() ;
+        switch (state) {
+            case HOLDING.value : return "HOLDING" ;
+            case ACTIVE.value : return "ACTIVE" ;
+            case DISCARDING.value : return "DISCARDING" ;
+            case INACTIVE.value : return "INACTIVE" ;
+            case NON_EXISTENT.value : return "NON_EXISTENT" ;
+            default : return "<INVALID>" ;
+        }
+    }
 
     final public ObjectReferenceTemplate getAdapterTemplate()
     {

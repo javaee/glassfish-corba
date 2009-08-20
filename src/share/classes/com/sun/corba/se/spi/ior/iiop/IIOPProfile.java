@@ -43,6 +43,10 @@ import com.sun.corba.se.spi.orb.ORBVersion ;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
+
 /** IIOPProfile represents an IIOP tagged profile.
 * It is essentially composed of an object identifier and
 * a template.  The template contains all of the 
@@ -50,8 +54,12 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 * Templates are frequently shared between many different profiles,
 * while the object identifiy is unique to each profile.
 */
+@ManagedData
+@Description( "The IIOPProfile version of a TaggedProfile" )
 public interface IIOPProfile extends TaggedProfile
 {
+    @ManagedAttribute
+    @Description( "The ORB version in use" ) 
     ORBVersion getORBVersion() ;
 
     /** Return the servant for this profile, if it is local 

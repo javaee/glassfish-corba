@@ -39,10 +39,6 @@ package com.sun.corba.se.impl.transport;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaConnectionCache;
@@ -55,7 +51,6 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
  */
 public abstract class CorbaConnectionCacheBase
     implements
-	ConnectionCache,
 	CorbaConnectionCache
 {
     protected ORB orb;
@@ -75,17 +70,12 @@ public abstract class CorbaConnectionCacheBase
 	dprintCreation();
     }
     
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ConnectionCache
-    //
-    
     public String getCacheType()
     {
 	return cacheType;
     }
 
-    public synchronized void stampTime(Connection c)
+    public synchronized void stampTime(CorbaConnection c)
     {
 	// _REVISIT_ Need to worry about wrap around some day
         c.setTimeStamp(timestamp++);
@@ -112,7 +102,7 @@ public abstract class CorbaConnectionCacheBase
 	synchronized (backingStore()) {
 	    Iterator connections = values().iterator();
 	    while (connections.hasNext()) {
-		if (! ((Connection)connections.next()).isBusy()) {
+		if (! ((CorbaConnection)connections.next()).isBusy()) {
 		    count++;
 		}
 	    }
@@ -126,7 +116,7 @@ public abstract class CorbaConnectionCacheBase
 	synchronized (backingStore()) {
 	    Iterator connections = values().iterator();
 	    while (connections.hasNext()) {
-		if (((Connection)connections.next()).isBusy()) {
+		if (((CorbaConnection)connections.next()).isBusy()) {
 		    count++;
 		}
 	    }
@@ -161,14 +151,11 @@ public abstract class CorbaConnectionCacheBase
 			+ " ("
 			+ orb.getORBData().getHighWaterMark()
 			+ "/"
-			+ orb.getORBData().getLowWaterMark()
-			+ "/"
 			+ orb.getORBData().getNumberToReclaim()
 			+ ")");
 	    }
 
-	    if (numberOfConnections <= orb.getORBData().getHighWaterMark() ||
-		numberOfConnections < orb.getORBData().getLowWaterMark()) {
+	    if (numberOfConnections <= orb.getORBData().getHighWaterMark()) {
 		return false;
 	    }
 	    
@@ -179,13 +166,13 @@ public abstract class CorbaConnectionCacheBase
 	         //           algorithm could be investigated.
 
 		for (int i=0; i < orb.getORBData().getNumberToReclaim(); i++) {
-		    Connection toClose = null;
+		    CorbaConnection toClose = null;
 		    long lru = java.lang.Long.MAX_VALUE;
 		    Iterator iterator = values().iterator();
 		    
 		    // Find least recently used and not busy connection in cache
 		    while ( iterator.hasNext() ) {
-			Connection c = (Connection) iterator.next();
+			CorbaConnection c = (CorbaConnection) iterator.next();
 			if ( !c.isBusy() && c.getTimeStamp() < lru ) {
 			    toClose = c; 
 			    lru = c.getTimeStamp();
@@ -263,7 +250,6 @@ public abstract class CorbaConnectionCacheBase
 		   + numberOfIdleConnections() + "/idle"
 		   + " (" 
 		   + orb.getORBData().getHighWaterMark() + "/"
-		   + orb.getORBData().getLowWaterMark() + "/"
 		   + orb.getORBData().getNumberToReclaim() 
 		   + ")");
 	}

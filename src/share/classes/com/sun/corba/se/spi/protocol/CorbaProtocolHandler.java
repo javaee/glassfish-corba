@@ -40,10 +40,7 @@ import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.UnknownException;
 
-import com.sun.corba.se.pept.protocol.ProtocolHandler;
-
 import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 
 import com.sun.corba.se.spi.servicecontext.ServiceContexts;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateRequestMessage;
@@ -52,8 +49,7 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
 /**
  * @author Harold Carr
  */
-public interface CorbaProtocolHandler
-    extends ProtocolHandler
+public abstract interface CorbaProtocolHandler
 {
     public void handleRequest(RequestMessage header, 
 			      CorbaMessageMediator messageMediator);
@@ -83,6 +79,8 @@ public interface CorbaProtocolHandler
         CorbaMessageMediator request, 
 	Throwable exception,
 	CompletionStatus completionStatus);
+
+    public boolean handleRequest(CorbaMessageMediator messageMediator);
 
 }
 

@@ -44,8 +44,6 @@
 
 package com.sun.corba.se.impl.protocol;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
-
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.sun.corba.se.spi.orb.ORB;
@@ -83,9 +81,8 @@ public class INSServerRequestDispatcher
         return getINSReference( insKey );
     }
 
-    public void dispatch(MessageMediator mediator) 
+    public void dispatch(CorbaMessageMediator request)
     {
-	CorbaMessageMediator request = (CorbaMessageMediator) mediator;
         // send a locate forward with the right IOR. If the insKey is not 
         // registered then it will throw OBJECT_NOT_EXIST Exception
         String insKey = new String( 

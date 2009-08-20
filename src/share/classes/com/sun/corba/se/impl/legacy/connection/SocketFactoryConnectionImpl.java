@@ -36,25 +36,15 @@
 
 package com.sun.corba.se.impl.legacy.connection;
 
-import java.net.Socket;
-import java.nio.channels.SocketChannel;
-import java.util.Collections;
 
-import org.omg.CORBA.COMM_FAILURE;
-import org.omg.CORBA.CompletionStatus;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.ContactInfo;
 
-import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.transport.SocketOrChannelContactInfoImpl;
 import com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl;
 
 /**

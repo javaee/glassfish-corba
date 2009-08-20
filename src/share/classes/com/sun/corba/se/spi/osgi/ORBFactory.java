@@ -36,9 +36,11 @@
 
 package com.sun.corba.se.spi.osgi;
 
-import com.sun.corba.se.spi.orb.*;
 import java.util.Properties ;
 
+import org.glassfish.external.amx.AMXGlassfish ;
+
+import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 
 import com.sun.corba.se.impl.orb.ORBImpl ;
@@ -48,7 +50,8 @@ import com.sun.corba.se.impl.osgi.loader.OSGIListener;
 /** A simple factory for creating our ORB that avoids the ClassLoader
  * problems with org.omg.CORBA.ORB.init, which must load the ORB impl class.
  * The usual OSGi configuration prevents this, so we just directly use a
- * static factory method here.
+ * static factory method here.  Note that this also assumes that the created
+ * ORB should be suitable for running inside GlassFish v3.
  */
 public class ORBFactory {   
     private ORBFactory() {} 
@@ -65,6 +68,8 @@ public class ORBFactory {
 
             ClassCodeBaseHandler ccbh = OSGIListener.classCodeBaseHandler() ;
             result.classCodeBaseHandler( ccbh ) ;
+            result.setRootParentObjectName( 
+                AMXGlassfish.DEFAULT.monitoringRoot() ) ;
         }
 
         result.setParameters( args, props ) ;

@@ -115,6 +115,8 @@
         <property name="testng-jar"			value="${root.dir}/lib/testng.jar"/>
         <property name="japex-jar"			value="${root.dir}/lib/japex.jar"/>
         <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
+        <property name="gmbal-jar"                      value="${root.dir}/lib/gmbal.jar"/>
+        <property name="management-api-jar"             value="${root.dir}/lib/management-api.jar"/>
         <property name="felix-jar"                      value="${root.dir}/lib/felix.jar"/>
 
         <!-- Places where the build puts things -->
@@ -184,10 +186,11 @@
         <property name="file.url"                       value="file:/tmp/maven"/>
         <property name="local.url"                      value="file:${local.maven}"/>
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
-
         <property name="bnd.properties.file"            value="make/bnd/bnd.properties"/>
 
 	<path id="classpath.master">
+	    <pathelement location="${management-api-jar}"/>
+	    <pathelement location="${gmbal-jar}"/>
 	    <pathelement location="${emma.classes.dir}"/>
 	    <pathelement location="${orblib.classes.dir}"/>
 	    <pathelement location="${classes.dir}"/>
@@ -775,7 +778,6 @@
                 </java>
             </sequential>
     </macrodef>
-
     <target name="make-src-bundle" depends="init">
         <jar jarfile="${releaselib.dir}/bundles/glassfish-corba-source.jar" duplicate="fail">
             <fileset dir="${src.dir}">
@@ -835,7 +837,6 @@
         <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
         <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
         <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
-
         <make-bundle classpath="${classes.dir}" file="osgi-test"/>
     </target>
 
@@ -1278,7 +1279,6 @@
     &test;
     &emma;
     &maven;
-
     <target name="do-rename" depends="clean, orb-library, rename"/>
 
     <target name="do-release" depends="clean, build, make-bundles, release-local"/>

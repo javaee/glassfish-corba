@@ -100,11 +100,11 @@ public class Client {
             byte[][] baResult1=(byte[][])baResult;
             MessageData md = ctm.getMessageData(baResult1);
             int bnum = 0 ;
-                for (byte[] data : baResult1) {
-                    ByteBuffer bb = ByteBuffer.wrap( data ) ;
-                    bb.position( bb.capacity() ) ;
-                    ORBUtility.printBuffer( "Dumping buffer " + bnum++, bb, System.out ) ;
-               }
+            for (byte[] data : baResult1) {
+                ByteBuffer bb = ByteBuffer.wrap( data ) ;
+                bb.position( bb.capacity() ) ;
+                ORBUtility.printBuffer( "Dumping buffer " + bnum++, bb, System.out ) ;
+            }
             Object cdrstream1=javax.rmi.CORBA.Util.readAny( md.getStream());
         } catch (Exception exc) {
             exc.printStackTrace() ;

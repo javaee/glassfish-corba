@@ -49,8 +49,8 @@ import java.util.Properties;
 
 import org.omg.CORBA.portable.ObjectImpl;
 
-import com.sun.corba.se.pept.transport.TransportManager;
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
@@ -94,8 +94,8 @@ public class ClientForTiming
     public static Timer clientInvoke ;
 
     public static IIOPPrimaryToContactInfoImpl primaryToContactInfo;
-    public static ContactInfo serverPrimaryContactInfo;
-    public static ContactInfo serverClearTextEntry;
+    public static CorbaContactInfo serverPrimaryContactInfo;
+    public static CorbaContactInfo serverClearTextEntry;
 
     // These are used as self-documenting values below.
     public static final boolean FAILOVER_SUPPORT = true;
@@ -247,7 +247,7 @@ public class ClientForTiming
 	    dprint("finding entry for key: " + serverPrimaryContactInfo);
 	    dprint("in map: " + primaryToContactInfo.map);
 
-	    serverClearTextEntry = (ContactInfo) 
+	    serverClearTextEntry = (CorbaContactInfo)
 		primaryToContactInfo.map.get(serverClearTextEntry);
 
 	    dprint("found entry: " + serverClearTextEntry);
@@ -297,7 +297,7 @@ public class ClientForTiming
     public static void killFailedOverToConnection()
 	throws Exception
     {
-	TransportManager transportManager = orb.getTransportManager();
+	CorbaTransportManager transportManager = orb.getTransportManager();
 
 	dprint();
 	dprint("killFailedOverToConnection");

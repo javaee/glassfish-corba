@@ -36,12 +36,9 @@
 
 package com.sun.corba.se.impl.oa.poa;
 
-import java.util.Iterator;
-import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 
-import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.CompletionStatus ;
 
 import org.omg.PortableServer.POAManager;
@@ -62,19 +59,31 @@ import com.sun.corba.se.impl.logging.POASystemException ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ParameterNames ;
+import org.glassfish.gmbal.NameValue ;
+
 /** POAManagerImpl is the implementation of the POAManager interface.
  *  Its public methods are activate(), hold_requests(), discard_requests()
  *  and deactivate().
  */
 
+@ManagedObject
+@Description( "A POAManager which controls invocations of its POAs")
 public class POAManagerImpl extends org.omg.CORBA.LocalObject implements 
     POAManager
 {
+    private static final long serialVersionUID = -751471445699682659L;
+
     private final POAFactory factory ;	// factory which contains global state 
 					// for all POAManagers 
     private PIHandler pihandler ;	// for adapterManagerStateChanged
     private State state;		// current state of this POAManager
-    private Set poas = new HashSet(4) ; // all poas controlled by this POAManager
+    private Set<POAImpl> poas =
+        new HashSet<POAImpl>(4) ;       // all poas controlled by this POAManager
     private int nInvocations=0;		// Number of invocations in progress
     private int nWaiters=0;		// Number of threads waiting for 
 					// invocations to complete
@@ -85,6 +94,30 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 					// discard_request, or deactivate is called.
 
     private static final boolean AM_DEBUG = false ;
+
+    @ManagedAttribute
+    @Description( "The set of POAs managed by this POAManager" )
+    Set<POAImpl> getManagedPOAs() {
+        return new HashSet<POAImpl>( poas ) ;
+    }
+
+    @ManagedAttribute
+    @Description( "Number of active invocations executing in this POAManager" )
+    public synchronized int numberOfInvocations() {
+        return nInvocations ;
+    }
+
+    @ManagedAttribute
+    @Description( "Number of threads waiting for invocations to complete in this POAManager" )
+    public synchronized int numberOfWaiters() {
+        return nWaiters ;
+    }
+
+    @ManagedAttribute
+    @Description( "The current state of this POAManager" ) 
+    public synchronized String displayState() {
+        return stateToString( state ) ;
+    }
 
     /** activeManagers is the set of POAManagerImpls for which a thread has called
      * enter without exit 1 or more times.  Once a thread has entered a POAManager,
@@ -142,11 +175,13 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	return "State[UNKNOWN]" ;
     }
 
+    @Override
     public int hashCode() 
     {
 	return myId ;
     }
 
+    @Override
     public boolean equals( Object obj ) 
     {
 	if (obj == this) {
@@ -162,7 +197,8 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	return other.myId == myId ;
     }
 
-    public String toString()
+    @Override
+    public synchronized String toString()
     {
 	return "POAManagerImpl[" + myId + 
 	    "," + stateToString(state) +
@@ -170,6 +206,8 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    ",nWaiters=" + nWaiters + "]" ;
     }
 
+    @ManagedAttribute
+    @Description( "The POAFactory that manages this POAManager" )
     POAFactory getFactory()
     {
 	return factory ;
@@ -213,6 +251,9 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    notifyAll() ;
     }
 
+    @ManagedAttribute
+    @NameValue
+    @Description( "The ID of this POAManager" )
     public int getManagerId() 
     {
 	return myId ;
@@ -241,17 +282,19 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    throw wrapper.addPoaInactive( CompletionStatus.COMPLETED_NO ) ;
 	}
 	    
-        poas.add(poa);
+        poas.add( (POAImpl)poa );
     }
 
     synchronized void removePOA(POA poa)
     {
-        poas.remove(poa);
+        poas.remove( (POAImpl)poa );
         if ( poas.isEmpty() ) {
             factory.removePoaManager(this);
 	}
     }
 
+    @ManagedAttribute
+    @Description( "The ObjectReferenceTemplate state of this POAManager" )
     public short getORTState() 
     {
 	switch (state.value()) {
@@ -285,6 +328,8 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * <code>activate</code>
      * <b>Spec: pages 3-14 thru 3-18</b>
      */
+    @ManagedOperation
+    @Description( "Make this POAManager active, so it can handle new requests" ) 
     public synchronized void activate()
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
@@ -320,6 +365,8 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * <code>hold_requests</code>
      * <b>Spec: pages 3-14 thru 3-18</b>
      */
+    @ManagedOperation
+    @Description( "Hold all requests to this POAManager" ) 
     public synchronized void hold_requests(boolean wait_for_completion)
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
@@ -360,6 +407,9 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * <code>discard_requests</code>
      * <b>Spec: pages 3-14 thru 3-18</b>
      */
+    @ManagedOperation
+    @ParameterNames( { "waitForCompletion" } )
+    @Description( "Make this POAManager discard all incoming requests" ) 
     public synchronized void discard_requests(boolean wait_for_completion)
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
@@ -452,7 +502,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     private class POAManagerDeactivator implements Runnable
     {
 	private boolean etherealize_objects ;
-	private POAManagerImpl pmi ;
+	private final POAManagerImpl pmi ;
 	private boolean debug ;
 
 	POAManagerDeactivator( POAManagerImpl pmi, boolean etherealize_objects,
@@ -479,7 +529,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 		}
 
 		if (etherealize_objects) {
-		    Iterator iterator = null ;
+                    Set<POAImpl> copyOfPOAs ;
 
 		    // Make sure that poas cannot change while we copy it!
 		    synchronized (pmi) {
@@ -489,15 +539,18 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 				pmi ) ;
 			}
 
-			iterator = (new HashSet(pmi.poas)).iterator();
+                        copyOfPOAs = new HashSet<POAImpl>( pmi.poas ) ;
 		    } 
 
-		    while (iterator.hasNext()) {
+                    for (POAImpl poa : copyOfPOAs) {
 			// Each RETAIN+USE_SERVANT_MGR poa
 			// must call etherealize for all its objects
-			((POAImpl)iterator.next()).etherealizeAll();
-		    }
+                        poa.etherealizeAll();
+                    }
 
+                    // XXX What if a new POA is created here before 
+                    // etherealization completes?  We would fail to call 
+                    // etherealize!
 		    synchronized (pmi) {
 			if (debug) {
 			    ORBUtility.dprint( this,

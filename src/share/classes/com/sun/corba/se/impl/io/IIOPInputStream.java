@@ -44,36 +44,21 @@
 
 package com.sun.corba.se.impl.io;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.io.ObjectInputValidation;
 import java.io.NotActiveException;
 import java.io.InvalidObjectException;
 import java.io.InvalidClassException;
-import java.io.DataInputStream;
 import java.io.OptionalDataException;
-import java.io.WriteAbortedException;
 import java.io.Externalizable;
 import java.io.EOFException;
 import java.lang.reflect.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
 
 import sun.corba.Bridge ;
 
-import java.security.AccessController ;
-import java.security.PrivilegedAction ;
-
-import com.sun.corba.se.impl.io.ObjectStreamClass;
-import com.sun.corba.se.impl.util.Utility;
-
 import org.omg.CORBA.portable.ValueInputStream;
 
-import org.omg.CORBA.ValueMember;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.ORB; 
@@ -88,11 +73,9 @@ import com.sun.org.omg.CORBA.AttributeDescription ;
 import com.sun.org.omg.CORBA.OperationDescription ;
 import com.sun.org.omg.CORBA.ParameterDescription ;
 import com.sun.org.omg.CORBA.ExceptionDescription ;
-import com.sun.org.omg.CORBA.Initializer ;
 
 import com.sun.org.omg.SendingContext.CodeBase;  
 
-import javax.rmi.PortableRemoteObject;
 import javax.rmi.CORBA.ValueHandler;
 
 import java.security.*;
@@ -103,11 +86,12 @@ import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 import com.sun.corba.se.impl.orbutil.OperationTracer;
 
 import com.sun.corba.se.impl.logging.OMGSystemException ;
-import com.sun.corba.se.impl.logging.UtilSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+
+import com.sun.corba.se.impl.util.Utility ;
 
 import com.sun.corba.se.spi.btrace.* ;
 
@@ -130,13 +114,6 @@ public class IIOPInputStream
 	    }
 	} 
     ) ;
-
-    private static OMGSystemException omgWrapper = 
-	com.sun.corba.se.spi.orb.ORB
-	    .getStaticLogWrapperTable().get_RPC_ENCODING_OMG() ;
-    private static UtilSystemException utilWrapper = 
-	com.sun.corba.se.spi.orb.ORB
-	    .getStaticLogWrapperTable().get_RPC_ENCODING_Util() ;
 
     // Necessary to pass the appropriate fields into the
     // defaultReadObjectDelegate method (which takes no
@@ -592,6 +569,7 @@ public class IIOPInputStream
      * @see #readObject
      * @since JDK 1.2
      */
+    @Override
     protected final Object readObjectOverride()
  	throws OptionalDataException, ClassNotFoundException, IOException
     {
@@ -693,14 +671,17 @@ public class IIOPInputStream
     // The following three methods allow the implementing orbStream
     // to provide mark/reset behavior as defined in java.io.InputStream.
 
+    @Override
     public final void mark(int readAheadLimit) {
         orbStream.mark(readAheadLimit);
     }
     
+    @Override
     public final boolean markSupported() {
         return orbStream.markSupported();
     }
     
+    @Override
     public final void reset() throws IOException {
         try {
             orbStream.reset();
@@ -711,16 +692,19 @@ public class IIOPInputStream
         }
     }
 
+    @Override
     public final int available() throws IOException{
         return 0; // unreliable
     }
 
+    @Override
     public final void close() throws IOException{
         // no op
     }
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final int read() throws IOException{
         try{
             readObjectState.readData(this);
@@ -743,6 +727,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final int read(byte data[], int offset, int length) throws IOException{
         try{
             readObjectState.readData(this);
@@ -767,6 +752,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final boolean readBoolean() throws IOException{
         try{
             readObjectState.readData(this);
@@ -785,6 +771,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final byte readByte() throws IOException{
         try{
             readObjectState.readData(this);
@@ -803,6 +790,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final char readChar() throws IOException{
         try{
             readObjectState.readData(this);
@@ -821,6 +809,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final double readDouble() throws IOException{
         try{
             readObjectState.readData(this);
@@ -838,6 +827,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final float readFloat() throws IOException{
         try{
             readObjectState.readData(this);
@@ -855,6 +845,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final void readFully(byte data[]) throws IOException{
 // d11623 : implement readFully, required for serializing some core classes
 
@@ -863,6 +854,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final void readFully(byte data[],  int offset,  int size) throws IOException{
 // d11623 : implement readFully, required for serializing some core classes
         try{
@@ -882,6 +874,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final int readInt() throws IOException{
         try{
             readObjectState.readData(this);
@@ -897,6 +890,7 @@ public class IIOPInputStream
 	}
     }
 
+    @Override
     public final String readLine() throws IOException{
 	// XXX I18N, logging needed.
         throw new IOException("Method readLine not supported");
@@ -904,6 +898,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final long readLong() throws IOException{
         try{
             readObjectState.readData(this);
@@ -921,6 +916,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final short readShort() throws IOException{
         try{
             readObjectState.readData(this);
@@ -936,12 +932,14 @@ public class IIOPInputStream
 	}
     }
 
+    @Override
     protected final void readStreamHeader() throws IOException, StreamCorruptedException{
         // no op
     }
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final int readUnsignedByte() throws IOException{
         try{
             readObjectState.readData(this);
@@ -959,6 +957,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final int readUnsignedShort() throws IOException{
         try{
             readObjectState.readData(this);
@@ -989,6 +988,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final String readUTF() throws IOException{
         try{
             readObjectState.readData(this);
@@ -1039,6 +1039,7 @@ public class IIOPInputStream
         }
     }
 
+    @Override
     public final synchronized void registerValidation(ObjectInputValidation obj,
 						      int prio)
 	throws NotActiveException, InvalidObjectException{
@@ -1046,12 +1047,14 @@ public class IIOPInputStream
         throw new Error("Method registerValidation not supported");
     }
 
+    @Override
     protected final Class resolveClass(java.io.ObjectStreamClass v)
 	throws IOException, ClassNotFoundException{
 	// XXX I18N, logging needed.
         throw new IOException("Method resolveClass not supported");
     }
 
+    @Override
     protected final Object resolveObject(Object obj) throws IOException{
 	// XXX I18N, logging needed.
         throw new IOException("Method resolveObject not supported");
@@ -1059,6 +1062,7 @@ public class IIOPInputStream
 
     @TraceValueHandler
     @ValueHandlerRead
+    @Override
     public final int skipBytes(int len) throws IOException{
         try{
             readObjectState.readData(this);

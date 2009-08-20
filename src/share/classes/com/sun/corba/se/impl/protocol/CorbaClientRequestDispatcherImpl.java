@@ -73,14 +73,14 @@ import org.omg.IOP.TAG_CODE_SETS;
 
 import com.sun.org.omg.SendingContext.CodeBase;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.OutboundConnectionCache;
-import com.sun.corba.se.pept.transport.ContactInfo;
+
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
@@ -135,7 +135,7 @@ import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
  */
 public class CorbaClientRequestDispatcherImpl
     implements
-	ClientRequestDispatcher
+	CorbaClientRequestDispatcher
 {
     // Used for locking
     private Object lock = new Object();
@@ -148,8 +148,8 @@ public class CorbaClientRequestDispatcherImpl
     private MaxStreamFormatVersionServiceContext msfvc = 
                             ServiceContextDefaults.getMaxStreamFormatVersionServiceContext();
 
-    public OutputObject beginRequest(Object self, String opName, 
-	boolean isOneWay, ContactInfo contactInfo) {
+    public CDROutputObject beginRequest(Object self, String opName,
+	boolean isOneWay, CorbaContactInfo contactInfo) {
 
         final CorbaContactInfo corbaContactInfo = (CorbaContactInfo) contactInfo;
         final ORB orb = (ORB)contactInfo.getBroker();
@@ -205,7 +205,7 @@ public class CorbaClientRequestDispatcherImpl
 			    // are marked in use by registerWaiter() call and since this
 			    // call happens later do it after that.
 			    if (contactInfo.shouldCacheConnection()) {
-				OutboundConnectionCache connectionCache =
+				CorbaOutboundConnectionCache connectionCache =
 				    orb.getTransportManager()
 					    .getOutboundConnectionCache(contactInfo);
 				connectionCache.stampTime(connection);
@@ -250,7 +250,7 @@ public class CorbaClientRequestDispatcherImpl
 		tp.exit_requestAddServiceContexts() ;
 	    }
 
-	    OutputObject outputObject = contactInfo.createOutputObject(messageMediator);
+	    CDROutputObject outputObject = contactInfo.createOutputObject(messageMediator);
 
 	    if (orb.subcontractDebugFlag) {
 		dputil.info( "created output object", outputObject );
@@ -268,7 +268,7 @@ public class CorbaClientRequestDispatcherImpl
                         if (orb.subcontractDebugFlag) {
                             dputil.info( "reclaiming connections" );
                         }
-			OutboundConnectionCache connectionCache = orb.getTransportManager()
+			CorbaOutboundConnectionCache connectionCache = orb.getTransportManager()
 			    .getOutboundConnectionCache(contactInfo);
 			connectionCache.reclaim();
 		    }
@@ -300,7 +300,7 @@ public class CorbaClientRequestDispatcherImpl
 		// ContactInfoList outside of subcontract.
 		// Want to move that update to here.
 		if (getContactInfoListIterator(orb).hasNext()) {
-		    contactInfo = (ContactInfo)getContactInfoListIterator(orb).next();
+		    contactInfo = (CorbaContactInfo)getContactInfoListIterator(orb).next();
                     if (orb.subcontractDebugFlag) {
                         dputil.info( "RemarshalException: hasNext true", 
                             "contact info", contactInfo ) ;
@@ -338,8 +338,8 @@ public class CorbaClientRequestDispatcherImpl
 	}
     }
 
-    public InputObject marshalingComplete(java.lang.Object self, 
-					  OutputObject outputObject)
+    public CDRInputObject marshalingComplete(java.lang.Object self,
+					  CDROutputObject outputObject)
 	throws 
 	    ApplicationException, 
 	    org.omg.CORBA.portable.RemarshalException
@@ -358,7 +358,7 @@ public class CorbaClientRequestDispatcherImpl
 
 	    tp.enter_clientTransportAndWait();
 
-	    InputObject inputObject = null ;
+	    CDRInputObject inputObject = null ;
 	    try {
 		inputObject = marshalingComplete1(orb, messageMediator);
 	    } finally {
@@ -377,7 +377,7 @@ public class CorbaClientRequestDispatcherImpl
 	}
     }
 
-    public InputObject marshalingComplete1(
+    public CDRInputObject marshalingComplete1(
             ORB orb, CorbaMessageMediator messageMediator)
 	throws
 	    ApplicationException, 
@@ -448,9 +448,9 @@ public class CorbaClientRequestDispatcherImpl
         }
     }
 
-    protected InputObject processResponse(ORB orb, 
+    protected CDRInputObject processResponse(ORB orb,
 					  CorbaMessageMediator messageMediator,
-					  InputObject inputObject)
+					  CDRInputObject inputObject)
 	throws 
 	    ApplicationException, 
 	    org.omg.CORBA.portable.RemarshalException
@@ -795,7 +795,7 @@ public class CorbaClientRequestDispatcherImpl
     }
 
     protected void unregisterWaiter(ORB orb) {
-	MessageMediator messageMediator =
+	CorbaMessageMediator messageMediator =
 	    orb.getInvocationInfo().getMessageMediator();
 	if (messageMediator!=null && messageMediator.getConnection() != null) {
 	    // REVISIT:
@@ -940,7 +940,7 @@ public class CorbaClientRequestDispatcherImpl
 	messageMediator.setReplyExceptionDetailMessage(msg);
     }
 
-    public void endRequest(Broker broker, Object self, InputObject inputObject)
+    public void endRequest(ORB broker, Object self, CDRInputObject inputObject)
     {
 	ORB orb = (ORB)broker ;
 	TimingPoints tp = orb.getTimerManager().points() ;
@@ -955,7 +955,7 @@ public class CorbaClientRequestDispatcherImpl
 	    //       in request or before _invoke returns.
 	    // Note: self may be null also (e.g., compiler generates null in stub).
 
-	    MessageMediator messageMediator =
+	    CorbaMessageMediator messageMediator =
 		orb.getInvocationInfo().getMessageMediator();
 	    if (messageMediator != null) {
 		ORBUtility.popEncVersionFromThreadLocalState();
@@ -967,12 +967,12 @@ public class CorbaClientRequestDispatcherImpl
 
                 // Release any outstanding NIO ByteBuffers to the ByteBufferPool
 
-                InputObject inputObj = messageMediator.getInputObject();
+                CDRInputObject inputObj = messageMediator.getInputObject();
                 if (inputObj != null) {
                     inputObj.close();
                 }
 
-                OutputObject outputObj = messageMediator.getOutputObject();
+                CDROutputObject outputObj = messageMediator.getOutputObject();
                 if (outputObj != null) {
                     outputObj.close();
                 }
@@ -1100,7 +1100,7 @@ public class CorbaClientRequestDispatcherImpl
 	ctxs.put(cssc);
     }    
 
-    protected String peekUserExceptionId(InputObject inputObject) {
+    protected String peekUserExceptionId(CDRInputObject inputObject) {
 	CDRInputObject cdrInputObject = (CDRInputObject) inputObject;
 	// REVISIT - need interface for mark/reset
         cdrInputObject.mark(Integer.MAX_VALUE);

@@ -37,6 +37,8 @@
 
 package corba.transportonly;
 
+import com.sun.corba.se.impl.oa.poa.Policies;
+import com.sun.corba.se.spi.ior.IORTemplate;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -45,15 +47,14 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-import com.sun.corba.se.pept.transport.Selector;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.EventHandler;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
+import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
@@ -61,11 +62,8 @@ import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import com.sun.corba.se.impl.transport.EventHandlerBase;
 
 public class AcceptorImpl
-    extends
-	EventHandlerBase
-    implements
-	Acceptor,
-	Work
+    extends EventHandlerBase
+    implements CorbaAcceptor, Work
 {
     private ServerSocketChannel serverSocketChannel;
     private ServerSocket serverSocket;
@@ -116,12 +114,12 @@ public class AcceptorImpl
 	throw new RuntimeException();
     }
 
-    public void setConnectionCache(InboundConnectionCache connectionCache)
+    public void setConnectionCache(CorbaInboundConnectionCache connectionCache)
     {
 	throw new RuntimeException();
     }
 
-    public InboundConnectionCache getConnectionCache()
+    public CorbaInboundConnectionCache getConnectionCache()
     {
 	throw new RuntimeException();
     }
@@ -142,7 +140,7 @@ public class AcceptorImpl
 				   shouldUseSelectThreadForConnections(),
 				   !shouldUseSelectThreadForConnections(),
 				   false);
-	    Selector selector = orb.getTransportManager().getSelector(0);
+	    Selector selector = orb.getCorbaTransportManager().getSelector(0);
 	    selector.registerForEvent(connection);
 	    System.out.println("connection registered.");
 	} catch (IOException e) {
@@ -202,12 +200,12 @@ public class AcceptorImpl
 	return SelectionKey.OP_ACCEPT;
     }
 
-    public Acceptor getAcceptor()
+    public CorbaAcceptor getAcceptor()
     {
 	return this;
     }
 
-    public Connection getConnection()
+    public CorbaConnection getConnection()
     {
 	return null;
     }
@@ -246,27 +244,42 @@ public class AcceptorImpl
 	return enqueueTime;
     }
 
-    //////////////////////////////////////////////////
-    //
-    //
-    //
-
-    public MessageMediator createMessageMediator(Broker xbroker,
-						 Connection xconnection)
+    public CorbaMessageMediator createMessageMediator(ORB xbroker,
+						 CorbaConnection xconnection)
     {
 	throw new RuntimeException("NO.");
     }
 
-    public InputObject createInputObject(Broker broker,
-					 MessageMediator messageMediator)
+    public CDRInputObject createInputObject(ORB broker,
+					 CorbaMessageMediator messageMediator)
     {
 	throw new RuntimeException("NO");
     }
 
-    public OutputObject createOutputObject(Broker broker,
-					   MessageMediator messageMediator)
+    public CDROutputObject createOutputObject(ORB broker,
+					   CorbaMessageMediator messageMediator)
     {
 	throw new RuntimeException("NO");
+    }
+
+    public String getObjectAdapterId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getObjectAdapterManagerId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void addToIORTemplate(IORTemplate iorTemplate, Policies policies, String codebase) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getMonitoringName() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public ServerSocket getServerSocket() {
+        return null ;
     }
 }
 

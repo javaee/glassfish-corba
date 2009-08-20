@@ -38,10 +38,7 @@ package pi.iorinterceptor;
 
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
-import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.PortableServer.*;
-import org.omg.PortableInterceptor.*;
-import org.omg.IOP.*;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;

@@ -36,17 +36,8 @@
 
 package com.sun.corba.se.impl.corba;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 import org.omg.CORBA.TypeCode ;
 import org.omg.CORBA.StructMember ;
@@ -54,23 +45,14 @@ import org.omg.CORBA.UnionMember ;
 import org.omg.CORBA.ValueMember ;
 import org.omg.CORBA.TCKind ;
 import org.omg.CORBA.Any ;
-import org.omg.CORBA.BAD_TYPECODE ;
-import org.omg.CORBA.BAD_PARAM ;
-import org.omg.CORBA.BAD_OPERATION ;
-import org.omg.CORBA.INTERNAL ;
-import org.omg.CORBA.MARSHAL ;
 import org.omg.CORBA.TypeCodePackage.BadKind ;
 import org.omg.CORBA_2_3.portable.InputStream;
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.encoding.MarshalInputStream;
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
-import com.sun.corba.se.impl.encoding.CDRInputStream;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.TypeCodeInputStream;
 import com.sun.corba.se.impl.encoding.TypeCodeOutputStream;
 import com.sun.corba.se.impl.encoding.TypeCodeReader;
@@ -696,7 +678,7 @@ public final class TypeCodeImpl extends TypeCode
 	    return new TypeCodeImpl(orb, tc);
     }
 
-    public static CDROutputStream newOutputStream(ORB orb) {
+    public static CDROutputObject newOutputStream(ORB orb) {
 	TypeCodeOutputStream tcos = new TypeCodeOutputStream((ORB)orb);
 	//if (debug) System.out.println("Created TypeCodeOutputStream " + tcos + 
 	// " with no parent");
@@ -1377,8 +1359,8 @@ public final class TypeCodeImpl extends TypeCode
 	    // hardly possible unless caller knows our "private" stream classes.
 	    if (read_value_kind((TypeCodeReader)is))
 		read_value_body(is);
-	} else if (is instanceof CDRInputStream) {
-	    WrapperInputStream wrapper = new WrapperInputStream((CDRInputStream)is);
+	} else if (is instanceof CDRInputObject) {
+	    WrapperInputStream wrapper = new WrapperInputStream((CDRInputObject)is);
 	    //if (debug) System.out.println("Created WrapperInputStream " + wrapper + 
 	    // " with no parent");
 	    if (read_value_kind((TypeCodeReader)wrapper))
@@ -2187,7 +2169,7 @@ public final class TypeCodeImpl extends TypeCode
 	    case TCKind._tk_any: 
 		{
 		    //Any tmp = new AnyImpl(_orb);
-		    Any tmp =  ((CDRInputStream)src).orb().create_any();
+		    Any tmp =  ((CDRInputObject)src).orb().create_any();
 		    TypeCodeImpl t = new TypeCodeImpl((ORB)dst.orb());
 		    t.read_value((org.omg.CORBA_2_3.portable.InputStream)src);
 		    t.write_value((org.omg.CORBA_2_3.portable.OutputStream)dst);

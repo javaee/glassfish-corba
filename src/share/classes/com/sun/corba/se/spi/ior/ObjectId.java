@@ -36,10 +36,18 @@
 
 package com.sun.corba.se.spi.ior;
 
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author Ken Cavanaugh
  */
+@ManagedData
+@Description( "The ObjectId field within an ObjectKey in an IOR" )
 public interface ObjectId extends Writeable
 {
+    @ManagedAttribute
+    @Description( "The actual bytes in the ObjectKey" ) 
     public byte[] getId() ;
 }

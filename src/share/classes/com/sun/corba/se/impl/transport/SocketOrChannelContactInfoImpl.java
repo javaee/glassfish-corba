@@ -36,7 +36,7 @@
 
 package com.sun.corba.se.impl.transport;
 
-import com.sun.corba.se.pept.transport.Connection;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.orb.ORB;
@@ -105,11 +105,6 @@ public class SocketOrChannelContactInfoImpl
 	this.addressingDisposition = addressingDisposition;
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ContactInfo
-    //
-
     public boolean isConnectionBased()
     {
 	return true;
@@ -125,9 +120,9 @@ public class SocketOrChannelContactInfoImpl
 	return CorbaTransportManager.SOCKET_OR_CHANNEL_CONNECTION_CACHE;
     }
 
-    public Connection createConnection()
+    public CorbaConnection createConnection()
     {
-	Connection connection =
+	CorbaConnection connection =
 	    new SocketOrChannelConnectionImpl(orb, this, 
 					      socketType, hostname, port);
 	return connection;
@@ -142,11 +137,6 @@ public class SocketOrChannelContactInfoImpl
     {
 	return "SocketConnections";
     }
-
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ContactInfo
-    //
 
     public String getType()
     {

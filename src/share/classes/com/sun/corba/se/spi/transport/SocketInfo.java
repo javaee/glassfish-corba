@@ -43,12 +43,11 @@ public interface SocketInfo
     // activation.idl accordingly.  It has a duplicate definition
     // to avoid a compilation dependency.
 
-    public static final String IIOP_CLEAR_TEXT = "IIOP_CLEAR_TEXT";
+    String IIOP_CLEAR_TEXT = "IIOP_CLEAR_TEXT";
 
+    String getType();
 
-    public String getType();
+    String getHost();
 
-    public String getHost();
-
-    public int    getPort();
+    int    getPort();
 }

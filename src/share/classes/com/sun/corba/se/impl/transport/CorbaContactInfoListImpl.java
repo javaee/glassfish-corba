@@ -41,7 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
@@ -74,7 +74,7 @@ public class CorbaContactInfoListImpl
     protected IOR targetIOR;
     protected IOR effectiveTargetIOR;
     protected List<CorbaContactInfo> effectiveTargetIORContactInfoList;
-    protected ContactInfo primaryContactInfo;
+    protected CorbaContactInfo primaryContactInfo;
     private boolean usePerRequestLoadBalancing = false ;
 
     private int startCount = 0 ;
@@ -174,11 +174,6 @@ public class CorbaContactInfoListImpl
 	setTargetIOR(targetIOR);
     }
     
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ContactInfoList
-    //
-
     public synchronized Iterator<CorbaContactInfo> iterator()
     {
 	createContactInfoList();
@@ -406,7 +401,7 @@ public class CorbaContactInfoListImpl
     }
 
     // For timing test.
-    public ContactInfo getPrimaryContactInfo()
+    public CorbaContactInfo getPrimaryContactInfo()
     {
 	return primaryContactInfo;
     }

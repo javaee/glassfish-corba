@@ -81,8 +81,8 @@ import org.omg.PortableServer.ServantRetentionPolicyValue;
 
 //import org.omg.PortableServer.CurrentHelper; REVISIT
 
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.Connection;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
@@ -572,7 +572,7 @@ public class U
 	Collection acceptors = transportManager.getAcceptors();
 	Iterator i = acceptors.iterator();
 	while (i.hasNext()) {
-	    Acceptor acceptor = (Acceptor) i.next();
+	    CorbaAcceptor acceptor = (CorbaAcceptor) i.next();
 	    if (acceptor instanceof SocketInfo) {
 		SocketInfo socketInfo = (SocketInfo) acceptor;
 		if (socketInfo.getType().equals(socketType)) {
@@ -587,7 +587,7 @@ public class U
 			((com.sun.corba.se.impl.transport.CorbaConnectionCacheBase)transportManager.getInboundConnectionCache(acceptor)).values();
 		    i = connections.iterator();
 		    while (i.hasNext()) {
-			Connection connection = (Connection) i.next();
+			CorbaConnection connection = (CorbaConnection) i.next();
 			CloseThread closeThread = new CloseThread(connection);
 			closeThread.start();
 		    }
@@ -602,15 +602,15 @@ public class U
 					   int port,
 					   com.sun.corba.se.spi.orb.ORB orb)
     {
-	Acceptor acceptor =
+	CorbaAcceptor acceptor =
 	    new SocketOrChannelAcceptorImpl(
                 orb,
 		port,
 		"Test",
 		socketType);
-	orb.getTransportManager().registerAcceptor(acceptor);
+	orb.getCorbaTransportManager().registerAcceptor(acceptor);
 	// This initializes it and registers it with the transport manager.
-	orb.getTransportManager().getAcceptors();
+	orb.getCorbaTransportManager().getAcceptors();
 	return true;
     }
 
@@ -822,8 +822,8 @@ public class U
 
 class CloseThread extends Thread
 {
-    Connection connection;
-    CloseThread(Connection connection)
+    CorbaConnection connection;
+    CloseThread(CorbaConnection connection)
     {
 	this.connection = connection;
     }

@@ -38,11 +38,15 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimerFactoryImpl ;
 
+import org.glassfish.gmbal.IncludeSubclass ;
+
 /** Handles timer events, represented by timer instances.
  * An enter event means that a measurement has begun for an event,
  * and an exit event signals the end of the last measurement that
  * was started.
  */
+@IncludeSubclass( { StatsEventHandler.class, LogEventHandler.class,
+    TimerFactoryImpl.TracingEventHandler.class } )
 public interface TimerEventHandler extends Named {
     void notify( TimerEvent event ) ;
 }

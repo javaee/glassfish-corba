@@ -39,29 +39,43 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 import java.util.Map ;
 import java.util.Set ;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.Description ;
 
 /** Factory class for all Timer-related objects.
  * TimerFactory is also a TimerGroup of all timers and timer groups that it creates.
  */
+@ManagedObject
+@Description( "The Factory used to create and managed all objects in the Timer framework" ) 
 public interface TimerFactory extends TimerGroup {
     /** Returns the maximum id used by this TimerFactory for creating Controllables.
      * The value of con.id() for any Controllable created by this
      * TimerFactory always ranges from 0 inclusive to numberOfIds()
      * exclusive.
      */
+    @ManagedAttribute
+    @Description( "The total number of Controllabled IDs in use" ) 
     int numberOfIds() ;
 
     /** Returns the Controllable corresponding to id, for 
      * id in the range 0 (inclusive) to numberOfIds() (exclusive). 
      * @throws IndexOutOfBoundsException if id is not in range.
      */
+    @ManagedOperation
+    @Description( "Look up a Timer or TimerGroup by its ID" ) 
     Controllable getControllable( int id ) ;
 
     /** Create a new LogEventHandler.  All LogEventHandler names
      * must be unique within the same TimerFactory.
      */
+    @ManagedOperation
+    @Description( "Create a new LogEventHandler" )
     LogEventHandler makeLogEventHandler( String name ) ;
 
+    @ManagedOperation
+    @Description( "Create a new TracingEventHandler" )
     TimerEventHandler makeTracingEventHandler( String name ) ;
 
     /** Create a new StatsEventHandler.  A StatsEventHandler records 
@@ -72,6 +86,8 @@ public interface TimerFactory extends TimerGroup {
      * must be unique within the same TimerFactory.
      * This StatsEventHandler must be used from a single thread.
      */
+    @ManagedOperation
+    @Description( "Create a new StatsEventHandler" )
     StatsEventHandler makeStatsEventHandler( String name ) ;
 
     /** Create a new StatsEventHandler.  A StatsEventHandler records 
@@ -82,52 +98,72 @@ public interface TimerFactory extends TimerGroup {
      * must be unique within the same TimerFactory.
      * This StatsEventHandler is multi-thread safe.
      */
+    @ManagedOperation
+    @Description( "Create a new Multi-Threaded StatsEventHandler" )
     StatsEventHandler makeMultiThreadedStatsEventHandler( String name ) ;
 
     /** Remove the handler from this TimerFactory.  The handler
      * should not be used after this call.
      */
+    @ManagedOperation
+    @Description( "Remove the TimerEventHandler from this factory" )
     void removeTimerEventHandler( TimerEventHandler handler ) ;
 
     /** Create a new Timer.  Note that Timers cannot be
      * destroyed, other than by garbage collecting the TimerFactory
      * that created them.
      */
+    @ManagedOperation
+    @Description( "Create a new Timer" ) 
     Timer makeTimer( String name, String description )  ;
 
     /** Returns a read-only map from Timer names to Timers.
      */
+    @ManagedAttribute
+    @Description( "All timers contained in this factory" ) 
     Map<String,? extends Timer> timers() ;
 
     /** Create a new TimerGroup.  Note that TimerGroups cannot be
      * destroyed, other than by garbage collecting the TimerFactory
      * that created them.
      */
+    @ManagedOperation
+    @Description( "Create a new TimerGroup" ) 
     TimerGroup makeTimerGroup( String name, String description ) ;
 
     /** Returns a read-only map from TimerGroup names to TimerGroups.
      */
+    @ManagedAttribute
+    @Description( "All timers contained in this factory" ) 
     Map<String,? extends TimerGroup> timerGroups() ;
 
     /** Create a TimerController, which can create TimerEvents and
      * send them to registered TimerEventHandlers.
      */
+    @ManagedOperation
+    @Description( "Create a new TimerEventController" ) 
     TimerEventController makeController( String name ) ;
 
     /** Remove the controller from this factory.  The controller 
      * should not be used after this call.
      */
+    @ManagedOperation
+    @Description( "Remote the TimerEventController from this factory" ) 
     void removeController( TimerEventControllerBase controller ) ;
 
     /** Returns a read-only view of the set of enabled Controllables.
      * These have been explicitly enabled via a call to enable().
      */
+    @ManagedAttribute
+    @Description( "All explicitly enabled Timers and TimerGroups" ) 
     Set<? extends Controllable> enabledSet() ;
 
     /** Returns a read-only view of the set of Controllables that are 
      * currently active.  An enabled Timer is active.  All Controllables
      * contained in an active or enabled TimerGroup are active.
      */
+    @ManagedAttribute
+    @Description( "All activated Timers" ) 
     Set<Timer> activeSet() ;
 }
 

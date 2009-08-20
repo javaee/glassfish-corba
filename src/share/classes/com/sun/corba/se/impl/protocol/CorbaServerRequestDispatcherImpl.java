@@ -51,8 +51,6 @@ import org.omg.PortableServer.Servant ;
 
 import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.SystemException;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.UNKNOWN;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.Any;
 
@@ -60,12 +58,6 @@ import org.omg.CORBA.portable.InvokeHandler;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.UnknownException;
-import org.omg.CORBA.portable.ResponseHandler;
-
-import com.sun.org.omg.SendingContext.CodeBase;
-
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersion;
@@ -95,16 +87,13 @@ import com.sun.corba.se.spi.servicecontext.CodeSetServiceContext;
 import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
 import com.sun.corba.se.spi.servicecontext.ORBVersionServiceContext;
 
-import com.sun.corba.se.impl.protocol.SpecialMethod ;
 import com.sun.corba.se.impl.corba.ServerRequestImpl ;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.MarshalInputStream;
-import com.sun.corba.se.impl.encoding.MarshalOutputStream;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.OperationTracer;
-import com.sun.corba.se.impl.protocol.RequestCanceledException;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.POASystemException;
 
@@ -173,9 +162,8 @@ public class CorbaServerRequestDispatcherImpl
 	} 
     }		
 
-    public void dispatch(MessageMediator messageMediator)
+    public void dispatch(CorbaMessageMediator request)
     {
-	CorbaMessageMediator request = (CorbaMessageMediator) messageMediator;
 	try {
 	    if (orb.subcontractDebugFlag) {
 		dprint(".dispatch->: " + opAndId(request));
@@ -695,7 +683,7 @@ public class CorbaServerRequestDispatcherImpl
 		    throw e;
 		}
 		response = (CorbaMessageMediator) 
-		    ((OutputObject)stream).getMessageMediator();
+		    ((CDROutputObject)stream).getMessageMediator();
 	    }
 
 	    return response ;

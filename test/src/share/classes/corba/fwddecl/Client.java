@@ -44,12 +44,11 @@ import java.util.Properties ;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream ;
-import com.sun.corba.se.impl.encoding.CDROutputStream ;
+import com.sun.corba.se.impl.encoding.CDRInputObject ;
+import com.sun.corba.se.impl.encoding.CDROutputObject ;
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 
-import org.testng.Assert ;
 import org.testng.annotations.Test ;
 
 import corba.framework.TestngRunner ;
@@ -63,7 +62,7 @@ public class Client
 	return new EncapsOutputStream( orb ) ;
     }
 
-    private CDRInputStream makeInputStream( OutputStream os ) 
+    private CDRInputObject makeInputStream( OutputStream os )
     {
 	byte[] bytes = getBytes( os ) ;
 	return makeInputStream( bytes ) ;
@@ -71,12 +70,12 @@ public class Client
 
     private byte[] getBytes( OutputStream os ) 
     {
-	CDROutputStream cos = (CDROutputStream)os ;
+	CDROutputObject cos = (CDROutputObject)os ;
 	byte[] bytes = cos.toByteArray() ;
 	return bytes ;
     }
 
-    private CDRInputStream makeInputStream( byte[] data ) 
+    private CDRInputObject makeInputStream( byte[] data )
     {
 	return new EncapsInputStream( orb, data, data.length ) ;
     }

@@ -83,7 +83,8 @@ public abstract class NamedBase implements Named {
 	    return false ;
 
 	Named other = Named.class.cast( obj ) ;
-	return other.name().equals( name ) ;
+	return other.name().equals( name ) && 
+            other.getClass().equals( this.getClass() ) ;
     }
 
     public int hashCode() {

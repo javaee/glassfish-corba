@@ -46,15 +46,29 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.InheritedAttribute ;
+import org.glassfish.gmbal.Description ;
+
 /** An IOR is represented as a list of profiles.
 * Only instances of TaggedProfile are contained in the list.
 */
+@ManagedData
+@Description( "Interoperable Object Reference: the internal structure of a remote object reference" )
 public interface IOR extends List<TaggedProfile>, Writeable, MakeImmutable
 {
+    // This is used only for management
+    @ManagedAttribute
+    @Description( "The list of profiles in this IOR" ) 
+    Iterator<TaggedProfile> getTaggedProfiles() ;
+
     ORB getORB() ;
 
     /** Return the type id string from the IOR.
     */
+    @ManagedAttribute
+    @Description( "The repository ID of the IOR" ) 
     String getTypeId() ;
    
     /** Return an iterator that iterates over tagged profiles with

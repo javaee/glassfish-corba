@@ -36,15 +36,15 @@
 package com.sun.corba.se.spi.transport ;
 
 import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.spi.encoding.CorbaInputObject ;
-import com.sun.corba.se.spi.encoding.CorbaOutputObject ;
+import com.sun.corba.se.impl.encoding.CDRInputObject ;
+import com.sun.corba.se.impl.encoding.CDROutputObject ;
 
 /** Interface that provides operations to transorm an IOR
  * between its programmatic representation and a representation
  * in an Input or Output object.
  */
 public interface IORTransformer {
-    IOR unmarshal( CorbaInputObject io ) ;
+    IOR unmarshal( CDRInputObject io ) ;
 
-    void marshal( CorbaOutputObject oo, IOR ior ) ;
+    void marshal( CDROutputObject oo, IOR ior ) ;
 }

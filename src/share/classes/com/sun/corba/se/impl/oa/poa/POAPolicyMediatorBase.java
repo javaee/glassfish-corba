@@ -36,8 +36,6 @@
 
 package com.sun.corba.se.impl.oa.poa ;
 
-import java.util.Collection;
-import java.util.Enumeration ;
 
 import org.omg.PortableServer.Servant ;
 import org.omg.PortableServer.ForwardRequest ;
@@ -45,7 +43,6 @@ import org.omg.PortableServer.POAPackage.WrongPolicy ;
 
 import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;

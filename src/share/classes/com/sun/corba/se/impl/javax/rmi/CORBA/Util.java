@@ -104,7 +104,7 @@ import org.omg.CORBA.portable.OutputStream;
 // This means that any of the following com.sun.corba classes
 // must only occur in contexts that also handle the non-Sun case.
 
-import com.sun.corba.se.pept.transport.ContactInfoList ;
+import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
@@ -669,7 +669,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	    if (delegate instanceof CorbaClientDelegate) {
 		// For the Sun ORB
 		CorbaClientDelegate cdel = (CorbaClientDelegate)delegate ;
-		ContactInfoList cil = cdel.getContactInfoList() ;
+		CorbaContactInfoList cil = cdel.getContactInfoList() ;
 		if (cil instanceof CorbaContactInfoList) {
 		    CorbaContactInfoList ccil = (CorbaContactInfoList)cil ;
 		    LocalClientRequestDispatcher lcs = ccil.getLocalClientRequestDispatcher() ;

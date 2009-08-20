@@ -36,40 +36,16 @@
 
 package com.sun.corba.se.impl.encoding;
 
-import org.omg.CORBA.TypeCode ;
-import org.omg.CORBA.StructMember ;
-import org.omg.CORBA.UnionMember ;
-import org.omg.CORBA.ValueMember ;
-import org.omg.CORBA.TCKind ;
-import org.omg.CORBA.Any ;
 import org.omg.CORBA.CompletionStatus ;
 
-import org.omg.CORBA.TypeCodePackage.BadKind ;
-
-import org.omg.CORBA_2_3.portable.InputStream;
 import org.omg.CORBA_2_3.portable.OutputStream;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.encoding.MarshalInputStream;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 public final class TypeCodeOutputStream extends EncapsOutputStream 
@@ -154,25 +130,9 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
         // with a call to write_long which will trigger the alignment.
         // Then write the rest of the byte array.
 
-        //if (TypeCodeImpl.debug) {
-            //System.out.println(this + ".writeRawBuffer(" + s + ", " + firstLong + ")");
-            //if (s instanceof CDROutputStream) {
-                //System.out.println("Parent position before writing kind = " + ((CDROutputStream)s).getIndex());
-            //}
-        //}
         s.write_long(firstLong);
-        //if (TypeCodeImpl.debug) {
-            //if (s instanceof CDROutputStream) {
-                //System.out.println("Parent position after writing kind = " + ((CDROutputStream)s).getIndex());
-            //}
-        //}
 	byte[] buf = ORBUtility.getByteBufferArray(getByteBuffer());
 	s.write_octet_array(buf, 4, getIndex() - 4);
-        //if (TypeCodeImpl.debug) {
-            //if (s instanceof CDROutputStream) {
-                //System.out.println("Parent position after writing all " + getIndex() + " bytes = " + ((CDROutputStream)s).getIndex());
-            //}
-        //}
     }
 
     public TypeCodeOutputStream createEncapsulation(org.omg.CORBA.ORB _orb) {
@@ -190,7 +150,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     }
 
     public static TypeCodeOutputStream wrapOutputStream(OutputStream os) {
-        boolean littleEndian = ((os instanceof CDROutputStream) ? ((CDROutputStream)os).isLittleEndian() : false);
+        boolean littleEndian = ((os instanceof CDROutputObject) ? ((CDROutputObject)os).isLittleEndian() : false);
         TypeCodeOutputStream tos = new TypeCodeOutputStream((ORB)os.orb(), littleEndian);
         tos.setEnclosingOutputStream(os);
         //if (TypeCodeImpl.debug) System.out.println("Created TypeCodeOutputStream " + tos + " with parent " + os);

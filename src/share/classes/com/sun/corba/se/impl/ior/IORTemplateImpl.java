@@ -38,12 +38,8 @@ package com.sun.corba.se.impl.ior;
 
 import java.util.Iterator ;
 
-import org.omg.CORBA.INTERNAL ;
-
 import org.omg.CORBA_2_3.portable.OutputStream ;
 import org.omg.CORBA_2_3.portable.InputStream ;
-
-import org.omg.IOP.TAG_INTERNET_IOP ;
 
 import com.sun.corba.se.spi.ior.IdentifiableContainerBase ;
 import com.sun.corba.se.spi.ior.IdentifiableFactoryFinder ;
@@ -66,6 +62,7 @@ public class IORTemplateImpl
 {
     private ObjectKeyTemplate oktemp ;
 
+    @Override
     public boolean equals( Object obj )
     {
 	if (obj == null)
@@ -79,6 +76,7 @@ public class IORTemplateImpl
 	return super.equals( obj ) && oktemp.equals( other.getObjectKeyTemplate() ) ;
     }
 
+    @Override
     public int hashCode()
     {
 	return super.hashCode() ^ oktemp.hashCode() ;
@@ -123,6 +121,7 @@ public class IORTemplateImpl
     * modified.  This overrides the method inherited from 
     * FreezableList through IdentifiableContainerBase.
     */
+    @Override
     public void makeImmutable()
     {
 	makeElementsImmutable() ;

@@ -36,35 +36,18 @@
 
 package com.sun.corba.se.impl.legacy.connection;
 
-import java.net.ServerSocket;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.omg.CORBA.INITIALIZE;
 import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.CompletionStatus;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.Selector;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
-import com.sun.corba.se.spi.ior.ObjectId ;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
-import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 
-import com.sun.corba.se.impl.encoding.EncapsOutputStream;
-import com.sun.corba.se.impl.legacy.connection.SocketFactoryAcceptorImpl;
-import com.sun.corba.se.impl.legacy.connection.USLPort;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
 public class LegacyServerSocketManagerImpl 

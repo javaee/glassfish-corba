@@ -40,16 +40,11 @@ package corba.transportonly;
  * Last Modified : 2003 Apr 24 (Thu) 18:06:47 by Harold Carr.
  */
 
-import java.io.IOException;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.Selector;
+import com.sun.corba.se.spi.transport.EventHandler;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import corba.transportonly.AcceptorImpl;
 
 public class Server
 {

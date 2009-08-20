@@ -48,16 +48,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Iterator;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-import com.sun.corba.se.pept.transport.Selector;
+
+import com.sun.corba.se.spi.transport.EventHandler;
+import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.extension.RequestPartitioningPolicy;
 import com.sun.corba.se.spi.extension.LoadBalancingPolicy;
@@ -74,7 +67,6 @@ import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.SocketInfo;
-import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
@@ -85,6 +77,8 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 // BEGIN Legacy support.
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 // END Legacy support.
 
 /**
@@ -95,7 +89,6 @@ public class SocketOrChannelAcceptorImpl
 	EventHandlerBase
     implements
 	CorbaAcceptor,
-	SocketOrChannelAcceptor,
 	Work,
 	// BEGIN Legacy
 	SocketInfo,
@@ -108,7 +101,7 @@ public class SocketOrChannelAcceptorImpl
     protected long enqueueTime;
     protected boolean initialized;
     protected ORBUtilSystemException wrapper ;
-    protected InboundConnectionCache connectionCache;
+    protected CorbaInboundConnectionCache connectionCache;
     
     private Class<?> lastExceptionClassSeen = null ;
 
@@ -149,11 +142,6 @@ public class SocketOrChannelAcceptorImpl
 	this.type = type;
     }
     // END Legacy support.
-
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.Acceptor
-    //
 
     public synchronized boolean initialize()
     {
@@ -226,12 +214,12 @@ public class SocketOrChannelAcceptorImpl
 	return this.getClass().toString();
     }
 
-    public void setConnectionCache(InboundConnectionCache connectionCache)
+    public void setConnectionCache(CorbaInboundConnectionCache connectionCache)
     {
 	this.connectionCache = connectionCache;
     }
 
-    public InboundConnectionCache getConnectionCache()
+    public CorbaInboundConnectionCache getConnectionCache()
     {
 	return connectionCache;
     }
@@ -457,12 +445,12 @@ public class SocketOrChannelAcceptorImpl
 	return SelectionKey.OP_ACCEPT;
     }
 
-    public Acceptor getAcceptor()
+    public CorbaAcceptor getAcceptor()
     {
 	return this;
     }
 
-    public Connection getConnection()
+    public CorbaConnection getConnection()
     {
 	throw new RuntimeException("Should not happen.");
     }
@@ -562,17 +550,17 @@ public class SocketOrChannelAcceptorImpl
     //
 
     // REVISIT: refactor into common base or delegate.
-    public MessageMediator createMessageMediator(Broker broker,
-						 Connection connection)
+    public CorbaMessageMediator createMessageMediator(ORB broker,
+						 CorbaConnection connection)
     {
 	// REVISIT - no factoring so cheat to avoid code dup right now.
 	// REVISIT **** COUPLING !!!!
-	ContactInfo contactInfo = new SocketOrChannelContactInfoImpl();
+	CorbaContactInfo contactInfo = new SocketOrChannelContactInfoImpl();
 	return contactInfo.createMessageMediator(broker, connection);
     }
 
-    public InputObject createInputObject(Broker broker,
-					 MessageMediator messageMediator)
+    public CDRInputObject createInputObject(ORB broker,
+					 CorbaMessageMediator messageMediator)
     {
 	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
 	    messageMediator;
@@ -582,8 +570,8 @@ public class SocketOrChannelAcceptorImpl
 				  corbaMessageMediator.getDispatchHeader());
     }
 
-    public OutputObject createOutputObject(Broker broker,
-					   MessageMediator messageMediator)
+    public CDROutputObject createOutputObject(ORB broker,
+					   CorbaMessageMediator messageMediator)
     {
 	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
 	    messageMediator;

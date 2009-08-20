@@ -22,5 +22,15 @@
             <artifactId>glassfish-corba-codegen</artifactId>
             <version>@version@</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.external</groupId>
+            <artigactId>management-api</artifactId>
+            <version>3.0.0-b004</version>
+        <dependency>
+        <dependency>
+            <groupId>org.glassfish.gmbal</groupId>
+            <artigactId>gmbal</artifactId>
+            <version>3.0.0-b009</version>
+        <dependency>
     </dependencies>
 </project>

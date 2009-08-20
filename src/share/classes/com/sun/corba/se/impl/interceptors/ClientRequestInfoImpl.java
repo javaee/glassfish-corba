@@ -65,7 +65,6 @@ import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.omg.PortableInterceptor.TRANSPORT_RETRY;
 import org.omg.PortableInterceptor.USER_EXCEPTION;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
@@ -1007,7 +1006,7 @@ public final class ClientRequestInfoImpl
      * Package-scope interfaces
      **********************************************************************/
 
-    protected void setInfo(MessageMediator messageMediator)
+    protected void setInfo(CorbaMessageMediator messageMediator)
     {
 	this.messageMediator = (CorbaMessageMediator)messageMediator;
 	// REVISIT - so mediator can handle DII in subcontract.

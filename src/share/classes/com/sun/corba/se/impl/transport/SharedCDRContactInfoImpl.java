@@ -36,12 +36,11 @@
 
 package com.sun.corba.se.impl.transport;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.Connection;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.ior.IOR;
@@ -53,7 +52,6 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.encoding.BufferManagerFactory;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
 import com.sun.corba.se.impl.protocol.SharedCDRClientRequestDispatcherImpl;
@@ -97,13 +95,7 @@ public class SharedCDRContactInfoImpl
 	throw wrapper.undefinedSocketinfoOperation() ;
     }
 
-
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ContactInfo
-    //
-
-    public ClientRequestDispatcher getClientRequestDispatcher()
+    public CorbaClientRequestDispatcher getClientRequestDispatcher()
     {
 	// REVISIT - use registry
 	return new SharedCDRClientRequestDispatcherImpl();
@@ -124,16 +116,16 @@ public class SharedCDRContactInfoImpl
 	throw wrapper.methodShouldNotBeCalled();
     }
     
-    public Connection createConnection()
+    public CorbaConnection createConnection()
     {
 	throw wrapper.methodShouldNotBeCalled();
     }
 
     // Called when client making an invocation.    
     @Override
-    public MessageMediator createMessageMediator(Broker broker,
-						 ContactInfo contactInfo,
-						 Connection connection,
+    public CorbaMessageMediator createMessageMediator(ORB broker,
+						 CorbaContactInfo contactInfo,
+						 CorbaConnection connection,
 						 String methodName,
 						 boolean isOneWay)
     {
@@ -158,12 +150,12 @@ public class SharedCDRContactInfoImpl
 	return messageMediator;
     }
 
-    public OutputObject createOutputObject(MessageMediator messageMediator)
+    public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator)
     {
 	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
 	    messageMediator;
 	// NOTE: GROW.
-	OutputObject outputObject = 
+	CDROutputObject outputObject =
 	    new CDROutputObject(orb, messageMediator, 
 				corbaMessageMediator.getRequestHeader(),
 				corbaMessageMediator.getStreamFormatVersion(),

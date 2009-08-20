@@ -90,8 +90,8 @@ import java.lang.reflect.Proxy;
 import javax.rmi.CORBA.Tie;
 import javax.rmi.CORBA.ValueHandler;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.ByteBufferPool;
 
 import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
 
@@ -2525,7 +2525,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         if (bbwi != null && getByteBuffer() != null)
         {
-            MessageMediator messageMediator = parent.getMessageMediator();
+            CorbaMessageMediator messageMediator = parent.getMessageMediator();
             if (messageMediator != null)
             {
                 CDROutputObject outputObj =

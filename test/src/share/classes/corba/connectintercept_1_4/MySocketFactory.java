@@ -231,7 +231,6 @@ public class MySocketFactory
 	    try {
 		socket.setTcpNoDelay(true);
 	    } catch (Exception e) {
-		;
 	    }
 	    return socket;
 	} else {
@@ -275,7 +274,6 @@ public class MySocketFactory
 		    try {
 			port = Integer.parseInt(pair.nextToken());
 		    } catch (NumberFormatException e) {
-			;
 		    }
 		}
 	    }
@@ -306,6 +304,7 @@ class SocketInfoImpl
 	return cookie;
     }
 
+    @Override
     public String toString()
     {
 	return 
@@ -327,6 +326,7 @@ class TypePortPair
     }
     public String getType  () { return type; }
     public int    getPort  () { return port; }
+    @Override
     public String toString () { return type + ":" + port; }
 }
 

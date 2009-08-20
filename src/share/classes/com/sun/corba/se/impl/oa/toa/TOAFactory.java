@@ -38,8 +38,6 @@ package com.sun.corba.se.impl.oa.toa ;
 import java.util.Map ;
 import java.util.HashMap ;
 
-import org.omg.CORBA.INTERNAL ;
-import org.omg.CORBA.CompletionStatus ;
 
 import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
 import com.sun.corba.se.spi.oa.ObjectAdapter ;
@@ -48,23 +46,40 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.ior.ObjectAdapterId ;
 
-import com.sun.corba.se.impl.oa.toa.TOAImpl ;
-import com.sun.corba.se.impl.oa.toa.TransientObjectManager ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 
 import com.sun.corba.se.impl.ior.ObjectKeyTemplateBase ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import org.glassfish.gmbal.AMXMetadata;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedObject;
 
+@ManagedObject
+@Description( "The Factory for the TOA (transient object adapter)")
+@AMXMetadata( isSingleton=true )
 public class TOAFactory implements ObjectAdapterFactory 
 {
     private ORB orb ;
     private ORBUtilSystemException wrapper ;
 
     private TOAImpl toa ;
-    private Map codebaseToTOA ;
+    private Map<String,TOAImpl> codebaseToTOA ;
     private TransientObjectManager tom ; 
+
+    @ManagedAttribute
+    @Description( "The default TOA used only for dispatch, not objref creation")
+    private TOAImpl getDefaultTOA() {
+        return toa ;
+    }
+
+    @ManagedAttribute
+    @Description( "The map from Codebase to TOA")
+    private synchronized Map<String,TOAImpl> getCodebaseMap() {
+        return new HashMap<String,TOAImpl>( codebaseToTOA ) ;
+    }
 
     public ObjectAdapter find ( ObjectAdapterId oaid ) 
     {
@@ -81,7 +96,8 @@ public class TOAFactory implements ObjectAdapterFactory
 	this.orb = orb ;
 	wrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_ORBUtil() ;
 	tom = new TransientObjectManager( orb ) ;
-	codebaseToTOA = new HashMap() ;
+	codebaseToTOA = new HashMap<String,TOAImpl>() ;
+        orb.mom().registerAtRoot( this ) ;
     }
 
     public void shutdown( boolean waitForCompletion )
@@ -93,7 +109,7 @@ public class TOAFactory implements ObjectAdapterFactory
 
     public synchronized TOA getTOA( String codebase )
     {
-	TOA toa = (TOA)(codebaseToTOA.get( codebase )) ;
+	TOAImpl toa = codebaseToTOA.get( codebase ) ;
 	if (toa == null) {
 	    toa = new TOAImpl( orb, tom, codebase ) ;
 

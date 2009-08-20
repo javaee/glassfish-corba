@@ -38,14 +38,13 @@ package com.sun.corba.se.impl.transport;
 
 import java.nio.ByteBuffer;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.OutboundConnectionCache;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
@@ -76,14 +75,9 @@ public abstract class CorbaContactInfoBase
     // NOTE: This may be different from same named one in CorbaContactInfoList.
     protected IOR effectiveTargetIOR;
     protected short addressingDisposition;
-    protected OutboundConnectionCache connectionCache;
+    protected CorbaOutboundConnectionCache connectionCache;
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ContactInfo
-    //
-
-    public Broker getBroker()
+    public ORB getBroker()
     {
 	return orb;
     }
@@ -93,7 +87,7 @@ public abstract class CorbaContactInfoBase
 	return contactInfoList;
     }
 
-    public ClientRequestDispatcher getClientRequestDispatcher() 
+    public CorbaClientRequestDispatcher getClientRequestDispatcher()
     {
 	int scid =
 	    getEffectiveProfile().getObjectKeyTemplate().getSubcontractId() ;
@@ -103,20 +97,20 @@ public abstract class CorbaContactInfoBase
 
     // Note: not all derived classes will use a connection cache.
     // These are convenience methods that may not be used.
-    public void setConnectionCache(OutboundConnectionCache connectionCache)
+    public void setConnectionCache(CorbaOutboundConnectionCache connectionCache)
     {
 	this.connectionCache = connectionCache;
     }
 
-    public OutboundConnectionCache getConnectionCache()
+    public CorbaOutboundConnectionCache getConnectionCache()
     {
 	return connectionCache;
     }
 
     // Called when client making an invocation.    
-    public MessageMediator createMessageMediator(Broker broker,
-						 ContactInfo contactInfo,
-						 Connection connection,
+    public CorbaMessageMediator createMessageMediator(ORB broker,
+						 CorbaContactInfo contactInfo,
+						 CorbaConnection connection,
 						 String methodName,
 						 boolean isOneWay)
     {
@@ -142,7 +136,7 @@ public abstract class CorbaContactInfoBase
     }
 
     // Called when not using "useNIOToWait" configuration
-    public MessageMediator createMessageMediator(Broker broker,Connection conn)
+    public CorbaMessageMediator createMessageMediator(ORB broker,CorbaConnection conn)
     {
 	ORB orb = (ORB) broker;
 	CorbaConnection connection = (CorbaConnection) conn;
@@ -163,12 +157,12 @@ public abstract class CorbaContactInfoBase
 	return messageMediator;
     }
 
-    public OutputObject createOutputObject(MessageMediator messageMediator)
+    public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator)
     {
 	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
 	    messageMediator;
 	
-	OutputObject outputObject = 
+	CDROutputObject outputObject =
 	    new CDROutputObject(orb, messageMediator, 
 				corbaMessageMediator.getRequestHeader(),
 				corbaMessageMediator.getStreamFormatVersion());
@@ -177,8 +171,8 @@ public abstract class CorbaContactInfoBase
 	return outputObject;
     }
 
-    public InputObject createInputObject(Broker broker,
-					 MessageMediator messageMediator)
+    public CDRInputObject createInputObject(ORB broker,
+					 CorbaMessageMediator messageMediator)
     {
 	// REVISIT: Duplicate of acceptor code.
 	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)

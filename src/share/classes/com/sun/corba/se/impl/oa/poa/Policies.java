@@ -39,17 +39,43 @@ package com.sun.corba.se.impl.oa.poa;
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.BitSet ;
-import java.util.Iterator ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 import com.sun.corba.se.spi.extension.ZeroPortPolicy ;
 import com.sun.corba.se.spi.extension.CopyObjectPolicy ;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedData;
 
+import org.omg.CORBA.Policy;
+
+import org.omg.PortableServer.ID_ASSIGNMENT_POLICY_ID;
+import org.omg.PortableServer.ID_UNIQUENESS_POLICY_ID;
+import org.omg.PortableServer.IMPLICIT_ACTIVATION_POLICY_ID;
+import org.omg.PortableServer.IdAssignmentPolicy;
+import org.omg.PortableServer.IdAssignmentPolicyValue;
+import org.omg.PortableServer.IdUniquenessPolicy;
+import org.omg.PortableServer.IdUniquenessPolicyValue;
+import org.omg.PortableServer.ImplicitActivationPolicy;
+import org.omg.PortableServer.ImplicitActivationPolicyValue;
+import org.omg.PortableServer.LIFESPAN_POLICY_ID;
+import org.omg.PortableServer.LifespanPolicy;
+import org.omg.PortableServer.LifespanPolicyValue;
+import org.omg.PortableServer.POAPackage.InvalidPolicy;
+import org.omg.PortableServer.REQUEST_PROCESSING_POLICY_ID;
+import org.omg.PortableServer.RequestProcessingPolicy;
+import org.omg.PortableServer.RequestProcessingPolicyValue;
+import org.omg.PortableServer.SERVANT_RETENTION_POLICY_ID;
+import org.omg.PortableServer.ServantRetentionPolicy;
+import org.omg.PortableServer.ServantRetentionPolicyValue;
+import org.omg.PortableServer.THREAD_POLICY_ID;
+import org.omg.PortableServer.ThreadPolicy;
+import org.omg.PortableServer.ThreadPolicyValue;
+
+@ManagedData
+@Description( "A collection of Policy instances")
 public final class Policies {
 /* Order of *POLICY_ID :
    THREAD_
@@ -69,6 +95,12 @@ public final class Policies {
     int defaultObjectCopierFactoryId ;
 
     private Map<Integer,Policy> policyMap = new HashMap<Integer,Policy>() ;	
+
+    @ManagedAttribute
+    @Description( "The policies")
+    Map<Integer,Policy> getPolicies() {
+        return new HashMap<Integer,Policy>( policyMap ) ;
+    }
 
     public static final Policies defaultPolicies 
 	= new Policies() ;
@@ -124,6 +156,7 @@ public final class Policies {
 	    RequestProcessingPolicyValue._USE_ACTIVE_OBJECT_MAP_ONLY ) ;
     }
 
+    @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
 	buffer.append( "Policies[" ) ;

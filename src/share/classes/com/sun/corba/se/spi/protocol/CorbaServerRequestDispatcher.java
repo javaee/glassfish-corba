@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.spi.protocol;
 
-import com.sun.corba.se.pept.protocol.ServerRequestDispatcher;
 
 import com.sun.corba.se.spi.ior.ObjectKey;
 
@@ -51,13 +50,14 @@ import com.sun.corba.se.spi.ior.IOR ;
  * ObjectAdapter to Servant, although this may be short-circuited.
  * Instances of this class are registered in the subcontract Registry.
  */
-public interface CorbaServerRequestDispatcher 
-    extends ServerRequestDispatcher
+public abstract interface CorbaServerRequestDispatcher
 {
     /**
      * Handle a locate request.
      */
     public IOR locate(ObjectKey key);
+
+    public void dispatch(CorbaMessageMediator messageMediator);
 }
 
 // End of file.

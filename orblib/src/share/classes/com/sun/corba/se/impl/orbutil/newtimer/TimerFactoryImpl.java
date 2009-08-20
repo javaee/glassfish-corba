@@ -43,6 +43,7 @@ import java.util.Set ;
 import java.util.HashSet ;
 import java.util.Collections ;
 
+import com.sun.corba.se.spi.orbutil.newtimer.Named ;
 import com.sun.corba.se.spi.orbutil.newtimer.Controllable ;
 import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
@@ -54,6 +55,10 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerEventControllerBase ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.NamedBase ;
+
+import org.glassfish.gmbal.ManagedObjectManager ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
 
 // TimerFactory is a TimerGroup containing all timers and timer groups 
 // that it creates
@@ -69,6 +74,8 @@ import com.sun.corba.se.spi.orbutil.newtimer.NamedBase ;
 // A lock will also be used in Timer to control access to the
 // activation state of a Timer.
 public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
+    private ManagedObjectManager mom ;
+
     // The string<->int dictionary for timer names
     private Map<Controllable,Integer> conToInt ;
     private Map<Integer,Controllable> intToCon;
@@ -83,8 +90,36 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
     private Map<String,TimerEventHandler> timerEventHandlers ;
     private Map<String,TimerEventControllerBase> timerEventControllers ;
 
-    public TimerFactoryImpl( String name, String description ) {
+    private boolean doGmbalRegistration ;
+
+    private void manage( Named obj ) {
+        // Note that no extra parameters are needed here, because Named.getName
+        // is an ObjectNameKey.
+        if ((mom != null) && doGmbalRegistration) {
+            // System.out.println( "Registering " + obj ) ;
+            mom.registerAtRoot( obj ) ;
+        }
+    }
+
+    private void manage( Named parent, Named obj ) {
+        // Note that no extra parameters are needed here, because Named.getName
+        // is an ObjectNameKey.
+        if ((mom != null) && doGmbalRegistration){
+            // System.out.println( "Registering " + obj ) ;
+            mom.register( parent, obj ) ;
+        }
+    }
+
+    private void unmanage( Named obj ) {
+        if ((mom != null) && doGmbalRegistration) {
+            mom.unregister( obj ) ;
+        }
+    }
+
+    public TimerFactoryImpl( ManagedObjectManager mom, String name, String description,
+        boolean doGmbalRegistration ) {
 	super( 0, null, name, description ) ;
+        this.mom = mom ;
 	setFactory( this ) ;
 	add( this ) ; // The TimerFactory is a group containing all 
 		      // Timers and TimerGroups it creates, so it
@@ -103,6 +138,8 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
 	timerEventHandlers = new HashMap<String,TimerEventHandler>() ;
 	timerEventControllers = new HashMap<String,TimerEventControllerBase>() ;
+        this.doGmbalRegistration = doGmbalRegistration ;
+        manage( this ) ;
     }
 
     // con must be a Controllable with an id already set (which is
@@ -140,6 +177,8 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    + " must be between 0 and " + (nextIndex - 1)) ;
     }
 
+    @ManagedObject
+    @Description( "A simple TimerEventHandler that just displays TimerEvents as they occur" ) 
     public static class TracingEventHandler 
 	extends NamedBase 
 	implements TimerEventHandler {
@@ -168,6 +207,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    throw new IllegalArgumentException( "Name " + name 
 		+ " is already in use." ) ;
 	TimerEventHandler result = new TracingEventHandler( factory(), name ) ;
+        manage( this, result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -177,6 +217,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    throw new IllegalArgumentException( "Name " + name 
 		+ " is already in use." ) ;
 	LogEventHandler result = new LogEventHandlerImpl( factory(), name ) ;
+        manage( this, result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -187,6 +228,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 		+ " is already in use." ) ;
 	StatsEventHandler result = new StatsEventHandlerImpl( factory(), 
 	    name ) ;
+        manage( this, result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -199,6 +241,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 		+ " is already in use." ) ;
 	StatsEventHandler result = new MultiThreadedStatsEventHandlerImpl( 
 	    factory(), name ) ;
+        manage( this, result ) ;
 	timerEventHandlers.put( name, result ) ;
 	return result ;
     }
@@ -207,12 +250,14 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	TimerEventHandler handler ) {
 
 	timerEventHandlers.remove( handler.name() ) ;
+        unmanage( handler ) ;
     }
 
     public synchronized Timer makeTimer( String name, String description ) {
 	checkArgs( timers.keySet(), name, description ) ;
 
 	TimerImpl result = new TimerImpl( nextIndex, this, name, description ) ;
+        manage( this, result ) ;
 	mapId( result ) ;
 	timers.put( name, result ) ;
 	add( result ) ;  // Remember, a TimerFactory is a TimerGroup 
@@ -232,6 +277,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
 	TimerGroupImpl result = new TimerGroupImpl( nextIndex, this, name, 
 	    description ) ;
+        manage( this, result ) ;
 
 	mapId( result ) ;
 	timerGroups.put( result.name(), result ) ;
@@ -256,6 +302,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 
     public synchronized TimerEventController makeController( String name ) {
 	TimerEventController result = new TimerEventController( this, name ) ;
+        manage( this, result ) ;
 	return result ;
     }
 
@@ -263,6 +310,7 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	TimerEventControllerBase controller ) {
 
 	timerEventControllers.remove( controller.name() ) ;
+        unmanage( controller ) ;
     }
 
     public synchronized Set<? extends Controllable> enabledSet() {

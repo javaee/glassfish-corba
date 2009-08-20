@@ -45,7 +45,7 @@
 	    <jvmarg value="-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
-	    <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}"/>
+	    <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${gmbal-jar}:${management-api-jar}"/>
             <!-- add this to debug use of JUnitReportHelper:
             <jvmarg value="-Dcorba.test.junit.helper.debug=true"/>
             -->
@@ -68,7 +68,7 @@
 	    <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
 	    <jvmarg value="-Demma.coverage.out.merge=true"/>
 	    <jvmarg value="-Demma.rt.control=false"/>
-	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${tools-jar}:${emma-jar}"/>
+	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${tools-jar}:${emma-jar}:${gmbal-jar}:${management-api-jar}"/>
 	    <jvmarg line="${debug.args}"/>
             <jvmarg value="-Xmx200m"/>
 	    <!-- was:
@@ -120,7 +120,7 @@
 	    <classpath>
 		<path refid="test-classpath.master"/>
 	    </classpath> 
-	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}"/> 
+	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}:${gmbal-jar}:${management-api-jar}"/> 
 	    <jvmarg line="${debug.args}"/>
 	    <formatter type="xml"/>
 	    <test-cases/>
@@ -178,7 +178,7 @@
 
 <target name="test" depends="test-init, build-tests, test-all"/>
 
-<target name="test-all" depends="test-init, clean-test-output, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
+<target name="test-all" depends="clean-test-output, test-init, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
 
 <target name="archive-test-results" depends="test-init">
     <jar jarfile="${releaselib.dir}/test-results.jar">
@@ -188,7 +188,7 @@
     </jar>
 </target>
 
-<target name="clean-test-output">
+<target name="clean-test-output" depends="init">
     <delete dir="${test.output}" quiet="false"/>
 </target>
 

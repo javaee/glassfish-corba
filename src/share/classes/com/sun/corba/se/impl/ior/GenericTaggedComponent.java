@@ -45,9 +45,15 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
 import com.sun.corba.se.spi.ior.TaggedComponent ;
 
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author 
  */
+@ManagedData
+@Description( "Generic representation of a tagged component of a type "
+    + "unknown to the ORB" ) 
 public class GenericTaggedComponent extends GenericIdentifiable 
     implements TaggedComponent 
 {

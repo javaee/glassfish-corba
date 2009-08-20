@@ -36,6 +36,9 @@
 
 package com.sun.corba.se.spi.ior;
 
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+
 import java.util.List ;
 import java.util.Iterator ;
 
@@ -48,15 +51,27 @@ import com.sun.corba.se.spi.ior.WriteContents ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.InheritedAttribute ;
+import org.glassfish.gmbal.IncludeSubclass ;
+
 /** Base template for creating TaggedProfiles.  A TaggedProfile will often contain
 * tagged components.  A template that does not contain components acts like 
 * an empty immutable list.
 *
 * @author Ken Cavanaugh
 */
+@ManagedData
+@Description( "A template for creating a TaggedProfile" ) 
+@IncludeSubclass( { com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate.class } )
 public interface TaggedProfileTemplate extends List<TaggedComponent>, 
     Identifiable, WriteContents, MakeImmutable
 {    
+    @ManagedAttribute
+    @Description( "The list of TaggedComponents in this TaggedProfileTemplate" ) 
+    public Iterator<TaggedComponent> getTaggedComponents() ;
+
     /** Return an iterator that iterates over tagged components with
     * identifier id.  It is not possible to modify the list through this
     * iterator.  

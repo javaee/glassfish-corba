@@ -43,7 +43,6 @@ import java.io.IOException ;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field ;
 import java.lang.reflect.Modifier ;
-import java.lang.reflect.InvocationTargetException ;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock ;
@@ -56,27 +55,16 @@ import java.util.Iterator ;
 import java.util.Properties ;
 import java.util.Map ;
 import java.util.HashMap ;
-import java.util.LinkedList ;
-import java.util.Collection ;
-import java.util.Collections ;
-import java.util.StringTokenizer ;
-import java.util.Enumeration ;
 import java.util.WeakHashMap ;
 
 import java.net.InetAddress ;
 
 import javax.rmi.CORBA.ValueHandler;
 
-import org.omg.CORBA.Context;
-import org.omg.CORBA.ContextList;
-import org.omg.CORBA.Environment;
-import org.omg.CORBA.ExceptionList;
-import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.NamedValue;
 import org.omg.CORBA.Request;
-import org.omg.CORBA.SystemException;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
@@ -85,7 +73,6 @@ import org.omg.CORBA.UnionMember;
 import org.omg.CORBA.ValueMember;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.MARSHAL;
 
 import org.omg.CORBA.portable.ValueFactory;
 
@@ -93,12 +80,7 @@ import org.omg.CORBA.ORBPackage.InvalidName;
 
 import com.sun.org.omg.SendingContext.CodeBase;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.protocol.ClientInvocationInfo ;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.ContactInfoList;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-import com.sun.corba.se.pept.transport.TransportManager;
+import com.sun.corba.se.spi.protocol.ClientInvocationInfo ;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.TaggedProfile;
@@ -108,8 +90,6 @@ import com.sun.corba.se.spi.ior.TaggedComponentFactoryFinder;
 import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.ObjectKey ;
 import com.sun.corba.se.spi.ior.ObjectKeyFactory ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.oa.OAInvocationInfo;
 import com.sun.corba.se.spi.oa.ObjectAdapterFactory;
 import com.sun.corba.se.spi.orb.DataCollector;
@@ -122,15 +102,10 @@ import com.sun.corba.se.spi.orb.OperationFactory;
 import com.sun.corba.se.spi.orb.ORBVersion;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
-import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
-import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory;
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher;
-import com.sun.corba.se.spi.protocol.RequestDispatcherDefault;
 import com.sun.corba.se.spi.protocol.PIHandler;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.resolver.Resolver;
 import com.sun.corba.se.spi.resolver.LocalResolver;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
@@ -142,16 +117,20 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry;
 import com.sun.corba.se.spi.monitoring.MonitoringConstants;
 import com.sun.corba.se.spi.monitoring.MonitoringManager;
-import com.sun.corba.se.spi.monitoring.MonitoringManagerFactory;
 import com.sun.corba.se.spi.monitoring.MonitoringFactories;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
 import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
+import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
+
+import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
+
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility;
 import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 
-import com.sun.corba.se.impl.corba.TypeCodeFactory;
+
+
 import com.sun.corba.se.impl.corba.TypeCodeImpl;
 import com.sun.corba.se.impl.corba.NVListImpl;
 import com.sun.corba.se.impl.corba.ExceptionListImpl;
@@ -160,7 +139,6 @@ import com.sun.corba.se.impl.corba.NamedValueImpl;
 import com.sun.corba.se.impl.corba.EnvironmentImpl;
 import com.sun.corba.se.impl.corba.AsynchInvoke;
 import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.encoding.CachedCodeBase;
 import com.sun.corba.se.impl.interceptors.PIHandlerImpl;
@@ -170,11 +148,9 @@ import com.sun.corba.se.impl.ior.TaggedProfileFactoryFinderImpl;
 import com.sun.corba.se.impl.ior.TaggedProfileTemplateFactoryFinderImpl;
 import com.sun.corba.se.impl.oa.toa.TOAFactory;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
-import com.sun.corba.se.impl.oa.poa.DelegateImpl;
 import com.sun.corba.se.impl.oa.poa.POAFactory;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl;
 import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolManagerImpl;
 import com.sun.corba.se.impl.protocol.RequestDispatcherRegistryImpl;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
@@ -185,13 +161,14 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.copyobject.CopierManagerImpl;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
-             
+         
+
 /**
  * The JavaIDL ORB implementation.
  */
 public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 {
-    protected TransportManager transportManager;
+    protected CorbaTransportManager transportManager;
     protected LegacyServerSocketManager legacyServerSocketManager;
 
     private ThreadLocal OAInvocationInfoStack ; 
@@ -382,6 +359,12 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         orbVersionThreadLocal.set(verObj);
     }
 
+
+    private void initManagedObjectManager() {
+        createORBManagedObjectManager() ;
+        mom.registerAtRoot( configData ) ;
+    }
+
 /****************************************************************************
  * The following methods are ORB initialization
  ****************************************************************************/
@@ -499,12 +482,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	new HashMap<String,Integer>() ;
     private String rootName = null ;
 
-    public String getUniqueOrbId() 
-    {
+    @Override
+    public synchronized String getUniqueOrbId() {
 	if (rootName == null) {
 	    String orbid = getORBData().getORBId() ;
 	    int num = 1 ;
-
 	    // Look up the current count of ORB instances with 
 	    // the same ORBId.  If this is the first instance,
 	    // the count is 1, otherwise increment the count.
@@ -542,29 +524,28 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     {
 	// First, create the standard ORB config data.
 	// This must be initialized before the ORBConfigurator
-	// is executed.
+	// is executed. Note that the orbId is initialized here.
 	configData = new ORBDataParserImpl( this, dataCollector) ;
 	if (orbInitDebug) {
 	    System.out.println( "Contents of ORB configData:" ) ;
 	    System.out.println( ObjectUtility.defaultObjectToString( configData ) ) ;
 	}
 
-	// Note that the TimerManager depends on getUniqueOrbId,
-	// which depends on configData, so this call must be after
-	// the configData init.  The TimerManager must also be
-	// initialized BEFORE the pihandler.initialize() call, in
-	// case we want to time interceptor setup.  Obviously we
-	// want to initialize the timerManager as early as possible
-	// so we can time parts of initialization if desired.
-	timerManager = makeTimerManager( getUniqueOrbId() ) ;
-
-	// This requires a valid TimerManager.
-	initializePrimitiveTypeCodeConstants() ;
-
 	// Set the debug flags early so they can be used by other
 	// parts of the initialization.
 	setDebugFlags( configData.getORBDebugFlags() ) ;
 
+        initManagedObjectManager() ;
+
+	// The TimerManager must be
+	// initialized BEFORE the pihandler.initialize() call, in
+	// case we want to time interceptor setup.  Obviously we
+	// want to initialize the timerManager as early as possible
+	// so we can time parts of initialization if desired.
+	timerManager = makeTimerManager( mom ) ;
+
+	// This requires a valid TimerManager.
+	initializePrimitiveTypeCodeConstants() ;
 	initMonitoringManager() ;
 
 	// REVISIT: this should go away after more transport init cleanup
@@ -604,6 +585,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         super.getByteBufferPool();
 	serviceContextsCache = new ServiceContextsCache(this);
 
+        // Now the ORB is ready, so finish all of the MBean registration
+        mom.resumeJMXRegistration() ;
     }
 
     private synchronized POAFactory getPOAFactory() 
@@ -1527,7 +1510,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         }
 
         CachedCodeBase.cleanCache( this ) ;
-
         try {
             pihandler.close() ;
         } catch (IOException exc) {
@@ -1585,6 +1567,12 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         invocationInterceptor = null ;
         objectKeyCache = null ; 
         objectKeyCacheLock = null ;
+
+        try {
+            mom.close() ;
+        } catch (IOException exc) {
+            // ignore: stupid close exception
+        }
     }
 
     /**
@@ -1717,6 +1705,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     /** This is the implementation of the public API used to connect
      *  a servant-skeleton to the ORB.
      */
+    @Override
     public synchronized void connect(org.omg.CORBA.Object servant)
     {
         checkShutdownState();
@@ -1731,6 +1720,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         }
     }
 
+    @Override
     public synchronized void disconnect(org.omg.CORBA.Object obj)
     {
         checkShutdownState();
@@ -1884,11 +1874,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	else
 	    throw wrapper.noPoa() ;
     }
-
-    ////////////////////////////////////////////////////
-    //
-    // pept.broker.Broker
-    //
 
     public ClientInvocationInfo createOrIncrementInvocationInfo() 
     {
@@ -2119,7 +2104,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
     }
 
-    public TransportManager getTransportManager()
+    public CorbaTransportManager getTransportManager()
     {
 	return transportManager;
     }
@@ -2224,7 +2209,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 	return entry ;
     }
-
     @Override
     public synchronized boolean orbIsShutdown() {
         return ((status == STATUS_DESTROYED) || 

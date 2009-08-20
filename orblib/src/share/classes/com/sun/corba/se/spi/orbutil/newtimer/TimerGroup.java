@@ -38,13 +38,23 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import java.util.Set ;
 
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
+
 /** A TimerGroup is a collection of Controllables, which includes
  * Timers and TimerGroups.  The contents() method in a TimerGroup
  * returns an unmodifiable set.  The contents may only be updated
  * throught the add and remove methods.
  */
+@ManagedObject
+@Description( "A group of Timers or other TimerGroups, which may be enabled or disabled together" ) 
 public interface TimerGroup extends Controllable {
+    @ManagedOperation
+    @Description( "Add a new Timer or TimerGroup to this TimerGroup" ) 
     boolean add( Controllable con ) ;
 
+    @ManagedOperation
+    @Description( "Remove a new Timer or TimerGroup from this TimerGroup" ) 
     boolean remove( Controllable con ) ;
 }

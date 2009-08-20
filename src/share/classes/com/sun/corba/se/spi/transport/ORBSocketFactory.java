@@ -42,7 +42,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.ServerSocket;
 
-import com.sun.corba.se.pept.transport.Acceptor;
 import com.sun.corba.se.spi.orb.ORB;
 
 /**
@@ -60,7 +59,7 @@ public interface ORBSocketFactory
 			       InetSocketAddress inetSocketAddress)
         throws IOException;
 
-    public void setAcceptedSocketOptions(Acceptor acceptor,
+    public void setAcceptedSocketOptions(CorbaAcceptor acceptor,
 					 ServerSocket serverSocket,
 					 Socket socket)
 	throws SocketException;

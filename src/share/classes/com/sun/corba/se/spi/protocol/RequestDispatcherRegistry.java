@@ -38,7 +38,6 @@ package com.sun.corba.se.spi.protocol;
 
 import java.util.Set;
 
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
 
@@ -56,11 +55,11 @@ public interface RequestDispatcherRegistry {
      * to control how a remote method invocation is processed by the ORB for a 
      * particular kind of object reference.
      */
-    void registerClientRequestDispatcher( ClientRequestDispatcher csc, int scid) ;
+    void registerClientRequestDispatcher( CorbaClientRequestDispatcher csc, int scid) ;
 
     /** Get the ClientRequestDispatcher for subcontract ID scid.
      */
-    ClientRequestDispatcher getClientRequestDispatcher( int scid ) ;
+    CorbaClientRequestDispatcher getClientRequestDispatcher( int scid ) ;
 
     /** Register a LocalClientRequestDispatcher for a particular subcontract ID.
      * The subcontract ID appears in the ObjectKey of an object reference, and is used

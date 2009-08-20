@@ -92,8 +92,6 @@
 // -test corba.connections.ConnectionsTest
 -test corba.cdrext.CDRExtTest
 -test corba.serialization.zerolengthstring.ZeroLengthStringTest
-// Commented out until we update to more recent XML tools
-// -test corba.genericRPCMSGFramework.GenericRPCMSGFrameworkTest
 -test corba.purgecalls.PurgecallsTest
 -test corba.codeset.CodeSetTest
 -test corba.codebase.CodeBaseTest

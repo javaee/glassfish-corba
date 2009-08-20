@@ -43,10 +43,16 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 
 import com.sun.corba.se.spi.ior.Identifiable ;
 
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author 
  * This is used for unknown components and profiles.  A TAG_MULTICOMPONENT_PROFILE will be represented this way.
  */
+@ManagedData
+@Description( "A generic implementation of an IIOP encapsulation with an integer id" ) 
 public abstract class GenericIdentifiable implements Identifiable 
 {
     private int id;
@@ -102,6 +108,8 @@ public abstract class GenericIdentifiable implements Identifiable
 	this.data = (byte[])(data.clone()) ;
     }
     
+    @ManagedAttribute
+    @Description( "The tagged component or profile CDR encoded data" )
     public byte[] getData() 
     {
 	return data ;

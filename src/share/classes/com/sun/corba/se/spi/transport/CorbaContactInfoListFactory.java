@@ -35,7 +35,6 @@
  */
 package com.sun.corba.se.spi.transport ;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.orb.ORB;

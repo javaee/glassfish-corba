@@ -47,11 +47,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.ListenerThread;
-import com.sun.corba.se.pept.transport.ReaderThread;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.EventHandler;
+import com.sun.corba.se.spi.transport.ListenerThread;
+import com.sun.corba.se.spi.transport.ReaderThread;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
@@ -61,26 +61,49 @@ import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
+import java.util.Map;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author Harold Carr
  */
+@ManagedObject
+@Description( "The Selector, which handles incoming requests to the ORB" )
 public class SelectorImpl
     extends
 	Thread
     implements
-	com.sun.corba.se.pept.transport.Selector
+	com.sun.corba.se.spi.transport.Selector
 {
     private ORB orb;
     private Selector selector;
     private long timeout;
     private List deferredRegistrations;
     private List interestOpsList;
-    private HashMap listenerThreads;
-    private HashMap readerThreads;
+    private Map<EventHandler,ListenerThread> listenerThreads;
+    private Map<EventHandler,ReaderThread>  readerThreads;
     private boolean selectorStarted;
     private volatile boolean closed;
     private ORBUtilSystemException wrapper ;
 
+    // XXX This needs more work on statistics:
+    // - how many registered events of different types?
+    // - how many events received?
+    @ManagedAttribute
+    @Description( "List of listener threads dedicated to listening "
+        + "for new connections on an acceptor")
+    private synchronized List<ListenerThread> getListenerThreads() {
+        return new ArrayList<ListenerThread>( listenerThreads.values()) ;
+    }
+
+    @ManagedAttribute
+    @Description( "List of reader threads dedicated to listening "
+        + "for new messages on a connection" )
+    private synchronized List<ReaderThread> getReaderThreads() {
+        return new ArrayList<ReaderThread>( readerThreads.values()) ;
+    }
 
     public SelectorImpl(ORB orb)
     {
@@ -90,8 +113,8 @@ public class SelectorImpl
 	timeout = 60000;
 	deferredRegistrations = new ArrayList();
 	interestOpsList = new ArrayList();
-	listenerThreads = new HashMap();
-	readerThreads = new HashMap();
+	listenerThreads = new HashMap<EventHandler,ListenerThread>();
+	readerThreads = new HashMap<EventHandler,ReaderThread>();
 	closed = false;
 	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
@@ -101,6 +124,8 @@ public class SelectorImpl
 	this.timeout = timeout;
     }
 
+    @ManagedAttribute
+    @Description( "The selector timeout" ) 
     public long getTimeout()
     {
 	return timeout;
@@ -232,19 +257,19 @@ public class SelectorImpl
 
 	// Kill listeners.
 
-	i = listenerThreads.values().iterator();
-	while (i.hasNext()) {
-	    ListenerThread listenerThread = (ListenerThread) i.next();
-	    listenerThread.close();
-	}
+        synchronized (this) {
+            for (ListenerThread lthread : listenerThreads.values()) {
+                lthread.close() ;
+            }
+        }
 
 	// Kill readers.
 
-	i = readerThreads.values().iterator();
-	while (i.hasNext()) {
-	    ReaderThread readerThread = (ReaderThread) i.next();
-	    readerThread.close();
-	}
+        synchronized (this) {
+            for (ReaderThread rthread : readerThreads.values()) {
+                rthread.close() ;
+            }
+        }
 
 	// Selector
 
@@ -489,10 +514,12 @@ public class SelectorImpl
 	if (orb.transportDebugFlag) {
 	    dprint(".createListenerThread: " + eventHandler);
 	}
-	Acceptor acceptor = eventHandler.getAcceptor();
+	CorbaAcceptor acceptor = (CorbaAcceptor)eventHandler.getAcceptor();
 	ListenerThread listenerThread =
 	    new ListenerThreadImpl(orb, acceptor);
-	listenerThreads.put(eventHandler, listenerThread);
+        synchronized (this) {
+            listenerThreads.put(eventHandler, listenerThread);
+        }
 	Throwable throwable = null;
 	try {
 	    orb.getThreadPoolManager().getThreadPool(0)
@@ -514,15 +541,19 @@ public class SelectorImpl
 	if (orb.transportDebugFlag) {
 	    dprint(".destroyListenerThread: " + eventHandler);
 	}
-	ListenerThread listenerThread = (ListenerThread)
-	    listenerThreads.get(eventHandler);
-	if (listenerThread == null) {
-	    if (orb.transportDebugFlag) {
-		dprint(".destroyListenerThread: cannot find ListenerThread - ignoring.");
-	    }
-	    return;
-	}
-	listenerThreads.remove(eventHandler);
+
+        ListenerThread listenerThread ;
+        synchronized (this) {
+            listenerThread = listenerThreads.get(eventHandler);
+            if (listenerThread == null) {
+                if (orb.transportDebugFlag) {
+                    dprint(".destroyListenerThread: cannot find ListenerThread - ignoring.");
+                }
+                return;
+            }
+            listenerThreads.remove(eventHandler);
+        }
+
 	listenerThread.close();
     }
 
@@ -531,10 +562,12 @@ public class SelectorImpl
 	if (orb.transportDebugFlag) {
 	    dprint(".createReaderThread: " + eventHandler);
 	}
-	Connection connection = eventHandler.getConnection();
+	CorbaConnection connection = eventHandler.getConnection();
 	ReaderThread readerThread = 
 	    new ReaderThreadImpl(orb, connection );
-	readerThreads.put(eventHandler, readerThread);
+        synchronized (this) {
+            readerThreads.put(eventHandler, readerThread);
+        }
 	Throwable throwable = null;
 	try {
 	    orb.getThreadPoolManager().getThreadPool(0)
@@ -556,15 +589,17 @@ public class SelectorImpl
 	if (orb.transportDebugFlag) {
 	    dprint(".destroyReaderThread: " + eventHandler);
 	}
-	ReaderThread readerThread = (ReaderThread)
-	    readerThreads.get(eventHandler);
-	if (readerThread == null) {
-	    if (orb.transportDebugFlag) {
-		dprint(".destroyReaderThread: cannot find ReaderThread - ignoring.");
-	    }
-	    return;
-	}
-	readerThreads.remove(eventHandler);
+	ReaderThread readerThread ;
+        synchronized (this) {
+	    readerThread = readerThreads.get(eventHandler);
+            if (readerThread == null) {
+                if (orb.transportDebugFlag) {
+                    dprint(".destroyReaderThread: cannot find ReaderThread - ignoring.");
+                }
+                return;
+            }
+            readerThreads.remove(eventHandler);
+        }
 	readerThread.close();
     }
 

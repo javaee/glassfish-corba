@@ -46,6 +46,10 @@ import java.util.Iterator ;
 import java.util.concurrent.locks.Condition ;
 import java.util.concurrent.locks.ReentrantLock ;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.management.ObjectName ;
+
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.SystemException ;
 
@@ -84,35 +88,32 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.NON_EXISTENT ;
 
-import org.omg.IOP.TAG_INTERNET_IOP ;
 
 import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.oa.OADestroyed ;
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
 import com.sun.corba.se.spi.oa.ObjectAdapterBase ;
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.ior.ObjectId ;
 import com.sun.corba.se.spi.ior.ObjectAdapterId ;
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.IORFactories ;
-import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.IORTemplateList ;
 import com.sun.corba.se.spi.ior.TaggedProfile ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.ForwardException ;
-import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 
 import com.sun.corba.se.impl.ior.POAObjectKeyTemplate ;
 import com.sun.corba.se.impl.ior.ObjectAdapterIdArray ;
 import com.sun.corba.se.impl.orbutil.ORBUtility; 
 import com.sun.corba.se.spi.orbutil.ORBConstants; 
+import java.util.ArrayList;
+import java.util.List;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedObject;
+import org.glassfish.gmbal.NameValue;
 
 /**
  * POAImpl is the implementation of the Portable Object Adapter. It 
@@ -123,8 +124,11 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
  * Specific comments have been added where 3.0 applies, but note that
  * we do not have the new 3.0 APIs yet.
  */
+@ManagedObject
 public class POAImpl extends ObjectAdapterBase implements POA 
 {
+    private static final long serialVersionUID = -1746388801294205323L;
+
     private boolean debug ;
 
     /* POA creation takes place in 2 stages: first, the POAImpl constructor is 
@@ -211,10 +215,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
     // Note that POAImpl handles all synchronization, so mediator is (mostly)
     // unsynchronized.
     private POAPolicyMediator mediator;
-    
+
     // Representation of object adapter ID
     private int numLevels;	    // counts depth of tree.  Root = 1.
     private ObjectAdapterId poaId ; // the actual object adapter ID for this POA
+
     private String name;	    // the name of this POA
 
     private POAManagerImpl manager; // This POA's POAManager
@@ -222,7 +227,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 				    // to the POAFactory, which has the same 
 				    // lifetime as the ORB.
     private POAImpl parent;	    // The POA that created this POA.
-    private Map children;	    // Map from name to POA of POAs created by
+    private Map<String,POAImpl> children; // Map from name to POA of POAs created by
 				    // this POA.
 
     private AdapterActivator activator;
@@ -248,14 +253,41 @@ public class POAImpl extends ObjectAdapterBase implements POA
     // POA.destroy().
     protected ThreadLocal isDestroying ;
 
+    // Used for synchronized access to the ManagedObjectManager.
+    private static final Object momLock = new Object() ;
+
     // This includes the most important information for debugging
     // POA problems.
+    @Override
     public String toString()
     {
 	return "POA[" + poaId.toString() + 
 	    ", uniquePOAId=" + uniquePOAId + 
 	    ", state=" + stateToString() + 
 	    ", invocationCount=" + invocationCount + "]" ;
+    }
+
+    @ManagedAttribute( id="POAState")
+    @Description( "The current state of the POA")
+    private String getDisplayState() {
+        lock() ;
+        try {
+            return stateToString() ;
+        } finally {
+            unlock() ;
+        }
+    }
+
+    @ManagedAttribute
+    @Description( "The POA's mediator")
+    POAPolicyMediator getMediator() {
+        return mediator ;
+    }
+
+    @ManagedAttribute
+    @Description( "The ObjectAdapterId for this POA")
+    private ObjectAdapterId getObjectAdapterId() {
+        return poaId ;
     }
 
     // package private for mediator implementations. 
@@ -271,11 +303,20 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    getObjectAdapterFactory( ORBConstants.TRANSIENT_SCID ) ;
     }
 
+    private static void registerMBean( ORB orb, Object obj ) {
+        if (orb.poaDebugFlag) {
+            ORBUtility.dprint( POAImpl.class.getName(), 
+                "Registering MBean for " + obj ) ;
+        }
+        orb.mom().register( getPOAFactory( orb ), obj ) ;
+    }
+
     // package private so that POAFactory can access it.
     static POAImpl makeRootPOA( ORB orb )
     {
 	POAManagerImpl poaManager = new POAManagerImpl( getPOAFactory( orb ), 
 	    orb.getPIHandler() ) ;
+        registerMBean( orb, poaManager ) ;
 
 	POAImpl result = new POAImpl( ORBConstants.ROOT_POA_NAME, 
 	    null, orb, STATE_START ) ;
@@ -285,6 +326,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
     }
 
     // package private so that POAPolicyMediatorBase can access it.
+    @ManagedAttribute()
+    @Description( "The unique ID for this POA")
     int getPOAId()
     {
 	return uniquePOAId ;
@@ -332,7 +375,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	this.state     = initialState ;
 	this.name      = name ;
 	this.parent    = parent;
-	children = new HashMap();
+	children = new HashMap<String,POAImpl>();
 	activator = null ;
 
 	// This was done in initialize, but I moved it here
@@ -373,6 +416,21 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		return Boolean.FALSE;
 	    }
 	};
+    }
+
+    @NameValue
+    private String getName() {
+        StringBuilder sb = new StringBuilder() ;
+        boolean first = true ;
+        for (String str : poaId.getAdapterName() ) {
+            if (first) {
+                first = false ;
+            } else {
+                sb.append( '.' ) ;
+            }
+            sb.append( str ) ;
+        }
+        return sb.toString() ;
     }
 
     // The POA lock must be held when this method is called.
@@ -576,6 +634,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    }
 	}
 
+        @Override
 	public void run() 
 	{
 	    Set destroyedPOATemplates = new HashSet() ;
@@ -589,8 +648,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    while (iter.hasNext()) 
 		orts[ index++ ] = (ObjectReferenceTemplate)iter.next();
 
-	    thePoa.getORB().getPIHandler().adapterStateChanged( orts, 
-		NON_EXISTENT.value ) ;
+            ORB myORB = thePoa.getORB() ;
+
+            if (destroyedPOATemplates.size() > 0) {
+                myORB.getPIHandler().adapterStateChanged( orts, NON_EXISTENT.value ) ;
+            }
         }
     
 	// Returns true if destruction must be completed, false 
@@ -638,8 +700,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 		// Make a copy since we can't hold the lock while destroying
 		// the children, and an iterator is not deletion-safe.
-		childPoas = (POAImpl[])poa.children.values().toArray( 
-		    new POAImpl[0] );
+		childPoas = poa.children.values().toArray( new POAImpl[0] );
 	    } finally {
 		poa.unlock() ;
 	    }
@@ -730,6 +791,25 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		    parent.children.remove( poa.name ) ;
 
 		destroyedPOATemplates.add( poa.getAdapterTemplate() ) ;
+
+                synchronized (momLock) {
+                    // Only unregister if the poa is still registered: we may get
+                    // here because another thread concurrently destroyed this POA.
+                    // XXX This may not be necessary now.
+                    ObjectName oname = poa.getORB().mom().getObjectName( poa ) ; 
+                    if (oname != null) {
+                        if (debug) {
+                            ORBUtility.dprint( this, "Unregistering MBean " + oname
+                                + " for object " + poa ) ;
+                        }
+
+                        poa.getORB().mom().unregister( poa );
+                    } else {
+                        if (debug) {
+                            ORBUtility.dprint( this, "No MBean found for object " + poa ) ;
+                        }
+                    }
+                }
 	    } catch (Throwable thr) {
 		if (thr instanceof ThreadDeath)
 		    throw (ThreadDeath)thr ;
@@ -795,10 +875,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    if (state > STATE_RUN)
 		throw omgLifecycleWrapper().createPoaDestroy() ;
 		
-	    POAImpl poa = (POAImpl)(children.get(name)) ;
+	    POAImpl poa = children.get(name) ;
 
 	    if (poa == null) {
 		poa = new POAImpl( name, this, getORB(), STATE_START ) ;
+                registerMBean( getORB(), poa ) ;
 	    }
 
 	    try {
@@ -813,9 +894,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		    throw new AdapterAlreadyExists();
 
 		POAManagerImpl newManager = (POAManagerImpl)theManager ;
-		if (newManager == null)
+		if (newManager == null) {
 		    newManager = new POAManagerImpl( manager.getFactory(),
 			manager.getPIHandler() );
+                    registerMBean( getORB(), newManager ) ;
+                }
 
 		int defaultCopierId = 
 		    getORB().getCopierManager().getDefaultId() ;
@@ -850,7 +933,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		" activate=" + activate + ") on poa " + this ) ;
 	}
 
-	found = (POAImpl) children.get(name);
+	found = children.get(name);
 
 	if (found != null) {
 	    if (debug) {
@@ -1064,6 +1147,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
      * <code>the_name</code>
      * <b>Section 3.3.8.6</b>
      */
+    @ManagedAttribute( id="POAName")
+    @Description( "The name of this POA")
     public String the_name() 
     {
 	try {
@@ -1079,6 +1164,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
      * <code>the_parent</code>
      * <b>Section 3.3.8.7</b>
      */
+    @ManagedAttribute( id="POAParent")
+    @Description( "The parent of this POA")
     public POA the_parent() 
     {
 	try {
@@ -1093,6 +1180,17 @@ public class POAImpl extends ObjectAdapterBase implements POA
     /**
      * <code>the_children</code>
      */
+    @ManagedAttribute( id="POAChildren")
+    @Description( "The children of this POA")
+    private List<POAImpl> children() {
+        try {
+            lock() ;
+            return new ArrayList<POAImpl>( children.values() ) ;
+        } finally {
+            unlock() ;
+        }
+    }
+
     public org.omg.PortableServer.POA[] the_children() 
     {
 	try {
@@ -1109,6 +1207,20 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    }
 
 	    return result ;
+	} finally {
+	    unlock() ;
+	}
+    }
+
+    // We need this in order to return the correct type.
+    // I'm not sure a covariant return could be used here.
+    @ManagedAttribute( id="POAManager")
+    @Description( "The POAManager of this POA")
+    private POAManagerImpl getPOAManager() {
+	try {
+	    lock() ;
+
+	    return manager;
 	} finally {
 	    unlock() ;
 	}
@@ -1133,6 +1245,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
      * <code>the_activator</code>
      * <b>Section 3.3.8.9</b>
      */
+    @ManagedAttribute( id="Activator")
+    @Description( "The AdapterActivator of this POA")
     public AdapterActivator the_activator() 
     {
 	try {
@@ -1179,6 +1293,16 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	}
     }
 
+    @ManagedAttribute
+    @Description( "The servant manager of this POA (may be null)")
+    private ServantManager servantManager() {
+        try {
+            return get_servant_manager();
+        } catch (WrongPolicy ex) {
+            return null ;
+        }
+    }
+
     /**
      * <code>set_servant_manager</code>
      * <b>Section 3.3.8.10</b>
@@ -1213,6 +1337,18 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	} finally {
 	    unlock() ;
 	}
+    }
+
+    @ManagedAttribute
+    @Description( "The default servant of this POA (may be null)")
+    private Servant servant() {
+        try {
+            return get_servant();
+        } catch (NoServant ex) {
+            return null ;
+        } catch (WrongPolicy ex) {
+            return null ;
+        }
     }
 
     /**
@@ -1645,7 +1781,18 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	manager.exit();
     }
-    
+
+    @ManagedAttribute
+    @Description( "The current invocation count of this POA")
+    private int getInvocationCount() {
+        try {
+            lock() ;
+            return invocationCount ;
+        } finally {
+            unlock() ;
+        }
+    }
+
     public void getInvocationServant( OAInvocationInfo info ) 
     {
 	try {

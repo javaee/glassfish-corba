@@ -38,7 +38,7 @@ package com.sun.corba.se.impl.transport;
 
 import java.nio.ByteBuffer;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
+import com.sun.corba.se.spi.transport.ByteBufferPool;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 

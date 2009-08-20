@@ -38,10 +38,16 @@ package com.sun.corba.se.spi.orbutil.newtimer ;
 
 import java.util.Set ;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.Description ;
+
 /** Creates timer events and sends them to all registered event
  * handlers.  Multiple controllers may be created from the
  * same TimerFactory.
  */
+@ManagedObject
+@Description( "Controls entering and exiting Timers" ) 
 public class TimerEventController extends TimerEventControllerBase {
 
     public TimerEventController( TimerFactory factory, String name ) {
@@ -53,6 +59,8 @@ public class TimerEventController extends TimerEventControllerBase {
      * TimerEventHandlers.  An event is only generated in
      * case timer.isActivated() is true.
      */
+    @ManagedOperation
+    @Description( "Enter a particular Timer" ) 
     public void enter( Timer timer ) {
 	handle( timer, TimerEvent.TimerEventType.ENTER ) ;
     }
@@ -62,6 +70,8 @@ public class TimerEventController extends TimerEventControllerBase {
      * TimerEventHandlers.  An event is only generated in
      * case timer.isActivated() is true.
      */
+    @ManagedOperation
+    @Description( "Exit a particular Timer" ) 
     public void exit( Timer timer ) {
 	handle( timer, TimerEvent.TimerEventType.EXIT ) ;
     }

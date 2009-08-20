@@ -2,10 +2,11 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/space/ws/mercurial/CORBA/corba-merge/test/src/share/classes/corba/copyobject/Client.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-merge/src/share/classes/com/sun/corba/se/impl/orbutil/OperationTracer.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-merge/test/src/share/classes/javax/rmi/fvd/TheTest.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-merge/test/src/share/classes/test/Util.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/transport/SocketOrChannelAcceptorBase.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/transport/SocketOrChannelAcceptorImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/legacy/connection/SocketFactoryAcceptorImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/transport/CorbaTransportManagerImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/transport/CorbaAcceptorLazyImpl.java</file>
     </open-files>
 </project-private>
 <!--

@@ -39,38 +39,12 @@
 <!-- ==================	@author ken.cavanaugh@sun ===========  -->
 
 <!-- ================================================================== -->
-<!-- Set current date/time in case, if we decide to timestamp -->
-<tstamp>
-    <format property="TODAY_LONG"  pattern="EEE MMM d HH:mm:ss z yyyy"/>
-    <format property="TODAY_SHORT" pattern="yyyy-MM-dd"/>
-</tstamp>
-
-<!-- ================================================================== -->
 <target name="mavenize" depends="init" description="initialize maven ">
     <!-- Download the SVN provider-->
     <artifact:install-provider artifactId="wagon-svn" groupId="org.jvnet.wagon-svn" version="1.7">
         <artifact:remoteRepository id="java.net.maven2.repository" url="http://download.java.net/maven/2/" />
         <!-- store the provider in temp local repository-->
     </artifact:install-provider>
-</target>
-
-<target name="test-loadfile">
-    <loadfile property="dependency" srcFile="make/dependency.template.xml">
-        <filterchain>
-            <replacetokens>
-                <token key="artifactId" value="codegen"/>
-                <token key="version" value="${version}"/>
-            </replacetokens>
-        </filterchain>
-    </loadfile>
-    <echo message="${dependency}"/>
-    <sequential>
-        <property name="dependencies" value="orb,codegen,asm"/>
-        <foreach list="${dependencies}" target="test-chain" name="foo"/>
-    </sequential>
-</target>
-
-<target name="test-chain">
 </target>
 
 <!--
@@ -98,12 +72,6 @@ The modules             (and their dependencies):
         pom template:       ${root.dir}/make/pom/${m}.template.pom
         resulting jar:      ${releaselib.dir}/bundles/glassfish-corba-${m}.jar
 -->
-
-<macrodef name="dependency">
-    <attribute name="module"/>
-    <sequential>
-    </sequential>
-</macrodef>
 
 <macrodef name="make-file">
     <attribute name="module"/>

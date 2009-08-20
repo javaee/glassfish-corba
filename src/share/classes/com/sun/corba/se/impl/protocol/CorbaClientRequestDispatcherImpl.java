@@ -309,6 +309,7 @@ public class CorbaClientRequestDispatcherImpl
                     // Fix for 6763340: Complete the first attempt before starting another.
                     orb.getPIHandler().makeCompletedClientRequest( 
                         ReplyMessage.LOCATION_FORWARD, null ) ;
+                    unregisterWaiter( orb ) ;
                     orb.getPIHandler().cleanupClientPIRequest() ;
 
 		    return beginRequest(self, opName, isOneWay, contactInfo);

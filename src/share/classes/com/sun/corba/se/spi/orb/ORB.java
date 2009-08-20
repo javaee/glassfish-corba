@@ -168,7 +168,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // Flag set at compile time to debug flag processing: this can't
     // be one of the xxxDebugFlags because it is used to debug the mechanism
     // that sets the xxxDebugFlags!
-    public static boolean orbInitDebug = AccessController.doPrivileged( 
+    public static final boolean orbInitDebug = AccessController.doPrivileged( 
 	new PrivilegedAction<Boolean>() {
 	    public Boolean run() {
 		return Boolean.getBoolean( ORBConstants.INIT_DEBUG_PROPERTY );
@@ -303,7 +303,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     private UnaryFunction<String,Class<?>> classNameResolver = defaultClassNameResolver ;
     private ClassCodeBaseHandler ccbHandler = null ;
 
-    public void destroy() {
+    public synchronized void destroy() {
         logWrapperTable = null ;
         wrapper = null ;
         omgWrapper = null ;
@@ -744,23 +744,12 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
 	    if (del instanceof CorbaClientDelegate) {
 		CorbaClientDelegate cdel = (CorbaClientDelegate)del ;
-		CorbaContactInfoList cil = cdel.getContactInfoList() ;
+		CorbaContactInfoList ccil = cdel.getContactInfoList() ;
+                ior = ccil.getTargetIOR() ;
+                if (ior == null)
+                    throw wrapper.nullIor() ;
 
-		if (cil instanceof CorbaContactInfoList) {
-		    CorbaContactInfoList ccil = (CorbaContactInfoList)cil ;
-		    ior = ccil.getTargetIOR() ;
-		    if (ior == null)
-			throw wrapper.nullIor() ;
-
-		    return ior ;
-		} else {
-		    // This is our code, but the ContactInfoList is not a 
-		    // CorbaContactInfoList.  This should not happen, because
-		    // we are in the CORBA application of the PEPt framework.
-		    // This is a coding error, and thus an INTERNAL exception
-		    // should be thrown.
-		    throw wrapper.badTypeInDelegate() ;
-		}
+                return ior ;
 	    } 
 
 	    if (obj instanceof ObjectImpl) {

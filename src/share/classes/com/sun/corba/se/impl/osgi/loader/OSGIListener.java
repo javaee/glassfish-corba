@@ -77,7 +77,14 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
     private static PackageAdmin pkgAdmin ;
 
+    // Map from class name to Bundle, which identifies all known 
+    // ORB-Class-Providers.
     private static Map<String,Bundle> classNameMap =
+        new HashMap<String,Bundle>() ;
+
+    // Map from package name to Bundle, which identifies all known
+    // exported packages.
+    private static Map<String,Bundle> packageNameMap = 
         new HashMap<String,Bundle>() ;
 
     private static final boolean DEBUG = Boolean.getBoolean( ORBConstants.DEBUG_OSGI_LISTENER ) ;
@@ -183,7 +190,19 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
 
         public Class loadClass( String codebase, String className ) {
-            if (codebase != null && codebase.startsWith( PREFIX )) {
+            if (codebase == null) {
+                Bundle bundle = getBundleForClass( className ) ;
+                if (bundle != null) {
+                    try {
+                        return bundle.loadClass( className ) ;
+                    } catch (ClassNotFoundException exc) {
+                        // XXX log this
+                    }
+                }
+            }
+
+            // XXX Should we treat this as a space-separated list here?
+            if (codebase.startsWith( PREFIX )) {
                 String rest = codebase.substring( PREFIX.length() ) ;
                 int index = rest.indexOf( "/" ) ;
                 if (index > 0) {
@@ -215,10 +234,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     }
 
     private static synchronized void insertORBProviders( Bundle bundle ) {
-        Dictionary dict = bundle.getHeaders() ;
-        String name = bundle.getSymbolicName() ;
+        final Dictionary dict = bundle.getHeaders() ;
+        final String name = bundle.getSymbolicName() ;
         if (dict != null) {
-            String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
+            final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
             if (orbProvider != null) {
                 for (String className : orbProvider.split(",") ) {
                     classNameMap.put( className, bundle ) ;
@@ -229,10 +248,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     }
 
     private static synchronized void removeORBProviders( Bundle bundle ) {
-        Dictionary dict = bundle.getHeaders() ;
-        String name = bundle.getSymbolicName() ;
+        final Dictionary dict = bundle.getHeaders() ;
+        final String name = bundle.getSymbolicName() ;
         if (dict != null) {
-            String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
+            final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
             if (orbProvider != null) {
                 for (String className : orbProvider.split(",") ) {
                     classNameMap.remove( className ) ;
@@ -243,7 +262,17 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     }
 
     private static synchronized Bundle getBundleForClass( String className ) {
-        return classNameMap.get( className ) ;
+        Bundle result = classNameMap.get( className ) ;
+        if (result == null) {
+            // Get package prefix
+            final int index = className.lastIndexOf( "." ) ;
+            if (index > 0) {
+                final String packageName = className.substring( 0, index ) ;
+                result = packageNameMap.get( packageName ) ;
+            }
+        }
+
+        return result ;
     }
 
     public void start( BundleContext context ) {
@@ -255,20 +284,20 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
         mapContents() ;
 
-        ServiceReference sref = context.getServiceReference( "org.osgi.service.packageadmin.PackageAdmin" ) ;
+        final ServiceReference sref = context.getServiceReference( "org.osgi.service.packageadmin.PackageAdmin" ) ;
         pkgAdmin = (PackageAdmin)context.getService( sref ) ;
     }
 
     public void stop( BundleContext context ) {
-        Bundle myBundle = context.getBundle() ;
+        final Bundle myBundle = context.getBundle() ;
         removeORBProviders( myBundle ) ;
         mapContents() ;
     }
 
     public void bundleChanged(BundleEvent event) {
-        int type = event.getType() ;
-        Bundle bundle = event.getBundle() ;
-        String name = bundle.getSymbolicName() ;
+        final int type = event.getType() ;
+        final Bundle bundle = event.getBundle() ;
+        final String name = bundle.getSymbolicName() ;
 
         wrapper.receivedBundleEvent( getBundleEventType( type ), name ) ;
 

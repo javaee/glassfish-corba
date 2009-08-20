@@ -46,14 +46,12 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Iterator;
 
 
 import com.sun.corba.se.spi.transport.EventHandler;
 import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.extension.RequestPartitioningPolicy;
-import com.sun.corba.se.spi.extension.LoadBalancingPolicy;
 import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
@@ -62,84 +60,39 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orbutil.threadpool.Work;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaConnection;
-import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.oa.poa.Policies; // REVISIT impl/poa specific
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
-// BEGIN Legacy support.
-import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
-// END Legacy support.
-
 /**
  * @author Harold Carr
  */
 public class SocketOrChannelAcceptorImpl
     extends
-	EventHandlerBase
-    implements
-	CorbaAcceptor,
-	Work,
-	// BEGIN Legacy
-	SocketInfo,
-	LegacyServerSocketEndPointInfo
-	// END Legacy
+        SocketOrChannelAcceptorBase
 {
     protected ServerSocketChannel serverSocketChannel;
     protected ServerSocket serverSocket;
-    protected int port;
-    protected long enqueueTime;
-    protected boolean initialized;
-    protected ORBUtilSystemException wrapper ;
-    protected CorbaInboundConnectionCache connectionCache;
     
     private Class<?> lastExceptionClassSeen = null ;
 
-    // BEGIN Legacy
-    protected String type = "";
-    protected String name = "";
-    protected String hostname;
-    protected int locatorPort;
-    // END Legacy
-
     public SocketOrChannelAcceptorImpl(ORB orb)
     {
-	this.orb = orb;
-	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
-
-	setWork(this);
-	initialized = false;
-
-	// BEGIN Legacy support.
-	this.hostname = orb.getORBData().getORBServerHost();
-	this.name = LegacyServerSocketEndPointInfo.NO_NAME;
-	this.locatorPort = -1;
-	// END Legacy support.
+        super( orb ) ;
     }
 
     public SocketOrChannelAcceptorImpl(ORB orb, int port)
     {
-	this(orb);
-	this.port = port;
+        super( orb, port ) ;
     }
 
     // BEGIN Legacy support.
     public SocketOrChannelAcceptorImpl(ORB orb, int port, 
 				       String name, String type)
     {
-	this(orb, port);
-	this.name = name;
-	this.type = type;
+        super( orb, port, name, type ) ;
     }
     // END Legacy support.
 
@@ -202,31 +155,6 @@ public class SocketOrChannelAcceptorImpl
 	setUseWorkerThreadForEvent(
             orb.getORBData().acceptorSocketUseWorkerThreadForEvent());
 
-    }
-
-    public synchronized boolean initialized()
-    {
-	return initialized;
-    }
-
-    public String getConnectionCacheType()
-    {
-	return this.getClass().toString();
-    }
-
-    public void setConnectionCache(CorbaInboundConnectionCache connectionCache)
-    {
-	this.connectionCache = connectionCache;
-    }
-
-    public CorbaInboundConnectionCache getConnectionCache()
-    {
-	return connectionCache;
-    }
-
-    public boolean shouldRegisterAcceptEvent()
-    {
-	return true;
     }
 
     public void accept()
@@ -323,136 +251,12 @@ public class SocketOrChannelAcceptorImpl
 	}
     }
 
-    public EventHandler getEventHandler()
-    {
-	return this;
-    }
-
-    ////////////////////////////////////////////////////
-    //
-    // CorbaAcceptor
-    //
-
-    public String getObjectAdapterId()
-    {
-	return null;
-    }
-
-    public String getObjectAdapterManagerId()
-    {
-	return null;
-    }
-
-    public void addToIORTemplate(IORTemplate iorTemplate,
-				 Policies policies,
-				 String codebase)
-    {
-	Iterator iterator = iorTemplate.iteratorById(
-            org.omg.IOP.TAG_INTERNET_IOP.value);
-
-	String hostname = orb.getORBData().getORBServerHost();
-
-	if (iterator.hasNext()) {
-	    // REVISIT - how does this play with legacy ORBD port exchange?
-	    IIOPAddress iiopAddress = 
-		IIOPFactories.makeIIOPAddress(orb, hostname, port);
-	    AlternateIIOPAddressComponent iiopAddressComponent =
-		IIOPFactories.makeAlternateIIOPAddressComponent(iiopAddress);
-
-	    while (iterator.hasNext()) {
-		TaggedProfileTemplate taggedProfileTemplate =
-		    (TaggedProfileTemplate) iterator.next();
-		taggedProfileTemplate.add(iiopAddressComponent);
-	    }
-	} else {
-	    IIOPProfileTemplate iiopProfile = makeIIOPProfileTemplate(
-		policies, codebase ) ;
-	    iorTemplate.add( iiopProfile ) ;
-	}
-    }
-
-    // Also useful in subclasses, since all useable IORTemplates
-    // must have an IIOPProfileTemplate.
-    protected final IIOPProfileTemplate makeIIOPProfileTemplate( 
-	Policies policies, String codebase ) 
-    {
-	GIOPVersion version = orb.getORBData().getGIOPVersion();
-	int templatePort;
-	if (policies.forceZeroPort()) {
-	    templatePort = 0;
-	} else if (policies.isTransient()) {
-	    templatePort = port;
-	} else {
-	    templatePort = orb.getLegacyServerSocketManager()
-	       .legacyGetPersistentServerPort(SocketInfo.IIOP_CLEAR_TEXT);
-	}
-	IIOPAddress addr =
-	    IIOPFactories.makeIIOPAddress(orb, hostname, templatePort);
-	IIOPProfileTemplate iiopProfile = 
-	    IIOPFactories.makeIIOPProfileTemplate(orb, version, addr);
-	if (version.supportsIORIIOPProfileComponents()) {
-	    iiopProfile.add(IIOPFactories.makeCodeSetsComponent(orb));
-	    iiopProfile.add(IIOPFactories.makeMaxStreamFormatVersionComponent());
-
-	    RequestPartitioningPolicy rpPolicy = (RequestPartitioningPolicy)
-		policies.get_effective_policy(
-				  ORBConstants.REQUEST_PARTITIONING_POLICY);
-	    if (rpPolicy != null) {
-		iiopProfile.add(
-		     IIOPFactories.makeRequestPartitioningComponent(
-			 rpPolicy.getValue()));
-	    }
-
-	    LoadBalancingPolicy lbPolicy = (LoadBalancingPolicy)
-		policies.get_effective_policy(
-				  ORBConstants.LOAD_BALANCING_POLICY);
-	    if (lbPolicy != null) {
-		iiopProfile.add(
-		     IIOPFactories.makeLoadBalancingComponent(
-			 lbPolicy.getValue()));
-	    }
-
-	    if (codebase != null && !codebase.equals("")) {
-		iiopProfile.add(IIOPFactories. makeJavaCodebaseComponent(codebase));
-	    }
-
-	    if (orb.getORBData().isJavaSerializationEnabled()) {
-		iiopProfile.add(
-		       IIOPFactories.makeJavaSerializationComponent());
-	    }
-	}
-
-	return iiopProfile ;
-    }
-
-    public String getMonitoringName()
-    {
-	return "AcceptedConnections";
-    }
-
-    ////////////////////////////////////////////////////
-    //
     // EventHandler methods
     //
 
     public SelectableChannel getChannel()
     {
 	return serverSocketChannel;
-    }
-
-    public int getInterestOps()
-    {
-	return SelectionKey.OP_ACCEPT;
-    }
-
-    public CorbaAcceptor getAcceptor()
-    {
-	return this;
-    }
-
-    public CorbaConnection getConnection()
-    {
-	throw new RuntimeException("Should not happen.");
     }
 
     ////////////////////////////////////////////////////
@@ -534,52 +338,6 @@ public class SocketOrChannelAcceptorImpl
 	}
     }
 
-    public void setEnqueueTime(long timeInMillis)
-    {
-	enqueueTime = timeInMillis;
-    }
-
-    public long getEnqueueTime()
-    {
-	return enqueueTime;
-    }
-
-
-    //
-    // Factory methods.
-    //
-
-    // REVISIT: refactor into common base or delegate.
-    public CorbaMessageMediator createMessageMediator(ORB broker,
-						 CorbaConnection connection)
-    {
-	// REVISIT - no factoring so cheat to avoid code dup right now.
-	// REVISIT **** COUPLING !!!!
-	CorbaContactInfo contactInfo = new SocketOrChannelContactInfoImpl();
-	return contactInfo.createMessageMediator(broker, connection);
-    }
-
-    public CDRInputObject createInputObject(ORB broker,
-					 CorbaMessageMediator messageMediator)
-    {
-	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
-	    messageMediator;
-	return new CDRInputObject((ORB)broker,
-				  (CorbaConnection)messageMediator.getConnection(),
-				  corbaMessageMediator.getDispatchBuffer(),
-				  corbaMessageMediator.getDispatchHeader());
-    }
-
-    public CDROutputObject createOutputObject(ORB broker,
-					   CorbaMessageMediator messageMediator)
-    {
-	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
-	    messageMediator;
-	return new CDROutputObject((ORB) broker, corbaMessageMediator, 
-				   corbaMessageMediator.getReplyHeader(),
-				   corbaMessageMediator.getStreamFormatVersion());
-    }
-
     ////////////////////////////////////////////////////
     //
     // SocketOrChannelAcceptor
@@ -588,97 +346,6 @@ public class SocketOrChannelAcceptorImpl
     public ServerSocket getServerSocket()
     {
 	return serverSocket;
-    }
-
-    ////////////////////////////////////////////////////
-    //
-    // Implementation.
-    //
-
-    public String toString()
-    {
-	String sock;
-	if (serverSocketChannel == null) {
-	    if (serverSocket == null) {
-		sock = "(not initialized)";
-	    } else {
-		sock = serverSocket.toString();
-	    }
-	} else {
-	    sock = serverSocketChannel.toString();
-	}
-
-	return 
-	    toStringName() + 
-	    "["
-	    + sock + " "
-	    + type + " "
-	    + shouldUseSelectThreadToWait() + " "
-	    + shouldUseWorkerThreadForEvent()
-	    + "]" ;
-    }
-
-    protected String toStringName()
-    {
-	return "SocketOrChannelAcceptorImpl";
-    }
-
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint(toStringName(), msg);
-    }
-
-    protected void dprint(String msg, Throwable t)
-    {
-	dprint(msg);
-	t.printStackTrace(System.out);
-    }
-
-    // BEGIN Legacy support
-    ////////////////////////////////////////////////////
-    //
-    // LegacyServerSocketEndPointInfo and EndPointInfo
-    //
-
-    public String getType() 
-    {
-	return type;
-    }
-
-    public String getHostName() 
-    {
-	return hostname;
-    }
-
-    public String getHost() 
-    {
-	return hostname;
-    }
-
-    public int getPort() 
-    {
-	return port;
-    }
-
-    public int getLocatorPort()
-    {
-	return locatorPort;
-    }
-
-    public void setLocatorPort (int port)
-    {
-	locatorPort = port;
-    }
-
-    public String getName()
-    {
-	// Kluge alert:
-	// Work and Legacy both define getName.
-	// Try to make this behave best for most cases.
-	String result = 
-	    name.equals(LegacyServerSocketEndPointInfo.NO_NAME) ?
-	    this.toString() : name;
-	return result;
     }
     // END Legacy support
 }

@@ -848,37 +848,43 @@ public class Client extends TestCase
 	}
     }
 
+    private void print2( String actual, String expected ) {
+        assertEquals( actual, expected ) ;
+        // System.out.println( "actual=" + actual + ",expected=" + expected ) ;
+    }
+
     public void testOperationTracer() {
         System.out.println( "Testing OperationTracer" ) ;
         long time = System.currentTimeMillis() ;
+        OperationTracer.enable() ;
         OperationTracer.finish() ;
-        assertEquals( OperationTracer.getAsString(), "" ) ;
+        print2( OperationTracer.getAsString(), "" ) ;
         OperationTracer.begin( "Initial" ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:" ) ;
+        print2( OperationTracer.getAsString(), "Initial:" ) ;
         OperationTracer.startReadValue( "Foo" ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Foo" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Foo" ) ;
         OperationTracer.readingField( "a" ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Foo.a" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Foo.a" ) ;
         OperationTracer.readingField( "b" ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Foo.b" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Foo.b" ) ;
         OperationTracer.endReadValue() ;
-        assertEquals( OperationTracer.getAsString(), "Initial:" ) ;
+        print2( OperationTracer.getAsString(), "Initial:" ) ;
         OperationTracer.startReadArray( "Bar", 27 ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>" ) ;
         OperationTracer.readingIndex( 0 ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[0]" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[0]" ) ;
         OperationTracer.readingIndex( 1 ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[1]" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[1]" ) ;
         OperationTracer.startReadValue( "Baz" ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[1],Baz" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[1],Baz" ) ;
         OperationTracer.readingField( "x1" ) ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[1],Baz.x1" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[1],Baz.x1" ) ;
         OperationTracer.endReadValue() ;
-        assertEquals( OperationTracer.getAsString(), "Initial:Bar<27>[1]" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[1]" ) ;
         OperationTracer.endReadArray() ;
-        assertEquals( OperationTracer.getAsString(), "Initial:" ) ;
+        print2( OperationTracer.getAsString(), "Initial:" ) ;
         OperationTracer.finish() ;
-        assertEquals( OperationTracer.getAsString(), "" ) ;
+        print2( OperationTracer.getAsString(), "" ) ;
         double elapsed = (time - System.currentTimeMillis())/1000 ;
         System.out.println( 
             "OperationTracer test complete in " + elapsed + " milliseconds" ) ;

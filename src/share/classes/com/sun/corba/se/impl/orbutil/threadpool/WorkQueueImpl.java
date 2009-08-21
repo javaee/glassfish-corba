@@ -39,10 +39,6 @@ package com.sun.corba.se.impl.orbutil.threadpool;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.sun.corba.se.spi.monitoring.LongMonitoredAttributeBase;
-import com.sun.corba.se.spi.monitoring.MonitoringConstants;
-import com.sun.corba.se.spi.monitoring.MonitoringFactories;
-import com.sun.corba.se.spi.monitoring.MonitoredObject;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPool;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
@@ -51,6 +47,10 @@ import com.sun.corba.se.spi.orbutil.threadpool.WorkQueue;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.NameValue ;
 
 public class WorkQueueImpl implements WorkQueue
 {
@@ -66,17 +66,9 @@ public class WorkQueueImpl implements WorkQueue
     // Name of the work queue
     final private String name;
 
-    // MonitoredObject for work queue
-    final private MonitoredObject workqueueMonitoredObject;
-
     public WorkQueueImpl() {
 	this.name = ORBConstants.WORKQUEUE_DEFAULT_NAME;
         this.queue = new LinkedList<Work>();
-        this.workqueueMonitoredObject = MonitoringFactories.
-			    getMonitoredObjectFactory().
-			    createMonitoredObject(name,
-			    MonitoringConstants.WORKQUEUE_MONITORING_DESCRIPTION);
-	initializeMonitoring();
     }
 
     public WorkQueueImpl(ThreadPool workerThreadPool) {
@@ -87,46 +79,6 @@ public class WorkQueueImpl implements WorkQueue
         this.workerThreadPool = workerThreadPool;
 	this.name = name;
         this.queue = new LinkedList<Work>();
-        this.workqueueMonitoredObject = MonitoringFactories.
-			    getMonitoredObjectFactory().
-			    createMonitoredObject(name,
-			    MonitoringConstants.WORKQUEUE_MONITORING_DESCRIPTION);
-	initializeMonitoring();
-    }
-
-    // Setup monitoring for this workqueue
-    private void initializeMonitoring() {
-	LongMonitoredAttributeBase b1 = new 
-	    LongMonitoredAttributeBase(MonitoringConstants.WORKQUEUE_TOTAL_WORK_ITEMS_ADDED, 
-		    MonitoringConstants.WORKQUEUE_TOTAL_WORK_ITEMS_ADDED_DESCRIPTION) {
-		public Object getValue() {
-		    return Long.valueOf(WorkQueueImpl.this.totalWorkItemsAdded());
-		}
-	    };
-	workqueueMonitoredObject.addAttribute(b1);
-	LongMonitoredAttributeBase b2 = new 
-	    LongMonitoredAttributeBase(MonitoringConstants.WORKQUEUE_WORK_ITEMS_IN_QUEUE, 
-		    MonitoringConstants.WORKQUEUE_WORK_ITEMS_IN_QUEUE_DESCRIPTION) {
-		public Object getValue() {
-		    return Long.valueOf(WorkQueueImpl.this.workItemsInQueue());
-		}
-	    };
-	workqueueMonitoredObject.addAttribute(b2);
-	LongMonitoredAttributeBase b3 = new 
-	    LongMonitoredAttributeBase(MonitoringConstants.WORKQUEUE_AVERAGE_TIME_IN_QUEUE, 
-		    MonitoringConstants.WORKQUEUE_AVERAGE_TIME_IN_QUEUE_DESCRIPTION) {
-		public Object getValue() {
-		    return Long.valueOf(WorkQueueImpl.this.averageTimeInQueue());
-		}
-	    };
-	workqueueMonitoredObject.addAttribute(b3);
-    }
-
-
-    // Package private method to get the monitored object for this
-    // class
-    MonitoredObject getMonitoredObject() {
-	return workqueueMonitoredObject;
     }
 
     private synchronized int getWorkQueueSize() {
@@ -231,6 +183,8 @@ public class WorkQueueImpl implements WorkQueue
     /**
      * Returns the total number of Work items added to the Queue.
      */
+    @ManagedAttribute
+    @Description( "Total number of items added to the queue" )
     public synchronized long totalWorkItemsAdded() {
         return workItemsAdded;
     }
@@ -238,6 +192,8 @@ public class WorkQueueImpl implements WorkQueue
     /**
      * Returns the total number of Work items in the Queue to be processed.
      */
+    @ManagedAttribute
+    @Description( "Total number of items in the queue to be processed" )
     public synchronized int workItemsInQueue() {
         return queue.size();
     }
@@ -246,6 +202,8 @@ public class WorkQueueImpl implements WorkQueue
      * Returns the average amount Work items have spent in the Queue waiting
      * to be processed.
      */
+    @ManagedAttribute
+    @Description( "Average time work items spend waiting in the queue in milliseconds" )
     public synchronized long averageTimeInQueue() {
         if (workItemsDequeued == 0) {
             return 0 ;
@@ -254,6 +212,7 @@ public class WorkQueueImpl implements WorkQueue
         }
     }
 
+    @NameValue
     public String getName() {
         return name;
     }

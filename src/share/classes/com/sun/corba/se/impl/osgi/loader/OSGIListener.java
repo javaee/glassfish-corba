@@ -50,6 +50,7 @@ import org.osgi.framework.BundleEvent ;
 import org.osgi.framework.ServiceReference ;
 
 import org.osgi.service.packageadmin.PackageAdmin ;
+import org.osgi.service.packageadmin.ExportedPackage ;
 
 import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 
@@ -196,12 +197,13 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                     try {
                         return bundle.loadClass( className ) ;
                     } catch (ClassNotFoundException exc) {
-                        // XXX log this
+                        wrapper.couldNotLoadClassInBundle( exc, className, 
+                            bundle.getSymbolicName() ) ;
+                        return null ;
                     }
                 }
             }
 
-            // XXX Should we treat this as a space-separated list here?
             if (codebase.startsWith( PREFIX )) {
                 String rest = codebase.substring( PREFIX.length() ) ;
                 int index = rest.indexOf( "/" ) ;
@@ -233,7 +235,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         return ccbHandler ;
     }
 
-    private static synchronized void insertORBProviders( Bundle bundle ) {
+    private static synchronized void insertClasses( Bundle bundle ) {
         final Dictionary dict = bundle.getHeaders() ;
         final String name = bundle.getSymbolicName() ;
         if (dict != null) {
@@ -245,9 +247,14 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                 }
             }
         }
+
+        ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
+        for (ExportedPackage ep : epkgs) {
+            packageNameMap.put( ep.getName(), bundle ) ;
+        }
     }
 
-    private static synchronized void removeORBProviders( Bundle bundle ) {
+    private static synchronized void removeClasses( Bundle bundle ) {
         final Dictionary dict = bundle.getHeaders() ;
         final String name = bundle.getSymbolicName() ;
         if (dict != null) {
@@ -259,17 +266,32 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                 }
             }
         }
+
+        ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
+        for (ExportedPackage ep : epkgs) {
+            packageNameMap.remove( ep.getName() ) ;
+        }
     }
 
     private static synchronized Bundle getBundleForClass( String className ) {
         Bundle result = classNameMap.get( className ) ;
         if (result == null) {
+            wrapper.classNotFoundInClassNameMap( className ) ;
             // Get package prefix
             final int index = className.lastIndexOf( "." ) ;
             if (index > 0) {
                 final String packageName = className.substring( 0, index ) ;
                 result = packageNameMap.get( packageName ) ;
+                if (result == null) {
+                    wrapper.classNotFoundInPackageNameMap( className ) ;
+                } else {
+                    wrapper.classFoundInPackageNameMap( className, 
+                        result.getSymbolicName() ) ;
+                }
             }
+        } else {
+            wrapper.classFoundInClassNameMap( className, 
+                result.getSymbolicName() ) ;
         }
 
         return result ;
@@ -280,17 +302,18 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         // Probe all existing bundles for ORB providers
         wrapper.probeBundlesForProviders() ;
         for (Bundle bundle : context.getBundles()) {
-            insertORBProviders( bundle ) ;
+            insertClasses( bundle ) ;
         }
         mapContents() ;
 
-        final ServiceReference sref = context.getServiceReference( "org.osgi.service.packageadmin.PackageAdmin" ) ;
+        final ServiceReference sref = context.getServiceReference( 
+            "org.osgi.service.packageadmin.PackageAdmin" ) ;
         pkgAdmin = (PackageAdmin)context.getService( sref ) ;
     }
 
     public void stop( BundleContext context ) {
         final Bundle myBundle = context.getBundle() ;
-        removeORBProviders( myBundle ) ;
+        removeClasses( myBundle ) ;
         mapContents() ;
     }
 
@@ -302,9 +325,9 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         wrapper.receivedBundleEvent( getBundleEventType( type ), name ) ;
 
         if (type == Bundle.INSTALLED) {
-            insertORBProviders( bundle ) ;
+            insertClasses( bundle ) ;
         } else if (type == Bundle.UNINSTALLED) {
-            removeORBProviders( bundle ) ;
+            removeClasses( bundle ) ;
         }
         mapContents() ;
     }

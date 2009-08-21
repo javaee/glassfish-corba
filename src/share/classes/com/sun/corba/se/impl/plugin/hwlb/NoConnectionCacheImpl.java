@@ -109,10 +109,6 @@ public class NoConnectionCacheImpl
 	    return store ;
 	}
 
-	protected void registerWithMonitoring() {
-	    // NO-OP
-	}
-
 	public CorbaConnection get(CorbaContactInfo contactInfo) {
 	    return connection ;
 	}

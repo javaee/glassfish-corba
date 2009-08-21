@@ -74,9 +74,7 @@
 -test corba.legacybootstrapserver.LegacyBootstrapServerTest
 -test corba.stubserialization.StubSerializationTest
 // now run directly from ant junit task: -test corba.dynamicrmiiiop.DynamicRmiIIOPTest
--test corba.threadpoolmonitoring.ThreadPoolMonitoringTests
 -test corba.adapteractivator.AdapterActivator
--test corba.monitoring.MonitoringTests
 -test corba.exceptiondetailsc.ExceptionDetailSCTest
 -test corba.preinvokepostinvoke.PreInvokePostInvokeTest
 -test corba.poacallback.POACallbackTest

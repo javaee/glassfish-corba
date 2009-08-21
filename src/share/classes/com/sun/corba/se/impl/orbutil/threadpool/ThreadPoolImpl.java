@@ -48,10 +48,6 @@ import java.util.ArrayList ;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.sun.corba.se.spi.monitoring.LongMonitoredAttributeBase;
-import com.sun.corba.se.spi.monitoring.MonitoringConstants;
-import com.sun.corba.se.spi.monitoring.MonitoredObject;
-import com.sun.corba.se.spi.monitoring.MonitoringFactories;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPool;
@@ -61,7 +57,13 @@ import com.sun.corba.se.spi.orbutil.threadpool.WorkQueue;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.NameValue ;
 
+@ManagedObject
+@Description( "A ThreadPool used by the ORB" ) 
 public class ThreadPoolImpl implements ThreadPool
 {
     // serial counter useful for debugging
@@ -104,9 +106,6 @@ public class ThreadPoolImpl implements ThreadPool
     // Name of the ThreadPool
     final private String name;
 
-    // MonitoredObject for ThreadPool
-    private MonitoredObject threadpoolMonitoredObject;
-    
     // ThreadGroup in which threads should be created
     private ThreadGroup threadGroup ;
 
@@ -142,10 +141,10 @@ public class ThreadPoolImpl implements ThreadPool
         minWorkerThreads = 0;
         maxWorkerThreads = Integer.MAX_VALUE;
         workQueue = new WorkQueueImpl(this);
+        // XXX register this with gmbal.
 	threadGroup = tg ;
 	name = threadpoolName;
 	workerThreadClassLoader = defaultClassLoader ;
-	initializeMonitoring();
     }
  
     /** Create a bounded thread pool in the current thread group
@@ -177,7 +176,6 @@ public class ThreadPoolImpl implements ThreadPool
                 createWorkerThread();
             }
         }
-	initializeMonitoring();
     }
 
 
@@ -220,83 +218,6 @@ public class ThreadPoolImpl implements ThreadPool
 	}
     }
 
-    // Setup monitoring for this threadpool
-    private void initializeMonitoring() {
-	// Get root monitored object
-	MonitoredObject root = MonitoringFactories.getMonitoringManagerFactory().
-		createMonitoringManager(MonitoringConstants.DEFAULT_MONITORING_ROOT, null).
-		getRootMonitoredObject();
-
-	// Create the threadpool monitoring root
-	MonitoredObject threadPoolMonitoringObjectRoot = root.getChild(
-		    MonitoringConstants.THREADPOOL_MONITORING_ROOT);
-	if (threadPoolMonitoringObjectRoot == null) {
-	    threadPoolMonitoringObjectRoot =  MonitoringFactories.
-		    getMonitoredObjectFactory().createMonitoredObject(
-		    MonitoringConstants.THREADPOOL_MONITORING_ROOT,
-		    MonitoringConstants.THREADPOOL_MONITORING_ROOT_DESCRIPTION);
-	    root.addChild(threadPoolMonitoringObjectRoot);
-	}
-	threadpoolMonitoredObject = MonitoringFactories.
-		    getMonitoredObjectFactory().
-		    createMonitoredObject(name,
-		    MonitoringConstants.THREADPOOL_MONITORING_DESCRIPTION);
-
-	threadPoolMonitoringObjectRoot.addChild(threadpoolMonitoredObject);
-
-	LongMonitoredAttributeBase b1 = new 
-	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_CURRENT_NUMBER_OF_THREADS, 
-		    MonitoringConstants.THREADPOOL_CURRENT_NUMBER_OF_THREADS_DESCRIPTION) {
-		public Object getValue() {
-		    return Long.valueOf(ThreadPoolImpl.this.currentNumberOfThreads());
-		}
-	    };
-	threadpoolMonitoredObject.addAttribute(b1);
-	LongMonitoredAttributeBase b2 = new 
-	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_NUMBER_OF_AVAILABLE_THREADS, 
-		    MonitoringConstants.THREADPOOL_CURRENT_NUMBER_OF_THREADS_DESCRIPTION) {
-		public Object getValue() {
-		    return Long.valueOf(ThreadPoolImpl.this.numberOfAvailableThreads());
-		}
-	    };
-	threadpoolMonitoredObject.addAttribute(b2);
-	LongMonitoredAttributeBase b3 = new 
-	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_NUMBER_OF_BUSY_THREADS, 
-		    MonitoringConstants.THREADPOOL_NUMBER_OF_BUSY_THREADS_DESCRIPTION) {
-		public Object getValue() {
-		    return Long.valueOf(ThreadPoolImpl.this.numberOfBusyThreads());
-		}
-	    };
-	threadpoolMonitoredObject.addAttribute(b3);
-	LongMonitoredAttributeBase b4 = new 
-	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_AVERAGE_WORK_COMPLETION_TIME, 
-		    MonitoringConstants.THREADPOOL_AVERAGE_WORK_COMPLETION_TIME_DESCRIPTION) {
-		public Object getValue() {
-		    return Long.valueOf(ThreadPoolImpl.this.averageWorkCompletionTime());
-		}
-	    };
-	threadpoolMonitoredObject.addAttribute(b4);
-	LongMonitoredAttributeBase b5 = new 
-	    LongMonitoredAttributeBase(MonitoringConstants.THREADPOOL_CURRENT_PROCESSED_COUNT, 
-		    MonitoringConstants.THREADPOOL_CURRENT_PROCESSED_COUNT_DESCRIPTION) {
-		public Object getValue() {
-		    return Long.valueOf(ThreadPoolImpl.this.currentProcessedCount());
-		}
-	    };
-	threadpoolMonitoredObject.addAttribute(b5);
-
-	// Add the monitored object for the WorkQueue
-	
-	threadpoolMonitoredObject.addChild(
-		((WorkQueueImpl)workQueue).getMonitoredObject());
-    }
-
-    // Package private method to get the monitored object for this
-    // class
-    MonitoredObject getMonitoredObject() {
-	return threadpoolMonitoredObject;
-    }
-    
     public WorkQueue getAnyWorkQueue()
     {
 	return workQueue;
@@ -409,6 +330,8 @@ public class ThreadPoolImpl implements ThreadPool
         return inactivityTimeout;
     }
     
+    @ManagedAttribute
+    @Description( "The current number of threads" ) 
     public int currentNumberOfThreads() {
         synchronized (workQueue) {
             return currentThreadCount;
@@ -427,26 +350,35 @@ public class ThreadPoolImpl implements ThreadPool
         }
     }
 
+    @ManagedAttribute
+    @Description( "The number of available threads in this ThreadPool" ) 
     public int numberOfAvailableThreads() {
          synchronized (workQueue) {
             return availableWorkerThreads;
         }
     }
 
+    @ManagedAttribute
+    @Description( "The number of threads busy processing work in this ThreadPool" ) 
     public int numberOfBusyThreads() {
         synchronized (workQueue) {
             return (currentNumberOfThreads() - numberOfAvailableThreads());
         }
     }
     
+    @ManagedAttribute
+    @Description( "The average time needed to complete a work item" ) 
     public long averageWorkCompletionTime() {
         return (totalTimeTaken.get() / processedCount.get());
     }
     
+    @ManagedAttribute
+    @Description( "The number of work items processed" ) 
     public long currentProcessedCount() {
         return processedCount.get();
     }
 
+    @NameValue
     public String getName() {
         return name;
     }

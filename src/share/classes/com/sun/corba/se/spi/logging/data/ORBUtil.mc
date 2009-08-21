@@ -155,6 +155,16 @@
              68 FINE "Received bundle event of type {0} on bundle {1}")
             (PROBE_BUNDLES_FOR_PROVIDERS
              69 FINE "Probing all bundles for ORB class providers")
+            (CLASS_NOT_FOUND_IN_CLASS_NAME_MAP
+             70 FINE "Could not find class {0} in classNameMap")
+            (CLASS_NOT_FOUND_IN_PACKAGE_NAME_MAP
+             71 FINE "Could not find class {0} in packageNameMap")
+            (CLASS_FOUND_IN_PACKAGE_NAME_MAP
+             72 FINE "Found class {0} in bundle {1} using packageNameMap")
+            (CLASS_FOUND_IN_CLASS_NAME_MAP
+             73 FINE "Found class {0} in bundle {1} using classNameMap")
+            (COULD_NOT_LOAD_CLASS_IN_BUNDLE
+             74 WARNING "Could not load class {0} in bundle {1}")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 

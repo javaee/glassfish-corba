@@ -46,13 +46,23 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message ;
 // REVISIT - impl/poa specific:
 import com.sun.corba.se.impl.oa.poa.Policies;
 
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.AMXMetadata ;
+
 /**
  * @author Harold Carr
  */
+@ManagedObject
+@Description( "The Transport Manager for the ORB" )
+@AMXMetadata( isSingleton=true ) 
 public interface CorbaTransportManager {
 
     public ByteBufferPool getByteBufferPool(int id);
 
+    @ManagedAttribute
+    @Description( "The Selector, which listens for all I/O events" )
     public Selector getSelector(int id);
 
     public void close();
@@ -60,6 +70,8 @@ public interface CorbaTransportManager {
     public static final String SOCKET_OR_CHANNEL_CONNECTION_CACHE =
 	"SocketOrChannelConnectionCache";
 
+    @ManagedAttribute
+    @Description( "List of all Acceptors in this ORB" ) 
     public Collection<CorbaAcceptor> getAcceptors() ;
 
     public Collection<CorbaAcceptor> getAcceptors(String objectAdapterManagerId,
@@ -109,10 +121,15 @@ public interface CorbaTransportManager {
     public CorbaOutboundConnectionCache getOutboundConnectionCache(
         CorbaContactInfo contactInfo);
 
+    @ManagedAttribute
+    @Description( "Outbound Connection Cache (client initiated connections)" )
     public Collection<CorbaOutboundConnectionCache> getOutboundConnectionCaches();
 
     public CorbaInboundConnectionCache getInboundConnectionCache(CorbaAcceptor acceptor);
 
+    // Only used for MBeans
+    @ManagedAttribute
+    @Description( "Inbound Connection Cache (server accepted connections)" )
     public Collection<CorbaInboundConnectionCache> getInboundConnectionCaches();
 
     public void registerAcceptor(CorbaAcceptor acceptor);

@@ -48,6 +48,7 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.NameValue ;
 
 /**
  * @author Harold Carr
@@ -72,6 +73,7 @@ public abstract class CorbaConnectionCacheBase
 	dprintCreation();
     }
     
+    @NameValue
     public String getCacheType()
     {
 	return cacheType;

@@ -73,19 +73,12 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
-import org.glassfish.gmbal.ManagedObject ;
-import org.glassfish.gmbal.ManagedAttribute ;
-import org.glassfish.gmbal.Description ;
-import org.glassfish.gmbal.AMXMetadata ;
 
 /**
  * @author Harold Carr
  */
 // Note that no ObjectKeyName attribute is needed, because there is only
 // one CorbaTransportManager per ORB.
-@ManagedObject
-@Description( "The Transport Manager for the ORB" )
-@AMXMetadata( isSingleton=true ) 
 public class CorbaTransportManagerImpl 
     implements
 	CorbaTransportManager
@@ -126,6 +119,7 @@ public class CorbaTransportManagerImpl
 			connectionCache = 
 			    new CorbaOutboundConnectionCacheImpl(orb,
 								 contactInfo);
+                        orb.mom().register( this, connectionCache ) ;
 			outboundConnectionCaches.put(
                             contactInfo.getConnectionCacheType(),
 			    connectionCache);
@@ -137,16 +131,11 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    @ManagedAttribute
-    @Description( "Outbound Connection Cache (client initiated connections)" )
     public Collection<CorbaOutboundConnectionCache> getOutboundConnectionCaches()
     {
 	return outboundConnectionCaches.values();
     }
 
-    // Only used for MBeans
-    @ManagedAttribute
-    @Description( "Inbound Connection Cache (server accepted connections)" )
     public Collection<CorbaInboundConnectionCache> getInboundConnectionCaches()
     {
 	return inboundConnectionCaches.values();
@@ -167,6 +156,7 @@ public class CorbaTransportManagerImpl
 			connectionCache = 
 			    new CorbaInboundConnectionCacheImpl(orb,
 								acceptor);
+                        orb.mom().register( this, connectionCache ) ;
 			inboundConnectionCaches.put(
                             acceptor.getConnectionCacheType(),
 			    connectionCache);
@@ -178,8 +168,6 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    @ManagedAttribute
-    @Description( "The Selector, which listens for all I/O events" )
     public Selector getSelector() {
         return selector ;
     }
@@ -230,8 +218,6 @@ public class CorbaTransportManagerImpl
     // CorbaTransportManager
     //
 
-    @ManagedAttribute
-    @Description( "List of all Acceptors in this ORB" ) 
     public Collection<CorbaAcceptor> getAcceptors() {
         return getAcceptors( null, null ) ;
     }

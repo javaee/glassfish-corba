@@ -43,194 +43,91 @@ package corba.connections;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.omg.CORBA.ORB;
-
-import com.sun.corba.se.spi.monitoring.MonitoredAttribute;
-import com.sun.corba.se.spi.monitoring.MonitoringConstants;
-import com.sun.corba.se.spi.monitoring.MonitoredObject;
+import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
 import corba.hcks.U;
 
+import org.glassfish.gmbal.GmbalException ;
+import org.glassfish.gmbal.AMXClient ;
+import org.glassfish.gmbal.ManagedObjectManager ;
+
 public class ConnectionStatistics
 {
-    public ConnectionStatistics()
-    {
+    private final ORB orb ;
+    private final CorbaTransportManager ctm ;
+
+    public ConnectionStatistics( ORB orb ) {
+        this.orb = orb ;
+        this.ctm = orb.getCorbaTransportManager() ;
     }
 
-    public String outbound(String msg, ORB orb)
-    {
+    private void handleAttribute( StringBuffer result, AMXClient amxc,
+        String attributeName ) {
+
+        try {
+            Object value = amxc.getAttribute( attributeName ) ;
+
+            pac(result, attributeName + " " + value );
+        } catch (GmbalException exc) {
+            pac(result, "--------------------------------------------------");
+            pac(result, "ERROR: Missing: " + attributeName ) ;
+            pac(result, "--------------------------------------------------");
+            System.exit(1);
+        } 
+    }
+
+    private void handleConnectionCache( StringBuffer result,
+        CorbaConnectionCache connectionCache ) {
+
+        pac(result, connectionCache.getMonitoringName());
+
+        AMXClient amxc = orb.mom().getAMXClient( connectionCache ) ;
+        if (amxc == null) {
+            pac(result, "--------------------------------------------------");
+            pac(result, "ERROR: Missing: " + connectionCache.getMonitoringName());
+            pac(result, "--------------------------------------------------");
+            System.exit(1);
+        }
+
+        handleAttribute( result, amxc, "TotalConnections" ) ;
+        handleAttribute( result, amxc, "ConnectionsIdle" ) ;
+        handleAttribute( result, amxc, "ConnectionsInUse" ) ;
+    }
+
+    public String outbound(String msg, ORB orb) {
+        ManagedObjectManager mom = orb.mom() ;
+
 	StringBuffer result = new StringBuffer("");
 	pac(result, "==================================================");
 	pac(result, msg + " OUTBOUND:");
 
-	MonitoredObject orbMO =
-	    ((com.sun.corba.se.spi.orb.ORB)orb)
-	        .getMonitoringManager().getRootMonitoredObject();
+        for (CorbaConnectionCache cache : ctm.getOutboundConnectionCaches() ) {
+            handleConnectionCache( result, cache ) ;
+        }
 
-	MonitoredObject connectionMO =
-	    orbMO.getChild(MonitoringConstants.CONNECTION_MONITORING_ROOT);
-	if (connectionMO == null) {
-	    pac(result, "--------------------------------------------------");
-	    pac(result, "ERROR: Missing: " 
-		+ MonitoringConstants.CONNECTION_MONITORING_ROOT);
-	    pac(result, "--------------------------------------------------");
-	    System.exit(1);
-	}
-	MonitoredObject outboundConnectionMO =
-	    connectionMO.getChild(MonitoringConstants.OUTBOUND_CONNECTION_MONITORING_ROOT);
-	if (outboundConnectionMO == null) {
-	    pac(result, "--------------------------------------------------");
-	    pac(result, "ERROR: Missing: " 
-		+ MonitoringConstants.OUTBOUND_CONNECTION_MONITORING_ROOT);
-	    pac(result, "--------------------------------------------------");
-	    System.exit(1);
-	}
-
-	Collection connectionCaches =
-	    ((com.sun.corba.se.spi.orb.ORB)orb)
-	        .getCorbaTransportManager().getOutboundConnectionCaches();
-
-	Iterator iterator = connectionCaches.iterator();
-	while (iterator.hasNext()) {
-	    CorbaConnectionCache connectionCache = (CorbaConnectionCache)
-		iterator.next();
-
-	    pac(result, connectionCache.getMonitoringName());
-
-	    MonitoredObject xMO =
-		outboundConnectionMO.getChild(connectionCache.getMonitoringName());
-	    if (xMO == null) {
-		pac(result, "--------------------------------------------------");
-		pac(result, "ERROR: Missing: " 
-		    + connectionCache.getMonitoringName());
-		pac(result, "--------------------------------------------------");
-		System.exit(1);
-	    }
-	    MonitoredAttribute attribute;
-
-	    attribute = xMO.getAttribute(MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS);
-	    if (attribute == null) {
-		pac(result, "--------------------------------------------------");
-		pac(result, "ERROR: Missing: " 
-		    + MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS);
-		pac(result, "--------------------------------------------------");
-		System.exit(1);
-	    } else {
-		pac(result, 
-		    MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS
-		    + " " + attribute.getValue());
-	    }
-
-	    attribute = xMO.getAttribute(MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS);
-	    if (attribute == null) {
-		pac(result, "--------------------------------------------------");
-		pac(result, "ERROR: Missing: " 
-		    + MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS);
-		pac(result, "--------------------------------------------------");
-		System.exit(1);
-	    } else {
-		pac(result, 
-		    MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS
-		    + " " + attribute.getValue());
-	    }
-
-	    attribute = xMO.getAttribute(MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS);
-	    if (attribute == null) {
-		pac(result, "--------------------------------------------------");
-		pac(result, "ERROR: Missing: " 
-		    + MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS);
-		pac(result, "--------------------------------------------------");
-		System.exit(1);
-	    } else {
-		pac(result, 
-		    MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS
-		    + " " + attribute.getValue());
-	    }
-	}
 	return result.toString();
     }
 
-    public String inbound(String msg, ORB orb)
-    {
+    public String inbound(String msg, ORB orb) {
+        ManagedObjectManager mom = orb.mom() ;
+
 	StringBuffer result = new StringBuffer("");
 	pac(result, "==================================================");
 	pac(result, msg + " INBOUND:");
 
-	MonitoredObject orbMO =
-	    ((com.sun.corba.se.spi.orb.ORB)orb)
-	        .getMonitoringManager().getRootMonitoredObject();
-	MonitoredObject connectionMO =
-	    orbMO.getChild(MonitoringConstants.CONNECTION_MONITORING_ROOT);
-	if (connectionMO == null) {
-	    pac(result, "Missing " 
-		+ MonitoringConstants.CONNECTION_MONITORING_ROOT);
-	    System.exit(1);
-	}
-	MonitoredObject inboundConnectionMO =
-	    connectionMO.getChild(MonitoringConstants.INBOUND_CONNECTION_MONITORING_ROOT);
-	if (inboundConnectionMO == null) {
-	    pac(result, "Missing " 
-		+ MonitoringConstants.INBOUND_CONNECTION_MONITORING_ROOT);
-	    System.exit(1);
-	}
+        for (CorbaConnectionCache cache : ctm.getInboundConnectionCaches() ) {
+            handleConnectionCache( result, cache ) ;
+        }
 
-	CorbaAcceptor acceptor = (CorbaAcceptor)
-	    ((com.sun.corba.se.spi.orb.ORB)orb)
-	        .getCorbaTransportManager().getAcceptors().iterator().next();
-
-	pac(result, acceptor.getMonitoringName());
-
-	MonitoredObject xMO =
-	    inboundConnectionMO.getChild(acceptor.getMonitoringName());
-	if (xMO == null) {
-	    pac(result, "Missing " 
-		+ acceptor.getMonitoringName());
-	    System.exit(1);
-	}
-
-	MonitoredAttribute attribute;
-
-	attribute = xMO.getAttribute(MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS);
-	if (attribute == null) {
-	    pac(result, "Missing " 
-		+ MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS);
-	    System.exit(1);
-	} else {
-	    pac(result,
-		" " + MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS
-		+ " " + attribute.getValue());
-	}
-	
-	attribute = xMO.getAttribute(MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS);
-	if (attribute == null) {
-	    pac(result, "Missing " 
-		+ MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS);
-	    System.exit(1);
-	} else {
-	    pac(result,
-		" " + MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS
-		+ " " + attribute.getValue());
-	}
-    
-	attribute = xMO.getAttribute(MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS);
-	if (attribute == null) {
-	    pac(result, "Missing " 
-		+ MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS);
-	    System.exit(1);
-	} else {
-	    pac(result,
-		" " + MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS
-		+ " " + attribute.getValue());
-	}
 	return result.toString();
     }
 
     // Print And Collect
-    public void pac(StringBuffer result, String append)
-    {
+    private void pac(StringBuffer result, String append) {
 	U.sop(append);
 	result.append(append).append('\n');
     }

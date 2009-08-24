@@ -213,7 +213,7 @@ public class Client extends TestCase
     }
 
     /** Test for bug 4919770: multiple ORBs share the same root MonitoredObject.
-      */
+      *
     public void testMonitoringRootName()
     {
 	for (int ctr=0; ctr<idInfo.length; ctr++) {
@@ -222,6 +222,8 @@ public class Client extends TestCase
 	    assertEquals( rootName, idInfo[ctr][1] ) ;
 	}
     }
+    */
+
 /*
     // Test for bug 6177606: incorrect error handling for string_to_object.
     public static class NamingTestSuite extends TestCase

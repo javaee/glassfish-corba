@@ -65,7 +65,6 @@ import com.sun.corba.se.spi.protocol.PIHandler ;
 import com.sun.corba.se.spi.resolver.LocalResolver ;
 import com.sun.corba.se.spi.resolver.Resolver ;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory ;
-import com.sun.corba.se.spi.monitoring.MonitoringManager ;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 
@@ -441,8 +440,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         return typeCodeMap.get(id);
     }
 
-    public abstract MonitoringManager getMonitoringManager( ) ;
-    
     // Special non-standard set_parameters method for
     // creating a precisely controlled ORB instance.
     // An ORB created by this call is affected only by

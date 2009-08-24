@@ -115,9 +115,6 @@ import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry;
-import com.sun.corba.se.spi.monitoring.MonitoringConstants;
-import com.sun.corba.se.spi.monitoring.MonitoringManager;
-import com.sun.corba.se.spi.monitoring.MonitoringFactories;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
 import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
@@ -289,8 +286,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private boolean orbOwnsThreadPoolManager = false ;
 
     private ThreadPoolManager threadpoolMgr;
-
-    private MonitoringManager monitoringManager;
 
     private InvocationInterceptor invocationInterceptor ;
 
@@ -498,7 +493,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 		idcount.put( orbid, num ) ;
 	    }
 
-	    rootName = MonitoringConstants.DEFAULT_MONITORING_ROOT ;
+	    rootName = "orb" ;
 
 	    // If this is not both the first ORB and ORBId "", give it 
 	    // a special name, otherwise the name is DEFAULT_MONITORING_ROOT.
@@ -509,15 +504,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
 
 	return rootName ;
-    }
-
-    private void initMonitoringManager()
-    {
-	// Set up the ORB Monitoring root.
-        monitoringManager = 
-            MonitoringFactories.getMonitoringManagerFactory( ).
-		createMonitoringManager( rootName,
-		MonitoringConstants.DEFAULT_MONITORING_ROOT_DESCRIPTION);
     }
 
     private void postInit( String[] params, DataCollector dataCollector )
@@ -546,7 +532,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 	// This requires a valid TimerManager.
 	initializePrimitiveTypeCodeConstants() ;
-	initMonitoringManager() ;
 
 	// REVISIT: this should go away after more transport init cleanup
 	// and going to ORT based ORBD.  
@@ -607,10 +592,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
 
 	return toaFactory ;
-    }
-
-    public MonitoringManager getMonitoringManager() {
-        return monitoringManager;
     }
 
     public void set_parameters( Properties props )
@@ -1502,13 +1483,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             }
         }
 
-        try {
-            monitoringManager.close() ;
-            monitoringManager = null ;
-        } catch (IOException exc) {
-            wrapper.ioExceptionOnClose( exc ) ;
-        }
-
         CachedCodeBase.cleanCache( this ) ;
         try {
             pihandler.close() ;
@@ -1941,6 +1915,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 		if (subcontractDebugFlag) {
 		    dprint(".releaseOrDecrementInvocationInfo: pop");
 		}
+                // XXX Does this belong here?
+                // finishedDispatch() ;
 	    }
 	} finally {
 	    if (subcontractDebugFlag) {

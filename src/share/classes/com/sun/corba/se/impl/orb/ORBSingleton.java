@@ -117,7 +117,6 @@ import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.spi.monitoring.MonitoringManager;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 
 /*
@@ -461,7 +460,7 @@ public class ORBSingleton extends ORB
 	    // Do NOT allow this special ORB to be created with the
 	    // empty name, which could conflict with app server
 	    // requirement that first ORB created with the empty name has
-	    // root monitoring agent name "orb" (see ORBImpl.initMonitoringManager).
+	    // root monitoring agent name "orb" 
 	    props.setProperty( ORBConstants.ORB_ID_PROPERTY,
 		"_$$$_INTERNAL_FULL_ORB_ID_$$$_" ) ;
 	    fullORB = new ORBImpl() ;
@@ -552,10 +551,6 @@ public class ORBSingleton extends ORB
     {
 	// To enable read_Object.
 	return false;
-    }
-
-    public MonitoringManager getMonitoringManager( ) {
-	return null ;
     }
 
     /*

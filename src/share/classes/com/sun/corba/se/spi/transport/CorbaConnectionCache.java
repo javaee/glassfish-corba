@@ -36,6 +36,10 @@
 
 package com.sun.corba.se.spi.transport;
 
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.NameValue ;
+
 /**
  * @author Harold Carr
  */
@@ -43,14 +47,21 @@ public interface CorbaConnectionCache
 {
     public String getMonitoringName();
 
+    @NameValue
     public String getCacheType();
 
     public void stampTime(CorbaConnection connection);
 
+    @ManagedAttribute( id="TotalConnections" ) 
+    @Description( "Total number of connections in the connection cache" ) 
     public long numberOfConnections();
 
+    @ManagedAttribute( id="ConnectionsIdle" ) 
+    @Description( "Number of connections in the connection cache that are idle" ) 
     public long numberOfIdleConnections();
 
+    @ManagedAttribute( id="ConnectionsInUse" ) 
+    @Description( "Number of connections in the connection cache that are in use" ) 
     public long numberOfBusyConnections();
 
     public boolean reclaim();

@@ -36,9 +36,14 @@
 
 package com.sun.corba.se.spi.transport;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author Harold Carr
  */
+@ManagedObject
+@Description( "Cache of connections originated by the ORB" ) 
 public interface CorbaOutboundConnectionCache extends CorbaConnectionCache
 {
     public CorbaConnection get(CorbaContactInfo contactInfo);

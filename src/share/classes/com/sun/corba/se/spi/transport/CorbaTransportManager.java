@@ -63,6 +63,8 @@ public interface CorbaTransportManager {
 
     @ManagedAttribute
     @Description( "The Selector, which listens for all I/O events" )
+    public Selector getSelector();
+
     public Selector getSelector(int id);
 
     public void close();

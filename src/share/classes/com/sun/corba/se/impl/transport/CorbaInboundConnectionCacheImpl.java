@@ -50,14 +50,9 @@ import org.glassfish.external.probe.provider.annotations.Probe ;
 import org.glassfish.external.probe.provider.annotations.ProbeProvider ;
 import org.glassfish.external.probe.provider.annotations.ProbeParam ;
 
-import org.glassfish.gmbal.ManagedObject ;
-import org.glassfish.gmbal.Description ;
-
 /**
  * @author Harold Carr
  */
-@ManagedObject
-@Description( "Cache of connections accepted by the ORB" ) 
 @ProbeProvider( providerName="glassfish", moduleName="orb" )
 public class CorbaInboundConnectionCacheImpl
     extends

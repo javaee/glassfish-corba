@@ -60,6 +60,7 @@ import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
+import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.extension.LoadBalancingPolicy;
 import java.nio.channels.SelectionKey;
 import java.util.Iterator;
@@ -254,7 +255,7 @@ public abstract class SocketOrChannelAcceptorBase
     }
 
     public String getConnectionCacheType() {
-        return this.getClass().toString();
+	return CorbaTransportManager.SOCKET_OR_CHANNEL_CONNECTION_CACHE;
     }
 
     public long getEnqueueTime() {

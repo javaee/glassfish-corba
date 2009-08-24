@@ -46,9 +46,6 @@ import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
-import org.glassfish.gmbal.ManagedAttribute ;
-import org.glassfish.gmbal.Description ;
-import org.glassfish.gmbal.NameValue ;
 
 /**
  * @author Harold Carr
@@ -73,7 +70,6 @@ public abstract class CorbaConnectionCacheBase
 	dprintCreation();
     }
     
-    @NameValue
     public String getCacheType()
     {
 	return cacheType;
@@ -85,8 +81,6 @@ public abstract class CorbaConnectionCacheBase
         c.setTimeStamp(timestamp++);
     }
 
-    @ManagedAttribute( id="TotalConnections" ) 
-    @Description( "Total number of connections in the connection cache" ) 
     public long numberOfConnections()
     {
 	synchronized (backingStore()) {
@@ -102,8 +96,6 @@ public abstract class CorbaConnectionCacheBase
         }
     }
 
-    @ManagedAttribute( id="ConnectionsIdle" ) 
-    @Description( "Number of connections in the connection cache that are idle" ) 
     public long numberOfIdleConnections()
     {
 	long count = 0;
@@ -118,8 +110,6 @@ public abstract class CorbaConnectionCacheBase
 	return count;
     }
 
-    @ManagedAttribute( id="ConnectionsInUse" ) 
-    @Description( "Number of connections in the connection cache that are in use" ) 
     public long numberOfBusyConnections()
     {
 	long count = 0;

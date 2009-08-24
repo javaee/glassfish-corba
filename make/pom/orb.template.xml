@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.glassfish.gmbal</groupId>
             <artigactId>gmbal</artifactId>
-            <version>3.0.0-b009</version>
+            <version>3.0.0-b011</version>
         <dependency>
     </dependencies>
 </project>

@@ -247,7 +247,7 @@
     </target>
 
     <!-- ========================= COMPILE ========================= -->
-    <target name="compile" depends="init, prepare-dirs, orb-library, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
+    <target name="compile" depends="init, prepare-dirs, orb-library, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources, create-jars">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"

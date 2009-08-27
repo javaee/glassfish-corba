@@ -42,6 +42,7 @@ import com.sun.corba.se.spi.ior.IORTemplate;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
@@ -127,6 +128,33 @@ public class AcceptorImpl
     public boolean shouldRegisterAcceptEvent()
     {
 	throw new RuntimeException("NO");
+    }
+
+    public Socket getAcceptedSocket() {
+	SocketChannel socketChannel = null;
+	try {
+	    socketChannel = serverSocketChannel.accept();
+	    System.out.println("accepted.");
+            return socketChannel.socket() ;
+	} catch (IOException e) {
+	    throw new RuntimeException(e.toString());
+	}
+    }
+
+    public void processSocket( Socket socket ) {
+	SocketChannel socketChannel = socket.getChannel() ;
+	try {
+	    ConnectionImpl connection =
+		new ConnectionImpl(orb, socketChannel,
+				   shouldUseSelectThreadForConnections(),
+				   !shouldUseSelectThreadForConnections(),
+				   false);
+	    Selector selector = orb.getCorbaTransportManager().getSelector(0);
+	    selector.registerForEvent(connection);
+	    System.out.println("connection registered.");
+	} catch (IOException e) {
+	    throw new RuntimeException(e.toString());
+	}
     }
 
     public void accept()

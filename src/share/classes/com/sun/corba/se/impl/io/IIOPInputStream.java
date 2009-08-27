@@ -83,7 +83,7 @@ import java.util.*;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
-import com.sun.corba.se.impl.orbutil.OperationTracer;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 

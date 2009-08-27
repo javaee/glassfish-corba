@@ -48,14 +48,10 @@ import java.util.ArrayList ;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPool;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import com.sun.corba.se.spi.orbutil.threadpool.WorkQueue;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.Description ;
@@ -66,10 +62,11 @@ import org.glassfish.gmbal.NameValue ;
 @Description( "A ThreadPool used by the ORB" ) 
 public class ThreadPoolImpl implements ThreadPool
 {
+    public static final int DEFAULT_INACTIVITY_TIMEOUT = 120000;
+
     // serial counter useful for debugging
-    private static AtomicInteger threadCounter = new AtomicInteger(0);
-    private static final ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
+    private static final AtomicInteger threadCounter = new AtomicInteger(0);
+    private static final Exceptions wrapper = Exceptions.self ;
 
     // Any time currentThreadCount and/or availableWorkerThreads is updated
     // or accessed this ThreadPool's WorkQueue must be locked. And, it is 
@@ -111,7 +108,8 @@ public class ThreadPoolImpl implements ThreadPool
 
     final private ClassLoader workerThreadClassLoader ; 
 
-    Object workersLock = new Object() ;
+    final Object workersLock = new Object() ;
+
     List<WorkerThread> workers = new ArrayList<WorkerThread>() ;
 
     /** Create an unbounded thread pool in the current thread group
@@ -137,7 +135,7 @@ public class ThreadPoolImpl implements ThreadPool
     public ThreadPoolImpl(ThreadGroup tg, String threadpoolName, 
 	ClassLoader defaultClassLoader) {
 
-        inactivityTimeout = ORBConstants.DEFAULT_INACTIVITY_TIMEOUT;
+        inactivityTimeout = DEFAULT_INACTIVITY_TIMEOUT;
         minWorkerThreads = 0;
         maxWorkerThreads = Integer.MAX_VALUE;
         workQueue = new WorkQueueImpl(this);
@@ -194,7 +192,8 @@ public class ThreadPoolImpl implements ThreadPool
                 try {
                     wt.join() ;
                 } catch (InterruptedException exc) {
-                    wrapper.interruptedJoinCallWhileClosingThreadPool( exc, wt, this ) ;
+                    wrapper.interruptedJoinCallWhileClosingThreadPool( exc,
+                        wt, this ) ;
                 }
             }
         }
@@ -292,17 +291,17 @@ public class ThreadPoolImpl implements ThreadPool
      * available.
      */
     void createWorkerThread() {
-        final String name = getName();
+        final String lname = getName();
         synchronized (workQueue) {
             try {
                 if (System.getSecurityManager() == null) {
-                    createWorkerThreadHelper(name) ;
+                    createWorkerThreadHelper(lname) ;
                 } else {
                     // If we get here, we need to create a thread.
                     AccessController.doPrivileged(
                             new PrivilegedAction() {
                         public Object run() {
-                            return createWorkerThreadHelper(name) ;
+                            return createWorkerThreadHelper(lname) ;
                         }
                     }
                     ) ;
@@ -482,8 +481,6 @@ public class ThreadPoolImpl implements ThreadPool
 
                 try {
                     setClassLoader() ;
-                    wrapper.workerThreadClassloaderReset(this, 
-                        currentClassLoader, workerThreadClassLoader);
                 } catch (SecurityException se) {
                     wrapper.workerThreadResetContextClassloaderFailed(se, this);
                 }
@@ -502,6 +499,7 @@ public class ThreadPoolImpl implements ThreadPool
             processedCount.incrementAndGet();
         }
 
+        @Override
         public void run() {
             try  {
                 while (!closeCalled) {

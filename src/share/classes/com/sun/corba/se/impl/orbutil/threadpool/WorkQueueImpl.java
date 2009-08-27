@@ -39,23 +39,18 @@ package com.sun.corba.se.impl.orbutil.threadpool;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPool;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import com.sun.corba.se.spi.orbutil.threadpool.WorkQueue;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-
-import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.NameValue ;
 
 public class WorkQueueImpl implements WorkQueue
 {
-    final private static ORBUtilSystemException wrapper = 
-	       ORB.getStaticLogWrapperTable().get_RPC_TRANSPORT_ORBUtil();
+    public static final String WORKQUEUE_DEFAULT_NAME = "default-workqueue";
+
     final private Queue<Work> queue;
     private ThreadPool workerThreadPool;
 
@@ -67,12 +62,12 @@ public class WorkQueueImpl implements WorkQueue
     final private String name;
 
     public WorkQueueImpl() {
-	this.name = ORBConstants.WORKQUEUE_DEFAULT_NAME;
+	this.name = WORKQUEUE_DEFAULT_NAME;
         this.queue = new LinkedList<Work>();
     }
 
     public WorkQueueImpl(ThreadPool workerThreadPool) {
-        this(workerThreadPool, ORBConstants.WORKQUEUE_DEFAULT_NAME);
+        this(workerThreadPool, WORKQUEUE_DEFAULT_NAME);
     }
 
     public WorkQueueImpl(ThreadPool workerThreadPool, String name) {

@@ -34,7 +34,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.file;
+package com.sun.corba.se.spi.orbutil.misc;
 
 import java.io.PrintStream ;
 

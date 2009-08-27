@@ -157,8 +157,7 @@ public class SocketOrChannelAcceptorImpl
 
     }
 
-    public void accept()
-    {
+    public Socket getAcceptedSocket() {
 	SocketChannel socketChannel = null;
 	Socket socket = null;
 
@@ -206,25 +205,9 @@ public class SocketOrChannelAcceptorImpl
 		    : serverSocketChannel.toString()));
 	}
 
-	CorbaConnection connection = 
-	    new SocketOrChannelConnectionImpl(orb, this, socket);
-	if (orb.transportDebugFlag) {
-	    dprint(".accept: new: " + connection);
-	}
-
-	// NOTE: The connection MUST be put in the cache BEFORE being
-	// registered with the selector.  Otherwise if the bytes
-	// are read on the connection it will attempt a time stamp
-	// but the cache will be null, resulting in NPE.
-	getConnectionCache().put(this, connection);
-
-	if (connection.shouldRegisterServerReadEvent()) {
-	    Selector selector = orb.getTransportManager().getSelector(0);
-	    selector.registerForEvent(connection.getEventHandler());
-	}
-
-	getConnectionCache().reclaim();
+        return socket ;
     }
+
 
     public void close ()
     {
@@ -281,7 +264,7 @@ public class SocketOrChannelAcceptorImpl
                 AccessController.doPrivileged(
 		    new PrivilegedAction<Object>() {
 			public java.lang.Object run() {
-			    accept();
+                            processSocket( getAcceptedSocket() ) ;
 			    return null;
 			}
 		    }

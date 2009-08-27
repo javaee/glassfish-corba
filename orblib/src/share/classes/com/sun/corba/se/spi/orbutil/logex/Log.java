@@ -1,27 +1,27 @@
-/*
+/* 
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
  * may not use this file except in compliance with the License. You can obtain
  * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific 
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * file and include the License file at legal/LICENSE.TXT.
  * Sun designates this particular file as subject to the "Classpath" exception
  * as provided by Sun in the GPL Version 2 section of the License file that
  * accompanied this code.  If applicable, add the following below the License
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -32,70 +32,42 @@
  * and therefore, elected the GPL Version 2 license, then the option applies
  * only if the new code is made subject to such option by the copyright
  * holder.
+ * 
+ */ 
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 
-package com.sun.corba.se.impl.orbutil.codegen;
+package com.sun.corba.se.spi.orbutil.logex;
 
-import java.io.PrintStream ;
-
-/** Extends the file utility Printer with line numbers that are
- * also optionally stored as Attributes in Nodes for annotating the AST.
+/**
+ *
+ * @author ken
  */
-public class Printer extends com.sun.corba.se.spi.orbutil.misc.Printer {
-    static Attribute<Integer> lineNumberAttribute = new Attribute<Integer>( 
-	Integer.class, "lineNumber", -1 ) ;
+import java.lang.annotation.Documented ;
+import java.lang.annotation.Target ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-    private int lineNumber ;
+/** This annotation is applied to an interface or abstract class that is used
+ * to define methods for logging and/or constructing exceptions.
+ */
+@Documented
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Log {
+    /** The logging Level (encoded as an enum) to use for the log record
+     * generated from the annotated method.
+     * 
+     * @return The log level.
+     */
+    LogLevel level() default LogLevel.WARNING ;
 
-    public Printer( PrintStream ps ) {
-	this( ps, DEFAULT_INCREMENT, ' ' ) ;
-    }
-
-    public Printer( PrintStream ps, int increment, char padChar ) {
-	super( ps, increment, padChar ) ;
-	this.lineNumber = 1 ;
-    }
-
-    public int lineNumber() {
-	return lineNumber ;
-    }
-
-    @Override
-    public Printer p( String str ) {
-	super.p( str ) ;
-	return this ;
-    }
-
-    @Override
-    public Printer p( Object obj ) {
-	super.p( obj ) ;
-	return this ;
-    }
-
-    @Override
-    public Printer in() {
-	super.in() ;
-	return this ;
-    }
-
-    @Override
-    public Printer out() {
-	super.out() ;
-	return this ;
-    }
-
-    @Override
-    public Printer nl() {
-	super.nl() ;
-	return this ;
-    }
-
-    public Printer nl( Node node ) {
-	lineNumber++ ;
-	if (node != null)
-	    lineNumberAttribute.set( node, lineNumber ) ;
-	super.nl() ;
-	return this ;
-    }
+    /** The exception ID to be used.  This is used to construct the message
+     * ID in the log message.
+     * @return The exception id (which must include the VMCID).
+     */
+    int id() default 0 ;
 }
-

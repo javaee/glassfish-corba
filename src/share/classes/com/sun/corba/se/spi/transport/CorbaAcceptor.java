@@ -45,17 +45,18 @@ import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.impl.oa.poa.Policies;
 import com.sun.corba.se.spi.orb.ORB;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * @author Harold Carr
  */
 public abstract interface CorbaAcceptor
 {
-    public String getObjectAdapterId();
-    public String getObjectAdapterManagerId();
-    public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
+    String getObjectAdapterId();
+    String getObjectAdapterManagerId();
+    void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
 				 String codebase);
-    public String getMonitoringName();
+    String getMonitoringName();
 
     /**
      * Used to initialize an <code>Acceptor</code>.
@@ -68,7 +69,7 @@ public abstract interface CorbaAcceptor
      * @return <code>true</code> when it performs initializatin
      * actions (typically the first call.
      */
-    public boolean initialize();
+    boolean initialize();
 
     /**
      * Used to determine if an <code>Acceptor</code> has been initialized.
@@ -76,13 +77,13 @@ public abstract interface CorbaAcceptor
      * @return <code>true</code. if the <code>Acceptor</code> has been
      * initialized.
      */
-    public boolean initialized();
+    boolean initialized();
 
-    public String getConnectionCacheType();
+    String getConnectionCacheType();
 
-    public void setConnectionCache(CorbaInboundConnectionCache connectionCache);
+    void setConnectionCache(CorbaInboundConnectionCache connectionCache);
 
-    public CorbaInboundConnectionCache getConnectionCache();
+    CorbaInboundConnectionCache getConnectionCache();
 
     /**
      * Used to determine if the <code>Acceptor</code> should register
@@ -94,32 +95,30 @@ public abstract interface CorbaAcceptor
      * @return <code>true</code> if the <code>Acceptor</code> should be
      * registered with a Selector.
      */
-    public boolean shouldRegisterAcceptEvent();
+    boolean shouldRegisterAcceptEvent();
 
-    /**
-     * Accept a connection request.
-     *
-     * This is called either when the selector gets an accept event
-     * for this <code>Acceptor</code> or by a ListenerThread.
-     *
-     * It results in a CorbaConnection being created.
+    /** Blocks until a new Socket is available on the acceptor's port.
      */
-    public void accept();
+    Socket getAcceptedSocket() ; 
+
+    /** Handle a newly accepted Socket.  
+     */
+    void processSocket( Socket channel ) ;
 
     /**
      * Close the <code>Acceptor</code>.
      */
-    public void close();
+    void close();
 
-    public EventHandler getEventHandler();
+    EventHandler getEventHandler();
 
-    public CorbaMessageMediator createMessageMediator(ORB xbroker, CorbaConnection xconnection);
+    CorbaMessageMediator createMessageMediator(ORB xbroker, CorbaConnection xconnection);
 
-    public CDRInputObject createInputObject(ORB broker, CorbaMessageMediator messageMediator);
+    CDRInputObject createInputObject(ORB broker, CorbaMessageMediator messageMediator);
 
-    public CDROutputObject createOutputObject(ORB broker, CorbaMessageMediator messageMediator);
+    CDROutputObject createOutputObject(ORB broker, CorbaMessageMediator messageMediator);
     
-    public ServerSocket getServerSocket();
+    ServerSocket getServerSocket();
 }
 
 // End of file.

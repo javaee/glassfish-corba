@@ -123,7 +123,7 @@ import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.impl.logging.UtilSystemException;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
-import com.sun.corba.se.impl.orbutil.OperationTracer;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 
 /**
  * Provides utility methods that can be used by stubs and ties to

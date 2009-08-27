@@ -41,7 +41,7 @@ import java.util.logging.LogRecord ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.orbutil.OperationTracer ;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
 public abstract class LogWrapperBase 
 {

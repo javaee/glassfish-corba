@@ -83,7 +83,7 @@ import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.OperationTracer ;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
 // implements com.sun.corba.se.impl.core.ClientRequestDispatcher
 // so RMI-IIOP Util.isLocal can call ClientRequestDispatcher.useLocalInvocation.

@@ -108,7 +108,7 @@ public class ListenerThreadImpl
 			dprint(".doWork: BEFORE ACCEPT CYCLE: " + acceptor);
 		    }
 
-		    acceptor.accept();
+                    acceptor.processSocket( acceptor.getAcceptedSocket() ) ;
 
 		    if (orb.transportDebugFlag) {
 			dprint(".doWork: AFTER ACCEPT CYCLE: " + acceptor);

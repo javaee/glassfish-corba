@@ -56,7 +56,7 @@ import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.impl.orbutil.OperationTracer ;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 

@@ -66,7 +66,7 @@ import com.sun.corba.se.impl.orbutil.copyobject.ClassCopierFactory ;
 import com.sun.corba.se.impl.orbutil.copyobject.PipelineClassCopierFactory ;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
-import com.sun.corba.se.impl.orbutil.OperationTracer ;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
 // XXX Not good to be importing this, but seems to be necessary.
 import com.sun.corba.se.impl.util.Utility ;

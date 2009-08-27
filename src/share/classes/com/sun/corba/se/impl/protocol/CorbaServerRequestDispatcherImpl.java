@@ -93,7 +93,7 @@ import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.OperationTracer;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.POASystemException;
 

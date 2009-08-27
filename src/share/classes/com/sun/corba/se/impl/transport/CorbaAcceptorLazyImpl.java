@@ -7,6 +7,7 @@ package com.sun.corba.se.impl.transport;
 
 import com.sun.corba.se.spi.orb.ORB;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.channels.SelectableChannel;
 
 /**
@@ -15,8 +16,13 @@ import java.nio.channels.SelectableChannel;
  */
 public class CorbaAcceptorLazyImpl extends SocketOrChannelAcceptorBase {
 
-    public CorbaAcceptorLazyImpl( ORB orb ) {
-        super( orb ) ;
+    public CorbaAcceptorLazyImpl( ORB orb, int port, String name, String type ) {
+        super( orb, port, name, type ) ;
+    }
+
+    public Socket getAcceptedSocket() {
+        // XXX Throw exception
+        throw wrapper.notSupportedOnLazyAcceptor() ;
     }
 
     public SelectableChannel getChannel() {
@@ -43,4 +49,8 @@ public class CorbaAcceptorLazyImpl extends SocketOrChannelAcceptorBase {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public boolean shouldRegisterAcceptEvent() {
+        return false;
+    }
 }

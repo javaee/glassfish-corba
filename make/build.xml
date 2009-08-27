@@ -916,10 +916,13 @@
 	-->
 	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor" fork="true"
 	    dir="${root.dir}">
+            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
+            <!--
 	    <bootclasspath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 		<pathelement location="${rt.jar}"/>
 	    </bootclasspath>
+            -->
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>
@@ -948,10 +951,13 @@
 	-->
 	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor" fork="true"
 	    dir="${root.dir}">
+            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
+            <!--
 	    <bootclasspath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 		<pathelement location="${rt.jar}"/>
 	    </bootclasspath>
+            -->
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>
@@ -990,10 +996,13 @@
 	<property name="tp-src-dir" value="${src.dir}/com/sun/tools/corba/se/timer"/>
 	<java classname="com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator" fork="true"
 	    dir="${tp-src-dir}">
+            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
+            <!--
 	    <bootclasspath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 		<pathelement location="${rt.jar}"/>
 	    </bootclasspath>
+            -->
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>
@@ -1182,10 +1191,13 @@
 	<mkdir dir="build/rename/ee"/>
 	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
 	    dir="${root.dir}">
+            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
+            <!--
 	    <bootclasspath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 		<pathelement location="${rt.jar}"/>
 	    </bootclasspath>
+            -->
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>

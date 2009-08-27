@@ -59,11 +59,13 @@ import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.SocketInfo;
+import com.sun.corba.se.spi.transport.Selector;
 import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.extension.LoadBalancingPolicy;
 import java.nio.channels.SelectionKey;
 import java.util.Iterator;
+import java.net.Socket ;
 import org.omg.IOP.TAG_INTERNET_IOP;
 
 /**
@@ -123,6 +125,27 @@ public abstract class SocketOrChannelAcceptorBase
 	this(orb, port);
 	this.name = name;
 	this.type = type;
+    }
+
+    public void processSocket( Socket socket ) {
+	CorbaConnection connection = 
+	    new SocketOrChannelConnectionImpl(orb, this, socket);
+	if (orb.transportDebugFlag) {
+	    dprint(".accept: new: " + connection);
+	}
+
+	// NOTE: The connection MUST be put in the cache BEFORE being
+	// registered with the selector.  Otherwise if the bytes
+	// are read on the connection it will attempt a time stamp
+	// but the cache will be null, resulting in NPE.
+	getConnectionCache().put(this, connection);
+
+	if (connection.shouldRegisterServerReadEvent()) {
+	    Selector selector = orb.getTransportManager().getSelector(0);
+	    selector.registerForEvent(connection.getEventHandler());
+	}
+
+	getConnectionCache().reclaim();
     }
 
     public void addToIORTemplate(IORTemplate iorTemplate, Policies policies, String codebase) {

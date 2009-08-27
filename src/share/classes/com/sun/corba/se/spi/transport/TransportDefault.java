@@ -45,6 +45,8 @@ import com.sun.corba.se.spi.ior.IOR ;
 // Internal imports, not used in the interface to this package
 import com.sun.corba.se.impl.protocol.CorbaClientDelegateImpl ;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
+import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl ;
+import com.sun.corba.se.impl.transport.CorbaAcceptorLazyImpl ;
 
 /** This class provices standard building blocks for the ORB, as do all Default classes
  * in the various packages.  
@@ -79,6 +81,18 @@ public abstract class TransportDefault {
 	final ORB broker )
     {
 	return null ;
+    }
+
+    public static CorbaAcceptor makeStandardCorbaAcceptor( 
+        ORB orb, int port, String name, String type ) {
+
+        return new SocketOrChannelAcceptorImpl( orb, port, name, type ) ;
+    }
+
+    public static CorbaAcceptor makeLazyCorbaAcceptor( 
+        ORB orb, int port, String name, String type ) {
+
+        return new CorbaAcceptorLazyImpl( orb, port, name, type ) ;
     }
 }
     

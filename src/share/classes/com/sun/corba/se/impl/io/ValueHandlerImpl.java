@@ -66,7 +66,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 
-import com.sun.corba.se.impl.orbutil.OperationTracer;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
  
 
 import com.sun.corba.se.impl.logging.OMGSystemException;

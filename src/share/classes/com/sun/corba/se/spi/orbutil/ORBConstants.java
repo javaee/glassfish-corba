@@ -530,15 +530,6 @@ public class ORBConstants {
     public static final String ORBID_DIR_BASE	    = "orbids" ;
     public static final String ORBID_DB_FILE_NAME   = "orbids.db" ;
 
-    // Constants for ThreadPool ********************************************************************
-
-    // Default value for when inactive threads in the pool can stop running (ms)
-    public static final int DEFAULT_INACTIVITY_TIMEOUT = 120000;
-    // Default name of the threadpool
-    public static final String THREADPOOL_DEFAULT_NAME = "default-threadpool";
-    // Default name of the workqueue
-    public static final String WORKQUEUE_DEFAULT_NAME = "default-workqueue";
-
     // Constants for minor code bases **************************************************************
     // This is the value that pre-Merlin Sun ORBs incorrectly used.  We preserve this
     // here for backwards compatibility, but note that the current ORB must never

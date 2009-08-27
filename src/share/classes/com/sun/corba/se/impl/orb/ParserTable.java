@@ -1015,7 +1015,8 @@ public class ParserTable {
 	public boolean shouldUseSelectThreadForConnections() { return true; }
 	public void setUseWorkerThreadForConnections(boolean x) { }
 	public boolean shouldUseWorkerThreadForConnections() { return true; }
-	public void accept() { }
+        public Socket getAcceptedSocket() { return null ; }
+        public void processSocket( Socket socket ) { } 
 	public void close() { }
 	public EventHandler getEventHandler() { return null; }
 	public CorbaMessageMediator createMessageMediator(
@@ -1052,7 +1053,8 @@ public class ParserTable {
 	public boolean shouldUseSelectThreadForConnections() { return true; }
 	public void setUseWorkerThreadForConnections(boolean x) { }
 	public boolean shouldUseWorkerThreadForConnections() { return true; }
-	public void accept() { }
+        public Socket getAcceptedSocket() { return null ; }
+        public void processSocket( Socket socket ) { } 
 	public void close() { }
 	public EventHandler getEventHandler() { return null; }
 	public CorbaMessageMediator createMessageMediator(

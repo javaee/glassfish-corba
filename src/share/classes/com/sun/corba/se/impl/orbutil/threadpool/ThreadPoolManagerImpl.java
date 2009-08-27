@@ -43,30 +43,24 @@ import java.security.AccessController ;
 
 import java.util.concurrent.atomic.AtomicInteger ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPool;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolChooser;
 
-import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-
 public class ThreadPoolManagerImpl implements ThreadPoolManager 
 { 
+    public static final String THREADPOOL_DEFAULT_NAME = "default-threadpool";
+
     private ThreadPool threadPool ;
     private ThreadGroup threadGroup ;
 
-    private static final ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
+    private final static Exceptions wrapper = Exceptions.self ;
 
     public ThreadPoolManagerImpl() {
         threadGroup = getThreadGroup() ;
-	threadPool = new ThreadPoolImpl( threadGroup, 
-            ORBConstants.THREADPOOL_DEFAULT_NAME ) ;
+	threadPool = new ThreadPoolImpl( threadGroup,
+            THREADPOOL_DEFAULT_NAME ) ;
     }
 
     private static AtomicInteger tgCount = new AtomicInteger() ;

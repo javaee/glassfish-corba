@@ -355,11 +355,10 @@ public class SelectorImpl
                         try {
                             eventHandler.handleEvent();
                         } catch (Throwable t) {
-                            if (orb.transportDebugFlag) {
-                                dprint(".run: eventHandler.handleEvent", t);
-                            }
+                            wrapper.exceptionInSelector( t, eventHandler ) ;
                         }
                     } else {
+                        wrapper.canceledSelectionKey( selectionKey ) ;
                         if (orb.transportDebugFlag) {
                             dprint(".run: skipping event since this " +
                                    "EventHandler's SelectionKey has been " +

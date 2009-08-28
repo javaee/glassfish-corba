@@ -165,6 +165,10 @@
              73 FINE "Found class {0} in bundle {1} using classNameMap")
             (COULD_NOT_LOAD_CLASS_IN_BUNDLE
              74 WARNING "Could not load class {0} in bundle {1}")
+            (EXCEPTION_IN_SELECTOR
+             75 WARNING "Exception while handling event on {0}")
+            (CANCELED_SELECTION_KEY 
+             76 FINE "Ignoring cancelled SelectionKey {0}: key will be removed from Selector")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 

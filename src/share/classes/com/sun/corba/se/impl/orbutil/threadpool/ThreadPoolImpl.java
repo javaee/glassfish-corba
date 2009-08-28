@@ -66,7 +66,6 @@ public class ThreadPoolImpl implements ThreadPool
 
     // serial counter useful for debugging
     private static final AtomicInteger threadCounter = new AtomicInteger(0);
-    private static final Exceptions wrapper = Exceptions.self ;
 
     // Any time currentThreadCount and/or availableWorkerThreads is updated
     // or accessed this ThreadPool's WorkQueue must be locked. And, it is 
@@ -192,7 +191,7 @@ public class ThreadPoolImpl implements ThreadPool
                 try {
                     wt.join() ;
                 } catch (InterruptedException exc) {
-                    wrapper.interruptedJoinCallWhileClosingThreadPool( exc,
+                    Exceptions.self.interruptedJoinCallWhileClosingThreadPool( exc,
                         wt, this ) ;
                 }
             }
@@ -280,7 +279,7 @@ public class ThreadPoolImpl implements ThreadPool
 	// are inside the doPrivileged block.
 	thread.setDaemon(true);
 	
-	wrapper.workerThreadCreated( thread, thread.getContextClassLoader() ) ;
+	Exceptions.self.workerThreadCreated( thread, thread.getContextClassLoader() ) ;
 	
 	thread.start();
 	return null ;
@@ -310,7 +309,7 @@ public class ThreadPoolImpl implements ThreadPool
                 // Decrementing the count of current worker threads.
                 // But, it will be increased in the finally block.
                 decrementCurrentNumberOfThreads();
-                wrapper.workerThreadCreationFailure(t);
+                Exceptions.self.workerThreadCreationFailure(t);
             } finally {
                 incrementCurrentNumberOfThreads();
             }
@@ -472,17 +471,17 @@ public class ThreadPoolImpl implements ThreadPool
                     );
                 }
             } catch (SecurityException se) {
-                throw wrapper.workerThreadGetContextClassloaderFailed(se, this);
+                throw Exceptions.self.workerThreadGetContextClassloaderFailed(se, this);
             }
 
             if (workerThreadClassLoader != currentClassLoader) {
-                wrapper.workerThreadForgotClassloaderReset(this, 
+                Exceptions.self.workerThreadForgotClassloaderReset(this, 
                     currentClassLoader, workerThreadClassLoader);
 
                 try {
                     setClassLoader() ;
                 } catch (SecurityException se) {
-                    wrapper.workerThreadResetContextClassloaderFailed(se, this);
+                    Exceptions.self.workerThreadResetContextClassloaderFailed(se, this);
                 }
             }
         }
@@ -492,7 +491,7 @@ public class ThreadPoolImpl implements ThreadPool
             try {
                 currentWork.doWork();
             } catch (Throwable t) {
-                wrapper.workerThreadDoWorkThrowable(t, this);
+                Exceptions.self.workerThreadDoWorkThrowable(t, this);
             }
             long elapsedTime = System.currentTimeMillis() - start;
             totalTimeTaken.addAndGet(elapsedTime);
@@ -509,17 +508,17 @@ public class ThreadPoolImpl implements ThreadPool
                         if (currentWork == null) 
                             continue;
                     } catch (WorkerThreadNotNeededException toe) {
-                        wrapper.workerThreadNotNeeded(this, 
+                        Exceptions.self.workerThreadNotNeeded(this, 
                             currentNumberOfThreads(), minimumNumberOfThreads());
                         closeCalled = true ;
                         continue ;
                     } catch (InterruptedException exc) {
-                        wrapper.workQueueThreadInterrupted( exc, super.getName(), 
+                        Exceptions.self.workQueueThreadInterrupted( exc, super.getName(), 
                             Boolean.valueOf( closeCalled ) ) ;
 
                         continue ;
                     } catch (Throwable t) {
-                        wrapper.workerThreadThrowableFromRequestWork(t, this, 
+                        Exceptions.self.workerThreadThrowableFromRequestWork(t, this, 
                                 workQueue.getName());
                         
                         continue;
@@ -535,7 +534,7 @@ public class ThreadPoolImpl implements ThreadPool
                 }
             } catch (Throwable e) {
                 // This should not be possible
-                wrapper.workerThreadCaughtUnexpectedThrowable(e, this);
+                Exceptions.self.workerThreadCaughtUnexpectedThrowable(e, this);
             } finally {
                 synchronized (workersLock) {
                     workers.remove( this ) ;

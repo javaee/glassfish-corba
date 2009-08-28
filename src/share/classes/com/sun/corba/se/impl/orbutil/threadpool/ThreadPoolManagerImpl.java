@@ -55,8 +55,6 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
     private ThreadPool threadPool ;
     private ThreadGroup threadGroup ;
 
-    private final static Exceptions wrapper = Exceptions.self ;
-
     public ThreadPoolManagerImpl() {
         threadGroup = getThreadGroup() ;
 	threadPool = new ThreadPoolImpl( threadGroup,
@@ -115,7 +113,7 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
         try {
             threadPool.close() ;
         } catch (IOException exc) {
-            wrapper.threadPoolCloseError() ;
+            Exceptions.self.threadPoolCloseError() ;
         }
 
         try {
@@ -124,18 +122,18 @@ public class ThreadPoolManagerImpl implements ThreadPoolManager
             int numGroups = threadGroup.activeGroupCount() ;
 
             if (isDestroyed) {
-                wrapper.threadGroupIsDestroyed( threadGroup ) ;
+                Exceptions.self.threadGroupIsDestroyed( threadGroup ) ;
             } else {
                 if (numThreads > 0)
-                    wrapper.threadGroupHasActiveThreadsInClose( threadGroup, numThreads ) ;
+                    Exceptions.self.threadGroupHasActiveThreadsInClose( threadGroup, numThreads ) ;
 
                 if (numGroups > 0)
-                    wrapper.threadGroupHasSubGroupsInClose( threadGroup, numGroups ) ;
+                    Exceptions.self.threadGroupHasSubGroupsInClose( threadGroup, numGroups ) ;
 
                 threadGroup.destroy() ;
             }
         } catch (IllegalThreadStateException exc ) {
-            wrapper.threadGroupDestroyFailed( exc, threadGroup ) ;
+            Exceptions.self.threadGroupDestroyFailed( exc, threadGroup ) ;
         }
 
         threadGroup = null ;

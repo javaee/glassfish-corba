@@ -72,7 +72,7 @@ import org.omg.IOP.TAG_INTERNET_IOP;
  *
  * @author ken
  */
-public abstract class SocketOrChannelAcceptorBase
+public abstract class CorbaAcceptorBase
     extends
 	EventHandlerBase
     implements
@@ -97,7 +97,8 @@ public abstract class SocketOrChannelAcceptorBase
     protected ORBUtilSystemException wrapper;
     protected CorbaInboundConnectionCache connectionCache;
 
-    public SocketOrChannelAcceptorBase(ORB orb)
+    public CorbaAcceptorBase(ORB orb, int port,
+				       String name, String type)
     {
 	this.orb = orb;
 	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
@@ -110,19 +111,8 @@ public abstract class SocketOrChannelAcceptorBase
 	this.name = LegacyServerSocketEndPointInfo.NO_NAME;
 	this.locatorPort = -1;
 	// END Legacy support.
-    }
 
-    public SocketOrChannelAcceptorBase(ORB orb, int port)
-    {
-	this(orb);
 	this.port = port;
-    }
-
-    // BEGIN Legacy support.
-    public SocketOrChannelAcceptorBase(ORB orb, int port,
-				       String name, String type)
-    {
-	this(orb, port);
 	this.name = name;
 	this.type = type;
     }

@@ -288,7 +288,7 @@ public final class ClientRequestInfoImpl
         try {
             // access is currently valid for all states:
             //checkAccess( MID_TARGET );
-            if (cachedTargetObject == null) {
+            if (messageMediator != null && cachedTargetObject == null) {
                 CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
                     messageMediator.getContactInfo();
                 cachedTargetObject =
@@ -321,7 +321,7 @@ public final class ClientRequestInfoImpl
             // Reason: See the way we handle COMM_FAILURES in 
             // ClientRequestDispatcher.createRequest, v1.32
 
-            if (cachedEffectiveTargetObject == null) {
+            if (messageMediator != null && cachedEffectiveTargetObject == null) {
                 CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
                     messageMediator.getContactInfo();
                 // REVISIT - get through chain like getLocatedIOR helper below.
@@ -351,7 +351,7 @@ public final class ClientRequestInfoImpl
             // access is currently valid for all states:
             //checkAccess( MID_EFFECTIVE_PROFILE );
 
-            if( cachedEffectiveProfile == null ) {
+            if(messageMediator != null && cachedEffectiveProfile == null ) {
                 CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
                     messageMediator.getContactInfo();
                 cachedEffectiveProfile =
@@ -482,7 +482,7 @@ public final class ClientRequestInfoImpl
             }
             
             // null could mean we cached null or not in cache.
-            if( (result == null) &&
+            if( (messageMediator != null) && (result == null) &&
                 (justCreatedCache ||
                 !cachedEffectiveComponents.containsKey( id ) ) )
             {
@@ -599,7 +599,10 @@ public final class ClientRequestInfoImpl
     public String operation(){
         // access is currently valid for all states:
         //checkAccess( MID_OPERATION );
-	return messageMediator.getOperationName();
+        if (messageMediator != null)
+            return messageMediator.getOperationName();
+        else 
+            return "<special operation>" ;
     }
 
     @Override

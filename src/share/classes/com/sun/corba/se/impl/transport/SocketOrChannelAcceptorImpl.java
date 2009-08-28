@@ -41,60 +41,35 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.SelectableChannel;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 
-import com.sun.corba.se.spi.transport.EventHandler;
 import com.sun.corba.se.spi.transport.Selector;
 
-import com.sun.corba.se.spi.extension.RequestPartitioningPolicy;
-import com.sun.corba.se.spi.ior.IORTemplate;
-import com.sun.corba.se.spi.ior.TaggedProfileTemplate;
-import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
-import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 /**
  * @author Harold Carr
  */
 public class SocketOrChannelAcceptorImpl
     extends
-        SocketOrChannelAcceptorBase
+        CorbaAcceptorBase
 {
     protected ServerSocketChannel serverSocketChannel;
     protected ServerSocket serverSocket;
     
     private Class<?> lastExceptionClassSeen = null ;
 
-    public SocketOrChannelAcceptorImpl(ORB orb)
-    {
-        super( orb ) ;
-    }
-
-    public SocketOrChannelAcceptorImpl(ORB orb, int port)
-    {
-        super( orb, port ) ;
-    }
-
-    // BEGIN Legacy support.
     public SocketOrChannelAcceptorImpl(ORB orb, int port, 
 				       String name, String type)
     {
         super( orb, port, name, type ) ;
     }
-    // END Legacy support.
 
     public synchronized boolean initialize()
     {
@@ -254,6 +229,10 @@ public class SocketOrChannelAcceptorImpl
     }
     */
 
+    protected void accept() {
+        processSocket( getAcceptedSocket() ) ;
+    }
+
     public void doWork()
     {
 	try {
@@ -264,7 +243,7 @@ public class SocketOrChannelAcceptorImpl
                 AccessController.doPrivileged(
 		    new PrivilegedAction<Object>() {
 			public java.lang.Object run() {
-                            processSocket( getAcceptedSocket() ) ;
+                            accept() ;
 			    return null;
 			}
 		    }

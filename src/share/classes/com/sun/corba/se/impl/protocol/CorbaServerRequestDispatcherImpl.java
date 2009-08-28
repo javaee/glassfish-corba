@@ -607,7 +607,10 @@ public class CorbaServerRequestDispatcherImpl
 	byte[] objectId, ObjectAdapter objectAdapter) 
     {
 	try {
-            OperationTracer.enable() ;
+            if (orb.operationTraceDebugFlag) {
+                OperationTracer.enable() ;
+            }
+
             OperationTracer.begin( "Dispatch to servant" ) ;
 
 	    if (orb.subcontractDebugFlag) {

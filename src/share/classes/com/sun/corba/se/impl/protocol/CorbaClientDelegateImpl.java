@@ -214,7 +214,9 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    }
 
             // Enable operation tracing for argument marshaling
-            OperationTracer.enable() ;
+            if (orb.operationTraceDebugFlag) {
+                OperationTracer.enable() ;
+            }
             OperationTracer.begin( "client argument marshaling:op=" + operation ) ;
 	}
     }
@@ -234,7 +236,9 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	        subcontract.marshalingComplete((Object)self, (CDROutputObject)output);
         } finally {
             // Enable operation tracing for result unmarshaling
-            OperationTracer.enable() ;
+            if (orb.operationTraceDebugFlag) {
+                OperationTracer.enable() ;
+            }
             OperationTracer.begin( "client result unmarshaling" ) ;
         }
     }

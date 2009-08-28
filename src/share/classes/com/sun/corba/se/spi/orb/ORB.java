@@ -204,6 +204,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean mbeanFineDebugFlag = false ;
     public boolean mbeanRuntimeDebugFlag = false ;
     public boolean orbLifecycleDebugFlag = false ;
+    public boolean operationTraceDebugFlag = false ;
 
     @ManagedAttribute
     @Description( "The current settings of the ORB debug flags" )

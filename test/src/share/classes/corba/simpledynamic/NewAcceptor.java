@@ -38,12 +38,12 @@ package corba.simpledynamic;
 
 import corba.framework.*;
 
-public class SimpleDynamic extends CORBATest
+public class NewAcceptor extends CORBATest
 {
     @Override
     protected void doTest() throws Throwable
     {
-	Controller client = createClient( "corba.simpledynamic.Client" ) ;
+	Controller client = createClient( "corba.simpledynamic.NewAcceptorClient" ) ;
 
 	client.start();
 
@@ -55,4 +55,3 @@ public class SimpleDynamic extends CORBATest
 	client.stop();
     }
 }
-

@@ -521,7 +521,11 @@ public class ParserTable {
                 OperationFactory.maskErrorAction( 
                     OperationFactoryExt.convertAction( ObjectName.class ) ),
                 "gmbalRootParentName", null,
-                testGmbalRootParentName, TEST_GMBAL_ROOT_PARENT_NAME )
+                testGmbalRootParentName, TEST_GMBAL_ROOT_PARENT_NAME ),
+            ParserDataFactory.make( ORBConstants.NO_DEFAULT_ACCEPTORS,
+                OperationFactory.booleanAction(),
+                "noDefaultAcceptors", Boolean.FALSE,
+                Boolean.TRUE, "TRUE" )
 	} ;
 
 	parserData = pd ;

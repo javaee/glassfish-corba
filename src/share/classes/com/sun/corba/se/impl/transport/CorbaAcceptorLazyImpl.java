@@ -30,8 +30,20 @@ public class CorbaAcceptorLazyImpl extends CorbaAcceptorBase {
         throw wrapper.notSupportedOnLazyAcceptor() ;
     }
 
-    public boolean initialize() {
-        return false ;
+    public synchronized boolean initialize() {
+	if (initialized) {
+	    return false;
+        }
+
+	if (orb.transportDebugFlag) {
+	    dprint(".initialize: " + this);
+	}
+
+	orb.getCorbaTransportManager().getInboundConnectionCache(this);
+
+        initialized = true ;
+
+        return true ;
     }
 
     public void close() {

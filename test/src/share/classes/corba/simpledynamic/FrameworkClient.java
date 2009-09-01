@@ -45,19 +45,13 @@ import java.rmi.MarshalException ;
 
 import java.util.Properties ;
 
-import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 
-import javax.rmi.PortableRemoteObject ;
-import javax.rmi.CORBA.Util ;
-import javax.rmi.CORBA.Tie ;
 
-import javax.naming.InitialContext ;
 
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
 import org.testng.annotations.BeforeGroups ;
-import org.testng.annotations.AfterGroups ;
   
 import corba.nortel.NortelSocketFactory ;
 
@@ -65,11 +59,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
-import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
 import com.sun.corba.se.spi.orbutil.newtimer.LogEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
@@ -78,8 +68,6 @@ import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction ;
 
 import corba.misc.Buck ;
-import corba.misc.BuckPasserAL ;
-import corba.misc.BuckPasserV ;
 
 import static corba.framework.PRO.* ;
 

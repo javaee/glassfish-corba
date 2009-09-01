@@ -389,6 +389,10 @@ public interface ORBData {
     @ManagedAttribute
     @Description( "The AMX parent ObjectName of the gmbal root of the orb" ) 
     public ObjectName gmbalRootParentName() ;
+
+    @ManagedAttribute
+    @Description( "If true, do not start any acceptors in the transport by default" )
+    public boolean noDefaultAcceptors() ;
 }
 
 // End of file.

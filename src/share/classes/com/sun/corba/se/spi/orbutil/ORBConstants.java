@@ -384,6 +384,9 @@ public class ORBConstants {
     public static final String WAIT_FOR_RESPONSE_TIMEOUT =
 	SUN_PREFIX + "transport.ORBWaitForResponseTimeout";
 
+    public static final String NO_DEFAULT_ACCEPTORS = 
+        SUN_PREFIX + "transport.ORBNoDefaultAcceptors" ;
+
     // POA related policies
     public static final String PERSISTENT_SERVER_PORT_PROPERTY	= SUN_PREFIX + "POA.ORBPersistentServerPort" ;
     public static final String BAD_SERVER_ID_HANDLER_CLASS_PROPERTY

@@ -326,7 +326,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    port = od.getORBServerPort();
 	} else if (od.getPersistentPortInitialized()) {
 	    port = od.getPersistentServerPort();
-	} else if (acceptors.length == 0) {
+	} else if ((acceptors.length == 0) && !od.noDefaultAcceptors()) {
 	    port = 0;
 	}
 	if (port != -1) {

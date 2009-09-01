@@ -40,9 +40,7 @@ import java.util.Properties ;
 import java.util.Hashtable ;
 
 import java.rmi.Remote ;
-import java.rmi.RemoteException ;
 
-import javax.rmi.PortableRemoteObject ;
 import javax.rmi.CORBA.Util ;
 import javax.rmi.CORBA.Tie ;
 
@@ -50,10 +48,7 @@ import javax.naming.InitialContext ;
 import javax.naming.NamingException ;
 
 import org.testng.TestNG ;
-import org.testng.Assert ;
-import org.testng.annotations.Test ;
 import org.testng.annotations.Configuration ;
-import org.testng.annotations.ExpectedExceptions ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -69,7 +64,7 @@ public abstract class Framework {
     private InitialContext clientIC ;
     private InitialContext serverIC ;
 
-    private static final String PORT_NUM = "3874" ;
+    protected static final String PORT_NUM = "3874" ;
 
     private String BASE = "com.sun.corba.se." ;
 
@@ -94,7 +89,7 @@ public abstract class Framework {
     // We need to set up the client and server ORBs, and start a transient
     // name server that runs on the server ORB, with the client ORB referring
     // to the server ORB's name service.
-    private ORB makeORB( boolean isServer, Properties extra ) {
+    protected ORB makeORB( boolean isServer, Properties extra ) {
 	Properties props = new Properties( extra ) ;
 	props.setProperty( "org.omg.CORBA.ORBClass", BASE + "impl.orb.ORBImpl" ) ;
 	props.setProperty( ORBConstants.INITIAL_HOST_PROPERTY, "localhost" ) ;
@@ -103,14 +98,16 @@ public abstract class Framework {
 
 	if (isServer) {
 	    props.setProperty( ORBConstants.ORB_ID_PROPERTY, "serverORB" ) ;
-	    props.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, PORT_NUM ) ;
-	    props.setProperty( ORBConstants.SERVER_HOST_PROPERTY, "localhost" ) ;
-	    props.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY, "300" ) ;
+            props.setProperty( ORBConstants.SERVER_HOST_PROPERTY, "localhost" ) ;
+            props.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY, "300" ) ;
+            setServerPort( props ) ;
 	} else {
 	    props.setProperty( ORBConstants.ORB_ID_PROPERTY, "clientORB" ) ;
 	}
 
 	ORB orb = (ORB)ORB.init( new String[0], props ) ;
+
+        updateORB( orb, isServer ) ;
 
 	if (isServer) {
 	    new TransientNameService( 
@@ -118,6 +115,17 @@ public abstract class Framework {
 	}
 
 	return orb ;
+    }
+
+    // This is the default setup for the server ORB's listening port.
+    // This can be overridden if necessary.
+    protected void setServerPort( Properties props ) {
+        props.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY, PORT_NUM ) ;
+    }
+
+    // Can be overridden if necessary to allow the ORB to be further
+    // configured before it is used.
+    protected void updateORB( ORB orb, boolean isServer ) {
     }
 
     private InitialContext makeIC( ORB orb ) throws NamingException {

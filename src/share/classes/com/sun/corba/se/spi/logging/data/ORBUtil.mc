@@ -169,6 +169,8 @@
              75 WARNING "Exception while handling event on {0}")
             (CANCELED_SELECTION_KEY 
              76 FINE "Ignoring cancelled SelectionKey {0}: key will be removed from Selector")
+            (PACKAGE_ADMIN_SERVICE_NOT_AVAILABLE
+             77 FINE "The OSGi PackageAdmin service is not available")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 

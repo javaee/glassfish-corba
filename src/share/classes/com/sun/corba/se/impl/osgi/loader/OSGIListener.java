@@ -169,6 +169,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                 return null ;
             }
 
+            if (pkgAdmin == null) {
+                return null ;
+            }
+
             Bundle bundle = pkgAdmin.getBundle( cls ) ;
             if (bundle == null) {
                 wrapper.classNotFoundInBundle( cls ) ;
@@ -211,15 +215,17 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                     String name = rest.substring( 0, index ) ;
                     String version = rest.substring( index+1 ) ;
                     // version is a version range
-                    Bundle[] defBundles = pkgAdmin.getBundles( name, version ) ;
-                    if (defBundles != null) {
-                        // I think this is the highest available version
-                        try {
-                            wrapper.foundClassInBundleVersion( className, name, version ) ;
-                            return defBundles[0].loadClass( className ) ;
-                        } catch (ClassNotFoundException cnfe) {
-                            wrapper.classNotFoundInBundleVersion( className, name, version ) ;
-                            // fall through to return null
+                    if (pkgAdmin != null) {
+                        Bundle[] defBundles = pkgAdmin.getBundles( name, version ) ;
+                        if (defBundles != null) {
+                            // I think this is the highest available version
+                            try {
+                                wrapper.foundClassInBundleVersion( className, name, version ) ;
+                                return defBundles[0].loadClass( className ) ;
+                            } catch (ClassNotFoundException cnfe) {
+                                wrapper.classNotFoundInBundleVersion( className, name, version ) ;
+                                // fall through to return null
+                            }
                         }
                     }
                 }
@@ -248,9 +254,11 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             }
         }
 
-        ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
-        for (ExportedPackage ep : epkgs) {
-            packageNameMap.put( ep.getName(), bundle ) ;
+        if (pkgAdmin != null) {
+            ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
+            for (ExportedPackage ep : epkgs) {
+                packageNameMap.put( ep.getName(), bundle ) ;
+            }
         }
     }
 
@@ -267,9 +275,11 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             }
         }
 
-        ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
-        for (ExportedPackage ep : epkgs) {
-            packageNameMap.remove( ep.getName() ) ;
+        if (pkgAdmin != null) {
+            ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
+            for (ExportedPackage ep : epkgs) {
+                packageNameMap.remove( ep.getName() ) ;
+            }
         }
     }
 
@@ -309,6 +319,9 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         final ServiceReference sref = context.getServiceReference( 
             "org.osgi.service.packageadmin.PackageAdmin" ) ;
         pkgAdmin = (PackageAdmin)context.getService( sref ) ;
+        if (pkgAdmin == null) {
+            wrapper.packageAdminServiceNotAvailable() ;
+        }
     }
 
     public void stop( BundleContext context ) {

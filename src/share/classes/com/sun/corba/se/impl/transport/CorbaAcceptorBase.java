@@ -85,7 +85,7 @@ public abstract class CorbaAcceptorBase
 {
     protected int port ;
     protected long enqueueTime;
-    protected boolean initialized;
+    protected boolean initialized = false ;
 
     // BEGIN legacy
     protected String type = "";
@@ -104,7 +104,6 @@ public abstract class CorbaAcceptorBase
 	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 
 	setWork(this);
-	initialized = false;
 
 	// BEGIN Legacy support.
 	this.hostname = orb.getORBData().getORBServerHost();

@@ -393,6 +393,9 @@ public interface ORBData {
     @ManagedAttribute
     @Description( "If true, do not start any acceptors in the transport by default" )
     public boolean noDefaultAcceptors() ;
+
+    // No reason to make this an attribute: if false, we won't see MBeans!
+    public boolean registerMBeans() ;
 }
 
 // End of file.

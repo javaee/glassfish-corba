@@ -132,6 +132,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private boolean useEnumDesc ;
     private ObjectName gmbalRootParentName ;
     private boolean noDefaultAcceptors ;
+    private boolean registerMBeans ;
 
     // This is not initialized from ParserTable.
     private CodeSetComponentInfo codesets ;
@@ -532,6 +533,10 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public boolean noDefaultAcceptors() {
         return noDefaultAcceptors ;
+    }
+
+    public boolean registerMBeans() {
+        return registerMBeans ;
     }
 }
 

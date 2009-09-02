@@ -525,6 +525,10 @@ public class ParserTable {
             ParserDataFactory.make( ORBConstants.NO_DEFAULT_ACCEPTORS,
                 OperationFactory.booleanAction(),
                 "noDefaultAcceptors", Boolean.FALSE,
+                Boolean.TRUE, "TRUE" ),
+            ParserDataFactory.make( ORBConstants.REGISTER_MBEANS,
+                OperationFactory.booleanAction(),
+                "registerMBeans", Boolean.FALSE,
                 Boolean.TRUE, "TRUE" )
 	} ;
 

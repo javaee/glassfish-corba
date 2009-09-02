@@ -571,7 +571,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	serviceContextsCache = new ServiceContextsCache(this);
 
         // Now the ORB is ready, so finish all of the MBean registration
-        mom.resumeJMXRegistration() ;
+        if (configData.registerMBeans()) {
+            mom.resumeJMXRegistration() ;
+        }
     }
 
     private synchronized POAFactory getPOAFactory() 

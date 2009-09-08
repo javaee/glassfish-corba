@@ -481,6 +481,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     public synchronized String getUniqueOrbId() {
 	if (rootName == null) {
 	    String orbid = getORBData().getORBId() ;
+            if (orbid.equals( "" ))
+                orbid = "orb" ;
+
 	    int num = 1 ;
 	    // Look up the current count of ORB instances with 
 	    // the same ORBId.  If this is the first instance,
@@ -493,14 +496,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 		idcount.put( orbid, num ) ;
 	    }
 
-	    rootName = "orb" ;
-
-	    // If this is not both the first ORB and ORBId "", give it 
-	    // a special name, otherwise the name is DEFAULT_MONITORING_ROOT.
-	    // This avoids changing the current value anywhere in the
-	    // normal operation of the app server.
-	    if (!orbid.equals("") || (num != 1))
-		rootName = rootName + "_" + orbid + "_" + num ;
+	    if (num != 1) {
+		rootName = rootName + "_" + num ;
+            }
 	}
 
 	return rootName ;

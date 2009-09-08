@@ -139,6 +139,7 @@ import java.lang.reflect.Field;
 import org.glassfish.gmbal.ManagedObjectManager ;
 import org.glassfish.gmbal.ManagedObjectManagerFactory ;
 import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.InheritedAttributes ;
 import org.glassfish.gmbal.InheritedAttribute ;
@@ -664,7 +665,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // Interfaces used only to define InheritedAttributes for other classes
     // If we register a class that has Servant in its inheritance, it will
     // pick up these InheritedAttributes.
-    @ManagedObject
+    @ManagedData
     @Description( "A servant, which implements a remote object in the server" )
     @InheritedAttributes( {
         @InheritedAttribute( methodName="_get_delegate", id="delegate", 
@@ -706,7 +707,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
             mom.setRegistrationDebug( ManagedObjectManager.RegistrationDebugLevel.NONE ) ;
         }
 
-        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedObject.class ) ) ;
+        mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( ManagedData.class ) ) ;
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( Description.class ) ) ;
         mom.addAnnotation( Servant.class, DummyServant.class.getAnnotation( InheritedAttributes.class ) ) ;
 

@@ -40,6 +40,8 @@ import java.util.Set ;
 import java.util.HashSet ;
 import java.util.Collections ;
 import java.util.Iterator ;
+import java.util.List ;
+import java.util.ArrayList ;
 import java.util.Map ;
 import java.util.WeakHashMap ;
 
@@ -70,6 +72,7 @@ import java.util.HashMap;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
+import org.glassfish.gmbal.ManagedData;
 import org.glassfish.gmbal.ManagedObjectManager;
 import org.glassfish.gmbal.AMXMetadata;
 
@@ -110,10 +113,35 @@ public class POAFactory implements ObjectAdapterFactory
 	orb = null ;
     }
 
+    @ManagedData
+    @Description( "A servant registered with a particular POA" )
+    public static class ServantPOAPair {
+        private Servant servant ;
+        private POAImpl poa ;
+
+        public ServantPOAPair( Servant servant, POAImpl poa ) {
+            this.servant = servant ;
+            this.poa = poa ;
+        }
+
+        @ManagedAttribute 
+        @Description( "Servant" ) 
+        Servant getServant() { return servant ; }
+
+        @ManagedAttribute
+        @Description( "POA for Servant" ) 
+        POAImpl getPOA() { return poa ; } 
+    }
+
     @ManagedAttribute
     @Description( "The servants managed by a particular POA" )
-    private synchronized Map<Servant,POA> getExportedServants() {
-        return new HashMap<Servant,POA>( exportedServantsToPOA ) ;
+    private synchronized List<ServantPOAPair> getExportedServants() {
+        List<ServantPOAPair> result = new ArrayList<ServantPOAPair>() ;
+        for (Map.Entry<Servant,POA> entry : exportedServantsToPOA.entrySet()) {
+            POAImpl pimpl = (POAImpl)entry.getValue() ;
+            result.add( new ServantPOAPair( entry.getKey(), pimpl ) ) ;
+        }
+        return result ;
     }
 
     @ManagedAttribute

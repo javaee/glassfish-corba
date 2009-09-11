@@ -878,6 +878,56 @@ public final class ORBUtility {
 	return result ;
     }
 
+    public static String dumpBinary( byte[] data ) {
+        ByteBuffer bb = ByteBuffer.wrap( data ) ;
+        StringBuffer sb = new StringBuffer() ;
+        dumpBinary( sb, bb ) ;
+        return sb.toString() ;
+    }
+
+    private static void dumpBinary( StringBuffer sbuf, ByteBuffer buffer ) {
+	int length = buffer.position() ;
+        char[] charBuf = new char[16];
+        for (int i = 0; i < length; i += 16) {
+            int j = 0;
+            
+            // For every 16 bytes, there is one line of output.  First, 
+            // the hex output of the 16 bytes with each byte separated
+            // by a space.
+            while (j < 16 && (i + j) < length) {
+                int k = buffer.get(i + j);
+                if (k < 0)
+                    k = 256 + k;
+                String hex = Integer.toHexString(k);
+                if (hex.length() == 1)
+                    hex = "0" + hex;
+                sbuf.append(hex + " ");
+                j++;
+            }
+            
+            // Add any extra spaces to align the
+            // text column in case we didn't end
+            // at 16
+            while (j < 16) {
+                sbuf.append("   ");
+                j++;
+            }
+            
+            // Now output the ASCII equivalents.  Non-ASCII
+            // characters are shown as periods.
+            int x = 0;
+            while (x < 16 && x + i < length) {
+                if (ORBUtility.isPrintable((char)buffer.get(i + x)))
+                    charBuf[x] = (char)buffer.get(i + x);
+                else
+                    charBuf[x] = '.';
+                x++;
+            }
+            sbuf.append(new String(charBuf, 0, x) + "\n" );
+        }
+    }
+
+
     /** Print the contents of the buffer out to the PrintStream in
     * hex and ASCII.
     * @param msg The message to use as the header for this display
@@ -895,47 +945,11 @@ public final class ORBUtility {
 	sbuf.append( msg + "\n" ) ; 
 	sbuf.append( "\n" ) ;
         sbuf.append( "Total length (ByteBuffer position) : " + length + "\n" );
-        sbuf.append( "Byte Buffer capacity               : " + buffer.capacity() + "\n\n" );
+        sbuf.append( "Byte Buffer capacity               : " + buffer.capacity() + 
+            "\n\n" );
 
         try {
-            char[] charBuf = new char[16];
-            for (int i = 0; i < length; i += 16) {
-                int j = 0;
-		
-                // For every 16 bytes, there is one line of output.  First, 
-		// the hex output of the 16 bytes with each byte separated
-                // by a space.
-                while (j < 16 && (i + j) < length) {
-                    int k = buffer.get(i + j);
-                    if (k < 0)
-                        k = 256 + k;
-                    String hex = Integer.toHexString(k);
-                    if (hex.length() == 1)
-                        hex = "0" + hex;
-                    sbuf.append(hex + " ");
-                    j++;
-                }
-                
-                // Add any extra spaces to align the
-                // text column in case we didn't end
-                // at 16
-                while (j < 16) {
-                    sbuf.append("   ");
-                    j++;
-                }
-                
-                // Now output the ASCII equivalents.  Non-ASCII
-                // characters are shown as periods.
-                int x = 0;
-                while (x < 16 && x + i < length) {
-                    if (ORBUtility.isPrintable((char)buffer.get(i + x)))
-                        charBuf[x] = (char)buffer.get(i + x);
-                    else
-                        charBuf[x] = '.';
-                    x++;
-                }
-                sbuf.append(new String(charBuf, 0, x) + "\n" );
-            }
+            dumpBinary( sbuf, buffer ) ;
         } catch (Throwable t) {
             t.printStackTrace();
         }

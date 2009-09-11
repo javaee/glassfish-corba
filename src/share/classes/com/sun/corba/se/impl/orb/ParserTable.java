@@ -528,8 +528,8 @@ public class ParserTable {
                 Boolean.TRUE, "TRUE" ),
             ParserDataFactory.make( ORBConstants.REGISTER_MBEANS,
                 OperationFactory.booleanAction(),
-                "registerMBeans", Boolean.FALSE,
-                Boolean.TRUE, "TRUE" )
+                "registerMBeans", Boolean.TRUE,
+                Boolean.FALSE, "FALSE" )
 	} ;
 
 	parserData = pd ;

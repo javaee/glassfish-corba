@@ -497,7 +497,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    }
 
 	    if (num != 1) {
-		rootName = rootName + "_" + num ;
+		rootName = orbid + "_" + num ;
+            } else {
+                rootName = orbid ;
             }
 	}
 

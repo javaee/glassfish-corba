@@ -205,6 +205,8 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                             bundle.getSymbolicName() ) ;
                         return null ;
                     }
+                } else {
+                    return null ;
                 }
             }
 

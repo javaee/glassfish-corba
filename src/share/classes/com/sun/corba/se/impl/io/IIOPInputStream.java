@@ -436,7 +436,7 @@ public class IIOPInputStream
             simpleReadDepth++;	// Entering
             Object obj = null;
 
-        OperationTracer.startReadValue( clz.getName() ) ;
+            OperationTracer.startReadValue( clz.getName() ) ;
 
             /*
              * Check for reset, handle it before reading an object.
@@ -463,6 +463,7 @@ public class IIOPInputStream
                 currentClassDesc = prevClassDesc;
                 currentClass = prevClass;
                 streamFormatVersion = oldStreamFormatVersion;
+                OperationTracer.endReadValue() ;
             }
 
             /* Check for thrown exceptions and re-throw them, clearing them if
@@ -1107,9 +1108,11 @@ public class IIOPInputStream
                     dputil.info( "reading Enum" ) ;
                 }
 
-                // Only for backwards compatibility with JDK: int ordinal = orbStream.read_long() ;
+                // Only for backwards compatibility with JDK: 
+                // int ordinal = orbStream.read_long() ;
                 String value = (String)orbStream.read_value( String.class ) ;
-                // Need to skip any other data marshaled from the enum, if the enum type has non-static non-transient state.
+                // Need to skip any other data marshaled from the enum, 
+                // if the enum type has non-static non-transient state.
                 return Return.value(Enum.valueOf( clz, value ) );
             } else if (currentClassDesc.isExternalizable()) {
                 if (valueHandlerDebug()) {

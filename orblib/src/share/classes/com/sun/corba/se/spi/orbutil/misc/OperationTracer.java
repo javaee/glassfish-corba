@@ -175,10 +175,14 @@ public class OperationTracer {
     public static void readingField( final String fieldName ) {
         if (enabled) {
             final List<Element> elements = state.get() ;
-            final Element elem = elements.get( elements.size() - 1 ) ;
-            if (elem instanceof ValueElement) {
-                ValueElement ve = (ValueElement)elem ;
-                ve.setFieldName( fieldName ) ;
+            final int lastIndex = elements.size() - 1 ;
+
+            if (lastIndex >= 0) {
+                final Element elem = elements.get( lastIndex ) ;
+                if (elem instanceof ValueElement) {
+                    ValueElement ve = (ValueElement)elem ;
+                    ve.setFieldName( fieldName ) ;
+                }
             }
         }
     }
@@ -200,10 +204,15 @@ public class OperationTracer {
     public static void readingIndex( final int index ) {
         if (enabled) {
             final List<Element> elements = state.get() ;
-            final Element elem = elements.get( elements.size() - 1 ) ;
-            if (elem instanceof ArrayElement) {
-                ArrayElement ae = (ArrayElement)elem ;
-                ae.setIndex( index ) ;
+            final int lastIndex = elements.size() - 1 ;
+
+            if (lastIndex >= 0) {
+                final Element elem = elements.get( lastIndex ) ;
+
+                if (elem instanceof ArrayElement) {
+                    ArrayElement ae = (ArrayElement)elem ;
+                    ae.setIndex( index ) ;
+                }
             }
         }
     }
@@ -216,6 +225,9 @@ public class OperationTracer {
 
     private static void end() {
         final List<Element> elements = state.get() ;
-        elements.remove( elements.size() - 1 ) ;
+        final int lastIndex = elements.size() - 1 ;
+        if (lastIndex >= 0) {
+            elements.remove( lastIndex ) ;
+        }
     }
 }

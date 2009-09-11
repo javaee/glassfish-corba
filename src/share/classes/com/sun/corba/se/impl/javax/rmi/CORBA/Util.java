@@ -757,7 +757,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	throws RemoteException 
     {
         try {
-            if (orb.operationTraceDebugFlag) {
+            if (((ORB)orb).operationTraceDebugFlag) {
                 OperationTracer.enable() ;
             }
 

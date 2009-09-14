@@ -320,6 +320,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	POAImpl result = new POAImpl( ORBConstants.ROOT_POA_NAME, 
 	    null, orb, STATE_START ) ;
+        registerMBean( getORB(), result ) ;
 	result.initialize( poaManager, Policies.rootPOAPolicies ) ;
 
 	return result ;
@@ -983,6 +984,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		    // by transitioning to STATE_RUN after unknown_adapter 
 		    // returns.
 		    found = new POAImpl( name, this, getORB(), STATE_INIT ) ;
+                    registerMBean( getORB(), found ) ;
 
 		    if (debug) {
 			ORBUtility.dprint( this, 

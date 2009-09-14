@@ -115,9 +115,11 @@ public class Server
 	    System.out.println("Server is ready.");
 	    System.out.println("--------------------------------------------");
 
- 	    rootPOA.the_POAManager().activate();
 	    createWithServantAndBind(Common.ReferenceName, servant, 
 				     testPOA, orb);
+            // This should come AFTER we have set up the servant, otherwise a
+            // request could be processed before the server is ready.
+ 	    rootPOA.the_POAManager().activate();
 
 	    // testLocalCalls( orb ) ;
 

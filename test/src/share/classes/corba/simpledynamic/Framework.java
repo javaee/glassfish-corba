@@ -64,7 +64,7 @@ public abstract class Framework {
     private InitialContext clientIC ;
     private InitialContext serverIC ;
 
-    protected static final String PORT_NUM = "3874" ;
+    protected static final String PORT_NUM = "3999" ;
 
     private String BASE = "com.sun.corba.se." ;
 

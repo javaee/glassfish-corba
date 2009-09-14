@@ -105,7 +105,8 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
     public void returnServant() 
     {
 	OAInvocationInfo info = orb.peekInvocationInfo();
-	if (locator == null)
+        // 6878245: added info == null check.
+	if (locator == null || info == null)
 	    return;
 
 	try {

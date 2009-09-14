@@ -238,6 +238,10 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
     public void returnServant()
     {
 	OAInvocationInfo info = orb.peekInvocationInfo();
+        // 6878245: added null check.
+        if (info == null) {
+            return ;
+        }
 	byte[] id = info.id() ;
 	ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
 	AOMEntry entry = activeObjectMap.get( key ) ;

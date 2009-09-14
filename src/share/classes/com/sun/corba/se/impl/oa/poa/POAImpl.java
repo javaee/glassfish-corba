@@ -1795,6 +1795,16 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
     public void getInvocationServant( OAInvocationInfo info ) 
     {
+        // 6878245
+        if (info == null) {
+            if (debug) {
+                ORBUtility.dprint( this, 
+                    "getInvocationServant: on POA " + this + ": info is null" ) ;
+            }
+
+            return ;
+        }
+
 	try {
 	    lock() ;
 

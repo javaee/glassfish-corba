@@ -227,7 +227,8 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    }
 
 	    nWaiters++ ;
-	    wait(); 
+            // 6878245: I can see some sense in the timeout, but why this value?
+	    wait(nWaiters*1000L); 
 	} catch ( java.lang.InterruptedException ex ) {
 	    // NOP
 	} finally {
@@ -666,11 +667,13 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    } 
 
 	    activeManagers.get().remove( this ) ;
+
 	    if (AM_DEBUG) {
 		ORBUtility.dprint( this, "6586417: Thread is removing " 
 		    + this + " from activeManagers" ) ;
 	    }
-
+	} finally {
+            // 6878245: moved finally above the decrement.  I don't see the need for this.
 	    nInvocations--; 
 
 	    if ( nInvocations == 0 ) {
@@ -678,7 +681,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 		// wait_for_completion loop in hold/discard/deactivate().
 		notifyWaiters();
 	    }
-	} finally {
+
 	    if (debug) {
 		ORBUtility.dprint( this,
 		    "Exiting exit for POAManagerImpl " + this ) ;

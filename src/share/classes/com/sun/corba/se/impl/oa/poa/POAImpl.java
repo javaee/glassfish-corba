@@ -320,7 +320,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	POAImpl result = new POAImpl( ORBConstants.ROOT_POA_NAME, 
 	    null, orb, STATE_START ) ;
-        registerMBean( getORB(), result ) ;
+        registerMBean( orb, result ) ;
 	result.initialize( poaManager, Policies.rootPOAPolicies ) ;
 
 	return result ;

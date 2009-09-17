@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,97 +40,124 @@ import java.io.Writer ;
 import java.io.OutputStream ;
 import java.io.BufferedWriter ;
 import java.io.OutputStreamWriter ;
-import jsint.Pair ;
 import java.util.StringTokenizer ;
+import jsint.Pair ;
 
 public class IndentingPrintWriter extends PrintWriter {
     private int level = 0 ;
     private int indentWidth = 4 ;
     private String indentString = "" ;
 
-    public void printMsg( String msg, Pair data )
+    public void printMsg( String msg, Object... data )
     {
-	// System.out.println( "printMsg called with msg=" + msg + " data=" + data ) ;
-	StringTokenizer st = new StringTokenizer( msg, "@", true ) ;
-	StringBuffer result = new StringBuffer() ;
-	Object head = data.first ;
-	Pair tail = (Pair)data.rest ;
-	String token = null ;
+        // System.out.println( "printMsg called with msg=" + msg + " data=" + data ) ;
+        StringTokenizer st = new StringTokenizer( msg, "@", true ) ;
+        StringBuffer result = new StringBuffer() ;
+        String token = null ;
+        int pos = 0;
 
-	while (st.hasMoreTokens()) {
-	    token = st.nextToken() ;
-	    if (token.equals("@")) {
-		if (head != null) {
-		    result.append( head ) ;
-		    head = tail.first ;
-		    tail = (Pair)tail.rest ;
-		} else {
-		    throw new Error( "List too short for message" ) ;
-		}
-	    } else {
-		result.append( token ) ;
-	    }
-	}
+        while (st.hasMoreTokens()) {
+            token = st.nextToken() ;
+            if (token.equals("@")) {
+                if (pos < data.length) {
+                    result.append( data[pos] );
+                    ++pos;
+                } else {
+                    throw new Error( "List too short for message" ) ;
+                }
+            } else {
+                result.append( token ) ;
+            }
+        }
 
-	// System.out.println( "Printing result " + result + " to file" ) ;
-	print( result ) ;
-	println() ;
+        // System.out.println( "Printing result " + result + " to file" ) ;
+        print( result ) ;
+        println() ;
+    }
+
+    public void printMsg( String msg, Pair pair )
+    {
+        // System.out.println( "printMsg called with msg=" + msg + " pair=" + pair ) ;
+        StringTokenizer st = new StringTokenizer( msg, "@", true ) ;
+        StringBuffer result = new StringBuffer() ;
+        Object head = pair.first ;
+        Pair tail = (Pair)pair.rest ;
+        String token = null ;
+
+        while (st.hasMoreTokens()) {
+            token = st.nextToken() ;
+            if (token.equals("@")) {
+                if (head != null) {
+                    result.append( head ) ;
+                    head = tail.first ;
+                    tail = (Pair)tail.rest ;
+                } else {
+                    throw new Error( "List too short for message" ) ;
+                }
+            } else {
+                result.append( token ) ;
+            }
+        }
+
+        // System.out.println( "Printing result " + result + " to file" ) ;
+        print( result ) ;
+        println() ;
     }
 
     public IndentingPrintWriter (Writer out) {
-	super( out, true ) ;
-	// System.out.println( "Constructing a new IndentingPrintWriter with Writer " + out ) ;
+        super( out, true ) ;
+        // System.out.println( "Constructing a new IndentingPrintWriter with Writer " + out ) ;
     }
 
     public IndentingPrintWriter(Writer out, boolean autoFlush) {
-	super( out, autoFlush ) ;
-	// System.out.println( "Constructing a new IndentingPrintWriter with Writer " + out ) ;
+        super( out, autoFlush ) ;
+        // System.out.println( "Constructing a new IndentingPrintWriter with Writer " + out ) ;
     }
 
     public IndentingPrintWriter(OutputStream out) {
-	super(out, true);
-	// System.out.println( "Constructing a new IndentingPrintWriter with OutputStream " + out ) ;
+        super(out, true);
+        // System.out.println( "Constructing a new IndentingPrintWriter with OutputStream " + out ) ;
     }
 
     public IndentingPrintWriter(OutputStream out, boolean autoFlush) {
-	super(new BufferedWriter(new OutputStreamWriter(out)), autoFlush);
-	// System.out.println( "Constructing a new IndentingPrintWriter with OutputStream " + out ) ;
+        super(new BufferedWriter(new OutputStreamWriter(out)), autoFlush);
+        // System.out.println( "Constructing a new IndentingPrintWriter with OutputStream " + out ) ;
     }
 
     public void setIndentWidth( int indentWidth )
     {
-	this.indentWidth = indentWidth ;
-	updateIndentString() ;
+        this.indentWidth = indentWidth ;
+        updateIndentString() ;
     }
 
     public void indent()
     {
-	level++ ;
-	updateIndentString() ;
+        level++ ;
+        updateIndentString() ;
     }
 
     public void undent()
     {
-	if (level > 0) {
-	    level-- ;
-	    updateIndentString() ;
-	}
+        if (level > 0) {
+            level-- ;
+            updateIndentString() ;
+        }
     }
 
     private void updateIndentString()
     {
-	int size = level * indentWidth ;
-	StringBuffer sbuf = new StringBuffer( size ) ;
-	for (int ctr = 0; ctr<size; ctr++ )
-	    sbuf.append( " " ) ;
-	indentString = sbuf.toString() ;
+        int size = level * indentWidth ;
+        StringBuffer sbuf = new StringBuffer( size ) ;
+        for (int ctr = 0; ctr<size; ctr++ )
+            sbuf.append( " " ) ;
+        indentString = sbuf.toString() ;
     }
 
     // overridden from PrintWriter
-    public void println() 
+    public void println()
     {
-	super.println() ;
+        super.println() ;
 
-	print( indentString ) ;
+        print( indentString ) ;
     }
 }

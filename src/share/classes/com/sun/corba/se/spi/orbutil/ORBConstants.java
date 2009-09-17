@@ -390,19 +390,29 @@ public class ORBConstants {
     public static final String REGISTER_MBEANS = 
         SUN_PREFIX + "ORBRegisterMBeans" ;
 
+    public static final int DEFAULT_FRAGMENT_READ_TIMEOUT = 18000 ;
+
+    public static final String FRAGMENT_READ_TIMEOUT = 
+        SUN_PREFIX + "ORBFragmentReadTimeout" ;
+
     // POA related policies
-    public static final String PERSISTENT_SERVER_PORT_PROPERTY	= SUN_PREFIX + "POA.ORBPersistentServerPort" ;
-    public static final String BAD_SERVER_ID_HANDLER_CLASS_PROPERTY
-	                                                        = SUN_PREFIX + "POA.ORBBadServerIdHandlerClass" ;
-    public static final String ACTIVATED_PROPERTY		= SUN_PREFIX + "POA.ORBActivated" ;
-    public static final String SERVER_NAME_PROPERTY		= SUN_PREFIX + "POA.ORBServerName" ;
+    public static final String PERSISTENT_SERVER_PORT_PROPERTY	= 
+        SUN_PREFIX + "POA.ORBPersistentServerPort" ;
+    public static final String BAD_SERVER_ID_HANDLER_CLASS_PROPERTY = 
+        SUN_PREFIX + "POA.ORBBadServerIdHandlerClass" ;
+    public static final String ACTIVATED_PROPERTY		= 
+        SUN_PREFIX + "POA.ORBActivated" ;
+    public static final String SERVER_NAME_PROPERTY		= 
+        SUN_PREFIX + "POA.ORBServerName" ;
 
     // Server Properties; e.g. when properties passed to ORB activated
     // servers
 
-    public static final String SERVER_DEF_VERIFY_PROPERTY	= SUN_PREFIX + "activation.ORBServerVerify" ;
+    public static final String SERVER_DEF_VERIFY_PROPERTY	= 
+        SUN_PREFIX + "activation.ORBServerVerify" ;
 
-    public static final String JTS_CLASS_PROPERTY		= SUN_PREFIX + "CosTransactions.ORBJTSClass" ;
+    public static final String JTS_CLASS_PROPERTY		= 
+        SUN_PREFIX + "CosTransactions.ORBJTSClass" ;
 
     // Property for enabling ORB's use of Java serialization.
     public static final String ENABLE_JAVA_SERIALIZATION_PROPERTY = 

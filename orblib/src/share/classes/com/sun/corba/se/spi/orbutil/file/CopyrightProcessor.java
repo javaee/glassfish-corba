@@ -129,7 +129,7 @@ public class CopyrightProcessor {
 	"bnd", "sxc", "sxi", "sxw", "odp", "gif", "png", "jar", "zip", "jpg", "pom",
 	"pdf", "doc", "mif", "fm", "book", "zargo", "zuml", "cvsignore", 
 	"hgignore", "list", "old", "orig", "rej", "swp", "swo", "class", "o",
-	"javaref", "idlref", "css" } ;
+	"javaref", "idlref", "css", "bin", "settings" } ;
 
     // Special file names to ignore
     private static final String[] IGNORE_FILE_NAMES = {

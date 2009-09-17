@@ -97,6 +97,22 @@ public abstract class CorbaAcceptorBase
     protected ORBUtilSystemException wrapper;
     protected CorbaInboundConnectionCache connectionCache;
 
+    public int getPort() {
+        return port ;
+    }
+
+    public String getName() {
+        // Kluge alert:
+        // Work and Legacy both define getName.
+        // Try to make this behave best for most cases.
+        String result = name.equals(LegacyServerSocketEndPointInfo.NO_NAME) ? this.toString() : name;
+        return result;
+    }
+
+    public String getType() {
+        return type ;
+    }
+
     public CorbaAcceptorBase(ORB orb, int port,
 				       String name, String type)
     {
@@ -153,22 +169,6 @@ public abstract class CorbaAcceptorBase
             IIOPProfileTemplate iiopProfile = makeIIOPProfileTemplate(policies, codebase);
             iorTemplate.add(iiopProfile);
         }
-    }
-
-    public String getName() {
-        // Kluge alert:
-        // Work and Legacy both define getName.
-        // Try to make this behave best for most cases.
-        String result = name.equals(LegacyServerSocketEndPointInfo.NO_NAME) ? this.toString() : name;
-        return result;
-    }
-
-    public String getObjectAdapterId() {
-        return null;
-    }
-
-    public String getObjectAdapterManagerId() {
-        return null;
     }
 
     protected final IIOPProfileTemplate makeIIOPProfileTemplate(Policies policies, String codebase) {
@@ -248,14 +248,6 @@ public abstract class CorbaAcceptorBase
 
     public int getLocatorPort() {
         return locatorPort;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public void setLocatorPort(int port) {

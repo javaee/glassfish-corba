@@ -133,6 +133,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private ObjectName gmbalRootParentName ;
     private boolean noDefaultAcceptors ;
     private boolean registerMBeans ;
+    private int fragmentReadTimeout ;
 
     // This is not initialized from ParserTable.
     private CodeSetComponentInfo codesets ;
@@ -537,6 +538,10 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public boolean registerMBeans() {
         return registerMBeans ;
+    }
+
+    public int fragmentReadTimeout() {
+        return fragmentReadTimeout ;
     }
 }
 

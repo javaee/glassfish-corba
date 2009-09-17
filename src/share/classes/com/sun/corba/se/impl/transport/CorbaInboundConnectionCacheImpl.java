@@ -46,30 +46,18 @@ import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
-import org.glassfish.external.probe.provider.annotations.Probe ;
-import org.glassfish.external.probe.provider.annotations.ProbeProvider ;
-import org.glassfish.external.probe.provider.annotations.ProbeParam ;
-
 /**
  * @author Harold Carr
  */
-@ProbeProvider( providerName="glassfish", moduleName="orb" )
 public class CorbaInboundConnectionCacheImpl
     extends
 	CorbaConnectionCacheBase
     implements
 	CorbaInboundConnectionCache
 {
-    @Probe( providerName="inboundConnectionOpened" )
-    public void connectionOpenedEvent( 
-        @ProbeParam( "acceptor" ) String acceptor, 
-        @ProbeParam( "connection" ) String connection ) {}
-
-    @Probe( providerName="inboundConnectionClosed" )
-    public void connectionClosedEvent( 
-        @ProbeParam( "connection" ) String connection ) {}
-
     protected Collection<CorbaConnection> connectionCache;
+    private CorbaInboundConnectionCacheProbeProvider pp =
+        new CorbaInboundConnectionCacheProbeProvider() ;
 
     public CorbaInboundConnectionCacheImpl(ORB orb, CorbaAcceptor acceptor)
     {
@@ -92,7 +80,7 @@ public class CorbaInboundConnectionCacheImpl
 	    connectionCache.add(connection);
 	    connection.setConnectionCache(this);
 	    dprintStatistics();
-            connectionOpenedEvent( acceptor.toString(), connection.toString() ) ;
+            pp.connectionOpenedEvent( acceptor.toString(), connection.toString() ) ;
 	}
     }
 
@@ -104,7 +92,7 @@ public class CorbaInboundConnectionCacheImpl
 	synchronized (backingStore()) {
 	    connectionCache.remove(connection);
 	    dprintStatistics();
-            connectionClosedEvent( connection.toString() ) ;
+            pp.connectionClosedEvent( connection.toString() ) ;
 	}
     }
 

@@ -47,13 +47,29 @@ import com.sun.corba.se.spi.orb.ORB;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author Harold Carr
  */
+@ManagedObject 
+@Description( "An Acceptor represents an endpoint on which the ORB handles incoming connections" ) 
 public abstract interface CorbaAcceptor
 {
-    String getObjectAdapterId();
-    String getObjectAdapterManagerId();
+    @ManagedAttribute
+    @Description( "The TCP port of this Acceptor" )  
+    int getPort() ;
+
+    @ManagedAttribute
+    @Description( "The name of the IP interface for this Acceptor" ) 
+    String getName() ;
+
+    @ManagedAttribute
+    @Description( "The type of requests that this Acceptor handles" ) 
+    String getType() ;
+
     void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
 				 String codebase);
     String getMonitoringName();

@@ -439,7 +439,7 @@
     <target name="compile-logutils" depends="init">
 	<echo message="Compiling logutils"/>
 	<javac srcdir="${src.dir}" destdir="${classes.dir}" 
-		classpathref="test-classpath.master" 
+		classpathref="classpath.master" 
 		deprecation="${deprecation}"
 		debug="${javac.debug}" 
 		optimize="${javac.optimize}"
@@ -449,7 +449,6 @@
     </target>
 
     <!-- ========================= COMPILE-IDL-COMPILER ================== -->
-    <!-- Compile the IDL compiler -->
     <target name="compile-idl-compiler" depends="init">
 	<echo message="Copying .prp files"/>
 	<copy todir="${classes.dir}" overwrite="false">
@@ -471,7 +470,6 @@
     </target>
 
     <!-- ========================= COMPILE-TESTS ========================= -->
-    <!-- This target compiles all the ORB unit tests -->
     <target name="build-tests" depends="init, prepare-dirs, run-all-test-idl, run-all-test-rmic, compile-tests"/>
 
     <target name="compile-tests" depends="init, prepare-dirs, compile-tests-main, compile-tests-values"/>

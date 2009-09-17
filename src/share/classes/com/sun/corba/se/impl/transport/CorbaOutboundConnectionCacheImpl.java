@@ -47,15 +47,9 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 
-import org.glassfish.external.probe.provider.annotations.Probe ;
-import org.glassfish.external.probe.provider.annotations.ProbeProvider ;
-import org.glassfish.external.probe.provider.annotations.ProbeParam ;
-
-
 /**
  * @author Harold Carr
  */
-@ProbeProvider( providerName="glassfish", moduleName="orb" )
 public class CorbaOutboundConnectionCacheImpl
     extends
 	CorbaConnectionCacheBase
@@ -63,17 +57,8 @@ public class CorbaOutboundConnectionCacheImpl
 	CorbaOutboundConnectionCache
 {
     protected Map<CorbaContactInfo, CorbaConnection> connectionCache;
-
-    @Probe( providerName="outboundConnectionOpened" )
-    public void connectionOpenedEvent( 
-        @ProbeParam( "contactInfo" ) String contactInfo, 
-        @ProbeParam( "connection" ) String connection ) {}
-
-    @Probe( providerName="outboundConnectionClosed" )
-    public void connectionClosedEvent(  
-        @ProbeParam( "contactInfo" ) String contactInfo, 
-        @ProbeParam( "connection" ) String connection ) {}
-
+    private CorbaOutboundConnectionCacheProbeProvider pp =
+        new CorbaOutboundConnectionCacheProbeProvider() ;
 
     public CorbaOutboundConnectionCacheImpl(ORB orb, CorbaContactInfo contactInfo)
     {
@@ -102,7 +87,7 @@ public class CorbaOutboundConnectionCacheImpl
 	synchronized (backingStore()) {
 	    connectionCache.put(contactInfo, connection);
 	    connection.setConnectionCache(this);
-            connectionOpenedEvent( contactInfo.toString(), connection.toString() ) ;
+            pp.connectionOpenedEvent( contactInfo.toString(), connection.toString() ) ;
 	    dprintStatistics();
 	}
     }
@@ -115,7 +100,7 @@ public class CorbaOutboundConnectionCacheImpl
 	synchronized (backingStore()) {
 	    if (contactInfo != null) {
 		CorbaConnection connection = connectionCache.remove(contactInfo);
-                connectionOpenedEvent( contactInfo.toString(), connection.toString() ) ;
+                pp.connectionClosedEvent( contactInfo.toString(), connection.toString() ) ;
 	    }
 	    dprintStatistics();
 	}

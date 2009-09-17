@@ -396,6 +396,10 @@ public interface ORBData {
 
     // No reason to make this an attribute: if false, we won't see MBeans!
     public boolean registerMBeans() ;
+
+    @ManagedAttribute
+    @Description( "The time that a CDRInputStream will wait for more data before throwing an exception" ) 
+    public int fragmentReadTimeout() ;
 }
 
 // End of file.

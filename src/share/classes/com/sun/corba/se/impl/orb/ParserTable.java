@@ -529,7 +529,13 @@ public class ParserTable {
             ParserDataFactory.make( ORBConstants.REGISTER_MBEANS,
                 OperationFactory.booleanAction(),
                 "registerMBeans", Boolean.TRUE,
-                Boolean.FALSE, "FALSE" )
+                Boolean.FALSE, "FALSE" ),
+            ParserDataFactory.make(
+                ORBConstants.FRAGMENT_READ_TIMEOUT,
+                OperationFactory.integerAction(), 
+		"fragmentReadTimeout",
+                Integer.valueOf(ORBConstants.DEFAULT_FRAGMENT_READ_TIMEOUT ),
+		Integer.valueOf(23000), "23000")
 	} ;
 
 	parserData = pd ;
@@ -1042,6 +1048,18 @@ public class ParserTable {
         public ServerSocket getServerSocket() {
             return null ;
         }
+
+        public int getPort() {
+            return 0 ;
+        }
+
+        public String getName() {
+            return "" ;
+        }
+
+        public String getType() {
+            return "" ;
+        }
     }
 
     public static final class TestAcceptor2
@@ -1078,6 +1096,18 @@ public class ParserTable {
         public String getMonitoringName() { return null ; }
         public ServerSocket getServerSocket() {
             return null ;
+        }
+
+        public int getPort() {
+            return 0 ;
+        }
+
+        public String getName() {
+            return "" ;
+        }
+
+        public String getType() {
+            return "" ;
         }
     }
 

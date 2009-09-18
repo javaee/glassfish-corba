@@ -104,7 +104,7 @@
         <property name="rt.jar"			        value="${java.home}/lib/rt.jar"/>
         <property name="emma-jar"			value="${root.dir}/lib/emma.jar"/>
         <property name="jdo-jar"			value="${root.dir}/lib/jdo2-api-2.3-SNAPSHOT.jar"/>
-        <property name="jscheme-jar"		        value="${root.dir}/lib/jscheme.jar"/>
+        <property name="jscheme-jar"		        value="${root.dir}/jscheme/lib/jscheme.jar"/>
         <property name="javatest-jar"		        value="${root.dir}/lib/javatest.jar"/>
         <property name="ejb-jar"			value="${root.dir}/lib/ejb-2_1-api.jar"/>
         <property name="ejb3-jar"			value="${root.dir}/lib/javax.ejb.jar"/>
@@ -245,7 +245,7 @@
     </target>
 
     <!-- ========================= COMPILE ========================= -->
-    <target name="compile" depends="init, prepare-dirs, orb-library, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources, create-jars">
+    <target name="compile" depends="init, prepare-dirs, build-jscheme, orb-library, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources, create-jars">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"
@@ -1024,7 +1024,7 @@
     </target>
     
     <!-- ========================= CLEAN ========================= -->
-    <target name="clean" depends="init,clean-emma,clean-tests,clean-experimental">
+    <target name="clean" depends="init,clean-jscheme,clean-emma,clean-tests,clean-experimental">
         <delete file="${bnd.properties.file}"/>
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>

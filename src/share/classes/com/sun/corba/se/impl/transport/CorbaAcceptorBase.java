@@ -115,6 +115,10 @@ public abstract class CorbaAcceptorBase
         return type ;
     }
 
+    public boolean isLazy() {
+        return false ;
+    }
+
     public CorbaAcceptorBase(ORB orb, int port,
 				       String name, String type)
     {

@@ -56,6 +56,37 @@
     </condition>
 </target>
 
+<condition property="jscheme-not-available">
+    <not>
+        <available file="jscheme/lib/jscheme.jar"/>
+    </not>
+</condition>
+
+<macrodef name="run-jscheme">
+    <attribute name="command"/>
+    <sequential>
+        <java classname="jscheme.REPL" classpath="jscheme/src" fork="true" dir="${root.dir}/jscheme">
+            <arg value="bld/make.scm"/>
+            <arg value="-main"/>
+            <arg value="commandMain"/>
+            <arg value="@{command}"/>
+        </java>
+    </sequential>
+</macrodef>
+
+<target name="build-jscheme" depends="init" if="jscheme-not-available">
+    <mkdir dir="${root.dir}/jscheme/lib"/>
+    <javac sourcepath="" destdir="jscheme/src" srcdir="jscheme/src" classpath="jscheme/src">
+        <include name="jscheme/REPL.java"/>
+    </javac>
+    <run-jscheme command="-all"/>
+</target>
+
+<target name="clean-jscheme" depends="init">
+    <run-jscheme command="-clean"/>
+    <delete dir="jscheme/lib"/>
+</target>
+
 <!-- This target is called repeatedly for each jscheme invocation -->
 <target name="call-jscheme" depends="check-minorcode-file-changed" if="minorcode-file-changed">
     <echo message="Running jscheme on ${only-file-name}.mc"/>

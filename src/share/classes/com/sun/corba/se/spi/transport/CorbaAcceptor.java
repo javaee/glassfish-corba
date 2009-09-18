@@ -70,6 +70,10 @@ public abstract interface CorbaAcceptor
     @Description( "The type of requests that this Acceptor handles" ) 
     String getType() ;
 
+    @ManagedAttribute
+    @Description( "True if this acceptor is used to lazily start the ORB" ) 
+    boolean isLazy() ;
+
     void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
 				 String codebase);
     String getMonitoringName();

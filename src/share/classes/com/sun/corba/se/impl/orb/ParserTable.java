@@ -1064,6 +1064,10 @@ public class ParserTable {
         public String getType() {
             return "" ;
         }
+
+        public boolean isLazy() {
+            return false ;
+        }
     }
 
     public static final class TestAcceptor2
@@ -1116,6 +1120,10 @@ public class ParserTable {
 
         public String getType() {
             return "" ;
+        }
+
+        public boolean isLazy() {
+            return false ;
         }
     }
 

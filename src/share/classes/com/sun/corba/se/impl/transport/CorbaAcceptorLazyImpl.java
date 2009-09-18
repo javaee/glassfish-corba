@@ -53,6 +53,11 @@ public class CorbaAcceptorLazyImpl extends CorbaAcceptorBase {
         super( orb, port, name, type ) ;
     }
 
+    @Override
+    public boolean isLazy() {
+        return true ;
+    }
+
     public Socket getAcceptedSocket() {
         throw wrapper.notSupportedOnLazyAcceptor() ;
     }

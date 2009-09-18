@@ -101,14 +101,16 @@ public abstract class CorbaAcceptorBase
         return port ;
     }
 
-    public String getName() {
-        // Kluge alert:
-        // Work and Legacy both define getName.
-        // Try to make this behave best for most cases.
+    public String getInterfaceName() {
         String result = name.equals(LegacyServerSocketEndPointInfo.NO_NAME) ? this.toString() : name;
         return result;
     }
 
+    // Need this for the work interface.
+    public String getName() {
+        return getInterfaceName() ;
+    }
+    
     public String getType() {
         return type ;
     }

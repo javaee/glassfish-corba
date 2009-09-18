@@ -222,13 +222,6 @@ public class SocketOrChannelAcceptorImpl
     // Work methods.
     //
 
-    /* CONFLICT: with legacy below.
-    public String getName()
-    {
-	return this.toString();
-    }
-    */
-
     protected void accept() {
         processSocket( getAcceptedSocket() ) ;
     }

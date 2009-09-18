@@ -64,7 +64,7 @@ public abstract interface CorbaAcceptor
 
     @ManagedAttribute
     @Description( "The name of the IP interface for this Acceptor" ) 
-    String getName() ;
+    String getInterfaceName() ;
 
     @ManagedAttribute
     @Description( "The type of requests that this Acceptor handles" ) 

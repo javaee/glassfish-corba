@@ -1057,6 +1057,10 @@ public class ParserTable {
             return "" ;
         }
 
+        public String getInterfaceName() {
+            return "" ;
+        }
+
         public String getType() {
             return "" ;
         }
@@ -1103,6 +1107,10 @@ public class ParserTable {
         }
 
         public String getName() {
+            return "" ;
+        }
+
+        public String getInterfaceName() {
             return "" ;
         }
 

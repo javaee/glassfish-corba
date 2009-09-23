@@ -47,14 +47,14 @@ import org.glassfish.external.probe.provider.annotations.ProbeParam ;
  *
  * @author Ken Cavanaugh 
  */
-@ProbeProvider( providerName="glassfish", moduleName="orb" )
+@ProbeProvider(moduleProviderName="glassfish", moduleName="orb" , probeProviderName="inboundconnection")
 public class CorbaInboundConnectionCacheProbeProvider {
-    @Probe( providerName="inboundConnectionOpened" )
+    @Probe(name="inboundConnectionOpened" )
     public void connectionOpenedEvent( 
         @ProbeParam( "acceptor" ) String acceptor, 
         @ProbeParam( "connection" ) String connection ) {}
 
-    @Probe( providerName="inboundConnectionClosed" )
+    @Probe(name="inboundConnectionClosed" )
     public void connectionClosedEvent( 
         @ProbeParam( "connection" ) String connection ) {}
 }

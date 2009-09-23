@@ -28,3 +28,7 @@ make/scripts/pkgrename/sed_pattern_file.version
 webrev*
 felix/felix-cache
 make/bnd/bnd.properties
+jscheme/doc/api
+jscheme/lib
+jscheme/doc/java-files.txt
+jscheme/src/jsint/version.txt

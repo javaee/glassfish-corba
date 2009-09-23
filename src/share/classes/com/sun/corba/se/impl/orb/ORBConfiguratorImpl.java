@@ -310,48 +310,50 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	// Set up server side.
 	//
 
-	//
-	// Maybe allocate the Legacy default listener.
-	//
-	// If old legacy properties set, or there are no explicit
-	// acceptors then register a default listener.  Type of
-	// default listener depends on presence of legacy socket factory.
-	//
-	// Note: this must happen *BEFORE* registering explicit acceptors.
-	//
+        if (!od.noDefaultAcceptors()) {
+            //
+            // Maybe allocate the Legacy default listener.
+            //
+            // If old legacy properties set, or there are no explicit
+            // acceptors then register a default listener.  Type of
+            // default listener depends on presence of legacy socket factory.
+            //
+            // Note: this must happen *BEFORE* registering explicit acceptors.
+            //
 
-	// BEGIN Legacy
-	int port = -1;
-	if (od.getORBServerPort() != 0) {
-	    port = od.getORBServerPort();
-	} else if (od.getPersistentPortInitialized()) {
-	    port = od.getPersistentServerPort();
-	} else if ((acceptors.length == 0) && !od.noDefaultAcceptors()) {
-	    port = 0;
-	}
-	if (port != -1) {
-	    createAndRegisterAcceptor(orb, legacySocketFactory, port,
-			LegacyServerSocketEndPointInfo.DEFAULT_ENDPOINT,
-			SocketInfo.IIOP_CLEAR_TEXT);
-	}
-	// END Legacy
+            // BEGIN Legacy
+            int port = -1;
+            if (od.getORBServerPort() != 0) {
+                port = od.getORBServerPort();
+            } else if (od.getPersistentPortInitialized()) {
+                port = od.getPersistentServerPort();
+            } else if ((acceptors.length == 0)) {
+                port = 0;
+            }
+            if (port != -1) {
+                createAndRegisterAcceptor(orb, legacySocketFactory, port,
+                            LegacyServerSocketEndPointInfo.DEFAULT_ENDPOINT,
+                            SocketInfo.IIOP_CLEAR_TEXT);
+            }
+            // END Legacy
 
-	for (int i = 0; i < acceptors.length; i++) {
-	    orb.getCorbaTransportManager().registerAcceptor(acceptors[i]);
-	}
+            for (int i = 0; i < acceptors.length; i++) {
+                orb.getCorbaTransportManager().registerAcceptor(acceptors[i]);
+            }
 
-	// BEGIN Legacy
-	// Allocate user listeners.
-	USLPort[] ports = od.getUserSpecifiedListenPorts() ;
-	if (ports != null) {
-	    for (int i = 0; i < ports.length; i++) {
-		createAndRegisterAcceptor(
-                    orb, legacySocketFactory, ports[i].getPort(),
-		    LegacyServerSocketEndPointInfo.NO_NAME,
-		    ports[i].getType());
-	    }
-	}
-	// END Legacy
+            // BEGIN Legacy
+            // Allocate user listeners.
+            USLPort[] ports = od.getUserSpecifiedListenPorts() ;
+            if (ports != null) {
+                for (int i = 0; i < ports.length; i++) {
+                    createAndRegisterAcceptor(
+                        orb, legacySocketFactory, ports[i].getPort(),
+                        LegacyServerSocketEndPointInfo.NO_NAME,
+                        ports[i].getType());
+                }
+            }
+            // END Legacy
+        }
     }
 
     /*

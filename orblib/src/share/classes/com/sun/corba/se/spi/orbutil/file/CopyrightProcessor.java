@@ -56,6 +56,7 @@ import com.sun.corba.se.spi.orbutil.argparser.DefaultValue ;
 import com.sun.corba.se.spi.orbutil.argparser.Separator ;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
+import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 public class CopyrightProcessor {
     private CopyrightProcessor() {} 
@@ -177,6 +178,131 @@ public class CopyrightProcessor {
     }
 
     private static final String COPYRIGHT = "Copyright" ;
+/*
+    Iterable<Character> getStringIterator( final String str ) {
+        return new Iterable<Character>() {
+            Iterator<Character> iterator() {
+                return new Iterator<Character>() {
+                    int pos = 0 ;
+
+                    public boolean hasNext() {
+                        return str.length() > pos ;
+                    }
+
+                    public Character next() {
+                        return str.charAt( ++pos ) ;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException() ;
+                    }
+                } ;
+            }
+        } ;
+    }
+*/
+    private static class StringParser {
+        private String data ;
+        private int pos ;
+        private char current ;
+
+        public StringParser( String str ) {
+            this.data = str ;
+            this.pos = 0 ;
+        }
+
+        boolean next() {
+            if (data.length() > pos) {
+                current = data.charAt( pos++ ) ;
+                return true ;
+            } else {
+                return false ;
+            }
+                
+        }
+
+        /** skip everything until str is found.  Returns true if found, otherwise
+         * false.
+         */
+        boolean skipToString( String str ) {
+            return false ;
+        }
+
+        /** skip over str, if str is at the current position.
+         */
+        boolean skipString( String str ) {
+            return false ;
+        }
+
+        /** Skip over whitespace.  Returns true if some whitespace skipped.
+         */
+        boolean skipWhitespace() {
+            while (Character.isWhitespace(current) && next()) ;
+            return false ;
+        }
+
+        /** Return int matched at current position as a string.
+         */
+        String parseInt() {
+            return "" ;
+        }
+    }
+
+    // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
+    private static Pair<String,String> getSunCopyrightPair( String str ) {
+        StringParser sp = new StringParser( str ) ;
+        if (!sp.skipToString( COPYRIGHT )) 
+            return null ;
+
+        if (!sp.skipWhitespace())
+            return null ;
+
+        String start = sp.parseInt() ;
+        if (start == null)
+            return null ;
+
+        if (!sp.skipString( "-" )) 
+            return null ;
+
+        String end = sp.parseInt() ;
+        if (end == null)
+            return null ;
+
+        return new Pair<String,String>( start, end ) ;
+    }
+
+    // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
+    private static Pair<String,String> getSunCopyrights( String str ) {
+	int index = str.indexOf( COPYRIGHT ) ;
+	if (index == -1) 
+	    return null ;
+
+        // Iterable<Character> it = getStringIterator( str.substring( index + COPYRIGHT.length() ) ) ;
+	int pos = index + COPYRIGHT.length() ;
+	char ch = str.charAt( pos ) ;
+	while (Character.isWhitespace(ch) && (pos<str.length())) {
+	    ch = str.charAt( ++pos ) ;
+	}
+	
+        // find number
+	int start = pos ;
+	ch = str.charAt( pos ) ;
+	while (Character.isDigit(ch) && (pos<str.length())) {
+	    ch = str.charAt( ++pos ) ;
+	}
+
+        if (pos==start)
+            return null ;
+
+        String startYear = str.substring( start, pos ) ;
+
+        if (ch != '-')
+            return null ;
+
+        pos++ ;
+        ch = str.charAt( pos ) ;
+        return null ;
+    }
 
     // Copyright year is first non-blank after COPYRIGHT
     private static String getSunCopyrightStart( String str ) {

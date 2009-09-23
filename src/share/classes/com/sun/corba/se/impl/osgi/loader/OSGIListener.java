@@ -258,8 +258,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
         if (pkgAdmin != null) {
             ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
-            for (ExportedPackage ep : epkgs) {
-                packageNameMap.put( ep.getName(), bundle ) ;
+            if (epkgs != null) {
+                for (ExportedPackage ep : epkgs) {
+                    packageNameMap.put( ep.getName(), bundle ) ;
+                }
             }
         }
     }
@@ -279,8 +281,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
         if (pkgAdmin != null) {
             ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
-            for (ExportedPackage ep : epkgs) {
-                packageNameMap.remove( ep.getName() ) ;
+            if (epkgs != null) {
+                for (ExportedPackage ep : epkgs) {
+                    packageNameMap.remove( ep.getName() ) ;
+                }
             }
         }
     }

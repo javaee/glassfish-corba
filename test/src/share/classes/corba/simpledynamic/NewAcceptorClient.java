@@ -55,7 +55,9 @@ public class NewAcceptorClient extends Framework {
     // Make sure that the ORB does not create any default acceptors.
     @Override
     protected void setServerPort( Properties props ) {
+        super.setServerPort( props ) ;
         props.setProperty( ORBConstants.NO_DEFAULT_ACCEPTORS, "true" ) ;
+        props.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY, "1" ) ;
     }
 
     // Can be overridden if necessary to allow the ORB to be further
@@ -77,6 +79,8 @@ public class NewAcceptorClient extends Framework {
 
         orb.getTransportManager().registerAcceptor( listener ) ;
         orb.getTransportManager().registerAcceptor( processor ) ;
+        // Called for side-effect of initializing IORTemplate and transport
+        orb.getFVDCodeBaseIOR() ;
     }
 
     private Echo makeServant( String name ) {

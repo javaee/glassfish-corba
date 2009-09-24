@@ -32,3 +32,5 @@ jscheme/doc/api
 jscheme/lib
 jscheme/doc/java-files.txt
 jscheme/src/jsint/version.txt
+jscheme/bin/doc/java-files.txt
+jscheme/bin/doc/java-packages.txt

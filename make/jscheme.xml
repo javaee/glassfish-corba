@@ -75,7 +75,6 @@
 </macrodef>
 
 <target name="build-jscheme" depends="init" if="jscheme-not-available">
-    <mkdir dir="${root.dir}/jscheme/lib"/>
     <javac sourcepath="" destdir="jscheme/src" srcdir="jscheme/src" classpath="jscheme/src">
         <include name="jscheme/REPL.java"/>
     </javac>
@@ -84,7 +83,7 @@
 
 <target name="clean-jscheme" depends="init">
     <run-jscheme command="-clean"/>
-    <delete dir="jscheme/lib"/>
+    <delete dir="${root.dir}/jscheme/lib"/>
 </target>
 
 <!-- This target is called repeatedly for each jscheme invocation -->

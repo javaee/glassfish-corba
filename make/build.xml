@@ -232,6 +232,7 @@
     <!-- Creates the necessary directories -->
     <target name="prepare-dirs" depends="init">
 	<mkdir dir="${build.dir}"/>
+	<mkdir dir="${root.dir}/jscheme/lib"/>
 	<mkdir dir="${orblib.classes.dir}"/>
 	<mkdir dir="${lib.dir}"/>
 	<mkdir dir="${gensrc.dir}"/>

@@ -624,7 +624,6 @@
 		    duplicate="fail">
 	    <fileset dir="${classes.dir}">
                 <include name="com/sun/corba/se/internal/**"/>
-                <include name="com/sun/corba/se/pept/**"/>
                 <include name="com/sun/corba/se/spi/btrace/**"/>
                 <include name="com/sun/corba/se/spi/copyobject/**"/>
                 <include name="com/sun/corba/se/spi/encoding/**"/>
@@ -1096,7 +1095,7 @@
     <!-- ========================= JAVADOC ========================= -->
     <target name="javadoc" depends="init">
         <mkdir dir="${javadoc.dir}"/>
-	<javadoc packagenames="com.sun.corba.se.spi.*,com.sun.corba.se.pept.*"
+	<javadoc packagenames="com.sun.corba.se.spi.*"
 	         sourcepath="${src.dir}:${orblib.src.dir}:${gensrc.dir}"
 		 classpathref="classpath.master"
 		 destdir="${javadoc.dir}"
@@ -1204,12 +1203,6 @@
 	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
 	    dir="${root.dir}">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
-            <!--
-	    <bootclasspath>
-		<pathelement location="${releaselib.dir}/orblib.jar"/>
-		<pathelement location="${rt.jar}"/>
-	    </bootclasspath>
-            -->
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>

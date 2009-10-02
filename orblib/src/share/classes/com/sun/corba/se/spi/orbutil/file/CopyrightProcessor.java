@@ -207,13 +207,24 @@ public class CopyrightProcessor {
         private char current ;
 
         public StringParser( String str ) {
+            if (str.length() == 0)
+                throw new RuntimeException( "Empty string not allowed" ) ;
+
             this.data = str ;
             this.pos = 0 ;
+            this.current = str.charAt( pos ) ;
+        }
+
+        private void setPos( int newPos ) {
+            if (newPos < data.length() ) {
+                pos = newPos ;
+                current = data.charAt( newPos ) ;
+            }
         }
 
         boolean next() {
             if (data.length() > pos) {
-                current = data.charAt( pos++ ) ;
+                setPos( pos + 1 ) ;
                 return true ;
             } else {
                 return false ;
@@ -225,26 +236,58 @@ public class CopyrightProcessor {
          * false.
          */
         boolean skipToString( String str ) {
-            return false ;
+            int index = data.indexOf( str ) ;
+            if (index >= 0) {
+                setPos( index ) ;
+                return true ;
+            } else {
+                return false ;
+            }
         }
 
         /** skip over str, if str is at the current position.
          */
         boolean skipString( String str ) {
-            return false ;
+            String cstr = data.substring( pos, pos+str.length() ) ;
+            if (cstr.equals( pos )) {
+                setPos( pos+str.length() ) ;
+                return true ;
+            } else {
+                return false ;
+            }
         }
 
         /** Skip over whitespace.  Returns true if some whitespace skipped.
          */
         boolean skipWhitespace() {
-            while (Character.isWhitespace(current) && next()) ;
-            return false ;
+            boolean hasSkipped = false ;
+            while (Character.isWhitespace(current)) { 
+                hasSkipped = true ;
+                if (!next()) {
+                    break ;
+                }
+            }
+
+            return hasSkipped ;
         }
 
         /** Return int matched at current position as a string.
          */
         String parseInt() {
-            return "" ;
+            int first = pos ;
+            boolean atStart = true ;
+            while ((current >= '0') && (current <= '9')) {
+                atStart = false ;
+                if (!next()) {
+                    break ;
+                }
+            }
+
+            if (atStart) {
+                return data.substring( first, pos ) ;
+            } else {
+                return null ;
+            }
         }
     }
 
@@ -252,6 +295,9 @@ public class CopyrightProcessor {
     private static Pair<String,String> getSunCopyrightPair( String str ) {
         StringParser sp = new StringParser( str ) ;
         if (!sp.skipToString( COPYRIGHT )) 
+            return null ;
+
+        if (!sp.skipString( COPYRIGHT ))
             return null ;
 
         if (!sp.skipWhitespace())

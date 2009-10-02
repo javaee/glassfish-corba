@@ -86,7 +86,7 @@ public class ReferenceManagerConfigurator implements ORBConfigurator {
 	}
 
 	public String name() {
-	    return "#INTERNAL#" + this.getClass().getName() + "#INTERNAL#" ;
+	    return "##" + this.getClass().getName() + "##" ;
 	}
 
 	public void destroy() {

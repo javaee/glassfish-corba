@@ -82,8 +82,7 @@ public class ReferenceFactoryManagerImpl
 
     private enum RFMState { READY, SUSPENDED } ;
 
-    private static final String PARENT_POA_NAME = 
-	"#INTERNAL#RFMBase#INTERNAL#" ;
+    private static final String PARENT_POA_NAME = "#RFMBase#" ;
 
     // Initialized in the constructor
     private RFMState state ;

@@ -76,6 +76,8 @@ import com.sun.corba.se.impl.protocol.CorbaClientDelegateImpl;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.*;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
 
+import org.glassfish.external.statistic.CountStatistic ;
+
 public class Client extends LocalObject 
     implements ORBInitializer, ClientRequestInterceptor 
 {
@@ -775,9 +777,9 @@ class DummyConnectionCache
 {
     public String getCacheType() { return null; }
     public void stampTime(CorbaConnection connection) {}
-    public long numberOfConnections() { return 0; }
-    public long numberOfIdleConnections() { return 0; }
-    public long numberOfBusyConnections() { return 0; }
+    public CountStatistic numberOfConnections() { return null; }
+    public CountStatistic numberOfIdleConnections() { return null; }
+    public CountStatistic numberOfBusyConnections() { return null; }
     public boolean reclaim() { return true; }
     public void close() {}
 

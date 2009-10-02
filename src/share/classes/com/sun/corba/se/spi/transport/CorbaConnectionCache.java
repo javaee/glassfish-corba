@@ -40,6 +40,8 @@ import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.NameValue ;
 
+import org.glassfish.external.statistics.CountStatistic ;
+
 /**
  * @author Harold Carr
  */
@@ -52,17 +54,30 @@ public interface CorbaConnectionCache
 
     public void stampTime(CorbaConnection connection);
 
-    @ManagedAttribute( id="TotalConnections" ) 
-    @Description( "Total number of connections in the connection cache" ) 
-    public long numberOfConnections();
+    public static final String STAT_UNIT = "count" ;
 
-    @ManagedAttribute( id="ConnectionsIdle" ) 
-    @Description( "Number of connections in the connection cache that are idle" ) 
-    public long numberOfIdleConnections();
+    public static final String TOTAL_ID = "TotalConnections" ;
+    public static final String IDLE_ID = "ConnectionsIdle" ;
+    public static final String BUSY_ID = "ConnectionsBusy" ;
 
-    @ManagedAttribute( id="ConnectionsInUse" ) 
-    @Description( "Number of connections in the connection cache that are in use" ) 
-    public long numberOfBusyConnections();
+    public static final String TOTAL_DESC = 
+        "Total number of connections in the connection cache" ; 
+    public static final String IDLE_DESC = 
+        "Number of connections in the connection cache that are idle" ; 
+    public static final String BUSY_DESC =
+        "Number of connections in the connection cache that are in use" ; 
+
+    @ManagedAttribute( id=TOTAL_ID ) 
+    @Description( TOTAL_DESC ) 
+    public CountStatistic numberOfConnections();
+
+    @ManagedAttribute( id=IDLE_ID ) 
+    @Description( IDLE_DESC )
+    public CountStatistic numberOfIdleConnections();
+
+    @ManagedAttribute( id=BUSY_ID ) 
+    @Description( BUSY_DESC )
+    public CountStatistic numberOfBusyConnections();
 
     public boolean reclaim();
 

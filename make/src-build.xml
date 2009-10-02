@@ -38,21 +38,43 @@
 
 <!--
     The source code is divided into 3 areas:
-    orb-library:
-	Contents: Contains libraries that can be used independently of the ORB.
-	    This includes the codegen library, the timing facility, an
-	    FSM library, and a number of generic utilities.  This also includes
-	    a copy of the ASM library from ObjectWeb.  
-	Dependencies: May not depend on classes from any other area.  
-	Delivery: Delivered in orblib.jar
-    main:
-	Contents: The core of the ORB.
-	Dependencies: Depends only on orb-library.
-	Delivery: peorb.jar
-    experimental:
-	Contents: experimental code not fully finished or delivered.
-	Depencies: Depends only on orb-library at present.
-	Deliver: not delivered.
+        orb-library:
+            Contents: Contains libraries that can be used independently of the ORB.
+                This includes the codegen library, the timing facility, an
+                FSM library, and a number of generic utilities.  This also includes
+                a copy of the ASM library from ObjectWeb.  
+            Dependencies: May not depend on classes from any other area.  
+            Delivery: as OSGi bundles:
+                glassfish-corba-codegen
+                glassfish-corba-newtimer
+                glassfish-corba-orbgeneric
+                glassfish-corba-asm
+        main:
+            Contents: The core of the ORB.
+            Dependencies: Depends only on orb-library.
+            Delivery: as OSGi bundles:
+                glassfish-corba-orb
+                glassfish-corba-omgapi
+                glassfish-corba-csiv2-idl
+        experimental:
+            Contents: experimental code not fully finished or delivered.
+            Depencies: Depends only on orb-library at present.
+            Delivery: not delivered
+
+    Dependencies:
+        Standard for source build:
+            - JDK 5 or later
+            - ant 1.7.1 or later
+        Non-standard (must be available in source build environment)
+            - hg
+            - bnd
+            - maven-ant-tasks-2.0.10
+        Other Sun projects (from local maven repo in source build)
+            - gmbal
+            - management-api
+            - wagon-svn
+        Non-sun projects (also from local maven repo)
+            - felix
 -->
 
 <project name="corba-src" default="all" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
@@ -91,6 +113,7 @@
         <property name="gmbal-jar"                      value="${root.dir}/lib/gmbal.jar"/>
         <property name="management-api-jar"             value="${root.dir}/lib/management-api.jar"/>
         <property name="felix-jar"                      value="${root.dir}/lib/felix.jar"/>
+        <property name="jscheme-jar"                    value="${root.dir}/jscheme/lib/jscheme.jar"/>
 
         <!-- Places where the build puts things -->
         <property name="build.dir"                      location="build"/>
@@ -908,9 +931,11 @@
         </condition>
     </target>
 
+    <!-- Targets used to build Jscheme -->
+
     <condition property="jscheme-not-available">
         <not>
-            <available file="jscheme/lib/jscheme.jar"/>
+            <available file="${jscheme-jar}"/>
         </not>
     </condition>
 
@@ -937,6 +962,8 @@
         <run-jscheme command="-clean"/>
         <delete dir="${root.dir}/jscheme/lib"/>
     </target>
+
+    <!-- Targets used to run Jscheme to generate minor code files -->
 
     <!-- This target is called repeatedly for each jscheme invocation -->
     <target name="call-jscheme" depends="check-minorcode-file-changed" if="minorcode-file-changed">

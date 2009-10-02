@@ -69,7 +69,7 @@ public class ORBFactory {
             ClassCodeBaseHandler ccbh = OSGIListener.classCodeBaseHandler() ;
             result.classCodeBaseHandler( ccbh ) ;
             result.setRootParentObjectName( 
-                AMXGlassfish.DEFAULT.monitoringRoot() ) ;
+                AMXGlassfish.DEFAULT.serverMonForDAS() ) ;
         }
 
         result.setParameters( args, props ) ;

@@ -151,11 +151,14 @@ public class IDLNameTranslatorImpl implements IDLNameTranslator {
      * @throws IllegalStateException if given class is not a valid 
      *         RMI/IIOP Remote Interface
      */
-    public static IDLNameTranslator get( Class interf )
+    public static IDLNameTranslator get( final Class interf )
     {
-        
-        return new IDLNameTranslatorImpl(new Class[] { interf } );
-
+        return AccessController.doPrivileged(
+            new PrivilegedAction<IDLNameTranslator>() {
+                public IDLNameTranslator run() {
+                    return new IDLNameTranslatorImpl( new Class[] { interf } ) ;
+                }
+            } ) ;
     }
 
     /**
@@ -164,11 +167,14 @@ public class IDLNameTranslatorImpl implements IDLNameTranslator {
      * @throws IllegalStateException if given classes are not  valid 
      *         RMI/IIOP Remote Interfaces
      */
-    public static IDLNameTranslator get( Class[] interfaces )
+    public static IDLNameTranslator get( final Class[] interfaces )
     {
-        
-        return new IDLNameTranslatorImpl(interfaces );
-
+        return AccessController.doPrivileged(
+            new PrivilegedAction<IDLNameTranslator>() {
+                public IDLNameTranslator run() {
+                    return new IDLNameTranslatorImpl( interfaces ) ;
+                }
+            } ) ;
     }
 
     public static String getExceptionId( Class cls ) 

@@ -1031,4 +1031,20 @@ public class Client extends TestCase
             fail( exc.toString() ) ;
         }
     }
+
+    public void testCorbaname() {
+        try {
+            String[] args = new String[0] ;
+            Properties props = new Properties() ;
+            orb = ORB.class.cast( ORB.init( args, props ) ) ;
+
+            // final String test = 
+                // "corbaname:iiop:1.2@192.168.178.1:3700#ejb/XXServiceBean" ;
+
+            // orb.string_to_object( test ) ;
+        } finally {
+            if (orb != null)
+                orb.destroy() ;
+        }
+    }
 }

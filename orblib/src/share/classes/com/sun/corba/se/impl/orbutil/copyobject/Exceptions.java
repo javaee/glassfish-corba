@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,35 +34,44 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.orbutil.copyobject ;
+package com.sun.corba.se.impl.orbutil.copyobject;
 
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
+import com.sun.corba.se.spi.orbutil.logex.Chain;
+import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
+import com.sun.corba.se.spi.orbutil.logex.Log;
+import com.sun.corba.se.spi.orbutil.logex.LogLevel;
+import com.sun.corba.se.spi.orbutil.logex.Message;
+import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
+
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-
-/** Trys a first ObjectCopier.  If the first throws a ReflectiveCopyException,
- * falls back and tries a second ObjectCopier.
+/** Exception wrapper class.  The logex WrapperGenerator uses this interface
+ * to generate an implementation which returns the appropriate exception, and
+ * generates a log report when the method is called.  This is used for all
+ * implementation classes in this package.
+ *
+ * The exception IDs are allocated in blocks of EXCEPTIONS_PER_CLASS, which is
+ * a lot more than is needed, but we have 32 bits for IDs, and multiples of
+ * a suitably chosen EXCEPTIONS_PER_CLASS (like 100 here) are easy to read in
+ * error messages.
+ *
+ * @author ken
  */
-public class FallbackObjectCopierImpl extends Pair<ObjectCopier,ObjectCopier>
-    implements ObjectCopier {
+@ExceptionWrapper( idPrefix="ORBOCOPY" )
+public interface Exceptions {
+    static final Exceptions self = WrapperGenerator.makeWrapper(
+        Exceptions.class ) ;
 
-    public FallbackObjectCopierImpl( ObjectCopier first, ObjectCopier second ) {
-	super( first, second ) ;
-    }
+    // Allow 100 exceptions per class
+    static final int EXCEPTIONS_PER_CLASS = 100 ;
 
-    public Object copy( Object src ) throws ReflectiveCopyException {
-	return copy( src, false ) ;
-    }
+// FallbackCopierImpl
+    static final int FB_START = 1 ;
 
-    public Object copy( Object src, 
-	boolean debug ) throws ReflectiveCopyException {
+    @Message( "Object copy failed on copy of {0} which has type {1}" )
+    @Log( id = FB_START + 0, level=LogLevel.FINE )
+    void failureInFallback(
+        @Chain ReflectiveCopyException exc, Object obj, Class cls );
 
-	try {
-	    return first().copy( src, debug ) ;
-	} catch (ReflectiveCopyException rce ) {
-            Exceptions.self.failureInFallback( rce, src, src.getClass() ) ;
-	    return second().copy( src, debug ) ;
-	}
-    }
+// XXX possibly add more logging elsewhere in the object copier
 }

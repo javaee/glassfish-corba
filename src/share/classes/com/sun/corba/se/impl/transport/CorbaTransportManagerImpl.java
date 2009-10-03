@@ -74,6 +74,9 @@ import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 
+import org.glassfish.external.probe.provider.StatsProviderManager ;
+import org.glassfish.external.probe.provider.PluginPoint ;
+
 /**
  * @author Harold Carr
  */
@@ -119,7 +122,13 @@ public class CorbaTransportManagerImpl
 			connectionCache = 
 			    new CorbaOutboundConnectionCacheImpl(orb,
 								 contactInfo);
+
+                        // XXX We need to clean up the multi-cache support:
+                        // this really only works with a single cache.
                         orb.mom().register( this, connectionCache ) ;
+                        StatsProviderManager.register( "orb", PluginPoint.SERVER,
+                            "transport/connectioncache/outbound", connectionCache ) ;
+
 			outboundConnectionCaches.put(
                             contactInfo.getConnectionCacheType(),
 			    connectionCache);
@@ -157,6 +166,9 @@ public class CorbaTransportManagerImpl
 			    new CorbaInboundConnectionCacheImpl(orb,
 								acceptor);
                         orb.mom().register( this, connectionCache ) ;
+                        StatsProviderManager.register( "orb", PluginPoint.SERVER,
+                            "transport/connectioncache/inbound", connectionCache ) ;
+
 			inboundConnectionCaches.put(
                             acceptor.getConnectionCacheType(),
 			    connectionCache);
@@ -200,9 +212,11 @@ public class CorbaTransportManagerImpl
 		dprint(".close->");
 	    }
             for (CorbaOutboundConnectionCache cc : outboundConnectionCaches.values()) {
+                StatsProviderManager.unregister( cc ) ;
                 cc.close() ;
             }
             for (CorbaInboundConnectionCache cc : inboundConnectionCaches.values()) {
+                StatsProviderManager.unregister( cc ) ;
                 cc.close() ;
             }
 	    getSelector(0).close();

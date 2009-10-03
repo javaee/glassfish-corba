@@ -76,7 +76,7 @@ import com.sun.corba.se.impl.protocol.CorbaClientDelegateImpl;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.*;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
 
-import org.glassfish.external.statistic.CountStatistic ;
+import org.glassfish.external.statistics.CountStatistic ;
 
 public class Client extends LocalObject 
     implements ORBInitializer, ClientRequestInterceptor 

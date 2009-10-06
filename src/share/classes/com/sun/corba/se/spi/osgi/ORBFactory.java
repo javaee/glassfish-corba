@@ -56,24 +56,32 @@ import com.sun.corba.se.impl.osgi.loader.OSGIListener;
 public class ORBFactory {   
     private ORBFactory() {} 
 
-    @SuppressWarnings("static-access")
-    public static ORB create( String[] args, Properties props, boolean useOSGi ) {
+    /** Create but do not initialize an ORB instance.
+     */
+    public static ORB create() {
         ORB result = new ORBImpl() ;
-        if (useOSGi) {
-            result.classNameResolver(
-                result.makeCompositeClassNameResolver(
+        return result ;
+    }
+
+    /** Complete the initialization of the ORB.  isGFv3 if true will cause an ORB initialization
+     * suitable for use in GlassFish v3.
+     */
+    @SuppressWarnings("static-access")
+    public static void initialize( ORB orb, String[] args, Properties props, boolean isGFv3 ) {
+        if (isGFv3) {
+            orb.classNameResolver(
+                orb.makeCompositeClassNameResolver(
                     OSGIListener.classNameResolver(),
-                    result.defaultClassNameResolver()
+                    orb.defaultClassNameResolver()
                 ) );
 
             ClassCodeBaseHandler ccbh = OSGIListener.classCodeBaseHandler() ;
-            result.classCodeBaseHandler( ccbh ) ;
-            result.setRootParentObjectName( 
+            orb.classCodeBaseHandler( ccbh ) ;
+            orb.setRootParentObjectName( 
                 AMXGlassfish.DEFAULT.serverMonForDAS() ) ;
         }
 
-        result.setParameters( args, props ) ;
-        return result ;
+        orb.setParameters( args, props ) ;
     }
 }
 

@@ -249,7 +249,8 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         if (dict != null) {
             final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
             if (orbProvider != null) {
-                for (String className : orbProvider.split(",") ) {
+                for (String str : orbProvider.split(",") ) {
+                    String className = str.trim() ;
                     classNameMap.put( className, bundle ) ;
                     wrapper.insertOrbProvider( className, name ) ;
                 }

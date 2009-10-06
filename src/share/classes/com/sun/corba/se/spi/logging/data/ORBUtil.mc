@@ -171,6 +171,8 @@
              76 FINE "Ignoring cancelled SelectionKey {0}: key will be removed from Selector")
             (PACKAGE_ADMIN_SERVICE_NOT_AVAILABLE
              77 FINE "The OSGi PackageAdmin service is not available")
+            (SET_PARAMETER_CALLED_AGAIN
+             78 WARNING "The ORBImpl.set_parameters method was called more than once")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 

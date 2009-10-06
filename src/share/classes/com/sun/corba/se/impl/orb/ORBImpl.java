@@ -165,6 +165,8 @@ import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
  */
 public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 {
+    private boolean set_parameters_called = false ;
+
     protected CorbaTransportManager transportManager;
     protected LegacyServerSocketManager legacyServerSocketManager;
 
@@ -594,6 +596,14 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
 
 	return toaFactory ;
+    }
+
+    public void check_set_parameters() {
+        if (set_parameters_called) {
+            throw wrapper.setParameterCalledAgain() ;
+        } else {
+            set_parameters_called = true ;
+        }
     }
 
     public void set_parameters( Properties props )

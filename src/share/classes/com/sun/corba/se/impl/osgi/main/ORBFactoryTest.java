@@ -132,7 +132,8 @@ public class ORBFactoryTest implements BundleActivator, SynchronousBundleListene
                 String[] args = {} ;
                 Properties props = new Properties() ;
                 props.setProperty( ORBConstants.RFM_PROPERTY, "dummy" ) ;
-                orb = ORBFactory.create( args, props, true ) ;
+                orb = ORBFactory.create() ;
+                ORBFactory.initialize( orb, args, props, true ) ;
                 ReferenceFactoryManager rfm = 
                     (ReferenceFactoryManager)orb.resolve_initial_references(
                         ORBConstants.REFERENCE_FACTORY_MANAGER ) ;

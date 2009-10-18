@@ -540,6 +540,9 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	transportManager = new CorbaTransportManagerImpl(this);
 	getLegacyServerSocketManager();
 
+        super.getByteBufferPool();
+	serviceContextsCache = new ServiceContextsCache(this);
+
 	// Create a parser to get the configured ORBConfigurator.
 	ConfigParser parser = new ConfigParser() ;
 	parser.init( dataCollector ) ;
@@ -561,16 +564,15 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    throw wrapper.orbConfiguratorError( exc ) ;
 	}
 
+        // Initialize the thread manager pool 
+        // so it may be initialized & accessed without synchronization.
+        // This must take place here so that a user conifigurator can 
+        // set the threadpool manager first.
+        getThreadPoolManager();
+
 	// Last of all, create the PIHandler and run the ORB initializers.
 	pihandler = new PIHandlerImpl( this, params) ;
 	pihandler.initialize() ;
-
-        // Initialize the thread manager pool and byte buffer pool
-        // so they may be initialized & accessed without synchronization
-        getThreadPoolManager();
-
-        super.getByteBufferPool();
-	serviceContextsCache = new ServiceContextsCache(this);
 
         // Now the ORB is ready, so finish all of the MBean registration
         if (configData.registerMBeans()) {

@@ -220,7 +220,7 @@ public class IDLNameTranslatorImpl implements IDLNameTranslator {
     private IDLNameTranslatorImpl(Class[] interfaces) 
     {
         SecurityManager s = System.getSecurityManager() ;
-        if (s != null) {
+        if (!PresentationDefaults.inAppServer() && (s != null)) {
             s.checkPermission( new DynamicAccessPermission( "access" ) ) ;
         }
 

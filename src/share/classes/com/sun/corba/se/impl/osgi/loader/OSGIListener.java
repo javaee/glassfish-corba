@@ -315,20 +315,23 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     }
 
     public void start( BundleContext context ) {
-        context.addBundleListener(this);
-        // Probe all existing bundles for ORB providers
-        wrapper.probeBundlesForProviders() ;
-        for (Bundle bundle : context.getBundles()) {
-            insertClasses( bundle ) ;
-        }
-        mapContents() ;
-
+        // Get a referece to the PackageAdmin service before we
+        // do ANYTHING else.
         final ServiceReference sref = context.getServiceReference( 
             "org.osgi.service.packageadmin.PackageAdmin" ) ;
         pkgAdmin = (PackageAdmin)context.getService( sref ) ;
         if (pkgAdmin == null) {
             wrapper.packageAdminServiceNotAvailable() ;
         }
+
+        context.addBundleListener(this);
+        
+        // Probe all existing bundles for ORB providers
+        wrapper.probeBundlesForProviders() ;
+        for (Bundle bundle : context.getBundles()) {
+            insertClasses( bundle ) ;
+        }
+        mapContents() ;
     }
 
     public void stop( BundleContext context ) {

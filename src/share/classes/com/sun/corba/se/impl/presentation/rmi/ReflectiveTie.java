@@ -54,6 +54,7 @@ import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAManager;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 

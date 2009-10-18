@@ -63,6 +63,7 @@ import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
 import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler ;

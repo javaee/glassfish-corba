@@ -51,6 +51,8 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
+import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
+
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 import com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission ;
 

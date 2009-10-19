@@ -245,8 +245,6 @@ public interface ORBData {
     @Description( "Pair of (name, CORBA URL) used to initialize resolve_initial_references" ) 
     public Pair<String,String>[] getORBInitialReferences();
 
-    @ManagedAttribute
-    @Description( "DESC" ) 
     public String getORBDefaultInitialReference() ;
 
     @ManagedAttribute
@@ -385,10 +383,6 @@ public interface ORBData {
     // if this returns true.  The default is false, but the ORB will do
     // the right thing if it receives an EnumDesc in any case.
     public boolean useEnumDesc() ;
-
-    @ManagedAttribute
-    @Description( "The AMX parent ObjectName of the gmbal root of the orb" ) 
-    public ObjectName gmbalRootParentName() ;
 
     @ManagedAttribute
     @Description( "If true, do not start any acceptors in the transport by default" )

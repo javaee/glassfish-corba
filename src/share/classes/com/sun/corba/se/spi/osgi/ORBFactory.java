@@ -56,6 +56,12 @@ import com.sun.corba.se.impl.osgi.loader.OSGIListener;
 public class ORBFactory {   
     private ORBFactory() {} 
 
+    public static ORB create( String[] args, Properties props, boolean isGFv3 ) {
+        ORB result = create() ;
+        initialize( result, args, props, isGFv3 ) ;
+        return result ;
+    }
+
     /** Create but do not initialize an ORB instance.
      */
     public static ORB create() {
@@ -63,7 +69,8 @@ public class ORBFactory {
         return result ;
     }
 
-    /** Complete the initialization of the ORB.  isGFv3 if true will cause an ORB initialization
+    /** Complete the initialization of the ORB.  
+     * isGFv3 if true will cause an ORB initialization
      * suitable for use in GlassFish v3.
      */
     @SuppressWarnings("static-access")

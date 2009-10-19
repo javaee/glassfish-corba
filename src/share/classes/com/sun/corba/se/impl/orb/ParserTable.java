@@ -517,11 +517,6 @@ public class ParserTable {
 		OperationFactory.booleanAction(),
 		"useEnumDesc", Boolean.TRUE,
 		Boolean.TRUE, "TRUE"),
-            ParserDataFactory.make( ORBConstants.GMBAL_ROOT_PARENT_NAME,
-                OperationFactory.maskErrorAction( 
-                    OperationFactoryExt.convertAction( ObjectName.class ) ),
-                "gmbalRootParentName", null,
-                testGmbalRootParentName, TEST_GMBAL_ROOT_PARENT_NAME ),
             ParserDataFactory.make( ORBConstants.NO_DEFAULT_ACCEPTORS,
                 OperationFactory.booleanAction(),
                 "noDefaultAcceptors", Boolean.FALSE,

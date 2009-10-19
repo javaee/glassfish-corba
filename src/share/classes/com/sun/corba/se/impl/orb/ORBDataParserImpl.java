@@ -130,7 +130,6 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private boolean blockingReadCheckMessageParser;
     private boolean timingPointsEnabled;
     private boolean useEnumDesc ;
-    private ObjectName gmbalRootParentName ;
     private boolean noDefaultAcceptors ;
     private boolean registerMBeans ;
     private int fragmentReadTimeout ;
@@ -476,10 +475,6 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public boolean blockingReadCheckMessageParser() {
         return blockingReadCheckMessageParser;
-    }
-
-    public ObjectName gmbalRootParentName() {
-        return gmbalRootParentName ;
     }
 
     // ====== Methods for constructing and initializing this object =========

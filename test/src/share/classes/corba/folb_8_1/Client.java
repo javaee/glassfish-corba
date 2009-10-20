@@ -48,7 +48,7 @@ import org.omg.PortableInterceptor.ClientRequestInfo;
 import org.omg.PortableInterceptor.ORBInitializer;
 import org.omg.PortableInterceptor.ORBInitInfo;
 
-import com.sun.corba.se.pept.transport.Connection;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
 import com.sun.corba.se.spi.transport.SocketInfo;
@@ -66,7 +66,7 @@ public class Client
     public static final String NO_CONNECTION = "no connection";
     public static boolean withSticky = false;
     public static boolean foundErrors = false;
-    public static Connection lastConnectionUsed;
+    public static CorbaConnection lastConnectionUsed;
     public static String lastSocketTypeUsed;
     public static I iRef;
     public static I2 zero1;
@@ -361,7 +361,7 @@ public class Client
 		    if (! Common.timing) {
 			System.out.println("    request on connection: " + rie.connection());
 		    }
-		    lastConnectionUsed = (Connection) rie.connection();
+		    lastConnectionUsed = (CorbaConnection) rie.connection();
 		    lastSocketTypeUsed = (String)
 			Common.portToSocketType.get(
 		          new Integer(rie.connection().getSocket().getPort()));

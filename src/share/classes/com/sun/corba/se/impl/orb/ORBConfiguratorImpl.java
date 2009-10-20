@@ -38,18 +38,14 @@ package com.sun.corba.se.impl.orb ;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetAddress ;
-import java.security.PrivilegedAction ;
 import java.security.PrivilegedExceptionAction ;
 import java.security.AccessController ;
 import java.util.Collection ;
 import java.util.Iterator ;
 
 import org.omg.CORBA.CompletionStatus ;
-import org.omg.CORBA.portable.ValueFactory ;
 
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher ;
-import com.sun.corba.se.pept.transport.Acceptor;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
 
 import com.sun.corba.se.spi.activation.Locator ;
 import com.sun.corba.se.spi.activation.Activator ;
@@ -70,7 +66,6 @@ import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
 
 import com.sun.corba.se.spi.oa.OADefault ;
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
 import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
 
 import com.sun.corba.se.spi.orb.Operation ;
@@ -102,7 +97,6 @@ import com.sun.corba.se.spi.transport.TransportDefault ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
-import com.sun.corba.se.spi.servicecontext.ServiceContext ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
@@ -119,6 +113,8 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 // XXX This needs an SPI
 import com.sun.corba.se.impl.dynamicany.DynAnyFactoryImpl ;
+
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 public class ORBConfiguratorImpl implements ORBConfigurator {
     private ORBUtilSystemException wrapper ;
@@ -256,7 +252,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 
 	CorbaContactInfoListFactory contactInfoListFactory =
 	    od.getCorbaContactInfoListFactory();
-	Acceptor[] acceptors = od.getAcceptors();
+	CorbaAcceptor[] acceptors = od.getAcceptors();
 
 	// BEGIN Legacy
 	ORBSocketFactory legacySocketFactory = od.getLegacySocketFactory();
@@ -314,48 +310,50 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	// Set up server side.
 	//
 
-	//
-	// Maybe allocate the Legacy default listener.
-	//
-	// If old legacy properties set, or there are no explicit
-	// acceptors then register a default listener.  Type of
-	// default listener depends on presence of legacy socket factory.
-	//
-	// Note: this must happen *BEFORE* registering explicit acceptors.
-	//
+        if (!od.noDefaultAcceptors()) {
+            //
+            // Maybe allocate the Legacy default listener.
+            //
+            // If old legacy properties set, or there are no explicit
+            // acceptors then register a default listener.  Type of
+            // default listener depends on presence of legacy socket factory.
+            //
+            // Note: this must happen *BEFORE* registering explicit acceptors.
+            //
 
-	// BEGIN Legacy
-	int port = -1;
-	if (od.getORBServerPort() != 0) {
-	    port = od.getORBServerPort();
-	} else if (od.getPersistentPortInitialized()) {
-	    port = od.getPersistentServerPort();
-	} else if (acceptors.length == 0) {
-	    port = 0;
-	}
-	if (port != -1) {
-	    createAndRegisterAcceptor(orb, legacySocketFactory, port,
-			LegacyServerSocketEndPointInfo.DEFAULT_ENDPOINT,
-			SocketInfo.IIOP_CLEAR_TEXT);
-	}
-	// END Legacy
+            // BEGIN Legacy
+            int port = -1;
+            if (od.getORBServerPort() != 0) {
+                port = od.getORBServerPort();
+            } else if (od.getPersistentPortInitialized()) {
+                port = od.getPersistentServerPort();
+            } else if ((acceptors.length == 0)) {
+                port = 0;
+            }
+            if (port != -1) {
+                createAndRegisterAcceptor(orb, legacySocketFactory, port,
+                            LegacyServerSocketEndPointInfo.DEFAULT_ENDPOINT,
+                            SocketInfo.IIOP_CLEAR_TEXT);
+            }
+            // END Legacy
 
-	for (int i = 0; i < acceptors.length; i++) {
-	    orb.getCorbaTransportManager().registerAcceptor(acceptors[i]);
-	}
+            for (int i = 0; i < acceptors.length; i++) {
+                orb.getCorbaTransportManager().registerAcceptor(acceptors[i]);
+            }
 
-	// BEGIN Legacy
-	// Allocate user listeners.
-	USLPort[] ports = od.getUserSpecifiedListenPorts() ;
-	if (ports != null) {
-	    for (int i = 0; i < ports.length; i++) {
-		createAndRegisterAcceptor(
-                    orb, legacySocketFactory, ports[i].getPort(),
-		    LegacyServerSocketEndPointInfo.NO_NAME,
-		    ports[i].getType());
-	    }
-	}
-	// END Legacy
+            // BEGIN Legacy
+            // Allocate user listeners.
+            USLPort[] ports = od.getUserSpecifiedListenPorts() ;
+            if (ports != null) {
+                for (int i = 0; i < ports.length; i++) {
+                    createAndRegisterAcceptor(
+                        orb, legacySocketFactory, ports[i].getPort(),
+                        LegacyServerSocketEndPointInfo.NO_NAME,
+                        ports[i].getType());
+                }
+            }
+            // END Legacy
+        }
     }
 
     /*
@@ -366,7 +364,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 					   ORBSocketFactory legacySocketFactory,
 					   int port, String name, String type)
     {
-	Acceptor acceptor;
+	CorbaAcceptor acceptor;
 	if (legacySocketFactory == null) {
 	    acceptor =
 		new SocketOrChannelAcceptorImpl(orb, port, name, type);
@@ -374,7 +372,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    acceptor =
 		new SocketFactoryAcceptorImpl(orb, port, name, type);
 	}
-	orb.getTransportManager().registerAcceptor(acceptor);
+	orb.getCorbaTransportManager().registerAcceptor(acceptor);
     }
 
     private void setLegacySocketFactoryORB(
@@ -520,6 +518,8 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    IIOPFactories.makeRequestPartitioningComponentFactory() ) ;
 	compFinder.registerFactory(
 	    IIOPFactories.makeJavaSerializationComponentFactory());
+	compFinder.registerFactory(
+	    IIOPFactories.makeLoadBalancingComponentFactory());
 
 	// Register the ValueFactory instances for ORT
 	IORFactories.registerValueFactories( orb ) ;
@@ -533,7 +533,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
 
 	// register client subcontracts
-	ClientRequestDispatcher csub = 
+	CorbaClientRequestDispatcher csub =
 	    RequestDispatcherDefault.makeClientRequestDispatcher() ;
 	scr.registerClientRequestDispatcher( csub, 
 	    ORBConstants.TOA_SCID ) ;

@@ -39,12 +39,16 @@ package com.sun.corba.se.impl.transport;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
 
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
+import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent ;
+import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
+import com.sun.corba.se.spi.ior.TaggedComponent ;
 import com.sun.corba.se.spi.oa.ObjectAdapterFactory;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher;
@@ -52,6 +56,7 @@ import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -69,7 +74,93 @@ public class CorbaContactInfoListImpl
     protected IOR targetIOR;
     protected IOR effectiveTargetIOR;
     protected List<CorbaContactInfo> effectiveTargetIORContactInfoList;
-    protected ContactInfo primaryContactInfo;
+    protected CorbaContactInfo primaryContactInfo;
+    private boolean usePerRequestLoadBalancing = false ;
+
+    private int startCount = 0 ;
+
+    private UnaryBooleanFunction<CorbaContactInfo> testPred =
+        new UnaryBooleanFunction<CorbaContactInfo>() {
+            public boolean evaluate( CorbaContactInfo arg ) {
+                return !arg.getType().equals( SocketInfo.IIOP_CLEAR_TEXT ) ;
+            }
+        } ;
+
+    private <T> List<T> filter( List<T> arg, UnaryBooleanFunction<T> pred ) {
+        List<T> result = new ArrayList<T>() ;
+        for (T elem : arg ) {
+            if (pred.evaluate( elem )) {
+                result.add( elem ) ;
+            }
+        }
+
+        return result ;
+    }
+
+    private static ThreadLocal<Boolean> skipRotate = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false ;
+        }
+    } ;
+
+    // This is an ugly hack to avoid rotating the iterator when the
+    // ClientGroupManager decides to update the iterator, which is only
+    // supposed to happen when the cluster shape changes.  Unfortunately it
+    // is happening on EVERY REQUEST, at least in the Argela test.
+    // XXX Fix the wrong behavior and remove this hack!
+    public static void setSkipRotate() {
+        skipRotate.set( true ) ;
+    }
+
+    // Move the first startCount elements of the list to the end, so that
+    // the list starts at the startCount'th element and continues
+    // through all elements.  Each time we rotate, increment
+    // startCount for load balancing.
+    private synchronized List<CorbaContactInfo> rotate( List<CorbaContactInfo> arg ) {
+        if (skipRotate.get()) {
+            skipRotate.set( false ) ;
+            return arg ;
+        }
+
+        if (usePerRequestLoadBalancing) {
+            if (orb.folbDebugFlag) {
+                dprint( ".rotate->: arg = " + arg + " startCount = " + startCount ) ;
+            }
+
+            LinkedList<CorbaContactInfo> tempList = null ; 
+
+            try {
+                // XXX  This may be the best way to support PRLB for now.
+                // The GIS will return types like "iiop-listener-1", but we also get
+                // IIOP_CLEAR_TEXT for some, for both SSL and non-SSL ports.  Invoking
+                // clear on an SSL port leads to bad failures that are not retryable.
+                tempList = new LinkedList<CorbaContactInfo>( filter( arg, testPred ) ) ;
+
+                // XXX Really should just be this:
+                // tempList = new LinkedList<CorbaContactInfo>( arg ) ;
+
+                if (startCount >= tempList.size()) {
+                    startCount = 0 ;
+                }
+
+                for (int ctr=0; ctr<startCount; ctr++) {
+                    CorbaContactInfo element = tempList.removeLast() ;
+                    tempList.addFirst( element ) ;
+                }
+
+                startCount++ ;
+            
+                return tempList ;
+            } finally {
+                if (orb.folbDebugFlag) {
+                    dprint( ".rotate<-: result = " + tempList ) ;
+                }
+            }
+        } else {
+            return arg ;
+        }
+    }
 
     // XREVISIT - is this used?
     public CorbaContactInfoListImpl(ORB orb)
@@ -83,17 +174,30 @@ public class CorbaContactInfoListImpl
 	setTargetIOR(targetIOR);
     }
     
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ContactInfoList
-    //
-
     public synchronized Iterator<CorbaContactInfo> iterator()
     {
 	createContactInfoList();
-	return new CorbaContactInfoListIteratorImpl(
+	Iterator<CorbaContactInfo> result = new CorbaContactInfoListIteratorImpl(
             orb, this, primaryContactInfo, 
-	    effectiveTargetIORContactInfoList);
+	    rotate( effectiveTargetIORContactInfoList ),
+            usePerRequestLoadBalancing );
+
+        /* This doesn't work due to some strange behavior in FOLB: we are getting far
+         * too many IOR updates.  Updates are received even when the cluster shape has not changed.
+         * XXX This should be found and fixed at some point.
+         */
+        /*
+        if (usePerRequestLoadBalancing) {
+            // Copy the list, otherwise we will get a ConcurrentModificationException as
+            // soon as next() is called on the iterator.
+            List<CorbaContactInfo> newList = new ArrayList( effectiveTargetIORContactInfoList ) ;
+            CorbaContactInfo head = newList.remove(0) ;
+            newList.add( head ) ;
+            effectiveTargetIORContactInfoList = newList ;
+        }
+        */
+
+        return result ;
     }
 
     ////////////////////////////////////////////////////
@@ -124,6 +228,18 @@ public class CorbaContactInfoListImpl
 	}
 	primaryContactInfo = null;
 	setLocalSubcontract();
+
+        // Set the per request load balancing flag.
+        IIOPProfile prof = effectiveTargetIOR.getProfile() ;
+        TaggedProfileTemplate temp = prof.getTaggedProfileTemplate() ;
+        Iterator<TaggedComponent> lbcomps = 
+            temp.iteratorById( ORBConstants.TAG_LOAD_BALANCING_ID ) ;
+        if (lbcomps.hasNext()) {
+            LoadBalancingComponent lbcomp = null ;
+            lbcomp = (LoadBalancingComponent)(lbcomps.next()) ;
+            usePerRequestLoadBalancing = 
+                lbcomp.getLoadBalancingValue() == ORBConstants.PER_REQUEST_LOAD_BALANCING ; 
+        }
     }
 
     public synchronized IOR getEffectiveTargetIOR()
@@ -158,7 +274,7 @@ public class CorbaContactInfoListImpl
     // Implementation
     //
 
-    protected void createContactInfoList()
+    private void createContactInfoList()
     {
 	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
 
@@ -211,9 +327,14 @@ public class CorbaContactInfoListImpl
 		}
 	    }
 	}
+
+        if (orb.folbDebugFlag) {
+            dprint( ".createContactInfoList: effectiveTargetIORContactInfoList = " +
+                effectiveTargetIORContactInfoList ) ;
+        }
     }
 
-    protected void addRemoteContactInfos(
+    private void addRemoteContactInfos(
         IOR  effectiveTargetIOR,
 	List<CorbaContactInfo> effectiveTargetIORContactInfoList)
     {
@@ -280,7 +401,7 @@ public class CorbaContactInfoListImpl
     }
 
     // For timing test.
-    public ContactInfo getPrimaryContactInfo()
+    public CorbaContactInfo getPrimaryContactInfo()
     {
 	return primaryContactInfo;
     }

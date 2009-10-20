@@ -35,20 +35,26 @@
  */
 package com.sun.corba.se.spi.transport ;
 
-import com.sun.corba.se.pept.transport.ContactInfoListIterator ;
 
 import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import java.util.Iterator;
 
-public interface CorbaContactInfoListIterator 
-    extends ContactInfoListIterator
-{
-    // REVISIT: this is GIOP specific.
-    public void reportAddrDispositionRetry(CorbaContactInfo contactInfo, 
+public abstract interface CorbaContactInfoListIterator 
+    extends Iterator<CorbaContactInfo> {
+
+    public void reportAddrDispositionRetry(CorbaContactInfo contactInfo,
 					   short disposition);
 
     public void reportRedirect(CorbaContactInfo contactInfo,
 			       IOR forwardedIOR);
+
+    public CorbaContactInfoList getContactInfoList();
+
+    public void reportSuccess(CorbaContactInfo contactInfo);
+
+    public boolean reportException(CorbaContactInfo contactInfo, RuntimeException exception);
+
+    public RuntimeException getFailureException();
 
 }
 

@@ -88,6 +88,7 @@ public class Client
     private JUnitReportHelper helper ;
     private PrintStream out ;
     private TestSession session ;
+    private boolean noJavaHomeAvailable = false ;
 
     public static void main(String args[])
     {
@@ -690,7 +691,10 @@ public class Client
 	    FileOutputStream out = new FileOutputStream( file ) ;
 	    return out ;
 	} catch (Exception exc) {
-	    throw new Error( "Unexpected exception", exc ) ;
+	    System.out.println( 
+                "Unexpected exception in makeFileOutputStream for " 
+                + fileName + ": " + exc ) ;
+            return null ;
 	}
     }
 
@@ -727,11 +731,15 @@ public class Client
 	    "localTransportStdImpl" ) ;
 	OutputStream os = makeFileOutputStream( System.getProperty( "java.home" ) + 
 	    File.separator + "lib" + File.separator + "orb.properties" ) ;
-	try {
-	    props.store( os, "New ORB test properties" ) ;
-	} catch (java.io.IOException exc) {
-	    throw new Error( "Unexpected exception", exc ) ;
-	}
+        if (os != null) {
+            try {
+                props.store( os, "New ORB test properties" ) ;
+            } catch (java.io.IOException exc) {
+                throw new Error( "Unexpected exception", exc ) ;
+            }
+        } else {
+            noJavaHomeAvailable = true ;
+        }
     }
 
     // Common DataCollector tests:

@@ -69,7 +69,7 @@ public class Client {
     private static final String TEST_REF_NAME = "testref" ;
     private static final String SERVER_NAME = "fromServer" ;
     private static final String CLIENT_NAME = "fromClient" ;
-    private static final String PORT_NUM = "3874" ;
+    private static final String PORT_NUM = "3992" ;
 
     private String BASE = "com.sun.corba.se." ;
 
@@ -176,6 +176,9 @@ public class Client {
 	    System.out.println( "Echoing third echoref" ) ;
 	    Echo ref2 = ref.say( ref ) ;
 	    Assert.assertEquals( ref2.name(), ref.name() ) ;
+
+            System.out.println( "Trying exception context" ) ;
+            ref.testExceptionContext() ;
 	} catch (Exception exc) {
 	    System.out.println( "Caught exception " + exc ) ;
 	    exc.printStackTrace() ;

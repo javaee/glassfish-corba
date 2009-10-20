@@ -35,7 +35,6 @@
  */
 package com.sun.corba.se.spi.protocol ;
 
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
 
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
@@ -58,7 +57,7 @@ import com.sun.corba.se.impl.protocol.BootstrapServerRequestDispatcher ;
 public final class RequestDispatcherDefault {
     private RequestDispatcherDefault() {}
 
-    public static ClientRequestDispatcher makeClientRequestDispatcher() 
+    public static CorbaClientRequestDispatcher makeClientRequestDispatcher()
     {
 	return new CorbaClientRequestDispatcherImpl() ;
     }

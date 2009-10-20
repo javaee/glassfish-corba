@@ -54,6 +54,7 @@ import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAManager;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 
@@ -75,7 +76,7 @@ public final class ReflectiveTie extends Servant implements Tie
     public ReflectiveTie( PresentationManager pm, ORBUtilSystemException wrapper )
     {
 	SecurityManager s = System.getSecurityManager();
- 	if (s != null) {
+ 	if (!PresentationDefaults.inAppServer() && (s != null)) {
  	    s.checkPermission(new DynamicAccessPermission("access"));
  	}
 	this.pm = pm ;

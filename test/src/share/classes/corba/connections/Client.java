@@ -45,7 +45,7 @@ import javax.naming.InitialContext;
 
 import java.util.Properties ;
 
-import org.omg.CORBA.ORB;
+import com.sun.corba.se.spi.orb.ORB ;
 
 import corba.hcks.C;
 import corba.hcks.U;
@@ -75,7 +75,6 @@ public class Client
     public static void main(String[] av)
     {
 	instance = Struct.getSampleInstance();
-	stats = new ConnectionStatistics();
 
         try {
 	    name = av[0];
@@ -84,7 +83,8 @@ public class Client
 
 	    Properties props = new Properties() ;
 	    props.setProperty( "com.sun.corba.se.ORBDebug", "subcontract" ) ;
-	    orb = ORB.init(av, props);
+	    orb = (com.sun.corba.se.spi.orb.ORB)ORB.init(av, props);
+            stats = new ConnectionStatistics( orb ) ;
 
 	    U.sop(name + " InitialContext ...");
 
@@ -149,11 +149,11 @@ public class Client
 	if (false) {
 	    com.sun.corba.se.spi.ior.IOR ior =
 		((com.sun.corba.se.spi.transport.CorbaContactInfoList)
-		 ((com.sun.corba.se.pept.protocol.ClientDelegate)
+		 ((com.sun.corba.se.spi.protocol.ClientDelegate)
 		  StubAdapter.getDelegate( result )).
 		  getContactInfoList()).getTargetIOR();
 
-	    ORB thisOrb = StubAdapter.getORB( result ) ;
+	    ORB thisOrb = (ORB)StubAdapter.getORB( result ) ;
 
 	    U.sop(i + ": lookup: " + rn 
 		  + " orbIdentity: " + System.identityHashCode(thisOrb)
@@ -202,13 +202,13 @@ public class Client
 
     public static void outbound(String msg)
     {
-	stats.outbound(name + " " + msg, orb);
+	stats.outbound(name + " " + msg, (com.sun.corba.se.spi.orb.ORB)orb);
     }
 
     public static void inbound(String msg)
     {
 	if (showInbound) {
-	    stats.inbound(name + " " + msg, orb);
+	    stats.inbound(name + " " + msg, (com.sun.corba.se.spi.orb.ORB)orb);
 	}
     }
 }
@@ -260,7 +260,7 @@ class CallThread
     {
 	try {
 	    U.sop(i + ": CallThread ORB.init:");
-	    ORB orb = ORB.init((String[])null, null);
+	    ORB orb = (ORB)ORB.init((String[])null, null);
 	    U.sop(i + ": CallThread InitialContext:");
 	    InitialContext initialContext = C.createInitialContext(orb);
 	    U.sop(i + ": CallThread lookup:");

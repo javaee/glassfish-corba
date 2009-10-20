@@ -218,6 +218,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	    this.pos = pos;
 	}
 
+        @Override
 	public int read(byte b[], int off, int len) throws IOException {
             System.arraycopy(buffer, pos, b, off, len);
             pos += len;
@@ -231,6 +232,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	    return buffer[pos++] & 0xff;
 	}
 
+        @Override
 	public long skip(long n) throws IOException {
 	    // Intentionally overridden, since super method calls read().
 	    return 0;
@@ -269,6 +271,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	/**
 	 * Connect the Stub to the ORB.
 	 */
+        @Override
 	protected final Object resolveObject(Object obj) throws IOException {
 	    try {
 		if (StubAdapter.isStub(obj)) {
@@ -289,6 +292,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	 * RMI class loader relies on the property java.rmi.server.codebase
 	 * to get hold of a URL to download classes remotely.
 	 */
+        @Override
 	protected Class resolveClass(ObjectStreamClass classDesc)
 	        throws IOException, ClassNotFoundException {
 
@@ -976,6 +980,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	peekCount = 0;
     }
 
+    @Override
     public boolean markSupported() { 
 	return true;
     }
@@ -1146,28 +1151,34 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 
     // java.io.InputStream
 
+    @Override
     public int read() throws IOException {
 	throw new UnsupportedOperationException();
     }
 
+    @Override
     public int read(byte b[]) throws IOException {
 	throw new UnsupportedOperationException();
     }
 
+    @Override
     public int read(byte b[], int off, int len) throws IOException {
 	throw new UnsupportedOperationException();
     }
 
+    @Override
     public long skip(long n) throws IOException {
 	throw new UnsupportedOperationException();
     }
 
+    @Override
     public int available() throws IOException {
 	throw new UnsupportedOperationException();
     }
 
     // caller: CorbaClientRequestDispatcherImpl.endRequest
     // caller: CorbaMessageMediatorImpl.endRequest
+    @Override
     public void close() throws IOException {
 	if (bis == null) {
 	    return;

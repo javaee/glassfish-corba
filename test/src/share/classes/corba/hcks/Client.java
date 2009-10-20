@@ -103,7 +103,7 @@ import org.omg.PortableInterceptor.Current;
 import javax.rmi.CORBA.Stub;
 import javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.pept.protocol.ClientDelegate;
+import com.sun.corba.se.spi.protocol.ClientDelegate;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.presentation.rmi.StubWrapper;

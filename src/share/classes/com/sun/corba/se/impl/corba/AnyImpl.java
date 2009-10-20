@@ -64,7 +64,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.io.ValueUtility;
@@ -116,7 +116,7 @@ public class AnyImpl extends Any
     // stream type is an Any extension of CDR stream that is used to
     // detect an optimization in read_value().
     //
-    private transient CDRInputStream stream;
+    private transient CDRInputObject stream;
     private long value;
     private java.lang.Object object;
 
@@ -596,18 +596,19 @@ public class AnyImpl extends Any
 	    if (AnyImpl.isStreamed[kind]) {
 		if ( in instanceof AnyInputStream ) {
 		    // could only have been created here
-		    stream = (CDRInputStream)in;
+		    stream = (CDRInputObject)in;
 		} else {
 		    org.omg.CORBA_2_3.portable.OutputStream out =
 			(org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
 		    typeCode.copy((org.omg.CORBA_2_3.portable.InputStream)in, out);
-		    stream = (CDRInputStream)out.create_input_stream();
+		    stream = (CDRInputObject)out.create_input_stream();
 		}
 	    } else {
 		java.lang.Object[] objholder = new java.lang.Object[1];
 		objholder[0] = object;
 		long[] longholder = new long[1];
-		TCUtility.unmarshalIn(in, typeCode, longholder, objholder);
+                // Fix for bug 5036554/4712731: realType() instead of typecode
+		TCUtility.unmarshalIn(in, realType(), longholder, objholder);
 		value = longholder[0];
 		object = objholder[0];
 		stream = null;

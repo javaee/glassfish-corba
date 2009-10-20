@@ -56,14 +56,12 @@ import org.omg.CORBA.ContextList ;
 
 import org.omg.CORBA_2_3.portable.Delegate ;
 
-import com.sun.corba.se.pept.transport.ContactInfoList ;
-import com.sun.corba.se.pept.broker.Broker ;
+import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.CorbaClientDelegate ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 
 import corba.dynamicrmiiiop.testclasses.TieTestImpl ;
 
@@ -258,12 +256,12 @@ public class TestClientDelegate extends CorbaClientDelegate
 
     // From ClientDelegate:
 
-    public Broker getBroker()
+    public ORB getBroker()
     {
 	return null ;
     }
 
-    public ContactInfoList getContactInfoList() 
+    public CorbaContactInfoList getContactInfoList()
     {
 	return new CorbaContactInfoList() {
 	    public Iterator iterator()

@@ -1,0 +1,11 @@
+Note: this version of Jscheme is derived from the original Jscheme 7.2
+by removing all of the contributed code and web-related code.
+I did this because I do not need the web code, and I want a simple,
+self-contained Jscheme which has no dependencies on any code outside
+of the JDK.  All of the great work on Jscheme was done by the
+original authors.  Any bugs introduced by my modifications are of
+course soley my responsbility.
+
+Ken Cavanaugh
+Sun Microsystems
+9/17/09

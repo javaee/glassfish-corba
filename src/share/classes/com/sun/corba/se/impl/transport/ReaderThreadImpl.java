@@ -37,9 +37,9 @@ package com.sun.corba.se.impl.transport;
 
 import java.io.IOException;
 
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ReaderThread;
-import com.sun.corba.se.pept.transport.Selector;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.ReaderThread;
+import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
@@ -52,12 +52,12 @@ public class ReaderThreadImpl
 	Work
 {
     private ORB orb;
-    private Connection connection;
+    private CorbaConnection connection;
     private boolean keepRunning;
     private long enqueueTime;
 
     public ReaderThreadImpl(ORB orb, 
-			    Connection connection)
+			    CorbaConnection connection)
     {
 	this.orb = orb;
 	this.connection = connection;
@@ -69,7 +69,7 @@ public class ReaderThreadImpl
     // ReaderThread methods.
     //
 
-    public Connection getConnection()
+    public CorbaConnection getConnection()
     {
 	return connection;
     }

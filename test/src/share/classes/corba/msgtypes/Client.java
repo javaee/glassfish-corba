@@ -39,23 +39,18 @@ import java.io.*;
 import java.rmi.RemoteException;
 import java.util.* ;
 import javax.rmi.PortableRemoteObject;
-import java.rmi.Remote ;
 
 import org.omg.CORBA.INTERNAL ;
 import org.omg.CORBA.LocalObject ;
-import org.omg.CosNaming.*;
 import org.omg.PortableInterceptor.*;
 
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ConnectionCache;
+import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactories;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
 import com.sun.corba.se.spi.ior.IORTemplate;
-import com.sun.corba.se.spi.ior.ObjectKeyFactory;
 import com.sun.corba.se.spi.ior.ObjectAdapterId;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
@@ -70,21 +65,18 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
 
-import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
-import com.sun.corba.se.impl.encoding.BufferManagerWrite;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.ior.ObjectKeyFactoryImpl;
 import com.sun.corba.se.impl.ior.ObjectKeyImpl;
 import com.sun.corba.se.impl.ior.POAObjectKeyTemplate;
 import com.sun.corba.se.impl.ior.OldPOAObjectKeyTemplate;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.CorbaClientDelegateImpl;
-import com.sun.corba.se.impl.protocol.CorbaClientDelegateImpl;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.*;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
+
+import org.glassfish.external.statistics.CountStatistic ;
 
 public class Client extends LocalObject 
     implements ORBInitializer, ClientRequestInterceptor 
@@ -255,7 +247,7 @@ public class Client extends LocalObject
         LocateRequestMessage msg = getLocateRequestMessage(orb, ior);
 	CorbaMessageMediator messageMediator =
 	    beginRequest(orb, fragTestStub, msg);
-	CDROutputStream os = (CDROutputStream)
+	CDROutputObject os = (CDROutputObject)
 	    messageMediator.getOutputObject();
         // create GIOP header and write to output buffer
         os.write_long(Message.GIOPBigMagic);
@@ -298,7 +290,7 @@ public class Client extends LocalObject
 		ServiceContextDefaults.makeServiceContexts( orb ), null);
 	CorbaMessageMediator messageMediator =
 	    beginRequest(orb, fragTestStub, msg);
-	CDROutputStream os = (CDROutputStream)
+	CDROutputObject os = (CDROutputObject)
 	    messageMediator.getOutputObject();
 
         msg.write(os);
@@ -386,7 +378,7 @@ public class Client extends LocalObject
         int align = ORBConstants.GIOP_12_MSG_BODY_ALIGNMENT; // 8 bytes length
         int charLength = 1;
         org.omg.CORBA.Object fragTestStub = getStub(orb);      
-        CDROutputStream os = (CDROutputStream)
+        CDROutputObject os = (CDROutputObject)
             StubAdapter.request(fragTestStub, "fooA", false); // CASE 1
         int beforePaddingIndex = os.getByteBufferWithInfo().position();
         os.write_char('a'); // forces padding if not already naturally aligned
@@ -406,7 +398,7 @@ public class Client extends LocalObject
         // check to see if padding is inserted. This is done by calling the
         // the method 'foob', which has an additional character in its name,
         // that will force non-alignment.
-        os = (CDROutputStream)
+        os = (CDROutputObject)
             StubAdapter.request(fragTestStub, "fooB", false); // CASE 2
         beforePaddingIndex = os.getByteBufferWithInfo().position();
         os.write_char('a'); // forces padding if not already naturally aligned
@@ -624,7 +616,7 @@ public class Client extends LocalObject
 	CorbaMessageMediator messageMediator = (CorbaMessageMediator)
 	    contactInfo.createMessageMediator(
                 orb, contactInfo, connection, "locate message", false);
-	OutputObject outputObject = null;
+	CDROutputObject outputObject = null;
 	if (strategy == -1) {
 	    outputObject =
 		new CDROutputObject(orb, messageMediator, msg,
@@ -781,15 +773,19 @@ public class Client extends LocalObject
 }
 
 class DummyConnectionCache
-    implements ConnectionCache
+    implements CorbaConnectionCache
 {
     public String getCacheType() { return null; }
-    public void stampTime(Connection connection) {}
-    public long numberOfConnections() { return 0; }
-    public long numberOfIdleConnections() { return 0; }
-    public long numberOfBusyConnections() { return 0; }
+    public void stampTime(CorbaConnection connection) {}
+    public CountStatistic numberOfConnections() { return null; }
+    public CountStatistic numberOfIdleConnections() { return null; }
+    public CountStatistic numberOfBusyConnections() { return null; }
     public boolean reclaim() { return true; }
     public void close() {}
+
+    public String getMonitoringName() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
 
 // End of file.

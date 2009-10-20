@@ -40,10 +40,6 @@ import java.nio.ByteBuffer;
 import org.omg.CORBA.CompletionStatus;
 import com.sun.org.omg.SendingContext.CodeBase;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.encoding.CDRInputStream;
-import com.sun.corba.se.impl.encoding.BufferManagerFactory;
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import com.sun.corba.se.spi.orb.ORB;
@@ -63,7 +59,7 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
  * When more encapsulations arise that have their own special code
  * sets defined, we can make all constructors take such parameters.
  */
-public class EncapsInputStream extends CDRInputStream
+public class EncapsInputStream extends CDRInputObject
 {
     private ORBUtilSystemException wrapper ;
 
@@ -158,7 +154,7 @@ public class EncapsInputStream extends CDRInputStream
         performORBVersionSpecificInit();
     }
 
-    public CDRInputStream dup() {
+    public CDRInputObject dup() {
         return new EncapsInputStream(this);
     }
 
@@ -188,6 +184,7 @@ public class EncapsInputStream extends CDRInputStream
                                                         false);
     }
 
+    @Override
     public CodeBase getCodeBase() {
         return codeBase;
     }

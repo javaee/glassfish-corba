@@ -48,7 +48,6 @@ package rmic;
 import test.ServantContext;
 import test.RemoteTest;
 import java.rmi.AccessException;
-import javax.rmi.CORBA.Tie;
 import java.util.Properties;
 import java.util.Enumeration;
 import java.io.Serializable;
@@ -61,8 +60,6 @@ import org.omg.CORBA.portable.ServantObject;
 import org.omg.CORBA.portable.Delegate;
 
 import com.sun.corba.se.spi.ior.IOR ;
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBData ;
@@ -107,6 +104,7 @@ public class HelloTest extends RemoteTest {
      * to 'currentArgs'. This implementation will set the output directory if
      * the OUTPUT_DIRECTORY flag was passed on the command line.
      */
+    @Override
     protected String[] getAdditionalRMICArgs (String[] currentArgs) {
         if (iiop) {
             String[] ourArgs = {"-alwaysGenerate", "-keepgenerated"};
@@ -120,6 +118,7 @@ public class HelloTest extends RemoteTest {
      * Append additional (i.e. after -iiop and before classes) rmic arguments
      * to 'currentArgs'.
      */
+    @Override
     protected boolean generateStubsOnlyOnce () {
         return false;
     }
@@ -127,6 +126,7 @@ public class HelloTest extends RemoteTest {
     /**
      * Return true if stubs should be generated in an external process.
      */
+    @Override
     protected boolean generateStubsExternally () {
         return false;
     }
@@ -605,10 +605,10 @@ public class HelloTest extends RemoteTest {
             if (context != null) {
                 context.destroy();
             }
-            java.util.Hashtable args = getArgs();
-            args.remove(LOCAL_SERVANTS_FLAG);
-            args.remove(NO_LOCAL_STUBS_FLAG);
-            args.remove(SKIP_RMIC_FLAG);
+            java.util.Hashtable myArgs = getArgs();
+            myArgs.remove(LOCAL_SERVANTS_FLAG);
+            myArgs.remove(NO_LOCAL_STUBS_FLAG);
+            myArgs.remove(SKIP_RMIC_FLAG);
             if (webServer != null) {
                 webServer.quit();
             }

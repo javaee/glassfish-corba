@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -47,6 +47,14 @@ import org.osgi.framework.BundleActivator ;
 import org.osgi.framework.SynchronousBundleListener ;
 import org.osgi.framework.BundleContext ;
 import org.osgi.framework.BundleEvent ;
+import org.osgi.framework.ServiceReference ;
+
+import org.osgi.service.packageadmin.PackageAdmin ;
+import org.osgi.service.packageadmin.ExportedPackage ;
+
+import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
+
+import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 /** OSGi class that monitors which bundles provide classes that the ORB
  * needs to instantiate for initialization.  This class is part of the
@@ -63,9 +71,21 @@ import org.osgi.framework.BundleEvent ;
  * @author ken
  */
 public class OSGIListener implements BundleActivator, SynchronousBundleListener {
+    private static ORBUtilSystemException wrapper =
+        com.sun.corba.se.spi.orb.ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
+
     private static final String ORB_PROVIDER_KEY = "ORB-Class-Provider" ;
 
+    private static PackageAdmin pkgAdmin ;
+
+    // Map from class name to Bundle, which identifies all known 
+    // ORB-Class-Providers.
     private static Map<String,Bundle> classNameMap =
+        new HashMap<String,Bundle>() ;
+
+    // Map from package name to Bundle, which identifies all known
+    // exported packages.
+    private static Map<String,Bundle> packageNameMap = 
         new HashMap<String,Bundle>() ;
 
     private static final boolean DEBUG = Boolean.getBoolean( ORBConstants.DEBUG_OSGI_LISTENER ) ;
@@ -114,27 +134,18 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         UnaryFunction<String,Class<?>> {
 
         public Class<?> evaluate(String arg) {
-            if (DEBUG) {
-                msg( "Looking for class \"" + arg + "\"" ) ;
-            }
-
             Bundle bundle = getBundleForClass( arg ) ;
             if (bundle == null) {
-                if (DEBUG) {
-                    msg( "Class not found" ) ;
-                }
-
+                wrapper.classNotFoundInBundle( arg ) ;
                 return null ;
             } else {
-                if (DEBUG) {
-                    msg( "Found class in bundle " + bundle ) ;
-                }
+                wrapper.foundClassInBundle( arg, bundle ) ;
             }
 
             try {
                 return bundle.loadClass(arg);
             } catch (ClassNotFoundException ex) {
-                throw new RuntimeException( ex ) ;
+                throw wrapper.bundleCouldNotLoadClass( ex, arg, bundle ) ;
             }
         }
 
@@ -150,74 +161,196 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         return classNameResolver ;
     }
 
-    private static synchronized void insertORBProviders( Bundle bundle ) {
-        Dictionary dict = bundle.getHeaders() ;
-        String name = bundle.getSymbolicName() ;
-        if (dict != null) {
-            String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
-            if (orbProvider != null) {
-                for (String className : orbProvider.split(",") ) {
-                    if (DEBUG) {
-                        msg( "Inserting: Bundle " + name + " provides ORB class \"" + className + "\"" ) ;
+    private static class ClassCodeBaseHandlerImpl implements ClassCodeBaseHandler {
+        private static final String PREFIX = "osgi://" ;
+
+        public String getCodeBase( Class cls ) {
+            if (cls == null) {
+                return null ;
+            }
+
+            if (pkgAdmin == null) {
+                return null ;
+            }
+
+            Bundle bundle = pkgAdmin.getBundle( cls ) ;
+            if (bundle == null) {
+                wrapper.classNotFoundInBundle( cls ) ;
+                return null ;
+            }
+            
+            String name = bundle.getSymbolicName() ;
+
+            Dictionary headers = bundle.getHeaders() ;
+            String version = "0.0.0" ;
+            if (headers != null) {
+                String hver = (String)headers.get( "Bundle-Version" ) ;
+                if (hver != null)
+                    version = hver ;
+            }
+
+            wrapper.foundClassInBundleVersion( cls, name, version ) ;
+
+            return PREFIX + name + "/" + version ;
+        }
+
+        public Class loadClass( String codebase, String className ) {
+            if (codebase == null) {
+                Bundle bundle = getBundleForClass( className ) ;
+                if (bundle != null) {
+                    try {
+                        return bundle.loadClass( className ) ;
+                    } catch (ClassNotFoundException exc) {
+                        wrapper.couldNotLoadClassInBundle( exc, className, 
+                            bundle.getSymbolicName() ) ;
+                        return null ;
                     }
+                } else {
+                    return null ;
+                }
+            }
+
+            if (codebase.startsWith( PREFIX )) {
+                String rest = codebase.substring( PREFIX.length() ) ;
+                int index = rest.indexOf( "/" ) ;
+                if (index > 0) {
+                    String name = rest.substring( 0, index ) ;
+                    String version = rest.substring( index+1 ) ;
+                    // version is a version range
+                    if (pkgAdmin != null) {
+                        Bundle[] defBundles = pkgAdmin.getBundles( name, version ) ;
+                        if (defBundles != null) {
+                            // I think this is the highest available version
+                            try {
+                                wrapper.foundClassInBundleVersion( className, name, version ) ;
+                                return defBundles[0].loadClass( className ) ;
+                            } catch (ClassNotFoundException cnfe) {
+                                wrapper.classNotFoundInBundleVersion( className, name, version ) ;
+                                // fall through to return null
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null ;
+        }
+    }
+
+    private static ClassCodeBaseHandler ccbHandler = new ClassCodeBaseHandlerImpl() ;
+
+    public static ClassCodeBaseHandler classCodeBaseHandler() {
+        return ccbHandler ;
+    }
+
+    private static synchronized void insertClasses( Bundle bundle ) {
+        final Dictionary dict = bundle.getHeaders() ;
+        final String name = bundle.getSymbolicName() ;
+        if (dict != null) {
+            final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
+            if (orbProvider != null) {
+                for (String str : orbProvider.split(",") ) {
+                    String className = str.trim() ;
                     classNameMap.put( className, bundle ) ;
+                    wrapper.insertOrbProvider( className, name ) ;
+                }
+            }
+        }
+
+        if (pkgAdmin != null) {
+            ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
+            if (epkgs != null) {
+                for (ExportedPackage ep : epkgs) {
+                    packageNameMap.put( ep.getName(), bundle ) ;
                 }
             }
         }
     }
 
-    private static synchronized void removeORBProviders( Bundle bundle ) {
-        Dictionary dict = bundle.getHeaders() ;
-        String name = bundle.getSymbolicName() ;
+    private static synchronized void removeClasses( Bundle bundle ) {
+        final Dictionary dict = bundle.getHeaders() ;
+        final String name = bundle.getSymbolicName() ;
         if (dict != null) {
-            String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
+            final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
             if (orbProvider != null) {
                 for (String className : orbProvider.split(",") ) {
                     classNameMap.remove( className ) ;
-                    if (DEBUG) {
-                        msg( "Removing: Bundle " + name + " provides ORB class \"" + className + "\"" ) ;
-                    }
+                    wrapper.removeOrbProvider( className, name ) ;
+                }
+            }
+        }
+
+        if (pkgAdmin != null) {
+            ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
+            if (epkgs != null) {
+                for (ExportedPackage ep : epkgs) {
+                    packageNameMap.remove( ep.getName() ) ;
                 }
             }
         }
     }
 
     private static synchronized Bundle getBundleForClass( String className ) {
-        return classNameMap.get( className ) ;
+        Bundle result = classNameMap.get( className ) ;
+        if (result == null) {
+            wrapper.classNotFoundInClassNameMap( className ) ;
+            // Get package prefix
+            final int index = className.lastIndexOf( "." ) ;
+            if (index > 0) {
+                final String packageName = className.substring( 0, index ) ;
+                result = packageNameMap.get( packageName ) ;
+                if (result == null) {
+                    wrapper.classNotFoundInPackageNameMap( className ) ;
+                } else {
+                    wrapper.classFoundInPackageNameMap( className, 
+                        result.getSymbolicName() ) ;
+                }
+            }
+        } else {
+            wrapper.classFoundInClassNameMap( className, 
+                result.getSymbolicName() ) ;
+        }
+
+        return result ;
     }
 
     public void start( BundleContext context ) {
-        context.addBundleListener(this);
-        // Probe all existing bundles for ORB providers
-        if (DEBUG) {
-            msg( "Starting up: probing all existing bundles for providers" ) ;
+        // Get a referece to the PackageAdmin service before we
+        // do ANYTHING else.
+        final ServiceReference sref = context.getServiceReference( 
+            "org.osgi.service.packageadmin.PackageAdmin" ) ;
+        pkgAdmin = (PackageAdmin)context.getService( sref ) ;
+        if (pkgAdmin == null) {
+            wrapper.packageAdminServiceNotAvailable() ;
         }
+
+        context.addBundleListener(this);
+        
+        // Probe all existing bundles for ORB providers
+        wrapper.probeBundlesForProviders() ;
         for (Bundle bundle : context.getBundles()) {
-            insertORBProviders( bundle ) ;
+            insertClasses( bundle ) ;
         }
         mapContents() ;
     }
 
     public void stop( BundleContext context ) {
-        Bundle myBundle = context.getBundle() ;
-        removeORBProviders( myBundle ) ;
+        final Bundle myBundle = context.getBundle() ;
+        removeClasses( myBundle ) ;
         mapContents() ;
     }
 
     public void bundleChanged(BundleEvent event) {
-        int type = event.getType() ;
-        Bundle bundle = event.getBundle() ;
-        String name = bundle.getSymbolicName() ;
+        final int type = event.getType() ;
+        final Bundle bundle = event.getBundle() ;
+        final String name = bundle.getSymbolicName() ;
 
-        if (DEBUG) {
-            msg( "Event type " + getBundleEventType( type ) 
-                + " on bundle " + name ) ;
-        }
+        wrapper.receivedBundleEvent( getBundleEventType( type ), name ) ;
 
         if (type == Bundle.INSTALLED) {
-            insertORBProviders( bundle ) ;
+            insertClasses( bundle ) ;
         } else if (type == Bundle.UNINSTALLED) {
-            removeORBProviders( bundle ) ;
+            removeClasses( bundle ) ;
         }
         mapContents() ;
     }

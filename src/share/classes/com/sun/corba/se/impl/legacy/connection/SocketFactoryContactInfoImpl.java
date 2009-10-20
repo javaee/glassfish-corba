@@ -36,7 +36,7 @@
 
 package com.sun.corba.se.impl.legacy.connection;
 
-import com.sun.corba.se.pept.transport.Connection;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.ior.IOR;
@@ -87,14 +87,9 @@ public class SocketFactoryContactInfoImpl
 	port = socketInfo.getPort();
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ContactInfo
-    //
-
-    public Connection createConnection() 
+    public CorbaConnection createConnection()
     {
-	Connection connection =
+	CorbaConnection connection =
 	    new SocketFactoryConnectionImpl(
                 orb, this,
 		orb.getORBData().connectionSocketUseSelectThreadToWait(),

@@ -53,6 +53,10 @@ public interface Test
 {
     public int echo(int x, float y, short[] z, String str, Map m )
 	throws RemoteException;
+
+    public Object testExceptionContext() throws RemoteException ;
+
+    public Object testSimpleExceptionContext() throws RemoteException ;
 }
 
 // End of file.

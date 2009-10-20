@@ -49,7 +49,7 @@ import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
@@ -117,7 +117,7 @@ public final class LocateReplyMessage_1_0 extends Message_1_0
 
         // The code below reads the reply body if status is OBJECT_FORWARD
         if (this.locate_status == OBJECT_FORWARD) {
-            CDRInputStream cdr = (CDRInputStream) istream;
+            CDRInputObject cdr = (CDRInputObject) istream;
 	    this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
         }
     }

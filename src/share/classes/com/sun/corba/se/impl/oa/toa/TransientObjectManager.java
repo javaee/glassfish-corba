@@ -46,13 +46,24 @@ package com.sun.corba.se.impl.oa.toa;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 import com.sun.corba.se.spi.orb.ORB ;
+import org.glassfish.gmbal.Description;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedData;
 
+@ManagedData
+@Description( "Maintains mapping from Object ID to servant")
 public final class TransientObjectManager {
     private ORB orb ;
     private int maxSize = 128;
     private Element[] elementArray; 
     private Element freeList;
 
+    @ManagedAttribute() 
+    @Description( "The element array mapping indices into servants" ) 
+    // XXX Really should return a deep clone!
+    private synchronized Element[] getElements() {
+        return elementArray.clone() ;
+    }
     void dprint( String msg ) {
 	ORBUtility.dprint( this, msg ) ;
     }
@@ -165,6 +176,8 @@ public final class TransientObjectManager {
 }
 
 
+@ManagedData
+@Description( "A single element mapping one ObjectId to a Servant")
 final class Element {
     java.lang.Object servant=null;     // also stores "next pointer" in free list
     java.lang.Object servantData=null;    
@@ -172,6 +185,30 @@ final class Element {
     int counter=0; 
     boolean valid=false; // valid=true if this Element contains
     // a valid servant
+
+    @ManagedAttribute
+    @Description( "The servant" )
+    private synchronized Object getServant() {
+        return servant ;
+    }
+
+    @ManagedAttribute
+    @Description( "The servant data" )
+    private synchronized Object getServantData() {
+        return servantData ;
+    }
+
+    @ManagedAttribute
+    @Description( "The reuse counter")
+    private synchronized int getReuseCounter() {
+        return counter ;
+    }
+
+    @ManagedAttribute
+    @Description( "The index of this entry")
+    private synchronized int getIndex() {
+        return index ;
+    }
 
     Element(int i, java.lang.Object next)
     {

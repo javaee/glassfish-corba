@@ -39,6 +39,7 @@ package com.sun.corba.se.impl.ior;
 import java.util.Arrays ;
 import com.sun.corba.se.spi.ior.ObjectId ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
+import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 /**
  * @author 
@@ -68,6 +69,10 @@ public final class ObjectIdImpl implements ObjectId
     public ObjectIdImpl( byte[] id ) 
     {
 	this.id = id ;
+    }
+
+    public String getIdString() {
+        return ORBUtility.dumpBinary( id ) ;
     }
 
     public byte[] getId()

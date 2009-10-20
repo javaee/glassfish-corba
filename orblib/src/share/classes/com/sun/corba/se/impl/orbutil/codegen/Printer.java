@@ -41,7 +41,7 @@ import java.io.PrintStream ;
 /** Extends the file utility Printer with line numbers that are
  * also optionally stored as Attributes in Nodes for annotating the AST.
  */
-public class Printer extends com.sun.corba.se.spi.orbutil.file.Printer {
+public class Printer extends com.sun.corba.se.spi.orbutil.misc.Printer {
     static Attribute<Integer> lineNumberAttribute = new Attribute<Integer>( 
 	Integer.class, "lineNumber", -1 ) ;
 

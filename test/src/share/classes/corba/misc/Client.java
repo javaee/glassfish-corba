@@ -39,12 +39,17 @@ package corba.misc ;
 import java.util.Properties ;
 import java.util.Random ;
 import java.util.Stack ;
+import java.util.Date ;
 
 import java.nio.ByteBuffer ;
 
+import java.io.ObjectOutputStream ;
 import java.io.Serializable ;
+import java.io.IOException ;
 import java.io.PrintStream ;
 import java.io.ByteArrayOutputStream ;
+
+import javax.jdo.identity.LongIdentity ;
 
 import org.omg.CORBA_2_3.portable.OutputStream ;
 import org.omg.CORBA_2_3.portable.InputStream ;
@@ -106,6 +111,8 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 import com.sun.corba.se.impl.logging.OMGSystemException ;
 import com.sun.corba.se.impl.oa.poa.POAImpl ;
+
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
 import corba.folb_8_1.IIOPPrimaryToContactInfoImpl ;
 
@@ -206,7 +213,7 @@ public class Client extends TestCase
     }
 
     /** Test for bug 4919770: multiple ORBs share the same root MonitoredObject.
-      */
+      *
     public void testMonitoringRootName()
     {
 	for (int ctr=0; ctr<idInfo.length; ctr++) {
@@ -215,6 +222,8 @@ public class Client extends TestCase
 	    assertEquals( rootName, idInfo[ctr][1] ) ;
 	}
     }
+    */
+
 /*
     // Test for bug 6177606: incorrect error handling for string_to_object.
     public static class NamingTestSuite extends TestCase
@@ -531,28 +540,15 @@ public class Client extends TestCase
 	    orb = ORB.class.cast( ORB.init( args, props ) ) ;
 
 	    OutputStream os = OutputStream.class.cast( orb.create_output_stream() ) ;
-	    // os.write_value( Color.BLUE ) ;
+	    os.write_value( pair ) ;
+	    os.write_value( colors ) ;
+	    os.write_value( Color.BLUE ) ;
 	    os.write_value( Coin.NICKEL ) ;
 	    os.write_value( colors ) ;
-	    os.write_value( pair ) ;
 
 	    InputStream is = InputStream.class.cast( os.create_input_stream() ) ;
-            /*
-	    Color shouldBeBlue = Color.class.cast( is.read_value() ) ;
-	    assertSame( "Result of read_value is not the expected value",
-		shouldBeBlue, Color.BLUE ) ;
-            */
 
-	    Coin shouldBeNickel = Coin.class.cast( is.read_value() ) ;
-	    assertSame( "Result of read_value is not the expected value",
-		shouldBeNickel, Coin.NICKEL ) ;
-
-	    Color[] shouldBeColors = (Color[])is.read_value() ;
-	    for (int ctr=0; ctr<colors.length; ctr++) {
-		assertSame( "Result[" + ctr + "] is not the expected value",
-		    shouldBeColors[ctr], colors[ctr] ) ;
-	    }
-
+            System.out.println( "Testing pair" ) ;
 	    SPair<SPair<Color,Color>,Color> shouldBePair = 
 		(SPair<SPair<Color,Color>,Color>)(is.read_value()) ;
 
@@ -564,6 +560,30 @@ public class Client extends TestCase
 
 	    assertSame( "pair.second()", shouldBePair.second(),
 		pair.second() ) ;
+
+            System.out.println( "Testing colors" ) ;
+	    Color[] shouldBeColors = (Color[])is.read_value() ;
+	    for (int ctr=0; ctr<colors.length; ctr++) {
+		assertSame( "Result[" + ctr + "] is not the expected value",
+		    shouldBeColors[ctr], colors[ctr] ) ;
+	    }
+
+            System.out.println( "Testing BLUE" ) ;
+	    Color shouldBeBlue = Color.class.cast( is.read_value() ) ;
+	    assertSame( "Result of read_value is not the expected value",
+		shouldBeBlue, Color.BLUE ) ;
+
+            System.out.println( "Testing NICKEL" ) ;
+	    Coin shouldBeNickel = Coin.class.cast( is.read_value() ) ;
+	    assertSame( "Result of read_value is not the expected value",
+		shouldBeNickel, Coin.NICKEL ) ;
+
+            System.out.println( "Testing colors" ) ;
+	    shouldBeColors = (Color[])is.read_value() ;
+	    for (int ctr=0; ctr<colors.length; ctr++) {
+		assertSame( "Result[" + ctr + "] is not the expected value",
+		    shouldBeColors[ctr], colors[ctr] ) ;
+	    }
 	} finally {
 	    if (orb != null)
 		orb.destroy() ;
@@ -830,6 +850,48 @@ public class Client extends TestCase
 	}
     }
 
+    private void print2( String actual, String expected ) {
+        assertEquals( actual, expected ) ;
+        // System.out.println( "actual=" + actual + ",expected=" + expected ) ;
+    }
+
+    public void testOperationTracer() {
+        System.out.println( "Testing OperationTracer" ) ;
+        long time = System.currentTimeMillis() ;
+        OperationTracer.enable() ;
+        OperationTracer.finish() ;
+        print2( OperationTracer.getAsString(), "" ) ;
+        OperationTracer.begin( "Initial" ) ;
+        print2( OperationTracer.getAsString(), "Initial:" ) ;
+        OperationTracer.startReadValue( "Foo" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Foo" ) ;
+        OperationTracer.readingField( "a" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Foo.a" ) ;
+        OperationTracer.readingField( "b" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Foo.b" ) ;
+        OperationTracer.endReadValue() ;
+        print2( OperationTracer.getAsString(), "Initial:" ) ;
+        OperationTracer.startReadArray( "Bar", 27 ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>" ) ;
+        OperationTracer.readingIndex( 0 ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[0]" ) ;
+        OperationTracer.readingIndex( 1 ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[1]" ) ;
+        OperationTracer.startReadValue( "Baz" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[1],Baz" ) ;
+        OperationTracer.readingField( "x1" ) ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[1],Baz.x1" ) ;
+        OperationTracer.endReadValue() ;
+        print2( OperationTracer.getAsString(), "Initial:Bar<27>[1]" ) ;
+        OperationTracer.endReadArray() ;
+        print2( OperationTracer.getAsString(), "Initial:" ) ;
+        OperationTracer.finish() ;
+        print2( OperationTracer.getAsString(), "" ) ;
+        double elapsed = (time - System.currentTimeMillis())/1000 ;
+        System.out.println( 
+            "OperationTracer test complete in " + elapsed + " milliseconds" ) ;
+    }
+
     public void test5161() {
         System.out.println( "Running test for issue 5161" ) ;
         BuckPasserAL bpal = new BuckPasserAL() ;
@@ -883,6 +945,106 @@ public class Client extends TestCase
 
         if (errorCount > 0) {
             fail( "Class marshaling test failed with " + errorCount + " errors" ) ;
+        }
+    }
+
+    public static abstract class WebContent implements Serializable {
+        long id = 42 ;
+
+        java.util.Set extractFieldSet = null ;
+        java.util.Set linkSet = null ;
+        Object stats = null ;
+        java.lang.Long wcmsNodeId = Long.valueOf(716368 ) ;
+        java.lang.String wcmsPath = "/tag/destination/US/CA/075/san-francisco.xml" ;
+
+        private final void writeObject(java.io.ObjectOutputStream os ) throws IOException {
+            os.defaultWriteObject() ;
+        }
+    }
+
+    public static class Trip extends WebContent {
+        int clientId = 2 ;
+        long id = 23900 ;
+        boolean isActive = false ;
+        int lengthDays = 12 ;
+        int version = 232 ;
+        char visibilityCode = 'A' ;
+
+        Date createData = new Date() ;
+        String description = "a description of the trip" ;
+        Destination dest = new Destination() ;
+        String destinationText = "some airport and hotel" ;
+        String name = "John Doe" ;
+        Object member = null ;
+        Object stats = null ;
+        Date startDate = new Date() ;
+        Date updatedDate = new Date() ;
+        Object updatedBy = null ;
+
+        private final void writeObject( ObjectOutputStream os ) throws IOException {
+           os.defaultWriteObject() ;
+        }
+    }
+    
+    public static class Destination implements Serializable {
+        int typeCode = 4 ;
+        Object airport = null ;
+        String featuresCode = "a Feature" ;
+        String fullName = "Full name" ;
+        Point geoPoint = new Point() ;
+        Object[] jdoDetachedState = {
+            new LongIdentity( this.getClass(), 0x123458275374573L ), 
+            null, null, null } ;
+        String name = "name" ;
+
+        private final void writeObject( ObjectOutputStream os ) throws IOException {
+            os.defaultWriteObject() ;
+        }
+    }
+
+    public static class Geometry implements Serializable {
+        int dimension = 2 ;
+        boolean haveMeasure = true ;
+        int srid ;
+        int type = 1 ;
+    }
+
+    public static class Point extends Geometry {
+        double m = 1.0 ;
+        double x = -23.343 ;
+        double y = 102.2325446 ;
+        double z = 100.23 ;
+    }
+
+    public void testTrip() {
+        try {
+            System.out.println( "test case testTrip" ) ;          
+            Trip trip = new Trip() ;
+
+            OutputStream os = (OutputStream)orb.create_output_stream() ;
+            os.write_value( trip ) ;
+            InputStream is = (InputStream)os.create_input_stream() ;
+            Trip newTrip = (Trip)is.read_value() ;
+            //Assert.assertEquals( lid, newLid ) ;
+        } catch (Exception exc) {
+            exc.printStackTrace() ;
+            fail( exc.toString() ) ;
+        }
+    }
+
+    public void testCorbaname() {
+        try {
+            String[] args = new String[0] ;
+            Properties props = new Properties() ;
+            orb = ORB.class.cast( ORB.init( args, props ) ) ;
+
+            // final String test = 
+                // "corbaname:iiop:1.2@192.168.178.1:3700#ejb/XXServiceBean" ;
+
+            // orb.string_to_object( test ) ;
+        } finally {
+            if (orb != null)
+                orb.destroy() ;
         }
     }
 }

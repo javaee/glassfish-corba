@@ -36,7 +36,7 @@
 
 package com.sun.corba.se.impl.orb ;
 
-import java.net.URL ;
+import java.net.SocketException;
 import java.net.InetSocketAddress;
 import java.net.Socket ;
 import java.net.ServerSocket ;
@@ -49,20 +49,20 @@ import java.security.AccessController ;
 import java.security.PrivilegedExceptionAction ;
 import java.security.PrivilegedActionException ;
 
+import javax.management.ObjectName ;
+
 import org.omg.PortableInterceptor.ORBInitializer ;
 import org.omg.PortableInterceptor.ORBInitInfo ;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.EventHandler;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.EventHandler;
 
 import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.ObjectKey ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.spi.orb.ORB;
@@ -72,14 +72,14 @@ import com.sun.corba.se.spi.orb.OperationFactoryExt ;
 import com.sun.corba.se.spi.orb.ParserData ;
 import com.sun.corba.se.spi.orb.ParserDataFactory ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.TcpTimeouts;
-import com.sun.corba.se.spi.transport.TransportDefault;
+import com.sun.corba.se.impl.oa.poa.Policies;
 
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry ;
@@ -94,6 +94,7 @@ import com.sun.corba.se.impl.transport.DefaultIORToSocketInfoImpl;
 import com.sun.corba.se.impl.transport.DefaultSocketFactoryImpl;
 import com.sun.corba.se.impl.transport.TcpTimeoutsImpl;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 
 /** Initialize the parser data for the standard ORB parser.  This is used both
  * to implement ORBDataParserImpl and to provide the basic testing framework
@@ -124,6 +125,19 @@ public class ParserTable {
     public ParserData[] getParserData() 
     {
 	return parserData ;
+    }
+
+    public static ObjectName testGmbalRootParentName ;
+
+    public final static String TEST_GMBAL_ROOT_PARENT_NAME = 
+        "test:pp=\"/\",type=\"Foo\",name=\"1\"" ;
+
+    static {
+        try {
+            testGmbalRootParentName = new ObjectName( TEST_GMBAL_ROOT_PARENT_NAME ) ;
+        } catch (Exception exc) {
+            testGmbalRootParentName = null ;
+        }
     }
 
     private ParserTable( UnaryFunction<String,Class<?>> cnr ) {
@@ -166,7 +180,7 @@ public class ParserTable {
 	    new Pair<String,String>( MY_CLASS_NAME + "$TestORBInitializer1", "dummy" ),
 	    new Pair<String,String>( MY_CLASS_NAME + "$TestORBInitializer2", "dummy" ) } ;
 
-	Acceptor[] TestAcceptors =
+	CorbaAcceptor[] TestAcceptors =
 	    { null, 
 	      new TestAcceptor2(), 
 	      new TestAcceptor1()
@@ -371,8 +385,8 @@ public class ParserTable {
 		TestORBInitializers, TestORBInitData, ORBInitializer.class ),
 	    ParserDataFactory.make( ORBConstants.ACCEPTOR_CLASS_PREFIX_PROPERTY,  
 		makeAcceptorInstantiationOperation(), 
-		"acceptors", new Acceptor[0],
-		TestAcceptors, TestAcceptorData, Acceptor.class ),
+		"acceptors", new CorbaAcceptor[0],
+		TestAcceptors, TestAcceptorData, CorbaAcceptor.class ),
 
 	    //
 	    // Socket/Channel control
@@ -501,8 +515,22 @@ public class ParserTable {
 		Boolean.TRUE, "TRUE"),
 	    ParserDataFactory.make( ORBConstants.USE_ENUM_DESC,
 		OperationFactory.booleanAction(),
-		"useEnumDesc", Boolean.FALSE,
-		Boolean.TRUE, "TRUE")
+		"useEnumDesc", Boolean.TRUE,
+		Boolean.TRUE, "TRUE"),
+            ParserDataFactory.make( ORBConstants.NO_DEFAULT_ACCEPTORS,
+                OperationFactory.booleanAction(),
+                "noDefaultAcceptors", Boolean.FALSE,
+                Boolean.TRUE, "TRUE" ),
+            ParserDataFactory.make( ORBConstants.REGISTER_MBEANS,
+                OperationFactory.booleanAction(),
+                "registerMBeans", Boolean.TRUE,
+                Boolean.FALSE, "FALSE" ),
+            ParserDataFactory.make(
+                ORBConstants.FRAGMENT_READ_TIMEOUT,
+                OperationFactory.integerAction(), 
+		"fragmentReadTimeout",
+                Integer.valueOf(ORBConstants.DEFAULT_FRAGMENT_READ_TIMEOUT ),
+		Integer.valueOf(23000), "23000")
 	} ;
 
 	parserData = pd ;
@@ -588,11 +616,9 @@ public class ParserTable {
 	    return null ;
 	}
 
-	public void setAcceptedSocketOptions(Acceptor acceptor,
-					     ServerSocket serverSocket,
-					     Socket socket)
-	{
-	}
+        public void setAcceptedSocketOptions(CorbaAcceptor acceptor, ServerSocket serverSocket, Socket socket) throws SocketException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     public static final class TestIORToSocketInfo
@@ -612,19 +638,19 @@ public class ParserTable {
     public static final class TestIIOPPrimaryToContactInfo
 	implements IIOPPrimaryToContactInfo
     {
-	public void reset(ContactInfo primary)
+	public void reset(CorbaContactInfo primary)
 	{
 	}
 
-	public boolean hasNext(ContactInfo primary,
-			       ContactInfo previous,
+	public boolean hasNext(CorbaContactInfo primary,
+			       CorbaContactInfo previous,
 			       List contactInfos)
 	{
 	    return true;
 	}
 
-	public ContactInfo next(ContactInfo primary,
-				ContactInfo previous,
+	public CorbaContactInfo next(CorbaContactInfo primary,
+				CorbaContactInfo previous,
 				List contactInfos)
 	{
 	    return null;
@@ -982,7 +1008,7 @@ public class ParserTable {
     }
 
     public static final class TestAcceptor1
-	implements Acceptor
+	implements CorbaAcceptor
     {
 	public boolean equals( Object other )
 	{
@@ -991,26 +1017,56 @@ public class ParserTable {
 	public boolean initialize() { return true; }
 	public boolean initialized() { return true; }
 	public String getConnectionCacheType() { return "FOO"; }
-	public void setConnectionCache(InboundConnectionCache connectionCache){}
-	public InboundConnectionCache getConnectionCache() { return null; }
+	public void setConnectionCache(CorbaInboundConnectionCache connectionCache){}
+	public CorbaInboundConnectionCache getConnectionCache() { return null; }
 	public boolean shouldRegisterAcceptEvent() { return true; }
 	public void setUseSelectThreadForConnections(boolean x) { }
 	public boolean shouldUseSelectThreadForConnections() { return true; }
 	public void setUseWorkerThreadForConnections(boolean x) { }
 	public boolean shouldUseWorkerThreadForConnections() { return true; }
-	public void accept() { }
+        public Socket getAcceptedSocket() { return null ; }
+        public void processSocket( Socket socket ) { } 
 	public void close() { }
 	public EventHandler getEventHandler() { return null; }
-	public MessageMediator createMessageMediator(
-            Broker xbroker, Connection xconnection) { return null; }
-	public InputObject createInputObject(
-            Broker broker, MessageMediator messageMediator) { return null; }
-	public OutputObject createOutputObject(
-            Broker broker, MessageMediator messageMediator) { return null; }
+	public CorbaMessageMediator createMessageMediator(
+            ORB xbroker, CorbaConnection xconnection) { return null; }
+	public CDRInputObject createInputObject(
+            ORB broker, CorbaMessageMediator messageMediator) { return null; }
+	public CDROutputObject createOutputObject(
+            ORB broker, CorbaMessageMediator messageMediator) { return null; }
+        public String getObjectAdapterId() { return null ; }
+        public String getObjectAdapterManagerId() { return null ; }
+        public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
+                                     String codebase) { }
+        public String getMonitoringName() { return null ; }
+
+        public ServerSocket getServerSocket() {
+            return null ;
+        }
+
+        public int getPort() {
+            return 0 ;
+        }
+
+        public String getName() {
+            return "" ;
+        }
+
+        public String getInterfaceName() {
+            return "" ;
+        }
+
+        public String getType() {
+            return "" ;
+        }
+
+        public boolean isLazy() {
+            return false ;
+        }
     }
 
     public static final class TestAcceptor2
-	implements Acceptor
+	implements CorbaAcceptor
     {
 	public boolean equals( Object other )
 	{
@@ -1019,22 +1075,51 @@ public class ParserTable {
 	public boolean initialize() { return true; }
 	public boolean initialized() { return true; }
 	public String getConnectionCacheType() { return "FOO"; }
-	public void setConnectionCache(InboundConnectionCache connectionCache){}
-	public InboundConnectionCache getConnectionCache() { return null; }
+	public void setConnectionCache(CorbaInboundConnectionCache connectionCache){}
+	public CorbaInboundConnectionCache getConnectionCache() { return null; }
 	public boolean shouldRegisterAcceptEvent() { return true; }
 	public void setUseSelectThreadForConnections(boolean x) { }
 	public boolean shouldUseSelectThreadForConnections() { return true; }
 	public void setUseWorkerThreadForConnections(boolean x) { }
 	public boolean shouldUseWorkerThreadForConnections() { return true; }
-	public void accept() { }
+        public Socket getAcceptedSocket() { return null ; }
+        public void processSocket( Socket socket ) { } 
 	public void close() { }
 	public EventHandler getEventHandler() { return null; }
-	public MessageMediator createMessageMediator(
-            Broker xbroker, Connection xconnection) { return null; }
-	public InputObject createInputObject(
-            Broker broker, MessageMediator messageMediator) { return null; }
-	public OutputObject createOutputObject(
-            Broker broker, MessageMediator messageMediator) { return null; }
+	public CorbaMessageMediator createMessageMediator(
+            ORB xbroker, CorbaConnection xconnection) { return null; }
+	public CDRInputObject createInputObject(
+            ORB broker, CorbaMessageMediator messageMediator) { return null; }
+	public CDROutputObject createOutputObject(
+            ORB broker, CorbaMessageMediator messageMediator) { return null; }
+        public String getObjectAdapterId() { return null ; }
+        public String getObjectAdapterManagerId() { return null ; }
+        public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
+                                     String codebase) { }
+        public String getMonitoringName() { return null ; }
+        public ServerSocket getServerSocket() {
+            return null ;
+        }
+
+        public int getPort() {
+            return 0 ;
+        }
+
+        public String getName() {
+            return "" ;
+        }
+
+        public String getInterfaceName() {
+            return "" ;
+        }
+
+        public String getType() {
+            return "" ;
+        }
+
+        public boolean isLazy() {
+            return false ;
+        }
     }
 
     // REVISIT - this is a cut and paste modification of makeROIOperation.
@@ -1053,13 +1138,13 @@ public class ParserTable {
 		// For security reasons avoid creating an instance 
 		// if this class is one that would fail the class cast 
 		// to ORBInitializer anyway.
-		if( Acceptor.class.isAssignableFrom( initClass ) ) {
+		if( CorbaAcceptor.class.isAssignableFrom( initClass ) ) {
 		    // Now that we have a class object, instantiate one and
 		    // remember it:
-		    Acceptor acceptor = null ; 
+		    CorbaAcceptor acceptor = null ;
 
 		    try {
-			acceptor = (Acceptor)AccessController.doPrivileged(
+			acceptor = (CorbaAcceptor)AccessController.doPrivileged(
 			    new PrivilegedExceptionAction() {
 				public Object run() 
 				    throws InstantiationException, IllegalAccessException 

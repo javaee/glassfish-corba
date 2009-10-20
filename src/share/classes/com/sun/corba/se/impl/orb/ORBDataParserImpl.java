@@ -39,10 +39,10 @@ package com.sun.corba.se.impl.orb ;
 import java.net.URL ;
 import java.net.InetAddress;
 
+import javax.management.ObjectName ;
+
 import org.omg.CORBA.CompletionStatus ;
 import org.omg.PortableInterceptor.ORBInitializer ;
-
-import com.sun.corba.se.pept.transport.Acceptor;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.spi.orb.DataCollector ;
@@ -58,6 +58,7 @@ import com.sun.corba.se.spi.transport.TcpTimeouts;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 import com.sun.corba.se.impl.legacy.connection.USLPort;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 
 public class ORBDataParserImpl extends ParserImplTableBase implements ORBData 
@@ -103,7 +104,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private Pair<String,String>[] orbInitialReferences ; 
     private String defaultInitRef ;
     private String[] debugFlags ;
-    private Acceptor[] acceptors;
+    private CorbaAcceptor[] acceptors;
     private CorbaContactInfoListFactory corbaContactInfoListFactory;
     private String acceptorSocketType;
     private boolean acceptorSocketUseSelectThreadToWait;
@@ -129,6 +130,9 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private boolean blockingReadCheckMessageParser;
     private boolean timingPointsEnabled;
     private boolean useEnumDesc ;
+    private boolean noDefaultAcceptors ;
+    private boolean registerMBeans ;
+    private int fragmentReadTimeout ;
 
     // This is not initialized from ParserTable.
     private CodeSetComponentInfo codesets ;
@@ -366,7 +370,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 	return debugFlags ;
     }
 
-    public Acceptor[] getAcceptors()
+    public CorbaAcceptor[] getAcceptors()
     {
 	return acceptors;
     }
@@ -472,6 +476,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public boolean blockingReadCheckMessageParser() {
         return blockingReadCheckMessageParser;
     }
+
     // ====== Methods for constructing and initializing this object =========
 
     public ORBDataParserImpl( ORB orb, DataCollector coll )
@@ -520,6 +525,18 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public boolean useEnumDesc() 
     {
         return useEnumDesc ;
+    }
+
+    public boolean noDefaultAcceptors() {
+        return noDefaultAcceptors ;
+    }
+
+    public boolean registerMBeans() {
+        return registerMBeans ;
+    }
+
+    public int fragmentReadTimeout() {
+        return fragmentReadTimeout ;
     }
 }
 

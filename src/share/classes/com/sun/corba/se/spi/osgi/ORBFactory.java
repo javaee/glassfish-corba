@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,35 +36,59 @@
 
 package com.sun.corba.se.spi.osgi;
 
-import com.sun.corba.se.spi.orb.*;
 import java.util.Properties ;
 
+import org.glassfish.external.amx.AMXGlassfish ;
+
+import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
+
 import com.sun.corba.se.impl.orb.ORBImpl ;
+
 import com.sun.corba.se.impl.osgi.loader.OSGIListener;
 
 /** A simple factory for creating our ORB that avoids the ClassLoader
  * problems with org.omg.CORBA.ORB.init, which must load the ORB impl class.
  * The usual OSGi configuration prevents this, so we just directly use a
- * static factory method here.
+ * static factory method here.  Note that this also assumes that the created
+ * ORB should be suitable for running inside GlassFish v3.
  */
 public class ORBFactory {   
     private ORBFactory() {} 
 
-    @SuppressWarnings("static-access")
-    public static ORB create( String[] args, Properties props, boolean useOSGi ) {
+    public static ORB create( String[] args, Properties props, boolean isGFv3 ) {
+        ORB result = create() ;
+        initialize( result, args, props, isGFv3 ) ;
+        return result ;
+    }
+
+    /** Create but do not initialize an ORB instance.
+     */
+    public static ORB create() {
         ORB result = new ORBImpl() ;
-        if (useOSGi) {
-            result.classNameResolver(
-                result.makeCompositeClassNameResolver(
+        return result ;
+    }
+
+    /** Complete the initialization of the ORB.  
+     * isGFv3 if true will cause an ORB initialization
+     * suitable for use in GlassFish v3.
+     */
+    @SuppressWarnings("static-access")
+    public static void initialize( ORB orb, String[] args, Properties props, boolean isGFv3 ) {
+        if (isGFv3) {
+            orb.classNameResolver(
+                orb.makeCompositeClassNameResolver(
                     OSGIListener.classNameResolver(),
-                    result.defaultClassNameResolver()
+                    orb.defaultClassNameResolver()
                 ) );
 
-            // System.out.println( "ORB ClassNameResolver= " + result.classNameResolver() ) ;
+            ClassCodeBaseHandler ccbh = OSGIListener.classCodeBaseHandler() ;
+            orb.classCodeBaseHandler( ccbh ) ;
+            orb.setRootParentObjectName( 
+                AMXGlassfish.DEFAULT.serverMonForDAS() ) ;
         }
 
-        result.setParameters( args, props ) ;
-        return result ;
+        orb.setParameters( args, props ) ;
     }
 }
 

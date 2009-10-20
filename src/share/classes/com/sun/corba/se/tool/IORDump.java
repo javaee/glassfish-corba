@@ -50,7 +50,7 @@ import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.ior.TaggedComponent ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
-import com.sun.corba.se.spi.orbutil.file.Printer ;
+import com.sun.corba.se.spi.orbutil.misc.Printer ;
 
 public class IORDump {
     private static Printer pr = new Printer( System.out ) ;

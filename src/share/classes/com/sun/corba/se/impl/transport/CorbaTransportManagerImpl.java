@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.impl.transport;
 
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,22 +45,13 @@ import java.util.Map;
 import java.nio.ByteBuffer ;
 import java.io.IOException ;
 
-import org.omg.CORBA.INITIALIZE;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
-
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-import com.sun.corba.se.pept.transport.OutboundConnectionCache;
-import com.sun.corba.se.pept.transport.Selector;
+import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.ObjectAdapterId;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.transport.ByteBufferPool;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
@@ -72,65 +62,73 @@ import com.sun.corba.se.spi.transport.MessageTraceManager;
 import com.sun.corba.se.impl.oa.poa.Policies;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
-import com.sun.corba.se.impl.encoding.CDRInputStream;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.BufferManagerRead;
-
-import com.sun.corba.se.impl.transport.BufferConnectionImpl;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message_1_2;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
+import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
+
+import org.glassfish.external.probe.provider.StatsProviderManager ;
+import org.glassfish.external.probe.provider.PluginPoint ;
+
 /**
  * @author Harold Carr
  */
+// Note that no ObjectKeyName attribute is needed, because there is only
+// one CorbaTransportManager per ORB.
 public class CorbaTransportManagerImpl 
     implements
 	CorbaTransportManager
 {
     protected ORB orb;
-    protected List acceptors;
-    protected Map outboundConnectionCaches;
-    protected Map inboundConnectionCaches;
+    protected List<CorbaAcceptor> acceptors;
+    protected Map<String,CorbaOutboundConnectionCache> outboundConnectionCaches;
+    protected Map<String,CorbaInboundConnectionCache> inboundConnectionCaches;
     protected Selector selector;
     
     public CorbaTransportManagerImpl(ORB orb) 
     {
 	this.orb = orb;
-	acceptors = new ArrayList();
-	outboundConnectionCaches = new HashMap();
-	inboundConnectionCaches = new HashMap();
+	acceptors = new ArrayList<CorbaAcceptor>();
+	outboundConnectionCaches = new HashMap<String,CorbaOutboundConnectionCache>();
+	inboundConnectionCaches = new HashMap<String,CorbaInboundConnectionCache>();
 	selector = new SelectorImpl(orb);
+        orb.mom().register( orb, this ) ;
     }
-
-    ////////////////////////////////////////////////////
-    //
-    // pept TransportManager
-    //
 
     public ByteBufferPool getByteBufferPool(int id)
     {
 	throw new RuntimeException(); 
     }
 
-    public OutboundConnectionCache getOutboundConnectionCache(
-        ContactInfo contactInfo) 
+    public CorbaOutboundConnectionCache getOutboundConnectionCache(
+        CorbaContactInfo contactInfo)
     {
 	synchronized (contactInfo) {
 	    if (contactInfo.getConnectionCache() == null) {
-		OutboundConnectionCache connectionCache = null;
+		CorbaOutboundConnectionCache connectionCache = null;
 		synchronized (outboundConnectionCaches) {
-		    connectionCache = (OutboundConnectionCache)
-			outboundConnectionCaches.get(
-                            contactInfo.getConnectionCacheType());
+		    connectionCache = outboundConnectionCaches.get(
+                        contactInfo.getConnectionCacheType());
 		    if (connectionCache == null) {
 			// REVISIT: Would like to be able to configure
 			// the connection cache type used.
 			connectionCache = 
 			    new CorbaOutboundConnectionCacheImpl(orb,
 								 contactInfo);
+
+                        // XXX We need to clean up the multi-cache support:
+                        // this really only works with a single cache.
+                        orb.mom().register( this, connectionCache ) ;
+                        StatsProviderManager.register( "orb", PluginPoint.SERVER,
+                            "transport/connectioncache/outbound", connectionCache ) ;
+
 			outboundConnectionCaches.put(
                             contactInfo.getConnectionCacheType(),
 			    connectionCache);
@@ -142,20 +140,24 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    public Collection getOutboundConnectionCaches()
+    public Collection<CorbaOutboundConnectionCache> getOutboundConnectionCaches()
     {
 	return outboundConnectionCaches.values();
     }
 
-    public InboundConnectionCache getInboundConnectionCache(
-        Acceptor acceptor) 
+    public Collection<CorbaInboundConnectionCache> getInboundConnectionCaches()
+    {
+	return inboundConnectionCaches.values();
+    }
+
+    public CorbaInboundConnectionCache getInboundConnectionCache(
+        CorbaAcceptor acceptor)
     {
 	synchronized (acceptor) {
 	    if (acceptor.getConnectionCache() == null) {
-		InboundConnectionCache connectionCache = null;
+		CorbaInboundConnectionCache connectionCache = null;
 		synchronized (inboundConnectionCaches) {
-		    connectionCache = (InboundConnectionCache)
-			inboundConnectionCaches.get(
+		    connectionCache = inboundConnectionCaches.get(
                             acceptor.getConnectionCacheType());
 		    if (connectionCache == null) {
 			// REVISIT: Would like to be able to configure
@@ -163,6 +165,10 @@ public class CorbaTransportManagerImpl
 			connectionCache = 
 			    new CorbaInboundConnectionCacheImpl(orb,
 								acceptor);
+                        orb.mom().register( this, connectionCache ) ;
+                        StatsProviderManager.register( "orb", PluginPoint.SERVER,
+                            "transport/connectioncache/inbound", connectionCache ) ;
+
 			inboundConnectionCaches.put(
                             acceptor.getConnectionCacheType(),
 			    connectionCache);
@@ -174,9 +180,8 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    public Collection getInboundConnectionCaches()
-    {
-	return inboundConnectionCaches.values();
+    public Selector getSelector() {
+        return selector ;
     }
 
     public Selector getSelector(int id) 
@@ -184,7 +189,7 @@ public class CorbaTransportManagerImpl
 	return selector;
     }
 
-    public synchronized void registerAcceptor(Acceptor acceptor) 
+    public synchronized void registerAcceptor(CorbaAcceptor acceptor)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".registerAcceptor->: " + acceptor);
@@ -195,12 +200,7 @@ public class CorbaTransportManagerImpl
 	}
     }
 
-    public Collection getAcceptors()
-    {
-	return getAcceptors(null, null);
-    }
-
-    public synchronized void unregisterAcceptor(Acceptor acceptor)
+    public synchronized void unregisterAcceptor(CorbaAcceptor acceptor)
     {
 	acceptors.remove(acceptor);
     }
@@ -211,11 +211,13 @@ public class CorbaTransportManagerImpl
 	    if (orb.transportDebugFlag) {
 		dprint(".close->");
 	    }
-            for (Object cc : outboundConnectionCaches.values()) {
-                ((ConnectionCache)cc).close() ;
+            for (CorbaOutboundConnectionCache cc : outboundConnectionCaches.values()) {
+                StatsProviderManager.unregister( cc ) ;
+                cc.close() ;
             }
-            for (Object cc : inboundConnectionCaches.values()) {
-                ((ConnectionCache)cc).close() ;
+            for (CorbaInboundConnectionCache cc : inboundConnectionCaches.values()) {
+                StatsProviderManager.unregister( cc ) ;
+                cc.close() ;
             }
 	    getSelector(0).close();
 	} finally {
@@ -230,20 +232,22 @@ public class CorbaTransportManagerImpl
     // CorbaTransportManager
     //
 
-    public Collection getAcceptors(String objectAdapterManagerId,
+    public Collection<CorbaAcceptor> getAcceptors() {
+        return getAcceptors( null, null ) ;
+    }
+
+    public Collection<CorbaAcceptor> getAcceptors(String objectAdapterManagerId,
 				   ObjectAdapterId objectAdapterId)
     {
 	// REVISIT - need to filter based on arguments.
 
 	// REVISIT - initialization will be moved to OA.
 	// Lazy initialization of acceptors.
-	Iterator iterator = acceptors.iterator();
-	while (iterator.hasNext()) {
-	    Acceptor acceptor = (Acceptor) iterator.next();
-	    if (acceptor.initialize()) {
-		if (acceptor.shouldRegisterAcceptEvent()) {
+        for (CorbaAcceptor acc : acceptors) {
+	    if (acc.initialize()) {
+		if (acc.shouldRegisterAcceptEvent()) {
 		    orb.getTransportManager().getSelector(0)
-			.registerForEvent(acceptor.getEventHandler());
+			.registerForEvent(acc.getEventHandler());
 		}
 	    }
 	}
@@ -336,7 +340,7 @@ public class CorbaTransportManagerImpl
 
 	return new MessageData() {
 	   public Message[] getMessages() { return messages ; }
-	   public CDRInputStream getStream() { return resultObj ; }
+	   public CDRInputObject getStream() { return resultObj ; }
 	} ;
     }
 

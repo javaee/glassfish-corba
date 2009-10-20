@@ -63,11 +63,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.INITIALIZE;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.SystemException;
-
 import com.sun.corba.se.spi.activation.BadServerDefinition;
 import com.sun.corba.se.spi.activation.RepositoryPackage.ServerDef;
 import com.sun.corba.se.spi.activation._RepositoryImplBase;
@@ -76,11 +71,11 @@ import com.sun.corba.se.spi.activation.ServerAlreadyInstalled;
 import com.sun.corba.se.spi.activation.ServerAlreadyUninstalled;
 import com.sun.corba.se.spi.activation.ServerNotRegistered;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
-import com.sun.corba.se.spi.transport.SocketOrChannelAcceptor;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.logging.ActivationSystemException;
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 /**
  * 
@@ -183,7 +178,7 @@ public class RepositoryImpl extends _RepositoryImplBase
 	LegacyServerSocketEndPointInfo endpoint =
 	    orb.getLegacyServerSocketManager()
  	        .legacyGetEndpoint(LegacyServerSocketEndPointInfo.BOOT_NAMING);
-	int initSvcPort = ((SocketOrChannelAcceptor)endpoint)
+	int initSvcPort = ((CorbaAcceptor)endpoint)
 	    .getServerSocket().getLocalPort();
 	ServerTableEntry entry = new ServerTableEntry( wrapper,
 	    illegalServerId, serverDef, (int) initSvcPort, "", true, debug );

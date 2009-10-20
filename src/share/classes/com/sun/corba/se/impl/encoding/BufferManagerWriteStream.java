@@ -43,8 +43,8 @@ import sun.corba.Bridge;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.RemarshalException;
 
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.transport.Connection;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
@@ -137,7 +137,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 
     private void sendFragment(boolean isLastFragment)
     {
-        Connection conn = ((OutputObject)outputObject).getMessageMediator().getConnection();
+        CorbaConnection conn = ((CDROutputObject)outputObject).getMessageMediator().getConnection();
 
 	// REVISIT: need an ORB
 	//System.out.println("sendFragment: last?: " + isLastFragment);
@@ -145,7 +145,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 
         try {
             // Send the fragment
-            conn.sendWithoutLock(((OutputObject)outputObject));
+            conn.sendWithoutLock(((CDROutputObject)outputObject));
 
             fragmentCount++;
 

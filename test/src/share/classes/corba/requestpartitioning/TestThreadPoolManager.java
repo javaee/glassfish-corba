@@ -80,7 +80,7 @@ public class TestThreadPoolManager implements ThreadPoolManager {
 	com.sun.corba.se.spi.orbutil.threadpool.ThreadPool threadpool = 
 	    new ThreadPoolImpl(DEFAULT_MIN_THREAD_COUNT,
 		               DEFAULT_MAX_THREAD_COUNT, 
-		               ORBConstants.DEFAULT_INACTIVITY_TIMEOUT * 1000,
+		               ThreadPoolImpl.DEFAULT_INACTIVITY_TIMEOUT * 1000,
 		               threadpoolId);
 
 	// Add the threadpool instance to the threadpoolList

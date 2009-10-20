@@ -56,6 +56,8 @@ import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
+
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
@@ -286,7 +288,11 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
     {
 	public Object read( InputStream is ) 
 	{
-	    return Util.getInstance().readAny(is) ;
+            try {
+                return Util.getInstance().readAny(is) ;
+            } finally {
+                OperationTracer.finish() ;
+            }
 	}
 
 	public void write( OutputStream os, Object value )
@@ -300,7 +306,11 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
     {
 	public Object read( InputStream is ) 
 	{
-	    return is.read_abstract_interface() ;
+            try {
+                return is.read_abstract_interface() ;
+            } finally {
+                OperationTracer.finish() ;
+            }
 	}
 
 	public void write( OutputStream os, Object value )
@@ -369,7 +379,11 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	{
 	    public Object read( InputStream is ) 
 	    {
-		return is.read_value(cls) ;
+                try {
+                    return is.read_value(cls) ;
+                } finally {
+                    OperationTracer.finish() ;
+                }
 	    }
 
 	    public void write( OutputStream os, Object value )

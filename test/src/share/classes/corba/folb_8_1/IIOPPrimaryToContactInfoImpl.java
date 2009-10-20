@@ -53,7 +53,7 @@ import java.util.logging.Level;
 //import com.sun.logging.LogDomains;
 
 // These are "ee" in the AS version:
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
@@ -96,7 +96,7 @@ public class IIOPPrimaryToContactInfoImpl
 	debug = false;
     }
 
-    public synchronized void reset(ContactInfo primary)
+    public synchronized void reset(CorbaContactInfo primary)
     {
 	try {
 	    if (debug) {
@@ -114,8 +114,8 @@ public class IIOPPrimaryToContactInfoImpl
 	}
     }
 
-    public synchronized boolean hasNext(ContactInfo primary,
-					ContactInfo previous,
+    public synchronized boolean hasNext(CorbaContactInfo primary,
+					CorbaContactInfo previous,
 					List contactInfos)
     {
 	try {
@@ -176,8 +176,8 @@ public class IIOPPrimaryToContactInfoImpl
 	}
     }
 
-    public synchronized ContactInfo next(ContactInfo primary,
-					 ContactInfo previous,
+    public synchronized CorbaContactInfo next(CorbaContactInfo primary,
+					 CorbaContactInfo previous,
 					 List contactInfos)
     {
 	try {
@@ -249,7 +249,7 @@ public class IIOPPrimaryToContactInfoImpl
 	    if (debug) {
 		dprint(debugMsg + result);
 	    }
-	    return (ContactInfo) result;
+	    return (CorbaContactInfo) result;
 	} catch (Throwable t) {
             _logger.log(Level.WARNING,
 			"Problem in " + baseMsg + ".next",
@@ -261,7 +261,7 @@ public class IIOPPrimaryToContactInfoImpl
 	}
     }
 
-    private Object getKey(ContactInfo contactInfo)
+    private Object getKey(CorbaContactInfo contactInfo)
     {
 	if (((SocketInfo)contactInfo).getPort() == 0) {
 	    // When CSIv2 is used the primary will have a zero port.
@@ -275,7 +275,7 @@ public class IIOPPrimaryToContactInfoImpl
     }
 
     private String formatKeyPreviousList(Object key,
-					 ContactInfo previous, List list)
+					 CorbaContactInfo previous, List list)
     {
 	String result =
 	      "\n  key     : " + key

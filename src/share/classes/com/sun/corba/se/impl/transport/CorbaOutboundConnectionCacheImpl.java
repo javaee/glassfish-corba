@@ -37,23 +37,15 @@
 package com.sun.corba.se.impl.transport;
 
 import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.OutboundConnectionCache;
-
-import com.sun.corba.se.spi.monitoring.LongMonitoredAttributeBase;
-import com.sun.corba.se.spi.monitoring.MonitoringConstants;
-import com.sun.corba.se.spi.monitoring.MonitoringFactories;
-import com.sun.corba.se.spi.monitoring.MonitoredObject;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 
 /**
  * @author Harold Carr
@@ -62,34 +54,31 @@ public class CorbaOutboundConnectionCacheImpl
     extends
 	CorbaConnectionCacheBase
     implements
-	OutboundConnectionCache
+	CorbaOutboundConnectionCache
 {
-    protected Hashtable connectionCache;
+    protected Map<CorbaContactInfo, CorbaConnection> connectionCache;
+    private CorbaOutboundConnectionCacheProbeProvider pp =
+        new CorbaOutboundConnectionCacheProbeProvider() ;
 
-    public CorbaOutboundConnectionCacheImpl(ORB orb, ContactInfo contactInfo) 
+    public CorbaOutboundConnectionCacheImpl(ORB orb, CorbaContactInfo contactInfo)
     {
 	super(orb, contactInfo.getConnectionCacheType(),
 	      ((CorbaContactInfo)contactInfo).getMonitoringName());
-	this.connectionCache = new Hashtable();
+	this.connectionCache = new HashMap<CorbaContactInfo,CorbaConnection>();
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.OutboundConnectionCache
-    //
-    
-    public Connection get(ContactInfo contactInfo) 
+    public CorbaConnection get(CorbaContactInfo contactInfo)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".get: " + contactInfo + " " + contactInfo.hashCode());
 	}
 	synchronized (backingStore()) {
 	    dprintStatistics();
-	    return (Connection) connectionCache.get(contactInfo);
+	    return connectionCache.get(contactInfo);
 	}
     }
     
-    public void put(ContactInfo contactInfo, Connection connection) 
+    public void put(CorbaContactInfo contactInfo, CorbaConnection connection)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".put: " + contactInfo + " " + contactInfo.hashCode() + " "
@@ -98,18 +87,20 @@ public class CorbaOutboundConnectionCacheImpl
 	synchronized (backingStore()) {
 	    connectionCache.put(contactInfo, connection);
 	    connection.setConnectionCache(this);
+            pp.connectionOpenedEvent( contactInfo.toString(), connection.toString() ) ;
 	    dprintStatistics();
 	}
     }
 
-    public void remove(ContactInfo contactInfo)
+    public void remove(CorbaContactInfo contactInfo)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".remove: " + contactInfo + " " + contactInfo.hashCode());
 	}
 	synchronized (backingStore()) {
 	    if (contactInfo != null) {
-		connectionCache.remove(contactInfo);
+		CorbaConnection connection = connectionCache.remove(contactInfo);
+                pp.connectionClosedEvent( contactInfo.toString(), connection.toString() ) ;
 	    }
 	    dprintStatistics();
 	}
@@ -130,88 +121,7 @@ public class CorbaOutboundConnectionCacheImpl
 	return connectionCache;
     }
 
-    protected void registerWithMonitoring()
-    {
-	// ORB
-	MonitoredObject orbMO = 
-	    orb.getMonitoringManager().getRootMonitoredObject();
-
-	// CONNECTION
-	MonitoredObject connectionMO = 
-	    orbMO.getChild(MonitoringConstants.CONNECTION_MONITORING_ROOT);
-	if (connectionMO == null) {
-	    connectionMO = 
-		MonitoringFactories.getMonitoredObjectFactory()
-		    .createMonitoredObject(
-		        MonitoringConstants.CONNECTION_MONITORING_ROOT,
-			MonitoringConstants.CONNECTION_MONITORING_ROOT_DESCRIPTION);
-	    orbMO.addChild(connectionMO);
-	}
-
-	// OUTBOUND CONNECTION
-	MonitoredObject outboundConnectionMO = 
-	    connectionMO.getChild(
-                MonitoringConstants.OUTBOUND_CONNECTION_MONITORING_ROOT);
-	if (outboundConnectionMO == null) {
-	    outboundConnectionMO =
-		MonitoringFactories.getMonitoredObjectFactory()
-		    .createMonitoredObject(
-		        MonitoringConstants.OUTBOUND_CONNECTION_MONITORING_ROOT,
-			MonitoringConstants.OUTBOUND_CONNECTION_MONITORING_ROOT_DESCRIPTION);
-	    connectionMO.addChild(outboundConnectionMO);
-	}
-
-	// NODE FOR THIS CACHE
-	MonitoredObject thisMO = 
-	    outboundConnectionMO.getChild(getMonitoringName());
-	if (thisMO == null) {
-	    thisMO =
-		MonitoringFactories.getMonitoredObjectFactory()
-		    .createMonitoredObject(
-			getMonitoringName(),
-			MonitoringConstants.CONNECTION_MONITORING_DESCRIPTION);
-	    outboundConnectionMO.addChild(thisMO);
-	}
-
-	LongMonitoredAttributeBase attribute;
-
-	// ATTRIBUTE
-	attribute = new 
-	    LongMonitoredAttributeBase(
-                MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS, 
-		MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS_DESCRIPTION)
-	    {
-		public Object getValue() {
-		    return Long.valueOf(CorbaOutboundConnectionCacheImpl.this.numberOfConnections());
-		}
-	    };
-	thisMO.addAttribute(attribute);
-
-	// ATTRIBUTE
-	attribute = new 
-	    LongMonitoredAttributeBase(
-                MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS, 
-		MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS_DESCRIPTION)
-	    {
-		public Object getValue() {
-		    return Long.valueOf(CorbaOutboundConnectionCacheImpl.this.numberOfIdleConnections());
-		}
-	    };
-	thisMO.addAttribute(attribute);
-
-	// ATTRIBUTE
-	attribute = new 
-	    LongMonitoredAttributeBase(
-                MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS, 
-		MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS_DESCRIPTION)
-	    {
-		public Object getValue() {
-		    return Long.valueOf(CorbaOutboundConnectionCacheImpl.this.numberOfBusyConnections());
-		}
-	    };
-	thisMO.addAttribute(attribute);
-    }
-
+    @Override
     public String toString()
     {
 	return "CorbaOutboundConnectionCacheImpl["
@@ -219,6 +129,7 @@ public class CorbaOutboundConnectionCacheImpl
 	    + "]";
     }
 
+    @Override
     protected void dprint(String msg)
     {
 	ORBUtility.dprint("CorbaOutboundConnectionCacheImpl", msg);

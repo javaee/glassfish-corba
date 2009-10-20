@@ -36,12 +36,11 @@
 
 package corba.simpledynamic;
 
-import test.Test;
 import corba.framework.*;
-import java.util.*;
 
 public class SimpleDynamic extends CORBATest
 {
+    @Override
     protected void doTest() throws Throwable
     {
 	Controller client = createClient( "corba.simpledynamic.Client" ) ;

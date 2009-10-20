@@ -44,7 +44,7 @@ import java.util.ArrayList ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimerFactoryImpl ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+import org.glassfish.gmbal.ManagedObjectManager ;
 
 /** TimerFactoryBuilder creates independent
  * instances of the TimerFactory interface.
@@ -57,20 +57,21 @@ public class TimerFactoryBuilder {
     public synchronized static TimerFactory make( 
         String name, String description ) {
 
-        return make( null, name, description ) ;
+        return make( null, name, description, false ) ;
     }
 
     /** Create a new TimerFactory.  No two TimerFactory instances
      * can have the same name.
      */
     public synchronized static TimerFactory make( ManagedObjectManager mom, 
-        String name, String description ) {
+        String name, String description, boolean doGmbalRegistration ) {
 
 	if (fmap.get( name ) != null)
 	    throw new IllegalArgumentException(
 		"There is currently a TimerFactory named " + name ) ;
 
-	TimerFactory result = new TimerFactoryImpl( mom, name, description ) ;
+	TimerFactory result = new TimerFactoryImpl( mom, name, description,
+            doGmbalRegistration ) ;
 	fmap.put( name, result ) ;
 	return result ;
     }

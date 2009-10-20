@@ -46,83 +46,20 @@
 package com.sun.corba.se.impl.protocol;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.rmi.RemoteException;
-import java.nio.ByteBuffer;
 
-import javax.rmi.CORBA.Tie;
 
-import org.omg.CORBA.COMM_FAILURE;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.WrongTransaction;
-import org.omg.CORBA.Request;
-import org.omg.CORBA.NamedValue;
-import org.omg.CORBA.NVList;
-import org.omg.CORBA.Context;
-import org.omg.CORBA.ContextList;
-import org.omg.CORBA.ExceptionList;
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.DATA_CONVERSION;
-import org.omg.CORBA.UNKNOWN;
-import org.omg.CORBA.portable.RemarshalException;
-import org.omg.CORBA_2_3.portable.InputStream;
-import org.omg.CORBA_2_3.portable.OutputStream;
-import org.omg.CORBA.portable.Delegate;
-import org.omg.CORBA.portable.ServantObject;
 import org.omg.CORBA.portable.ApplicationException;
-import org.omg.CORBA.portable.UnknownException;
-import org.omg.IOP.TAG_CODE_SETS;
 
-import com.sun.org.omg.SendingContext.CodeBase;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.pept.protocol.MessageMediator;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.ConnectionCache;
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
 
-import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
-import com.sun.corba.se.spi.ior.iiop.CodeSetsComponent;
-import com.sun.corba.se.spi.oa.OAInvocationInfo;
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orb.ORBVersion;
-import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
-import com.sun.corba.se.spi.transport.CorbaContactInfo ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator ;
-import com.sun.corba.se.spi.transport.CorbaConnection;
 
-import com.sun.corba.se.spi.servicecontext.ServiceContext;
-import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext;
-import com.sun.corba.se.spi.servicecontext.CodeSetServiceContext;
-import com.sun.corba.se.spi.servicecontext.MaxStreamFormatVersionServiceContext;
-import com.sun.corba.se.spi.servicecontext.SendingContextServiceContext;
 import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
-import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
-import com.sun.corba.se.impl.encoding.MarshalOutputStream;
-import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ProfileAddr;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ReferenceAddr;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
 
 /**
  * ClientDelegate is the RMI client-side subcontract or representation
@@ -141,8 +78,8 @@ public class SharedCDRClientRequestDispatcherImpl
     // Benefit: then in ContactInfo no need to do a direct new
     // of subcontract - does not complicate subcontract registry.
 
-    public InputObject marshalingComplete(java.lang.Object self, 
-					  OutputObject outputObject)
+    public CDRInputObject marshalingComplete(java.lang.Object self,
+					  CDROutputObject outputObject)
 	throws 
 	    ApplicationException, 
 	    org.omg.CORBA.portable.RemarshalException
@@ -211,7 +148,7 @@ public class SharedCDRClientRequestDispatcherImpl
 
 	cdrInputObject.unmarshalHeader();
 
-	InputObject inputObject = cdrInputObject;
+	CDRInputObject inputObject = cdrInputObject;
 
 	return processResponse(orb, messageMediator, inputObject);
 

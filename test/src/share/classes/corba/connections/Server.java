@@ -74,7 +74,6 @@ public class Server
 	serverName = av[0];
 	name1 = av[1];
 	name2 = av[2];
-	ConnectionStatistics stats = new ConnectionStatistics();
 
         try {
 	    Properties props = new Properties();
@@ -88,6 +87,7 @@ public class Server
 		props.put(ORBConstants.DEBUG_PROPERTY, "transport");
 	    }
 	    orb = (ORB) org.omg.CORBA.ORB.init((String[])null, props);
+            ConnectionStatistics stats = new ConnectionStatistics(orb);
 
 	    /* Cannot do these here because there is no "Connections" root
 	    stats.inbound(serverName + ": after ORB.init", orb);

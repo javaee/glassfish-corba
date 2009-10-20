@@ -39,12 +39,11 @@ import org.omg.CORBA.portable.ApplicationException ;
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.impl.encoding.CDROutputStream ;
+import com.sun.corba.se.impl.encoding.CDROutputObject ;
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
-import com.sun.corba.se.impl.encoding.CDRInputStream ;
+import com.sun.corba.se.impl.encoding.CDRInputObject ;
 
-import com.sun.corba.se.pept.encoding.InputObject ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -62,7 +61,7 @@ public class TestTransport {
 
     public InputStream getInputStream( OutputStream os ) 
     {
-	CDROutputStream cos = (CDROutputStream)os ;
+	CDROutputObject cos = (CDROutputObject)os ;
 	byte[] data = cos.toByteArray() ;
 	return new EncapsInputStream( orb, data, data.length ) ;
     }
@@ -102,7 +101,7 @@ public class TestTransport {
     // must leave the stream ready to read the repo id
     // string, so we need to use mark/reset here.
     // This code is taken from CorbaClientRequestDispatcher.
-    private String peekUserExceptionId(CDRInputStream inputObject)
+    private String peekUserExceptionId(CDRInputObject inputObject)
     {
 	// REVISIT - need interface for mark/reset
         inputObject.mark(Integer.MAX_VALUE);
@@ -118,7 +117,7 @@ public class TestTransport {
 	if (header == NORMAL_REPLY_HEADER) {
 	    // NO-OP
 	} else if (header == EXCEPTION_REPLY_HEADER) {
-	    String id = peekUserExceptionId( (CDRInputStream)is ) ;
+	    String id = peekUserExceptionId( (CDRInputObject)is ) ;
 	    throw new ApplicationException( id, is ) ;
 	} else {
 	    // error

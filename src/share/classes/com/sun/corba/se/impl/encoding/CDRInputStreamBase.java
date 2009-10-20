@@ -35,16 +35,12 @@
  */
 package com.sun.corba.se.impl.encoding;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.org.omg.SendingContext.CodeBase;
 
 /**
@@ -55,9 +51,9 @@ import com.sun.org.omg.SendingContext.CodeBase;
  */
 abstract class CDRInputStreamBase extends java.io.InputStream
 {
-    protected CDRInputStream parent;
+    protected CDRInputObject parent;
 
-    public void setParent(CDRInputStream parent) {
+    public void setParent(CDRInputObject parent) {
         this.parent = parent;
     }
 

@@ -88,10 +88,11 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     // If isNextIsLocalValid.get() == Boolean.TRUE, 
     // the next call to isLocal should be valid
     private static final ThreadLocal isNextCallValid = new ThreadLocal() {
-	    protected synchronized Object initialValue() {
-		return Boolean.TRUE;
-	    }
-	};
+        @Override
+        protected synchronized Object initialValue() {
+            return Boolean.TRUE;
+        }
+    };
 
     protected LocalClientRequestDispatcherBase(ORB orb, int scid, IOR ior)
     {

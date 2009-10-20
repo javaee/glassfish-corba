@@ -47,6 +47,12 @@ import org.omg.CosNaming.NameComponent ;
 import org.testng.annotations.Test ;
 import org.testng.annotations.BeforeSuite ;
 import org.testng.Assert ;
+import org.testng.TestNG ;
+
+import mymath.BigDecimal ;
+
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
+
 
 import corba.framework.TestngRunner ;
 import mymath.BigDecimal ;
@@ -59,6 +65,12 @@ public class Client
     @BeforeSuite 
     public void setup() throws Exception {
         String[] args = new String[0] ;
+        orb = ORB.init(args, System.getProperties());
+
+        // XXX Why is this needed here, but not everywhere else?
+        System.getProperties().setProperty( ORBConstants.INITIAL_PORT_PROPERTY, 
+            "1049" ) ;
+
         orb = ORB.init(args, System.getProperties());
 
         org.omg.CORBA.Object objRef = 
@@ -122,12 +134,6 @@ public class Client
         Assert.assertTrue( verifier.validateFeatureInfo( finfo ) ) ;
     }
 
-    private void setSerializationDebug( boolean flag ) {
-        ((com.sun.corba.se.spi.orb.ORB)orb).cdrDebugFlag = flag ;
-        ((com.sun.corba.se.spi.orb.ORB)orb).streamFormatVersionDebugFlag = flag ;
-        ((com.sun.corba.se.spi.orb.ORB)orb).valueHandlerDebugFlag = flag ;
-    }
-
     @Test
     public void testBigDecimal() throws Exception {
         System.out.println( "Testing BigDecimal interop" )  ;
@@ -150,6 +156,12 @@ public class Client
         // setSerializationDebug( false ) ;
         
         Assert.assertEquals( orig, result ) ;
+    }
+
+    private void setSerializationDebug( boolean flag ) {
+        ((com.sun.corba.se.spi.orb.ORB)orb).cdrDebugFlag = flag ;
+        ((com.sun.corba.se.spi.orb.ORB)orb).streamFormatVersionDebugFlag = flag ;
+        ((com.sun.corba.se.spi.orb.ORB)orb).valueHandlerDebugFlag = flag ;
     }
 
     public static void main(String args[]) {

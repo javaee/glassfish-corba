@@ -27,3 +27,10 @@ NORENAME
 make/scripts/pkgrename/sed_pattern_file.version
 webrev*
 felix/felix-cache
+make/bnd/bnd.properties
+jscheme/doc/api
+jscheme/lib/*.jar
+jscheme/doc/java-files.txt
+jscheme/src/jsint/version.txt
+jscheme/bin/doc/java-files.txt
+jscheme/bin/doc/java-packages.txt

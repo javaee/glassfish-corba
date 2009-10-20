@@ -166,13 +166,20 @@ abstract public class ClientCommon
         // Should result in send_request being called for all, 
         // receive_exception called for 3, and 2, and receive_other for
         // 1.
-        out.println(
-            "- Testing standard invocation where interceptor #2 " +
-            "throws ForwardRequest in receive_exception." );
-        testInvocation( "intercepto2ForwardRequestReceiveException",
-            SampleClientRequestInterceptor.MODE_RECEIVE_EXCEPTION_FORWARD,
-            "sr1sr2sr3re3re2ro1sr1sr2sr3re3re2re1", "sayException", 
-            true, true, true );
+        orb.interceptorDebugFlag = true ;
+        orb.subcontractDebugFlag = true ;
+        try {
+            out.println(
+                "- Testing standard invocation where interceptor #2 " +
+                "throws ForwardRequest in receive_exception." );
+            testInvocation( "intercepto2ForwardRequestReceiveException",
+                SampleClientRequestInterceptor.MODE_RECEIVE_EXCEPTION_FORWARD,
+                "sr1sr2sr3re3re2ro1sr1sr2sr3re3re2re1", "sayException", 
+                true, true, true );
+        } finally {
+            orb.interceptorDebugFlag = false ;
+            orb.subcontractDebugFlag = false ;
+        }
 
         // Check that call counter is zero (balanced starting points with
 	// ending points)

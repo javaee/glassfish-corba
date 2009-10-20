@@ -621,11 +621,13 @@ public class #[ class-name ]# implements LogWrapperTable {
 				    ; " minor=" minor " level=" level " message=" message))
 				(let*
 				    (
+                                        (numargs (StringUtil.countArgs message))
 					(msgid (get-message-id major group minor))
 					(ident (StringUtil.toMixedCase (symbol->string name))))
 				    (begin
 					; (dprint (string-append "msgid=" msgid " ident=" ident))
-					(.printMsg pw "@.@=\"@: (@) @\"" (list group ident msgid major message))
+					(.printMsg pw "@.@=\"@: (@) @{@}\"" (list group ident msgid major 
+                                                                                  message numargs))
 					(.flush pw)
 					(if (and last-flag1 last-flag2) 
 					    (begin

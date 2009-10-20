@@ -46,8 +46,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.protocol.MessageMediator;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
@@ -70,9 +68,9 @@ public class CorbaResponseWaitingRoomImpl
 {
     final static class OutCallDesc
     {
-	MessageMediator messageMediator;
+	CorbaMessageMediator messageMediator;
         SystemException exception;
-        InputObject inputObject;
+        CDRInputObject inputObject;
         ReentrantLock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
     }
@@ -96,15 +94,8 @@ public class CorbaResponseWaitingRoomImpl
                Collections.synchronizedMap(new HashMap<Integer, OutCallDesc>());
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.ResponseWaitingRoom
-    //
-
-    public void registerWaiter(MessageMediator mediator)
+    public void registerWaiter(CorbaMessageMediator messageMediator)
     {
-	CorbaMessageMediator messageMediator = (CorbaMessageMediator) mediator;
-
 	if (orb.transportDebugFlag) {
 	    dprint(".registerWaiter: " + opAndId(messageMediator));
 	}
@@ -121,7 +112,7 @@ public class CorbaResponseWaitingRoomImpl
         }
     }
 
-    public void unregisterWaiter(MessageMediator mediator)
+    public void unregisterWaiter(CorbaMessageMediator mediator)
     {
 	CorbaMessageMediator messageMediator = (CorbaMessageMediator) mediator;
 
@@ -134,12 +125,10 @@ public class CorbaResponseWaitingRoomImpl
         out_calls.remove(requestId);
     }
 
-    public InputObject waitForResponse(MessageMediator mediator) {
-        CorbaMessageMediator messageMediator = (CorbaMessageMediator) mediator;
-        
+    public CDRInputObject waitForResponse(CorbaMessageMediator messageMediator) {
         try {
             tp.enter_waitForResponse() ;
-            InputObject returnStream = null;
+            CDRInputObject returnStream = null;
             
             if (orb.transportDebugFlag) {
                 dprint(".waitForResponse->: " + opAndId(messageMediator));
@@ -246,7 +235,7 @@ public class CorbaResponseWaitingRoomImpl
         }
     }
 
-    public void responseReceived(InputObject is) 
+    public void responseReceived(CDRInputObject is)
     {
 	CDRInputObject inputObject = (CDRInputObject) is;
 	LocateReplyOrReplyMessage header = (LocateReplyOrReplyMessage)
@@ -338,7 +327,7 @@ public class CorbaResponseWaitingRoomImpl
         }
     }
 
-    public MessageMediator getMessageMediator(int requestId)
+    public CorbaMessageMediator getMessageMediator(int requestId)
     {
         OutCallDesc call = out_calls.get(requestId);
 	if (call == null) {

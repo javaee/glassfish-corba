@@ -36,13 +36,15 @@
 
 package com.sun.corba.se.spi.protocol;
 
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.transport.CorbaConnection;
 import java.nio.ByteBuffer;
 
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.ResponseHandler;
 import org.omg.CORBA_2_3.portable.InputStream;
-
-import com.sun.corba.se.pept.protocol.MessageMediator;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
@@ -59,9 +61,8 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
 /**
  * @author Harold Carr
  */
-public interface CorbaMessageMediator
+public abstract interface CorbaMessageMediator
     extends
-	MessageMediator,
 	ResponseHandler
 {
     public void setReplyHeader(LocateReplyOrReplyMessage header);
@@ -142,6 +143,36 @@ public interface CorbaMessageMediator
     public boolean executePIInResponseConstructor();
 
     public void setExecutePIInResponseConstructor( boolean b );
+
+    public ORB getBroker();
+
+    public CorbaContactInfo getContactInfo();
+
+    public CorbaConnection getConnection();
+
+    /**
+     * Used to initialize message headers.
+     *
+     * Note: this should be moved to a <code>RequestDispatcher</code>.
+     */
+    public void initializeMessage();
+
+    /**
+     * Used to send the message (or its last fragment).
+     *
+     * Note: this should be moved to a <code>RequestDispatcher</code>.
+     */
+    public void finishSendingRequest();
+
+    public CDRInputObject waitForResponse();
+
+    public void setOutputObject(CDROutputObject outputObject);
+
+    public CDROutputObject getOutputObject();
+
+    public void setInputObject(CDRInputObject inputObject);
+
+    public CDRInputObject getInputObject();
 }
 
 // End of file.

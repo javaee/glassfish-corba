@@ -41,6 +41,8 @@ import java.util.logging.LogRecord ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
+
 public abstract class LogWrapperBase 
 {
     private Logger logger ;
@@ -60,12 +62,31 @@ public abstract class LogWrapperBase
 	return logger ;
     }
 
+    private String getOpTraceValue() {
+        String otval = OperationTracer.getAsString() ;
+        if (otval.length() == 0)
+            return "" ;
+
+        return "<<Context:" + otval + ">>" ;
+    }
+
     protected void doLog( Level level, String key, Object[] params, Class wrapperClass,
 	Throwable thr ) 
     {
 	LogRecord lrec = new LogRecord( level, key ) ;
-	if (params != null)
-	    lrec.setParameters( params ) ;
+
+        Object[] newParams ;
+	if (params == null) {
+            newParams = new Object[] { getOpTraceValue() } ;
+        } else {
+            newParams = new Object[ params.length + 1 ] ;
+            for (int ctr=0; ctr<params.length; ctr++) {
+                newParams[ctr] = params[ctr] ;
+            }
+            newParams[params.length] = getOpTraceValue() ;
+        }
+        lrec.setParameters( newParams ) ;
+
 	if (level != Level.INFO) {
 	    inferCaller( wrapperClass, lrec ) ;
 	    lrec.setThrown( thr ) ;

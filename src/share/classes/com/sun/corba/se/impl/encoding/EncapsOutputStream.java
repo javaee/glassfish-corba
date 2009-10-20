@@ -42,11 +42,6 @@ import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.encoding.CDROutputStream;
-import com.sun.corba.se.impl.encoding.BufferManagerWrite;
-import com.sun.corba.se.impl.encoding.BufferManagerFactory;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
@@ -63,7 +58,7 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
  * When more encapsulations arise that have their own special code
  * sets defined, we can make all constructors take such parameters.
  */
-public class EncapsOutputStream extends CDROutputStream
+public class EncapsOutputStream extends CDROutputObject
 {
 
     // REVISIT - Right now, EncapsOutputStream's do not use

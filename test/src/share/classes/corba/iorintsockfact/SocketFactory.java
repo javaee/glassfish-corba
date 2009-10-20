@@ -42,15 +42,7 @@ package corba.iorintsockfact;
 
 import java.util.Iterator;
 
-import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.INTERNAL;
-
-import org.omg.IOP.Codec;
-import org.omg.IOP.CodecFactory;
-import org.omg.IOP.CodecFactoryHelper;
-import org.omg.IOP.Encoding;
-import org.omg.IOP.TaggedComponent;
 
 import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
 import com.sun.corba.se.spi.ior.IOR;
@@ -79,6 +71,7 @@ public class SocketFactory
     // Client side.
     //
 
+    @Override
     public SocketInfo getEndPointInfo(ORB orb, 
 					IOR ior,
 					SocketInfo socketInfo)

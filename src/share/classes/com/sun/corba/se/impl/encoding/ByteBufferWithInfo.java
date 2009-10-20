@@ -41,7 +41,7 @@ import java.nio.ByteBuffer;
 
 import com.sun.corba.se.impl.encoding.BufferManagerWrite;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.pept.transport.ByteBufferPool;
+import com.sun.corba.se.spi.transport.ByteBufferPool;
 import com.sun.corba.se.spi.orb.ORB;
 
 
@@ -228,8 +228,6 @@ public class ByteBufferWithInfo
     // Grow byteBuffer to a size larger than position() + needed
     public void growBuffer(com.sun.corba.se.spi.orb.ORB orb)
     {
-        // This code used to live directly in CDROutputStream.grow.
-
         int newLength = getLength() * 2;
 
         while (position() + getNumberOfBytesNeeded() >= newLength)
@@ -238,8 +236,7 @@ public class ByteBufferWithInfo
         ByteBufferPool byteBufferPool = orb.getByteBufferPool();
         ByteBuffer newBB = byteBufferPool.getByteBuffer(newLength);
 
-        if (debug)
-        {
+        if (debug) {
             // print address of ByteBuffer just gotten
             int newbbAddress = System.identityHashCode(newBB);
             StringBuffer sb = new StringBuffer(80);
@@ -253,8 +250,7 @@ public class ByteBufferWithInfo
         newBB.put(getByteBuffer());
 
         // return 'old' byteBuffer reference to the ByteBuffer pool
-        if (debug)
-        {
+        if (debug) {
             // print address of ByteBuffer being released
             int bbAddress = System.identityHashCode(getByteBuffer());
             StringBuffer sb = new StringBuffer(80);

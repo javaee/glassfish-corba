@@ -301,7 +301,7 @@ abstract public class ORB {
      *
      * @return the singleton ORB
      */
-    public static ORB init() {
+    public static synchronized ORB init() {
         if (singleton == null) {
             String className = getSystemProperty(ORBSingletonClassKey);
             if (className == null)

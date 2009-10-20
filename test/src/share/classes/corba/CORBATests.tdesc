@@ -43,7 +43,7 @@
 // clients or servers within the test process will be run
 // with the -separateprocess flag. 
 
--test corba.jmx.JmxTest
+-test corba.simpledynamic.NewAcceptor
 -test corba.copyobjectpolicy.CopyObjectPolicyTest
 -test corba.connectioncache.ConnectionCacheTest
 -test corba.timer.TimerTest
@@ -75,9 +75,7 @@
 -test corba.legacybootstrapserver.LegacyBootstrapServerTest
 -test corba.stubserialization.StubSerializationTest
 // now run directly from ant junit task: -test corba.dynamicrmiiiop.DynamicRmiIIOPTest
--test corba.threadpoolmonitoring.ThreadPoolMonitoringTests
 -test corba.adapteractivator.AdapterActivator
--test corba.monitoring.MonitoringTests
 -test corba.exceptiondetailsc.ExceptionDetailSCTest
 -test corba.preinvokepostinvoke.PreInvokePostInvokeTest
 -test corba.poacallback.POACallbackTest
@@ -93,8 +91,6 @@
 // -test corba.connections.ConnectionsTest
 -test corba.cdrext.CDRExtTest
 -test corba.serialization.zerolengthstring.ZeroLengthStringTest
-// Commented out until we update to more recent XML tools
-// -test corba.genericRPCMSGFramework.GenericRPCMSGFrameworkTest
 -test corba.purgecalls.PurgecallsTest
 -test corba.codeset.CodeSetTest
 -test corba.codebase.CodeBaseTest

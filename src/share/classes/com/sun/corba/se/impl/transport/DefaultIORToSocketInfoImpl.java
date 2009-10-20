@@ -43,8 +43,6 @@ import java.util.List;
 import org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS ;
 
 import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
 import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent;

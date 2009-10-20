@@ -42,15 +42,13 @@ import java.util.HashMap ;
 
 import org.omg.CORBA.LocalObject ;
 
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
 
-import com.sun.corba.se.pept.transport.Connection ;
-import com.sun.corba.se.pept.transport.OutboundConnectionCache ;
-import com.sun.corba.se.pept.transport.ContactInfo ;
+import com.sun.corba.se.spi.transport.CorbaConnection ;
+import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache ;
+import com.sun.corba.se.spi.transport.CorbaContactInfo ;
 
-import com.sun.corba.se.pept.broker.Broker ;
-
-import com.sun.corba.se.pept.encoding.InputObject ;
+import com.sun.corba.se.impl.encoding.CDRInputObject ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBConfigurator ;
@@ -86,13 +84,13 @@ public class NoConnectionCacheImpl
     implements ORBConfigurator
 {
     private static class NCCConnectionCacheImpl extends CorbaConnectionCacheBase
-	implements OutboundConnectionCache {
+	implements CorbaOutboundConnectionCache {
 	// store is a dummy variable
 	private Map store = new HashMap() ;
 	private boolean debug ;
 
 	// holds only one connection
-	private Connection connection = null ;
+	private CorbaConnection connection = null ;
 
 	public void dprint( String msg ) {
 	    ORBUtility.dprint("NCCConnectionCacheImpl",msg) ;
@@ -111,15 +109,11 @@ public class NoConnectionCacheImpl
 	    return store ;
 	}
 
-	protected void registerWithMonitoring() {
-	    // NO-OP
-	}
-
-	public Connection get(ContactInfo contactInfo) {
+	public CorbaConnection get(CorbaContactInfo contactInfo) {
 	    return connection ;
 	}
 
-	public void put(ContactInfo contactInfo, Connection conn ) {
+	public void put(CorbaContactInfo contactInfo, CorbaConnection conn ) {
 	    if (debug) {
 		dprint( "put-> " + conn ) ;
 	    }
@@ -134,7 +128,7 @@ public class NoConnectionCacheImpl
 	    }
 	}
 
-	public void remove(ContactInfo contactInfo) {
+	public void remove(CorbaContactInfo contactInfo) {
 	    if (debug) {
 		dprint( "remove->" ) ;
 	    }
@@ -232,12 +226,12 @@ public class NoConnectionCacheImpl
 	    return false ;
 	}
 
-	public Connection createConnection() {
+	public CorbaConnection createConnection() {
 	    if (debug) {
 		dprint( "createConnection->" ) ;
 	    }
 	    try {
-		Connection connection = new NCCConnectionImpl( orb, this, 
+		CorbaConnection connection = new NCCConnectionImpl( orb, this,
 		    socketType, hostname, port ) ;
 		if (debug) {
 		    dprint( "createConnection: created " + connection ) ;
@@ -269,9 +263,9 @@ public class NoConnectionCacheImpl
     }
 
     private static class NCCClientRequestDispatcherImpl extends CorbaClientRequestDispatcherImpl {
-	public void endRequest( Broker broker, Object self, InputObject inputObject ) {
+	public void endRequest( ORB broker, Object self, CDRInputObject inputObject ) {
 	    super.endRequest( broker, self, inputObject) ;
-	    getConnectionCache( (ORB)broker ).remove( null ) ;
+	    getConnectionCache( broker ).remove( null ) ;
 	}
     }
 
@@ -295,11 +289,11 @@ public class NoConnectionCacheImpl
 
 	orb.setCorbaContactInfoListFactory( factory ) ;
 
-	ClientRequestDispatcher crd = new NCCClientRequestDispatcherImpl() ;
+	CorbaClientRequestDispatcher crd = new NCCClientRequestDispatcherImpl() ;
 	RequestDispatcherRegistry rdr = orb.getRequestDispatcherRegistry() ;
 	// Need to register crd with all scids.  Assume range is 0 to MAX_POA_SCID.
 	for (int ctr=0; ctr<ORBConstants.MAX_POA_SCID; ctr++) {
-	    ClientRequestDispatcher disp = rdr.getClientRequestDispatcher( ctr ) ;
+	    CorbaClientRequestDispatcher disp = rdr.getClientRequestDispatcher( ctr ) ;
 	    if (disp != null) {
 		rdr.registerClientRequestDispatcher( crd, ctr ) ;
 	    }

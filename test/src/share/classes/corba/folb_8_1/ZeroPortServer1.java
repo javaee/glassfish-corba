@@ -41,20 +41,12 @@
 package corba.folb_8_1;
 
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Properties ;
 
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
-import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 
 /**
  * @author Harold Carr

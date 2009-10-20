@@ -64,7 +64,7 @@ public class RemoteService
 	this.orb = orb;
 	this.serverName = serverName;
 	this.blocker = new Object();
-	this.stats = new ConnectionStatistics();
+	this.stats = new ConnectionStatistics( orb );
     }
 
     public Struct[] method(Struct[] in)

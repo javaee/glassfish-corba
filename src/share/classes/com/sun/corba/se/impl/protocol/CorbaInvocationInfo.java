@@ -40,10 +40,10 @@ import java.util.Iterator;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.pept.protocol.ClientInvocationInfo;
-import com.sun.corba.se.pept.protocol.MessageMediator;
+import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
 
 /**
  * @author Harold Carr
@@ -56,8 +56,8 @@ public class CorbaInvocationInfo implements ClientInvocationInfo
     private int entryCount;
     private ORB orb;
     private Iterator contactInfoListIterator;
-    private ClientRequestDispatcher clientRequestDispatcher;
-    private MessageMediator messageMediator;
+    private CorbaClientRequestDispatcher clientRequestDispatcher;
+    private CorbaMessageMediator messageMediator;
     
     private CorbaInvocationInfo() 
     {
@@ -105,22 +105,22 @@ public class CorbaInvocationInfo implements ClientInvocationInfo
 	entryCount--;
     }
     
-    public void setClientRequestDispatcher(ClientRequestDispatcher clientRequestDispatcher)
+    public void setClientRequestDispatcher(CorbaClientRequestDispatcher clientRequestDispatcher)
     {
 	this.clientRequestDispatcher = clientRequestDispatcher;
     }
 
-    public ClientRequestDispatcher getClientRequestDispatcher()
+    public CorbaClientRequestDispatcher getClientRequestDispatcher()
     {
 	return clientRequestDispatcher;
     }
 
-    public void setMessageMediator(MessageMediator messageMediator) 
+    public void setMessageMediator(CorbaMessageMediator messageMediator)
     {
         this.messageMediator = messageMediator;
     }
 
-    public MessageMediator getMessageMediator()
+    public CorbaMessageMediator getMessageMediator()
     {
         return messageMediator;
     }

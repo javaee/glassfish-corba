@@ -61,7 +61,7 @@ public class FallbackObjectCopierImpl extends Pair<ObjectCopier,ObjectCopier>
 	try {
 	    return first().copy( src, debug ) ;
 	} catch (ReflectiveCopyException rce ) {
-	    // XXX log this fallback at a low level
+            Exceptions.self.failureInFallback( rce, src, src.getClass() ) ;
 	    return second().copy( src, debug ) ;
 	}
     }

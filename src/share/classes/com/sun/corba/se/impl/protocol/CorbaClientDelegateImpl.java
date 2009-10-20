@@ -57,14 +57,13 @@ import org.omg.CORBA.portable.OutputStream;
 import org.omg.CORBA.portable.RemarshalException;
 import org.omg.CORBA.portable.ServantObject;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.encoding.InputObject;
-import com.sun.corba.se.pept.encoding.OutputObject;
-import com.sun.corba.se.pept.protocol.ClientInvocationInfo;
-import com.sun.corba.se.pept.protocol.ClientRequestDispatcher;
-import com.sun.corba.se.pept.transport.ContactInfo;
-import com.sun.corba.se.pept.transport.ContactInfoList;
-import com.sun.corba.se.pept.transport.ContactInfoListIterator;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
+import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
 
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.ior.IOR;
@@ -73,15 +72,18 @@ import com.sun.corba.se.spi.protocol.CorbaClientDelegate ;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
 import com.sun.corba.se.impl.util.JDKBridge;
+
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
+
+import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
 // implements com.sun.corba.se.impl.core.ClientRequestDispatcher
 // so RMI-IIOP Util.isLocal can call ClientRequestDispatcher.useLocalInvocation.
@@ -110,12 +112,12 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     // framework.subcontract.Delegate
     //
 
-    public Broker getBroker()
+    public ORB getBroker()
     {
 	return orb;
     }
 
-    public ContactInfoList getContactInfoList()
+    public CorbaContactInfoList getContactInfoList()
     {
 	return contactInfoList;
     }
@@ -166,11 +168,14 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 			}
 			contactInfo = (CorbaContactInfo)
 			    contactInfoListIterator.next();
+                        if (orb.folbDebugFlag) {
+                            dprint( ".request: op/" + operation + " contactInfo/" + contactInfo ) ;
+                        }
 		    } finally {
 			tp.exit_hasNextNext() ;
 		    }
 
-		    ClientRequestDispatcher subcontract =
+		    CorbaClientRequestDispatcher subcontract =
 		        contactInfo.getClientRequestDispatcher();
 		    // Remember chosen subcontract for invoke and releaseReply.
 		    // 
@@ -207,6 +212,12 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
        	    if (orb.subcontractDebugFlag) {
 	        dprint(".request<- op/" + operation);
 	    }
+
+            // Enable operation tracing for argument marshaling
+            if (orb.operationTraceDebugFlag) {
+                OperationTracer.enable() ;
+            }
+            OperationTracer.begin( "client argument marshaling:op=" + operation ) ;
 	}
     }
     
@@ -215,30 +226,46 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    ApplicationException,
 	    RemarshalException 
     {
-	ClientRequestDispatcher subcontract = getClientRequestDispatcher();
-	return (InputStream)
-	    subcontract.marshalingComplete((Object)self, (OutputObject)output);
+        // Disable operation tracing for argment marshaling
+        OperationTracer.disable() ;
+        OperationTracer.finish() ;
+
+	CorbaClientRequestDispatcher subcontract = getClientRequestDispatcher();
+        try {
+	    return (InputStream)
+	        subcontract.marshalingComplete((Object)self, (CDROutputObject)output);
+        } finally {
+            // Enable operation tracing for result unmarshaling
+            if (orb.operationTraceDebugFlag) {
+                OperationTracer.enable() ;
+            }
+            OperationTracer.begin( "client result unmarshaling" ) ;
+        }
     }
     
     public void releaseReply(org.omg.CORBA.Object self, InputStream input) 
     {
 	try {
 	    // NOTE: InputStream may be null (e.g., exception request from PI).
-	    ClientRequestDispatcher subcontract = getClientRequestDispatcher();
+	    CorbaClientRequestDispatcher subcontract = getClientRequestDispatcher();
 	    if (subcontract != null) {
 		// Important: avoid an NPE.
 		// ie: Certain errors may happen before a subcontract is selected.
-		subcontract.endRequest(orb, self, (InputObject)input);
+		subcontract.endRequest(orb, self, (CDRInputObject)input);
 	    }
 	    orb.releaseOrDecrementInvocationInfo();
 	} finally {
 	    tp.exit_totalInvocation() ;
+        
+            // Disable operation tracing for result unmarshaling
+            OperationTracer.disable() ;
+            OperationTracer.finish() ;
 	}
     }
 
-    private ClientRequestDispatcher getClientRequestDispatcher()
+    private CorbaClientRequestDispatcher getClientRequestDispatcher()
     {
-        return (ClientRequestDispatcher)
+        return (CorbaClientRequestDispatcher)
             ((CorbaInvocationInfo)orb.getInvocationInfo())
 	    .getClientRequestDispatcher();
     }
@@ -504,7 +531,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
      */
     public boolean is_local(org.omg.CORBA.Object self) 
     {
-	// XXX this need to check isNextCallValid
+	// XXX this needs to check isNextCallValid
         return contactInfoList.getEffectiveTargetIOR().getProfile().
 	    isLocal();
     }

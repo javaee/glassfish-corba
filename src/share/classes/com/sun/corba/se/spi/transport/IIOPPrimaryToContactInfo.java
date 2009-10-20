@@ -38,7 +38,7 @@ package com.sun.corba.se.spi.transport;
 
 import java.util.List;
 
-import com.sun.corba.se.pept.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 /**
  * This interface is the "sticky manager" for IIOP failover.  The default
@@ -63,7 +63,7 @@ public interface IIOPPrimaryToContactInfo
     /**
      * @param primary - clear any state relating to primary.
      */
-    public void reset(ContactInfo primary);
+    public void reset(CorbaContactInfo primary);
 
     /**
      * @param primary - the key.
@@ -73,8 +73,8 @@ public interface IIOPPrimaryToContactInfo
      * @param contactInfos - the list of replicas associated with the
      * primary.
      */
-    public boolean hasNext(ContactInfo primary,
-			   ContactInfo previous,
+    public boolean hasNext(CorbaContactInfo primary,
+			   CorbaContactInfo previous,
 			   List contactInfos);
 
     /**
@@ -87,8 +87,8 @@ public interface IIOPPrimaryToContactInfo
      * contactInfos.  Map the <code>ContactInfo</code> following
      * previous to primary and return that <code>ContactInfo</code>.
      */
-    public ContactInfo next(ContactInfo primary,
-			    ContactInfo previous,
+    public CorbaContactInfo next(CorbaContactInfo primary,
+			    CorbaContactInfo previous,
 			    List contactInfos);
 
 }

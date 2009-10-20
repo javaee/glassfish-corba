@@ -39,18 +39,10 @@ package com.sun.corba.se.impl.transport;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.sun.corba.se.pept.broker.Broker;
-import com.sun.corba.se.pept.transport.Acceptor;
-import com.sun.corba.se.pept.transport.Connection;
-import com.sun.corba.se.pept.transport.InboundConnectionCache;
-
-import com.sun.corba.se.spi.monitoring.LongMonitoredAttributeBase;
-import com.sun.corba.se.spi.monitoring.MonitoringConstants;
-import com.sun.corba.se.spi.monitoring.MonitoringFactories;
-import com.sun.corba.se.spi.monitoring.MonitoredObject;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
@@ -61,28 +53,25 @@ public class CorbaInboundConnectionCacheImpl
     extends
 	CorbaConnectionCacheBase
     implements
-	InboundConnectionCache
+	CorbaInboundConnectionCache
 {
-    protected Collection connectionCache;
+    protected Collection<CorbaConnection> connectionCache;
+    private CorbaInboundConnectionCacheProbeProvider pp =
+        new CorbaInboundConnectionCacheProbeProvider() ;
 
-    public CorbaInboundConnectionCacheImpl(ORB orb, Acceptor acceptor)
+    public CorbaInboundConnectionCacheImpl(ORB orb, CorbaAcceptor acceptor)
     {
 	super(orb, acceptor.getConnectionCacheType(),
 	      ((CorbaAcceptor)acceptor).getMonitoringName());
-	this.connectionCache = new ArrayList();
+	this.connectionCache = new ArrayList<CorbaConnection>();
     }
 
-    ////////////////////////////////////////////////////
-    //
-    // pept.transport.InboundConnectionCache
-    //
-    
-    public Connection get(Acceptor acceptor) 
+    public CorbaConnection get(CorbaAcceptor acceptor)
     {
 	throw wrapper.methodShouldNotBeCalled();
     }
     
-    public void put(Acceptor acceptor, Connection connection) 
+    public void put(CorbaAcceptor acceptor, CorbaConnection connection)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".put: " + acceptor + " " + connection);
@@ -91,10 +80,11 @@ public class CorbaInboundConnectionCacheImpl
 	    connectionCache.add(connection);
 	    connection.setConnectionCache(this);
 	    dprintStatistics();
+            pp.connectionOpenedEvent( acceptor.toString(), connection.toString() ) ;
 	}
     }
 
-    public void remove(Connection connection)
+    public void remove(CorbaConnection connection)
     {
 	if (orb.transportDebugFlag) {
 	    dprint(".remove: " +  connection);
@@ -102,6 +92,7 @@ public class CorbaInboundConnectionCacheImpl
 	synchronized (backingStore()) {
 	    connectionCache.remove(connection);
 	    dprintStatistics();
+            pp.connectionClosedEvent( connection.toString() ) ;
 	}
     }
 
@@ -118,90 +109,6 @@ public class CorbaInboundConnectionCacheImpl
     protected Object backingStore()
     {
 	return connectionCache;
-    }
-
-    protected void registerWithMonitoring()
-    {
-	// ORB
-	MonitoredObject orbMO = 
-	    orb.getMonitoringManager().getRootMonitoredObject();
-
-	// REVISIT - add ORBUtil mkdir -p like operation for this.
-
-	// CONNECTION
-	MonitoredObject connectionMO = 
-	    orbMO.getChild(MonitoringConstants.CONNECTION_MONITORING_ROOT);
-	if (connectionMO == null) {
-	    connectionMO = 
-		MonitoringFactories.getMonitoredObjectFactory()
-		    .createMonitoredObject(
-		        MonitoringConstants.CONNECTION_MONITORING_ROOT,
-			MonitoringConstants.CONNECTION_MONITORING_ROOT_DESCRIPTION);
-	    orbMO.addChild(connectionMO);
-	}
-
-	// INBOUND CONNECTION
-	MonitoredObject inboundConnectionMO = 
-	    connectionMO.getChild(
-                MonitoringConstants.INBOUND_CONNECTION_MONITORING_ROOT);
-	if (inboundConnectionMO == null) {
-	    inboundConnectionMO =
-		MonitoringFactories.getMonitoredObjectFactory()
-		    .createMonitoredObject(
-		        MonitoringConstants.INBOUND_CONNECTION_MONITORING_ROOT,
-			MonitoringConstants.INBOUND_CONNECTION_MONITORING_ROOT_DESCRIPTION);
-	    connectionMO.addChild(inboundConnectionMO);
-	}
-
-	// NODE FOR THIS CACHE
-	MonitoredObject thisMO = 
-	    inboundConnectionMO.getChild(getMonitoringName());
-	if (thisMO == null) {
-	    thisMO =
-		MonitoringFactories.getMonitoredObjectFactory()
-		    .createMonitoredObject(
-		        getMonitoringName(),
-			MonitoringConstants.CONNECTION_MONITORING_DESCRIPTION);
-	    inboundConnectionMO.addChild(thisMO);
-	}
-
-	LongMonitoredAttributeBase attribute;
-
-	// ATTRIBUTE
-	attribute = new 
-	    LongMonitoredAttributeBase(
-                MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS, 
-		MonitoringConstants.CONNECTION_TOTAL_NUMBER_OF_CONNECTIONS_DESCRIPTION)
-	    {
-		public Object getValue() {
-		    return Long.valueOf(CorbaInboundConnectionCacheImpl.this.numberOfConnections());
-		}
-	    };
-	thisMO.addAttribute(attribute);
-
-	// ATTRIBUTE
-	attribute = new 
-	    LongMonitoredAttributeBase(
-                MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS, 
-		MonitoringConstants.CONNECTION_NUMBER_OF_IDLE_CONNECTIONS_DESCRIPTION)
-	    {
-		public Object getValue() {
-		    return Long.valueOf(CorbaInboundConnectionCacheImpl.this.numberOfIdleConnections());
-		}
-	    };
-	thisMO.addAttribute(attribute);
-
-	// ATTRIBUTE
-	attribute = new 
-	    LongMonitoredAttributeBase(
-                MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS, 
-		MonitoringConstants.CONNECTION_NUMBER_OF_BUSY_CONNECTIONS_DESCRIPTION)
-	    {
-		public Object getValue() {
-		    return Long.valueOf(CorbaInboundConnectionCacheImpl.this.numberOfBusyConnections());
-		}
-	    };
-	thisMO.addAttribute(attribute);
     }
 
     protected void dprint(String msg)

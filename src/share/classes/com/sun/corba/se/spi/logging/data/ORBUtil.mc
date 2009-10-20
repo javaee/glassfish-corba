@@ -137,6 +137,42 @@
 	     59 WARNING "Exception in ConvertAction operation")
             (IO_EXCEPTION_ON_CLOSE
              60 FINE "Useless exception on call to Closeable.close()")
+            (CLASS_NOT_FOUND_IN_BUNDLE
+             61 FINE "Bundle not found for class {0}")
+            (FOUND_CLASS_IN_BUNDLE
+             62 FINE "Class {0} found in bundle {1}")
+            (BUNDLE_COULD_NOT_LOAD_CLASS
+             63 FINE "Class {0} could not be loaded by bundle {1}")
+            (FOUND_CLASS_IN_BUNDLE_VERSION
+             64 FINE "Class {0} found in bundle {1} with version {2}")
+            (CLASS_NOT_FOUND_IN_BUNDLE_VERSION
+             65 FINE "Class {0} not found in bundle {1} with version {2}")
+            (INSERT_ORB_PROVIDER
+             66 FINE "Inserting ORB provider class {0} from bundle {1}")
+            (REMOVE_ORB_PROVIDER
+             67 FINE "Inserting ORB provider class {0} from bundle {1}")
+            (RECEIVED_BUNDLE_EVENT
+             68 FINE "Received bundle event of type {0} on bundle {1}")
+            (PROBE_BUNDLES_FOR_PROVIDERS
+             69 FINE "Probing all bundles for ORB class providers")
+            (CLASS_NOT_FOUND_IN_CLASS_NAME_MAP
+             70 FINE "Could not find class {0} in classNameMap")
+            (CLASS_NOT_FOUND_IN_PACKAGE_NAME_MAP
+             71 FINE "Could not find class {0} in packageNameMap")
+            (CLASS_FOUND_IN_PACKAGE_NAME_MAP
+             72 FINE "Found class {0} in bundle {1} using packageNameMap")
+            (CLASS_FOUND_IN_CLASS_NAME_MAP
+             73 FINE "Found class {0} in bundle {1} using classNameMap")
+            (COULD_NOT_LOAD_CLASS_IN_BUNDLE
+             74 WARNING "Could not load class {0} in bundle {1}")
+            (EXCEPTION_IN_SELECTOR
+             75 WARNING "Exception while handling event on {0}")
+            (CANCELED_SELECTION_KEY 
+             76 FINE "Ignoring cancelled SelectionKey {0}: key will be removed from Selector")
+            (PACKAGE_ADMIN_SERVICE_NOT_AVAILABLE
+             77 FINE "The OSGi PackageAdmin service is not available")
+            (SET_PARAMETER_CALLED_AGAIN
+             78 WARNING "The ORBImpl.set_parameters method was called more than once")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 
@@ -201,8 +237,14 @@
 	     30 WARNING "{0} is not a valid positive decimal integer for {1}")
 	    (BAD_TIMEOUT_DATA_LENGTH
 	     31 WARNING "Timeout data must be 3 or 4 positive decimal integers separated by :")
+	    (INVALID_LOAD_BALANCING_POLICY_VALUE 
+	     32 WARNING "Load balancing value specified, {0}, is outside supported range, {1} - {2}")
+	    (INVALID_LOAD_BALANCING_COMPONENT_VALUE 
+	     33 WARNING "Could not set load balancing component value to {0}, valid values are {1} - {2}")
+	    (INVALID_LOAD_BALANCING_ID
+	     34 WARNING "Invalid request partitioning id {0}, valid values are {1} - {2}")
             (CODE_BASE_UNAVAILABLE 
-             32 FINE "CodeBase unavailable on connection {0}")
+             35 FINE "CodeBase unavailable on connection {0}")
 	    )
 	(BAD_INV_ORDER 
 	    (DSIMETHOD_NOTCALLED 
@@ -369,9 +411,9 @@
 	    (GET_SERVER_PORT_CALLED_BEFORE_ENDPOINTS_INITIALIZED 
 	     4 WARNING "legacyGetServerPort called before endpoints initialized")
 	    (PERSISTENT_SERVERPORT_NOT_SET  
-	     5 WARNING "Persistent server port is not set")
+	     5 FINE "Persistent server port is not set")
 	    (PERSISTENT_SERVERID_NOT_SET  
-	     6 WARNING "Persistent server ID is not set")
+	     6 FINE "Persistent server ID is not set")
 	    (USER_CONFIGURATOR_EXCEPTION
 	     7 WARNING "Exception occured while running a user configurator")
 	    )
@@ -573,32 +615,6 @@
 	     102 WARNING "Object in ServiceContext map was not of the correct type")
 	    (BAD_TYPE_IN_DELEGATE 
 	     103 WARNING "The ContactInfoList in a CorbaClientDelegate is NOT a CorbaContactInfoList")
-	    (WORKER_THREAD_CREATED
-	     104 FINE "Worker thread {0} has been created with ClassLoader {1}")
-	    (WORKER_THREAD_CLASSLOADER_RESET
-	     105 FINE "Worker thread {0} finished work item with ClassLoader {1}; ClassLoader successfully reset to {2}")
-	    (WORKER_THREAD_GET_CONTEXT_CLASSLOADER_FAILED
-	     106 WARNING "Unable to get worker thread {0} context ClassLoader; check security policy file, must grant 'getContextClassLoader' runtime permission.")
-	    (WORKER_THREAD_FORGOT_CLASSLOADER_RESET
-	     107 FINE "Worker thread {0} context ClassLoader was changed to {1}; will attempt a reset to its initial ClassLoader {2}.")
-	    (WORKER_THREAD_RESET_CONTEXT_CLASSLOADER_FAILED
-	     108 WARNING "Unable to set worker thread {0} context ClassLoader; cause {1}; check security policy file, must grant 'setContextClassLoader' runtime permission, or reset the thread context ClassLoader before returning the worker thread to the thread pool.")
-            	    (WORKER_THREAD_THROWABLE_FROM_REQUEST_WORK
-             	     109 FINE "Worker thread {0} caught throwable when requesting work from work queue {1}.")
-            (WORKER_THREAD_NOT_NEEDED
-             110 FINE "Worker thread {0} will exit; current thread count, {1}, greater than minimum worker threads needed, {2}.")
-            (WORKER_THREAD_DO_WORK_THROWABLE
-             111 WARNING "Worker thread {0} caught throwable while executing work.")
-            (WORKER_THREAD_CAUGHT_UNEXPECTED_THROWABLE
-             112 WARNING "Worker thread {0} caught unexpected throwable.")
-            (WORKER_THREAD_CREATION_FAILURE
-             113 SEVERE "Worker thread creation failure; cause {0}.")
-            (WORKER_THREAD_SET_NAME_FAILURE
-             114 WARNING "Unable to set worker thread {0} name to {1}; cause {2}.")
-            (WORK_QUEUE_THREAD_INTERRUPTED
-             115 FINE "Worker Thread from thread pool {0} was interrupted: closeCalled is {1}.")
-            (WORK_QUEUE_REQUEST_WORK_NO_WORK_FOUND
-             116 WARNING "Ignoring unexpected {0} when retrieving of work from work queue, {1}.")
             (NO_FRAGMENT_QUEUE_FOR_REQUEST_ID
              117 WARNING "Ignoring parsed fragment message because there is no fragment queue found for request id {0}.")
             (RESUME_OPTIMIZED_READ_THREAD_INTERRUPTED
@@ -617,22 +633,12 @@
 	     124 WARNING "SharedCDRContactInfoImpl does not support SocketInfo calls")
 	    (DUPLICATE_REQUEST_IDS_IN_RESPONSE_WAITING_ROOM
 	     125 WARNING "Duplicate request ids in response waiting room: over wrote old one: {0},  with new one: {1}")
-            (THREAD_POOL_CLOSE_ERROR 
-             126 WARNING "Error in closing ThreadPool")
-            (THREAD_GROUP_IS_DESTROYED
-             127 WARNING "ThreadGroup {0} is already destroyed: can't destroy it")
-            (THREAD_GROUP_HAS_ACTIVE_THREADS_IN_CLOSE
-             128 WARNING "ThreadGroup {0} has {1} active threads: destroy may cause exception")
-            (THREAD_GROUP_HAS_SUB_GROUPS_IN_CLOSE
-             129 WARNING "ThreadGroup {0} has {1} sub-thread groups: destroy may cause exception")
-            (THREAD_GROUP_DESTROY_FAILED
-             130 WARNING "ThreadGroup {0} could not be destroyed")
-            (INTERRUPTED_JOIN_CALL_WHILE_CLOSING_THREAD_POOL
-             131 WARNING "Join was interrupted on thread {0} while closing ThreadPool {1}")
             (EXCEPTION_IN_READER_THREAD
              132 FINE "Exception occurred in reader thread")
             (EXCEPTION_IN_LISTENER_THREAD
              133 FINE "Exception occurred in listener thread")
+            (ORB_LIFECYCLE_TRACE
+             134 WARNING "ORB Lifecycle for ORB {0}: {1}" )
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 
@@ -776,7 +782,10 @@
 	    (SEND_DEFERRED_NOTIMPLEMENTED
 	     4  FINE "send deferred is not implemented")
 	    (LONG_DOUBLE_NOT_IMPLEMENTED
-	     5 FINE "IDL type long double is not supported in Java"))
+	     5 FINE "IDL type long double is not supported in Java")
+            (NOT_SUPPORTED_ON_LAZY_ACCEPTOR
+             6 WARNING "getAcceptedSocket is not supported for a CorbaAcceptorLazyImpl")
+            )
 	(OBJ_ADAPTER 
 	    (NO_SERVER_SC_IN_DISPATCH
 	     1  WARNING "No server request dispatcher found when dispatching request to object adapter")

@@ -40,10 +40,22 @@ import com.sun.corba.se.spi.ior.TaggedComponent ;
 
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+
+
 /**
  * @author Ken Cavanaugh
  */
+@ManagedData
+@Description( "The character codesets to be used for encoding "
+    + "strings sent to the object reference represented by "
+    + "this IOR" ) 
 public interface CodeSetsComponent extends TaggedComponent
 {
+    @ManagedAttribute
+    @Description( "The codeset component info" ) 
+    // we'll just use toString() to represent this
     public CodeSetComponentInfo getCodeSetComponentInfo() ;
 }

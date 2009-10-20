@@ -35,10 +35,15 @@
  */
 package com.sun.corba.se.impl.osgi.main ;
 
+import org.osgi.framework.Bundle ;
 import org.osgi.framework.BundleActivator ;
 import org.osgi.framework.BundleEvent ;
 import org.osgi.framework.BundleContext ;
 import org.osgi.framework.SynchronousBundleListener ;
+import org.osgi.framework.ServiceReference ;
+
+import org.osgi.service.packageadmin.PackageAdmin ;
+import org.osgi.service.packageadmin.ExportedPackage ;
 
 import java.util.Properties ;
 
@@ -48,7 +53,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 
 public class ORBFactoryTest implements BundleActivator, SynchronousBundleListener {
-    private ORB orb = null ;
+    private static PackageAdmin pkgAdmin ;
     
     private static String getBundleEventType( int type ) {
         if (type == BundleEvent.INSTALLED) 
@@ -79,9 +84,30 @@ public class ORBFactoryTest implements BundleActivator, SynchronousBundleListene
         System.out.println( "ORBFactoryTest: " + arg ) ;
     }
 
+    private ORB orb = null ;
+
     public void start( BundleContext context ) {
         msg( "Starting ORBFactoryTest" ) ;
         context.addBundleListener( this ) ;
+
+        try {
+            ServiceReference sref = context.getServiceReference( "org.osgi.service.packageadmin.PackageAdmin" ) ;
+            pkgAdmin = (PackageAdmin)context.getService( sref ) ;
+
+            dumpInfo( context, pkgAdmin ) ;
+        } catch (Exception exc) {
+            msg( "Exception in getting PackageAdmin: " + exc ) ;
+        }
+    }
+
+    private void dumpInfo( BundleContext context, PackageAdmin pkgAdmin ) {
+        msg( "Dumping bundle information" ) ;
+        for (Bundle bundle : context.getBundles()) {
+            msg( "\tBundle: " + bundle.getSymbolicName() ) ;
+            for (ExportedPackage ep : pkgAdmin.getExportedPackages( bundle ) ) {
+                msg( "\t\tExport: " + ep.getName() ) ;
+            }
+        }
     }
 
     public void stop( BundleContext context ) {
@@ -106,7 +132,8 @@ public class ORBFactoryTest implements BundleActivator, SynchronousBundleListene
                 String[] args = {} ;
                 Properties props = new Properties() ;
                 props.setProperty( ORBConstants.RFM_PROPERTY, "dummy" ) ;
-                orb = ORBFactory.create( args, props, true ) ;
+                orb = ORBFactory.create() ;
+                ORBFactory.initialize( orb, args, props, true ) ;
                 ReferenceFactoryManager rfm = 
                     (ReferenceFactoryManager)orb.resolve_initial_references(
                         ORBConstants.REFERENCE_FACTORY_MANAGER ) ;

@@ -59,10 +59,6 @@ import com.sun.corba.se.spi.ior.IdentifiableContainerBase ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.ior.IORFactories ;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
-
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.encoding.MarshalOutputStream;
@@ -93,6 +89,10 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
     private boolean isCachedHashValue = false;
     private int cachedHashValue;
 
+    public Iterator<TaggedProfile> getTaggedProfiles() {
+        return iterator() ;
+    }
+
     public ORB getORB()
     {
 	return factory ;
@@ -108,6 +108,7 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
      */
     private IORTemplateList iortemps = null ;
 
+    @Override
     public boolean equals( Object obj )
     {
 	if (obj == null)
@@ -121,6 +122,7 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
 	return super.equals( obj ) && typeId.equals( other.getTypeId() ) ;
     }
 
+    @Override
     public int hashCode() 
     {
 	if (!isCachedHashValue) { 
@@ -227,6 +229,7 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
         return ORBConstants.STRINGIFY_PREFIX + bs;
     }
 
+    @Override
     public synchronized void makeImmutable()
     {
 	makeElementsImmutable() ;
@@ -318,8 +321,10 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
     }
 
     /** Return the first IIOPProfile in this IOR.
-     * XXX THIS IS TEMPORARY FOR BACKWARDS COMPATIBILITY AND WILL BE REMOVED
-     * SOON!
+     * Originally we planned to remove this, because we planned to use
+     * multiple IIOP profiles.  However, we really have no need for 
+     * multiple profiles in the ORB, so we will probably never remove
+     * this API.
      */
     public IIOPProfile getProfile() 
     {

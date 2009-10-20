@@ -38,10 +38,18 @@ package com.sun.corba.se.spi.ior.iiop;
 
 import com.sun.corba.se.spi.ior.TaggedComponent ;
 
+import org.glassfish.gmbal.ManagedData ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author Ken Cavanaugh
  */
+@ManagedData
+@Description( "Component representing Codebase URLs for downloading code" )
 public interface JavaCodebaseComponent extends TaggedComponent 
 {
+    @ManagedAttribute
+    @Description( "List of URLs in the codebase" ) 
     public String getURLs() ;
 }

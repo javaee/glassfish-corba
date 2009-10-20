@@ -37,7 +37,7 @@ package com.sun.corba.se.spi.transport;
 
 // XXX we need better SPIs here
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message ;
-import com.sun.corba.se.impl.encoding.CDRInputStream ;
+import com.sun.corba.se.impl.encoding.CDRInputObject;
 
 public interface MessageData {
     /** An array of GIOP messages.  The messages will
@@ -58,5 +58,5 @@ public interface MessageData {
      /** A fully initialized input stream for the message data, positioned
       * at the first element of the body.
       */
-    CDRInputStream getStream() ;
+    CDRInputObject getStream() ;
 }

@@ -110,7 +110,7 @@ import static corba.codegen.ControlBase.moa ;
  * </UL>
  */
 public class Client extends TestCase {
-    private static final boolean DEBUG = true ;
+    private static final boolean DEBUG = false ;
 
     // Make sure that ControlBase is loaded in the ClassLoader
     // that loaded Client, otherwise it could first be
@@ -135,7 +135,7 @@ public class Client extends TestCase {
 	JavaCodeGenerator gen = new JavaCodeGenerator( 
 	    ClassGeneratorFactoryRegistry.get( "_DImpl_Tie" )) ;
 	Class<?> cls = gen.generate( makeClassLoader() ) ;
-        if (DEBUG)
+        // if (DEBUG)
             gen.reportTimes() ;
 	assertNotNull( cls ) ;
     }
@@ -143,7 +143,7 @@ public class Client extends TestCase {
     private ClassInfo getClassInfo( SimpleCodeGenerator cg ) {
 	ClassLoader cl = makeClassLoader() ;
 	Class<?> cls = cg.generate( cl ) ;
-        if (DEBUG)
+        // if (DEBUG)
             cg.reportTimes() ;
 	assertNotNull( cls ) ;
 	Type type = Type.type( cls ) ;
@@ -168,7 +168,7 @@ public class Client extends TestCase {
 	JavaCodeGenerator gen = new JavaCodeGenerator( 
 	    ClassGeneratorFactoryRegistry.get( "MyRemote__Adapter" ) ) ;
 	Class<?> cls = gen.generate( makeClassLoader() ) ;
-        if (DEBUG)
+        // if (DEBUG)
             gen.reportTimes() ;
 	assertNotNull( cls ) ;
     }
@@ -341,7 +341,7 @@ public class Client extends TestCase {
 	JavaCodeGenerator gen = new JavaCodeGenerator( 
 	    ClassGeneratorFactoryRegistry.get( "_DImpl_Tie" ) ) ;
 	Class<?> cls = gen.generate( cl ) ;
-        if (DEBUG)
+        // if (DEBUG)
             gen.reportTimes() ;
 	assertNotNull( cls ) ;
 

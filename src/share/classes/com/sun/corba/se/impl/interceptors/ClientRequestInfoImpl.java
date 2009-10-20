@@ -41,36 +41,22 @@ import java.util.HashMap ;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.Context;
 import org.omg.CORBA.ContextList;
 import org.omg.CORBA.CTX_RESTRICT_SCOPE;
 import org.omg.CORBA.ExceptionList;
-import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.NamedValue;
-import org.omg.CORBA.NO_IMPLEMENT;
-import org.omg.CORBA.NO_RESOURCES;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.Object;
-import org.omg.CORBA.ParameterMode;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.UserException;
 import org.omg.CORBA.portable.ApplicationException;
-import org.omg.CORBA.portable.InputStream;
 import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.servicecontext.UnknownServiceContext;
 
 import org.omg.IOP.ServiceContext;
-import org.omg.IOP.ServiceContextHelper;
 import org.omg.IOP.TaggedProfile;
-import org.omg.IOP.TaggedProfileHelper;
 import org.omg.IOP.TaggedComponent;
-import org.omg.IOP.TaggedComponentHelper;
-import org.omg.IOP.TAG_INTERNET_IOP;
 import org.omg.Dynamic.Parameter;
 import org.omg.PortableInterceptor.ClientRequestInfo;
 import org.omg.PortableInterceptor.LOCATION_FORWARD;
@@ -79,22 +65,19 @@ import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.omg.PortableInterceptor.TRANSPORT_RETRY;
 import org.omg.PortableInterceptor.USER_EXCEPTION;
 
-import com.sun.corba.se.pept.protocol.MessageMediator;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+// 6763340
+import com.sun.corba.se.spi.protocol.RetryType;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
 
-import com.sun.corba.se.impl.encoding.CDROutputStream;
-import com.sun.corba.se.impl.encoding.CDRInputStream_1_0;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
-import com.sun.corba.se.impl.util.RepositoryId;
 
 /**
  * Implementation of the ClientRequestInfo interface as specified in
@@ -122,7 +105,7 @@ public final class ClientRequestInfoImpl
     
     // The current retry request status.  True if this request is being 
     // retried and this info object is to be reused, or false otherwise.
-    private boolean retryRequest;
+    private RetryType retryRequest;
     
     // The number of times this info object has been (re)used.  This is
     // incremented every time a request is retried, and decremented every
@@ -168,40 +151,52 @@ public final class ClientRequestInfoImpl
      * Reset the info object so that it can be reused for a retry,
      * for example.
      */
+    @Override
     void reset() {
-        super.reset();
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "reset" ) ;
+        }
 
-	// Please keep these in the same order that they're declared above.
-        
-        retryRequest = false;
+        try {
+            super.reset();
 
-        // Do not reset entryCount because we need to know when to pop this
-        // from the stack.
+            // Please keep these in the same order that they're declared above.
+            
+            // 6763340
+            retryRequest = RetryType.NONE;
 
-        request = null;
-	diiInitiate = false;
-	messageMediator = null;
+            // Do not reset entryCount because we need to know when to pop this
+            // from the stack.
 
-	// Clear cached attributes:
-	cachedTargetObject = null;
-	cachedEffectiveTargetObject = null;
-	cachedArguments = null;
-	cachedExceptions = null;
-	cachedContexts = null;
-	cachedOperationContext = null;
-	cachedReceivedExceptionId = null;
-	cachedResult = null;
-	cachedReceivedException = null;
-	cachedEffectiveProfile = null;
-	cachedRequestServiceContexts = null;
-	cachedReplyServiceContexts = null;
-        cachedEffectiveComponents = null;
+            request = null;
+            diiInitiate = false;
+            messageMediator = null;
 
-	piCurrentPushed = false;
+            // Clear cached attributes:
+            cachedTargetObject = null;
+            cachedEffectiveTargetObject = null;
+            cachedArguments = null;
+            cachedExceptions = null;
+            cachedContexts = null;
+            cachedOperationContext = null;
+            cachedReceivedExceptionId = null;
+            cachedResult = null;
+            cachedReceivedException = null;
+            cachedEffectiveProfile = null;
+            cachedRequestServiceContexts = null;
+            cachedReplyServiceContexts = null;
+            cachedEffectiveComponents = null;
 
-        startingPointCall = CALL_SEND_REQUEST;
-        endingPointCall = CALL_RECEIVE_REPLY;
+            piCurrentPushed = false;
 
+            startingPointCall = CALL_SEND_REQUEST;
+            endingPointCall = CALL_RECEIVE_REPLY;
+
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /*
@@ -286,15 +281,25 @@ public final class ClientRequestInfoImpl
      * The object which the client called to perform the operation.
      */
     public org.omg.CORBA.Object target (){
-	// access is currently valid for all states:
-        //checkAccess( MID_TARGET );
-	if (cachedTargetObject == null) {
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
-		messageMediator.getContactInfo();
-	    cachedTargetObject =
-		iorToObject(corbaContactInfo.getTargetIOR());
-	}
-	return cachedTargetObject;
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "target" ) ;
+        }
+
+        try {
+            // access is currently valid for all states:
+            //checkAccess( MID_TARGET );
+            if (messageMediator != null && cachedTargetObject == null) {
+                CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
+                    messageMediator.getContactInfo();
+                cachedTargetObject =
+                    iorToObject(corbaContactInfo.getTargetIOR());
+            }
+            return cachedTargetObject;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
@@ -304,21 +309,31 @@ public final class ClientRequestInfoImpl
      * remain unchanged.  
      */
     public org.omg.CORBA.Object effective_target() {
-	// access is currently valid for all states:
-        //checkAccess( MID_EFFECTIVE_TARGET );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "effective_target" ) ;
+        }
 
-        // Note: This is not necessarily the same as locatedIOR.
-        // Reason: See the way we handle COMM_FAILURES in 
-        // ClientRequestDispatcher.createRequest, v1.32
+        try {
+            // access is currently valid for all states:
+            //checkAccess( MID_EFFECTIVE_TARGET );
 
-	if (cachedEffectiveTargetObject == null) {
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
-		messageMediator.getContactInfo();
-	    // REVISIT - get through chain like getLocatedIOR helper below.
-	    cachedEffectiveTargetObject =
-		iorToObject(corbaContactInfo.getEffectiveTargetIOR());
-	}
-	return cachedEffectiveTargetObject;
+            // Note: This is not necessarily the same as locatedIOR.
+            // Reason: See the way we handle COMM_FAILURES in 
+            // ClientRequestDispatcher.createRequest, v1.32
+
+            if (messageMediator != null && cachedEffectiveTargetObject == null) {
+                CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
+                    messageMediator.getContactInfo();
+                // REVISIT - get through chain like getLocatedIOR helper below.
+                cachedEffectiveTargetObject =
+                    iorToObject(corbaContactInfo.getEffectiveTargetIOR());
+            }
+            return cachedEffectiveTargetObject;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
@@ -328,68 +343,98 @@ public final class ClientRequestInfoImpl
      * profile.
      */
     public TaggedProfile effective_profile (){
-        // access is currently valid for all states:
-        //checkAccess( MID_EFFECTIVE_PROFILE );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "effective_profile" ) ;
+        }
 
-	if( cachedEffectiveProfile == null ) {
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
-		messageMediator.getContactInfo();
-	    cachedEffectiveProfile =
-		corbaContactInfo.getEffectiveProfile().getIOPProfile();
-	}
+        try {
+            // access is currently valid for all states:
+            //checkAccess( MID_EFFECTIVE_PROFILE );
 
-	// Good citizen: In the interest of efficiency, we assume interceptors
-	// will not modify the returned TaggedProfile in any way so we need
-	// not make a deep copy of it.
+            if(messageMediator != null && cachedEffectiveProfile == null ) {
+                CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
+                    messageMediator.getContactInfo();
+                cachedEffectiveProfile =
+                    corbaContactInfo.getEffectiveProfile().getIOPProfile();
+            }
 
-	return cachedEffectiveProfile;
+            // Good citizen: In the interest of efficiency, we assume interceptors
+            // will not modify the returned TaggedProfile in any way so we need
+            // not make a deep copy of it.
+
+            return cachedEffectiveProfile;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
      * Contains the exception to be returned to the client.
      */
     public Any received_exception (){
-        checkAccess( MID_RECEIVED_EXCEPTION );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "received_exception" ) ;
+        }
 
-	if( cachedReceivedException == null ) {
-	    cachedReceivedException = exceptionToAny( exception );
-	}
+        try {
+            checkAccess( MID_RECEIVED_EXCEPTION );
 
-	// Good citizen: In the interest of efficiency, we assume interceptors
-	// will not modify the returned Any in any way so we need
-	// not make a deep copy of it.
+            if( cachedReceivedException == null ) {
+                cachedReceivedException = exceptionToAny( exception );
+            }
 
-	return cachedReceivedException;
+            // Good citizen: In the interest of efficiency, we assume interceptors
+            // will not modify the returned Any in any way so we need
+            // not make a deep copy of it.
+
+            return cachedReceivedException;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
      * The CORBA::RepositoryId of the exception to be returned to the client.
      */
     public String received_exception_id (){
-        checkAccess( MID_RECEIVED_EXCEPTION_ID );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "received_exception_id" ) ;
+        }
 
-	if( cachedReceivedExceptionId == null ) {
-	    String result = null;
-	    
-	    if( exception == null ) {
-		// Note: exception should never be null here since we will 
-		// throw a BAD_INV_ORDER if this is not called from 
-		// receive_exception.
-		throw wrapper.exceptionWasNull() ;
-	    } else if( exception instanceof SystemException ) {
-		String name = exception.getClass().getName();
-		result = ORBUtility.repositoryIdOf(name);
-	    } else if( exception instanceof ApplicationException ) {
-		result = ((ApplicationException)exception).getId();
-	    }
+        try {
+            checkAccess( MID_RECEIVED_EXCEPTION_ID );
 
-	    // _REVISIT_ We need to be able to handle a UserException in the 
-	    // DII case.  How do we extract the ID from a UserException?
-	    
-	    cachedReceivedExceptionId = result;
-	}
+            if( cachedReceivedExceptionId == null ) {
+                String result = null;
+                
+                if( exception == null ) {
+                    // Note: exception should never be null here since we will 
+                    // throw a BAD_INV_ORDER if this is not called from 
+                    // receive_exception.
+                    throw wrapper.exceptionWasNull() ;
+                } else if( exception instanceof SystemException ) {
+                    String name = exception.getClass().getName();
+                    result = ORBUtility.repositoryIdOf(name);
+                } else if( exception instanceof ApplicationException ) {
+                    result = ((ApplicationException)exception).getId();
+                }
 
-	return cachedReceivedExceptionId;
+                // _REVISIT_ We need to be able to handle a UserException in the 
+                // DII case.  How do we extract the ID from a UserException?
+                
+                cachedReceivedExceptionId = result;
+            }
+
+            return cachedReceivedExceptionId;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
@@ -399,9 +444,19 @@ public final class ClientRequestInfoImpl
      * returns (get_effective_component should be called instead).
      */
     public TaggedComponent get_effective_component (int id){
-        checkAccess( MID_GET_EFFECTIVE_COMPONENT );
-        
-        return get_effective_components( id )[0];
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "get_effective_component" ) ;
+        }
+
+        try {
+            checkAccess( MID_GET_EFFECTIVE_COMPONENT );
+            
+            return get_effective_components( id )[0];
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
@@ -409,54 +464,74 @@ public final class ClientRequestInfoImpl
      * selected for this request.
      */
     public TaggedComponent[] get_effective_components (int id){
-        checkAccess( MID_GET_EFFECTIVE_COMPONENTS );
-	TaggedComponent[] result = null;
-	boolean justCreatedCache = false;
-
-	if( cachedEffectiveComponents == null ) {
-	    cachedEffectiveComponents = new HashMap<Integer,TaggedComponent[]>();
-	    justCreatedCache = true;
-	} else {
-	    // Look in cache:
-	    result = cachedEffectiveComponents.get( id );
-	}
-        
-	// null could mean we cached null or not in cache.
-	if( (result == null) &&
-	    (justCreatedCache ||
-	    !cachedEffectiveComponents.containsKey( id ) ) )
-	{
-	    // Not in cache.  Get it from the profile:
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
-		messageMediator.getContactInfo();
-	    IIOPProfileTemplate ptemp = 
-		(IIOPProfileTemplate)corbaContactInfo.getEffectiveProfile().
-		getTaggedProfileTemplate();
-	    result = ptemp.getIOPComponents(myORB, id);
-	    cachedEffectiveComponents.put( id, result );
-	}
-        
-        // As per ptc/00-08-06, section 21.3.13.6., If not found, raise 
-        // BAD_PARAM with minor code INVALID_COMPONENT_ID.
-        if( (result == null) || (result.length == 0) ) {
-	    throw stdWrapper.invalidComponentId( id ) ;
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "get_effective_components" ) ;
         }
 
-	// Good citizen: In the interest of efficiency, we will assume 
-	// interceptors will not modify the returned TaggedCompoent[], or
-	// the TaggedComponents inside of it.  Otherwise, we would need to
-	// clone the array and make a deep copy of its contents.
-        
-        return result;
+        try {
+            checkAccess( MID_GET_EFFECTIVE_COMPONENTS );
+            TaggedComponent[] result = null;
+            boolean justCreatedCache = false;
+
+            if( cachedEffectiveComponents == null ) {
+                cachedEffectiveComponents = new HashMap<Integer,TaggedComponent[]>();
+                justCreatedCache = true;
+            } else {
+                // Look in cache:
+                result = cachedEffectiveComponents.get( id );
+            }
+            
+            // null could mean we cached null or not in cache.
+            if( (messageMediator != null) && (result == null) &&
+                (justCreatedCache ||
+                !cachedEffectiveComponents.containsKey( id ) ) )
+            {
+                // Not in cache.  Get it from the profile:
+                CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
+                    messageMediator.getContactInfo();
+                IIOPProfileTemplate ptemp = 
+                    (IIOPProfileTemplate)corbaContactInfo.getEffectiveProfile().
+                    getTaggedProfileTemplate();
+                result = ptemp.getIOPComponents(myORB, id);
+                cachedEffectiveComponents.put( id, result );
+            }
+            
+            // As per ptc/00-08-06, section 21.3.13.6., If not found, raise 
+            // BAD_PARAM with minor code INVALID_COMPONENT_ID.
+            if( (result == null) || (result.length == 0) ) {
+                throw stdWrapper.invalidComponentId( id ) ;
+            }
+
+            // Good citizen: In the interest of efficiency, we will assume 
+            // interceptors will not modify the returned TaggedCompoent[], or
+            // the TaggedComponents inside of it.  Otherwise, we would need to
+            // clone the array and make a deep copy of its contents.
+            
+            return result;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
      * Returns the given policy in effect for this operation.
      */
     public Policy get_request_policy (int type){
-        checkAccess( MID_GET_REQUEST_POLICY );
-	// _REVISIT_ Our ORB is not policy-based at this time.
-	throw wrapper.piOrbNotPolicyBased() ;
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "get_request_policy" ) ;
+        }
+
+        try {
+            checkAccess( MID_GET_REQUEST_POLICY );
+            // _REVISIT_ Our ORB is not policy-based at this time.
+            throw wrapper.piOrbNotPolicyBased() ;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
@@ -468,16 +543,26 @@ public final class ClientRequestInfoImpl
     public void add_request_service_context (ServiceContext service_context, 
                                              boolean replace)
     {
-        checkAccess( MID_ADD_REQUEST_SERVICE_CONTEXT );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "add_request_service_context" ) ;
+        }
 
-	if( cachedRequestServiceContexts == null ) {
-	    cachedRequestServiceContexts = 
-		new HashMap<Integer,org.omg.IOP.ServiceContext>();
-	}
+        try {
+            checkAccess( MID_ADD_REQUEST_SERVICE_CONTEXT );
 
-	addServiceContext( cachedRequestServiceContexts, 
-			   messageMediator.getRequestServiceContexts(),
-			   service_context, replace );
+            if( cachedRequestServiceContexts == null ) {
+                cachedRequestServiceContexts = 
+                    new HashMap<Integer,org.omg.IOP.ServiceContext>();
+            }
+
+            addServiceContext( cachedRequestServiceContexts, 
+                               messageMediator.getRequestServiceContexts(),
+                               service_context, replace );
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     // NOTE: When adding a method, be sure to:
@@ -514,9 +599,13 @@ public final class ClientRequestInfoImpl
     public String operation(){
         // access is currently valid for all states:
         //checkAccess( MID_OPERATION );
-	return messageMediator.getOperationName();
+        if (messageMediator != null)
+            return messageMediator.getOperationName();
+        else 
+            return "<special operation>" ;
     }
 
+    @Override
     public String toString() {
 	return "ClientRequestInfoImpl[operation=" 
 	    + operation() + "]" ;
@@ -526,175 +615,225 @@ public final class ClientRequestInfoImpl
      * See RequestInfoImpl for javadoc.
      */
     public Parameter[] arguments (){
-        checkAccess( MID_ARGUMENTS );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "arguments" ) ;
+        }
 
-	if( cachedArguments == null ) {
-	    if( request == null ) {
-		throw stdWrapper.piOperationNotSupported1() ;
-	    }
+        try {
+            checkAccess( MID_ARGUMENTS );
 
-	    // If it is DII request then get the arguments from the DII req
-	    // and convert that into parameters.
-	    cachedArguments = nvListToParameterArray( request.arguments() );
-	}
+            if( cachedArguments == null ) {
+                if( request == null ) {
+                    throw stdWrapper.piOperationNotSupported1() ;
+                }
 
-        // Good citizen: In the interest of efficiency, we assume 
-        // interceptors will be "good citizens" in that they will not 
-        // modify the contents of the Parameter[] array.  We also assume 
-        // they will not change the values of the containing Anys.
+                // If it is DII request then get the arguments from the DII req
+                // and convert that into parameters.
+                cachedArguments = nvListToParameterArray( request.arguments() );
+            }
 
-	return cachedArguments;
+            // Good citizen: In the interest of efficiency, we assume 
+            // interceptors will be "good citizens" in that they will not 
+            // modify the contents of the Parameter[] array.  We also assume 
+            // they will not change the values of the containing Anys.
+
+            return cachedArguments;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     /**
      * See RequestInfoImpl for javadoc.
      */
     public TypeCode[] exceptions (){
-        checkAccess( MID_EXCEPTIONS );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "exceptions" ) ;
+        }
 
-	if( cachedExceptions == null ) {
-	    if( request == null ) {
-	       throw stdWrapper.piOperationNotSupported2() ;
-	    }
+        try {
+            checkAccess( MID_EXCEPTIONS );
 
-	    // Get the list of exceptions from DII request data, If there are
-	    // no exceptions raised then this method will return null.
-	    ExceptionList excList = request.exceptions( );
-	    int count = excList.count();
-	    TypeCode[] excTCList = new TypeCode[count];
-	    try {
-		for( int i = 0; i < count; i++ ) {
-		    excTCList[i] = excList.item( i );
-		}
-	    } catch( Exception e ) {
-		throw wrapper.exceptionInExceptions( e ) ;
-	    }
+            if( cachedExceptions == null ) {
+                if( request == null ) {
+                   throw stdWrapper.piOperationNotSupported2() ;
+                }
 
-	    cachedExceptions = excTCList;
-	}
+                // Get the list of exceptions from DII request data, If there are
+                // no exceptions raised then this method will return null.
+                ExceptionList excList = request.exceptions( );
+                int count = excList.count();
+                TypeCode[] excTCList = new TypeCode[count];
+                try {
+                    for( int i = 0; i < count; i++ ) {
+                        excTCList[i] = excList.item( i );
+                    }
+                } catch( Exception e ) {
+                    throw wrapper.exceptionInExceptions( e ) ;
+                }
 
-        // Good citizen: In the interest of efficiency, we assume 
-        // interceptors will be "good citizens" in that they will not 
-        // modify the contents of the TypeCode[] array.  We also assume 
-        // they will not change the values of the containing TypeCodes.
+                cachedExceptions = excTCList;
+            }
 
-	return cachedExceptions;
+            // Good citizen: In the interest of efficiency, we assume 
+            // interceptors will be "good citizens" in that they will not 
+            // modify the contents of the TypeCode[] array.  We also assume 
+            // they will not change the values of the containing TypeCodes.
+
+            return cachedExceptions;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     /**
      * See RequestInfoImpl for javadoc.
      */
     public String[] contexts (){
-        checkAccess( MID_CONTEXTS );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "contexts" ) ;
+        }
 
-	if( cachedContexts == null ) {
-	    if( request == null ) {
-		throw stdWrapper.piOperationNotSupported3() ;
-	    }
+        try {
+            checkAccess( MID_CONTEXTS );
 
-	    // Get the list of contexts from DII request data, If there are
-	    // no contexts then this method will return null.
-	    ContextList ctxList = request.contexts( );
-	    int count = ctxList.count();
-	    String[] ctxListToReturn = new String[count];
-	    try {
-		for( int i = 0; i < count; i++ ) {
-		    ctxListToReturn[i] = ctxList.item( i );
-		}
-	    } catch( Exception e ) {
-		throw wrapper.exceptionInContexts( e ) ;
-	    }
+            if( cachedContexts == null ) {
+                if( request == null ) {
+                    throw stdWrapper.piOperationNotSupported3() ;
+                }
 
-            cachedContexts = ctxListToReturn;
-	}
+                // Get the list of contexts from DII request data, If there are
+                // no contexts then this method will return null.
+                ContextList ctxList = request.contexts( );
+                int count = ctxList.count();
+                String[] ctxListToReturn = new String[count];
+                try {
+                    for( int i = 0; i < count; i++ ) {
+                        ctxListToReturn[i] = ctxList.item( i );
+                    }
+                } catch( Exception e ) {
+                    throw wrapper.exceptionInContexts( e ) ;
+                }
 
-        // Good citizen: In the interest of efficiency, we assume 
-        // interceptors will be "good citizens" in that they will not 
-        // modify the contents of the String[] array.  
+                cachedContexts = ctxListToReturn;
+            }
 
-	return cachedContexts;
+            // Good citizen: In the interest of efficiency, we assume 
+            // interceptors will be "good citizens" in that they will not 
+            // modify the contents of the String[] array.  
+
+            return cachedContexts;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     /**
      * See RequestInfoImpl for javadoc.
      */
     public String[] operation_context (){
-        checkAccess( MID_OPERATION_CONTEXT );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "operation_context" ) ;
+        }
 
-	if( cachedOperationContext == null ) {
-	    if( request == null ) {
-		throw stdWrapper.piOperationNotSupported4() ;
-	    }
+        try {
+            checkAccess( MID_OPERATION_CONTEXT );
 
-	    // Get the list of contexts from DII request data, If there are
-	    // no contexts then this method will return null.
-	    Context ctx = request.ctx( );
-	    // _REVISIT_ The API for get_values is not compliant with the spec,
-	    // Revisit this code once it's fixed.
-	    // _REVISIT_ Our ORB doesn't support Operation Context, This code
-	    // will not be excerscised until it's supported.
-	    // The first parameter in get_values is the start_scope which 
-	    // if blank makes it as a global scope.
-	    // The second parameter is op_flags which is set to RESTRICT_SCOPE
-	    // As there is only one defined in the spec.
-	    // The Third param is the pattern which is '*' requiring it to 
-	    // get all the contexts.
-	    NVList nvList = ctx.get_values( "", CTX_RESTRICT_SCOPE.value,"*" );
-	    String[] context = new String[(nvList.count() * 2) ];
-	    if( ( nvList != null ) &&( nvList.count() != 0 ) ) {
-		// The String[] array will contain Name and Value for each
-		// context and hence double the size in the array.
-		int index = 0;
-		for( int i = 0; i < nvList.count(); i++ ) {
-		    NamedValue nv;
-		    try {
-			nv = nvList.item( i );
-		    }
-		    catch (Exception e ) {
-			return (String[]) null;
-		    }
-		    context[index] = nv.name();
-		    index++;
-		    context[index] = nv.value().extract_string();
-		    index++;
-		}
-	    }
+            if( cachedOperationContext == null ) {
+                if( request == null ) {
+                    throw stdWrapper.piOperationNotSupported4() ;
+                }
 
-	    cachedOperationContext = context;
-	}
+                // Get the list of contexts from DII request data, If there are
+                // no contexts then this method will return null.
+                Context ctx = request.ctx( );
+                // _REVISIT_ The API for get_values is not compliant with the spec,
+                // Revisit this code once it's fixed.
+                // _REVISIT_ Our ORB doesn't support Operation Context, This code
+                // will not be excerscised until it's supported.
+                // The first parameter in get_values is the start_scope which 
+                // if blank makes it as a global scope.
+                // The second parameter is op_flags which is set to RESTRICT_SCOPE
+                // As there is only one defined in the spec.
+                // The Third param is the pattern which is '*' requiring it to 
+                // get all the contexts.
+                NVList nvList = ctx.get_values( "", CTX_RESTRICT_SCOPE.value,"*" );
+                String[] context = new String[(nvList.count() * 2) ];
+                if( ( nvList != null ) &&( nvList.count() != 0 ) ) {
+                    // The String[] array will contain Name and Value for each
+                    // context and hence double the size in the array.
+                    int index = 0;
+                    for( int i = 0; i < nvList.count(); i++ ) {
+                        NamedValue nv;
+                        try {
+                            nv = nvList.item( i );
+                        }
+                        catch (Exception e ) {
+                            return (String[]) null;
+                        }
+                        context[index] = nv.name();
+                        index++;
+                        context[index] = nv.value().extract_string();
+                        index++;
+                    }
+                }
 
-        // Good citizen: In the interest of efficiency, we assume 
-        // interceptors will be "good citizens" in that they will not 
-        // modify the contents of the String[] array.  
+                cachedOperationContext = context;
+            }
 
-	return cachedOperationContext;
+            // Good citizen: In the interest of efficiency, we assume 
+            // interceptors will be "good citizens" in that they will not 
+            // modify the contents of the String[] array.  
+
+            return cachedOperationContext;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     /**
      * See RequestInfoImpl for javadoc.
      */
     public Any result (){
-        checkAccess( MID_RESULT );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "result" ) ;
+        }
 
-	if( cachedResult == null ) {
-	    if( request == null ) {
-		throw stdWrapper.piOperationNotSupported5() ;
-	    }
-	    // Get the result from the DII request data.
-	    NamedValue nvResult = request.result( );
+        try {
+            checkAccess( MID_RESULT );
 
-	    if( nvResult == null ) {
-		throw wrapper.piDiiResultIsNull() ;
-	    }
+            if( cachedResult == null ) {
+                if( request == null ) {
+                    throw stdWrapper.piOperationNotSupported5() ;
+                }
+                // Get the result from the DII request data.
+                NamedValue nvResult = request.result( );
 
-	    cachedResult = nvResult.value();
-	}
+                if( nvResult == null ) {
+                    throw wrapper.piDiiResultIsNull() ;
+                }
 
-	// Good citizen: In the interest of efficiency, we assume that
-	// interceptors will not modify the contents of the result Any.
-	// Otherwise, we would need to create a deep copy of the Any.
+                cachedResult = nvResult.value();
+            }
 
-        return cachedResult;
+            // Good citizen: In the interest of efficiency, we assume that
+            // interceptors will not modify the contents of the result Any.
+            // Otherwise, we would need to create a deep copy of the Any.
+
+            return cachedResult;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     /**
@@ -710,60 +849,99 @@ public final class ClientRequestInfoImpl
      * See RequestInfoImpl for javadoc.
      */
     public Object forward_reference (){
-        checkAccess( MID_FORWARD_REFERENCE );
-        // Check to make sure we are in LOCATION_FORWARD
-        // state as per ptc/00-08-06, table 21-1
-        // footnote 2.
-        if( replyStatus != LOCATION_FORWARD.value ) {
-	    throw stdWrapper.invalidPiCall1() ;
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "forward_reference" ) ;
         }
 
-	// Do not cache this value since if an interceptor raises
-	// forward request then the next interceptor in the
-	// list should see the new value.
-	IOR ior = getLocatedIOR();
-	return iorToObject(ior);
+        try {
+            checkAccess( MID_FORWARD_REFERENCE );
+            // Check to make sure we are in LOCATION_FORWARD
+            // state as per ptc/00-08-06, table 21-1
+            // footnote 2.
+            if( replyStatus != LOCATION_FORWARD.value ) {
+                throw stdWrapper.invalidPiCall1() ;
+            }
+
+            // Do not cache this value since if an interceptor raises
+            // forward request then the next interceptor in the
+            // list should see the new value.
+            IOR ior = getLocatedIOR();
+            return iorToObject(ior);
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
-    private IOR getLocatedIOR()
-    {
-	IOR ior;
-	CorbaContactInfoList contactInfoList = (CorbaContactInfoList)
-	    messageMediator.getContactInfo().getContactInfoList();
-	ior = contactInfoList.getEffectiveTargetIOR();
-	return ior;
+    private IOR getLocatedIOR() {
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "getLocatedIOR" ) ;
+        }
+
+        try {
+            IOR ior;
+            CorbaContactInfoList contactInfoList = (CorbaContactInfoList)
+                messageMediator.getContactInfo().getContactInfoList();
+            ior = contactInfoList.getEffectiveTargetIOR();
+            return ior;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     // Used to be protected. public for IIOPFailoverManagerImpl.
-    public void setLocatedIOR(IOR ior)
-    {
-	ORB orb = (ORB) messageMediator.getBroker();
+    public void setLocatedIOR(IOR ior) {
 
-	CorbaContactInfoListIterator iterator = (CorbaContactInfoListIterator)
-	    ((CorbaInvocationInfo)orb.getInvocationInfo())
-	    .getContactInfoListIterator();
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "setLocatedIOR" ) ;
+        }
 
-	// REVISIT - this most likely causes reportRedirect to happen twice.
-	// Once here and once inside the request dispatcher.
-	iterator.reportRedirect(
-	    (CorbaContactInfo)messageMediator.getContactInfo(),
-	    ior);
+        try {
+            ORB orb = (ORB) messageMediator.getBroker();
+
+            CorbaContactInfoListIterator iterator = (CorbaContactInfoListIterator)
+                ((CorbaInvocationInfo)orb.getInvocationInfo())
+                .getContactInfoListIterator();
+
+            // REVISIT - this most likely causes reportRedirect to happen twice.
+            // Once here and once inside the request dispatcher.
+            iterator.reportRedirect(
+                (CorbaContactInfo)messageMediator.getContactInfo(),
+                ior);
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     /**
      * See RequestInfoImpl for javadoc.
      */
     public org.omg.IOP.ServiceContext get_request_service_context( int id ) {
-        checkAccess( MID_GET_REQUEST_SERVICE_CONTEXT );
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "get_request_service_context" ) ;
+        }
 
-	if( cachedRequestServiceContexts == null ) {
-	    cachedRequestServiceContexts = 
-		new HashMap<Integer,org.omg.IOP.ServiceContext>();
-	}
+        try {
+            checkAccess( MID_GET_REQUEST_SERVICE_CONTEXT );
 
-	return  getServiceContext(cachedRequestServiceContexts, 
-				  messageMediator.getRequestServiceContexts(),
-				  id);
+            if( cachedRequestServiceContexts == null ) {
+                cachedRequestServiceContexts = 
+                    new HashMap<Integer,org.omg.IOP.ServiceContext>();
+            }
+
+            return  getServiceContext(cachedRequestServiceContexts, 
+                                      messageMediator.getRequestServiceContexts(),
+                                      id);
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     /**
@@ -771,35 +949,45 @@ public final class ClientRequestInfoImpl
      * TBD_BP is raised.
      */
     public org.omg.IOP.ServiceContext get_reply_service_context( int id ) {
-        checkAccess( MID_GET_REPLY_SERVICE_CONTEXT );       
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "get_reply_service_context" ) ;
+        }
 
-	if( cachedReplyServiceContexts == null ) {
-	    cachedReplyServiceContexts = 
-		new HashMap<Integer,org.omg.IOP.ServiceContext>();
-	}
+        try {
+            checkAccess( MID_GET_REPLY_SERVICE_CONTEXT );       
 
-	// In the event this is called from a oneway, we will have no
-	// response object.
-	//
-	// In the event this is called after a IIOPConnection.purgeCalls,
-	// we will have a response object, but that object will
-	// not contain a header (which would hold the service context
-	// container).  See bug 4624102.
-	//
+            if( cachedReplyServiceContexts == null ) {
+                cachedReplyServiceContexts = 
+                    new HashMap<Integer,org.omg.IOP.ServiceContext>();
+            }
 
-	// REVISIT: getReplyHeader should not be visible here.
-	if (messageMediator.getReplyHeader() != null) {
-	    ServiceContexts serviceContexts =
-		messageMediator.getReplyServiceContexts();
-	    if (serviceContexts != null) {
-		return getServiceContext(cachedReplyServiceContexts,
-					 serviceContexts, id);
-	    }
-	}
-	// See purge calls test.  The waiter is woken up by the
-	// call to purge calls - but there is no reply containing
-	// service contexts.
-	throw stdWrapper.invalidServiceContextId() ;
+            // In the event this is called from a oneway, we will have no
+            // response object.
+            //
+            // In the event this is called after a IIOPConnection.purgeCalls,
+            // we will have a response object, but that object will
+            // not contain a header (which would hold the service context
+            // container).  See bug 4624102.
+            //
+
+            // REVISIT: getReplyHeader should not be visible here.
+            if (messageMediator.getReplyHeader() != null) {
+                ServiceContexts sctxs =
+                    messageMediator.getReplyServiceContexts();
+                if (sctxs != null) {
+                    return getServiceContext(cachedReplyServiceContexts,
+                                             sctxs, id);
+                }
+            }
+            // See purge calls test.  The waiter is woken up by the
+            // call to purge calls - but there is no reply containing
+            // service contexts.
+            throw stdWrapper.invalidServiceContextId() ;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
 
     //
@@ -807,6 +995,7 @@ public final class ClientRequestInfoImpl
     // Override RequestInfoImpl connection to work in framework.
     //
 
+    @Override
     public com.sun.corba.se.spi.legacy.connection.Connection connection()
     {
 	return (com.sun.corba.se.spi.legacy.connection.Connection) 
@@ -820,7 +1009,7 @@ public final class ClientRequestInfoImpl
      * Package-scope interfaces
      **********************************************************************/
 
-    protected void setInfo(MessageMediator messageMediator)
+    protected void setInfo(CorbaMessageMediator messageMediator)
     {
 	this.messageMediator = (CorbaMessageMediator)messageMediator;
 	// REVISIT - so mediator can handle DII in subcontract.
@@ -830,14 +1019,16 @@ public final class ClientRequestInfoImpl
     /**
      * Set or reset the retry request flag.  
      */
-    void setRetryRequest( boolean retryRequest ) {
+    void setRetryRequest( RetryType retryRequest ) {
+        // 6763340
         this.retryRequest = retryRequest;
     }
     
     /**
      * Retrieve the current retry request status.
      */
-    boolean getRetryRequest() {
+    RetryType getRetryRequest() {
+        // 6763340
         return this.retryRequest;
     }
     
@@ -845,42 +1036,109 @@ public final class ClientRequestInfoImpl
      * Increases the entry count by 1.
      */
     void incrementEntryCount() {
-        this.entryCount++;
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "incrementEntryCount" ) ;
+        }
+
+        try {
+            this.entryCount++;
+            if (myORB.interceptorDebugFlag) {
+                dputil.info( "entryCount", this.entryCount ) ;
+            }
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
      * Decreases the entry count by 1.
      */
     void decrementEntryCount() {
-        this.entryCount--;
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "decrementEntryCount" ) ;
+        }
+
+        try {
+            this.entryCount--;
+            if (myORB.interceptorDebugFlag) {
+                dputil.info( "entryCount", this.entryCount ) ;
+            }
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
     }
     
     /**
      * Retrieve the current entry count
      */
     int getEntryCount() {
-        return this.entryCount;
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "getEntryCount" ) ;
+        }
+
+        int result = 0 ;
+        try {
+            result = this.entryCount;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit( result ) ;
+            }
+        }
+        return result ;
     }
     
     /**
      * Overridden from RequestInfoImpl.  Calls the super class, then
      * sets the ending point call depending on the reply status.
      */
+    @Override
     protected void setReplyStatus( short replyStatus ) {
-        super.setReplyStatus( replyStatus );
-        switch( replyStatus ) {
-        case SUCCESSFUL.value:
-            endingPointCall = CALL_RECEIVE_REPLY;
-            break;
-        case SYSTEM_EXCEPTION.value:
-        case USER_EXCEPTION.value:
-            endingPointCall = CALL_RECEIVE_EXCEPTION;
-            break;
-        case LOCATION_FORWARD.value:
-        case TRANSPORT_RETRY.value:
-            endingPointCall = CALL_RECEIVE_OTHER;
-            break;
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "setReplyStatus", 
+                PIHandlerImpl.getReplyStatus(replyStatus) ) ;
         }
+        try {
+            super.setReplyStatus( replyStatus );
+            switch( replyStatus ) {
+            case SUCCESSFUL.value:
+                endingPointCall = CALL_RECEIVE_REPLY;
+                break;
+            case SYSTEM_EXCEPTION.value:
+            case USER_EXCEPTION.value:
+                endingPointCall = CALL_RECEIVE_EXCEPTION;
+                break;
+            case LOCATION_FORWARD.value:
+            case TRANSPORT_RETRY.value:
+                endingPointCall = CALL_RECEIVE_OTHER;
+                break;
+            }
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit() ;
+            }
+        }
+    }
+
+    @Override
+    protected short getReplyStatus() {
+        if (myORB.interceptorDebugFlag) {
+            dputil.enter( "getReplyStatus" ) ;
+        }
+
+        short result = 0 ;
+        try {
+            result = super.getReplyStatus() ;
+        } finally {
+            if (myORB.interceptorDebugFlag) {
+                dputil.exit( PIHandlerImpl.getReplyStatus( result ) ) ;
+            }
+        }
+        
+        return result ;
     }
 
     /**
@@ -923,6 +1181,7 @@ public final class ClientRequestInfoImpl
     /**
      * Overridden from RequestInfoImpl.
      */
+    @Override
     protected void setException( Exception exception ) {
         super.setException( exception );
 

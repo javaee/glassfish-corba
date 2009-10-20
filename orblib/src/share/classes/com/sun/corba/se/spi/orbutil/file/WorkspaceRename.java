@@ -69,22 +69,24 @@ public class WorkspaceRename {
 	"xjmk", "set", "settings", "data", "txt", "text", "javaref", "idlref" } ;
 
     private static final String[] SUBSTITUTE_NAMES = {
-	"Makefile.corba", "Makefile.example", "ExampleMakefile", "Makefile" 
+	"Makefile.corba", "Makefile.example", "ExampleMakefile", "Makefile",
+        "manifest", "README", "README.SUN"
     } ;
 
     private static final String[] COPY_SUFFIXES = {
 	"sxc", "sxi", "sxw", "odp", "gif", "png", "jar", "zip", "jpg", "pom",
 	"pdf", "doc", "mif", "fm", "book", "zargo", "zuml", "cvsignore", 
 	"hgignore", "list", "old", "orig", "rej", "hgtags", "xsl", "bat", "css",
-        "icns"
+        "icns", "bin", "ico", "init", "ss", "pp", "el", "mail", "lisp", "sch",
+        "tst", "xcf"
     } ;
 
     private static final String[] IGNORE_SUFFIXES = {
-	"swo", "swp", "class", "o" 
+	"swo", "swp", "class", "o"
     } ;
 
     private static final String[] IGNORE_NAMES = {
-	"NORENAME", "errorfile", "sed_pattern_file.version"
+	"NORENAME", "errorfile", "sed_pattern_file.version", "package-list"
     } ;
 
     private static final String[] IGNORE_DIRS = {

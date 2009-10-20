@@ -46,20 +46,15 @@ package com.sun.corba.se.impl.javax.rmi.CORBA; // Util (sed marker, don't remove
 
 import java.rmi.RemoteException;
 import java.rmi.UnexpectedException;
-import java.rmi.MarshalException;
 
 import java.rmi.server.RMIClassLoader;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
-import java.util.Properties;
-import java.util.Map;
 import java.util.WeakHashMap;
 
 import java.io.Serializable;
 import java.io.NotSerializableException;
 
-import java.lang.reflect.Constructor;
 
 import javax.rmi.CORBA.ValueHandler;
 import javax.rmi.CORBA.Tie;
@@ -77,6 +72,11 @@ import java.rmi.ServerException;
 import javax.transaction.TransactionRequiredException;
 import javax.transaction.TransactionRolledbackException;
 import javax.transaction.InvalidTransactionException;
+
+// These classes only exist in Java SE 6 and later.
+import javax.activity.ActivityRequiredException ;
+import javax.activity.ActivityCompletedException ;
+import javax.activity.InvalidActivityException ;
 
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.Any;
@@ -104,7 +104,7 @@ import org.omg.CORBA.portable.OutputStream;
 // This means that any of the following com.sun.corba classes
 // must only occur in contexts that also handle the non-Sun case.
 
-import com.sun.corba.se.pept.transport.ContactInfoList ;
+import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
@@ -112,9 +112,7 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
-import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.impl.io.ValueHandlerImpl;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -125,6 +123,7 @@ import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.impl.logging.UtilSystemException;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 
 /**
  * Provides utility methods that can be used by stubs and ties to
@@ -136,7 +135,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     private static KeepAlive keepAlive = null;
 
     // Maps targets to ties.
-    private static IdentityHashtable exportedServants = new IdentityHashtable();
+    private static final IdentityHashtable exportedServants = new IdentityHashtable();
 
     private static ValueHandler valueHandlerSingleton;          
 
@@ -147,7 +146,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     private WeakHashMap<java.lang.Class, String> annotationMap = 
                                     new WeakHashMap<java.lang.Class, String> ();
 
-    private java.lang.Object annotObj = new java.lang.Object();
+    private static final java.lang.Object annotObj = new java.lang.Object();
 
     private static final String SUN_JAVA_VENDOR = "Sun Microsystems Inc." ;
 
@@ -311,53 +310,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
             return new MarshalException(message,inner);
         } else if (ex instanceof ACTIVITY_REQUIRED) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.ActivityRequiredException");
-                Class[] params = new Class[2];
-                params[0] = java.lang.String.class;
-                params[1] = java.lang.Throwable.class;
-                Constructor cr = cl.getConstructor(params);
-                Object[] args = new Object[2];
-                args[0] = message;
-                args[1] = ex;
-                return (RemoteException) cr.newInstance(args);                
-	    } catch (Throwable e) {
-                utilWrapper.classNotFound(
-                              e, "javax.activity.ActivityRequiredException");
-            }
+            return new ActivityRequiredException( message, ex ) ;
         } else if (ex instanceof ACTIVITY_COMPLETED) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.ActivityCompletedException");
-		Class[] params = new Class[2];
-		params[0] = java.lang.String.class;
-		params[1] = java.lang.Throwable.class;
-		Constructor cr = cl.getConstructor(params);
-		Object[] args = new Object[2];
-		args[0] = message;
-		args[1] = ex;
-		return (RemoteException) cr.newInstance(args);
-              } catch (Throwable e) {
-                  utilWrapper.classNotFound(
-                                e, "javax.activity.ActivityCompletedException");
-              }
+            return new ActivityCompletedException( message, ex ) ;
         } else if (ex instanceof INVALID_ACTIVITY) {
-	    try {
-		Class cl = ORBClassLoader.loadClass(
-			       "javax.activity.InvalidActivityException");
-		Class[] params = new Class[2];
-		params[0] = java.lang.String.class;
-		params[1] = java.lang.Throwable.class;
-		Constructor cr = cl.getConstructor(params);
-		Object[] args = new Object[2];
-		args[0] = message;
-		args[1] = ex;
-		return (RemoteException) cr.newInstance(args);
-              } catch (Throwable e) {
-                  utilWrapper.classNotFound(
-                                e, "javax.activity.InvalidActivityException");
-              }
+            return new InvalidActivityException( message, ex ) ;
 	}
 
         // Just map to a generic RemoteException...
@@ -712,7 +669,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	    if (delegate instanceof CorbaClientDelegate) {
 		// For the Sun ORB
 		CorbaClientDelegate cdel = (CorbaClientDelegate)delegate ;
-		ContactInfoList cil = cdel.getContactInfoList() ;
+		CorbaContactInfoList cil = cdel.getContactInfoList() ;
 		if (cil instanceof CorbaContactInfoList) {
 		    CorbaContactInfoList ccil = (CorbaContactInfoList)cil ;
 		    LocalClientRequestDispatcher lcs = ccil.getLocalClientRequestDispatcher() ;
@@ -799,46 +756,57 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     public Object copyObject (Object obj, org.omg.CORBA.ORB orb)
 	throws RemoteException 
     {
-	if (orb instanceof ORB) {
-	    ORB lorb = (ORB)orb ;
+        try {
+            if (((ORB)orb).operationTraceDebugFlag) {
+                OperationTracer.enable() ;
+            }
 
-	    try {
-		try {
-		    // This gets the copier for the current invocation, which was
-		    // previously set by preinvoke.
-		    return lorb.peekInvocationInfo().getCopierFactory().make().copy( obj ) ;
-		} catch (java.util.EmptyStackException exc) {
-		    // copyObject was invoked outside of an invocation, probably by
-		    // a test.  Get the default copier from the ORB.
-		    // XXX should we just make the default copier available directly
-		    // and avoid constructing one on each call?
-		    CopierManager cm = lorb.getCopierManager() ;
-		    ObjectCopier copier = cm.getDefaultObjectCopierFactory().make() ;
-		    return copier.copy( obj ) ;
-		}
-	    } catch (ReflectiveCopyException exc) {
-		RemoteException rexc = new RemoteException() ;
-		rexc.initCause( exc ) ;
-		throw rexc ;
-	    }
-	} else {
-	    // XXX The code in this else branch is identical to the code in
-	    // ORBStreamObjectCopierImpl: Refactor.  Assume that orb may
-	    // in fact be a foreign ORB: probably need a static method for this.
+            OperationTracer.begin( "copyObject") ;
 
-	    if (obj instanceof Remote) {
-		// Make sure obj is connected and converted to a stub,
-		// if necessary.
-		return Utility.autoConnect( obj, orb, true ) ;
-	    }
+            if (orb instanceof ORB) {
+                ORB lorb = (ORB)orb ;
 
-	    org.omg.CORBA_2_3.portable.OutputStream out = 
-		(org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
-	    out.write_value((Serializable)obj);
-	    org.omg.CORBA_2_3.portable.InputStream in = 
-		(org.omg.CORBA_2_3.portable.InputStream)out.create_input_stream();
-	    return in.read_value();
-	}
+                try {
+                    try {
+                        // This gets the copier for the current invocation, which was
+                        // previously set by preinvoke.
+                        return lorb.peekInvocationInfo().getCopierFactory().make().copy( obj ) ;
+                    } catch (java.util.EmptyStackException exc) {
+                        // copyObject was invoked outside of an invocation, probably by
+                        // a test.  Get the default copier from the ORB.
+                        // XXX should we just make the default copier available directly
+                        // and avoid constructing one on each call?
+                        CopierManager cm = lorb.getCopierManager() ;
+                        ObjectCopier copier = cm.getDefaultObjectCopierFactory().make() ;
+                        return copier.copy( obj ) ;
+                    }
+                } catch (ReflectiveCopyException exc) {
+                    RemoteException rexc = new RemoteException() ;
+                    rexc.initCause( exc ) ;
+                    throw rexc ;
+                }
+            } else {
+                // XXX The code in this else branch is identical to the code in
+                // ORBStreamObjectCopierImpl: Refactor.  Assume that orb may
+                // in fact be a foreign ORB: probably need a static method for this.
+
+                if (obj instanceof Remote) {
+                    // Make sure obj is connected and converted to a stub,
+                    // if necessary.
+                    return Utility.autoConnect( obj, orb, true ) ;
+                }
+
+                org.omg.CORBA_2_3.portable.OutputStream out =
+                    (org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
+                out.write_value((Serializable)obj);
+                org.omg.CORBA_2_3.portable.InputStream in =
+                    (org.omg.CORBA_2_3.portable.InputStream)out.create_input_stream();
+                return in.read_value();
+            }
+        } finally {
+            OperationTracer.disable();
+            OperationTracer.finish(); 
+        }
     }
 }
 
@@ -851,6 +819,7 @@ class KeepAlive extends Thread
         setDaemon(false);
     }
     
+    @Override
     public synchronized void run () 
     {
         while (!quit) {

@@ -96,6 +96,9 @@ public class ORBConstants {
     // Introduced in AS 9.0
     public static final int FOLB_MEMBERSHIP_LABEL_TAGGED_COMPONENT_ID =
 	SUN_TAGGED_COMPONENT_ID_BASE + 4;
+    // Introduced in GFv2.1
+    public static final int TAG_LOAD_BALANCING_ID = 
+	SUN_TAGGED_COMPONENT_ID_BASE + 5;
 
     ////////////////////////////////////////////////////
     //
@@ -124,6 +127,7 @@ public class ORBConstants {
     public static final int COPY_OBJECT_POLICY	        = SUNVMCID.value + 2 ;
     public static final int REQUEST_PARTITIONING_POLICY = SUNVMCID.value + 3 ;
     public static final int REFERENCE_MANAGER_POLICY    = SUNVMCID.value + 4 ;
+    public static final int LOAD_BALANCING_POLICY       = SUNVMCID.value + 5 ;
 
     // These are the subcontract IDs for various qualities of
     // service/implementation.
@@ -260,6 +264,12 @@ public class ORBConstants {
     public static final int REQUEST_PARTITIONING_MIN_THREAD_POOL_ID =  0;
     public static final int REQUEST_PARTITIONING_MAX_THREAD_POOL_ID = 63;
 
+    // Load balancing polices: integer to avoid issues with Enum encoding
+    public static final int FIRST_LOAD_BALANCING_VALUE      = 0 ;
+    public static final int NO_LOAD_BALANCING               = FIRST_LOAD_BALANCING_VALUE + 0 ;
+    public static final int PER_REQUEST_LOAD_BALANCING      = FIRST_LOAD_BALANCING_VALUE + 1 ;
+    public static final int LAST_LOAD_BALANCING_VALUE       = PER_REQUEST_LOAD_BALANCING ;
+
     // transport read tcp timeout property, colon separated property
     // with syntax <initial time to wait:max wait time
     // :backoff factor:max wait on a single sleep call>
@@ -374,19 +384,35 @@ public class ORBConstants {
     public static final String WAIT_FOR_RESPONSE_TIMEOUT =
 	SUN_PREFIX + "transport.ORBWaitForResponseTimeout";
 
+    public static final String NO_DEFAULT_ACCEPTORS = 
+        SUN_PREFIX + "transport.ORBNoDefaultAcceptors" ;
+
+    public static final String REGISTER_MBEANS = 
+        SUN_PREFIX + "ORBRegisterMBeans" ;
+
+    public static final int DEFAULT_FRAGMENT_READ_TIMEOUT = 18000 ;
+
+    public static final String FRAGMENT_READ_TIMEOUT = 
+        SUN_PREFIX + "ORBFragmentReadTimeout" ;
+
     // POA related policies
-    public static final String PERSISTENT_SERVER_PORT_PROPERTY	= SUN_PREFIX + "POA.ORBPersistentServerPort" ;
-    public static final String BAD_SERVER_ID_HANDLER_CLASS_PROPERTY
-	                                                        = SUN_PREFIX + "POA.ORBBadServerIdHandlerClass" ;
-    public static final String ACTIVATED_PROPERTY		= SUN_PREFIX + "POA.ORBActivated" ;
-    public static final String SERVER_NAME_PROPERTY		= SUN_PREFIX + "POA.ORBServerName" ;
+    public static final String PERSISTENT_SERVER_PORT_PROPERTY	= 
+        SUN_PREFIX + "POA.ORBPersistentServerPort" ;
+    public static final String BAD_SERVER_ID_HANDLER_CLASS_PROPERTY = 
+        SUN_PREFIX + "POA.ORBBadServerIdHandlerClass" ;
+    public static final String ACTIVATED_PROPERTY		= 
+        SUN_PREFIX + "POA.ORBActivated" ;
+    public static final String SERVER_NAME_PROPERTY		= 
+        SUN_PREFIX + "POA.ORBServerName" ;
 
     // Server Properties; e.g. when properties passed to ORB activated
     // servers
 
-    public static final String SERVER_DEF_VERIFY_PROPERTY	= SUN_PREFIX + "activation.ORBServerVerify" ;
+    public static final String SERVER_DEF_VERIFY_PROPERTY	= 
+        SUN_PREFIX + "activation.ORBServerVerify" ;
 
-    public static final String JTS_CLASS_PROPERTY		= SUN_PREFIX + "CosTransactions.ORBJTSClass" ;
+    public static final String JTS_CLASS_PROPERTY		= 
+        SUN_PREFIX + "CosTransactions.ORBJTSClass" ;
 
     // Property for enabling ORB's use of Java serialization.
     public static final String ENABLE_JAVA_SERIALIZATION_PROPERTY = 
@@ -520,15 +546,6 @@ public class ORBConstants {
     public static final String ORBID_DIR_BASE	    = "orbids" ;
     public static final String ORBID_DB_FILE_NAME   = "orbids.db" ;
 
-    // Constants for ThreadPool ********************************************************************
-
-    // Default value for when inactive threads in the pool can stop running (ms)
-    public static final int DEFAULT_INACTIVITY_TIMEOUT = 120000;
-    // Default name of the threadpool
-    public static final String THREADPOOL_DEFAULT_NAME = "default-threadpool";
-    // Default name of the workqueue
-    public static final String WORKQUEUE_DEFAULT_NAME = "default-workqueue";
-
     // Constants for minor code bases **************************************************************
     // This is the value that pre-Merlin Sun ORBs incorrectly used.  We preserve this
     // here for backwards compatibility, but note that the current ORB must never
@@ -601,10 +618,15 @@ public class ORBConstants {
     public static final String TIMING_POINTS_ENABLED = SUN_PREFIX 
 	+ "ORBEnableTimingPoints" ;
 
-    // Enable the use of the EnumDesc class for marshaling enums.  Only present for
-    // testing.
+    // Enable the use of the EnumDesc class for marshaling enums.  Really only
+    // present for testing.
     public static final String USE_ENUM_DESC = SUN_PREFIX 
         + "ORBUseEnumDesc" ;
+
+    // Specify an AMXv3-compliant ObjectName (as a string) for the parent of the
+    // ORB's gmbal root.
+    public static final String GMBAL_ROOT_PARENT_NAME = SUN_PREFIX 
+        + "ORBGmbalRootParentName" ;
 }
 
 // End of file.

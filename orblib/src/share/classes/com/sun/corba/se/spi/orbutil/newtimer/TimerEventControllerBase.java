@@ -42,8 +42,9 @@ import java.util.HashSet ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.TimerFactoryImpl ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedAttribute ;
-import com.sun.corba.se.spi.orbutil.jmx.ManagedOperation ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.ManagedOperation ;
+import org.glassfish.gmbal.Description ;
 
 /** Supports registration of TimerEventHandlers.  A subclass of this class
  * must also provide some mechanism to create and propagate TimerEvents,
@@ -70,7 +71,8 @@ public abstract class TimerEventControllerBase extends NamedBase {
     /** Register the handler to start receiving events from this
      * controller.
      */
-    @ManagedOperation( description="Register a TimerEventHandler with this TimerEventController" ) 
+    @ManagedOperation
+    @Description( "Register a TimerEventHandler with this TimerEventController" ) 
     public void register( TimerEventHandler handler ) {
 	handlers.add( handler ) ;
     }	
@@ -78,14 +80,16 @@ public abstract class TimerEventControllerBase extends NamedBase {
     /** Deregister the handler to stop receiving events from this
      * controller.
      */
-    @ManagedOperation( description="Deregister a TimerEventHandler from this TimerEventController" ) 
+    @ManagedOperation
+    @Description( "Deregister a TimerEventHandler from this TimerEventController" ) 
     public void deregister( TimerEventHandler handler ) {
 	handlers.remove( handler ) ;
     }
 
     /** Read-only image of the set of Handlers.
      */
-    @ManagedAttribute( description="TimerEventHandlers registered with this TimerEventController" ) 
+    @ManagedAttribute
+    @Description( "TimerEventHandlers registered with this TimerEventController" ) 
     public Set<TimerEventHandler> handlers() {
 	return roHandlers ;
     }

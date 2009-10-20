@@ -36,25 +36,109 @@
 
 package com.sun.corba.se.spi.transport;
 
-import com.sun.corba.se.pept.transport.Acceptor;
-
+import com.sun.corba.se.impl.encoding.CDRInputObject;
+import com.sun.corba.se.impl.encoding.CDROutputObject;
+import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.ior.IORTemplate;
 
 // REVISIT - impl/poa specific:
 import com.sun.corba.se.impl.oa.poa.Policies;
+import com.sun.corba.se.spi.orb.ORB;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
 
 /**
  * @author Harold Carr
  */
-public interface CorbaAcceptor
-    extends
-	Acceptor
+@ManagedObject 
+@Description( "An Acceptor represents an endpoint on which the ORB handles incoming connections" ) 
+public abstract interface CorbaAcceptor
 {
-    public String getObjectAdapterId();
-    public String getObjectAdapterManagerId();
-    public void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
+    @ManagedAttribute
+    @Description( "The TCP port of this Acceptor" )  
+    int getPort() ;
+
+    @ManagedAttribute
+    @Description( "The name of the IP interface for this Acceptor" ) 
+    String getInterfaceName() ;
+
+    @ManagedAttribute
+    @Description( "The type of requests that this Acceptor handles" ) 
+    String getType() ;
+
+    @ManagedAttribute
+    @Description( "True if this acceptor is used to lazily start the ORB" ) 
+    boolean isLazy() ;
+
+    void addToIORTemplate(IORTemplate iorTemplate, Policies policies,
 				 String codebase);
-    public String getMonitoringName();
+    String getMonitoringName();
+
+    /**
+     * Used to initialize an <code>Acceptor</code>.
+     *
+     * For example, initialization may mean to create a
+     * {@link java.nio.channels.ServerSocketChannel ServerSocketChannel}.
+     *
+     * Note: this must be prepared to be be called multiple times.
+     *
+     * @return <code>true</code> when it performs initializatin
+     * actions (typically the first call.
+     */
+    boolean initialize();
+
+    /**
+     * Used to determine if an <code>Acceptor</code> has been initialized.
+     *
+     * @return <code>true</code. if the <code>Acceptor</code> has been
+     * initialized.
+     */
+    boolean initialized();
+
+    String getConnectionCacheType();
+
+    void setConnectionCache(CorbaInboundConnectionCache connectionCache);
+
+    CorbaInboundConnectionCache getConnectionCache();
+
+    /**
+     * Used to determine if the <code>Acceptor</code> should register
+     * with a Selector to handle accept events.
+     *
+     * For example, this may be <em>false</em> in the case of Solaris Doors
+     * which do not actively listen.
+     *
+     * @return <code>true</code> if the <code>Acceptor</code> should be
+     * registered with a Selector.
+     */
+    boolean shouldRegisterAcceptEvent();
+
+    /** Blocks until a new Socket is available on the acceptor's port.
+     */
+    Socket getAcceptedSocket() ; 
+
+    /** Handle a newly accepted Socket.  
+     */
+    void processSocket( Socket channel ) ;
+
+    /**
+     * Close the <code>Acceptor</code>.
+     */
+    void close();
+
+    EventHandler getEventHandler();
+
+    CorbaMessageMediator createMessageMediator(ORB xbroker, CorbaConnection xconnection);
+
+    CDRInputObject createInputObject(ORB broker, CorbaMessageMediator messageMediator);
+
+    CDROutputObject createOutputObject(ORB broker, CorbaMessageMediator messageMediator);
+    
+    ServerSocket getServerSocket();
 }
 
 // End of file.

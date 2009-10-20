@@ -99,13 +99,15 @@ public class Server extends PortableRemoteObject implements Tester
         }
     }
 
+    private static InitialContext rootContext ;
+
     public static void main(String[] args) {
 	try {
             System.setSecurityManager(new NoSecurityManager());
 
             Server.tryLoadingClasses();
 
-            Context rootContext = new InitialContext();
+            rootContext = new InitialContext();
             Server p = new Server();
 
             rootContext.rebind("Tester", p);

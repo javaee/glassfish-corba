@@ -56,6 +56,7 @@ import com.sun.corba.se.spi.orbutil.argparser.DefaultValue ;
 import com.sun.corba.se.spi.orbutil.argparser.Separator ;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
+import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 public class CopyrightProcessor {
     private CopyrightProcessor() {} 
@@ -144,7 +145,7 @@ public class CopyrightProcessor {
 	"bnd", "sxc", "sxi", "sxw", "odp", "gif", "png", "jar", "zip", "jpg", "pom",
 	"pdf", "doc", "mif", "fm", "book", "zargo", "zuml", "cvsignore", 
 	"hgignore", "list", "old", "orig", "rej", "swp", "swo", "class", "o",
-	"javaref", "idlref", "css" } ;
+	"javaref", "idlref", "css", "bin", "settings" } ;
 
     // Special file names to ignore
     private static final String[] IGNORE_FILE_NAMES = {
@@ -187,6 +188,177 @@ public class CopyrightProcessor {
     }
 
     private static final String COPYRIGHT = "Copyright" ;
+/*
+    Iterable<Character> getStringIterator( final String str ) {
+        return new Iterable<Character>() {
+            Iterator<Character> iterator() {
+                return new Iterator<Character>() {
+                    int pos = 0 ;
+
+                    public boolean hasNext() {
+                        return str.length() > pos ;
+                    }
+
+                    public Character next() {
+                        return str.charAt( ++pos ) ;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException() ;
+                    }
+                } ;
+            }
+        } ;
+    }
+*/
+    private static class StringParser {
+        private String data ;
+        private int pos ;
+        private char current ;
+
+        public StringParser( String str ) {
+            if (str.length() == 0)
+                throw new RuntimeException( "Empty string not allowed" ) ;
+
+            this.data = str ;
+            this.pos = 0 ;
+            this.current = str.charAt( pos ) ;
+        }
+
+        private void setPos( int newPos ) {
+            if (newPos < data.length() ) {
+                pos = newPos ;
+                current = data.charAt( newPos ) ;
+            }
+        }
+
+        boolean next() {
+            if (data.length() > pos) {
+                setPos( pos + 1 ) ;
+                return true ;
+            } else {
+                return false ;
+            }
+                
+        }
+
+        /** skip everything until str is found.  Returns true if found, otherwise
+         * false.
+         */
+        boolean skipToString( String str ) {
+            int index = data.indexOf( str ) ;
+            if (index >= 0) {
+                setPos( index ) ;
+                return true ;
+            } else {
+                return false ;
+            }
+        }
+
+        /** skip over str, if str is at the current position.
+         */
+        boolean skipString( String str ) {
+            String cstr = data.substring( pos, pos+str.length() ) ;
+            if (cstr.equals( pos )) {
+                setPos( pos+str.length() ) ;
+                return true ;
+            } else {
+                return false ;
+            }
+        }
+
+        /** Skip over whitespace.  Returns true if some whitespace skipped.
+         */
+        boolean skipWhitespace() {
+            boolean hasSkipped = false ;
+            while (Character.isWhitespace(current)) { 
+                hasSkipped = true ;
+                if (!next()) {
+                    break ;
+                }
+            }
+
+            return hasSkipped ;
+        }
+
+        /** Return int matched at current position as a string.
+         */
+        String parseInt() {
+            int first = pos ;
+            boolean atStart = true ;
+            while ((current >= '0') && (current <= '9')) {
+                atStart = false ;
+                if (!next()) {
+                    break ;
+                }
+            }
+
+            if (atStart) {
+                return data.substring( first, pos ) ;
+            } else {
+                return null ;
+            }
+        }
+    }
+
+    // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
+    private static Pair<String,String> getSunCopyrightPair( String str ) {
+        StringParser sp = new StringParser( str ) ;
+        if (!sp.skipToString( COPYRIGHT )) 
+            return null ;
+
+        if (!sp.skipString( COPYRIGHT ))
+            return null ;
+
+        if (!sp.skipWhitespace())
+            return null ;
+
+        String start = sp.parseInt() ;
+        if (start == null)
+            return null ;
+
+        if (!sp.skipString( "-" )) 
+            return null ;
+
+        String end = sp.parseInt() ;
+        if (end == null)
+            return null ;
+
+        return new Pair<String,String>( start, end ) ;
+    }
+
+    // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
+    private static Pair<String,String> getSunCopyrights( String str ) {
+	int index = str.indexOf( COPYRIGHT ) ;
+	if (index == -1) 
+	    return null ;
+
+        // Iterable<Character> it = getStringIterator( str.substring( index + COPYRIGHT.length() ) ) ;
+	int pos = index + COPYRIGHT.length() ;
+	char ch = str.charAt( pos ) ;
+	while (Character.isWhitespace(ch) && (pos<str.length())) {
+	    ch = str.charAt( ++pos ) ;
+	}
+	
+        // find number
+	int start = pos ;
+	ch = str.charAt( pos ) ;
+	while (Character.isDigit(ch) && (pos<str.length())) {
+	    ch = str.charAt( ++pos ) ;
+	}
+
+        if (pos==start)
+            return null ;
+
+        String startYear = str.substring( start, pos ) ;
+
+        if (ch != '-')
+            return null ;
+
+        pos++ ;
+        ch = str.charAt( pos ) ;
+        return null ;
+    }
 
     // Copyright year is first non-blank after COPYRIGHT
     private static String getSunCopyrightStart( String str ) {

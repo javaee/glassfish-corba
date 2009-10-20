@@ -467,6 +467,7 @@ public class RogueClient extends Thread
 	U.sop("PASSED");
     }
 
+    @Override
     public void run() {
 	try {
             U.sop("Finding Tester ...");

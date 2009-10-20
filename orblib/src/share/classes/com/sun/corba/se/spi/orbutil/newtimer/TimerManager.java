@@ -40,7 +40,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
 
-import com.sun.corba.se.spi.orbutil.jmx.ManagedObjectManager ;
+import org.glassfish.gmbal.ManagedObjectManager ;
 
 /** Provides access to timer facilities.
  * This is intended to make it easy to set up timing,
@@ -60,13 +60,13 @@ public class TimerManager<T> {
     /** Create a new TimerManager, with a TimerFactory registered under the given name
      * in the TimerFactoryBuilder, and a TimerEventController with the same name.
      */
-    public TimerManager( ManagedObjectManager mom, String name ) {
-	tf = TimerFactoryBuilder.make( mom, name, name ) ;
+    public TimerManager( ManagedObjectManager mom, String name, boolean doGmbalRegistration ) {
+	tf = TimerFactoryBuilder.make( mom, name, name, doGmbalRegistration ) ;
 	controller = tf.makeController( name ) ;
     }
 
     public TimerManager( String name ) {
-        this( null, name ) ;
+        this( null, name, false ) ;
     }
 
     /** Destroy this TimerManager by removing its TimerFactory from the

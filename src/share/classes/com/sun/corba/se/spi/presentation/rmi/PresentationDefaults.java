@@ -67,7 +67,7 @@ public abstract class PresentationDefaults
 	getDynamicStubFactoryFactory()
     {
 	if (dynamicImpl == null)
-	    dynamicImpl = new StubFactoryFactoryStaticImpl( );
+	    dynamicImpl = new StubFactoryFactoryCodegenImpl( );
 
 	return dynamicImpl ;
     }
@@ -133,8 +133,9 @@ public abstract class PresentationDefaults
 	    PresentationDefaults.getStaticStubFactoryFactory() ) ;
 	result.setStubFactoryFactory( true, 
             PresentationDefaults.getDynamicStubFactoryFactory() ) ;
-	if (debug)
+	if (debug) {
 	    result.enableDebug( System.out ) ;
+        }
 
 	return result ;
     }

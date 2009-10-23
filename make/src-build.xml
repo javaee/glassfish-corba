@@ -130,7 +130,7 @@
 
         <!-- javac flags -->
         <property name="deprecation"                    value="off"/>
-        <property name="javac.optimize"		        value="false"/>
+        <property name="javac.optimize"		        value="true"/>
         <property name="javac.debug"		        value="true"/>
 
 	<!-- properties needed for updating and validating copyright headers -->

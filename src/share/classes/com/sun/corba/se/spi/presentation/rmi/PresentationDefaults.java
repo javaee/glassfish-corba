@@ -46,10 +46,11 @@ import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
-import com.sun.corba.se.impl.presentation.rmi.StubFactoryFactoryProxyImpl;
 import com.sun.corba.se.impl.presentation.rmi.StubFactoryFactoryStaticImpl;
 import com.sun.corba.se.impl.presentation.rmi.StubFactoryStaticImpl;
 import com.sun.corba.se.impl.presentation.rmi.PresentationManagerImpl ;
+
+import com.sun.corba.se.impl.presentation.rmi.codegen.StubFactoryFactoryCodegenImpl ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
@@ -57,9 +58,19 @@ import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
 
 public abstract class PresentationDefaults
 {
-    private static StubFactoryFactoryStaticImpl staticImpl = null ;
+    private static PresentationManager.StubFactoryFactory staticImpl = null ;
+    private static PresentationManager.StubFactoryFactory dynamicImpl = null ;
 
     private PresentationDefaults() {}
+
+    public synchronized static PresentationManager.StubFactoryFactory 
+	getDynamicStubFactoryFactory()
+    {
+	if (dynamicImpl == null)
+	    dynamicImpl = new StubFactoryFactoryStaticImpl( );
+
+	return dynamicImpl ;
+    }
 
     public synchronized static PresentationManager.StubFactoryFactory 
 	getStaticStubFactoryFactory()
@@ -68,12 +79,6 @@ public abstract class PresentationDefaults
 	    staticImpl = new StubFactoryFactoryStaticImpl( );
 
 	return staticImpl ;
-    }
-
-    public static PresentationManager.StubFactoryFactory 
-	getProxyStubFactoryFactory()
-    {
-	return new StubFactoryFactoryProxyImpl();
     }
 
     public static PresentationManager.StubFactory makeStaticStubFactory( 
@@ -117,48 +122,20 @@ public abstract class PresentationDefaults
     }
 
     public static PresentationManager makeOrbPresentationManager() {
-
-	final ORBUtilSystemException staticWrapper  = 
-	    ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
-
 	final boolean useDynamicStub = getBooleanPropertyValue( 
 	    ORBConstants.USE_DYNAMIC_STUB_PROPERTY, inAppServer() ) ;
 
 	final boolean debug = getBooleanPropertyValue( 
 	    ORBConstants.DEBUG_DYNAMIC_STUB, false ) ;
 
-	PresentationManager.StubFactoryFactory dynamicStubFactoryFactory = 
-	    AccessController.doPrivileged(
-		new PrivilegedAction<PresentationManager.StubFactoryFactory>() {
-		    public PresentationManager.StubFactoryFactory run() {
-			PresentationManager.StubFactoryFactory sff = 
-			    PresentationDefaults.getProxyStubFactoryFactory() ;
-
-			final String className = System.getProperty( 
-			    ORBConstants.DYNAMIC_STUB_FACTORY_FACTORY_CLASS,
-			    "com.sun.corba.se.impl.presentation.rmi.codegen.StubFactoryFactoryCodegenImpl" ) ;
-
-			try {
-			    // First try the configured class name, if any
-			    final Class cls = ORBClassLoader.loadClass( className ) ;
-			    sff = (PresentationManager.StubFactoryFactory)cls.newInstance() ;
-			} catch (Exception exc) {
-			    // Use the default. Log the error as a warning. 
-			    staticWrapper.errorInSettingDynamicStubFactoryFactory( 
-				exc, className ) ;
-			}
-
-			return sff ;
-		    }
-		}
-	    ) ;
-
 	final PresentationManager result = new PresentationManagerImpl( useDynamicStub ) ;
 	result.setStubFactoryFactory( false, 
 	    PresentationDefaults.getStaticStubFactoryFactory() ) ;
-	result.setStubFactoryFactory( true, dynamicStubFactoryFactory ) ; 
+	result.setStubFactoryFactory( true, 
+            PresentationDefaults.getDynamicStubFactoryFactory() ) ;
 	if (debug)
 	    result.enableDebug( System.out ) ;
+
 	return result ;
     }
 }

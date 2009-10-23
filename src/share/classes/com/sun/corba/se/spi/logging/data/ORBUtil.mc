@@ -638,7 +638,7 @@
             (EXCEPTION_IN_LISTENER_THREAD
              133 FINE "Exception occurred in listener thread")
             (ORB_LIFECYCLE_TRACE
-             134 WARNING "ORB Lifecycle for ORB {0}: {1}" )
+             134 INFO "ORB Lifecycle for ORB {0}: {1}" )
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 

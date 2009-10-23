@@ -358,8 +358,18 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 
     private void initManagedObjectManager() {
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "starting ManagedObjectManager initialization" ) ;
+        }
+
         createORBManagedObjectManager() ;
         mom.registerAtRoot( configData ) ;
+
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "ManagedObjectManager initialization complete" ) ;
+        }
     }
 
 /****************************************************************************
@@ -523,6 +533,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	// parts of the initialization.
 	setDebugFlags( configData.getORBDebugFlags() ) ;
 
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "Config data parsing complete" ) ;
+        }
+
         initManagedObjectManager() ;
 
 	// The TimerManager must be
@@ -539,6 +554,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	// and going to ORT based ORBD.  
 	transportManager = new CorbaTransportManagerImpl(this);
 	getLegacyServerSocketManager();
+
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "Transport initialization complete" ) ;
+        }
 
         super.getByteBufferPool();
 	serviceContextsCache = new ServiceContextsCache(this);
@@ -564,6 +584,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    throw wrapper.orbConfiguratorError( exc ) ;
 	}
 
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "User configurator execution complete" ) ;
+        }
+
         // Initialize the thread manager pool 
         // so it may be initialized & accessed without synchronization.
         // This must take place here so that a user conifigurator can 
@@ -574,9 +599,19 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	pihandler = new PIHandlerImpl( this, params) ;
 	pihandler.initialize() ;
 
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "Interceptor initialization complete" ) ;
+        }
+
         // Now the ORB is ready, so finish all of the MBean registration
         if (configData.registerMBeans()) {
             mom.resumeJMXRegistration() ;
+
+            if (orbLifecycleDebugFlag) {
+                wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                    "MBeans should be registered" ) ;
+            }
         }
     }
 

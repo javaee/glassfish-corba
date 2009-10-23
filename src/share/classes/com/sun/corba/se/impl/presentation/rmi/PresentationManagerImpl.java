@@ -69,8 +69,6 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.impl.presentation.rmi.IDLNameTranslatorImpl ;
-import com.sun.corba.se.impl.presentation.rmi.StubFactoryProxyImpl ;
 
 import com.sun.corba.se.impl.util.RepositoryId ;
 

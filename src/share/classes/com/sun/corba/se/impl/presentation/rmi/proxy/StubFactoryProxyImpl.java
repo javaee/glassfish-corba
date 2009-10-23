@@ -34,8 +34,9 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.presentation.rmi ;
+package com.sun.corba.se.impl.presentation.rmi.proxy ;
 
+import com.sun.corba.se.impl.presentation.rmi.*;
 import java.lang.reflect.Proxy ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;

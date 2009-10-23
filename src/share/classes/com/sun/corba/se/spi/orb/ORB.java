@@ -719,6 +719,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
         mom.suspendJMXRegistration() ;
 
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "MBean registration suspended" ) ;
+        }     
+
         mom.createRoot( this, getUniqueOrbId() ) ;
     }
 

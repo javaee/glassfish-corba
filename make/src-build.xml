@@ -103,16 +103,12 @@
         <property environment="env"/>
         <property name="java.home"                      value="${env.JAVA_HOME}"/>
         <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
-        <property name="local.maven"                    value="${env.HOME}/.m2"/>
-        <echo message="local.maven=${local.maven}"/> 
+        <property name="maven.repo.local"                    value="${env.HOME}/.m2"/>
+        <echo message="maven.repo.local=${maven.repo.local}"/> 
 
         <!-- Required JAR files -->
         <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
         <property name="emma-jar"			value="${root.dir}/lib/emma.jar"/>
-        <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
-        <property name="gmbal-jar"                      value="${root.dir}/lib/gmbal.jar"/>
-        <property name="management-api-jar"             value="${root.dir}/lib/management-api.jar"/>
-        <property name="felix-jar"                      value="${root.dir}/lib/felix.jar"/>
         <property name="jscheme-jar"                    value="${root.dir}/jscheme/lib/jscheme.jar"/>
 
         <!-- Places where the build puts things -->
@@ -147,14 +143,28 @@
         <property name="orb.groupId"                    value="com.sun.corba"/>
         <property name="repo.url"                       value="java-net:/maven2-repository/trunk/repository"/>
         <property name="file.url"                       value="file:/tmp/maven"/>
-        <property name="local.url"                      value="file:${local.maven}"/>
+        <property name="local.url"                      value="file:${maven.repo.local}"/>
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
         <property name="bnd.properties.file"            value="make/bnd/bnd.properties"/>
+        
+        <artifact:remoteRepository id="gf.repo" url="${gf.repository}"/>
+        <artifact:remoteRepository id="aqute.repo" url="${aqute.repository}"/>
+
+        <artifact:dependencies pathId="dependency.classpath">
+            <remoteRepository refid="gf.repo"/>
+            <dependency groupId="${gmbal.groupid}" artifactId="${gmbal.artifactid}" version="${gmbal.version}" scope="runtime"/>
+            <dependency groupId="${management-api.groupid}" artifactId="${management-api.artifactid}" version="${management-api.version}" scope="runtime"/>
+            <dependency groupId="${felix.groupid}" artifactId="${felix.artifactid}" version="${felix.version}" scope="runtime"/>
+        </artifact:dependencies>
+
+        <artifact:dependencies pathId="bnd.classpath">
+            <remoteRepository refid="aqute.repo"/>
+            <dependency groupId="${bnd.groupid}" artifactId="${bnd.artifactid}" version="${bnd.version}" scope="compile"/>
+        </artifact:dependencies>
 
 	<path id="classpath.master">
-	    <pathelement location="${management-api-jar}"/>
-	    <pathelement location="${gmbal-jar}"/>
-	    <pathelement location="${felix-jar}"/>
+            <path refid="dependency.classpath"/>
+
 	    <pathelement location="${orblib.classes.dir}"/>
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${jscheme-jar}"/>        <!-- needed to build logutils -->
@@ -406,7 +416,7 @@
         <attribute name="classpath"/>
         <attribute name="file"/>
             <sequential>
-                <java jar="${bnd-jar}" fork="true" failonerror="true">
+                <java classpathref="bnd.classpath" classname="aQute.bnd.main.bnd" fork="true" failonerror="true">
                     <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
                     <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
                     <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>

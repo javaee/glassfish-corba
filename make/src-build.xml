@@ -114,6 +114,9 @@
         <!-- Places where the build puts things -->
         <property name="build.dir"                      location="build"/>
         <property name="lib.dir"                        location="${build.dir}/lib"/>
+        <property name="libcache.dir"                   location="${build.dir}/libcache"/>
+        <property name="gmbal-jar"                      location="${libcache.dir}/gmbal.jar"/>
+        <property name="management-api-jar"             location="${libcache.dir}/management-api.jar"/>
 	<property name="gensrc.dir"                     location="${build.dir}/gensrc"/>
 	<property name="classes.dir"                    location="${build.dir}/classes"/>
 	<property name="releaselib.dir"                 location="${build.dir}/release/lib"/>   
@@ -150,7 +153,7 @@
         <artifact:remoteRepository id="gf.repo" url="${gf.repository}"/>
         <artifact:remoteRepository id="aqute.repo" url="${aqute.repository}"/>
 
-        <artifact:dependencies pathId="dependency.classpath">
+        <artifact:dependencies versionsId="dependency.versions" filesetId="dependency.fileset" pathId="dependency.classpath">
             <remoteRepository refid="gf.repo"/>
             <dependency groupId="${gmbal.groupid}" artifactId="${gmbal.artifactid}" version="${gmbal.version}" scope="runtime"/>
             <dependency groupId="${management-api.groupid}" artifactId="${management-api.artifactid}" version="${management-api.version}" scope="runtime"/>
@@ -172,6 +175,16 @@
 	</path>
     </target>
 
+    <target name="get-dependencies" depends="init">
+            <mkdir dir="${libcache.dir}"/>
+            <copy todir="${libcache.dir}">
+                <fileset refid="dependency.fileset"/>
+                <mapper classpathref="maven-ant-tasks.classpath" 
+                    classname="org.apache.maven.artifact.ant.VersionMapper"
+                    from="${dependency.versions}" to="flatten"/>
+            </copy>
+    </target>
+
     <target name="prepare-dirs" depends="init">
 	<mkdir dir="${build.dir}"/>
 	<mkdir dir="${root.dir}/jscheme/lib"/>
@@ -185,7 +198,7 @@
 
     <!-- ========================= COMPILE ========================= -->
 
-    <target name="compile" depends="init, prepare-dirs, build-jscheme, orb-library, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
+    <target name="compile" depends="init, prepare-dirs, get-dependencies, build-jscheme, orb-library, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"

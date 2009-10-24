@@ -33,15 +33,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/*
- * @(#)counterClient.java	1.1 00/02/15
- *
- * Copyright 1997-1999 Sun Microsystems, Inc. All Rights Reserved.
- * 
- * This software is the proprietary information of Sun Microsystems, Inc.  
- * Use is subject to license terms.
- * 
- */
 package performance.simpleperf2;
 
 import java.io.PrintStream;

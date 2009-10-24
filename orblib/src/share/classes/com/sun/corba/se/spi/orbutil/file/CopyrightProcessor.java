@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -57,6 +57,9 @@ import com.sun.corba.se.spi.orbutil.argparser.Separator ;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class CopyrightProcessor {
     private CopyrightProcessor() {} 
@@ -89,6 +92,10 @@ public class CopyrightProcessor {
 	@DefaultValue( "1997" )
 	@Help( "Default copyright start year, if not otherwise specified" ) 
 	String startyear() ;
+
+        @DefaultValue( "false" ) 
+        @Help( "Run some simple tests" ) 
+        boolean test() ;
     }
 
     private static boolean validate ;
@@ -222,7 +229,7 @@ public class CopyrightProcessor {
             }
         }
 
-        boolean next() {
+        private boolean next() {
             if (data.length() > pos) {
                 setPos( pos + 1 ) ;
                 return true ;
@@ -235,7 +242,7 @@ public class CopyrightProcessor {
         /** skip everything until str is found.  Returns true if found, otherwise
          * false.
          */
-        boolean skipToString( String str ) {
+        public boolean skipToString( String str ) {
             int index = data.indexOf( str ) ;
             if (index >= 0) {
                 setPos( index ) ;
@@ -247,9 +254,9 @@ public class CopyrightProcessor {
 
         /** skip over str, if str is at the current position.
          */
-        boolean skipString( String str ) {
+        public boolean skipString( String str ) {
             String cstr = data.substring( pos, pos+str.length() ) ;
-            if (cstr.equals( pos )) {
+            if (cstr.equals( str )) {
                 setPos( pos+str.length() ) ;
                 return true ;
             } else {
@@ -259,7 +266,7 @@ public class CopyrightProcessor {
 
         /** Skip over whitespace.  Returns true if some whitespace skipped.
          */
-        boolean skipWhitespace() {
+        public boolean skipWhitespace() {
             boolean hasSkipped = false ;
             while (Character.isWhitespace(current)) { 
                 hasSkipped = true ;
@@ -273,7 +280,7 @@ public class CopyrightProcessor {
 
         /** Return int matched at current position as a string.
          */
-        String parseInt() {
+        public String parseInt() {
             int first = pos ;
             boolean atStart = true ;
             while ((current >= '0') && (current <= '9')) {
@@ -284,9 +291,9 @@ public class CopyrightProcessor {
             }
 
             if (atStart) {
-                return data.substring( first, pos ) ;
-            } else {
                 return null ;
+            } else {
+                return data.substring( first, pos ) ;
             }
         }
     }
@@ -315,6 +322,15 @@ public class CopyrightProcessor {
             return null ;
 
         return new Pair<String,String>( start, end ) ;
+    }
+
+    public static void testGetSunCopyrightPair() {
+        final String data = 
+            " * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved." ;
+
+        Pair<String,String> pair = getSunCopyrightPair( data ) ;
+
+        System.out.println( pair ) ;
     }
 
     // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
@@ -375,12 +391,13 @@ public class CopyrightProcessor {
     }
 
     private static final String START_YEAR = "StartYear" ;
+    private static final String LAST_YEAR = "LastYear" ;
 
-    private static Block makeCopyrightBlock( String startYear, 
+    private static Block makeCopyrightBlock( Pair<String,String> years, 
 	Block copyrightText) throws IOException {
 
 	if (verbose > 1) {
-	    trace( "makeCopyrightBlock: startYear = " + startYear ) ;
+	    trace( "makeCopyrightBlock: years = " + years ) ;
 	    trace( "makeCopyrightBlock: copyrightText = " + copyrightText ) ;
 
 	    trace( "Contents of copyrightText block:" ) ;
@@ -390,7 +407,8 @@ public class CopyrightProcessor {
 	}
 
 	Map<String,String> map = new HashMap<String,String>() ;
-	map.put( START_YEAR, startYear ) ;
+	map.put( START_YEAR, years.first() ) ;
+	map.put( LAST_YEAR, years.second() ) ;
 	Block withStart = copyrightText.instantiateTemplate( map ) ;
 
 	if (verbose > 1) {
@@ -480,7 +498,10 @@ public class CopyrightProcessor {
 
 	    public boolean evaluate( FileWrapper fw ) {
 		try {
-		    String startYear = defaultStartYear ;
+                    int cy = (new GregorianCalendar()).get( Calendar.YEAR ) ;
+                    String currentYear = "" + cy ;
+                    Pair<String,String> years = 
+                        new Pair<String,String>( defaultStartYear, currentYear ) ;
 		    boolean hadAnOldSunCopyright = false ;
 		    
 		    // Convert file into blocks
@@ -492,7 +513,10 @@ public class CopyrightProcessor {
 			if (str != null) {
 			    block.addTag( COPYRIGHT_BLOCK_TAG ) ;
 			    if (str.contains( "Sun" )) {
-				startYear = getSunCopyrightStart( str ) ;
+				Pair<String,String> scp = getSunCopyrightPair( str ) ;
+                                if (scp != null) {
+                                    years = scp ;
+                                }
 				block.addTag( SUN_COPYRIGHT_TAG ) ;
 				hadAnOldSunCopyright = true ;
 			    }
@@ -509,7 +533,7 @@ public class CopyrightProcessor {
 			}
 		    }
 
-		    Block cb = makeCopyrightBlock( startYear, copyrightText ) ;
+		    Block cb = makeCopyrightBlock( years, copyrightText ) ;
 
 		    if (validate) {
 			// There should be a Sun copyright block in the first block
@@ -615,6 +639,10 @@ public class CopyrightProcessor {
 	if (verbose > 0) {
 	    trace( "Main: args:\n" + args ) ;
 	}
+
+        if (args.test()) {
+            testGetSunCopyrightPair() ;
+        }
 
 	try {
 	    // Create the blocks needed for different forms of the 

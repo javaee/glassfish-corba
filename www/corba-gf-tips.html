@@ -1,12 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+
 <title>CORBA GFv3 Tips</title>
-</head>
-<body bgcolor="#ffffff" text="#000000">
+</head><body bgcolor="#ffffff" text="#000000">
 
 <h1>CORBA GFv3 Tips</h1>
 
+<!-- ================================================== -->
 <h2>Mercurial Tips</h2>
 <ul>
   <li><code>hg tags</code>
@@ -50,13 +52,13 @@
 <ul>
   <li><code>hg tag VERSION-3.0.0-bXXX</code>
     <ul><li>To add a new tag.</li></ul>
-  <li><code>hg tag --remove VERSION-3.0.0-bXXX</code>
+  </li><li><code>hg tag --remove VERSION-3.0.0-bXXX</code>
     <ul><li>To remove a tag (if you add it to the wrong changeset; typical this is done if you forget something)</li></ul>
-  <li><code>hg log -r 380:VERSION-3.0.0-b021</code> (or <code>380:373</code>)
+  </li><li><code>hg log -r 380:VERSION-3.0.0-b021</code> (or <code>380:373</code>)
      <ul><li>To see (say) all changes since b032 was released.</li></ul>
-  <li><code>hg clone -r VERSION-3.0.0-b021</code> (or just <code>373</code>)
+  </li><li><code>hg clone -r VERSION-3.0.0-b021</code> (or just <code>373</code>)
      <ul><li>To get a copy of a particular release.</li></ul>
-  <li><code>hg status</code>
+  </li><li><code>hg status</code>
      <ul>
        <li> will tell you what has changed.&nbsp; It displays
 &lt;mode&gt; &lt;pathname&gt;, where pathname is always relative to the
@@ -87,6 +89,7 @@ multiple heads is a sign that a merge is needed.</li>
   <li>You will probably want to have a ~/.hgrc file.&nbsp; Ken's looks like
 this:</li>
 </ul>
+
 <blockquote>[ui]<br>
 merge = jfilemerge<br>
 verbose = true<br>
@@ -111,8 +114,9 @@ really important.&nbsp; jfilemerge is the same as the old TeamWare merge
 tool, which still works better than most programs that came after it
 (this is a pure java version).&nbsp; It's available somewhere on SWAN, but I
 can't get to that copy at the moment, so I've attached my mercurial
-workspace (which is a NB project) of the jfilemerge tool.<br>
+workspace (which is a NB project) of the jfilemerge tool.
 </blockquote>
+
 <ul>
   <li><code>hg annotate</code>
     <ul><li>useful for finding out which version of a file
@@ -144,18 +148,30 @@ Jean-Christophe Collet's jHg is probably more useful (attached).</li>
 uncommitted changes), then jHg -w `pwd` to have an easy way to browse
 changes to create the commit comment.</li></ul></li>
 </ul>
+
+
+<!-- ================================================== -->
 <h2>GFv3 workspace and build</h2>
 The GFv3 wiki starts at
-<a class="moz-txt-link-freetext" href="http://wiki.glassfish.java.net/Wiki.jsp?page=PlanForGlassFishV3">http://wiki.glassfish.java.net/Wiki.jsp?page=PlanForGlassFishV3</a>.&nbsp; Some
-of it is actually<br>
-useful.&nbsp; <br>
+<a class="moz-txt-link-freetext" href="http://wiki.glassfish.java.net/Wiki.jsp?page=PlanForGlassFishV3">
+         http://wiki.glassfish.java.net/Wiki.jsp?page=PlanForGlassFishV3</a>.
+Some of it is actually useful.<br>
 <br>
 The GFv3 workspace is at
-<a class="moz-txt-link-freetext" href="https://svn.dev.java.net/svn/glassfish-svn/trunk/v3">https://svn.dev.java.net/svn/glassfish-svn/trunk/v3</a>.<br>
-See the build <a
- href="http://wiki.glassfish.java.net/Wiki.jsp?page=V3EngineersGuide#section-V3EngineersGuide-7.1SourceCodeManagement">chapter</a>
-of the V3EngineersGuide for build information.<br>
-<br>
+<a class="moz-txt-link-freetext" href="https://svn.dev.java.net/svn/glassfish-svn/trunk/v3">
+         https://svn.dev.java.net/svn/glassfish-svn/trunk/v3</a>.<br>
+
+See the following for build information:
+
+<ul>
+  <li>Full build instructions:
+      <a href="http://wiki.glassfish.java.net/Wiki.jsp?page=V3FullBuildInstructions">
+              http://wiki.glassfish.java.net/Wiki.jsp?page=V3FullBuildInstructions</a></li>
+  <li>Build chapter on wiki:
+      <a href="http://wiki.glassfish.java.net/Wiki.jsp?page=V3EngineersGuide#section-V3EngineersGuide-7.1SourceCodeManagement">
+               http://wiki.glassfish.java.net/Wiki.jsp?page=V3EngineersGuide#section-V3EngineersGuide-7.1SourceCodeManagement</a></li>
+</ul>
+
 The QL tests are in the GFv3 workspace.&nbsp; The appserv tests are in a
 slightly different place:<br>
 <br>
@@ -163,21 +179,32 @@ slightly different place:<br>
 <br>
 We only care about the devtests/ejb directory in appserv-tests.<br>
 <br>
-Quick summary:<a class="moz-txt-link-freetext" href="https://svn.dev.java.net/svn/glassfish-svn/trunk/v3">https://svn.dev.java.net/svn/glassfish-svn/trunk/v3</a>
+Quick summary:
 <ul>
-  <li>svn checkout (first time) or update (subsequently)
-<a class="moz-txt-link-freetext" href="https://svn.dev.java.net/svn/glassfish-svn/trunk/v3">https://svn.dev.java.net/svn/glassfish-svn/trunk/v3</a></li>
-  <li>mvn clean (if you are paranoid)</li>
-  <li>mvn -U install (this takes around 12 minutes on my triple core
-2.8 GHz AMD machine with local disks)<br>
-  </li>
+  <li><code>svn checkout <a class="moz-txt-link-freetext" href="https://svn.dev.java.net/svn/glassfish-svn/trunk/v3">https://svn.dev.java.net/svn/glassfish-svn/trunk/v3</a></code>
+    <ul><li>first time</li></ul></li>
+  <li><code>svn update <a class="moz-txt-link-freetext" href="https://svn.dev.java.net/svn/glassfish-svn/trunk/v3">https://svn.dev.java.net/svn/glassfish-svn/trunk/v3</a></code>
+    <ul><li>subsequently</li></ul></li>
+  <li><code>cd v3</code>
+    <ul><li>assuming your local workspace is <code>v3</code></li></ul></li>
+  <li><code>export MAVEN_OPTS=-Xmx512m</code></li>
+  <li>Note: you need <code>JDK 1.6.0_04</code> or greater.</li>
+  <li><code>mvn clean</code>
+    <ul>
+      <li>(if you are paranoid)</li>
+      <li>Note: use Maven 2.0.9 (not a later version)</li></ul></li>
+  <li><code>mvn -U install</code>
+    <ul><li>this takes around 12 minutes on my triple core 2.8 GHz AMD machine with local disks</li></ul></li>
+  
 </ul>
-To see what corba version is in use, look in the top level pom.xml file
+To see what corba version is in use, look in the top level file:
+<pre>   v3/pom.xml</pre>
 for the element<br>
-<pre>	&lt;glassfish-corba.version&gt;3.0.0-b032&lt;glassfish-corba.version&gt;
+<pre>   &lt;glassfish-corba.version&gt;3.0.0-b032&lt;glassfish-corba.version&gt;
 </pre>
 You can edit this if needed to update the ORB release, then rebuild.<br>
 <br>
+
 <b>Question:</b> I know you can incrementally rebuild a module simply
 by running mvn -U install in the module's top<br>
 level directory, but how to you regenerate glassfish.zip and web.zip?<br>
@@ -234,10 +261,17 @@ causes all of the initialization problems.<br>
     <li>amx lives under here</li>
   </ul>
 </ul>
+
+<!-- ================================================== -->
 <h2>Maven repositories</h2>
-We deal with two repositories: ~/.m2 and
-<a class="moz-txt-link-freetext" href="http://download.java.net/maven/2">http://download.java.net/maven/2</a>.&nbsp; Both have the same structure.&nbsp; Corba
-modules are <br>
+
+We deal with two repositories: 
+<ul>
+<li><code>~/.m2</code></li>
+<li><code><a class="moz-txt-link-freetext" href="http://download.java.net/maven/2">
+                   http://download.java.net/maven/2</a></code></li>
+</ul>
+Both have the same structure.&nbsp; Corba modules are
 under com/sun/corba.&nbsp; The following are the CORBA modules we currently
 use:<br>
 <ul>
@@ -254,107 +288,86 @@ We may combine or rename some of these.&nbsp; The structure of all of these
 is the same: the next level of subdirectory gives the version,<br>
 as in for example
 <a class="moz-txt-link-freetext" href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031:">http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031:</a><br>
-<pre><a
- href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.jar"
- name="glassfish-corba-orb-3.0.0-b031.jar"><img
- src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.jar</a>                               19-Oct-2009 14:49     1M    
-<a
- href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.jar.md5"
- name="glassfish-corba-orb-3.0.0-b031.jar.md5"><img
- src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.jar.md5</a>                           19-Oct-2009 14:49     1K    
-<a
- href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.jar.sha1"
- name="glassfish-corba-orb-3.0.0-b031.jar.sha1"><img
- src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.jar.sha1</a>                          19-Oct-2009 14:49     1K    
-<a
- href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.pom"
- name="glassfish-corba-orb-3.0.0-b031.pom"><img
- src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.pom</a>                               19-Oct-2009 14:49     4K    
-<a
- href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.pom.md5"
- name="glassfish-corba-orb-3.0.0-b031.pom.md5"><img
- src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.pom.md5</a>                           19-Oct-2009 14:49     1K    
-<a
- href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.pom.sha1"
- name="glassfish-corba-orb-3.0.0-b031.pom.sha1"><img
- src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.pom.sha1</a>                          19-Oct-2009 14:49     1K 
+<pre><a href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.jar" name="glassfish-corba-orb-3.0.0-b031.jar"><img src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.jar</a>                               19-Oct-2009 14:49     1M    
+<a href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.jar.md5" name="glassfish-corba-orb-3.0.0-b031.jar.md5"><img src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.jar.md5</a>                           19-Oct-2009 14:49     1K    
+<a href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.jar.sha1" name="glassfish-corba-orb-3.0.0-b031.jar.sha1"><img src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.jar.sha1</a>                          19-Oct-2009 14:49     1K    
+<a href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.pom" name="glassfish-corba-orb-3.0.0-b031.pom"><img src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.pom</a>                               19-Oct-2009 14:49     4K    
+<a href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.pom.md5" name="glassfish-corba-orb-3.0.0-b031.pom.md5"><img src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.pom.md5</a>                           19-Oct-2009 14:49     1K    
+<a href="http://download.java.net/maven/2/com/sun/corba/glassfish-corba-orb/3.0.0-b031/glassfish-corba-orb-3.0.0-b031.pom.sha1" name="glassfish-corba-orb-3.0.0-b031.pom.sha1"><img src="cid:part1.03070407.07080901@sun.com" alt="[   ]" border="0">  glassfish-corba-orb-3.0.0-b031.pom.sha1</a>                          19-Oct-2009 14:49     1K 
 
 </pre>
 Every artifact in maven (like the jar file) comes with a pom file that
 describes it.<br>
+
+<!-- ================================================== -->
 <h2>CORBA workspace and build</h2>
+
 The GFv3 CORBA workspace is at
-<a class="moz-txt-link-freetext" 
-   href="https://kenai.com/hg/gf-corba-v3-mirror~staging ">
-   https://kenai.com/hg/gf-corba-v3-mirror~staging</a>.<br>
+<blockquote>
+<a class="moz-txt-link-freetext" href="https://kenai.com/hg/gf-corba-v3-mirror%7Estaging">
+   https://kenai.com/hg/gf-corba-v3-mirror~staging</a>.</blockquote>
+
 Build instructions (assuming &lt;ws&gt; is where your workspace lives):<br>
 <ul>
-  <li>cd &lt;ws&gt;</li>
-  <li>ant clean orb-library rename</li>
-  <li>cd &lt;ws&gt;/build/rename/ee</li>
-  <li>ant build</li>
-  <ul>
-    <li>builds all of the ORB <br>
-    </li>
-  </ul>
-  <li>ant build-tests</li>
-  <ul>
-    <li>builds all of the ORB tests</li>
-  </ul>
-  <li>ant make-bundles</li>
-  <ul>
-    <li>generates the bundles that we install in maven (or sometimes
-directly in the modules directory)</li>
-  </ul>
-  <li>ant release</li>
-  <ul>
-    <li>release to the download.java.net maven repository</li>
+  <li><code>cd &lt;ws&gt;</code></li>
+  <li><code>ant clean orb-library rename</code></li>
+  <li><code>cd &lt;ws&gt;/build/rename/ee</code></li>
+  <li><code>ant build</code>
+    <ul><li>builds all of the ORB</li></ul></li>
+  <li><code>ant build-tests</code>
+    <ul><li>builds all of the ORB tests</li></ul></li>
+  <li><code>ant make-bundles</code>
+    <ul><li>generates the bundles that we install in maven (or sometimes
+         directly in the modules directory)</li></ul></li>
+  <li><code>ant release</code>
     <ul>
+      <li>release to the download.java.net maven repository</li>
       <li>Note: this is REALLY slow.&nbsp; It upload about 8 MB of artifacts
 to a slow server (takes 4-8 minutes), which then takes at least 30
 minutes to copy files to the real repository.&nbsp; Only do this when
 releasing an ORB.</li>
-    </ul>
-  </ul>
-  <li>ant release-local <br>
-  </li>
-  <ul>
-    <li>Related to the ~/.m2 maven repository.&nbsp; This is really fast,
-and is fine for developing on your machine</li>
-  </ul>
+    </ul></li>
+  <li><code>ant release-local</code>
+    <ul><li>Related to the <code>~/.m2</code> maven repository.&nbsp; This is really fast, and is fine for developing on your machine</li></ul></li>
 </ul>
-Docs are at www/index.html.&nbsp; For more details, see
-www/design/orb_notes.html (which is mostly up to date for the<br>
-GFv3 workspace structure and build). Note that PEPt has been removed
-(to avoid problems with inhertance and generics in<br>
-the framework).<br>
-<br>
+
+<b>Documentation</b>
+<ul>
+<li><code>www/index.html</code></li>
+<li>For more details, see
+  <ul>
+    <li><code>www/design/orb_notes.html</code> (which is mostly up to date for the GFv3 workspace structure and build)</li>
+    <li>Note that PEPt has been removed (to avoid problems with inhertance and generics in the framework).</li></ul></li>
+</ul>
+
 You can browse the b020 version of the ORB at
 <a class="moz-txt-link-freetext" href="http://kencavanaugh.com/CORBA/www/sources/orb-sources.html">http://kencavanaugh.com/CORBA/www/sources/orb-sources.html</a>.<br>
 Unfortunately I have not had time to keep that up to date.<br>
+
+<!-- ================================================== -->
 <h2>Hudson</h2>
-<br>
-I highly recommend setting up your own Hudson server. The config.xml
-that I use for the corba-master job is attached (it pulls<br>
-from a local repository, and that is specific to my setup).&nbsp; This
-allows you to simply commit, and not even think about <br>
-running the tests (Hudson does that for you). I think you can use this
-as follows:<br>
+
+I highly recommend setting up your own Hudson server. The
+<code>config.xml</code> that I use for the corba-master job is
+attached (it pulls from a local repository, and that is specific to my
+setup).&nbsp; This allows you to simply <code>commit</code>, and not
+even think about running the tests (Hudson does that for you). I think
+you can use this as follows:
+
 <br>
 <ul>
-  <li>Get the latest hudson, and run it: java -jar hudson.war (you may
-want to put this in a startup item to automatically start up)</li>
-  <li>
-<pre>
-nohup java -jar ~/hc/java/hudson/hudson-1-330.war --httpPort=9090 --httpsPort=9091 > ~/.hudson/logfile 2>&1 &
-</pre>
-  </li>
-  <li>create a job for the CORBA workspace (call it corba-master for
-example)</li>
-  <li>In ~/.hudson/jobs/corba-master, there should be a config.xml.&nbsp;
-Replace it with the attached version.</li>
+  <li>Get the latest hudson, and run it: <code>java -jar hudson.war</code></li>
+  <li>You may want to put this in a startup item to automatically start up.
+something like:
+    <ul><li><code>nohup java -jar ~/hc/java/hudson/hudson-1-330.war --httpPort=9090 --httpsPort=9091 &gt; ~/.hudson/logfile 2&gt;&amp;1 </code></li></ul></li>
+  <li>create a job for the CORBA workspace (call it <code>corba-master</code>
+      for example)</li>
+  <li>In ~/.hudson/jobs/corba-master, there should be a
+      <code>config.xml</code>. Replace it with the attached version.</li>
 </ul>
 This should get you close.<br>
+
+<!-- ================================================== -->
 <h2>Testing</h2>
 The testing and release procedure for the ORB is as follows:<br>
 <ul>
@@ -412,6 +425,8 @@ server</li>
   <li>rerunql: same as qlonly</li>
 </ul>
 These are all in the temp.tgz attachment.<br>
+
+<!-- ================================================== -->
 <h2>The GFv3 installation structure</h2>
 Unzipping glassfish.zip creates the following structure:<br>
 <ul>
@@ -472,6 +487,8 @@ here)<br>
     </li>
   </ul>
 </ul>
+
+<!-- ================================================== -->
 <h2>Bug tracking</h2>
 Here is a <a href="http://tinyurl.com/yzeobjd">query</a> for CORBA in
 IssueTracker. We don't use bugster much (except for CTS issues).<br>
@@ -485,6 +502,4 @@ more tomorrow.<br>
 <br>
 <br>
 Ken.<br>
-</body>
-</html>
-
+</body></html>

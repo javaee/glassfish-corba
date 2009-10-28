@@ -297,14 +297,20 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
     {
 	if (!checkedIsLocal) {
 	    checkedIsLocal = true ;
-	    String host = proftemp.getPrimaryAddress().getHost() ;
+	    final String host = proftemp.getPrimaryAddress().getHost() ;
+            final boolean isLocalHost = orb.isLocalHost( host ) ;
 
-	    cachedIsLocal = orb.isLocalHost(host) && 
-		orb.isLocalServerId(oktemp.getSubcontractId(),
-					   oktemp.getServerId()) &&
-		orb.getLegacyServerSocketManager()
-		    .legacyIsLocalServerPort(
-                        proftemp.getPrimaryAddress().getPort());
+            final int scid = oktemp.getSubcontractId() ;
+            final int sid = oktemp.getServerId() ;
+            final boolean isLocalServerId = (sid == -1) ||
+                orb.isLocalServerId( scid, sid ) ;
+
+            final boolean isLocalServerPort = 
+                orb.getLegacyServerSocketManager().legacyIsLocalServerPort( 
+                    proftemp.getPrimaryAddress().getPort() );
+
+	    cachedIsLocal = isLocalHost && isLocalServerId 
+                && isLocalServerPort ;
         }
 
 	return cachedIsLocal ;

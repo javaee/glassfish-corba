@@ -369,10 +369,14 @@ public class Type {
     public Class<?> getTypeClass() {
 	if (typeClass == null) {
 	    try {
-		typeClass = Class.forName( name, true, CurrentClassLoader.get() ) ;
+		typeClass = Class.forName( name, true, 
+                    CurrentClassLoader.get() ) ;
 	    } catch (ClassNotFoundException cnfe) {
-		throw new IllegalArgumentException( "Cannot load class for type " +
-		    name ) ;
+		IllegalArgumentException exc = 
+                    new IllegalArgumentException( 
+                        "Cannot load class for type " + name ) ;
+                exc.initCause( cnfe ) ;
+                throw exc ;
 	    }
 
 	    // Now that the name has been resolved to a specific Class, 
@@ -387,12 +391,12 @@ public class Type {
     public ClassInfo classInfo() {
 	if (classInfo == null) {
 	    if (isArray())
-		throw new IllegalStateException( "Cannot get ClassInfo for array type " +
-		    name ) ;
+		throw new IllegalStateException( 
+                    "Cannot get ClassInfo for array type " + name ) ;
 
 	    if (isPrimitive())
-		throw new IllegalStateException( "Cannot get ClassInfo for primitive type " +
-		    name ) ;
+		throw new IllegalStateException( 
+                    "Cannot get ClassInfo for primitive type " + name ) ;
 
 	    classInfo = new ClassInfoReflectiveImpl( this ) ;
 	}

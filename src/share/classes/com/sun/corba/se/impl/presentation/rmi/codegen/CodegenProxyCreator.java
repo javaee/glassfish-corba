@@ -77,11 +77,11 @@ public class CodegenProxyCreator {
 	debugProps.setProperty( USE_ASM_VERIFIER, "true" ) ;
     }
 
-    public CodegenProxyCreator( String className, String superClassName,
+    public CodegenProxyCreator( String className, Class sc,
 	Class[] interfaces, Method[] methods ) {
 
 	this.className = className ;
-	this.superClass = Type._class( superClassName ) ;
+	this.superClass = Type.type( sc ) ;
 
 	this.interfaces = new ArrayList<Type>() ;
 	for (Class cls : interfaces) {

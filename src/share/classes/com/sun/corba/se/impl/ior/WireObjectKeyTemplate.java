@@ -60,6 +60,8 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
 {
     private ORB orb ;
     private IORSystemException wrapper ;
+    private static ObjectAdapterId NULL_OBJECT_ADAPTER_ID = 
+        new ObjectAdapterIdArray( new String[0] ) ;
 
     public boolean equals( Object obj )
     {
@@ -119,7 +121,9 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
 
     public ObjectAdapterId getObjectAdapterId() 
     {
-	throw wrapper.objectAdapterIdNotAvailable() ;
+        return NULL_OBJECT_ADAPTER_ID ;
+
+	// throw wrapper.objectAdapterIdNotAvailable() ;
     }
 
     /** Adapter ID is not available, since our

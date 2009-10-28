@@ -431,7 +431,7 @@ public class TestCodegenProxyCreator extends TestCase {
 	    // Make sure we only try to create the proxy class once!
 	    if (proxyClass == null) {
 		// Set up proxy for ti: this is really the main part of the test
-		String baseClassName = TestBase.class.getName() ;
+		Class baseClass = TestBase.class ;
 		Class interfaceClass = TestInterface.class ;
 		Class[] interfaces = new Class[] { interfaceClass } ;
 		methods = interfaceClass.getDeclaredMethods() ;
@@ -442,7 +442,7 @@ public class TestCodegenProxyCreator extends TestCase {
 		CodegenProxyCreator pc = 
 		    new CodegenProxyCreator( 
 			"corba.dynamicrmiiiop.TestInterfaceProxy", 
-			baseClassName, interfaces, methods ) ;
+			baseClass, interfaces, methods ) ;
 
 		proxyClass = pc.create( pd, loader, DEBUG, System.out ) ;
 	    }

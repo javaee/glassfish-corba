@@ -8,11 +8,12 @@
 <h1>CORBA GFv3 Tips</h1>
 
 <h2>Mercurial Tips</h2>
-hg pull and push are I think reasonably familiar.&nbsp; Some other useful
-tips:<br>
 <ul>
-  <li>To find all of the versions of the workspace: hg tags.&nbsp; Typical
-output:<br>
+  <li><code>hg tags</code>
+    <ul>
+      <li>To find all of the versions of the workspace.  Typical output:
+      </li>
+    </ul>
   </li>
 </ul>
 <pre>	tip                              380:372bc5d51565
@@ -47,39 +48,43 @@ output:<br>
 
 </pre>
 <ul>
-  <li>To add a new tag: hg tag VERSION-3.0.0-bXXX</li>
-  <li>To remove a tag (if you add it to the wrong changeset): hg tag
---remove VERSION-3.0.0-bXXX (typical this is done if you forget
-something)</li>
-  <li>To see (say) all changes since b032 was released: hg log -r
-380:VERSION-3.0.0-b021 (or 380:373)</li>
-  <li>To get a copy of a particular release: hg clone -r
-VERSION-3.0.0-b021 (or just 373)</li>
-  <li>hg status will tell you what has changed.&nbsp; It displays
+  <li><code>hg tag VERSION-3.0.0-bXXX</code>
+    <ul><li>To add a new tag.</li></ul>
+  <li><code>hg tag --remove VERSION-3.0.0-bXXX</code>
+    <ul><li>To remove a tag (if you add it to the wrong changeset; typical this is done if you forget something)</li></ul>
+  <li><code>hg log -r 380:VERSION-3.0.0-b021</code> (or <code>380:373</code>)
+     <ul><li>To see (say) all changes since b032 was released.</li></ul>
+  <li><code>hg clone -r VERSION-3.0.0-b021</code> (or just <code>373</code>)
+     <ul><li>To get a copy of a particular release.</li></ul>
+  <li><code>hg status</code>
+     <ul>
+       <li> will tell you what has changed.&nbsp; It displays
 &lt;mode&gt; &lt;pathname&gt;, where pathname is always relative to the
-start of the workspace. Some typical modes:</li>
-  <ul>
-    <li>M: modified</li>
-    <li>A: added</li>
-    <li>R: removed</li>
-    <li>?: new file not currently part of workspace</li>
-    <li>!: file was removed that is in workspace</li>
-  </ul>
-  <li>To get rid of ? and ! files: hg addremove</li>
-  <ul>
-    <li><b>NOTE: </b>I've seen addremove fail to find files, so keep
-an eye on it.</li>
-  </ul>
-  <li>There is a .hgignore file at the top of the workspace.&nbsp; This
+start of the workspace. Some typical modes:
+         <ul>
+           <li>M: modified</li>
+           <li>A: added</li>
+           <li>R: removed</li>
+           <li>?: new file not currently part of workspace</li>
+           <li>!: file was removed that is in workspace</li>
+         </ul>
+       </li>
+    </ul></li>
+  <li><code>hg addremove</code>
+    <ul><li>To get rid of ? and ! files</li>
+        <li><b>NOTE: </b>I've seen addremove fail to find files, so keep an eye on it.</li></ul></li>
+  <li><code>.hgignore</code>
+    <ul><li>file at the top of the workspace. This
 gives the many patterns that are ignored (generated files, temp files,
-etc) in the build.</li>
-  <li>There is a .hg directory at the top of the workspace.&nbsp; Do not
+etc) in the build.</li></ul></li>
+  <li><code>.hg</code>
+    <ul><li> directory at the top of the workspace.&nbsp; Do not
 touch anything in it except the hgrc file, which typically just
-contains the parent (if any) from which the workspace was cloned.</li>
+contains the parent (if any) from which the workspace was cloned.</li></ul></li>
   <li>We do not use branches in the CORBA workspace.&nbsp; If a command says
 something about multiple heads, don't force it with -f.&nbsp; Instead,
 multiple heads is a sign that a merge is needed.</li>
-  <li>You will probably want to have a ~/.hgrc file.&nbsp; Mine looks like
+  <li>You will probably want to have a ~/.hgrc file.&nbsp; Ken's looks like
 this:</li>
 </ul>
 <blockquote>[ui]<br>
@@ -109,34 +114,35 @@ can't get to that copy at the moment, so I've attached my mercurial
 workspace (which is a NB project) of the jfilemerge tool.<br>
 </blockquote>
 <ul>
-  <li>hg annotate is useful for finding out which version of a file
+  <li><code>hg annotate</code>
+    <ul><li>useful for finding out which version of a file
 first introduced a particular line in a source file (similar to other
-version control systems).</li>
-  <li>hg cat looks useful for fetching a particular version of a file
-(I haven't used this).</li>
-  <li>Remember that updating your workspace (commit) and publishing
-your changes (push) are separate operations.&nbsp; This sometimes confuses
-people used to svn and the like.</li>
-  <li>hg diff is available for seeing what's changed (and you can give
-it 0-2 -r options to select versions).</li>
-  <li>hg heads will show you what's going on if you have multiple heads
-(not really useful otherwise)</li>
-  <li>hg merge is how you merge changes when needed. Normally you need
+version control systems).</li></ul></li>
+  <li><code>hg cat</code>
+    <ul><li>looks useful for fetching a particular version of a file
+(I haven't used this).</li></ul></li>
+  <li>NOTE: <code>commit</code> (updating your workspace) and <code>push</code>  (publishing your changes) are separate operations.&nbsp; This sometimes confuses people used to svn and the like.</li>
+  <li><code>hg diff</code>
+    <ul><li>for seeing what's changed (you can give
+it 0-2 -r options to select versions).</li></ul></li>
+  <li><code>hg heads</code>
+    <ul><li>shows what's going on if you have multiple heads
+(not really useful otherwise)</li></ul></li>
+  <li><code>hg merge</code>
+    <ul>
+      <li>how you merge changes when needed. Normally you need
 this only when you do an hg pull that results in conflicts.</li>
-  <ul>
-    <li>It's probably best to do hg commit before hg pull and then
-merge afterwards.</li>
-  </ul>
-  <li>hg rename should be used to move things around (otherwise I think
-hg may not link the revisions for the old and new files)</li>
-  <li>hg view will show you the overall structure of the changesets.&nbsp;
+      <li>It's probably best to do <code>hg commit</code> before <code>hg pull</code> and then merge afterwards.</li></ul></li>
+  <li><code>hg rename</code>
+    <ul><li>used to move things around (otherwise I think
+hg may not link the revisions for the old and new files)</li></ul></li>
+  <li><code>hg view</code>
+    <ul>
+      <li>shows overall structure of the changesets.&nbsp;
 Jean-Christophe Collet's jHg is probably more useful (attached).</li>
-  <ul>
-    <li>Most useful way for me to use jHg: cd &lt;ws&gt; (with
+      <li>Most useful way for me to use jHg: cd &lt;ws&gt; (with
 uncommitted changes), then jHg -w `pwd` to have an easy way to browse
-changes to create the commit comment.<br>
-    </li>
-  </ul>
+changes to create the commit comment.</li></ul></li>
 </ul>
 <h2>GFv3 workspace and build</h2>
 The GFv3 wiki starts at

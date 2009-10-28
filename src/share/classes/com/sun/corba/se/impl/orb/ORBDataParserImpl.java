@@ -130,6 +130,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private boolean blockingReadCheckMessageParser;
     private boolean timingPointsEnabled;
     private boolean useEnumDesc ;
+    private boolean environmentIsGFServer ;
     private boolean noDefaultAcceptors ;
     private boolean registerMBeans ;
     private int fragmentReadTimeout ;
@@ -525,6 +526,10 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public boolean useEnumDesc() 
     {
         return useEnumDesc ;
+    }
+
+    public boolean environmentIsGFServer() {
+        return environmentIsGFServer ;
     }
 
     public boolean noDefaultAcceptors() {

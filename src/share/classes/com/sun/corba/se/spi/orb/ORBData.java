@@ -385,6 +385,10 @@ public interface ORBData {
     public boolean useEnumDesc() ;
 
     @ManagedAttribute
+    @Description( "Returns true if ORB is running inside the GFv3 application server" ) 
+    boolean environmentIsGFServer() ;
+
+    @ManagedAttribute
     @Description( "If true, do not start any acceptors in the transport by default" )
     public boolean noDefaultAcceptors() ;
 

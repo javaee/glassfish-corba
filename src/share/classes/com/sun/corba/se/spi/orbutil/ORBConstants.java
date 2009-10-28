@@ -232,6 +232,9 @@ public class ORBConstants {
     public static final int GIOP_FRAGMENT_DIVISOR = 8;
     public static final int GIOP_FRAGMENT_MINIMUM_SIZE = 32;
 
+    public static final String ENV_IS_SERVER_PROPERTY = 
+        SUN_PREFIX + "ORBEnvironmentIsGlassFishServer" ;
+
     // connection management properties
     public static final String HIGH_WATER_MARK_PROPERTY	=
 	SUN_PREFIX + "connection.ORBHighWaterMark" ;

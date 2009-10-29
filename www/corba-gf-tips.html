@@ -307,12 +307,12 @@ The GFv3 CORBA workspace is at
 <a class="moz-txt-link-freetext" href="https://kenai.com/hg/gf-corba-v3-mirror%7Estaging">
    https://kenai.com/hg/gf-corba-v3-mirror~staging</a>.</blockquote>
 
-Build instructions (assuming &lt;ws&gt; is where your workspace lives):<br>
+Build instructions (assuming <code>WS</code> is where your workspace lives):<br>
 <ul>
-  <li><code>cd &lt;ws&gt;/make</code></li>
+  <li><code>cd WS/make</code></li>
   <li><code>ant clean orb-library rename</code></li>
-  <li><code>cd &lt;ws&gt;/build/rename/ee/make</code></li>
-  <li><code>ant build</code>
+  <li><code>cd WS/build/rename/ee/make</code></li>
+  <li><code>ant clean build</code>
     <ul><li>builds all of the ORB</li></ul></li>
   <li><code>ant build-tests</code>
     <ul><li>builds all of the ORB tests</li></ul></li>

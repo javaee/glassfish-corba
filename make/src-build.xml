@@ -690,7 +690,7 @@
     <target name="rename" depends="init">
 	<mkdir dir="build/rename/ee"/>
 	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
-	    dir="${root.dir}">
+	    dir="${root.dir}" failonerror="true">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>

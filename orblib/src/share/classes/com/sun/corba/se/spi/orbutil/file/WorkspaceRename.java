@@ -150,6 +150,8 @@ public class WorkspaceRename {
     private final boolean copyonly ;
     private final boolean expandtabs ;
 
+    private final List<String> noActionFileNames = new ArrayList<String>() ;
+
     private void trace( String msg ) {
 	System.out.println( msg ) ;
     }
@@ -300,6 +302,16 @@ public class WorkspaceRename {
 	    // Create the actions we need
 	    final Recognizer recognizer = af.getRecognizerAction() ; 
 
+            recognizer.setDefaultAction(
+                new Scanner.Action() {
+                    public String toString() { return "WorkspaceRename default action" ; } 
+
+                    public boolean evaluate( FileWrapper fw ) {
+                        noActionFileNames.add( fw.getAbsoluteName() ) ;
+                        return true ;
+                    }
+                } ) ;
+
 	    final Scanner.Action skipAction = af.getSkipAction() ;
 
 	    final Scanner.Action action = copyonly ?
@@ -336,6 +348,16 @@ public class WorkspaceRename {
 		scanner.addDirectoryToSkip( str ) ;
 
 	    scanner.scan( recognizer ) ;
+
+            int rc = noActionFileNames.size() ;
+
+            if (rc > 0) {
+                System.out.println( "Rename FAILED: no action defined for files:" ) ;
+                for (String str : noActionFileNames) {
+                    System.out.println( "\t" + str ) ;
+                }
+                System.exit( rc ) ;
+            }
 	} catch (IOException exc) {
 	    System.out.println( "Exception while processing: " + exc ) ;
 	    exc.printStackTrace() ;

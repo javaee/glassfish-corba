@@ -252,9 +252,9 @@ import com.sun.corba.se.impl.orbutil.codegen.WhileStatement ;
  * don't use "{}" to delimit scope in the generated code).
  * <LI>Variables representing _catch statements can be referenced until the next
  * corresponding _catch, _finally, or _end.
- * </OL>
  * Any attempt to use an Expression that references a Variable that is out of scope
  * will result in an IllegalStateException.
+ * </OL>
  * <P>
  * The _classGenerator() method is used here to get the ClassGeneratorImpl,
  * which can then be used in the CodeGenerator API to create source

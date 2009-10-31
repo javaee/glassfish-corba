@@ -84,7 +84,12 @@ public class ReaderThreadImpl
 	}
 
 	keepRunning = false;
-        connection.close() ;
+
+        // Note: do not close the connection here, as it may be 
+        // re-used if we are simply closing the ReaderThread
+        // because it has completed its operation.
+        // If we are calling close because of transport shutdown,
+        // the connection will be closed when the connection caches are closed.
     }
 
     private synchronized boolean isRunning() {

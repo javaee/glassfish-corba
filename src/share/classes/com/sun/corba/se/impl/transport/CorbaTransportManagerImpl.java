@@ -127,7 +127,7 @@ public class CorbaTransportManagerImpl
                         // this really only works with a single cache.
                         orb.mom().register( this, connectionCache ) ;
                         StatsProviderManager.register( "orb", PluginPoint.SERVER,
-                            "transport/connectioncache/outbound", connectionCache ) ;
+                            "orb/transport/connectioncache/outbound", connectionCache ) ;
 
 			outboundConnectionCaches.put(
                             contactInfo.getConnectionCacheType(),
@@ -167,7 +167,7 @@ public class CorbaTransportManagerImpl
 								acceptor);
                         orb.mom().register( this, connectionCache ) ;
                         StatsProviderManager.register( "orb", PluginPoint.SERVER,
-                            "transport/connectioncache/inbound", connectionCache ) ;
+                            "orb/transport/connectioncache/inbound", connectionCache ) ;
 
 			inboundConnectionCaches.put(
                             acceptor.getConnectionCacheType(),

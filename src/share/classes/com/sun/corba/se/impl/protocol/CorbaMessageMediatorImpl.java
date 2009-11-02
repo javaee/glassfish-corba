@@ -90,6 +90,7 @@ import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.impl.encoding.BufferManagerFactory;
 import com.sun.corba.se.impl.encoding.BufferManagerReadStream;
+import com.sun.corba.se.impl.encoding.BufferManagerWrite;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
@@ -447,7 +448,16 @@ public class CorbaMessageMediatorImpl
 
     public boolean sentFragment()
     {
-	return outputObject.getBufferManager().sentFragment();
+        if (outputObject != null) {
+            BufferManagerWrite buffMan = 
+                outputObject.getBufferManager() ;
+
+            if (buffMan != null) {
+                return outputObject.getBufferManager().sentFragment();
+            }
+        }
+
+        return false ;
     }
 
     public void setDIIInfo(org.omg.CORBA.Request diiRequest)

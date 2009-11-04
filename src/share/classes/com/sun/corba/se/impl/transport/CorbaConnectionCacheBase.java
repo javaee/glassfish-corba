@@ -46,6 +46,10 @@ import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.NameValue ;
+
 import org.glassfish.external.statistics.CountStatistic ;
 import org.glassfish.external.statistics.impl.CountStatisticImpl ;
 
@@ -56,6 +60,19 @@ public abstract class CorbaConnectionCacheBase
     implements
 	CorbaConnectionCache
 {
+    private static final String STAT_UNIT = "count" ;
+
+    private static final String TOTAL_ID = "TotalConnections" ;
+    private static final String IDLE_ID = "ConnectionsIdle" ;
+    private static final String BUSY_ID = "ConnectionsBusy" ;
+
+    private static final String TOTAL_DESC = 
+        "Total number of connections in the connection cache" ; 
+    private static final String IDLE_DESC = 
+        "Number of connections in the connection cache that are idle" ; 
+    private static final String BUSY_DESC =
+        "Number of connections in the connection cache that are in use" ; 
+
     protected ORB orb;
     protected long timestamp = 0;
     protected String cacheType;
@@ -72,6 +89,7 @@ public abstract class CorbaConnectionCacheBase
 	dprintCreation();
     }
     
+    @NameValue
     public String getCacheType()
     {
 	return cacheType;
@@ -87,11 +105,13 @@ public abstract class CorbaConnectionCacheBase
         long value ) {
 
         CountStatisticImpl result = new CountStatisticImpl( name,
-            CorbaConnectionCache.STAT_UNIT, desc ) ;
+            STAT_UNIT, desc ) ;
         result.setCount( value ) ;
         return result ;
     }
 
+    @ManagedAttribute( id=TOTAL_ID ) 
+    @Description( TOTAL_DESC ) 
     public CountStatistic numberOfConnections()
     {
         long count = 0 ;
@@ -100,8 +120,8 @@ public abstract class CorbaConnectionCacheBase
 	}
 
         return makeCountStat( 
-            CorbaConnectionCache.TOTAL_ID.toLowerCase(),
-            CorbaConnectionCache.TOTAL_DESC, count ) ;
+            TOTAL_ID.toLowerCase(),
+            TOTAL_DESC, count ) ;
     }
 
     public void close() {
@@ -112,6 +132,8 @@ public abstract class CorbaConnectionCacheBase
         }
     }
 
+    @ManagedAttribute( id=IDLE_ID ) 
+    @Description( IDLE_DESC )
     public CountStatistic numberOfIdleConnections()
     {
 	long count = 0;
@@ -125,10 +147,12 @@ public abstract class CorbaConnectionCacheBase
 	}
 
         return makeCountStat( 
-            CorbaConnectionCache.IDLE_ID.toLowerCase(),
-            CorbaConnectionCache.IDLE_DESC, count ) ;
+            IDLE_ID.toLowerCase(),
+            IDLE_DESC, count ) ;
     }
 
+    @ManagedAttribute( id=BUSY_ID ) 
+    @Description( BUSY_DESC )
     public CountStatistic numberOfBusyConnections()
     {
 	long count = 0;
@@ -142,8 +166,8 @@ public abstract class CorbaConnectionCacheBase
 	}
 
         return makeCountStat( 
-            CorbaConnectionCache.BUSY_ID.toLowerCase(),
-            CorbaConnectionCache.BUSY_DESC, count ) ;
+            BUSY_ID.toLowerCase(),
+            BUSY_DESC, count ) ;
     }
 
     /**

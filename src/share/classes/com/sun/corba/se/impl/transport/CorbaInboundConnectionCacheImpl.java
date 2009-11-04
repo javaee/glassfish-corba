@@ -46,9 +46,14 @@ import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author Harold Carr
  */
+@ManagedObject
+@Description( "Cache of connections accepted by the ORB" ) 
 public class CorbaInboundConnectionCacheImpl
     extends
 	CorbaConnectionCacheBase

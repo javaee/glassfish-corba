@@ -173,6 +173,10 @@
              77 FINE "The OSGi PackageAdmin service is not available")
             (SET_PARAMETER_CALLED_AGAIN
              78 WARNING "The ORBImpl.set_parameters method was called more than once")
+            (INSERT_BUNDLE_PACKAGE
+             79 FINE "Inserting exported package {0} from bundle {1} into packageNameMap")
+            (REMOVE_BUNDLE_PACKAGE
+             80 FINE "Removing exported package {0} from bundle {1} from packageNameMap") 
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 

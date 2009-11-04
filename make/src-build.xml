@@ -83,6 +83,7 @@
     </description>
 
     <property name="root.dir"			value="${basedir}"/>
+    <property name="jscheme-jar"                value="${root.dir}/jscheme/lib/jscheme.jar"/>
 
     <!-- ========================= set up for the maven ant tasks ============================ -->
 
@@ -109,7 +110,6 @@
         <!-- Required JAR files -->
         <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
         <property name="emma-jar"			value="${root.dir}/lib/emma.jar"/>
-        <property name="jscheme-jar"                    value="${root.dir}/jscheme/lib/jscheme.jar"/>
 
         <!-- Places where the build puts things -->
         <property name="build.dir"                      location="build"/>

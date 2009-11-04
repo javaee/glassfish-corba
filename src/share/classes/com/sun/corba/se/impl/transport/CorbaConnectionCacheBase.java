@@ -62,9 +62,12 @@ public abstract class CorbaConnectionCacheBase
 {
     private static final String STAT_UNIT = "count" ;
 
-    private static final String TOTAL_ID = "TotalConnections" ;
-    private static final String IDLE_ID = "ConnectionsIdle" ;
-    private static final String BUSY_ID = "ConnectionsBusy" ;
+    private static final String TOTAL_ID_STD    = "TotalConnections" ;
+    private static final String TOTAL_ID        = "totalconnections" ;
+    private static final String IDLE_ID_STD     = "ConnectionsIdle" ;
+    private static final String IDLE_ID         = "connectionsidle" ;
+    private static final String BUSY_ID_STD     = "ConnectionsBusy" ;
+    private static final String BUSY_ID         = "connectionsbusy" ;
 
     private static final String TOTAL_DESC = 
         "Total number of connections in the connection cache" ; 
@@ -119,9 +122,7 @@ public abstract class CorbaConnectionCacheBase
 	    count = values().size();
 	}
 
-        return makeCountStat( 
-            TOTAL_ID.toLowerCase(),
-            TOTAL_DESC, count ) ;
+        return makeCountStat( TOTAL_ID_STD, TOTAL_DESC, count ) ;
     }
 
     public void close() {
@@ -146,9 +147,7 @@ public abstract class CorbaConnectionCacheBase
 	    }
 	}
 
-        return makeCountStat( 
-            IDLE_ID.toLowerCase(),
-            IDLE_DESC, count ) ;
+        return makeCountStat( IDLE_ID_STD, IDLE_DESC, count ) ;
     }
 
     @ManagedAttribute( id=BUSY_ID ) 
@@ -165,9 +164,7 @@ public abstract class CorbaConnectionCacheBase
 	    }
 	}
 
-        return makeCountStat( 
-            BUSY_ID.toLowerCase(),
-            BUSY_DESC, count ) ;
+        return makeCountStat( BUSY_ID_STD, BUSY_DESC, count ) ;
     }
 
     /**

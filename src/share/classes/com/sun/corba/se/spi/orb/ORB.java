@@ -165,8 +165,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // 3. Logging support is here so that we can avoid problems with
     //    incompletely initialized ORBs that need to perform logging.
     
-    // Flag set at compile time to debug flag processing: this can't
-    // be one of the xxxDebugFlags because it is used to debug the mechanism
+    // This is not one of the xxxDebugFlags because it is used to debug the mechanism
     // that sets the xxxDebugFlags!
     public static final boolean orbInitDebug = AccessController.doPrivileged( 
 	new PrivilegedAction<Boolean>() {
@@ -183,18 +182,15 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean transportDebugFlag = false ;
     public boolean subcontractDebugFlag = false ;
     public boolean poaDebugFlag = false ;
-    public boolean poaConcurrencyDebugFlag = false ;
     public boolean poaFSMDebugFlag = false ;
     public boolean orbdDebugFlag = false ;
     public boolean namingDebugFlag = false ;
     public boolean serviceContextDebugFlag = false ;
     public boolean transientObjectManagerDebugFlag = false ;
-    public boolean giopVersionDebugFlag = false;
     public boolean shutdownDebugFlag = false;
     public boolean giopDebugFlag = false;
     public boolean giopSizeDebugFlag = false;
     public boolean giopReadDebugFlag = false;
-    public boolean invocationTimingDebugFlag = false ;
     public boolean interceptorDebugFlag = false ;
     public boolean folbDebugFlag = false ;
     public boolean cdrCacheDebugFlag = false ;

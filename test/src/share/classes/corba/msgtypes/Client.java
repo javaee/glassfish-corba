@@ -396,10 +396,10 @@ public class Client extends LocalObject
         // body in the previous case was likely naturally aligned. 
         // So, now force non-alignment, in order to
         // check to see if padding is inserted. This is done by calling the
-        // the method 'foob', which has an additional character in its name,
+        // the method 'fooAA', which has an additional character in its name,
         // that will force non-alignment.
         os = (CDROutputObject)
-            StubAdapter.request(fragTestStub, "fooB", false); // CASE 2
+            StubAdapter.request(fragTestStub, "fooAA", false); // CASE 2
         beforePaddingIndex = os.getByteBufferWithInfo().position();
         os.write_char('a'); // forces padding if not already naturally aligned
         afterPaddingIndex = os.getByteBufferWithInfo().position();

@@ -77,7 +77,7 @@ public final class ReflectiveTie extends Servant implements Tie
     {
         if (!PresentationDefaults.inAppServer()) {
             SecurityManager s = System.getSecurityManager();
-            if (!PresentationDefaults.inAppServer() && (s != null)) {
+            if (s != null) {
                 s.checkPermission(new DynamicAccessPermission("access"));
             }
         }

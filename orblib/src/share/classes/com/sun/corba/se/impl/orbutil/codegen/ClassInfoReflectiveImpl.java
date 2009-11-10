@@ -43,6 +43,9 @@ import java.util.HashMap ;
 import java.util.Set ;
 import java.util.HashSet ;
 
+import java.security.AccessController ;
+import java.security.PrivilegedAction ;
+
 import java.lang.reflect.Method ;
 import java.lang.reflect.Constructor ;
 
@@ -63,7 +66,7 @@ public class ClassInfoReflectiveImpl extends ClassInfoBase {
 	System.out.println( "ClassInfoReflectImpl: " + msg ) ;
     }
 
-    public ClassInfoReflectiveImpl( Type type ) {
+    public ClassInfoReflectiveImpl( final Type type ) {
 	super( type.getTypeClass().getModifiers(), type ) ;
 
 	if (DEBUG)
@@ -72,55 +75,59 @@ public class ClassInfoReflectiveImpl extends ClassInfoBase {
 	assert !type.isPrimitive() ;
 	assert !type.isArray() ;
 
-	Class<?> cls = type.getTypeClass() ;
+        AccessController.doPrivileged( 
+            new PrivilegedAction<Object>() {
+                public Object run() {
+                    Class<?> cls = type.getTypeClass() ;
 
-	List<Type> impls = new ArrayList<Type>() ;
-	if (DEBUG)
-	    dprint( "Setting interfaces: " ) ;
+                    List<Type> impls = new ArrayList<Type>() ;
+                    if (DEBUG) dprint( "Setting interfaces: " ) ;
 
-	for (Class<?> x : cls.getInterfaces()) {
-	    if (DEBUG)
-		dprint( "\t" + x.getName() ) ;
+                    for (Class<?> x : cls.getInterfaces()) {
+                        if (DEBUG) dprint( "\t" + x.getName() ) ;
 
-	    impls.add( Type.type(x) ) ;
-	}
+                        impls.add( Type.type(x) ) ;
+                    }
 
-	if (cls.isInterface()) {
-	    initializeInterface( impls ) ;
-	} else {
-	    Type stype = null ;
-	    if (cls.getSuperclass() != null)
-		stype = Type._class( cls.getSuperclass().getName() ) ;
+                    if (cls.isInterface()) {
+                        initializeInterface( impls ) ;
+                    } else {
+                        Type stype = null ;
+                        if (cls.getSuperclass() != null)
+                            stype = Type._class( 
+                                cls.getSuperclass().getName() ) ;
 
-	    initializeClass( type, stype, impls ) ;
-	}
+                        initializeClass( type, stype, impls ) ;
+                    }
 
-	if (DEBUG)
-	    dprint( "Setting fields:" ) ;
-	for (java.lang.reflect.Field x : cls.getDeclaredFields()) {
-	    if (DEBUG) 
-		dprint( "\t" + x.getName() ) ;
+                    if (DEBUG) dprint( "Setting fields:" ) ;
+                    for (java.lang.reflect.Field x : cls.getDeclaredFields()) {
+                        if (DEBUG) dprint( "\t" + x.getName() ) ;
 
-	    FieldInfo var = new FieldInfoImpl( this, x.getModifiers(),
-		Type.type( x.getType()), x.getName() ) ;
-	    addFieldInfo( var ) ;
-	}
-	
-	if (DEBUG)
-	    dprint( "Setting methods:" ) ;
-	for (Method x : cls.getDeclaredMethods()) {
-	    if (DEBUG) 
-		dprint( "\t" + x ) ;
-	    addMethodInfo( new MethodInfoReflectiveImpl( this, x )) ;
-	}
+                        FieldInfo var = new FieldInfoImpl( 
+                            ClassInfoReflectiveImpl.this, x.getModifiers(),
+                            Type.type( x.getType()), x.getName() ) ;
+                        addFieldInfo( var ) ;
+                    }
+                    
+                    if (DEBUG) dprint( "Setting methods:" ) ;
+                    for (Method x : cls.getDeclaredMethods()) {
+                        if (DEBUG) dprint( "\t" + x ) ;
+                        addMethodInfo( new MethodInfoReflectiveImpl( 
+                            ClassInfoReflectiveImpl.this, x )) ;
+                    }
 
-	if (DEBUG)
-	    dprint( "Setting constructors:" ) ;
-	for (Constructor x : cls.getDeclaredConstructors()) {
-	    if (DEBUG) 
-		dprint( "\t" + x ) ;
+                    if (DEBUG) dprint( "Setting constructors:" ) ;
+                    for (Constructor x : cls.getDeclaredConstructors()) {
+                        if (DEBUG) dprint( "\t" + x ) ;
 
-	    addConstructorInfo( new MethodInfoReflectiveImpl( this, x )) ;
-	}
+                        addConstructorInfo( new MethodInfoReflectiveImpl( 
+                            ClassInfoReflectiveImpl.this, x )) ;
+                    }
+
+                    return null ;
+                }
+            }
+        ) ;
     }
 }

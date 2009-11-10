@@ -92,10 +92,13 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
     public StubInvocationHandlerImpl( PresentationManager pm,
 	PresentationManager.ClassData classData, org.omg.CORBA.Object stub ) 
     {
-	SecurityManager s = System.getSecurityManager();
-	if (!PresentationDefaults.inAppServer() && (s != null)) {
- 	    s.checkPermission(new DynamicAccessPermission("access"));
- 	}
+        if (!PresentationDefaults.inAppServer()) {
+            SecurityManager s = System.getSecurityManager();
+            if (!PresentationDefaults.inAppServer() && (s != null)) {
+                s.checkPermission(new DynamicAccessPermission("access"));
+            }
+        }
+
 	this.classData = classData ;
 	this.pm = pm ;
 	this.stub = stub ;

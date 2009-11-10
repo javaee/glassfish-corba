@@ -75,10 +75,13 @@ public final class ReflectiveTie extends Servant implements Tie
 
     public ReflectiveTie( PresentationManager pm, ORBUtilSystemException wrapper )
     {
-	SecurityManager s = System.getSecurityManager();
- 	if (!PresentationDefaults.inAppServer() && (s != null)) {
- 	    s.checkPermission(new DynamicAccessPermission("access"));
- 	}
+        if (!PresentationDefaults.inAppServer()) {
+            SecurityManager s = System.getSecurityManager();
+            if (!PresentationDefaults.inAppServer() && (s != null)) {
+                s.checkPermission(new DynamicAccessPermission("access"));
+            }
+        }
+
 	this.pm = pm ;
 	this.wrapper = wrapper ;
     }

@@ -49,11 +49,11 @@ public interface CorbaConnectionCache
 
     public void stampTime(CorbaConnection connection);
 
-    public CountStatistic numberOfConnections();
+    public long numberOfConnections();
 
-    public CountStatistic numberOfIdleConnections();
+    public long numberOfIdleConnections();
 
-    public CountStatistic numberOfBusyConnections();
+    public long numberOfBusyConnections();
 
     public boolean reclaim();
 

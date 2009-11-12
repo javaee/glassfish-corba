@@ -777,9 +777,9 @@ class DummyConnectionCache
 {
     public String getCacheType() { return null; }
     public void stampTime(CorbaConnection connection) {}
-    public CountStatistic numberOfConnections() { return null; }
-    public CountStatistic numberOfIdleConnections() { return null; }
-    public CountStatistic numberOfBusyConnections() { return null; }
+    public long numberOfConnections() { return 0; }
+    public long numberOfIdleConnections() { return 0; }
+    public long numberOfBusyConnections() { return 0; }
     public boolean reclaim() { return true; }
     public void close() {}
 

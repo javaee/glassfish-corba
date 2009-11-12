@@ -113,18 +113,6 @@ public abstract class CorbaConnectionCacheBase
         return result ;
     }
 
-    @ManagedAttribute( id=TOTAL_ID ) 
-    @Description( TOTAL_DESC ) 
-    public CountStatistic numberOfConnections()
-    {
-        long count = 0 ;
-	synchronized (backingStore()) {
-	    count = values().size();
-	}
-
-        return makeCountStat( TOTAL_ID_STD, TOTAL_DESC, count ) ;
-    }
-
     public void close() {
         synchronized (backingStore()) {
             for (Object obj : values()) {
@@ -133,9 +121,33 @@ public abstract class CorbaConnectionCacheBase
         }
     }
 
+    @ManagedAttribute( id=TOTAL_ID ) 
+    @Description( TOTAL_DESC ) 
+    private CountStatistic numberOfConnectionsAttr()
+    {
+        return makeCountStat( TOTAL_ID_STD, TOTAL_DESC, 
+            numberOfConnections() ) ;
+    }
+
+    public long numberOfConnections()
+    {
+        long count = 0 ;
+	synchronized (backingStore()) {
+	    count = values().size();
+	}
+
+        return count ;
+    }
+
     @ManagedAttribute( id=IDLE_ID ) 
     @Description( IDLE_DESC )
-    public CountStatistic numberOfIdleConnections()
+    private CountStatistic numberOfIdleConnectionsAttr()
+    {
+        return makeCountStat( IDLE_ID_STD, IDLE_DESC, 
+            numberOfIdleConnections() ) ;
+    }
+
+    public long numberOfIdleConnections()
     {
 	long count = 0;
 	synchronized (backingStore()) {
@@ -147,12 +159,18 @@ public abstract class CorbaConnectionCacheBase
 	    }
 	}
 
-        return makeCountStat( IDLE_ID_STD, IDLE_DESC, count ) ;
+        return count ;
     }
 
     @ManagedAttribute( id=BUSY_ID ) 
     @Description( BUSY_DESC )
-    public CountStatistic numberOfBusyConnections()
+    private CountStatistic numberOfBusyConnectionsAttr()
+    {
+        return makeCountStat( BUSY_ID_STD, BUSY_DESC, 
+            numberOfBusyConnections() ) ;
+    }
+
+    public long numberOfBusyConnections()
     {
 	long count = 0;
 	synchronized (backingStore()) {
@@ -163,9 +181,10 @@ public abstract class CorbaConnectionCacheBase
 		}
 	    }
 	}
-
-        return makeCountStat( BUSY_ID_STD, BUSY_DESC, count ) ;
+        
+        return count ;
     }
+
 
     /**
      * Discarding least recently used Connections that are not busy
@@ -187,7 +206,7 @@ public abstract class CorbaConnectionCacheBase
     synchronized public boolean reclaim()
     {
 	try {
-	    long numberOfConnections = numberOfConnections().getCount() ;
+	    long numberOfConnections = numberOfConnections() ;
 
 	    if (orb.transportDebugFlag) {
 		dprint(".reclaim->: " + numberOfConnections
@@ -238,7 +257,7 @@ public abstract class CorbaConnectionCacheBase
 
 		if (orb.transportDebugFlag) {
 		    dprint(".reclaim: connections reclaimed (" 
-			    + (numberOfConnections - numberOfConnections().getCount()) + ")");
+			    + (numberOfConnections - numberOfConnections()) + ")");
 		}
 	    }
 

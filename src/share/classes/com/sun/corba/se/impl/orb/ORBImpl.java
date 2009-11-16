@@ -380,15 +380,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     // of the property parsing.
     private void preInit( String[] params, Properties props )
     {
-        // Before ORBConfiguration we need to set a PINoOpHandlerImpl,
-        // because PersisentServer Initialization inside configurator will
-        // invoke orb.resolve_initial_references( ) which will result in a 
-        // check on piHandler to invoke Interceptors. We do not want any
-        // Interceptors to be invoked before the complete ORB initialization.
-        // piHandler will be replaced by a real PIHandler implementation at the
-        // end of this method.
-	pihandler = new PINoOpHandlerImpl( );
-
 	// This is the unique id of this server (JVM). Multiple incarnations
 	// of this server will get different ids.
 	// Compute transientServerId = milliseconds since Jan 1, 1970
@@ -563,6 +554,15 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         super.getByteBufferPool();
 	serviceContextsCache = new ServiceContextsCache(this);
 
+        // Set up the full PIHandler now.  The ORB configurator call is the
+        // earliest point at which an invocation on this ORB can occur.
+        // ORB invocations can also occur during the execution of
+        // the ORBInitializers.  Interceptors will not be executed until 
+        // after pihandler.initialize().  A request that starts before
+        // initialize completes and completes after initialize completes does
+        // not see any interceptors.
+	pihandler = new PIHandlerImpl( this, params) ;
+
 	// Create a parser to get the configured ORBConfigurator.
 	ConfigParser parser = new ConfigParser() ;
 	parser.init( dataCollector ) ;
@@ -595,8 +595,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         // set the threadpool manager first.
         getThreadPoolManager();
 
-	// Last of all, create the PIHandler and run the ORB initializers.
-	pihandler = new PIHandlerImpl( this, params) ;
+	// Last of all, run the ORB initializers.
 	pihandler.initialize() ;
 
         if (orbLifecycleDebugFlag) {

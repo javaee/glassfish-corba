@@ -167,7 +167,9 @@ public abstract class RequestInfoImpl
     // The exception to be returned by received_exception and 
     // received_exception_id
     protected Exception exception;
-    
+   
+    protected boolean interceptorsEnabledForThisRequest ;
+
     //////////////////////////////////////////////////////////////////////
     //
     // NOTE: IF AN ATTRIBUTE IS ADDED, PLEASE UPDATE RESET();
@@ -199,6 +201,8 @@ public abstract class RequestInfoImpl
         // We don't need to reset the Slots because they are
         // already in the clean state after recieve_<point> interceptor
         // are called. 
+
+        interceptorsEnabledForThisRequest = false ;
     }
 
     /*
@@ -244,6 +248,8 @@ public abstract class RequestInfoImpl
         // Capture the current TSC and make it the RSC of this request.
         PICurrent current = (PICurrent)(myORB.getPIHandler().getPICurrent());
         slotTable = current.getSlotTable( );
+
+        interceptorsEnabledForThisRequest = false ;
     }
 
     /**

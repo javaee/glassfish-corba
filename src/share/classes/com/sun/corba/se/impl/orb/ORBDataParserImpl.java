@@ -138,6 +138,8 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     // This is not initialized from ParserTable.
     private CodeSetComponentInfo codesets ;
 
+    private String[] orbInitArgs ;
+
 // Public accessor methods ========================================================================
 
     public String getORBInitialHost() 
@@ -542,6 +544,14 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public int fragmentReadTimeout() {
         return fragmentReadTimeout ;
+    }
+
+    public void setOrbInitArgs( String[] args ) {
+        orbInitArgs = args ;
+    }
+
+    public String[] getOrbInitArgs() {
+        return orbInitArgs ;
     }
 }
 

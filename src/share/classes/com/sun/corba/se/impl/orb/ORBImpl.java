@@ -337,6 +337,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	return pihandler ;
     }
 
+    public void createPIHandler() 
+    {
+        this.pihandler = new PIHandlerImpl( this, configData.getOrbInitArgs() ) ;
+    }
+
     /**
      * Create a new ORB. Should be followed by the appropriate
      * set_parameters() call.
@@ -519,6 +524,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    System.out.println( "Contents of ORB configData:" ) ;
 	    System.out.println( ObjectUtility.defaultObjectToString( configData ) ) ;
 	}
+        configData.setOrbInitArgs( params ) ;
 
 	// Set the debug flags early so they can be used by other
 	// parts of the initialization.
@@ -554,15 +560,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         super.getByteBufferPool();
 	serviceContextsCache = new ServiceContextsCache(this);
 
-        // Set up the full PIHandler now.  The ORB configurator call is the
-        // earliest point at which an invocation on this ORB can occur.
-        // ORB invocations can also occur during the execution of
-        // the ORBInitializers.  Interceptors will not be executed until 
-        // after pihandler.initialize().  A request that starts before
-        // initialize completes and completes after initialize completes does
-        // not see any interceptors.
-	pihandler = new PIHandlerImpl( this, params) ;
-
 	// Create a parser to get the configured ORBConfigurator.
 	ConfigParser parser = new ConfigParser() ;
 	parser.init( dataCollector ) ;
@@ -596,6 +593,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         getThreadPoolManager();
 
 	// Last of all, run the ORB initializers.
+        // Interceptors will not be executed until 
+        // after pihandler.initialize().  A request that starts before
+        // initialize completes and completes after initialize completes does
+        // not see any interceptors.
 	pihandler.initialize() ;
 
         if (orbLifecycleDebugFlag) {

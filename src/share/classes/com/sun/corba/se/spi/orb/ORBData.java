@@ -398,6 +398,12 @@ public interface ORBData {
     @ManagedAttribute
     @Description( "The time that a CDRInputStream will wait for more data before throwing an exception" ) 
     public int fragmentReadTimeout() ;
+
+    public void setOrbInitArgs( String[] args ) ;
+
+    @ManagedAttribute
+    @Description( "The String[] args that were passed to the ORB init call (used for interceptor initialization)" ) 
+    public String[] getOrbInitArgs() ;
 }
 
 // End of file.

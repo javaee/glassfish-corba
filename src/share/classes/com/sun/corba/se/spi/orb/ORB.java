@@ -478,6 +478,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     @Description( "The PortableInterceptor Handler" ) 
     public abstract PIHandler getPIHandler() ;
 
+    public abstract void createPIHandler() ;
+
     public abstract void checkShutdownState();
 
     // Dispatch support: in the ORB because it is needed for shutdown.
@@ -870,6 +872,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public abstract void releaseOrDecrementInvocationInfo();
 
     public abstract CorbaTransportManager getTransportManager();
+
+    
 }
 
 // End of file.

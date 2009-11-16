@@ -159,6 +159,14 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	initServiceContextRegistry( theOrb ) ;
 	initRequestDispatcherRegistry( theOrb ) ;
 	registerInitialReferences( theOrb ) ;
+        
+        // Set up the PIHandler now.  The user configurator call is the
+        // earliest point at which an invocation on this ORB can occur due to
+        // external code extending the ORB through a configurator.
+        // persistentServerInitialization also needs to make invocations to ORBD.
+        // ORB invocations can also occur during the execution of
+        // the ORBInitializers.  
+        theOrb.createPIHandler() ;
 
 	persistentServerInitialization( theOrb ) ;
 

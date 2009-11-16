@@ -642,6 +642,10 @@ public class ORBSingleton extends ORB
 	return null ;
     }
 
+    public void createPIHandler() 
+    {
+    }
+
     public void checkShutdownState()
     {
     }

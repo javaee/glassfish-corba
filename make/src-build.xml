@@ -94,7 +94,7 @@
         classpathref="maven-ant-tasks.classpath">
     </typedef>
 
-    <target name="build" depends="init, prepare-dirs, compile"/>
+    <target name="build" depends="init, prepare-dirs, compile, orb-jar"/>
 
     <target name="init">
         <property file="make/build.properties"/>
@@ -488,6 +488,15 @@
 	<jar jarfile="${releaselib.dir}/orblib.jar"
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
+		<include name="**"/>
+	    </fileset>
+	</jar>
+    </target>
+   
+    <target name="orb-jar" depends="init, compile"> 
+	<jar jarfile="${releaselib.dir}/orb.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
 		<include name="**"/>
 	    </fileset>
 	</jar>

@@ -309,7 +309,7 @@ public class WorkspaceRename {
                     public boolean evaluate( FileWrapper fw ) {
                         // Ignore irritating tmp* files that show up in Hudson job workspaces 
                         // for some unknown reason.
-                        if (!fw.getName().startsWith( "tmp" ) {
+                        if (!fw.getName().startsWith( "tmp" )) {
                             noActionFileNames.add( fw.getAbsoluteName() ) ;
                         }
                         return true ;

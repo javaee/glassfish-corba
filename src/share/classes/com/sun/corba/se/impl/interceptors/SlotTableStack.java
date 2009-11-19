@@ -125,6 +125,13 @@ public class SlotTableStack
      * popping.
      */
     SlotTable peekSlotTable( ) {
-       return tableContainer.get( currentIndex - 1);
+        SlotTable result = tableContainer.get( currentIndex - 1 ) ;
+        if (result.getSize() != current.getTableSize()) {
+            // stale table, so throw it away
+            result = new SlotTable( orb, current.getTableSize() ) ;
+            tableContainer.set( currentIndex - 1, result ) ;
+        }
+
+        return result ;
     }
 }

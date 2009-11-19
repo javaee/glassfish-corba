@@ -73,6 +73,7 @@ public class Server
 
 	    U.sop(main + " ready");
 	    U.sop("Server is ready."); // CORBATest handshake.
+
 	    System.out.flush();
 
 	    orb.run();

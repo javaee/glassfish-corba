@@ -57,7 +57,7 @@ public class ServiceContextsCache {
 
     }
 
-    public ServiceContexts get(CASE c) {
+    public synchronized ServiceContexts get(CASE c) {
 
         if (data.size() == 0) {
 

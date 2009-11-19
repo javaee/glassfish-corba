@@ -315,7 +315,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     static POAImpl makeRootPOA( ORB orb )
     {
 	POAManagerImpl poaManager = new POAManagerImpl( getPOAFactory( orb ), 
-	    orb.getPIHandler() ) ;
+	    orb ) ;
         registerMBean( orb, poaManager ) ;
 
 	POAImpl result = new POAImpl( ORBConstants.ROOT_POA_NAME, 
@@ -897,7 +897,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		POAManagerImpl newManager = (POAManagerImpl)theManager ;
 		if (newManager == null) {
 		    newManager = new POAManagerImpl( manager.getFactory(),
-			manager.getPIHandler() );
+			getORB() );
                     registerMBean( getORB(), newManager ) ;
                 }
 

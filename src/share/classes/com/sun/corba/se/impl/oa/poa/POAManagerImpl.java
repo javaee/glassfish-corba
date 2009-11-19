@@ -51,6 +51,8 @@ import org.omg.PortableInterceptor.HOLDING ;
 import org.omg.PortableInterceptor.INACTIVE ;
 import org.omg.PortableInterceptor.NON_EXISTENT ;
 
+import com.sun.corba.se.spi.orb.ORB ;
+
 import com.sun.corba.se.spi.protocol.PIHandler ;
 
 import com.sun.corba.se.spi.orbutil.generic.MultiSet ;
@@ -80,7 +82,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
     private final POAFactory factory ;	// factory which contains global state 
 					// for all POAManagers 
-    private PIHandler pihandler ;	// for adapterManagerStateChanged
+    private ORB orb ;
     private State state;		// current state of this POAManager
     private Set<POAImpl> poas =
         new HashSet<POAImpl>(4) ;       // all poas controlled by this POAManager
@@ -215,7 +217,14 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
     PIHandler getPIHandler()
     {
-	return pihandler ;
+	return orb.getPIHandler() ;
+    }
+
+    private void reportStateChange() {
+        final PIHandler pih = getPIHandler() ;
+        if (pih != null) {
+	    pih.adapterManagerStateChanged( myId, getORTState() ) ;
+        }
     }
 
     private void countedWait()
@@ -260,11 +269,11 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	return myId ;
     }
 
-    POAManagerImpl( POAFactory factory, PIHandler pihandler )
+    POAManagerImpl( POAFactory factory, ORB orb )
     {
 	this.factory = factory ;
         factory.addPoaManager(this);
-	this.pihandler = pihandler ;
+	this.orb = orb ;
 	myId = factory.newPOAManagerId() ;
 	state = State.HOLDING;
 	debug = factory.getORB().poaDebugFlag ;
@@ -348,7 +357,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    // set the state to ACTIVE
 	    state = State.ACTIVE;
 	    
-	    pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+            reportStateChange() ;
 
 	    // Notify any invocations that were waiting because the previous
 	    // state was HOLDING, as well as notify any threads that were waiting
@@ -384,7 +393,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    // set the state to HOLDING
 	    state  = State.HOLDING;
 
-	    pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+            reportStateChange() ;
 
 	    // Notify any threads that were waiting in the wait() inside
 	    // discard_requests. This will cause discard_requests to return
@@ -428,7 +437,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    // set the state to DISCARDING
 	    state = State.DISCARDING;
 
-	    pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+            reportStateChange() ;
 
 	    // Notify any invocations that were waiting because the previous
 	    // state was HOLDING. Those invocations will henceforth be rejected with
@@ -472,7 +481,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
 		state = State.INACTIVE;
 
-		pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+                reportStateChange() ;
 
 		// Notify any invocations that were waiting because the previous
 		// state was HOLDING. Those invocations will then be rejected with

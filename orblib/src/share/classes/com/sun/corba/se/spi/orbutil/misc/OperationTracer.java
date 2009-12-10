@@ -38,11 +38,39 @@ package com.sun.corba.se.spi.orbutil.misc ;
 
 import java.util.List ;
 import java.util.ArrayList ;
-
+import java.util.Arrays ;
 
 public class OperationTracer {
     private static boolean enabled = false ;
 
+    public static String convertToString( Object arg ) {
+        if (arg == null)
+            return "<NULL>" ;
+
+        Class cls = arg.getClass() ;
+        if (cls.isArray()) {
+            Class cclass = cls.getComponentType() ;
+            if (cclass.equals( int.class ))
+                        return Arrays.toString( (int[])arg ) ;
+            if (cclass.equals( byte.class ))
+                        return Arrays.toString( (byte[])arg ) ;
+            if (cclass.equals( boolean.class ))
+                        return Arrays.toString( (boolean[])arg ) ;
+            if (cclass.equals( char.class ))
+                        return Arrays.toString( (char[])arg ) ;
+            if (cclass.equals( short.class ))
+                        return Arrays.toString( (short[])arg ) ;
+            if (cclass.equals( long.class ))
+                        return Arrays.toString( (long[])arg ) ;
+            if (cclass.equals( float.class ))
+                        return Arrays.toString( (float[])arg ) ;
+            if (cclass.equals( double.class ))
+                        return Arrays.toString( (double[])arg ) ;
+            return Arrays.toString( (Object[])arg ) ;
+        } else {
+            return arg.toString() ;
+        }
+    }
 
     public static void enable() {
         enabled = true ;
@@ -107,6 +135,39 @@ public class OperationTracer {
             } else {
                 return valueName + '.' + fieldName ;
             }
+        }
+    }
+
+    private static class GenericElement implements Element {
+        private String name ;
+        private Object[] data ;
+
+        public GenericElement( final String name, final Object[] data ) {
+            this.name = name ;
+            this.data = data ;
+        }
+
+        public String getAsString() {
+            StringBuilder sb = new StringBuilder() ;
+            if (name == null) {
+                sb.append( "!NULL_NAME!" ) ;
+            } else {
+                sb.append( name ) ;
+            }
+
+            sb.append( '(' ) ;
+            boolean first = true ;
+            for (Object obj : data) {
+                if (first) {
+                    first = false ;
+                } else {
+                    sb.append( ',' ) ;
+                }
+
+                sb.append( convertToString(obj)) ;
+            }
+            sb.append( ')' ) ;
+            return sb.toString() ;
         }
     }
 
@@ -228,6 +289,24 @@ public class OperationTracer {
         final int lastIndex = elements.size() - 1 ;
         if (lastIndex >= 0) {
             elements.remove( lastIndex ) ;
+        }
+    }
+
+    public static void clear() {
+        if (enabled) {
+            state.get().clear() ;
+        }
+    }
+
+    public static void enter( final String name, final Object... args ) {
+        if (enabled) {
+            state.get().add( new GenericElement( name, args ) ) ;    
+        }
+    }
+
+    public static void exit() {
+        if (enabled) {
+            end() ;
         }
     }
 }

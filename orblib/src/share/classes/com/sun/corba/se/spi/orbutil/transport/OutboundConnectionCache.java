@@ -80,7 +80,9 @@ public interface OutboundConnectionCache<C extends Connection>
      * This works as follows:
      * <ul>
      * <li>Call the finder.  If it returns non-null, use that connection;
-     * (Note that this may be a new connection, created in the finder)
+     * (Note that this may be a new connection, created in the finder).
+     * The finder SHOULD NOT create a new connection if canCreateNewConnection
+     * returns false, but this is advisory.
      * <li>otherwise, Use an idle connection, if one is available; 
      * <li>otherwise, create a new connection, if not too many connections are 
      * open;

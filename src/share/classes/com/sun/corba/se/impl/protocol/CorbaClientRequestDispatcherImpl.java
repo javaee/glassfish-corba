@@ -170,6 +170,8 @@ public class CorbaClientRequestDispatcherImpl
 
 	    // This locking is done so that multiple connections are not created
 	    // for the same endpoint
+            // XXX NEW CACHE: all of this is replaced with the get() call, except
+            // the code needed to add the connection to the selector.
 	    synchronized (lock) {
 		if (contactInfo.isConnectionBased()) {
 		    try {
@@ -390,6 +392,10 @@ public class CorbaClientRequestDispatcherImpl
 
 	try {
 	    messageMediator.finishSendingRequest();
+
+            // XXX NEW CACHE: call release( conn, numResponse ) here
+            // Get connection from MessageMediator
+            // Get numResponse from messageMediator.isOneWay: 0 or 1 expected. 
 
 	    return messageMediator.waitForResponse();
 	} catch (RuntimeException e) {
@@ -978,6 +984,7 @@ public class CorbaClientRequestDispatcherImpl
                     outputObj.close();
                 }
 
+                // XXX NEW CACHE: release( conn ) : conn is in MessageMediator
             }
 
 	    // XREVISIT NOTE - Assumes unregistering the waiter for

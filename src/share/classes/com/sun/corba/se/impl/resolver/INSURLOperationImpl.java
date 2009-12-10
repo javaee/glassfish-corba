@@ -140,7 +140,7 @@ public class INSURLOperationImpl implements Operation
 	    else {
 		INSURL insURL = insURLHandler.parseURL( str ) ;
 		if (insURL == null)
-		    throw omgWrapper.soBadSchemeName() ;
+		    throw omgWrapper.soBadSchemeName( str ) ;
 		return resolveINSURL( insURL ) ;
 	    }
 	}
@@ -178,7 +178,7 @@ public class INSURLOperationImpl implements Operation
 	    try {
 		result = orb.resolve_initial_references( keyString ) ;
 	    } catch (InvalidName exc) {
-		throw omgWrapper.soBadSchemaSpecific( exc ) ;
+		throw omgWrapper.soBadSchemaSpecific( exc, keyString ) ;
 	    }
 	} else {
 	    result = getIORUsingCorbaloc( theCorbaLocObject );
@@ -225,7 +225,7 @@ public class INSURLOperationImpl implements Operation
             clearRootNamingContextCache( );
             // XXX Should this throw an exception or simply return null?
             // See bug 6475580
-	    throw omgWrapper.soBadSchemaSpecific( e ) ;
+	    throw omgWrapper.soBadSchemaSpecific( e, theCorbaName.getStringifiedName() ) ;
         }
      }
 

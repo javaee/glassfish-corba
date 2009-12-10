@@ -34,21 +34,62 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.transport;
+package com.sun.corba.se.impl.orbutil.transport;
 
+import java.util.Queue ;
 import java.util.Collection ;
+import java.util.Collections ;
 
-import java.io.IOException ;
+import java.util.concurrent.LinkedBlockingQueue ;
 
-/** An instance of a ConnectionFinder may be supplied to the
- * OutboundConnectionCache.get method.
- */
-public interface ConnectionFinder<C extends Connection> {
-    /** Method that searches idleConnections and busyConnections for 
-     * the best connection.  May return null if no best connection
-     * exists.  May create a new connection and return it.
-     */
-    C find( ContactInfo<C> cinfo, Collection<C> idleConnections, 
-	Collection<C> busyConnections ) throws IOException ;
+import java.util.concurrent.locks.ReentrantLock ;
+import java.util.concurrent.locks.Condition ;
+
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.gmbal.Description ;
+
+import com.sun.corba.se.spi.orbutil.transport.Connection ;
+
+// Represents an entry in the outbound connection cache.  
+// This version handles normal shareable ContactInfo 
+// (we also need to handle no share).
+@ManagedObject
+public class OutboundCacheEntry<C extends Connection> {
+    private ReentrantLock lock ;
+
+    public OutboundCacheEntry( ReentrantLock lock ) {
+        this.lock = lock ;
+    }
+
+    final Queue<C> idleConnections = new LinkedBlockingQueue<C>() ;
+    final Collection<C> idleConnectionsView =
+        Collections.unmodifiableCollection( idleConnections ) ;
+
+    final Queue<C> busyConnections = new LinkedBlockingQueue<C>() ;
+    final Collection<C> busyConnectionsView =
+        Collections.unmodifiableCollection( busyConnections ) ;
+
+    private int pendingConnections = 0 ;
+    private Condition waitForPendingConnections = 
+        lock.newCondition() ;
+
+    public int totalConnections() {
+        return idleConnections.size() + busyConnections.size() 
+            + pendingConnections ;
+    }
+
+    public void startConnect() {
+        pendingConnections++ ;
+    }
+
+    public void finishConnect() {
+        pendingConnections-- ;
+        waitForPendingConnections.signal() ;
+    }
+
+    public void waitForConnection() {
+        waitForPendingConnections.awaitUninterruptibly() ;
+    }
 }
 

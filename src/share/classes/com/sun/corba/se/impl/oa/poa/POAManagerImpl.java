@@ -153,7 +153,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * Another possible route to fix the app server bug (more globally) is to have the RFM 
      * suspend method use discard instead of hold.  This may be better in some ways, 
      * but early tests with that approach led to some problems (which I can't recall right now).  
-     * I suspect e the issues may have been related to problems with the client-side retry logic,
+     * I suspect the issues may have been related to problems with the client-side retry logic,
      * but those problems have now been fixed.  In any case, we need to fix the POAManager
      * issues.
      */
@@ -509,7 +509,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	}
     }
 
-    private class POAManagerDeactivator implements Runnable
+    private static class POAManagerDeactivator implements Runnable
     {
 	private boolean etherealize_objects ;
 	private final POAManagerImpl pmi ;
@@ -534,7 +534,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 		    }
 
 		    while ( pmi.nInvocations > 0 ) { 
-			countedWait() ;
+			pmi.countedWait() ;
 		    }
 		}
 
@@ -568,8 +568,8 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 				"with pmi=" + pmi ) ;
 			}
 
-			factory.removePoaManager(pmi);
-			poas.clear();
+			pmi.factory.removePoaManager(pmi);
+			pmi.poas.clear();
 		    }
 		}
 	    } finally {

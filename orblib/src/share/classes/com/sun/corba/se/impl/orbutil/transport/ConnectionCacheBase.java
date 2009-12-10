@@ -90,16 +90,20 @@ public abstract class ConnectionCacheBase<C extends Connection>
 	final Logger logger ) {
 
 	if (cacheType == null)
-	    throw new IllegalArgumentException( "cacheType must not be null" ) ;
+	    throw new IllegalArgumentException( 
+                "cacheType must not be null" ) ;
 
 	if (highWaterMark < 0)
-	    throw new IllegalArgumentException( "highWaterMark must be non-negative" ) ;
+	    throw new IllegalArgumentException( 
+                "highWaterMark must be non-negative" ) ;
 
 	if (numberToReclaim < 1)
-	    throw new IllegalArgumentException( "numberToReclaim must be at least 1" ) ;
+	    throw new IllegalArgumentException( 
+                "numberToReclaim must be at least 1" ) ;
 
 	if (logger == null)
-	    throw new IllegalArgumentException( "logger must not be null" ) ;
+	    throw new IllegalArgumentException( 
+                "logger must not be null" ) ;
 
 	this.cacheType = cacheType ;
 	this.logger = logger ;

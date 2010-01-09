@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,8 +36,6 @@
 
 package com.sun.corba.se.impl.orbutil.transport;
 
-import java.util.logging.Logger ;
-
 import java.io.IOException ;
 
 import java.util.concurrent.ConcurrentMap ;
@@ -46,11 +44,11 @@ import java.util.concurrent.ConcurrentHashMap ;
 import java.util.concurrent.atomic.AtomicInteger ;
 
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
-import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
 import com.sun.corba.se.spi.orbutil.transport.InboundConnectionCache ;
 
-import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory;
 
 /** Manage connections that are initiated from another VM. 
  * Connections are reclaimed when 
@@ -66,6 +64,9 @@ import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
 public final class InboundConnectionCacheImpl<C extends Connection> 
     extends ConnectionCacheNonBlockingBase<C> 
     implements InboundConnectionCache<C> {
+
+    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil(
+        InboundConnectionCacheImpl.class ) ;
     
     private final ConcurrentMap<C,ConnectionState<C>> connectionMap ;
 
@@ -101,17 +102,12 @@ public final class InboundConnectionCacheImpl<C extends Connection>
     }
 
     public InboundConnectionCacheImpl( final String cacheType, 
-	final int highWaterMark, final int numberToReclaim, 
-	Logger logger ) {
+	final int highWaterMark, final int numberToReclaim, long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, logger ) ;
+	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
 
 	this.connectionMap = 
 	    new ConcurrentHashMap<C,ConnectionState<C>>() ;
-
-	if (debug()) {
-	    dprint(".constructor completed: " + getCacheType() );
-	}
     }
 
     // We do not need to define equals or hashCode for this class.
@@ -137,37 +133,28 @@ public final class InboundConnectionCacheImpl<C extends Connection>
     public void requestProcessed( final C conn, 
 	final int numResponsesExpected ) {
 
-	if (debug())
-	    dprint( "->requestProcessed: connection " + conn 
-		+ " expecting " + numResponsesExpected + " responses" ) ;
+        mm.enter( debug(), "requestProcessed", conn, numResponsesExpected ) ;
 
 	try {
 	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
 
 	    if (cs == null) {
-		if (debug())
-		    dprint( ".release: connection " + conn + " was closed" ) ;
-
+                mm.info( debug(), "connection was closed" ) ;
 		return ; 
 	    } else {
 		int numResp = cs.expectedResponseCount.addAndGet( 
 		    numResponsesExpected ) ;
 		int numBusy = cs.busyCount.decrementAndGet() ;
 
-		if (debug()) {
-		    dprint( ".release: " + numResp + " responses expected" ) ;
-		    dprint( ".release: " + numBusy + " responses expected" ) ;
-		}
+                mm.info( debug(), "numResp", numResp, "numBusy", numBusy ) ;
 
 		if (numBusy == 0) {
 		    totalBusy.decrementAndGet() ;
 		    totalIdle.incrementAndGet() ;
 
 		    if (numResp == 0) {
-			if (debug())
-			    dprint( ".release: "
-				+ "queuing reclaimable connection "
-				+ conn ) ;
+                        mm.info( debug(), "queuing reclaimable connection", 
+                            conn ) ;
 
 			cs.reclaimableHandle = 
 			    reclaimableConnections.offer( conn ) ;
@@ -175,8 +162,7 @@ public final class InboundConnectionCacheImpl<C extends Connection>
 		}
 	    }
 	} finally {
-	    if (debug())
-		dprint( "<-requestProcessed" ) ;
+            mm.exit( debug() ) ;
 	}
     }
 
@@ -209,8 +195,7 @@ public final class InboundConnectionCacheImpl<C extends Connection>
 	try {
 	    conn.close() ;
 	} catch (IOException exc) {
-	    if (debug())
-		dprint( ".close: " + conn + " close threw " + exc ) ;
+            // XXX log this
 	}
     }
 

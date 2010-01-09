@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,21 +45,24 @@ import java.util.concurrent.LinkedBlockingQueue ;
 import java.util.concurrent.locks.ReentrantLock ;
 import java.util.concurrent.locks.Condition ;
 
-import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
 
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
+import java.util.ArrayList;
 
 // Represents an entry in the outbound connection cache.  
 // This version handles normal shareable ContactInfo 
 // (we also need to handle no share).
-@ManagedObject
+@ManagedData
 public class OutboundCacheEntry<C extends Connection> {
     private ReentrantLock lock ;
+    private final Condition waitForPendingConnections ;
 
     public OutboundCacheEntry( ReentrantLock lock ) {
         this.lock = lock ;
+        waitForPendingConnections = lock.newCondition() ;
     }
 
     final Queue<C> idleConnections = new LinkedBlockingQueue<C>() ;
@@ -71,8 +74,73 @@ public class OutboundCacheEntry<C extends Connection> {
         Collections.unmodifiableCollection( busyConnections ) ;
 
     private int pendingConnections = 0 ;
-    private Condition waitForPendingConnections = 
-        lock.newCondition() ;
+
+    @Override
+    public String toString() {
+        lock.lock() ;
+        try {
+            return "OutboundCacheEntry[numIdle=" + idleConnections.size()
+                    + ",numBusy=" + busyConnections.size()
+                    + ",numPending=" + pendingConnections + "]" ;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @ManagedAttribute
+    @Description( "list of idle connections")
+    private Collection<C> idleConnections() {
+        lock.lock() ;
+        try {
+            return new ArrayList<C>( idleConnections ) ;
+        } finally {
+            lock.unlock() ;
+        }
+    }
+
+    @ManagedAttribute
+    @Description( "list of idle connections")
+    private Collection<C> busyConnections() {
+        lock.lock() ;
+        try {
+            return new ArrayList<C>( busyConnections ) ;
+        } finally {
+            lock.unlock() ;
+        }
+    }
+
+    @ManagedAttribute( id="numIdleConnections" )
+    @Description( "Number of idle connections" ) 
+    private int numIdleConnectionsAttribute() {
+        lock.lock() ;
+        try {
+            return idleConnections.size() ;
+        } finally {
+            lock.unlock() ;
+        }
+    }
+
+    @ManagedAttribute( id="numPendingConnections" )
+    @Description( "Number of pending connections" ) 
+    private int numPendingConnectionsAttribute() {
+        lock.lock() ;
+        try {
+            return pendingConnections ;
+        } finally {
+            lock.unlock() ;
+        }
+    }
+
+    @ManagedAttribute( id="numBusyConnections" )
+    @Description( "Number of busy connections" ) 
+    private int numBusyConnectionsAttribute() {
+        lock.lock() ;
+        try {
+            return busyConnections.size() ;
+        } finally {
+            lock.unlock() ;
+        }
+    }
 
     public int totalConnections() {
         return idleConnections.size() + busyConnections.size() 

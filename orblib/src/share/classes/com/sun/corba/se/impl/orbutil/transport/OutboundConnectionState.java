@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,8 +38,6 @@ package com.sun.corba.se.impl.orbutil.transport;
 
 import java.io.IOException ;
 
-import org.glassfish.gmbal.ManagedData ;
-
 import com.sun.corba.se.spi.orbutil.misc.MethodMonitor ;
 import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory ;
 
@@ -47,6 +45,7 @@ import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue ;
+import org.glassfish.gmbal.Description;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -65,7 +64,6 @@ public class OutboundConnectionState<C extends Connection> {
 
     final ContactInfo<C> cinfo ;	// ContactInfo used to create this 
                                         // Connection
-    @ManagedAttribute
     final C connection ;		// Connection of the ConnectionState
                                         //
     final OutboundCacheEntry<C> entry ;	// This Connection's OutboundCacheEntry
@@ -84,14 +82,25 @@ public class OutboundConnectionState<C extends Connection> {
                                                     // in use and has no
                                                     // outstanding requests
 
+    public String toString() {
+        return "OutboundConnectionState[csv=" + csv
+            + ",cinfo=" + cinfo
+            + ",connection=" + connection
+            + ",busyCount=" + busyCount
+            + ",expectedResponceCount=" + expectedResponseCount + "]" ;
+    }
+
 // State exposed as managed attributes
     @ManagedAttribute
+    @Description( "The current state of this connection")
     private synchronized ConnectionStateValue state() { return csv ; }
 
     @ManagedAttribute
+    @Description( "The contactInfo used to create this connection")
     private synchronized ContactInfo<C> contactInfo() { return cinfo ; }
 
     @ManagedAttribute
+    @Description( "The underlying connection for this ConnectionState")
     private synchronized C connection() { return connection ; }
 
     @ManagedAttribute
@@ -121,13 +130,6 @@ public class OutboundConnectionState<C extends Connection> {
         busyCount = 0 ;
         expectedResponseCount = 0 ;
         reclaimableHandle = null ;
-    }
-
-    public synchronized String toString() {
-        return "ConnectionState[" + "cinfo=" + cinfo 
-            + " connection=" + connection + " busyCount=" + busyCount 
-            + " expectedResponseCount=" + expectedResponseCount 
-            + "]" ;
     }
 
 // Methods used in OutboundConnectionCacheBlockingImpl

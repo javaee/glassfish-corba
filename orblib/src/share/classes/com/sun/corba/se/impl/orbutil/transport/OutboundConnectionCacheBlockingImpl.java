@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,22 +40,14 @@ import java.io.IOException ;
 
 import java.util.Map ;
 import java.util.HashMap ;
-import java.util.Queue ;
-import java.util.Collection ;
-import java.util.Collections ;
 
-import java.util.concurrent.LinkedBlockingQueue ;
 import java.util.concurrent.locks.ReentrantLock ;
-import java.util.concurrent.locks.Condition ;
-
-import java.util.logging.Logger ;
 
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.ConnectionFinder ;
 import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
 import com.sun.corba.se.spi.orbutil.transport.OutboundConnectionCache ;
 
-import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
 
 import com.sun.corba.se.spi.orbutil.misc.MethodMonitor ;
@@ -89,16 +81,14 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 
     @ManagedAttribute( id="cacheEntries" ) 
     private Map<ContactInfo<C>,OutboundCacheEntry<C>> entryMap() {
-        // XXX return a copy of the map
-        return null ;
+        return new HashMap<ContactInfo<C>,OutboundCacheEntry<C>>( entryMap ) ;
     }
     
     private Map<C,OutboundConnectionState<C>> connectionMap ;
 
     @ManagedAttribute( id="connections" ) 
     private Map<C,OutboundConnectionState<C>> connectionMap() {
-        // XXX return a copy of the map
-        return null ;
+        return new HashMap<C,OutboundConnectionState<C>>( connectionMap ) ;
     }
 
     protected String thisClassName() {
@@ -107,9 +97,9 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 
     public OutboundConnectionCacheBlockingImpl( final String cacheType, 
 	final int highWaterMark, final int numberToReclaim, 
-	final int maxParallelConnections, Logger logger ) {
+	final int maxParallelConnections, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, logger ) ;
+	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
 
         mm.enter( debug(), "<init>", cacheType, highWaterMark, 
             numberToReclaim, maxParallelConnections ) ;
@@ -124,7 +114,7 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
             new HashMap<ContactInfo<C>,OutboundCacheEntry<C>>() ;
 	this.connectionMap = new HashMap<C,OutboundConnectionState<C>>() ;
         this.reclaimableConnections = 
-            ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue() ;
+            ConcurrentQueueFactory.<C>makeConcurrentQueue( ttl ) ;
 
         mm.exit( debug() ) ;
     }
@@ -144,11 +134,16 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 
     private boolean internalCanCreateNewConnection( 
         final OutboundCacheEntry<C> entry ) {
-	final boolean createNewConnection = (entry.totalConnections() == 0) || 
-	    ((numberOfConnections() < highWaterMark()) && 
-	     (entry.totalConnections() < maxParallelConnections)) ;
+        lock.lock() ;
+        try {
+            final boolean createNewConnection = (entry.totalConnections() == 0) ||
+                ((numberOfConnections() < highWaterMark()) &&
+                (entry.totalConnections() < maxParallelConnections)) ;
 
-	return createNewConnection ;
+            return createNewConnection ;
+        } finally {
+            lock.unlock() ;
+        }
     }
 
     public C get( final ContactInfo<C> cinfo) throws IOException {
@@ -238,11 +233,11 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 	    // This is the only place a OutboundCacheEntry is constructed.
 	    result = entryMap.get( cinfo ) ;
 	    if (result == null) {
-                mm.info( debug(), "creating new OutboundCacheEntry" ) ;
 		result = new OutboundCacheEntry<C>( lock ) ;
+                mm.info( debug(), "creating new OutboundCacheEntry", result ) ;
 		entryMap.put( cinfo, result ) ;
 	    } else {
-                mm.info( debug(), "re-using existing OutboundCacheEntry" ) ;
+                mm.info( debug(), "re-using existing OutboundCacheEntry", result ) ;
 	    }
 	} finally {
             mm.exit( debug(), result ) ;
@@ -288,8 +283,8 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 	try {
 	    OutboundConnectionState<C> cs = connectionMap.get( conn ) ;
 	    if (cs == null) {
-                mm.info( debug(), "creating new OutboundConnectionState ", cs ) ;
 		cs = new OutboundConnectionState<C>( cinfo, entry, conn ) ;
+                mm.info( debug(), "creating new OutboundConnectionState ", cs ) ;
 		connectionMap.put( conn, cs ) ;
 	    } else {
                 mm.info( debug(), "found OutboundConnectionState ", cs ) ;
@@ -317,6 +312,7 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 		return ; 
 	    } else {
                 int numResp = cs.release( numResponsesExpected ) ;
+                mm.info( debug(), "numResponsesExpected", numResponsesExpected ) ;
 
 		if (!cs.isBusy()) {
 		    boolean connectionClosed = false ;
@@ -413,9 +409,6 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 
             cs.close() ;
 	} finally {
-	    if (debug()) {
-		dprintStatistics() ;
-	    }
             mm.exit( debug() ) ;
             lock.unlock() ;
 	}

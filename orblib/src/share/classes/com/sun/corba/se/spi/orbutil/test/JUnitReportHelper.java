@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -130,8 +130,12 @@ public class JUnitReportHelper {
         if (current == null)
             throw new RuntimeException( "No current test set!" ) ;
 
+        if (testComplete)
+            System.out.println( "Test " + current + " has already been completed" ) ;
+        /*
         if (testComplete) 
             throw new RuntimeException( "Test " + current + " has already been completed!" ) ;
+         */
 
         testComplete = true ;
     }

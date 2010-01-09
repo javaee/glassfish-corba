@@ -3,6 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
         <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/file/CopyrightProcessor.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/impl/orbutil/transport/OutboundConnectionCacheBlockingImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/impl/orbutil/transport/OutboundCacheEntry.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/impl/orbutil/transport/OutboundConnectionState.java</file>
     </open-files>
 </project-private>
 <!--

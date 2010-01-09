@@ -38,12 +38,12 @@ package corba.connectioncache;
 
 import corba.framework.*;
 
-public class ConnectionCacheTest extends CORBATest
+public class ConnectionCacheStressTest extends CORBATest
 {
     @Override
     protected void doTest() throws Throwable
     {
-	Controller client = createClient( "corba.connectioncache.Client" ) ;
+	Controller client = createClient( "corba.connectioncache.StressClient" ) ;
 
 	client.start();
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -52,6 +52,8 @@ import com.sun.corba.se.spi.orbutil.transport.OutboundConnectionCache ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory;
 
 /** Manage connections that are initiated from this VM. Connections are managed 
  * by a get/release mechanism and cached by the ContactInfo used to create them.
@@ -82,6 +84,9 @@ import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
 public final class OutboundConnectionCacheImpl<C extends Connection> 
     extends ConnectionCacheNonBlockingBase<C> 
     implements OutboundConnectionCache<C> {
+
+    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil(
+        OutboundConnectionCacheImpl.class ) ;
     
     private final int maxParallelConnections ;	// Maximum number of connections 
 						// we will open to the same 
@@ -145,10 +150,10 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
     // (we also need to handle no share).
     private static final class CacheEntry<C extends Connection> {
 	final ConcurrentQueue<C> idleConnections =
-	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue() ;
+	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue(0) ;
 
 	final ConcurrentQueue<C> busyConnections =
-	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue() ;
+	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue(0) ;
 
 	public int totalConnections() {
 	    return idleConnections.size() + busyConnections.size() ;
@@ -157,9 +162,9 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 
     public OutboundConnectionCacheImpl( final String cacheType, 
 	final int highWaterMark, final int numberToReclaim, 
-	final int maxParallelConnections, Logger logger ) {
+	final int maxParallelConnections, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, logger ) ;
+	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
 	this.maxParallelConnections = maxParallelConnections ;
 
 	this.entryMap = 
@@ -167,11 +172,7 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 	this.connectionMap = 
 	    new ConcurrentHashMap<C,ConnectionState<C>>() ;
         this.reclaimableConnections = 
-            ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue() ;
-
-	if (debug()) {
-	    dprint(".constructor completed: " + cacheType );
-	}
+            ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue( ttl ) ;
     }
 
     // We do not need to define equals or hashCode for this class.
@@ -191,7 +192,7 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 	    reclaim() ;
 
 	do {
-	    result = entry.idleConnections.poll() ;
+	    result = entry.idleConnections.poll().value() ;
 	    if (result == null) {
 		if (canCreateNewConnection( entry )) { 
 		    // If this throws an exception just let it
@@ -202,8 +203,6 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 		    final ConnectionState<C> cs = new ConnectionState<C>( cinfo, 
 			entry, result ) ;
 		    connectionMap.put( result, cs ) ;
-		    if (debug())
-			dprint( ".get: created connection " + result ) ;
 
 		    // Make sure this connection is busy: it is
 		    // available to other get calls as soon as
@@ -217,10 +216,7 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 		    // use a busy connection, move to end of busyConnections
                     // to indicate that the connection has been used recently.
 
-		    if (debug())
-			dprint( ".get: re-using busy connection " + result ) ;
-
-		    result = entry.busyConnections.poll() ;
+		    result = entry.busyConnections.poll().value() ;
 		    if (result != null) {
 			entry.busyConnections.offer( result ) ;
 		    }
@@ -240,9 +236,6 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
                         } else {
                             // another thread closed this connection: try again
                             result = null ;
-                            
-                            if (debug())
-                                dprint( ".get: using idle connection " + result ) ;
                         }   	
                     }
 		}
@@ -253,27 +246,15 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
     }
 
     public void release( final C conn, final int numResponsesExpected ) {
-	if (debug())
-	    dprint( "->release: connection " + conn 
-		+ " expecting " + numResponsesExpected + " responses" ) ;
-
 	try {
 	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
 
 	    if (cs == null) {
-		if (debug())
-		    dprint( ".release: connection " + conn + " was closed" ) ;
-
 		return ; 
 	    } else {
 		int numResp = cs.expectedResponseCount.addAndGet( 
 		    numResponsesExpected ) ;
 		int numBusy = cs.busyCount.decrementAndGet() ;
-
-		if (debug()) {
-		    dprint( ".release: " + numResp + " responses expected" ) ;
-		    dprint( ".release: " + numBusy + " responses expected" ) ;
-		}
 
 		if (numBusy == 0) {
 		    final ConcurrentQueue.Handle busyHandle = cs.busyHandle ;
@@ -293,11 +274,6 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 			// it cannot again change state.
 		    
 			if (cs.busyCount.get() > 0) {
-			    if (debug()) 
-				dprint( 
-				    ".release: re-queuing busy connection " 
-				    + conn ) ;
-
 			    cs.busyHandle = entry.busyConnections.offer( conn ) ;
 			} else {
 			    // If the connection does not have waiters, put it on
@@ -307,19 +283,10 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 			    // release usually requires some response before 
 			    // the connection is eligible for reclamation.
 			    if (cs.expectedResponseCount.get() == 0) {
-				if (debug())
-				    dprint( ".release: "
-					+ "queuing reclaimable connection "
-					+ conn ) ;
-
 				cs.reclaimableHandle = 
 				    reclaimableConnections.offer( conn ) ;
 				totalBusy.decrementAndGet() ;
 			    }
-
-			    if (debug())
-				dprint( ".release: queuing idle connection "
-				    + conn ) ;
 
 			    cs.idleHandle = entry.idleConnections.offer( conn ) ;
 			}
@@ -327,8 +294,6 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 		}
 	    }
 	} finally {
-	    if (debug())
-		dprint( "<-release" ) ;
 	}
     }
 
@@ -380,8 +345,7 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 	try { 
 	    conn.close() ;
 	} catch (IOException exc) {
-	    if (debug())
-		dprint( ".close: " + conn + " close threw " + exc ) ;
+            // XXX log this
 	}
     }
 

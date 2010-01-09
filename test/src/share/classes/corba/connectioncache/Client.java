@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,11 +42,7 @@ import java.util.ArrayList ;
 import java.util.Set ;
 import java.util.HashSet ;
 
-import java.util.concurrent.ConcurrentMap ;
-import java.util.concurrent.ConcurrentHashMap ;
 
-import java.util.concurrent.atomic.AtomicBoolean ;
-import java.util.concurrent.atomic.AtomicLong ;
 
 import java.util.logging.Logger ;
 import java.util.logging.Handler ;
@@ -55,17 +51,14 @@ import java.util.logging.StreamHandler ;
 import java.util.logging.Formatter ;
 import java.util.logging.LogRecord ;
 
-import java.io.PrintWriter ;
 import java.io.IOException ;
 
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
-import org.testng.annotations.ExpectedExceptions ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue ;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory ;
 
-import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.ConnectionFinder ;
 import com.sun.corba.se.spi.orbutil.transport.ConnectionCache ;
 import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
@@ -99,17 +92,19 @@ public class Client {
 	    }
 	}
 
+        @Override
 	public void publish(LogRecord record) {
 	    super.publish(record);	
 	    flush();
 	}
 
+        @Override
 	public void close() {
 	    flush();
 	}
     }
 
-    private static final boolean DEBUG = true ;
+    private static final boolean DEBUG = false ;
 
     private static final Logger logger = Logger.getLogger( "test.corba" ) ;
     private static final Handler handler = new SystemOutputHandler() ;
@@ -126,106 +121,25 @@ public class Client {
     private static final int HIGH_WATER_MARK = 20 ; // must be a multiple of
 						    // MAX_PARALLEL_CONNECTIONS
 						    // for outboundCacheTest4.
+    private static final int TTL = 2*60*1000 ;      // 2 minute TTL (time to live)
+                                                    // for reclaimable connections
 
     private static final OutboundConnectionCache<ConnectionImpl> obcache = 
 	ConnectionCacheFactory.<ConnectionImpl>
 	    makeBlockingOutboundConnectionCache(
 		"BlockingOutboundCache", HIGH_WATER_MARK, NUMBER_TO_RECLAIM,
-		MAX_PARALLEL_CONNECTIONS, logger ) ;
+		MAX_PARALLEL_CONNECTIONS, TTL ) ;
 
     private static final InboundConnectionCache<ConnectionImpl> ibcache = 
 	ConnectionCacheFactory.<ConnectionImpl>
 	    makeBlockingInboundConnectionCache(
-		"BlockingInboundCache", HIGH_WATER_MARK, NUMBER_TO_RECLAIM, 
-		logger ) ;
+		"BlockingInboundCache", HIGH_WATER_MARK, NUMBER_TO_RECLAIM, TTL ) ;
 
-    // A simple implementation of Connection for testing.  No 
-    // synchronization is required to use this class.  
-    public static class ConnectionImpl implements Connection {
-	private String name ;
-	private long id ;
-	private ContactInfoImpl cinfo ;
-	private AtomicBoolean isClosed ;
-
-	public ConnectionImpl( String name, long id, ContactInfoImpl cinfo ) {
-	    this.name = name ;
-	    this.id = id ;
-	    this.cinfo = cinfo ;
-	    this.isClosed = new AtomicBoolean() ;
-	}
-
-	public ContactInfoImpl getContactInfo() {
-	    return cinfo ;
-	}
-
-	// Simulate access (read/write) to a connection to make sure
-	// we do not access a closed connection.
-	public void access() {
-	    if (isClosed.get())
-		throw new RuntimeException( "Illegal access: connection " 
-		    + name + " is closed." ) ;
-	}
-
-	public void close() {
-	    boolean wasClosed = isClosed.getAndSet( true ) ;
-	    if (wasClosed)
-		throw new RuntimeException( 
-		    "Attempting to close connection " ) ;
-	}
-
-	public String toString() {
-	    return "ConnectionImpl[" + name + ":" + id + "]" ;
-	}
-    }
-
-    // XXX Do we need to list all ContactInfos?
-    // XXX Do we need to list all connections created from a ContactInfo?
-    public static class ContactInfoImpl implements ContactInfo<ConnectionImpl> {
-	private String address ;
-
-	private static AtomicLong nextId =
-	    new AtomicLong() ;
-	private static AtomicBoolean simulateAddressUnreachable = 
-	    new AtomicBoolean() ;
-
-	private static ConcurrentMap<String,ContactInfoImpl> cinfoMap =
-	    new ConcurrentHashMap<String,ContactInfoImpl>() ;
-
-	private ContactInfoImpl( String address ) {
-	    this.address = address ;
-	}
-
-	public static ContactInfoImpl get( String address ) {
-	    ContactInfoImpl result = new ContactInfoImpl( address ) ;
-	    ContactInfoImpl entry = cinfoMap.putIfAbsent( address, result ) ;
-	    if (entry == null)
-		return result ;
-	    else
-		return entry ;
-	}
-
-	public void remove( String address ) {
-	    cinfoMap.remove( address ) ;
-	}
-
-	public void setUnreachable( boolean arg ) {
-	    simulateAddressUnreachable.set( arg ) ;
-	}
-
-	public ConnectionImpl createConnection() throws IOException {
-	    if (simulateAddressUnreachable.get()) {
-		throw new IOException( "Address " + address 
-		    + " is currently unreachable" ) ;
-	    } else {
-		long id = nextId.getAndIncrement() ;
-		ConnectionImpl result = new ConnectionImpl( address, id, this ) ;
-		return result ;
-	    }
-	}
-
-	public String toString() {
-	    return "ContactInfoImpl[" + address + "]" ;
-	}
+    static {
+        if (DEBUG) {
+            obcache.debug( true ) ;
+            ibcache.debug( true ) ;
+        }
     }
 
     private void testBanner( String msg ) {
@@ -247,7 +161,7 @@ public class Client {
     public void nonBlockingConcurrentQueueTest() {
 	testBanner( "nonBlockingConccurentQueueTest" ) ;
 	ConcurrentQueue<Integer> testQ = 
-	    ConcurrentQueueFactory.<Integer>makeConcurrentQueue() ;
+	    ConcurrentQueueFactory.<Integer>makeConcurrentQueue( TTL ) ;
 	testConcurrentQueue( testQ ) ;
     }
 
@@ -272,7 +186,7 @@ public class Client {
 
 	Assert.assertEquals( queue.size(), master.length ) ;
 	for (int val : master) {
-	    int qval = queue.poll() ;
+	    int qval = queue.poll().value() ;
 	    Assert.assertEquals( val, qval ) ; 
 	}
     }
@@ -472,8 +386,8 @@ public class Client {
     }
 
     // Test a ContactInfoImpl that throws an IOException
-    @Test(dependsOnMethods={"nonBlockingConcurrentQueueTest", "outboundTest4"})
-    @ExpectedExceptions( { IOException.class } ) 
+    @Test(dependsOnMethods={"nonBlockingConcurrentQueueTest", "outboundTest4"},
+        expectedExceptions={IOException.class})
     public void outboundTest5() throws IOException {
 	testBanner( "outboundTest5: test connection open error" ) ;
 	ContactInfoImpl cinfo = ContactInfoImpl.get( "ExceptionTest" ) ;
@@ -482,6 +396,7 @@ public class Client {
 	    obcache.get( cinfo ) ; // should throw an IOException
 	} finally {
 	    checkStats( obcache, 0, 0, 0, 0 ) ;
+            cinfo.setUnreachable( false ) ;
 	}
     }
     
@@ -602,8 +517,7 @@ public class Client {
 	checkStats( obcache, 0, 0, 0, 0 ) ;
     }
 
-    @Test()
-    @ExpectedExceptions( { IOException.class } ) 
+    @Test( expectedExceptions = { IOException.class } )
     private void outboundTest7() throws IOException {
 	testBanner( "outboundTest7: test ConnectionFinder error case" ) ;
 	ContactInfoImpl cinfo = ContactInfoImpl.get( "CFTest" ) ;

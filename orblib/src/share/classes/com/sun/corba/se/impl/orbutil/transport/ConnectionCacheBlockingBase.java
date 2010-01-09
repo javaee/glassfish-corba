@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2001-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,12 +36,11 @@
 
 package com.sun.corba.se.impl.orbutil.transport;
 
-import java.util.logging.Logger ;
 
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 
-import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
 
 abstract class ConnectionCacheBlockingBase<C extends Connection> 
     extends ConnectionCacheBase<C> {
@@ -50,15 +49,15 @@ abstract class ConnectionCacheBlockingBase<C extends Connection>
     protected int totalIdle ;	// Number of idle connections
 
     ConnectionCacheBlockingBase( String cacheType, int highWaterMark,
-	int numberToReclaim, Logger logger ) {
+	int numberToReclaim, MethodMonitor mm, long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, logger ) ;
+	super( cacheType, highWaterMark, numberToReclaim, mm ) ;
 
 	this.totalBusy = 0 ;
 	this.totalIdle = 0 ;
 
 	this.reclaimableConnections = 
-	    ConcurrentQueueFactory.<C>makeConcurrentQueue() ;
+	    ConcurrentQueueFactory.<C>makeConcurrentQueue( ttl ) ;
     }
 
     public synchronized long numberOfConnections() {

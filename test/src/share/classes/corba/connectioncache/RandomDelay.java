@@ -34,25 +34,38 @@
  * holder.
  */
 
-package corba.connectioncache;
+package corba.connectioncache ;
 
-import corba.framework.*;
+import java.util.Random;
 
-public class ConnectionCacheTest extends CORBATest
-{
-    @Override
-    protected void doTest() throws Throwable
-    {
-	Controller client = createClient( "corba.connectioncache.Client" ) ;
+public class RandomDelay{
+    Random random = new Random() ;
 
-	client.start();
+    private final int minDelay ;
+    private final int maxDelay ;
 
-	// Wait for the client to finish for up to 2 minutes, then
-	// throw an exception.
-	client.waitFor(120000);
+    public RandomDelay( int minDelay, int maxDelay ) {
+        if (minDelay < 0)
+            throw new RuntimeException( "minDelay must be >= 0") ;
+        if (maxDelay < minDelay)
+            throw new RuntimeException( "maxDelay must be >= minDelay" ) ;
 
-	// Make sure all the processes are shut down.
-	client.stop();
+        this.minDelay = minDelay ;
+        this.maxDelay = maxDelay ;
+    }
+
+    void randomWait() {
+        int delay = minDelay ;
+        if (maxDelay > minDelay) {
+            delay = minDelay + random.nextInt( maxDelay-minDelay ) ;
+        }
+
+        if (delay > 0) {
+            try {
+                wait(delay);
+            } catch (InterruptedException ex) {
+                // ignore this
+            }
+        }
     }
 }
-

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,22 +36,23 @@
 
 package com.sun.corba.se.impl.orbutil.transport;
 
-import java.util.logging.Logger ;
-import java.util.logging.Level ;
 
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.ConnectionCache ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue ;
+import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue.Handle;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
 
 public abstract class ConnectionCacheBase<C extends Connection> 
     implements ConnectionCache<C> {
 
+    private boolean flag ;
+
     // A name for this instance, provided for convenience.
     private final String cacheType ;
 
-    // Log to this logger if FINER is enabled.
-    protected final Logger logger ;
+    private final MethodMonitor mm ;
 
     // Configuration data
     // XXX we may want this data to be dynamically re-configurable
@@ -64,8 +65,12 @@ public abstract class ConnectionCacheBase<C extends Connection>
     // MUST be initialized in a subclass
     protected ConcurrentQueue<C> reclaimableConnections = null ;
 
-    protected boolean debug() {
-	return logger.isLoggable( Level.FINER ) ;
+    public boolean debug() {
+        return flag ;
+    }
+
+    public void debug( final boolean flag ) {
+        this.flag = flag ;
     }
 
     public final String getCacheType() {
@@ -87,7 +92,7 @@ public abstract class ConnectionCacheBase<C extends Connection>
 
     ConnectionCacheBase( final String cacheType, 
 	final int highWaterMark, final int numberToReclaim, 
-	final Logger logger ) {
+	final MethodMonitor mm ) {
 
 	if (cacheType == null)
 	    throw new IllegalArgumentException( 
@@ -101,69 +106,47 @@ public abstract class ConnectionCacheBase<C extends Connection>
 	    throw new IllegalArgumentException( 
                 "numberToReclaim must be at least 1" ) ;
 
-	if (logger == null)
-	    throw new IllegalArgumentException( 
-                "logger must not be null" ) ;
-
 	this.cacheType = cacheType ;
-	this.logger = logger ;
+	this.mm = mm ;
 	this.highWaterMark = highWaterMark ;
 	this.numberToReclaim = numberToReclaim ;
     }
     
-    protected final void dprint( final String msg) {
-	logger.finer( thisClassName() + msg );
-    }
-
+    @Override
     public String toString() {
 	return thisClassName() + "[" 
 	    + getCacheType() + "]";
     }
      
-    public void dprintStatistics() {
-	dprint( ".stats:"
-	       + " idle=" + numberOfIdleConnections() 
-	       + " reclaimable=" + numberOfReclaimableConnections() 
-	       + " busy=" + numberOfBusyConnections() 
-	       + " total=" + numberOfConnections() 
-	       + " (" 
-	       + highWaterMark() + "/"
-	       + numberToReclaim() 
-	       + ")");
-    }
-
     /** Reclaim some idle cached connections.  Will never 
      * close a connection that is busy.
      */
     protected boolean reclaim() {
-	if (debug())
-	    dprint( ".reclaim: starting" ) ;
+        mm.enter( debug(), "reclaim" );
+        try {
+            int ctr = 0 ;
+            while (ctr < numberToReclaim()) {
+                Handle<C> candidate = reclaimableConnections.poll() ;
+                if (candidate == null)
+                    // If we have closed all idle connections, we must stop
+                    // reclaiming.
+                    break ;
 
-	int ctr = 0 ;
-	while (ctr < numberToReclaim()) {
-	    C candidate = reclaimableConnections.poll() ;
-	    if (candidate == null)
-		// If we have closed all idle connections, we must stop 
-		// reclaiming.
-		break ;
+                try {
+                    mm.info( debug(), "closing connection", candidate) ;
+                    close( candidate.value() ) ;
+                } catch (RuntimeException exc) {
+                    mm.info( debug(), "exception on close", exc ) ;
+                    throw exc ;
+                }
 
-	    if (debug())
-		dprint( ".reclaim: closing connection " + candidate ) ;
+                ctr++ ;
+            }
 
-	    try {
-		close( candidate ) ;	    
-	    } catch (RuntimeException exc) {
-		if (debug())
-		    dprint( ".reclaim: caught exception on close: " + exc ) ;
-		throw exc ;
-	    }
-
-	    ctr++ ;
-	}
-
-	if (debug())
-	    dprint( ".reclaim: reclaimed " + ctr + " connection(s)" ) ;
-
-	return ctr > 0 ;
+            mm.info( debug(), "number of connections reclaimed", ctr ) ;
+            return ctr > 0 ;
+        } finally {
+            mm.exit( debug() ) ;
+        }
     }
 }

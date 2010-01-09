@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,14 +36,13 @@
 
 package com.sun.corba.se.impl.orbutil.transport;
 
-import java.util.logging.Logger ;
 
 import java.util.concurrent.atomic.AtomicInteger ;
 
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 
-import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue ;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory ;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
 
 abstract class ConnectionCacheNonBlockingBase<C extends Connection> 
     extends ConnectionCacheBase<C> {
@@ -52,16 +51,16 @@ abstract class ConnectionCacheNonBlockingBase<C extends Connection>
     protected final AtomicInteger totalIdle ;	// Number of idle connections
 
     ConnectionCacheNonBlockingBase( String cacheType, int highWaterMark,
-	int numberToReclaim, Logger logger ) {
+	int numberToReclaim, MethodMonitor mm, long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, logger ) ;
+	super( cacheType, highWaterMark, numberToReclaim, mm ) ;
 
 	this.totalBusy = new AtomicInteger() ;
 	this.totalIdle = new AtomicInteger() ;
 
 	this.reclaimableConnections = 
 	    // XXX make this the non-blocking version once we write it.
-	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue() ;
+	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue( ttl ) ;
     }
 
     public long numberOfConnections() {

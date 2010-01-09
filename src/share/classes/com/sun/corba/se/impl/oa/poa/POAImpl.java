@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -320,8 +320,9 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	POAImpl result = new POAImpl( ORBConstants.ROOT_POA_NAME, 
 	    null, orb, STATE_START ) ;
-        registerMBean( orb, result ) ;
 	result.initialize( poaManager, Policies.rootPOAPolicies ) ;
+        // must come after initialize!
+        registerMBean( orb, result ) ;
 
 	return result ;
     }
@@ -880,7 +881,6 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	    if (poa == null) {
 		poa = new POAImpl( name, this, getORB(), STATE_START ) ;
-                registerMBean( getORB(), poa ) ;
 	    }
 
 	    try {
@@ -907,6 +907,9 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		    new Policies( policies, defaultCopierId ) ;
 
 		poa.initialize( newManager, POAPolicies ) ;
+
+                // Must come after poa.initialize!
+                registerMBean( getORB(), poa ) ;
 
 		return poa;
 	    } finally {
@@ -984,7 +987,6 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		    // by transitioning to STATE_RUN after unknown_adapter 
 		    // returns.
 		    found = new POAImpl( name, this, getORB(), STATE_INIT ) ;
-                    registerMBean( getORB(), found ) ;
 
 		    if (debug) {
 			ORBUtility.dprint( this, 

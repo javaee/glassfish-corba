@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,25 +34,49 @@
  * holder.
  */
 
-package corba.connectioncache;
+package corba.connectioncache ;
+    
+// A simple implementation of Connection for testing.  No 
 
-import corba.framework.*;
+import com.sun.corba.se.spi.orbutil.transport.Connection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ConnectionCacheTest extends CORBATest
-{
+// synchronization is required to use this class.  
+public class ConnectionImpl implements Connection {
+    private String name ;
+    private long id ;
+    private ContactInfoImpl cinfo ;
+    private AtomicBoolean isClosed ;
+
+    public ConnectionImpl( String name, long id, ContactInfoImpl cinfo ) {
+        this.name = name ;
+        this.id = id ;
+        this.cinfo = cinfo ;
+        this.isClosed = new AtomicBoolean() ;
+    }
+
+    public ContactInfoImpl getContactInfo() {
+        return cinfo ;
+    }
+
+    // Simulate access (read/write) to a connection to make sure
+    // we do not access a closed connection.
+    public void access() {
+        if (isClosed.get())
+            throw new RuntimeException( "Illegal access: connection " 
+                + name + " is closed." ) ;
+    }
+
+    public void close() {
+        boolean wasClosed = isClosed.getAndSet( true ) ;
+        if (wasClosed)
+            throw new RuntimeException( 
+                "Attempting to close connection " ) ;
+    }
+
     @Override
-    protected void doTest() throws Throwable
-    {
-	Controller client = createClient( "corba.connectioncache.Client" ) ;
-
-	client.start();
-
-	// Wait for the client to finish for up to 2 minutes, then
-	// throw an exception.
-	client.waitFor(120000);
-
-	// Make sure all the processes are shut down.
-	client.stop();
+    public String toString() {
+        return "ConnectionImpl[" + name + ":" + id + "]" ;
     }
 }
 

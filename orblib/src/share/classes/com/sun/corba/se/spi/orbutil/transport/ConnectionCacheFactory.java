@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.spi.orbutil.transport;
 
-import java.util.logging.Logger ;
 
 import com.sun.corba.se.impl.orbutil.transport.OutboundConnectionCacheBlockingImpl ;
 import com.sun.corba.se.impl.orbutil.transport.OutboundConnectionCacheImpl ;
@@ -56,31 +55,31 @@ public final class ConnectionCacheFactory {
 
     public static <C extends Connection> OutboundConnectionCache<C>
     makeBlockingOutboundConnectionCache( String cacheType, int highWaterMark,
-	int numberToReclaim, int maxParallelConnections, Logger logger ) {
+	int numberToReclaim, int maxParallelConnections, int ttl ) {
 
 	return new OutboundConnectionCacheBlockingImpl<C>( cacheType, highWaterMark,
-	    numberToReclaim, maxParallelConnections, logger ) ;
+	    numberToReclaim, maxParallelConnections, ttl ) ;
     }
 
     public static <C extends Connection> OutboundConnectionCache<C>
     makeNonBlockingOutboundConnectionCache( String cacheType, int highWaterMark,
-	int numberToReclaim, int maxParallelConnections, Logger logger ) {
+	int numberToReclaim, int maxParallelConnections, int ttl ) {
 
 	return new OutboundConnectionCacheImpl<C>( cacheType, highWaterMark,
-	    numberToReclaim, maxParallelConnections, logger ) ;
+	    numberToReclaim, maxParallelConnections, ttl ) ;
     }
 
     public static <C extends Connection> InboundConnectionCache<C>
     makeBlockingInboundConnectionCache( String cacheType, int highWaterMark,
-	int numberToReclaim, Logger logger ) {
+	int numberToReclaim, int ttl ) {
 	return new InboundConnectionCacheBlockingImpl<C>( cacheType,
-	    highWaterMark, numberToReclaim, logger ) ;
+	    highWaterMark, numberToReclaim, ttl ) ;
     }
 
     public static <C extends Connection> InboundConnectionCache<C> 
     makeNonBlockingInboundConnectionCache( String cacheType, int highWaterMark,
-	int numberToReclaim, Logger logger ) {
+	int numberToReclaim, int ttl ) {
 	return new InboundConnectionCacheImpl<C>( cacheType,
-	    highWaterMark, numberToReclaim, logger ) ;
+	    highWaterMark, numberToReclaim, ttl ) ;
     }
 }

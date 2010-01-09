@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,11 +44,11 @@ import java.util.Map ;
 import java.util.HashMap ;
 
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
-import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
 import com.sun.corba.se.spi.orbutil.transport.InboundConnectionCache ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
-import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory;
 
 /** Manage connections that are initiated from another VM. 
  *
@@ -57,6 +57,9 @@ import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
 public final class InboundConnectionCacheBlockingImpl<C extends Connection> 
     extends ConnectionCacheBlockingBase<C> 
     implements InboundConnectionCache<C> {
+
+    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil(
+        InboundConnectionCacheBlockingImpl.class ) ;
 
     private final Map<C,ConnectionState<C>> connectionMap ;
 
@@ -87,23 +90,17 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
     }
 
     public InboundConnectionCacheBlockingImpl( final String cacheType, 
-	final int highWaterMark, final int numberToReclaim, 
-	Logger logger ) {
+	final int highWaterMark, final int numberToReclaim, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, logger ) ;
+	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
 
 	this.connectionMap = new HashMap<C,ConnectionState<C>>() ;
-
-	if (debug()) {
-	    dprint(".constructor completed: " + getCacheType() );
-	}
     }
 
     // We do not need to define equals or hashCode for this class.
 
     public synchronized void requestReceived( final C conn ) {
-	if (debug())
-	    dprint( "->requestReceived: connection " + conn ) ;
+        mm.enter( debug(), "requestReceived", conn ) ;
 
 	try {
 	    ConnectionState<C> cs = getConnectionState( conn ) ;
@@ -114,62 +111,46 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
 
 	    ConcurrentQueue.Handle<C> reclaimHandle = cs.reclaimableHandle ;
 	    if (reclaimHandle != null) {
-		if (debug())
-		    dprint( ".requestReceived: " + conn 
-			+ " removed from reclaimableQueue" ) ;
 		reclaimHandle.remove() ;
+                mm.info( debug(), "removed from reclaimableQueue", conn ) ;
 	    }
 
 	    int count = cs.busyCount++ ;
 	    if (count == 0) {
-		if (debug())
-		    dprint( ".requestReceived: " + conn 
-			+ " transition from idle to busy" ) ;
+                mm.info(debug(), "moved from idle to busy", conn ) ;
 
 		totalIdle-- ;
 		totalBusy++ ;
 	    }
 	} finally {
-	    if (debug())
-		dprint( "<-requestReceived: connection " + conn ) ;
+            mm.exit( debug()) ;
 	}
     }
 
     public synchronized void requestProcessed( final C conn, 
 	final int numResponsesExpected ) {
 
-	if (debug())
-	    dprint( "->requestProcessed: connection " + conn 
-		+ " expecting " + numResponsesExpected + " responses" ) ;
-
+        mm.enter( debug(), "requestProcessed", conn, numResponsesExpected ) ;
 	try {
 	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
 
 	    if (cs == null) {
-		if (debug())
-		    dprint( ".release: connection " + conn + " was closed" ) ;
-
+                mm.info( debug(), "connection was closed") ;
 		return ; 
 	    } else {
 		cs.expectedResponseCount += numResponsesExpected ;
 		int numResp = cs.expectedResponseCount ;
 		int numBusy = --cs.busyCount ;
 
-		if (debug()) {
-		    dprint( ".release: " + numResp + " responses expected" ) ;
-		    dprint( ".release: " + numBusy + 
-			" busy count for connection" ) ;
-		}
+                mm.info( debug(), "responses expected", numResp,
+                    "connection busy count", numBusy ) ;
 
 		if (numBusy == 0) {
 		    totalBusy-- ;
 		    totalIdle++ ;
 
 		    if (numResp == 0) {
-			if (debug())
-			    dprint( ".release: "
-				+ "queuing reclaimable connection "
-				+ conn ) ;
+			mm.info( debug(), "queuing reclaimable connection", conn ) ;
 
 			if ((totalBusy+totalIdle) > highWaterMark()) {
 			    close( conn ) ;
@@ -181,8 +162,7 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
 		}
 	    }
 	} finally {
-	    if (debug())
-		dprint( "<-requestProcessed" ) ;
+           mm.exit( debug() ) ;
 	}
     }
 
@@ -190,42 +170,25 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
      * and has no expected responses, it can be reclaimed.
      */
     public synchronized void responseSent( final C conn ) {
-	if (debug())
-	    dprint( "->responseSent: " + conn ) ;
+        mm.enter( debug(), "responseSent", conn ) ;
 
 	try {
 	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
 	    final int waitCount = --cs.expectedResponseCount ;
 	    if (waitCount == 0) {
-		if (debug())
-		    dprint( ".responseSent: " + conn + " is now reclaimable" ) ;
+                mm.info( debug(), "reclaimable connection", conn ) ;
 
 		if ((totalBusy+totalIdle) > highWaterMark()) {
-		    if (debug()) {
-			dprint( ".responseSent: " + conn 
-			    + " closing connection" ) ; 
-		    }
-
 		    close( conn ) ;
 		} else {
 		    cs.reclaimableHandle = 
 			reclaimableConnections.offer( conn ) ;
-
-		    if (debug()) {
-			dprint( ".responseSent: " + conn 
-			    + " is now reclaimable" ) ; 
-		    }
 		}
 	    } else {
-		if (debug()) {
-		    dprint( ".responseSent: " + conn + " waitCount=" 
-			+ waitCount ) ;
-		}
+                mm.info( debug(), "wait count", waitCount ) ;
 	    }
 	} finally {
-	    if (debug()) {
-		dprint( "<-responseSent: " + conn ) ;
-	    }
+            mm.exit( debug() ) ;
 	}
     }
 
@@ -233,14 +196,13 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
      * or not.
      */
     public synchronized void close( final C conn ) {
-	if (debug()) 
-	    dprint( "->close: " + conn ) ;
+        mm.enter( debug(), "close", conn ) ;
 	
 	try {
 	    final ConnectionState<C> cs = connectionMap.remove( conn ) ;
+            mm.info( debug(), "connection state", cs ) ;
+
 	    int count = cs.busyCount ;
-	    if (debug())
-		dprint( ".close: " + conn + " count = " + count ) ;
 
 	    if (count == 0)
 		totalIdle-- ;
@@ -249,21 +211,17 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
 
 	    final ConcurrentQueue.Handle rh = cs.reclaimableHandle ;
 	    if (rh != null) {
-		if (debug())
-		    dprint( ".close: " + conn + " connection was reclaimable" ) ;
-
+                mm.info( debug(), "connection was reclaimable") ;
 		rh.remove() ;
 	    }
 
 	    try {
 		conn.close() ;
 	    } catch (IOException exc) {
-		if (debug())
-		    dprint( ".close: " + conn + " close threw "  + exc ) ;
+                mm.info( debug(), "close threw", exc ) ;
 	    }
 	} finally {
-	    if (debug())
-		dprint( "<-close: " + conn ) ;
+            mm.exit( debug() ) ;
 	}
     }
 
@@ -271,25 +229,14 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
     // create a new one AND put it in the cache
     private ConnectionState<C> getConnectionState( C conn ) {
 	// This should be the only place a CacheEntry is constructed.
-	if (debug())
-	    dprint( "->getConnectionState: " + conn ) ;
+        ConnectionState<C> result = connectionMap.get( conn ) ;
+        if (result == null) {
+            result = new ConnectionState( conn ) ;
+            connectionMap.put( conn, result ) ;
+            totalIdle++ ;
+        }
 
-	try {
-	    ConnectionState<C> result = connectionMap.get( conn ) ;
-	    if (result == null) {
-		if (debug())
-		    dprint( ".getConnectionState: " + conn + 
-			" creating new ConnectionState instance" ) ;
-		result = new ConnectionState( conn ) ;
-		connectionMap.put( conn, result ) ;
-		totalIdle++ ;
-	    }
-	    
-	    return result ;
-	} finally {
-	    if (debug())
-		dprint( "<-getConnectionState: " + conn ) ;
-	}
+        return result ;
     }
 }
 

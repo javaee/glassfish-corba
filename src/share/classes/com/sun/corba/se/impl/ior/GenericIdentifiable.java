@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -91,7 +91,7 @@ public abstract class GenericIdentifiable implements Identifiable
 	GenericIdentifiable encaps = (GenericIdentifiable)obj ;
 
 	return (getId() == encaps.getId()) && 
-	    Arrays.equals( getData(), encaps.getData() ) ;
+	    Arrays.equals( data, encaps.data ) ;
     }
    
     public int hashCode() 
@@ -112,6 +112,6 @@ public abstract class GenericIdentifiable implements Identifiable
     @Description( "The tagged component or profile CDR encoded data" )
     public byte[] getData() 
     {
-	return data ;
+	return (byte[])data.clone() ;
     }
 }

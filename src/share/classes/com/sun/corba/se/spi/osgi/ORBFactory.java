@@ -63,6 +63,7 @@ public class ORBFactory {
     }
 
     /** Create but do not initialize an ORB instance.
+     * @return The newly created uninitialized ORB.
      */
     public static ORB create() {
         ORB result = new ORBImpl() ;
@@ -72,6 +73,10 @@ public class ORBFactory {
     /** Complete the initialization of the ORB.  
      * isGFv3 if true will cause an ORB initialization
      * suitable for use in GlassFish v3.
+     * @param orb The orb to initialize.
+     * @param args Usual args passed to an ORB.init() call.
+     * @param props Usual props passed to an ORB.init() call.
+     * @param isGFv3 true if the ORB is running in GFv3 or later (generally means an OSGI environment).
      */
     @SuppressWarnings("static-access")
     public static void initialize( ORB orb, String[] args, Properties props, boolean isGFv3 ) {

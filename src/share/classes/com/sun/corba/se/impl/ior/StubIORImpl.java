@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,10 +44,8 @@
 
 package com.sun.corba.se.impl.ior;
 
-import java.io.ObjectInputStream ;
 import java.io.ObjectOutputStream ;
 import java.io.IOException ;
-import java.io.StringWriter ;
 import java.io.Serializable ;
 
 import java.util.Arrays ;
@@ -72,6 +70,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
  */
 public class StubIORImpl implements Serializable 
 {
+    private static final long serialVersionUID = -6261452601247416282L;
     // cached hash code
     transient private int hashCode = 0 ;
     
@@ -89,8 +88,9 @@ public class StubIORImpl implements Serializable
 
     public String getRepositoryId()
     {
-	if (typeData == null)
+	if (typeData == null) {
 	    return null ;
+        }
 
 	return new String( typeData ) ;
     }
@@ -157,8 +157,7 @@ public class StubIORImpl implements Serializable
 	    InputStream istr = ostr.create_input_stream() ;
 
 	    // read the IOR back from the stream
-	    org.omg.CORBA.Object obj =
-		(org.omg.CORBA.Object) istr.read_Object();
+	    org.omg.CORBA.Object obj = istr.read_Object();
 	    return StubAdapter.getDelegate( obj ) ;
 
 	} finally {
@@ -207,6 +206,7 @@ public class StubIORImpl implements Serializable
      * that represent the same remote object.
      * @return the hash code value.
      */
+    @Override
     public synchronized int hashCode() 
     {
 	if (hashCode == 0) {
@@ -229,17 +229,20 @@ public class StubIORImpl implements Serializable
 
     private boolean equalArrays( byte[][] data1, byte[][] data2 ) 
     {
-	if (data1.length != data2.length)
+	if (data1.length != data2.length) {
 	    return false ;
+        }
 
 	for (int ctr=0; ctr<data1.length; ctr++) {
-	    if (!Arrays.equals( data1[ctr], data2[ctr] )) 
+	    if (!Arrays.equals( data1[ctr], data2[ctr] ))  {
 		return false ;
+            }
 	}
 
 	return true ;
     }
 
+    @Override
     public boolean equals(java.lang.Object obj) 
     {
         if (this == obj) {
@@ -273,6 +276,7 @@ public class StubIORImpl implements Serializable
      * "SimpleIORImpl[<typeName>,[<profileID>]data, ...]"
      * @return a string representation of this stub.
      */
+    @Override
     public String toString() 
     {
 	StringBuffer result = new StringBuffer() ;

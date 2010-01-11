@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,12 +42,13 @@ import org.omg.CORBA_2_3.portable.OutputStream ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 /**
- * @author 
+ * @author Ken Cavanaugh
  */
 public final class ObjectIdImpl implements ObjectId
 {
     private byte[] id;
     
+    @Override
     public boolean equals( Object obj )
     {
 	if (!(obj instanceof ObjectIdImpl))
@@ -58,6 +59,7 @@ public final class ObjectIdImpl implements ObjectId
 	return Arrays.equals( this.id, other.id ) ;
     }
 
+    @Override
     public int hashCode() 
     {
 	int result = 17 ;
@@ -68,7 +70,7 @@ public final class ObjectIdImpl implements ObjectId
 
     public ObjectIdImpl( byte[] id ) 
     {
-	this.id = id ;
+	this.id = (byte[])id.clone() ;
     }
 
     public String getIdString() {
@@ -77,7 +79,7 @@ public final class ObjectIdImpl implements ObjectId
 
     public byte[] getId()
     {
-	return id ;
+	return (byte[])id.clone() ;
     }
 
     public void write( OutputStream os )

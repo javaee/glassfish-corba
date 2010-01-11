@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,9 +42,18 @@ import java.util.Arrays ;
 public class ObjectAdapterIdArray extends ObjectAdapterIdBase {
     private final String[] objectAdapterId ;
 
+    @Override
+    public boolean equals( Object obj ) {
+        // Note that the superclass equals method is correct and general,
+        // because it tests for equality using the iterator.  The state of
+        // the derived classes simply implements the iterator.
+        // This equals method is added here to appease findbugs.
+        return super.equals( obj ) ;
+    }
+
     public ObjectAdapterIdArray( String[] objectAdapterId )
     {
-	this.objectAdapterId = objectAdapterId ;
+	this.objectAdapterId = (String[])objectAdapterId.clone() ;
     }
 
     /** Special constructor used for OA IDs of length 2. 
@@ -68,6 +77,6 @@ public class ObjectAdapterIdArray extends ObjectAdapterIdBase {
 
     public String[] getAdapterName()
     {      
-        return objectAdapterId;
+        return (String[])objectAdapterId.clone() ;
     }
 }

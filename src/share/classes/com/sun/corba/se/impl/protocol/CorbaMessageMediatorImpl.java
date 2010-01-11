@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1818,7 +1818,7 @@ public class CorbaMessageMediatorImpl
 		    + ": dispatching to scid: " + oktemp.getSubcontractId());
 	}
 
-	CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher(myOrb);
+	CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher();
 
 	if (myOrb.subcontractDebugFlag) {
 	    dprint(".handleRequest: " + opAndId(messageMediator)
@@ -1856,8 +1856,7 @@ public class CorbaMessageMediatorImpl
 	try {
 	    ((CDRInputObject)messageMediator.getInputObject()).unmarshalHeader();
 	    ObjectKey okey = msg.getObjectKeyCacheEntry().getObjectKey() ;
-	    CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher(
-                myOrb ) ;
+	    CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher() ;
 	    if (sc == null) {
 		return;
 	    }

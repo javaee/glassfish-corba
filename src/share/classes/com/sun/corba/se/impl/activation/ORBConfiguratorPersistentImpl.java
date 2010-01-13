@@ -48,8 +48,6 @@ import com.sun.corba.se.spi.activation.ActivatorHelper ;
 import com.sun.corba.se.spi.activation.EndPointInfo ;
 
 import com.sun.corba.se.spi.orb.ORBData ;
-import com.sun.corba.se.spi.orb.DataCollector ;
-import com.sun.corba.se.spi.orb.ORBConfigurator ;
 import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.transport.SocketInfo;
@@ -57,22 +55,17 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 // XXX This should go away once we get rid of the port exchange for ORBD
+import com.sun.corba.se.impl.orb.ORBConfiguratorImpl;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 
 // XXX These should move to SPI
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
-public class ORBConfiguratorPersistentImpl implements ORBConfigurator {
+public class ORBConfiguratorPersistentImpl extends ORBConfiguratorImpl {
     private ORBUtilSystemException wrapper ;
 
-    public void configure( DataCollector collector, ORB orb )
-    {
-	ORB theOrb = orb ;
-	wrapper = orb.getLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
-        persistentServerInitialization( orb ) ;
-    }
-
-    private void persistentServerInitialization( ORB orb )
+    @Override
+    protected void persistentServerInitialization( ORB orb )
     {
 	ORBData data = orb.getORBData() ;
 

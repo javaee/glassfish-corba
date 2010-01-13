@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,10 +42,7 @@ import java.util.logging.Level;
 import com.sun.corba.se.impl.orbutil.LogKeywords;
 
 // Import general CORBA classes
-import org.omg.CORBA.Object;
 import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
 
@@ -58,14 +55,9 @@ import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextHelper;
 import org.omg.CosNaming.NamingContext;
 import org.omg.CosNaming.NamingContextPackage.*;
-import org.omg.CosNaming._NamingContextImplBase;
-import org.omg.CosNaming.NamingContextExtHelper;
-import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtPOA;
-import org.omg.CosNaming.NamingContextExtPackage.*;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
 
-import com.sun.corba.se.impl.naming.cosnaming.NamingContextDataStore;
 
 import com.sun.corba.se.impl.naming.namingutil.INSURLHandler;
 import com.sun.corba.se.impl.logging.CORBALogDomains;
@@ -118,6 +110,7 @@ public abstract class NamingContextImpl
      * Create a naming context servant.
      * Runs the super constructor.
      * @param orb an ORB object.
+     * @param poa the POA.
      * @exception java.lang.Exception a Java exception.
      */
     public NamingContextImpl(ORB orb, POA poa) throws java.lang.Exception {
@@ -198,7 +191,7 @@ public abstract class NamingContextImpl
      * exists. The NamingContext will participate in recursive resolving.
      * @param n a sequence of NameComponents which is the name under which
      * the object will be bound.
-     * @param obj the NamingContect object reference to be bound.
+     * @param nc the NamingContect object reference to be bound.
      * @exception org.omg.CosNaming.NamingContextPackage.NotFound A name with 
      * multiple components was supplied, but the first component could not be
      * resolved.
@@ -295,7 +288,7 @@ public abstract class NamingContextImpl
      * resolving.
      * @param n a sequence of NameComponents which is the name under which
      * the object will be bound.
-     * @param obj the object reference to be bound.
+     * @param nc the object reference to be bound.
      * @exception org.omg.CosNaming.NamingContextPackage.NotFound A name with 
      * multiple components was supplied, but the first component could not be
      * resolved.
@@ -430,7 +423,7 @@ public abstract class NamingContextImpl
 	// List actually generates the list
 	NamingContextDataStore impl = (NamingContextDataStore)this;
 	synchronized (impl) {
-	    impl.List(how_many,bl,bi);
+	    impl.listImpl(how_many,bl,bi);
 	}
         if( readLogger.isLoggable( Level.FINE ) && (bl.value != null )) {
             // isLoggable call to make sure that we save some precious 
@@ -454,7 +447,7 @@ public abstract class NamingContextImpl
         lifecycleLogger.fine( "Creating New Naming Context " ); 
 	NamingContextDataStore impl = (NamingContextDataStore)this;
 	synchronized (impl) {
-            NamingContext nctx = impl.NewContext();
+            NamingContext nctx = impl.newContextImpl();
             if( nctx != null ) {
                 lifecycleLogger.fine( LogKeywords.LIFECYCLE_CREATE_SUCCESS );
             } else {
@@ -497,8 +490,9 @@ public abstract class NamingContextImpl
 	NamingContext nc = null;
 	NamingContext rnc = null;
 	try {
-	    if (debug)
-		dprint("bind_new_context " + nameToString(n));
+	    if (debug) {
+                dprint("bind_new_context " + nameToString(n));
+            }
 	    // The obvious solution:
 	    nc = this.new_context();
 	    this.bind_context(n,nc);
@@ -506,9 +500,12 @@ public abstract class NamingContextImpl
 	    nc = null;
 	} finally {
 	    try {
-		if(nc != null)
-		    nc.destroy();
+		if (nc != null) {
+                    nc.destroy();
+                }
 	    } catch (org.omg.CosNaming.NamingContextPackage.NotEmpty e) {
+                throw new CannotProceed( "Old naming context is not empty", 
+                    nc, n) ;
 	    }
 	}
         if( updateLogger.isLoggable( Level.FINE ) ) {
@@ -535,9 +532,9 @@ public abstract class NamingContextImpl
         lifecycleLogger.fine( "Destroying Naming Context " ); 
 	NamingContextDataStore impl = (NamingContextDataStore)this;
 	synchronized (impl) {
-	    if (impl.IsEmpty() == true) {
+	    if (impl.isEmptyImpl() == true) {
 		// The context is empty so it can be destroyed
-		impl.Destroy();
+		impl.destroyImpl();
                 lifecycleLogger.fine ( LogKeywords.LIFECYCLE_DESTROY_SUCCESS );
             }
 	    else {
@@ -610,7 +607,7 @@ public abstract class NamingContextImpl
 		// Yes: bind object in this context under the name
 		BindingTypeHolder bth = new BindingTypeHolder();
 		if (rebind) {
-                    org.omg.CORBA.Object objRef = impl.Resolve( n[0], bth );
+                    org.omg.CORBA.Object objRef = impl.resolveImpl( n[0], bth );
                     if( objRef != null ) {
                         // Refer Naming Service Doc:00-11-01 section 2.2.3.4 
                         // If there is an object already bound with the name
@@ -631,17 +628,17 @@ public abstract class NamingContextImpl
                                     NotFoundReason.not_object, n);
                             }
                         }
-                        impl.Unbind(n[0]);
+                        impl.unbindImpl(n[0]);
                     }
 
 		} else {
-		    if (impl.Resolve(n[0],bth) != null)
+		    if (impl.resolveImpl(n[0],bth) != null)
 			// "Resistence is futile." [Borg pickup line]
 			throw new AlreadyBound();
 		}
 	
 		// Now there are no other bindings under this name
-		impl.Bind(n[0],obj,bt);
+		impl.bindImpl(n[0],obj,bt);
 	    }
 	} else {
 	    // No: bind in a different context
@@ -724,7 +721,7 @@ public abstract class NamingContextImpl
 	if (n.length == 1) {
 	    synchronized (impl) {
 		// Resolve first level in this context
-		obj = impl.Resolve(n[0],bth);
+		obj = impl.resolveImpl(n[0],bth);
 	    }
 	    if (obj == null) {
 		// Object was not found
@@ -796,7 +793,7 @@ public abstract class NamingContextImpl
 	    org.omg.CORBA.Object objRef = null;
 	    synchronized (impl) {
 		// Yes: unbind in this context
-		objRef = impl.Unbind(n[0]);
+		objRef = impl.unbindImpl(n[0]);
 	    }
       
 	    if (objRef == null)
@@ -841,7 +838,7 @@ public abstract class NamingContextImpl
     
 	synchronized (impl) {
 	    // Resolve first  - must be resolveable
-	    topRef = impl.Resolve(n[0],bth);
+	    topRef = impl.resolveImpl(n[0],bth);
 	    if (topRef == null) {
 		// It was not bound
 		throw new NotFound(NotFoundReason.missing_node,n);
@@ -870,9 +867,10 @@ public abstract class NamingContextImpl
    /**
     * This operation creates a stringified name from the array of Name
     * components.
-    * @param n Name of the object <p>
-    * @exception org.omg.CosNaming.NamingContextExtPackage.InvalidName
-    * Indicates the name does not identify a binding.<p>
+    * @param n Name of the object
+    * @return 
+    * @throws org.omg.CosNaming.NamingContextPackage.InvalidName
+    * Indicates the name does not identify a binding.
     *
     */
     public String to_string(org.omg.CosNaming.NameComponent[] n)
@@ -883,7 +881,6 @@ public abstract class NamingContextImpl
 	{
 		throw new InvalidName();
 	}
-	NamingContextDataStore impl = (NamingContextDataStore)this;
 
         String theStringifiedName = insImpl.convertToString( n );
 
@@ -900,8 +897,8 @@ public abstract class NamingContextImpl
     * This operation  converts a Stringified Name into an  equivalent array
     * of Name Components.
     * @param sn Stringified Name of the object <p>
-    * @exception org.omg.CosNaming.NamingContextExtPackage.InvalidName
-    * Indicates the name does not identify a binding.<p>
+    * @return 
+    * @throws org.omg.CosNaming.NamingContextPackage.InvalidName
     *
     */
     public org.omg.CosNaming.NameComponent[] to_name(String sn)
@@ -912,7 +909,6 @@ public abstract class NamingContextImpl
 	{
 		throw new InvalidName();
 	}
-	NamingContextDataStore impl = (NamingContextDataStore)this;
 	org.omg.CosNaming.NameComponent[] theNameComponents =
 		insImpl.convertToNameComponent( sn );
 	if( ( theNameComponents == null ) || (theNameComponents.length == 0 ) )
@@ -939,11 +935,9 @@ public abstract class NamingContextImpl
     * @param addr internet based address of the host machine where  
     * Name Service is running <p>
     * @param sn Stringified Name of the object <p>
-    * @exception org.omg.CosNaming.NamingContextExtPackage.InvalidName
-    * Indicates the name does not identify a binding.<p>
-    * @exception org.omg.CosNaming.NamingContextPackage.InvalidAddress
-    * Indicates the internet based address of the host machine is
-    * incorrect <p>
+    * @return 
+    * @throws org.omg.CosNaming.NamingContextExtPackage.InvalidAddress
+    * @throws org.omg.CosNaming.NamingContextPackage.InvalidName
     *
     */ 
 
@@ -961,7 +955,6 @@ public abstract class NamingContextImpl
 	    throw new 
                 org.omg.CosNaming.NamingContextExtPackage.InvalidAddress();
 	}
-	NamingContextDataStore impl = (NamingContextDataStore)this;
 	String urlBasedAddress = null;
 	urlBasedAddress = insImpl.createURLBasedAddress( addr, sn ); 
         // Extra check to see that corba name url created is valid as per
@@ -978,15 +971,13 @@ public abstract class NamingContextImpl
     /**
      * This operation resolves the Stringified name into the object
      * reference.
-     * @param sn Stringified Name of the object <p>
+     * @param sn Stringified Name of the object 
+     * @return
      * @exception org.omg.CosNaming.NamingContextPackage.NotFound
-     * Indicates there is no object reference for the given name. <p>
+     * Indicates there is no object reference for the given name.
      * @exception org.omg.CosNaming.NamingContextPackage.CannotProceed
-     * Indicates that the given compound name is incorrect <p>
-     * @exception org.omg.CosNaming.NamingContextExtPackage.InvalidName
-     * Indicates the name does not identify a binding.<p>
-     * @exception org.omg.CosNaming.NamingContextPackage.AlreadyBound
-     * Indicates the name is already bound.<p>
+     * Indicates that the given compound name is incorrect
+     * @throws org.omg.CosNaming.NamingContextPackage.InvalidName
      *
      */
     public org.omg.CORBA.Object resolve_str(String sn)
@@ -995,23 +986,20 @@ public abstract class NamingContextImpl
                org.omg.CosNaming.NamingContextPackage.InvalidName
     {
 	org.omg.CORBA.Object theObject = null;
-	// Name valid?
-	if  ( (sn == null ) || (sn.length() == 0) )
-	{
-		throw new InvalidName();
+	if ((sn == null) || (sn.length() == 0)) {
+            throw new InvalidName();
 	}
-	NamingContextDataStore impl = (NamingContextDataStore)this;
+
 	org.omg.CosNaming.NameComponent[] theNameComponents =
 		insImpl.convertToNameComponent( sn );
 
-	if( ( theNameComponents == null ) || (theNameComponents.length == 0 ) )
-	{
-		throw new InvalidName();
+	if ((theNameComponents == null) || (theNameComponents.length == 0 )) {
+            throw new InvalidName();
 	}
+
 	theObject = resolve( theNameComponents );
 	return theObject;
     }
-
 
     transient protected ORB orb;
   
@@ -1020,8 +1008,10 @@ public abstract class NamingContextImpl
 	StringBuffer s = new StringBuffer("{");
 	if (name != null) {
 	    for (int i=0;i<name.length;i++) {
-		if (i>0)
-		    s.append(",");
+		if (i>0) {
+                    s.append(",");
+                }
+
 		s.append("[").
 		    append(name[i].id).
 		    append(",").
@@ -1029,7 +1019,9 @@ public abstract class NamingContextImpl
 		    append("]");
 	    }
 	}
+
 	s.append("}");
+
 	return s.toString();
     }  
 

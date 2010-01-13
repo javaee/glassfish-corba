@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1993-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1993-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,14 +37,8 @@
 package com.sun.corba.se.impl.naming.pcosnaming;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.omg.CORBA.Policy;
-import org.omg.PortableServer.POA;
-import org.omg.PortableServer.LifespanPolicyValue;
-import org.omg.PortableServer.RequestProcessingPolicyValue;
-import org.omg.PortableServer.IdAssignmentPolicyValue;
-import org.omg.PortableServer.ServantRetentionPolicyValue;
 import org.omg.CosNaming.NamingContext;
 import org.omg.CosNaming.NamingContextHelper;
 import org.omg.PortableServer.*;
@@ -133,6 +127,7 @@ public class NameService
 
     /**
      * This method returns the Root Naming Context
+     * @return root naming context
      */
     public NamingContext initialNamingContext()
     {
@@ -149,68 +144,58 @@ public class NameService
 
 
     /**
-     * This method  creates a NewContext, This will internally invoked from
+     * This method  creates a NewContext, This will be internally invoked from
      * NamingContextImpl. It is not a public API. NewContext is in this class
-     * because a Persiten reference has to be created with Persistent NameService
+     * because a persitent reference has to be created with Persistent NameService
      * POA.
+     * @return new naming context
      */
-    public NamingContext NewContext( ) throws org.omg.CORBA.SystemException 
-    {
-	try
-	{
-		// Get the new Naming Context Key from 
-		// the ServantManager
-		String newKey = 
-		contextMgr.getNewObjectKey( );
-		// Create the new Naming context and create the Persistent
-		// reference
-		NamingContextImpl theContext = 
-		new NamingContextImpl( theorb, newKey,
-		    this, contextMgr );
-		NamingContextImpl tempContext = contextMgr.addContext( newKey,
-						 theContext );
-		if( tempContext != null )
-		{
-			theContext = tempContext;
-		}
-		// If the context is read from the File, The following three entries
-		// will be null. So a fresh setup may be required.
-		theContext.setServantManagerImpl( contextMgr );
-		theContext.setORB( theorb );
-		theContext.setRootNameService( this );
-	        NamingContext theNewContext = 
-		NamingContextHelper.narrow(
-	 	nsPOA.create_reference_with_id( newKey.getBytes( ), 
-	        NamingContextHelper.id( )) );
-		return theNewContext;
+    public NamingContext newContext( ) {
+	try {
+            // Get the new Naming Context Key from
+            // the ServantManager
+            String newKey = contextMgr.getNewObjectKey( );
+            // Create the new Naming context and create the Persistent
+            // reference
+            NamingContextImpl theContext = new NamingContextImpl( theorb,
+                newKey, this, contextMgr );
+            NamingContextImpl tempContext = contextMgr.addContext( newKey,
+                                                theContext );
+            if( tempContext != null ) {
+                theContext = tempContext;
+            }
+            // If the context is read from the File, The following three entries
+            // will be null. So a fresh setup may be required.
+            theContext.setServantManagerImpl( contextMgr );
+            theContext.setORB( theorb );
+            theContext.setRootNameService( this );
+            NamingContext theNewContext =
+            NamingContextHelper.narrow(
+            nsPOA.create_reference_with_id( newKey.getBytes( ),
+            NamingContextHelper.id( )) );
+            return theNewContext;
+	} catch( org.omg.CORBA.SystemException e ) {
+            throw e;
+	} catch( java.lang.Exception e ) {
+            //throw e;
 	}
-	catch( org.omg.CORBA.SystemException e )
-	{
-		throw e;
-	}
-	catch( java.lang.Exception e )
-	{
-		//throw e;
-	}
+
 	return null;
     } 	
 
-    /**
-     * getObjectReferenceFromKey returns the Object reference from the objectkey using POA.create_reference_with_id method
+    /** getObjectReferenceFromKey returns the Object reference from the objectkey
+     * using POA.create_reference_with_id method.
      * @param Object Key as String
      * @returns reference an CORBA.Object.
      */
-    org.omg.CORBA.Object getObjectReferenceFromKey( String key )
-    { 
+    org.omg.CORBA.Object getObjectReferenceFromKey( String key ) {
 	org.omg.CORBA.Object theObject = null;
-	try
-	{
-		theObject = nsPOA.create_reference_with_id( key.getBytes( ), NamingContextHelper.id( ) );
+	try {
+            theObject = nsPOA.create_reference_with_id( key.getBytes( ), NamingContextHelper.id( ) );
+	} catch (Exception e ) {
+            theObject = null;
 	}
-	catch (Exception e )
-	{
-		theObject = null;
-	}
+
         return theObject;
     } 
 
@@ -219,28 +204,19 @@ public class NameService
      * @param reference an CORBA.Object.
      * @returns Object Key as String
      */
-    String getObjectKey( org.omg.CORBA.Object reference )
-    { 
+    String getObjectKey( org.omg.CORBA.Object reference ) {
 	byte theId[];
-	try
-	{
-		theId = nsPOA.reference_to_id( reference ); 
+	try {
+            theId = nsPOA.reference_to_id( reference );
+	} catch( org.omg.PortableServer.POAPackage.WrongAdapter e ) {
+            return null;
+	} catch( org.omg.PortableServer.POAPackage.WrongPolicy e ) {
+            return null;
+	} catch( Exception e ) {
+            return null;
 	}
-	catch( org.omg.PortableServer.POAPackage.WrongAdapter e )
-	{
-		return null;
-	}
-	catch( org.omg.PortableServer.POAPackage.WrongPolicy e )
-	{
-		return null;
-	}
-	catch( Exception e )
-	{
-		return null;
-	}
+
 	String theKey = new String( theId );
 	return theKey;
     }
-
- 
 }

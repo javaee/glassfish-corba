@@ -109,6 +109,10 @@ import com.sun.corba.se.spi.transport.CorbaAcceptor;
 public class ORBConfiguratorImpl implements ORBConfigurator {
     private ORBUtilSystemException wrapper ;
 
+    protected void persistentServerInitialization(ORB theOrb) {
+        // Does nothing, but can be overridden in subclass.
+    }
+
     public static class ConfigParser extends ParserImplBase {
         private ORB orb ;
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -46,6 +46,7 @@ import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 import com.sun.corba.se.impl.orb.ORBImpl ;
 
 import com.sun.corba.se.impl.osgi.loader.OSGIListener;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 /** A simple factory for creating our ORB that avoids the ClassLoader
  * problems with org.omg.CORBA.ORB.init, which must load the ORB impl class.
@@ -81,6 +82,9 @@ public class ORBFactory {
     @SuppressWarnings("static-access")
     public static void initialize( ORB orb, String[] args, Properties props, boolean isGFv3 ) {
         if (isGFv3) {
+            props.setProperty( ORBConstants.DISABLE_ORBD_INIT_PROPERTY,
+                "true" ) ;
+
             orb.classNameResolver(
                 orb.makeCompositeClassNameResolver(
                     OSGIListener.classNameResolver(),

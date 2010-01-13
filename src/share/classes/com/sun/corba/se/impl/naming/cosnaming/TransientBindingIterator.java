@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,23 +37,18 @@
 package com.sun.corba.se.impl.naming.cosnaming;
 
 // Import general CORBA classes
-import org.omg.CORBA.SystemException;
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
 
 // Get org.omg.CosNaming Types
 import org.omg.CosNaming.Binding;
 import org.omg.CosNaming.BindingType;
-import org.omg.CosNaming.BindingTypeHolder;
 import org.omg.CosNaming.NameComponent;
 
 // Get base implementation
-import com.sun.corba.se.impl.naming.cosnaming.NamingContextImpl;
-import com.sun.corba.se.impl.naming.cosnaming.InternalBindingValue;
 
 // Get a hash table
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -75,9 +70,8 @@ public class TransientBindingIterator extends BindingIteratorImpl
      * @param orb a org.omg.CORBA.ORB object.
      * @param aTable A hashtable containing InternalBindingValues which is
      * the content of the TransientNamingContext.
-     * @param java.lang.Exception a Java exception.
-     * @exception Exception a Java exception thrown of the base class cannot
-     * initialize.
+     * @param thePOA the POA to use.
+     * @throws java.lang.Exception a Java exception.
    */
     public TransientBindingIterator(ORB orb, 
 	Map<InternalBindingKey,InternalBindingValue> aTable,
@@ -98,7 +92,7 @@ public class TransientBindingIterator extends BindingIteratorImpl
    * @param b The Binding as an out parameter.
    * @return true if there were more bindings.
    */
-    final public boolean NextOne(org.omg.CosNaming.BindingHolder b)
+    final public boolean nextOneImpl(org.omg.CosNaming.BindingHolder b)
     {
 	// If there are more elements get the next element
 	boolean hasMore = bindingIterator.hasNext();
@@ -117,7 +111,7 @@ public class TransientBindingIterator extends BindingIteratorImpl
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    final public void Destroy()
+    final public void destroyImpl()
     {
 	// Remove the object from the Active Object Map.
         try {
@@ -136,7 +130,7 @@ public class TransientBindingIterator extends BindingIteratorImpl
      * Returns the remaining number of elements in the iterator.
      * @return the remaining number of elements in the iterator.   
      */
-    public final int RemainingElements() {
+    public final int remainingElementsImpl() {
 	return currentSize;
     }
 

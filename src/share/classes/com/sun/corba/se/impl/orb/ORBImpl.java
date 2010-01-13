@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -58,6 +58,8 @@ import java.util.HashMap ;
 import java.util.WeakHashMap ;
 
 import java.net.InetAddress ;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.rmi.CORBA.ValueHandler;
 
@@ -453,9 +455,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             try {
                 Field fld = this.getClass().getField( token + "DebugFlag" ) ;
                 int mod = fld.getModifiers() ;
-                if (Modifier.isPublic( mod ) && !Modifier.isStatic( mod ))
-                    if (fld.getType() == boolean.class)
-                        fld.setBoolean( this, true ) ;
+                if (Modifier.isPublic( mod ) && !Modifier.isStatic( mod )) {
+                    if (fld.getType() == boolean.class) {
+                        fld.setBoolean(this, true);
+                    }
+                }
             } catch (Exception exc) {
                 // ignore it XXX log this as info
             }
@@ -467,7 +471,21 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private class ConfigParser extends ParserImplBase {
 	// The default here is the ORBConfiguratorImpl that we define,
 	// but this can be replaced.
-	public Class configurator = ORBConfiguratorImpl.class ;
+	public Class<?> configurator ;
+
+        public ConfigParser( boolean disableORBD ) {
+            if (disableORBD) {
+                configurator = ORBConfiguratorImpl.class ;            
+            } else {
+                String cname = 
+                    "com.sun.corba.se.impl.activation.ORBConfiguratorPersistentImpl" ;
+                try {
+                    configurator = Class.forName(cname);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ORBImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
 
 	public PropertyParser makeParser()
 	{
@@ -561,7 +579,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	serviceContextsCache = new ServiceContextsCache(this);
 
 	// Create a parser to get the configured ORBConfigurator.
-	ConfigParser parser = new ConfigParser() ;
+	ConfigParser parser = new ConfigParser( configData.disableORBD() ) ;
 	parser.init( dataCollector ) ;
 
 	ORBConfigurator configurator =  null ;

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -35,8 +35,6 @@
  */
 
 package com.sun.corba.se.spi.orb ;
-
-import javax.management.ObjectName ;
 
 import org.omg.PortableInterceptor.ORBInitializer ;
 
@@ -404,6 +402,10 @@ public interface ORBData {
     @ManagedAttribute
     @Description( "The String[] args that were passed to the ORB init call (used for interceptor initialization)" ) 
     public String[] getOrbInitArgs() ;
+
+    @ManagedAttribute
+    @Description( "True if ORBD should not be used in this ORB instance")
+    public boolean disableORBD() ;
 }
 
 // End of file.

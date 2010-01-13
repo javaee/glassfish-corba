@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,6 +48,7 @@ import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
 import com.sun.corba.se.impl.logging.NamingSystemException;
+import java.util.Arrays;
 
 /**
  * Class TransientNameServer is a standalone application which
@@ -122,7 +123,8 @@ public class TransientNameServer
 	// Determine the initial bootstrap port to use
 	int initialPort = 0;
 	try {
-	    trace( "Transient name server started with args " + args ) ;
+	    trace( "Transient name server started with args " + 
+                Arrays.asList( args ) ) ;
 
 	    // Create an ORB object
 	    Properties props = System.getProperties() ;

@@ -43,7 +43,8 @@ public class ConnectionCacheStressTest extends CORBATest
     @Override
     protected void doTest() throws Throwable
     {
-	Controller client = createClient( "corba.connectioncache.StressClient" ) ;
+	Controller client = createClient( "corba.connectioncache.StressClient",
+            "stressClient" ) ;
 
 	client.start();
 

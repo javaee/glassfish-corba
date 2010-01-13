@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -141,7 +141,7 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    public final void Bind(NameComponent n, org.omg.CORBA.Object obj,
+    public final void bindImpl(NameComponent n, org.omg.CORBA.Object obj,
 			   BindingType bt)
 	throws org.omg.CORBA.SystemException
     {
@@ -179,7 +179,7 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    public final org.omg.CORBA.Object Resolve(NameComponent n,
+    public final org.omg.CORBA.Object resolveImpl(NameComponent n,
 					      BindingTypeHolder bth)
 	throws org.omg.CORBA.SystemException
     {
@@ -216,7 +216,7 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    public final org.omg.CORBA.Object Unbind(NameComponent n)
+    public final org.omg.CORBA.Object unbindImpl(NameComponent n)
 	throws org.omg.CORBA.SystemException
     {
 	// Create a key and remove it from the hashtable
@@ -251,7 +251,7 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    public final void List(int how_many, BindingListHolder bl,
+    public final void listImpl(int how_many, BindingListHolder bl,
 			   BindingIteratorHolder bi)
 	throws org.omg.CORBA.SystemException
     {
@@ -294,7 +294,7 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    public final org.omg.CosNaming.NamingContext NewContext()
+    public final org.omg.CosNaming.NamingContext newContextImpl()
 	throws org.omg.CORBA.SystemException
     {
 	try {
@@ -325,7 +325,7 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    public final void Destroy()
+    public final void destroyImpl()
 	throws org.omg.CORBA.SystemException
     {
 	// Destroy the object reference by disconnecting from the ORB
@@ -361,7 +361,7 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
      * this request to the hash table.
      * @return true if this NamingContext contains no bindings.
      */
-    public final boolean IsEmpty()
+    public final boolean isEmptyImpl()
     {
 	return bindingMap.isEmpty();
     }

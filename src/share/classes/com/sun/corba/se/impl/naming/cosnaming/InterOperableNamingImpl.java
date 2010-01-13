@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,16 +36,10 @@
 
 package com.sun.corba.se.impl.naming.cosnaming;
 
-import org.omg.CosNaming.NamingContextExtPackage.*;
 import java.io.StringWriter;
 
-// Import general CORBA classes
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.Object;
-
-// Import org.omg.CosNaming types
 import org.omg.CosNaming.NameComponent;
-import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextExtPackage.InvalidAddress;
 
 
 /**
@@ -61,24 +55,34 @@ public class InterOperableNamingImpl
      * Method which stringifies the Name Components given as the input 
      * parameter.
      *
-     * @param n Array of Name Components (Simple or Compound Names)
+     * @param theNameComponents Array of Name Components (Simple or Compound
+     * Names)
      * @return string which is the stringified reference.
      */
     public String convertToString( org.omg.CosNaming.NameComponent[] 
                                    theNameComponents )
     {
-        String theConvertedString = 
-            convertNameComponentToString( theNameComponents[0] );
-        String temp;
-        for( int i = 1; i < theNameComponents.length; i++ ) {
-            temp = convertNameComponentToString( theNameComponents[i] );
-            if( temp != null ) {
-                 theConvertedString = 
-                 theConvertedString + "/" +  convertNameComponentToString( 
-                     theNameComponents[i] );
+        boolean first = true ;
+        final StringBuffer sb = new StringBuffer() ;
+        for (NameComponent nc : theNameComponents) {
+            final String temp = convertNameComponentToString( nc ) ;
+            sb.append( temp ) ;
+            if (first) {
+                first = false ;
+            } else {
+                sb.append( '/' ) ;
             }
         }
-        return theConvertedString;
+
+        return sb.toString() ;
+    }
+
+    private boolean isEmpty( String str ) {
+        return str==null || str.length() == 0 ;
+    }
+
+    private boolean contains( String str, char ch ) {
+        return str.indexOf( ch ) != -1 ;
     }
 
    /** This method converts a single Namecomponent to String, By adding Escapes
@@ -87,30 +91,21 @@ public class InterOperableNamingImpl
     private String convertNameComponentToString( 
         org.omg.CosNaming.NameComponent theNameComponent ) 
     {
-        if( ( ( theNameComponent.id == null ) 
-            ||( theNameComponent.id.length() == 0 ) )
-          &&( ( theNameComponent.kind == null ) 
-            ||( theNameComponent.kind.length() == 0 ) ) )
-        {
-            return ".";
+        final String id = addEscape( theNameComponent.id ) ;
+        final String kind = addEscape( theNameComponent.kind ) ;
+        final StringBuffer sb = new StringBuffer() ;
+
+        if (!isEmpty(id)) {
+            sb.append( id ) ;
         }
-        else if( ( theNameComponent.id == null ) 
-               ||( theNameComponent.id.length() == 0 ) )
-        {
-            String kind = addEscape( theNameComponent.kind );
-            return "." + kind;
+
+        sb.append( '.' ) ;
+
+        if (!isEmpty(kind)) {
+            sb.append(kind) ;
         }
-        else if( ( theNameComponent.kind == null ) 
-               ||( theNameComponent.kind.length() == 0 ) )
-        {
-            String id = addEscape( theNameComponent.id );
-            return id;
-        }
-        else {
-            String id = addEscape( theNameComponent.id );
-            String kind = addEscape( theNameComponent.kind );
-            return (id + "." +  kind);
-        }
+
+        return sb.toString() ;
     }
 
 
@@ -118,71 +113,64 @@ public class InterOperableNamingImpl
     */
    private String addEscape( String value )
    {
-        StringBuffer theNewValue;
-        if( (value != null) && ( (value.indexOf('.') != -1 ) || 
-                                 (value.indexOf('/') != -1)))
-        {
-            char c;
-            theNewValue = new StringBuffer( );
+        if ((value != null) && (contains( value, '.' ) ||
+            contains( value, '/' ))) {
+            final StringBuffer theNewValue = new StringBuffer() ;
             for( int i = 0; i < value.length( ); i++ ) {
-                c = value.charAt( i );
-                if( ( c != '.' ) && (c != '/' ) )
-                {
-                    theNewValue.append( c );
-                }
-                else {
-                    // Adding escape for the "."
+                char c = value.charAt( i );
+                if ((c == '.') || (c == '/')) {
                     theNewValue.append( '\\' );
-                    theNewValue.append( c );
                 }
+
+                // Adding escape for the "."
+                theNewValue.append( c );
             }
-        }
-        else {
+
+            return theNewValue.toString() ;
+        } else {
             return value;
         }
-        return new String( theNewValue );
    } 
 
    /**
      * Method which converts the Stringified name into Array of Name Components.
      *
-     * @param string which is the stringified name.
-     * @return  Array of Name Components (Simple or Compound Names)
+     * @param theStringifiedName which is the stringified name.
+    * @return  Array of Name Components (Simple or Compound Names)
+    * @throws org.omg.CosNaming.NamingContextPackage.InvalidName
      */
    public org.omg.CosNaming.NameComponent[] convertToNameComponent( 
        String theStringifiedName )
        throws org.omg.CosNaming.NamingContextPackage.InvalidName
    {
-	String[] theStringifiedNameComponents = 
-		 breakStringToNameComponents( theStringifiedName );
-        if( ( theStringifiedNameComponents == null ) 
-         || (theStringifiedNameComponents.length == 0 ) )
-        {
+	String[] components = breakStringToNameComponents( theStringifiedName );
+        if (( components == null ) || (components.length == 0)) {
             return null;
         } 
-        NameComponent[] theNameComponents = 
-            new NameComponent[theStringifiedNameComponents.length];
-        for( int i = 0; i < theStringifiedNameComponents.length; i++ ) {
+
+        NameComponent[] theNameComponents = new NameComponent[components.length];
+        for( int i = 0; i < components.length; i++ ) {
             theNameComponents[i] = createNameComponentFromString( 
-                theStringifiedNameComponents[i] );
+                components[i] );
         }
+
         return theNameComponents;
    }
 
    /** Step1 in converting Stringified name into  array of Name Component 
      * is breaking the String into multiple name components
      */
-   private String[] breakStringToNameComponents( String theStringifiedName ) {
+   private String[] breakStringToNameComponents( final String sname ) {
        int[] theIndices = new int[100];
        int theIndicesIndex = 0;
 
-       for(int index = 0; index <= theStringifiedName.length(); ) {
-           theIndices[theIndicesIndex] = theStringifiedName.indexOf( '/', 
+       for(int index = 0; index <= sname.length(); ) {
+           theIndices[theIndicesIndex] = sname.indexOf( '/',
                 index );
            if( theIndices[theIndicesIndex] == -1 ) {
                // This is the end of all the occurence of '/' and hence come
                // out of the loop
-               index = theStringifiedName.length()+1;
+               index = sname.length()+1;
            }
            else {
                // If the '/' is found, first check whether it is 
@@ -190,7 +178,7 @@ public class InterOperableNamingImpl
                // If not then set theIndices and increment theIndicesIndex 
                // and also set the index else just ignore the '/'
                if( (theIndices[theIndicesIndex] > 0 )
-               && (theStringifiedName.charAt(
+               && (sname.charAt(
                    theIndices[theIndicesIndex]-1) == '\\') )
                {
                   index = theIndices[theIndicesIndex] + 1;
@@ -204,14 +192,14 @@ public class InterOperableNamingImpl
         }
         if( theIndicesIndex == 0 ) {
             String[] tempString = new String[1];
-            tempString[0] = theStringifiedName;
+            tempString[0] = sname;
             return tempString;
         }
         if( theIndicesIndex != 0 ) {
             theIndicesIndex++;
         }
         return StringComponentsFromIndices( theIndices, theIndicesIndex, 
-                                            theStringifiedName );
+                                            sname );
     } 
 
    /** This method breaks one big String into multiple substrings based

@@ -139,7 +139,7 @@ public class StressClient {
 	    "Total connections" ) ;
     }
 
-    private static final int NUM_ITERATIONS = 1000 ;
+    private static final int NUM_ITERATIONS = 2000 ;
 
     private static final int NUM_CONTACT_INFO = 8 ;
     private static final int NUM_THREADS = 40 ;
@@ -193,7 +193,7 @@ public class StressClient {
                     operationDelay.randomWait();
                     obcache.responseReceived(conn);
                 } catch (IOException exc) {
-
+                    Assert.fail( "Error in thread", exc ) ;
                 }
             }
         }
@@ -246,6 +246,15 @@ public class StressClient {
                 }
             }
         }
+
+        System.out.println( "Number of busy connections: " +
+            ibcache.numberOfBusyConnections() ) ;
+        System.out.println( "Number of connections: " +
+            ibcache.numberOfConnections() ) ;
+        System.out.println( "Number of idle connections: " +
+            ibcache.numberOfIdleConnections() ) ;
+        System.out.println( "Number of reclaimable connections: " +
+            ibcache.numberOfReclaimableConnections() ) ;
     }
     
     public static void main( String[] args ) {

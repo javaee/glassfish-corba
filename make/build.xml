@@ -3,7 +3,7 @@
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
-  Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
+  Copyright 2003-2010 Sun Microsystems, Inc. All rights reserved.
  
   The contents of this file are subject to the terms of either the GNU
   General Public License Version 2 only ("GPL") or the Common Development
@@ -1885,14 +1885,16 @@
 	    <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.CodegenCopier*"/>
 	    <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.FastCache*"/>
 	    <filter excludes="com.sun.corba.se.spi.orbutil.proxy.*"/>
-	    <filter excludes="com.sun.corba.se.impl.orbutil.*1_3"/>
-	    <filter excludes="com.sun.corba.se.impl.orbutil.*1_3_1"/>
 	    <filter excludes="com.sun.corba.se.impl.dynamicany.*"/>
 	    <filter excludes="com.sun.corba.se.impl.naming.pcosnaming.*"/>
 	    <filter excludes="com.sun.corba.se.internal.*.*"/>
 	    <filter excludes="com.sun.corba.se.org.omg"/>
 	    <filter excludes="com.sun.org.omg"/>
 	    <filter excludes="com.sun.corba.se.org.objectweb"/>
+	    <filter excludes="com.sun.corba.se.impl.osgi.main"/>
+	    <filter excludes="com.sun.corba.se.impl.presentation.proxy"/>
+	    <filter excludes="com.sun.corba.se.impl.orbutil.file"/>
+	    <filter excludes="com.sun.corba.se.impl.orbutil.argparser"/>
 	</instr>
     </emma>
   </target>

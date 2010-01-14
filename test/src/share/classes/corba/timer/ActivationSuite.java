@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -402,62 +402,69 @@ public class ActivationSuite {
 
     @Test()
     public void testStatsHandler() {
-	List<String> elist = asList( "t1", "t2", "t3" ) ;
-	Set<Controllable> cset = makeControllableSet( elist ) ;
-	String shName = "Stats1" ;
-	StatsEventHandler handler = tf.makeStatsEventHandler( shName ) ;
-	controller.register( handler ) ;
-	enableControllables( cset ) ;
-	generateEvents( controller, evIn ) ;
-	Map<Timer,Statistics> smap = handler.stats() ;
-	displayStatsMap( smap ) ;
+        final String shName = "Stats1" ;
+        final StatsEventHandler handler = tf.makeStatsEventHandler( shName ) ;
 
-	handler.clear() ;
-	smap = handler.stats() ;
-	for (Timer timer : smap.keySet()) {
-	    Statistics stats = smap.get( timer ) ;
-	    Assert.assertTrue( stats.count() == 0 ) ;
-	}
+        try {
+            final List<String> elist = asList( "t1", "t2", "t3" ) ;
+            final Set<Controllable> cset = makeControllableSet( elist ) ;
+            controller.register( handler ) ;
+            enableControllables( cset ) ;
+            generateEvents( controller, evIn ) ;
+            Map<Timer,Statistics> smap = handler.stats() ;
+            displayStatsMap( smap ) ;
+
+            handler.clear() ;
+            smap = handler.stats() ;
+            for (Timer timer : smap.keySet()) {
+                Statistics stats = smap.get( timer ) ;
+                Assert.assertTrue( stats.count() == 0 ) ;
+            }
+        } finally {
+            controller.deregister( handler ) ;
+        }
     }
 
     @Test()
     public void testTimerController() {
-	List<String> elist = asList( "t1", "t3" ) ;
-	Set<Controllable> cset = makeControllableSet( elist ) ;
-	enableControllables( cset ) ;
+        try {
+            List<String> elist = asList( "t1", "t3" ) ;
+            Set<Controllable> cset = makeControllableSet( elist ) ;
+            enableControllables( cset ) ;
 
-	// Test for correct name and factory of controller
-	Assert.assertEquals( controller.name(), controllerName ) ;
-	Assert.assertEquals( controller.factory(), tf ) ;
+            // Test for correct name and factory of controller
+            Assert.assertEquals( controller.name(), controllerName ) ;
+            Assert.assertEquals( controller.factory(), tf ) ;
 
-	// Test registration of event handlers
-	controller.register( h1 ) ;
-	controller.register( h2 ) ;
-	Set<TimerEventHandler> etecSet = asSet( (TimerEventHandler)h1, 
-	    (TimerEventHandler)h2 ) ;
-	Set<TimerEventHandler> atecSet = controller.handlers() ;
-	Assert.assertEquals( etecSet, atecSet ) ;
+            // Test registration of event handlers
+            controller.register( h1 ) ;
+            controller.register( h2 ) ;
+            Set<TimerEventHandler> etecSet = asSet( (TimerEventHandler)h1, 
+                (TimerEventHandler)h2 ) ;
+            Set<TimerEventHandler> atecSet = controller.handlers() ;
+            Assert.assertEquals( etecSet, atecSet ) ;
 
-	// Test event handler deregistration
-	controller.deregister( h2 ) ;
-	etecSet = asSet( (TimerEventHandler)h1 ) ;
-	atecSet = controller.handlers() ;
-	Assert.assertEquals( etecSet, atecSet ) ;
+            // Test event handler deregistration
+            controller.deregister( h2 ) ;
+            etecSet = asSet( (TimerEventHandler)h1 ) ;
+            atecSet = controller.handlers() ;
+            Assert.assertEquals( etecSet, atecSet ) ;
 
-	// Test for correct generation of event sequence with
-	// activated timers.
-	controller.register( h2 ) ;
-	generateEvents( controller, evIn ) ;
-	List<TimerEvent> events1 = h1.events() ;
-	List<TimerEvent> events2 = h2.events() ;
-	Assert.assertEquals( events1, events2 ) ;
+            // Test for correct generation of event sequence with
+            // activated timers.
+            controller.register( h2 ) ;
+            generateEvents( controller, evIn ) ;
+            List<TimerEvent> events1 = h1.events() ;
+            List<TimerEvent> events2 = h2.events() ;
+            Assert.assertEquals( events1, events2 ) ;
 
-	validateEvents( h1.events(), evOut ) ;
-
-	// clean up
-	controller.deregister( h1 ) ;
-	controller.deregister( h2 ) ;
-	disableAllControllables() ;
+            validateEvents( h1.events(), evOut ) ;
+        } finally {
+            // clean up
+            controller.deregister( h1 ) ;
+            controller.deregister( h2 ) ;
+            disableAllControllables() ;
+        }
     }
 
     @Configuration( afterTest = true ) 

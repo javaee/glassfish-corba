@@ -70,7 +70,11 @@ public final class ObjectIdImpl implements ObjectId
 
     public ObjectIdImpl( byte[] id ) 
     {
-	this.id = (byte[])id.clone() ;
+        if (id == null) {
+            this.id = null ;
+        } else {
+            this.id = (byte[])id.clone() ;
+        }
     }
 
     public String getIdString() {

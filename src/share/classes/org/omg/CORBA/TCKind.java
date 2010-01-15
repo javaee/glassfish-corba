@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -556,12 +556,11 @@ public class TCKind {
     * @param  _value the <code>int</code> to convert.  It must be one of
     *         the <code>int</code> constants in the class
     *         <code>TCKind</code>.
-    * @return  a new <code>TCKind</code> instance whose <code>value</code>
-    * field matches the given <code>int</code>
     */
     // @Deprecated
     protected TCKind(int _value){
 	this._value = _value;
     }
+
     private int _value;
 }

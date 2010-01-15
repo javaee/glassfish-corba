@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -174,7 +174,7 @@ public class PortableRemoteObject {
      * happens implicitly when the object is sent or received as an argument
      * on a remote method call, but in some circumstances it is useful to
      * perform this action by making an explicit call.  See the 
-     * {@link Stub#connect} method for more information. 
+     * {@link javax.rmi.CORBA.Stub#connect} method for more information. 
      * @param target the object to connect.
      * @param source a previously connected object.
      * @throws RemoteException if <code>source</code> is not connected

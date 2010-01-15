@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1567,7 +1567,7 @@ module PortableInterceptor {
      * <p>
      * Any number of components may exist with the same component ID. 
      * 
-     * @param a_component The IOP.TaggedComponent to add.
+     * @param tagged_component The IOP.TaggedComponent to add.
      */
     void add_ior_component 
       (in IOP::TaggedComponent tagged_component);
@@ -1581,7 +1581,7 @@ module PortableInterceptor {
      * <p>
      * Any number of components may exist with the same component ID. 
      * 
-     * @param a_component The <code>IOP.TaggedComponent</code> to add. 
+     * @param tagged_component The <code>IOP.TaggedComponent</code> to add. 
      * @param profile_id The profile id of the profile to 
      *     which this component will be added.
      * @exception BAD_PARAM thrown, with a standard minor code of 29, if the 

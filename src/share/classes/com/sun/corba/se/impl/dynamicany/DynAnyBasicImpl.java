@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,16 +41,15 @@ import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.TCKind;
 
-import org.omg.DynamicAny.*;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 public class DynAnyBasicImpl extends DynAnyImpl
 {
+    private static final long serialVersionUID = -6855799336532160409L;
     //
     // Constructors
     //
@@ -75,6 +74,7 @@ public class DynAnyBasicImpl extends DynAnyImpl
     // DynAny interface methods
     //
 
+    @Override
     public void assign (org.omg.DynamicAny.DynAny dyn_any)
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch
     {
@@ -85,6 +85,7 @@ public class DynAnyBasicImpl extends DynAnyImpl
         index = NO_INDEX;
     }
 
+    @Override
     public void from_any (org.omg.CORBA.Any value)
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
@@ -169,8 +170,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_boolean)
+        if (any.type().kind().value() != TCKind._tk_boolean) {
             throw new TypeMismatch();
+        }
         any.insert_boolean(value);
     }
 
@@ -181,8 +183,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_octet)
+        if (any.type().kind().value() != TCKind._tk_octet) {
             throw new TypeMismatch();
+        }
         any.insert_octet(value);
     }
 
@@ -193,8 +196,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_char)
+        if (any.type().kind().value() != TCKind._tk_char) {
             throw new TypeMismatch();
+        }
         any.insert_char(value);
     }
 
@@ -205,8 +209,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_short)
+        if (any.type().kind().value() != TCKind._tk_short) {
             throw new TypeMismatch();
+        }
         any.insert_short(value);
     }
 
@@ -217,8 +222,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_ushort)
+        if (any.type().kind().value() != TCKind._tk_ushort) {
             throw new TypeMismatch();
+        }
         any.insert_ushort(value);
     }
 
@@ -229,8 +235,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_long)
+        if (any.type().kind().value() != TCKind._tk_long) {
             throw new TypeMismatch();
+        }
         any.insert_long(value);
     }
 
@@ -241,8 +248,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_ulong)
+        if (any.type().kind().value() != TCKind._tk_ulong) {
             throw new TypeMismatch();
+        }
         any.insert_ulong(value);
     }
 
@@ -253,8 +261,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_float)
+        if (any.type().kind().value() != TCKind._tk_float) {
             throw new TypeMismatch();
+        }
         any.insert_float(value);
     }
 
@@ -265,8 +274,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_double)
+        if (any.type().kind().value() != TCKind._tk_double) {
             throw new TypeMismatch();
+        }
         any.insert_double(value);
     }
 
@@ -277,14 +287,17 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_string)
+        if (any.type().kind().value() != TCKind._tk_string) {
             throw new TypeMismatch();
-        if (value == null)
+        }
+        if (value == null) {
             throw new InvalidValue();
+        }
         // Throw InvalidValue if this is a bounded string and the length is exceeded
         try {
-            if (any.type().length() > 0 && any.type().length() < value.length())
+            if (any.type().length() > 0 && any.type().length() < value.length()) {
                 throw new InvalidValue();
+            }
         } catch (BadKind bad) { // impossible
         }
         any.insert_string(value);
@@ -297,8 +310,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_objref)
+        if (any.type().kind().value() != TCKind._tk_objref) {
             throw new TypeMismatch();
+        }
         any.insert_Object(value);
     }
 
@@ -309,8 +323,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_TypeCode)
+        if (any.type().kind().value() != TCKind._tk_TypeCode) {
             throw new TypeMismatch();
+        }
         any.insert_TypeCode(value);
     }
 
@@ -321,8 +336,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_longlong)
+        if (any.type().kind().value() != TCKind._tk_longlong) {
             throw new TypeMismatch();
+        }
         any.insert_longlong(value);
     }
 
@@ -333,8 +349,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_ulonglong)
+        if (any.type().kind().value() != TCKind._tk_ulonglong) {
             throw new TypeMismatch();
+        }
         any.insert_ulonglong(value);
     }
 
@@ -345,8 +362,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_wchar)
+        if (any.type().kind().value() != TCKind._tk_wchar) {
             throw new TypeMismatch();
+        }
         any.insert_wchar(value);
     }
 
@@ -357,14 +375,17 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_wstring)
+        if (any.type().kind().value() != TCKind._tk_wstring) {
             throw new TypeMismatch();
-        if (value == null)
+        }
+        if (value == null) {
             throw new InvalidValue();
+        }
         // Throw InvalidValue if this is a bounded string and the length is exceeded
         try {
-            if (any.type().length() > 0 && any.type().length() < value.length())
+            if (any.type().length() > 0 && any.type().length() < value.length()) {
                 throw new InvalidValue();
+            }
         } catch (BadKind bad) { // impossible
         }
         any.insert_wstring(value);
@@ -377,8 +398,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_any)
+        if (any.type().kind().value() != TCKind._tk_any) {
             throw new TypeMismatch();
+        }
         any.insert_any(value);
     }
 
@@ -389,8 +411,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_any)
+        if (any.type().kind().value() != TCKind._tk_any) {
             throw new TypeMismatch();
+        }
         // _REVISIT_ Copy value here?
         any.insert_any(value.to_any());
     }
@@ -403,8 +426,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
 	    throw wrapper.dynAnyDestroyed() ;
         }
         int kind = any.type().kind().value();
-        if (kind != TCKind._tk_value && kind != TCKind._tk_value_box)
+        if (kind != TCKind._tk_value && kind != TCKind._tk_value_box) {
             throw new TypeMismatch();
+        }
         any.insert_Value(value);
     }
 
@@ -416,8 +440,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
 	    throw wrapper.dynAnyDestroyed() ;
         }
         int kind = any.type().kind().value();
-        if (kind != TCKind._tk_value && kind != TCKind._tk_value_box)
+        if (kind != TCKind._tk_value && kind != TCKind._tk_value_box) {
             throw new TypeMismatch();
+        }
         return any.extract_Value();
     }
 
@@ -428,8 +453,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_boolean)
+        if (any.type().kind().value() != TCKind._tk_boolean) {
             throw new TypeMismatch();
+        }
         return any.extract_boolean();
     }
 
@@ -440,8 +466,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_octet)
+        if (any.type().kind().value() != TCKind._tk_octet) {
             throw new TypeMismatch();
+        }
         return any.extract_octet();
     }
 
@@ -452,8 +479,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_char)
+        if (any.type().kind().value() != TCKind._tk_char) {
             throw new TypeMismatch();
+        }
         return any.extract_char();
     }
 
@@ -464,8 +492,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_short)
+        if (any.type().kind().value() != TCKind._tk_short) {
             throw new TypeMismatch();
+        }
         return any.extract_short();
     }
 
@@ -476,8 +505,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_ushort)
+        if (any.type().kind().value() != TCKind._tk_ushort) {
             throw new TypeMismatch();
+        }
         return any.extract_ushort();
     }
 
@@ -488,8 +518,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_long)
+        if (any.type().kind().value() != TCKind._tk_long) {
             throw new TypeMismatch();
+        }
         return any.extract_long();
     }
 
@@ -500,8 +531,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_ulong)
+        if (any.type().kind().value() != TCKind._tk_ulong) {
             throw new TypeMismatch();
+        }
         return any.extract_ulong();
     }
 
@@ -512,8 +544,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_float)
+        if (any.type().kind().value() != TCKind._tk_float) {
             throw new TypeMismatch();
+        }
         return any.extract_float();
     }
 
@@ -524,8 +557,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_double)
+        if (any.type().kind().value() != TCKind._tk_double) {
             throw new TypeMismatch();
+        }
         return any.extract_double();
     }
 
@@ -536,8 +570,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_string)
+        if (any.type().kind().value() != TCKind._tk_string) {
             throw new TypeMismatch();
+        }
         return any.extract_string();
     }
 
@@ -548,8 +583,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_objref)
+        if (any.type().kind().value() != TCKind._tk_objref) {
             throw new TypeMismatch();
+        }
         return any.extract_Object();
     }
 
@@ -560,8 +596,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_TypeCode)
+        if (any.type().kind().value() != TCKind._tk_TypeCode) {
             throw new TypeMismatch();
+        }
         return any.extract_TypeCode();
     }
 
@@ -572,8 +609,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_longlong)
+        if (any.type().kind().value() != TCKind._tk_longlong) {
             throw new TypeMismatch();
+        }
         return any.extract_longlong();
     }
 
@@ -584,8 +622,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_ulonglong)
+        if (any.type().kind().value() != TCKind._tk_ulonglong) {
             throw new TypeMismatch();
+        }
         return any.extract_ulonglong();
     }
 
@@ -596,8 +635,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_wchar)
+        if (any.type().kind().value() != TCKind._tk_wchar) {
             throw new TypeMismatch();
+        }
         return any.extract_wchar();
     }
 
@@ -608,8 +648,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_wstring)
+        if (any.type().kind().value() != TCKind._tk_wstring) {
             throw new TypeMismatch();
+        }
         return any.extract_wstring();
     }
 
@@ -620,8 +661,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_any)
+        if (any.type().kind().value() != TCKind._tk_any) {
             throw new TypeMismatch();
+        }
         return any.extract_any();
     }
 
@@ -632,8 +674,9 @@ public class DynAnyBasicImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if (any.type().kind().value() != TCKind._tk_any)
+        if (any.type().kind().value() != TCKind._tk_any) {
             throw new TypeMismatch();
+        }
         // _REVISIT_ Copy value here?
         try {
             return DynAnyUtil.createMostDerivedDynAny(any.extract_any(), orb, true);

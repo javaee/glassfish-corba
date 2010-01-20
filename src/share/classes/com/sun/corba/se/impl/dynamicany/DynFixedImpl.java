@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,18 +38,18 @@ package com.sun.corba.se.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
-import org.omg.CORBA.NO_IMPLEMENT;
-import org.omg.DynamicAny.*;
-import org.omg.DynamicAny.DynAnyPackage.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
+import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
+import org.omg.DynamicAny.DynFixed;
 
 public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
 {
+    private static final long serialVersionUID = -426296363713464920L;
     //
     // Constructors
     //
@@ -112,17 +112,16 @@ public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
 	    throw wrapper.dynAnyDestroyed() ;
         }
         int digits = 0;
-        int scale = 0;
         boolean preservedPrecision = true;
         try {
             digits = any.type().fixed_digits();
-            scale = any.type().fixed_scale();
         } catch (BadKind ex) { // impossible
         }
         // First get rid of leading or trailing whitespace which is allowed
         String string = val.trim();
-        if (string.length() == 0)
+        if (string.length() == 0) {
             throw new TypeMismatch();
+        }
         // Now scan for the sign
         String sign = "";
         if (string.charAt(0) == '-') {
@@ -141,8 +140,9 @@ public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
             string = string.substring(0, dIndex);
         }
         // Just to be sure
-        if (string.length() == 0)
+        if (string.length() == 0) {
             throw new TypeMismatch();
+        }
         // Now look for the dot to determine the integer part
         String integerPart;
         String fractionPart;
@@ -211,6 +211,7 @@ public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
         return preservedPrecision;
     }
 
+    @Override
     public String toString() {
         int digits = 0;
         int scale = 0;

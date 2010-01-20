@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,19 +38,18 @@ package com.sun.corba.se.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
-import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.TypeCodePackage.Bounds;
 import org.omg.DynamicAny.*;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
 {
+    private static final long serialVersionUID = -4420130353899323070L;
+
     //
     // Instance variables
     //
@@ -61,10 +60,6 @@ abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
     //
     // Constructors
     //
-
-    private DynAnyCollectionImpl() {
-        this(null, (Any)null, false);
-    }
 
     protected DynAnyCollectionImpl(ORB orb, Any any, boolean copyValue) {
         super(orb, any, copyValue);
@@ -190,7 +185,9 @@ abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
         checkValue(value);
 
         components = (value == null ? emptyComponents : value);
-        anys = new Any[value.length];
+        if (value != null) {
+            anys = new Any[value.length];
+        }
 
         // We know that this is of kind tk_sequence or tk_array
         TypeCode expectedTypeCode = getContentType();

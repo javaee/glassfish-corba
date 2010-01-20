@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,26 +39,19 @@ package com.sun.corba.se.impl.dynamicany;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.TypeCodePackage.Bounds;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.DynamicAny.*;
-import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 public class DynArrayImpl extends DynAnyCollectionImpl implements DynArray
 {
+    private static final long serialVersionUID = -5898255222474271560L;
     //
     // Constructors
     //
-
-    private DynArrayImpl() {
-        this(null, (Any)null, false);
-    }
 
     protected DynArrayImpl(ORB orb, Any any, boolean copyValue) {
         super(orb, any, copyValue);
@@ -71,8 +64,6 @@ public class DynArrayImpl extends DynAnyCollectionImpl implements DynArray
     // Initializes components and anys representation
     // from the Any representation
     protected boolean initializeComponentsFromAny() {
-        // This typeCode is of kind tk_array.
-        TypeCode typeCode = any.type();
         int length = getBound();
         TypeCode contentType = getContentType();
         InputStream input;
@@ -104,8 +95,6 @@ public class DynArrayImpl extends DynAnyCollectionImpl implements DynArray
     // This is not done recursively, only one level.
     // More levels are initialized lazily, on demand.
     protected boolean initializeComponentsFromTypeCode() {
-        // This typeCode is of kind tk_array.
-        TypeCode typeCode = any.type();
         int length = getBound();
         TypeCode contentType = getContentType();
 

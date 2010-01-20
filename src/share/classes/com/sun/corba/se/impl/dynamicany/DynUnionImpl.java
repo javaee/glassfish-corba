@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,21 +37,21 @@
 package com.sun.corba.se.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.TCKind;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.TypeCodePackage.Bounds;
 import org.omg.CORBA.portable.InputStream;
-import org.omg.DynamicAny.*;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynUnion;
 
 public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
 {
+    private static final long serialVersionUID = 5712467966035057576L;
     //
     // Instance variables
     //
@@ -65,11 +65,6 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
     //
     // Constructors
     //
-
-    private DynUnionImpl() {
-        this(null, (Any)null, false);
-    }
-
     protected DynUnionImpl(ORB orb, Any any, boolean copyValue) {
         // We can be sure that typeCode is of kind tk_union
         super(orb, any, copyValue);
@@ -187,6 +182,7 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         return NO_INDEX;
     }
 
+    @Override
     protected void clearData() {
         super.clearData();
         discriminator = null;
@@ -208,7 +204,8 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
 
     /**
     * Returns the current discriminator value.
-    */
+     * @return current discriminator value.
+     */
     public org.omg.DynamicAny.DynAny get_discriminator () {
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
@@ -359,8 +356,9 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX)
+        if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX) {
             throw new InvalidValue();
+        }
         return currentMember;
     }
 
@@ -374,8 +372,9 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX)
+        if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX) {
             throw new InvalidValue();
+        }
         String memberName = memberName(currentMemberIndex);
         return (memberName == null ? "" : memberName);
     }
@@ -388,8 +387,9 @@ public class DynUnionImpl extends DynAnyConstructedImpl implements DynUnion
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-        if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX)
+        if ( ! checkInitComponents() || currentMemberIndex == NO_INDEX) {
             throw new InvalidValue();
+        }
         return memberType(currentMemberIndex).kind();
     }
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,31 +39,24 @@ package com.sun.corba.se.impl.dynamicany;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.TypeCodePackage.Bounds;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
-import org.omg.DynamicAny.*;
-import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynSequence;
 
 // _REVIST_ Could make this a subclass of DynArrayImpl
 // But that would mean that an object that implements DynSequence also implements DynArray
 // which the spec doesn't mention (it also doesn't forbid it).
 public class DynSequenceImpl extends DynAnyCollectionImpl implements DynSequence
 {
+    private static final long serialVersionUID = 5355861023015151151L;
     //
     // Constructors
     //
-
-    private DynSequenceImpl() {
-        this(null, (Any)null, false);
-    }
-
     protected DynSequenceImpl(ORB orb, Any any, boolean copyValue) {
         super(orb, any, copyValue);
     }
@@ -77,7 +70,6 @@ public class DynSequenceImpl extends DynAnyCollectionImpl implements DynSequence
     // from the Any representation
     protected boolean initializeComponentsFromAny() {
         // This typeCode is of kind tk_sequence.
-        TypeCode typeCode = any.type();
         int length;
         TypeCode contentType = getContentType();
         InputStream input;
@@ -114,6 +106,7 @@ public class DynSequenceImpl extends DynAnyCollectionImpl implements DynSequence
     }
 
     // Collapses the whole DynAny hierarchys values into one single streamed Any
+    @Override
     protected boolean initializeAnyFromComponents() {
         OutputStream out = any.create_output_stream();
         // Writing the length first is the only difference to supers implementation
@@ -196,8 +189,9 @@ public class DynSequenceImpl extends DynAnyCollectionImpl implements DynSequence
 
             // Increasing the length of a sequence sets the current position to the first
             // newly-added element if the previous current position was -1.
-            if (index == NO_INDEX)
+            if (index == NO_INDEX) {
                 index = oldLength;
+            }
         } else if (len < oldLength) {
             // Decrease length
             DynAny[] newComponents = new DynAny[len];

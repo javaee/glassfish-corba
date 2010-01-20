@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,14 +59,6 @@ import org.omg.CORBA.Request;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.UnknownUserException;
-import org.omg.CORBA.Bounds;
-import org.omg.CORBA.UNKNOWN;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.NO_IMPLEMENT;
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.WrongTransaction;
 
 import org.omg.CORBA.portable.ApplicationException ;
 import org.omg.CORBA.portable.RemarshalException ;
@@ -76,7 +68,6 @@ import org.omg.CORBA.portable.OutputStream ;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.corba.AsynchInvoke;
 
 public class RequestImpl 
     extends Request
@@ -131,25 +122,28 @@ public class RequestImpl
         _opName	= operationName;
 
         // initialize argument list if not passed in
-        if (argumentList == null)
+        if (argumentList == null) {
             _arguments = new NVListImpl(_orb);
-        else
+        } else {
             _arguments = argumentList;
+        }
 
         // set result container. 
         _result = resultContainer;
 
         // initialize exception list if not passed in
-        if (exceptionList == null)
+        if (exceptionList == null) {
             _exceptions = new ExceptionListImpl();
-        else
+        } else {
             _exceptions = exceptionList;
+        }
 
         // initialize context list if not passed in
-        if (ctxList == null)
+        if (ctxList == null) {
             _ctxList = new ContextListImpl(_orb);
-        else
+        } else {
             _ctxList = ctxList;
+        }
 
         // initialize environment 
         _env	= new EnvironmentImpl();
@@ -193,8 +187,9 @@ public class RequestImpl
     
     public synchronized Context ctx() 
     {
-        if (_ctx == null)
+        if (_ctx == null) {
             _ctx = new ContextImpl(_orb);
+        }
         return _ctx;
     }
     
@@ -235,15 +230,17 @@ public class RequestImpl
 
     public synchronized void set_return_type(TypeCode tc)
     {
-        if (_result == null)
+        if (_result == null) {
             _result = new NamedValueImpl(_orb);
+        }
         _result.value().type(tc);
     }
 
     public synchronized Any return_value()
     {
-        if (_result == null)
+        if (_result == null) {
             _result = new NamedValueImpl(_orb);
+        }
         return _result.value();
     }
 
@@ -353,7 +350,7 @@ public class RequestImpl
     }
 
     // REVISIT -  make protected after development - so xgiop can get it.
-    public void unmarshalReply(InputStream is)
+    public synchronized void unmarshalReply(InputStream is)
     {
         // First unmarshal the return value if it is not void
         if ( _result != null ) {
@@ -377,8 +374,7 @@ public class RequestImpl
 		    break;
                 }
             }
-        } 
-	catch ( org.omg.CORBA.Bounds ex ) {
+        } catch ( org.omg.CORBA.Bounds ex ) {
 	    // Cannot happen since we only iterate till _arguments.count()
         }
     }

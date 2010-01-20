@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,11 +39,7 @@ package com.sun.corba.se.impl.dynamicany;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.TCKind;
-import org.omg.CORBA.portable.OutputStream;
-import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.TypeCodePackage.Bounds;
 import org.omg.CORBA.portable.InputStream;
-import org.omg.DynamicAny.*;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 import java.math.BigDecimal;
@@ -51,6 +47,7 @@ import com.sun.corba.se.impl.corba.AnyImpl;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import org.omg.DynamicAny.DynAny;
 
 public class DynAnyUtil
 {
@@ -78,8 +75,9 @@ public class DynAnyUtil
     static DynAny createMostDerivedDynAny(Any any, ORB orb, boolean copyValue)
         throws org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode
     {
-        if (any == null || ! DynAnyUtil.isConsistentType(any.type()))
+        if (any == null || ! DynAnyUtil.isConsistentType(any.type())) {
             throw new org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode();
+        }
 
         switch (any.type().kind().value()) {
             case TCKind._tk_sequence:
@@ -106,8 +104,9 @@ public class DynAnyUtil
     static DynAny createMostDerivedDynAny(TypeCode typeCode, ORB orb)
         throws org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode
     {
-        if (typeCode == null || ! DynAnyUtil.isConsistentType(typeCode))
+        if (typeCode == null || ! DynAnyUtil.isConsistentType(typeCode)) {
             throw new org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode();
+        }
 
         switch (typeCode.kind().value()) {
             case TCKind._tk_sequence:
@@ -188,7 +187,7 @@ public class DynAnyUtil
                 break;
             case TCKind._tk_double:
                 // zero for numeric types
-                returnValue.insert_double((double)0.0);
+                returnValue.insert_double(0.0);
                 break;
             case TCKind._tk_octet:
                 // zero for types octet, char, and wchar
@@ -327,8 +326,9 @@ public class DynAnyUtil
             try {
                 dynAny.rewind();
                 do {
-                    if (dynAny.current_component() == currentComponent)
+                    if (dynAny.current_component() == currentComponent) {
                         return true;
+                    }
                 } while (dynAny.next());
             } catch (TypeMismatch tm) { /* impossible */ }
         }

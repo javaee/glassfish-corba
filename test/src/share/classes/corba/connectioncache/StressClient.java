@@ -126,8 +126,8 @@ public class StressClient {
 	Assert.assertEquals( actual, expected, type ) ;
     }
 
-    private void checkStats( ConnectionCache cc, int idle, int reclaimable, 
-	int busy, int total ) {
+    private void checkStats( ConnectionCache<ConnectionImpl> cc, int idle,
+        int reclaimable, int busy, int total ) {
 
 	checkStat( cc.numberOfIdleConnections(), idle, 
 	    "Idle connections" ) ;
@@ -180,9 +180,9 @@ public class StressClient {
             for (int ctr=0; ctr<NUM_ITERATIONS; ctr++) {
                 try {
                     final int cindex = rand.nextInt( cinfos.size() ) ;
-                    ContactInfo cinfo = cinfos.get( cindex ) ;
+                    ContactInfo<ConnectionImpl> cinfo = cinfos.get( cindex ) ;
 
-                    ConnectionImpl conn = (ConnectionImpl)obcache.get(cinfo) ;
+                    ConnectionImpl conn = obcache.get(cinfo) ;
 
                     operationDelay.randomWait();
                     conn.access() ;

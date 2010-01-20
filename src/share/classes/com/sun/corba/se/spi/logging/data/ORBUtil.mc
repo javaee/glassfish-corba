@@ -336,7 +336,7 @@
             (UNEXPECTED_EXCEPTION_CANCEL_AND_FLUSH_TEMP_SELECTOR
 	     32 FINE "Unexpected exception when canceling SelectionKey and flushing temporary Selector")
             (MAXIMUM_READ_BYTE_BUFFER_SIZE_EXCEEDED
-	     33 WARNING "Ignoring request to read a message which exceeds read size threshold of {0} bytes, requested size was {1}. Use ORB property -D{3}=<# of bytes> to set threshold higher.")
+	     33 WARNING "Ignoring request to read a message which exceeds read size threshold of {0} bytes, requested size was {1}. Use ORB property -D{2}=<# of bytes> to set threshold higher.")
             (BLOCKING_READ_END_OF_STREAM
 	     34 FINE "Received {0}, in a blocking read on connection, {1}, because an 'end of stream' was detected")
             (NONBLOCKING_READ_END_OF_STREAM

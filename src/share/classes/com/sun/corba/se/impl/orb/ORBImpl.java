@@ -414,7 +414,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 	requestDispatcherRegistry = new RequestDispatcherRegistryImpl( 
 	    this, ORBConstants.DEFAULT_SCID);
-	copierManager = new CopierManagerImpl( this ) ;
+	copierManager = new CopierManagerImpl() ;
 
 	taggedComponentFactoryFinder = 
 	    new TaggedComponentFactoryFinderImpl(this) ;

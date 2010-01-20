@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,9 +43,7 @@ package corba.folb;
 import java.util.Hashtable;
 import java.util.Properties;
 import javax.naming.InitialContext;
-import javax.rmi.PortableRemoteObject;
 
-import com.sun.corba.se.spi.folb.CSIv2SSLTaggedComponentHandler;
 import com.sun.corba.se.spi.folb.GroupInfoService;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 
@@ -59,12 +57,9 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import corba.folb_8_1.SocketFactoryImpl;
-import corba.framework.Controller;
 import corba.framework.TestngRunner;
 import corba.hcks.U;
 
-import org.testng.annotations.BeforeSuite ;
-import org.testng.annotations.Test ;
 import org.testng.Assert ;
 
 import org.omg.CORBA.SystemException ;

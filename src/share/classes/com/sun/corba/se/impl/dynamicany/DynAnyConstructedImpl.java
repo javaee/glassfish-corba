@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,15 +41,15 @@ import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.OutputStream;
 import org.omg.DynamicAny.*;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
-import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 import com.sun.corba.se.impl.corba.TypeCodeImpl;	// needed for recursive type codes
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 abstract class DynAnyConstructedImpl extends DynAnyImpl
 {
+    private static final long serialVersionUID = -5868871025693895861L;
+
     protected static final byte REPRESENTATION_NONE = 0;
     protected static final byte REPRESENTATION_TYPECODE = 1;
     protected static final byte REPRESENTATION_ANY = 2;
@@ -72,11 +72,6 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
     //
     // Constructors
     //
-
-    private DynAnyConstructedImpl() {
-        this(null, (Any)null, false);
-    }
-
     protected DynAnyConstructedImpl(ORB orb, Any any, boolean copyValue) {
         super(orb, any, copyValue);
         //System.out.println(this + " constructed with any " + any);
@@ -107,10 +102,11 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (isRecursive == RECURSIVE_UNDEF) {
             TypeCode typeCode = any.type();
             if (typeCode instanceof TypeCodeImpl) {
-                if (((TypeCodeImpl)typeCode).is_recursive())
+                if (((TypeCodeImpl)typeCode).is_recursive()) {
                     isRecursive = RECURSIVE_YES;
-                else
+                } else {
                     isRecursive = RECURSIVE_NO;
+                }
             } else {
                 // No way to find out unless the TypeCode spec changes.
                 isRecursive = RECURSIVE_NO;
@@ -187,6 +183,7 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
     // Utility methods
     //
 
+    @Override
     protected void clearData() {
         super.clearData();
         // _REVISIT_ What about status?
@@ -195,6 +192,7 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         representations = REPRESENTATION_NONE;
     }
 
+    @Override
     protected void writeAny(OutputStream out) {
         // If all we got is TypeCode representation (no value)
         // then we don't want to force creating a default value
@@ -234,8 +232,9 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
                 }
             } else if ((representations & REPRESENTATION_TYPECODE) != 0) {
                 //System.out.println(this + " checkInitAny: reps has REPRESENTATION_TYPECODE");
-                if (representations == REPRESENTATION_TYPECODE && isRecursive())
+                if (representations == REPRESENTATION_TYPECODE && isRecursive()) {
                     return;
+                }
                 if (initializeComponentsFromTypeCode()) {
                     representations |= REPRESENTATION_COMPONENTS;
                 }
@@ -272,6 +271,7 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
     // DynAny interface methods
     //
 
+    @Override
     public void assign (org.omg.DynamicAny.DynAny dyn_any)
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch
     {
@@ -284,6 +284,7 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         index = 0;
     }
 
+    @Override
     public void from_any (org.omg.CORBA.Any value)
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
@@ -328,8 +329,9 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
             // Remember the current position to restore it later
             currentComponent = dyn_any.current_component();
             for (int i=0; i<components.length; i++) {
-                if (dyn_any.seek(i) == false)
+                if (dyn_any.seek(i) == false) {
                     return false;
+                }
                 //System.out.println(this + " comparing component " + i + "=" + components[i] +
                 //                   " of type " + components[i].type().kind().value());
                 if ( ! components[i].equal(dyn_any.current_component())) {
@@ -382,11 +384,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_boolean(value);
     }
 
@@ -397,11 +401,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_octet(value);
     }
 
@@ -412,11 +418,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_char(value);
     }
 
@@ -427,11 +435,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_short(value);
     }
 
@@ -442,11 +452,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_ushort(value);
     }
 
@@ -457,11 +469,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_long(value);
     }
 
@@ -472,11 +486,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_ulong(value);
     }
 
@@ -487,11 +503,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_float(value);
     }
 
@@ -502,11 +520,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_double(value);
     }
 
@@ -517,11 +537,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_string(value);
     }
 
@@ -532,11 +554,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_reference(value);
     }
 
@@ -547,11 +571,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_typecode(value);
     }
 
@@ -562,11 +588,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_longlong(value);
     }
 
@@ -577,11 +605,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_ulonglong(value);
     }
 
@@ -592,11 +622,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_wchar(value);
     }
 
@@ -607,11 +639,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_wstring(value);
     }
 
@@ -622,11 +656,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_any(value);
     }
 
@@ -637,11 +673,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_dyn_any(value);
     }
     
@@ -652,11 +690,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         currentComponent.insert_val(value);
     }
 
@@ -667,11 +707,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_val();
     }
 
@@ -682,11 +724,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_boolean();
     }
 
@@ -697,11 +741,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_octet();
     }
 
@@ -712,11 +758,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_char();
     }
 
@@ -727,11 +775,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_short();
     }
 
@@ -742,11 +792,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_ushort();
     }
 
@@ -757,11 +809,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_long();
     }
 
@@ -772,11 +826,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_ulong();
     }
 
@@ -787,11 +843,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_float();
     }
 
@@ -802,11 +860,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_double();
     }
 
@@ -817,11 +877,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_string();
     }
 
@@ -832,11 +894,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_reference();
     }
 
@@ -847,11 +911,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_typecode();
     }
 
@@ -862,11 +928,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_longlong();
     }
 
@@ -877,11 +945,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_ulonglong();
     }
 
@@ -892,11 +962,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_wchar();
     }
 
@@ -907,11 +979,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_wstring();
     }
 
@@ -922,11 +996,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_any();
     }
 
@@ -937,11 +1013,13 @@ abstract class DynAnyConstructedImpl extends DynAnyImpl
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.dynAnyDestroyed() ;
         }
-	if (index == NO_INDEX)
+	if (index == NO_INDEX) {
             throw new org.omg.DynamicAny.DynAnyPackage.InvalidValue();
+        }
         DynAny currentComponent = current_component();
-        if (DynAnyUtil.isConstructedDynAny(currentComponent))
+        if (DynAnyUtil.isConstructedDynAny(currentComponent)) {
             throw new org.omg.DynamicAny.DynAnyPackage.TypeMismatch();
+        }
         return currentComponent.get_dyn_any();
     }
 }

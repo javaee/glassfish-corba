@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,6 +44,7 @@
 
 package com.sun.corba.se.impl.corba;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List ;
@@ -73,12 +74,16 @@ import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import java.io.ObjectInputStream;
 
 // subclasses must provide a matching helper class
 public class AnyImpl extends Any
 {
+    private static final long serialVersionUID = -8646067979785949029L;
+
     private static final class AnyInputStream extends EncapsInputStream 
     {
+        private static final long serialVersionUID = -1719923004953871705L;
 	public AnyInputStream(EncapsInputStream theStream ) 
 	{
 	    super( theStream );
@@ -87,11 +92,13 @@ public class AnyImpl extends Any
 
     private static final class AnyOutputStream extends EncapsOutputStream 
     {
+        private static final long serialVersionUID = 9105274185226938185L;
 	public AnyOutputStream(ORB orb) 
 	{
-	    super((ORB)orb);
+	    super(orb);
 	}
 
+        @Override
 	public org.omg.CORBA.portable.InputStream create_input_stream() 
 	{
 	    return new AnyInputStream(
@@ -167,6 +174,21 @@ public class AnyImpl extends Any
         false   // abstract interface
     };
 
+    // Usual FindBugs Kluge: this class isn't really Serializable in the
+    // normal Java sense (it is marshallable to a CDR stream), so we need
+    // to create a method that sets transients to null (which will never be
+    // called) to remove large numbers of FindBugs errors.
+    private void readObject( ObjectInputStream is )
+        throws IOException, ClassNotFoundException {
+
+        is.defaultReadObject();
+
+        stream = null ;
+        orb = null ;
+        tp = null ;
+        wrapper = null ;
+    }
+
     static AnyImpl convertToNative(ORB orb, Any any) {
         if (any instanceof AnyImpl) {
             return (AnyImpl)any;
@@ -184,12 +206,13 @@ public class AnyImpl extends Any
      * A constructor that sets the Any to contain a null. It also marks
      * the value as being invalid so that extractions throw an exception
      * until an insertion has been performed. 
+     * @param orb ORB to use for this any
      */
     public AnyImpl(ORB orb)
     {
 	this.orb = orb;
 	tp = orb.getTimerManager().points() ;
-	wrapper = ((com.sun.corba.se.spi.orb.ORB)orb).getLogWrapperTable()
+	wrapper = orb.getLogWrapperTable()
 	    .get_RPC_PRESENTATION_ORBUtil() ;
 
 	typeCode = orb.get_primitive_tc(TCKind._tk_null);
@@ -215,8 +238,9 @@ public class AnyImpl extends Any
 		object = objImpl.object;
 		isInitialized = objImpl.isInitialized;
 
-		if (objImpl.stream != null)
-		    stream = objImpl.stream.dup();
+		if (objImpl.stream != null) {
+                    stream = objImpl.stream.dup();
+                }
 
 	    } else {
 		read_value(obj.create_input_stream(), obj.type());
@@ -283,13 +307,15 @@ public class AnyImpl extends Any
     {
 	tp.enter_anyEqual() ;
 	try {
-	    if (otherAny == this)
-		return true;
+	    if (otherAny == this) {
+                return true;
+            }
 
 	    // first check for typecode equality.
 	    // note that this will take aliases into account
-	    if (!typeCode.equal(otherAny.type()))
-		return false;
+	    if (!typeCode.equal(otherAny.type())) {
+                return false;
+            }
 
 	    // Resolve aliases here
 	    TypeCode realType = realType();
@@ -462,8 +488,9 @@ public class AnyImpl extends Any
 			}
 			TypeCodeImpl realTypeCodeImpl = TypeCodeImpl.convertToNative(orb, realType);
 			int memberIndex = realTypeCodeImpl.currentUnionMemberIndex(myDiscriminator);
-			if (memberIndex == -1)
-			    throw wrapper.unionDiscriminatorError() ;
+			if (memberIndex == -1) {
+                            throw wrapper.unionDiscriminatorError();
+                        }
 
 			if ( ! equalMember(realType.member_type(memberIndex), myStream, otherStream)) {
 			    return false;
@@ -551,7 +578,7 @@ public class AnyImpl extends Any
 	    if (AnyImpl.isStreamed[realType().kind().value()]) {
 		return stream.dup();
 	    } else {
-		OutputStream os = (OutputStream)orb.create_output_stream();
+		OutputStream os = orb.create_output_stream();
 		TCUtility.marshalIn(os, realType(), value, object);
 
 		return os.create_input_stream();
@@ -648,6 +675,7 @@ public class AnyImpl extends Any
      *
      * @param s		the streamable to insert
      */
+    @Override
     public void insert_Streamable(Streamable s)
     {
 	//debug.log ("insert_Streamable");
@@ -656,6 +684,7 @@ public class AnyImpl extends Any
 	isInitialized = true;
     }
      
+    @Override
     public Streamable extract_Streamable()
     {
 	//debug.log( "extract_Streamable" ) ;
@@ -678,16 +707,18 @@ public class AnyImpl extends Any
 
     private String getTCKindName( int tc )
     {
-	if ((tc >= 0) && (tc < TypeCodeImpl.kindNames.length))
-	    return TypeCodeImpl.kindNames[tc] ;
-	else
-	    return "UNKNOWN(" + tc + ")" ;
+	if ((tc >= 0) && (tc < TypeCodeImpl.kindNames.length)) {
+            return TypeCodeImpl.kindNames[tc];
+        } else {
+            return "UNKNOWN(" + tc + ")";
+        }
     }
 
     private void checkExtractBadOperation( int expected ) 
     {
-	if (!isInitialized)
-	    throw wrapper.extractNotInitialized() ;
+	if (!isInitialized) {
+            throw wrapper.extractNotInitialized();
+        }
 
 	int tc = realType().kind().value() ;
 	if (tc != expected) {
@@ -699,17 +730,21 @@ public class AnyImpl extends Any
 
     private void checkExtractBadOperationList( int[] expected )
     {
-	if (!isInitialized)
-	    throw wrapper.extractNotInitialized() ;
+	if (!isInitialized) {
+            throw wrapper.extractNotInitialized();
+        }
 
 	int tc = realType().kind().value() ;
-	for (int ctr=0; ctr<expected.length; ctr++)
-	    if (tc == expected[ctr])
-		return ;
+	for (int ctr=0; ctr<expected.length; ctr++) {
+            if (tc == expected[ctr]) {
+                return;
+            }
+        }
 
 	List<String> list = new ArrayList<String>() ;
-	for (int ctr=0; ctr<expected.length; ctr++)
-	    list.add( getTCKindName( expected[ctr] ) ) ;
+	for (int ctr=0; ctr<expected.length; ctr++) {
+            list.add(getTCKindName(expected[ctr]));
+        }
 
 	String tcName = getTCKindName( tc ) ;
 	throw wrapper.extractWrongTypeList( list, tcName ) ;
@@ -1083,22 +1118,22 @@ public class AnyImpl extends Any
     /**
      * A variant of the insertion operation that takes a typecode
      * argument as well.
+     * @param tc TypeCode to insert into o.
      */
     public void insert_Object(org.omg.CORBA.Object o, TypeCode tc)
     {
 	//debug.log ("insert_Object2");
 	try {
-	    if ( tc.id().equals("IDL:omg.org/CORBA/Object:1.0") || o._is_a(tc.id()) )
-		{
-		    typeCode = TypeCodeImpl.convertToNative(orb, tc);
-		    object = o;
-		}
-	    else {
+	    if ( tc.id().equals("IDL:omg.org/CORBA/Object:1.0") || o._is_a(tc.id()) ) {
+                typeCode = TypeCodeImpl.convertToNative(orb, tc);
+                object = o;
+            } else {
 		throw wrapper.insertObjectIncompatible() ;
 	    }
 	} catch ( Exception ex ) {
 	    throw wrapper.insertObjectFailed(ex) ;
 	}
+
 	isInitialized = true;
     }
 
@@ -1108,8 +1143,9 @@ public class AnyImpl extends Any
     public org.omg.CORBA.Object extract_Object()
     {
 	//debug.log ("extract_Object");
-	if (!isInitialized)
-	    throw wrapper.extractNotInitialized() ;
+	if (!isInitialized) {
+            throw wrapper.extractNotInitialized();
+        }
 
 	// Check if the object contained here is of the type in typeCode
 	org.omg.CORBA.Object obj = null;
@@ -1127,6 +1163,7 @@ public class AnyImpl extends Any
 
     /**
      * See the description of the <a href="#anyOps">general Any operations.</a>
+     * @param tc TypeCode to insert.
      */
     public void insert_TypeCode(TypeCode tc)
     {
@@ -1147,6 +1184,7 @@ public class AnyImpl extends Any
     }
 
     @SuppressWarnings({"deprecation"})
+    @Override
     public void insert_Principal(org.omg.CORBA.Principal p)
     {
 	typeCode = orb.get_primitive_tc(TCKind._tk_Principal);
@@ -1155,6 +1193,7 @@ public class AnyImpl extends Any
     }
 
     @SuppressWarnings({"deprecation"})
+    @Override
     public org.omg.CORBA.Principal extract_Principal()
     {
 	checkExtractBadOperation( TCKind._tk_Principal ) ;
@@ -1209,6 +1248,7 @@ public class AnyImpl extends Any
 	isInitialized = true;
     }
 
+    @Override
     public void insert_fixed(java.math.BigDecimal value) {
 	typeCode = TypeCodeImpl.convertToNative(orb,
 	    orb.create_fixed_tc(TypeCodeImpl.digits(value), TypeCodeImpl.scale(value)));
@@ -1216,6 +1256,7 @@ public class AnyImpl extends Any
 	isInitialized = true;
     }
 
+    @Override
     public void insert_fixed(java.math.BigDecimal value, org.omg.CORBA.TypeCode type)
     {
 	try {
@@ -1233,6 +1274,7 @@ public class AnyImpl extends Any
 	isInitialized = true;
     }
 
+    @Override
     public java.math.BigDecimal extract_fixed() {
 	checkExtractBadOperation( TCKind._tk_fixed ) ;
 	return (BigDecimal)object;
@@ -1243,6 +1285,9 @@ public class AnyImpl extends Any
      *
      * The ORB passed in should have the desired ORBVersion.  It
      * is used to generate the type codes.
+     * @param c The Class for which a TypeCode is needed.
+     * @param tcORB ORB to use when creating TypeCode.
+     * @return The newly created TypeCode.
      */
     public TypeCode createTypeCodeForClass (java.lang.Class c, ORB tcORB)
     {
@@ -1251,8 +1296,9 @@ public class AnyImpl extends Any
 
 	    // Look in the cache first
 	    TypeCodeImpl classTC = tcORB.getTypeCodeForClass(c);
-	    if (classTC != null)
-		return classTC;
+	    if (classTC != null) {
+                return classTC;
+            }
 
 	    // All cases need to be able to create repository IDs.
 	    //
@@ -1340,10 +1386,11 @@ public class AnyImpl extends Any
 	    // the one used to create the Any -- so we use the
 	    // most recent version (see insert_Value).
 	    if (ORBVersionFactory.getFOREIGN().compareTo(tcORB.getORBVersion()) == 0 ||
-		ORBVersionFactory.getNEWER().compareTo(tcORB.getORBVersion()) <= 0)
-		return tcORB.get_primitive_tc(TCKind.tk_wchar);
-	    else
-		return tcORB.get_primitive_tc(TCKind.tk_char);
+		ORBVersionFactory.getNEWER().compareTo(tcORB.getORBVersion()) <= 0) {
+                return tcORB.get_primitive_tc(TCKind.tk_wchar);
+            } else {
+                return tcORB.get_primitive_tc(TCKind.tk_char);
+            }
 	} else if (c == Boolean.TYPE) {
 	    return tcORB.get_primitive_tc (TCKind.tk_boolean);
 	} else {

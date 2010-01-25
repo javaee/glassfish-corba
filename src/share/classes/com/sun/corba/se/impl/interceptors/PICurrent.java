@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,9 +59,9 @@ public class PICurrent extends org.omg.CORBA.LocalObject
     private int slotCounter;
 
     // The ORB associated with this PICurrent object.
-    private ORB myORB;
+    private transient ORB myORB;
 
-    private OMGSystemException wrapper ;
+    private transient OMGSystemException wrapper ;
 
     // True if the orb is still initialzing and get_slot and set_slot are not
     // to be called.
@@ -69,7 +69,7 @@ public class PICurrent extends org.omg.CORBA.LocalObject
 
     // ThreadLocal contains a stack of SlotTable which are used
     // for resolve_initial_references( "PICurrent" );
-    private ThreadLocal<SlotTableStack> threadLocalSlotTable
+    private transient ThreadLocal<SlotTableStack> threadLocalSlotTable
         = new ThreadLocal<SlotTableStack>() {
             protected SlotTableStack initialValue( ) {
                 return new SlotTableStack( myORB, PICurrent.this );

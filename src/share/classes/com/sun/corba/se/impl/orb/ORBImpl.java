@@ -1461,7 +1461,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     }
 
     // Note that the caller must hold the ORBImpl lock.
-    public void checkShutdownState() 
+    private void checkShutdownState()
     {
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.orbDestroyed() ;
@@ -1559,55 +1559,57 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
         super.destroy() ;
 
-        badServerIdHandlerAccessLock = null ;
-        clientDelegateFactoryAccessorLock = null ;
-        corbaContactInfoListFactoryAccessLock = null ; 
-        corbaContactInfoListFactoryReadLock = null ;
-        corbaContactInfoListFactoryWriteLock = null ;
+        synchronized (this) {
+            badServerIdHandlerAccessLock = null ;
+            clientDelegateFactoryAccessorLock = null ;
+            corbaContactInfoListFactoryAccessLock = null ; 
+            corbaContactInfoListFactoryReadLock = null ;
+            corbaContactInfoListFactoryWriteLock = null ;
 
-        objectKeyFactoryAccessLock = null ;
-        legacyServerSocketManagerAccessLock = null ;
-        threadPoolManagerAccessLock = null ;
-        transportManager = null ;
-        legacyServerSocketManager = null ;
-        OAInvocationInfoStack  = null ; 
-        clientInvocationInfoStack  = null ; 
-        codeBase = null ; 
-        codeBaseIOR = null ;
-        dynamicRequests  = null ; 
-        svResponseReceived  = null ;
-        runObj = null ;
-        shutdownObj = null ;
-        waitForCompletionObj = null ;
-        invocationObj = null ;
-        isProcessingInvocation = null ;
-        typeCodeForClassMap  = null ;
-        valueFactoryCache = null ;
-        orbVersionThreadLocal = null ; 
-        requestDispatcherRegistry = null ;
-        copierManager = null ;
-        serviceContextFactoryRegistry = null ;
-        serviceContextsCache= null ;
-        toaFactory = null ;
-        poaFactory = null ;
-        pihandler = null ;
-        configData = null ;
-        badServerIdHandler = null ;
-        clientDelegateFactory = null ;
-        corbaContactInfoListFactory = null ;
-        resolver = null ;
-        localResolver = null ;
-        insNamingDelegate = null ;
-        resolverLock = null ;
-        urlOperation = null ;
-        urlOperationLock = null ;
-        taggedComponentFactoryFinder = null ;
-        taggedProfileFactoryFinder = null ;
-        taggedProfileTemplateFactoryFinder = null ;
-        objectKeyFactory = null ;
-        invocationInterceptor = null ;
-        objectKeyCache = null ; 
-        objectKeyCacheLock = null ;
+            objectKeyFactoryAccessLock = null ;
+            legacyServerSocketManagerAccessLock = null ;
+            threadPoolManagerAccessLock = null ;
+            transportManager = null ;
+            legacyServerSocketManager = null ;
+            OAInvocationInfoStack  = null ; 
+            clientInvocationInfoStack  = null ; 
+            codeBase = null ; 
+            codeBaseIOR = null ;
+            dynamicRequests  = null ; 
+            svResponseReceived  = null ;
+            runObj = null ;
+            shutdownObj = null ;
+            waitForCompletionObj = null ;
+            invocationObj = null ;
+            isProcessingInvocation = null ;
+            typeCodeForClassMap  = null ;
+            valueFactoryCache = null ;
+            orbVersionThreadLocal = null ; 
+            requestDispatcherRegistry = null ;
+            copierManager = null ;
+            serviceContextFactoryRegistry = null ;
+            serviceContextsCache= null ;
+            toaFactory = null ;
+            poaFactory = null ;
+            pihandler = null ;
+            configData = null ;
+            badServerIdHandler = null ;
+            clientDelegateFactory = null ;
+            corbaContactInfoListFactory = null ;
+            resolver = null ;
+            localResolver = null ;
+            insNamingDelegate = null ;
+            resolverLock = null ;
+            urlOperation = null ;
+            urlOperationLock = null ;
+            taggedComponentFactoryFinder = null ;
+            taggedProfileFactoryFinder = null ;
+            taggedProfileTemplateFactoryFinder = null ;
+            objectKeyFactory = null ;
+            invocationInterceptor = null ;
+            objectKeyCache = null ; 
+            objectKeyCacheLock = null ;
+        }
 
         try {
             mom.close() ;

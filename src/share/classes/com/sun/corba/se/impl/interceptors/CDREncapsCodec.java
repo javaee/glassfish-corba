@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -65,11 +65,11 @@ public final class CDREncapsCodec
     implements Codec 
 {
     // The ORB that created the factory this codec was created from
-    private ORB orb;
-    ORBUtilSystemException wrapper;
+    private transient ORB orb;
+    transient ORBUtilSystemException wrapper;
 
     // The GIOP version we are encoding for
-    private GIOPVersion giopVersion;
+    private transient GIOPVersion giopVersion;
 
     /*
      *******************************************************************

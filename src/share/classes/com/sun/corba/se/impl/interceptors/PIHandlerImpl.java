@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -207,6 +207,11 @@ public class PIHandlerImpl implements PIHandler
         // value indicates they are enabled.
 	// NOTE: The is only currently used on the client side.
         public int disableCount = 0;
+
+        // Get FindBugs to shut up about not overridding equals.
+        public boolean equals( Object o ) {
+            return super.equals( o ) ;
+        }
     }
         
     public PIHandlerImpl( ORB orb, String[] args ) {
@@ -219,7 +224,7 @@ public class PIHandlerImpl implements PIHandler
             wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
             orbutilWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
             omgWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
-            arguments = args ;
+            arguments = args.clone() ;
 
             // Create codec factory:
             codecFactory = new CodecFactoryImpl( orb );

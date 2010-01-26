@@ -187,25 +187,25 @@ abstract class DynAnyCollectionImpl extends DynAnyConstructedImpl
         components = (value == null ? emptyComponents : value);
         if (value != null) {
             anys = new Any[value.length];
-        }
 
-        // We know that this is of kind tk_sequence or tk_array
-        TypeCode expectedTypeCode = getContentType();
-        for (int i=0; i<value.length; i++) {
-            if (value[i] != null) {
-                if (! value[i].type().equal(expectedTypeCode)) {
+            // We know that this is of kind tk_sequence or tk_array
+            TypeCode expectedTypeCode = getContentType();
+            for (int i=0; i<value.length; i++) {
+                if (value[i] != null) {
+                    if (! value[i].type().equal(expectedTypeCode)) {
+                        clearData();
+                        // _REVISIT_ More info
+                        throw new TypeMismatch();
+                    }
+                    anys[i] = getAny(value[i]);
+                } else {
                     clearData();
                     // _REVISIT_ More info
-                    throw new TypeMismatch();
+                    throw new InvalidValue();
                 }
-                anys[i] = getAny(value[i]);
-            } else {
-                clearData();
-                // _REVISIT_ More info
-                throw new InvalidValue();
             }
+            index = (value.length == 0 ? NO_INDEX : 0);
         }
-        index = (value.length == 0 ? NO_INDEX : 0);
         // Other representations are invalidated by this operation
         representations = REPRESENTATION_COMPONENTS;
     }

@@ -73,7 +73,7 @@ public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
 	    throw wrapper.dynAnyDestroyed() ;
         }
         checkInitComponents();
-        return nameValuePairs;
+        return nameValuePairs.clone() ;
     }
 
     public org.omg.DynamicAny.NameDynAnyPair[] get_members_as_dyn_any () {
@@ -81,6 +81,6 @@ public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
 	    throw wrapper.dynAnyDestroyed() ;
         }
         checkInitComponents();
-        return nameDynAnyPairs;
+        return nameDynAnyPairs.clone() ;
     }
 }

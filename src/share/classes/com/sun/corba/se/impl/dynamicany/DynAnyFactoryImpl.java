@@ -39,6 +39,8 @@ package com.sun.corba.se.impl.dynamicany;
 
 
 import com.sun.corba.se.spi.orb.ORB ;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 public class DynAnyFactoryImpl
     extends org.omg.CORBA.LocalObject
@@ -50,7 +52,7 @@ public class DynAnyFactoryImpl
     // Instance variables
     //
 
-    private ORB orb;
+    private transient ORB orb;
 
     //
     // Constructors
@@ -64,6 +66,11 @@ public class DynAnyFactoryImpl
         this.orb = orb;
     }
 
+    // Present only to get rid of FindBugs error
+    private void readObject( ObjectInputStream is ) throws IOException,
+        ClassNotFoundException {
+        this.orb = null ;
+    }
     //
     // DynAnyFactory interface methods
     //

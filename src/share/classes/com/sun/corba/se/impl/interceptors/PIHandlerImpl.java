@@ -212,6 +212,10 @@ public class PIHandlerImpl implements PIHandler
         public boolean equals( Object o ) {
             return super.equals( o ) ;
         }
+        
+        public int hashCode() {
+            return super.hashCode() ;
+        }
     }
         
     public PIHandlerImpl( ORB orb, String[] args ) {

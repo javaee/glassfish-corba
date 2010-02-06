@@ -25,11 +25,7 @@ public class Listener11 extends JavaListener implements java.awt.event.WindowLis
     super(handler);
   }
  
-  public void windowActivated(java.awt.event.WindowEvent e) {
-        handler.apply(U.list(e));
-      }
-    
-  public void windowClosed(java.awt.event.WindowEvent e) {
+  public void windowOpened(java.awt.event.WindowEvent e) {
         handler.apply(U.list(e));
       }
     
@@ -37,11 +33,7 @@ public class Listener11 extends JavaListener implements java.awt.event.WindowLis
         handler.apply(U.list(e));
       }
     
-  public void windowDeactivated(java.awt.event.WindowEvent e) {
-        handler.apply(U.list(e));
-      }
-    
-  public void windowDeiconified(java.awt.event.WindowEvent e) {
+  public void windowClosed(java.awt.event.WindowEvent e) {
         handler.apply(U.list(e));
       }
     
@@ -49,7 +41,15 @@ public class Listener11 extends JavaListener implements java.awt.event.WindowLis
         handler.apply(U.list(e));
       }
     
-  public void windowOpened(java.awt.event.WindowEvent e) {
+  public void windowDeiconified(java.awt.event.WindowEvent e) {
+        handler.apply(U.list(e));
+      }
+    
+  public void windowActivated(java.awt.event.WindowEvent e) {
+        handler.apply(U.list(e));
+      }
+    
+  public void windowDeactivated(java.awt.event.WindowEvent e) {
         handler.apply(U.list(e));
       }
     
@@ -57,23 +57,11 @@ public class Listener11 extends JavaListener implements java.awt.event.WindowLis
         handler.apply(U.list(e));
       }
     
-  public void mouseDragged(java.awt.event.MouseEvent e) {
-        handler.apply(U.list(e));
-      }
-    
   public void mouseMoved(java.awt.event.MouseEvent e) {
         handler.apply(U.list(e));
       }
     
-  public void mouseClicked(java.awt.event.MouseEvent e) {
-        handler.apply(U.list(e));
-      }
-    
-  public void mouseEntered(java.awt.event.MouseEvent e) {
-        handler.apply(U.list(e));
-      }
-    
-  public void mouseExited(java.awt.event.MouseEvent e) {
+  public void mouseDragged(java.awt.event.MouseEvent e) {
         handler.apply(U.list(e));
       }
     
@@ -85,15 +73,27 @@ public class Listener11 extends JavaListener implements java.awt.event.WindowLis
         handler.apply(U.list(e));
       }
     
+  public void mouseClicked(java.awt.event.MouseEvent e) {
+        handler.apply(U.list(e));
+      }
+    
+  public void mouseExited(java.awt.event.MouseEvent e) {
+        handler.apply(U.list(e));
+      }
+    
+  public void mouseEntered(java.awt.event.MouseEvent e) {
+        handler.apply(U.list(e));
+      }
+    
+  public void keyTyped(java.awt.event.KeyEvent e) {
+        handler.apply(U.list(e));
+      }
+    
   public void keyPressed(java.awt.event.KeyEvent e) {
         handler.apply(U.list(e));
       }
     
   public void keyReleased(java.awt.event.KeyEvent e) {
-        handler.apply(U.list(e));
-      }
-    
-  public void keyTyped(java.awt.event.KeyEvent e) {
         handler.apply(U.list(e));
       }
     
@@ -117,7 +117,7 @@ public class Listener11 extends JavaListener implements java.awt.event.WindowLis
         handler.apply(U.list(e));
       }
     
-  public void componentHidden(java.awt.event.ComponentEvent e) {
+  public void componentResized(java.awt.event.ComponentEvent e) {
         handler.apply(U.list(e));
       }
     
@@ -125,11 +125,11 @@ public class Listener11 extends JavaListener implements java.awt.event.WindowLis
         handler.apply(U.list(e));
       }
     
-  public void componentResized(java.awt.event.ComponentEvent e) {
+  public void componentShown(java.awt.event.ComponentEvent e) {
         handler.apply(U.list(e));
       }
     
-  public void componentShown(java.awt.event.ComponentEvent e) {
+  public void componentHidden(java.awt.event.ComponentEvent e) {
         handler.apply(U.list(e));
       }
     

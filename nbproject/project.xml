@@ -42,6 +42,7 @@
             <name>Java CORBA Development: master workspace</name>
             <properties>
                 <property name="ant.script">make/build.xml</property>
+                <property name="project.license">glassfish</property>
             </properties>
             <folders>
                 <source-folder>

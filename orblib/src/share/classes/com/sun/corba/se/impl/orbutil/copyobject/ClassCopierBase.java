@@ -117,10 +117,16 @@ public abstract class ClassCopierBase implements ClassCopier {
     {
 	Object result = oldToNew.get( source ) ;
 	if (result == null) {
-	    result = createCopy( source, debug ) ;
-	    oldToNew.put( source, result ) ;
-	    result = doCopy( oldToNew, source, result, debug ) ;
+            try {
+                result = createCopy( source, debug ) ;
+                oldToNew.put( source, result ) ;
+                result = doCopy( oldToNew, source, result, debug ) ;
+            } catch (StackOverflowError ex) {
+                throw new ReflectiveCopyException( 
+                    "Stack overflow in copy object", ex ) ; 
+            }
 	}
+
 	return result ;
     }
 

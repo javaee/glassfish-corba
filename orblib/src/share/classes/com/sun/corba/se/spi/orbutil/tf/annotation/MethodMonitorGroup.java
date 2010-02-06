@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,38 +34,34 @@
  * holder.
  */
 
-package corba.enuminterop;
+package com.sun.corba.se.spi.orbutil.tf.annotation;
 
-import corba.framework.CORBATest;
-import corba.framework.Controller;
-import corba.framework.Options;
-import java.util.Properties;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Target ;
+import java.lang.annotation.Documented ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-public class EnumTest extends CORBATest {
-    @Override
-    protected void doTest() throws Throwable
-    {
-        Options.addServerArg("-debug");
-        Controller orbd = createORBD();
- 
-        Properties serverProps = Options.getServerProperties();
- 
-        Controller server = createServer( Server.class.getName() ) ;
- 
-        orbd.start();
- 
-        server.start();
- 
-        Controller client = createClient( Client.class.getName() ) ;
- 
-        client.start();
- 
-        client.waitFor(120000);
- 
-        client.stop();
- 
-        server.stop();
-
-        orbd.stop();
-    }
+/** Meta-annotation used to define annotations that define groups of related
+ * classes whose methods should be traced.  MethodMonitorGroups may be nested,
+ * and MethodMonitorFactory instances that apply to a group apply to all
+ * subgroups as well (following the transitive closure of the subgroups).
+ *
+ * @author ken
+ */
+@Documented
+@Target(ElementType.ANNOTATION_TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MethodMonitorGroup {
+    /** List of MethodMonitorGroups that are subgrops of this one.
+     * Because annotations don't support circularity, the type
+     * can't be MethodMonitorGroup[], so we require that all classes
+     * in subgroups be annotations which are annotated with
+     * @MethodMonitorGroup.
+     *
+     * @return List of MethodMonitorGroups that are subgroups of
+     * this one.
+     */
+    Class<? extends Annotation>[] value() default {} ;
 }

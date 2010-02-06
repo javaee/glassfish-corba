@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,38 +34,23 @@
  * holder.
  */
 
-package corba.enuminterop;
+package com.sun.corba.se.spi.orbutil.tf.annotation;
 
-import corba.framework.CORBATest;
-import corba.framework.Controller;
-import corba.framework.Options;
-import java.util.Properties;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Target ;
+import java.lang.annotation.Documented ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-public class EnumTest extends CORBATest {
-    @Override
-    protected void doTest() throws Throwable
-    {
-        Options.addServerArg("-debug");
-        Controller orbd = createORBD();
- 
-        Properties serverProps = Options.getServerProperties();
- 
-        Controller server = createServer( Server.class.getName() ) ;
- 
-        orbd.start();
- 
-        server.start();
- 
-        Controller client = createClient( Client.class.getName() ) ;
- 
-        client.start();
- 
-        client.waitFor(120000);
- 
-        client.stop();
- 
-        server.stop();
-
-        orbd.stop();
-    }
+/** Used to indicate that a method is used for invoking MethodMonitor.info.
+ * The method must have a void return type.  Any arguments are passed into the
+ * MethodMonitor.info call in the instrumented code.
+ *
+ * @author ken
+ */
+@Documented
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface InfoMethod {
 }

@@ -34,38 +34,21 @@
  * holder.
  */
 
-package corba.enuminterop;
+package corba.tf;
 
 import corba.framework.CORBATest;
 import corba.framework.Controller;
-import corba.framework.Options;
-import java.util.Properties;
 
-public class EnumTest extends CORBATest {
+public class TFTest extends CORBATest {
     @Override
     protected void doTest() throws Throwable
     {
-        Options.addServerArg("-debug");
-        Controller orbd = createORBD();
- 
-        Properties serverProps = Options.getServerProperties();
- 
-        Controller server = createServer( Server.class.getName() ) ;
- 
-        orbd.start();
- 
-        server.start();
- 
         Controller client = createClient( Client.class.getName() ) ;
- 
-        client.start();
- 
-        client.waitFor(120000);
- 
-        client.stop();
- 
-        server.stop();
 
-        orbd.stop();
+        client.start();
+
+        client.waitFor(120000);
+
+        client.stop();
     }
 }

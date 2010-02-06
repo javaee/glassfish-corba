@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2003-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,38 +34,41 @@
  * holder.
  */
 
-package corba.enuminterop;
+package corba.tf  ;
 
-import corba.framework.CORBATest;
-import corba.framework.Controller;
-import corba.framework.Options;
-import java.util.Properties;
+import corba.framework.TestngRunner;
+import java.io.PrintStream;
+import java.rmi.RemoteException ;
 
-public class EnumTest extends CORBATest {
-    @Override
-    protected void doTest() throws Throwable
+import org.testng.Assert ;
+import org.testng.annotations.Test ;
+
+/**
+ * This tests that enums can be correctly deserialized when sent from the JDK ORB (no EnumDesc support)
+ * to GlassFish, which supports EnumDesc.  We may also add a config flag to allow testing between two
+ * GlassFish ORB instances.
+ *
+ * Basic test: have server run on JDK ORB (or GF with noEnumDesc configuration), and
+ * then see if the client can correctly receive an echoed enum from the server.
+ */
+public class Client
+{
+    private PrintStream out ;
+    private PrintStream err ;
+
+    public static void main( String[] args )
     {
-        Options.addServerArg("-debug");
-        Controller orbd = createORBD();
- 
-        Properties serverProps = Options.getServerProperties();
- 
-        Controller server = createServer( Server.class.getName() ) ;
- 
-        orbd.start();
- 
-        server.start();
- 
-        Controller client = createClient( Client.class.getName() ) ;
- 
-        client.start();
- 
-        client.waitFor(120000);
- 
-        client.stop();
- 
-        server.stop();
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
+    }
 
-        orbd.stop();
+    public Client() throws Exception {
+	this.out = System.out;
+	this.err = System.err;
+    }
+
+    @Test
+    public void testEcho() throws RemoteException {
     }
 }

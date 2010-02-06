@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -106,7 +106,7 @@ public abstract class ControllableBase extends NamedBaseImpl implements Controll
     // This is only called from TimerGroupImpl.tcContents, which is only 
     // called from TimerFactoryImpl.updateActiation, which in turn
     // is only called from enable and disable.  Therefore this does
-    // not need any addition synchronization.
+    // not need any additional synchronization.
     void transitiveClosure( Set<ControllableBase> result ) {
 	result.add( this ) ;
 	for (ControllableBase c : contents() ) {

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,38 +34,21 @@
  * holder.
  */
 
-package corba.enuminterop;
+package com.sun.corba.se.spi.orbutil.tf;
 
-import corba.framework.CORBATest;
-import corba.framework.Controller;
-import corba.framework.Options;
-import java.util.Properties;
-
-public class EnumTest extends CORBATest {
-    @Override
-    protected void doTest() throws Throwable
-    {
-        Options.addServerArg("-debug");
-        Controller orbd = createORBD();
- 
-        Properties serverProps = Options.getServerProperties();
- 
-        Controller server = createServer( Server.class.getName() ) ;
- 
-        orbd.start();
- 
-        server.start();
- 
-        Controller client = createClient( Client.class.getName() ) ;
- 
-        client.start();
- 
-        client.waitFor(120000);
- 
-        client.stop();
- 
-        server.stop();
-
-        orbd.stop();
-    }
+/** Since each MethodMonitor generally needs a reference to the class it is
+ * monitoring, we actually work with MethodMonitorFactory instances instead
+ * of simply using MethodMonitor.
+ *
+ * @author ken
+ */
+public interface MethodMonitorFactory {
+    /** Return an instance of a MethodMonitor suitable for use in the given
+     * class cls, according to the currently registered MethodMonitorFactory 
+     * instances in the MethodMonitorRegistry.
+     * 
+     * @param cls The class for which we need the MethodMonitor.
+     * @return The MethodMonitor for cls.
+     */
+    MethodMonitor create( Class<?> cls ) ;
 }

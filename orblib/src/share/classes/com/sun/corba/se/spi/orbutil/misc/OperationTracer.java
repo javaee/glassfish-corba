@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,28 +44,37 @@ public class OperationTracer {
     private static boolean enabled = false ;
 
     public static String convertToString( Object arg ) {
-        if (arg == null)
-            return "<NULL>" ;
+        if (arg == null) {
+            return "<NULL>";
+        }
 
-        Class cls = arg.getClass() ;
+        Class<?> cls = arg.getClass() ;
         if (cls.isArray()) {
-            Class cclass = cls.getComponentType() ;
-            if (cclass.equals( int.class ))
-                        return Arrays.toString( (int[])arg ) ;
-            if (cclass.equals( byte.class ))
-                        return Arrays.toString( (byte[])arg ) ;
-            if (cclass.equals( boolean.class ))
-                        return Arrays.toString( (boolean[])arg ) ;
-            if (cclass.equals( char.class ))
-                        return Arrays.toString( (char[])arg ) ;
-            if (cclass.equals( short.class ))
-                        return Arrays.toString( (short[])arg ) ;
-            if (cclass.equals( long.class ))
-                        return Arrays.toString( (long[])arg ) ;
-            if (cclass.equals( float.class ))
-                        return Arrays.toString( (float[])arg ) ;
-            if (cclass.equals( double.class ))
-                        return Arrays.toString( (double[])arg ) ;
+            Class<?> cclass = cls.getComponentType() ;
+            if (cclass.equals( int.class )) {
+                return Arrays.toString((int[]) arg);
+            }
+            if (cclass.equals( byte.class )) {
+                return Arrays.toString((byte[]) arg);
+            }
+            if (cclass.equals( boolean.class )) {
+                return Arrays.toString((boolean[]) arg);
+            }
+            if (cclass.equals( char.class )) {
+                return Arrays.toString((char[]) arg);
+            }
+            if (cclass.equals( short.class )) {
+                return Arrays.toString((short[]) arg);
+            }
+            if (cclass.equals( long.class )) {
+                return Arrays.toString((long[]) arg);
+            }
+            if (cclass.equals( float.class )) {
+                return Arrays.toString((float[]) arg);
+            }
+            if (cclass.equals( double.class )) {
+                return Arrays.toString((double[]) arg);
+            }
             return Arrays.toString( (Object[])arg ) ;
         } else {
             return arg.toString() ;
@@ -86,11 +95,13 @@ public class OperationTracer {
         String getAsString() ;
     }
 
-    private static ThreadLocal<List<Element>> state = new ThreadLocal() {
-        public List<Element> initialValue() {
-            return new ArrayList<Element>() ;
-        }
-    } ;
+    private static ThreadLocal<List<Element>> state = 
+        new ThreadLocal<List<Element>>() {
+        @Override
+            public List<Element> initialValue() {
+                return new ArrayList<Element>() ;
+            }
+        } ;
 
     private static class ArrayElement implements Element {
         private String componentName ;
@@ -173,6 +184,7 @@ public class OperationTracer {
 
     /** Return the current contents of the OperationTracer state
      * for the current thread.
+     * @return The string.
      */
     public static String getAsString() {
         final StringBuilder sb = new StringBuilder() ;

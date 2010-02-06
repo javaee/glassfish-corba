@@ -34,53 +34,23 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.se.spi.orbutil.tf.annotation;
 
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.Any;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Target ;
+import java.lang.annotation.Documented ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import org.omg.DynamicAny.DynStruct;
-
-public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
-{
-    private static final long serialVersionUID = 2832306671453429704L;
-
-    //
-    // Constructors
-    //
-    protected DynStructImpl(ORB orb, Any any, boolean copyValue) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, any, copyValue);
-        // Initialize components lazily, on demand.
-        // This is an optimization in case the user is only interested in storing Anys.
-    }
-
-    protected DynStructImpl(ORB orb, TypeCode typeCode) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, typeCode);
-        // For DynStruct, the operation sets the current position to -1
-        // for empty exceptions and to zero for all other TypeCodes.
-        // The members (if any) are (recursively) initialized to their default values.
-        index = 0;
-    }
-
-    //
-    // Methods differing from DynValues
-    //
-    public org.omg.DynamicAny.NameValuePair[] get_members () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameValuePairs.clone() ;
-    }
-
-    public org.omg.DynamicAny.NameDynAnyPair[] get_members_as_dyn_any () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameDynAnyPairs.clone() ;
-    }
+/** Used to indicate that a method is used for invoking MethodMonitor.info.
+ * The method must have a void return type.  Any arguments are passed into the
+ * MethodMonitor.info call in the instrumented code.
+ *
+ * @author ken
+ */
+@Documented
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface InfoMethod {
 }

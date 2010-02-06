@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,53 +34,58 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.se.spi.orbutil.generic ;
 
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.Any;
-
-import com.sun.corba.se.spi.orb.ORB ;
-import org.omg.DynamicAny.DynStruct;
-
-public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
+/** Type safe holder that can hold any non-primitive type.
+ * Useful for out parameters and passing arguments that need
+ * to be set later.
+ */
+public class SynchronizedHolder<T> 
 {
-    private static final long serialVersionUID = 2832306671453429704L;
+    private T _content ;
 
-    //
-    // Constructors
-    //
-    protected DynStructImpl(ORB orb, Any any, boolean copyValue) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, any, copyValue);
-        // Initialize components lazily, on demand.
-        // This is an optimization in case the user is only interested in storing Anys.
+    public SynchronizedHolder( T content ) 
+    {
+	this._content = content ;
     }
 
-    protected DynStructImpl(ORB orb, TypeCode typeCode) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, typeCode);
-        // For DynStruct, the operation sets the current position to -1
-        // for empty exceptions and to zero for all other TypeCodes.
-        // The members (if any) are (recursively) initialized to their default values.
-        index = 0;
+    public SynchronizedHolder()
+    {
+	this( null ) ;
     }
 
-    //
-    // Methods differing from DynValues
-    //
-    public org.omg.DynamicAny.NameValuePair[] get_members () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
+    public synchronized T content()
+    {
+	return _content ;
+    }
+
+    public synchronized void content( T content ) 
+    {
+	this._content = content ;
+    }
+
+    public synchronized boolean equals( Object obj )
+    {
+	if (!(obj instanceof SynchronizedHolder))
+	    return false ;
+
+	SynchronizedHolder other = SynchronizedHolder.class.cast( obj ) ;
+
+        if (_content == null) {
+            return other.content() == null ;
+        } else  {
+            return _content.equals( other.content() ) ;
         }
-        checkInitComponents();
-        return nameValuePairs.clone() ;
     }
 
-    public org.omg.DynamicAny.NameDynAnyPair[] get_members_as_dyn_any () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameDynAnyPairs.clone() ;
+    public synchronized int hashCode()
+    {
+	return _content.hashCode() ;
+    }
+
+    public synchronized String toString() 
+    {
+	return "SynchronizedHolder[" + _content + "]" ;
     }
 }
+

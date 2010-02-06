@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,53 +34,21 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package corba.tf;
 
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.Any;
+import corba.framework.CORBATest;
+import corba.framework.Controller;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import org.omg.DynamicAny.DynStruct;
+public class TFTest extends CORBATest {
+    @Override
+    protected void doTest() throws Throwable
+    {
+        Controller client = createClient( Client.class.getName() ) ;
 
-public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
-{
-    private static final long serialVersionUID = 2832306671453429704L;
+        client.start();
 
-    //
-    // Constructors
-    //
-    protected DynStructImpl(ORB orb, Any any, boolean copyValue) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, any, copyValue);
-        // Initialize components lazily, on demand.
-        // This is an optimization in case the user is only interested in storing Anys.
-    }
+        client.waitFor(120000);
 
-    protected DynStructImpl(ORB orb, TypeCode typeCode) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, typeCode);
-        // For DynStruct, the operation sets the current position to -1
-        // for empty exceptions and to zero for all other TypeCodes.
-        // The members (if any) are (recursively) initialized to their default values.
-        index = 0;
-    }
-
-    //
-    // Methods differing from DynValues
-    //
-    public org.omg.DynamicAny.NameValuePair[] get_members () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameValuePairs.clone() ;
-    }
-
-    public org.omg.DynamicAny.NameDynAnyPair[] get_members_as_dyn_any () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameDynAnyPairs.clone() ;
+        client.stop();
     }
 }

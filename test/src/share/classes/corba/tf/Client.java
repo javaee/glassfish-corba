@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2003-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,53 +34,41 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package corba.tf  ;
 
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.Any;
+import corba.framework.TestngRunner;
+import java.io.PrintStream;
+import java.rmi.RemoteException ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import org.omg.DynamicAny.DynStruct;
+import org.testng.Assert ;
+import org.testng.annotations.Test ;
 
-public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
+/**
+ * This tests that enums can be correctly deserialized when sent from the JDK ORB (no EnumDesc support)
+ * to GlassFish, which supports EnumDesc.  We may also add a config flag to allow testing between two
+ * GlassFish ORB instances.
+ *
+ * Basic test: have server run on JDK ORB (or GF with noEnumDesc configuration), and
+ * then see if the client can correctly receive an echoed enum from the server.
+ */
+public class Client
 {
-    private static final long serialVersionUID = 2832306671453429704L;
+    private PrintStream out ;
+    private PrintStream err ;
 
-    //
-    // Constructors
-    //
-    protected DynStructImpl(ORB orb, Any any, boolean copyValue) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, any, copyValue);
-        // Initialize components lazily, on demand.
-        // This is an optimization in case the user is only interested in storing Anys.
+    public static void main( String[] args )
+    {
+        TestngRunner runner = new TestngRunner() ;
+        runner.registerClass( Client.class ) ;
+        runner.run() ;
     }
 
-    protected DynStructImpl(ORB orb, TypeCode typeCode) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, typeCode);
-        // For DynStruct, the operation sets the current position to -1
-        // for empty exceptions and to zero for all other TypeCodes.
-        // The members (if any) are (recursively) initialized to their default values.
-        index = 0;
+    public Client() throws Exception {
+	this.out = System.out;
+	this.err = System.err;
     }
 
-    //
-    // Methods differing from DynValues
-    //
-    public org.omg.DynamicAny.NameValuePair[] get_members () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameValuePairs.clone() ;
-    }
-
-    public org.omg.DynamicAny.NameDynAnyPair[] get_members_as_dyn_any () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameDynAnyPairs.clone() ;
+    @Test
+    public void testEcho() throws RemoteException {
     }
 }

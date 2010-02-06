@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/tf/MethodMonitor.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/tf/annotation/MethodMonitor.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/tf/annotation/MethodMonitorGroup.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/tf/annotation/MonitoredMethod.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/tf/annotation/InfoMethod.java</file>
+    </open-files>
 </project-private>
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.

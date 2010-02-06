@@ -66,6 +66,8 @@ import com.sun.corba.se.spi.orbutil.copyobject.Copy;
 import com.sun.corba.se.spi.orbutil.copyobject.CopyType;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 // no chance of subclasses, so no problems with runtime helper lookup
 public final class TypeCodeImpl extends TypeCode 
@@ -206,6 +208,14 @@ public final class TypeCodeImpl extends TypeCode
 
     @Copy( CopyType.IDENTITY )
     private transient TimingPoints tp ;
+
+    // Present only to suppress FindBugs warnings
+    private void readObject( ObjectInputStream is ) throws IOException,
+        ClassNotFoundException  {
+        _orb = null ;
+        wrapper = null ;
+        tp = null ;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Constructors...

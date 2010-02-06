@@ -34,53 +34,34 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.dynamicany;
+package com.sun.corba.se.spi.orbutil.tf.annotation;
 
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.Any;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Target ;
+import java.lang.annotation.Documented ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-import org.omg.DynamicAny.DynStruct;
-
-public class DynStructImpl extends DynAnyComplexImpl implements DynStruct
-{
-    private static final long serialVersionUID = 2832306671453429704L;
-
-    //
-    // Constructors
-    //
-    protected DynStructImpl(ORB orb, Any any, boolean copyValue) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, any, copyValue);
-        // Initialize components lazily, on demand.
-        // This is an optimization in case the user is only interested in storing Anys.
-    }
-
-    protected DynStructImpl(ORB orb, TypeCode typeCode) {
-        // We can be sure that typeCode is of kind tk_struct
-        super(orb, typeCode);
-        // For DynStruct, the operation sets the current position to -1
-        // for empty exceptions and to zero for all other TypeCodes.
-        // The members (if any) are (recursively) initialized to their default values.
-        index = 0;
-    }
-
-    //
-    // Methods differing from DynValues
-    //
-    public org.omg.DynamicAny.NameValuePair[] get_members () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameValuePairs.clone() ;
-    }
-
-    public org.omg.DynamicAny.NameDynAnyPair[] get_members_as_dyn_any () {
-        if (status == STATUS_DESTROYED) {
-	    throw wrapper.dynAnyDestroyed() ;
-        }
-        checkInitComponents();
-        return nameDynAnyPairs.clone() ;
-    }
+/** Meta-annotation used to define annotations that define groups of related
+ * classes whose methods should be traced.  MethodMonitorGroups may be nested,
+ * and MethodMonitorFactory instances that apply to a group apply to all
+ * subgroups as well (following the transitive closure of the subgroups).
+ *
+ * @author ken
+ */
+@Documented
+@Target(ElementType.ANNOTATION_TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MethodMonitorGroup {
+    /** List of MethodMonitorGroups that are subgrops of this one.
+     * Because annotations don't support circularity, the type
+     * can't be MethodMonitorGroup[], so we require that all classes
+     * in subgroups be annotations which are annotated with
+     * @MethodMonitorGroup.
+     *
+     * @return List of MethodMonitorGroups that are subgroups of
+     * this one.
+     */
+    Class<? extends Annotation>[] value() default {} ;
 }

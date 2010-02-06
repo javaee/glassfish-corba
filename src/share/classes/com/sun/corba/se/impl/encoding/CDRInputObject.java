@@ -56,6 +56,7 @@ import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 
@@ -74,11 +75,25 @@ public class CDRInputObject
     private transient ORBUtilSystemException wrapper ;
     private transient OMGSystemException omgWrapper ;
     private transient CDRInputStreamBase impl;
-
     private transient CorbaConnection corbaConnection;
     private transient Message header;
-    private boolean unmarshaledHeader;
     protected transient CorbaMessageMediator messageMediator;
+
+    // Present only to suppress FindBugs errors
+    private void readObject( ObjectInputStream is ) throws IOException,
+        ClassNotFoundException {
+
+        orb = null ;
+        tp = null ;
+        wrapper = null ;
+        omgWrapper = null ;
+        impl = null ;
+        corbaConnection = null ;
+        header = null ;
+        messageMediator = null ;
+    }
+
+    private boolean unmarshaledHeader;
 
     private static class InputStreamFactory {
         public static CDRInputStreamBase newInputStream(

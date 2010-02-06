@@ -197,11 +197,9 @@ public class DynFixedImpl extends DynAnyBasicImpl implements DynFixed
         // Now check whether both parts are valid numbers
         BigDecimal result;
         try {
-            new BigInteger(integerPart);
             if (fractionPart == null) {
                 result = new BigDecimal(sign + integerPart);
             } else {
-                new BigInteger(fractionPart);
                 result = new BigDecimal(sign + integerPart + "." + fractionPart);
             }
         } catch (NumberFormatException nfe) {

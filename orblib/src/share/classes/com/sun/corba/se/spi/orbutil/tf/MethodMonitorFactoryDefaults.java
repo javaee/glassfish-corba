@@ -39,6 +39,7 @@ package com.sun.corba.se.spi.orbutil.tf;
 import com.sun.corba.se.spi.orbutil.generic.Algorithms;
 import com.sun.corba.se.spi.orbutil.generic.Pair;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
@@ -88,91 +89,91 @@ public class MethodMonitorFactoryDefaults {
 
     // XXX define me
     private static MethodMonitorFactory operationTracerImpl = null ;
-public static class OperationTracer {
-    private static boolean enabled = true ;
 
-    public static void enable() {
-        enabled = true ;
-    }
+    public static class OperationTracer {
+        private static boolean enabled = true ;
 
-    public static void disable() {
-        enabled = false ;
-    }
-
-    private OperationTracer() {}
-
-    private static ThreadLocal<List<Pair<String,Object[]>>> state = 
-        new ThreadLocal<List<Pair<String,Object[]>>>() {
-        @Override
-        public List<Pair<String,Object[]>> initialValue() {
-            return new ArrayList<Pair<String,Object[]>>() ;
-        }
-    } ;
-
-    private static String format( final Pair<String,Object[]> arg ) {
-        String name = arg.first() ;
-        Object[] args = arg.second() ;
-        StringBuilder sb = new StringBuilder() ;
-        if (name == null) {
-            sb.append( "!NULL_NAME!" ) ;
-        } else {
-            sb.append( name ) ;
+        public static void enable() {
+            enabled = true ;
         }
 
-        sb.append( '(' ) ;
-        boolean first = true ;
-        for (Object obj : args ) {
-            if (first) {
-                first = false ;
+        public static void disable() {
+            enabled = false ;
+        }
+
+        private OperationTracer() {}
+
+        private static ThreadLocal<List<Pair<String,Object[]>>> state =
+            new ThreadLocal<List<Pair<String,Object[]>>>() {
+            @Override
+            public List<Pair<String,Object[]>> initialValue() {
+                return new ArrayList<Pair<String,Object[]>>() ;
+            }
+        } ;
+
+        private static String format( final Pair<String,Object[]> arg ) {
+            String name = arg.first() ;
+            Object[] args = arg.second() ;
+            StringBuilder sb = new StringBuilder() ;
+            if (name == null) {
+                sb.append( "!NULL_NAME!" ) ;
             } else {
-                sb.append( ',' ) ;
+                sb.append( name ) ;
             }
 
-	    sb.append( Algorithms.convertToString(obj)) ;
-        }
-        sb.append( ')' ) ;
-        return sb.toString() ;
-    }
+            sb.append( '(' ) ;
+            boolean first = true ;
+            for (Object obj : args ) {
+                if (first) {
+                    first = false ;
+                } else {
+                    sb.append( ',' ) ;
+                }
 
-    /** Return the current contents of the OperationTracer state
-     * for the current thread.
-     * @return State of the OperationTracer.
-     */
-    public static String getAsString() {
-        final StringBuilder sb = new StringBuilder() ;
-        final Formatter fmt = new Formatter( sb ) ;
-        final List<Pair<String,Object[]>> elements = state.get() ;
-        int ctr = 0 ;
-        for (Pair<String,Object[]> elem : elements) {
-            fmt.format( "\n\t(%3d): %s", ctr++, format( elem ) ) ;
+                sb.append( Algorithms.convertToString(obj)) ;
+            }
+            sb.append( ')' ) ;
+            return sb.toString() ;
         }
 
-        return sb.toString() ;
-    }
-
-    public static void clear() {
-        if (enabled) {
-            state.get().clear() ;
-        }
-    }
-
-    public static void enter( final String name, final Object... args ) {
-        if (enabled) {
-            state.get().add( new Pair<String,Object[]>( name, args ) ) ;
-        }
-    }
-
-    public static void exit() {
-        if (enabled) {
+        /** Return the current contents of the OperationTracer state
+         * for the current thread.
+         * @return State of the OperationTracer.
+         */
+        public static String getAsString() {
+            final StringBuilder sb = new StringBuilder() ;
+            final Formatter fmt = new Formatter( sb ) ;
             final List<Pair<String,Object[]>> elements = state.get() ;
-            int size = elements.size() ;
-            if (size > 0) {
-                elements.remove( size - 1 ) ;
+            int ctr = 0 ;
+            for (Pair<String,Object[]> elem : elements) {
+                fmt.format( "\n\t(%3d): %s", ctr++, format( elem ) ) ;
+            }
+
+            return sb.toString() ;
+        }
+
+        public static void clear() {
+            if (enabled) {
+                state.get().clear() ;
+            }
+        }
+
+        public static void enter( final String name, final Object... args ) {
+            if (enabled) {
+                state.get().add( new Pair<String,Object[]>( name, args ) ) ;
+            }
+        }
+
+        public static void exit() {
+            if (enabled) {
+                final List<Pair<String,Object[]>> elements = state.get() ;
+                int size = elements.size() ;
+                if (size > 0) {
+                    elements.remove( size - 1 ) ;
+                }
             }
         }
     }
-}
-
 
     private static MethodMonitorFactory dprintImpl = new MethodMonitorFactory() {
         private static final boolean USE_LOGGER = false ;
@@ -222,29 +223,34 @@ public static class OperationTracer {
                 }
 
                 public void enter( Object ident, Object... args ) {
-                    String mname = MethodMonitorRegistry.getMethodName( cls, ident ) ;
+                    String mname = MethodMonitorRegistry.getMethodName( cls,
+                        ident ) ;
                     String str = makeString( args ) ;
                     dprint( mname, "->" + str ) ;
                 }
 
                 public void exception( Object ident, Throwable thr ) {
-                    String mname = MethodMonitorRegistry.getMethodName( cls, ident ) ;
+                    String mname = MethodMonitorRegistry.getMethodName( cls,
+                        ident ) ;
                     dprint( mname, ":throw:" + thr ) ;
                 }
 
                 public void info( Object ident, Object... args ) {
-                    String mname = MethodMonitorRegistry.getMethodName( cls, ident ) ;
+                    String mname = MethodMonitorRegistry.getMethodName( cls,
+                        ident ) ;
                     String str = makeString( args ) ;
                     dprint( mname, "::" + str ) ;
                 }
 
                 public void exit( Object ident ) {
-                    String mname = MethodMonitorRegistry.getMethodName( cls, ident ) ;
+                    String mname = MethodMonitorRegistry.getMethodName( cls,
+                        ident ) ;
                     dprint( mname, "<-" ) ;
                 }
 
                 public void exit( Object ident, Object retVal ) {
-                    String mname = MethodMonitorRegistry.getMethodName( cls, ident ) ;
+                    String mname = MethodMonitorRegistry.getMethodName( cls,
+                        ident ) ;
                     dprint( mname, "<-(" + retVal + ")" ) ;
                 }
 
@@ -287,7 +293,7 @@ public static class OperationTracer {
     }
 
     public static MethodMonitorFactory compose(
-        final List<MethodMonitorFactory> factories ) {
+        final Collection<MethodMonitorFactory> factories ) {
 
         return new MethodMonitorFactory() {
             public MethodMonitor create(final Class<?> cls) {

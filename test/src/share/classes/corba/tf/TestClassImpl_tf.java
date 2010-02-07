@@ -15,14 +15,14 @@ import java.util.Map;
  * @author ken
  */
 @A @B @C
-public class TestClass_tf {
+public class TestClassImpl_tf implements TestClass {
     // Set-up for tracing facility (generated)
     private static SynchronizedHolder<MethodMonitor> __mmA ;
     private static SynchronizedHolder<MethodMonitor> __mmB ;
     private static SynchronizedHolder<MethodMonitor> __mmC ;
 
     static {
-        Class<?> thisClass = TestClass_tf.class ;
+        Class<?> thisClass = TestClassImpl_tf.class ;
 
         final List<String> __mnames = new ArrayList<String>() ;
         __mnames.add( "increment" ) ;

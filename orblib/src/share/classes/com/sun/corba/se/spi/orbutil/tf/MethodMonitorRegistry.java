@@ -34,7 +34,6 @@
  * holder.
  */
 
-
 package com.sun.corba.se.spi.orbutil.tf;
 
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
@@ -42,6 +41,7 @@ import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,72 +59,191 @@ public class MethodMonitorRegistry {
         new HashMap<Class<?>,List<String>>() ;
     
     // Maps traceable classes to a Map from Annotation class to the 
-    // MethodMonitor Holder, which allows easy and safe updates to the MethodMonitor.
-    private static final Map<Class<?>,Map<Class<? extends Annotation>,SynchronizedHolder<MethodMonitor>>> classToAnnoMM =
-        new HashMap<Class<?>,Map<Class<? extends Annotation>,SynchronizedHolder<MethodMonitor>>>() ;
+    // MethodMonitor Holder, which allows easy and safe updates to the
+    // MethodMonitor.
+    private static final Map<Class<?>,
+        Map<Class<? extends Annotation>,
+            SynchronizedHolder<MethodMonitor>>> classToAnnoMM =
+
+            new HashMap<Class<?>,
+                Map<Class<? extends Annotation>,
+                    SynchronizedHolder<MethodMonitor>>>() ;
 
     // For each MM Annotation, lists all of the immediate subgroups.
-    private static final Map<Class<? extends Annotation>,List<Class<? extends Annotation>>> subgroups =
-        new HashMap<Class<? extends Annotation>,List<Class<? extends Annotation>>>() ;
+    private static final Map<Class<? extends Annotation>,
+        Set<Class<? extends Annotation>>> subgroups =
+        new HashMap<Class<? extends Annotation>,
+            Set<Class<? extends Annotation>>>() ;
 
     // For each MM Annotation, lists all MM annotations reachable via subgroups.
     // This is the reflexive, transitive closure of subgroups.
-    private static final Map<Class<? extends Annotation>,List<Class<? extends Annotation>>> subgroupsTC =
-        new HashMap<Class<? extends Annotation>,List<Class<? extends Annotation>>>() ;
+    private static final Map<Class<? extends Annotation>,
+        Set<Class<? extends Annotation>>> subgroupsTC =
+        new HashMap<Class<? extends Annotation>,
+            Set<Class<? extends Annotation>>>() ;
     
-    // For each MM Annotation, lists all traceable Classes that have that annotation.
-    private static final Map<Class<? extends Annotation>,List<Class<?>>> annotationToClasses =
-        new HashMap<Class<? extends Annotation>,List<Class<?>>>() ;
+    // For each MM Annotation, lists all traceable Classes that
+    // have that annotation.
+    private static final Map<Class<? extends Annotation>,
+        Set<Class<?>>> annotationToClasses =
+        new HashMap<Class<? extends Annotation>,Set<Class<?>>>() ;
 
     // For each MM Annotation, give the registered MethodMonitorFactory (if any)
-    private static final Map<Class<? extends Annotation>,MethodMonitorFactory> annotationToMMF =
+    private static final Map<Class<? extends Annotation>,
+        MethodMonitorFactory> annotationToMMF =
         new HashMap<Class<? extends Annotation>,MethodMonitorFactory>() ; 
 
-    // For each MM Annotation a, give the set of all MethodMonitorFactory instances
-    // that are registered to any element of subgroupsTC(a).
-    private static final Map<Class<? extends Annotation>,Set<MethodMonitorFactory>> annotationToMMFsets =
+    // For each MM Annotation a, give the set of all MethodMonitorFactory 
+    // instances that are registered to any element of subgroupsTC(a).
+    private static final Map<Class<? extends Annotation>,
+        Set<MethodMonitorFactory>> annotationToMMFSets =
         new HashMap<Class<? extends Annotation>,Set<MethodMonitorFactory>>() ;
 
     // For each MM Annotation a, give the composition of annotationToMMFSets(a).
-    private static final Map<Class<? extends Annotation>,MethodMonitorFactory> annotationToMMFComposition =
+    private static final Map<Class<? extends Annotation>,
+        MethodMonitorFactory> annotationToMMFComposition =
         new HashMap<Class<? extends Annotation>,MethodMonitorFactory>() ;
 
-    /** Register a class with the tracing facility.  The class must be an 
-     * instrumented class that is annotated with an annotation with a 
+    private static void updateTracedClass( Class<?> cls ) {
+        Map<Class<? extends Annotation>,SynchronizedHolder<MethodMonitor>> map =
+            classToAnnoMM.get( cls ) ; 
+
+        for (Map.Entry<Class<? extends Annotation>, 
+            SynchronizedHolder<MethodMonitor>> entry : map.entrySet() ) {
+
+            MethodMonitorFactory mmf =
+                annotationToMMFComposition.get( entry.getKey() ) ;
+
+            if (mmf == null) {
+                entry.getValue().content( null ) ;
+            } else {
+                entry.getValue().content( mmf.create( cls )) ;
+            }
+        }
+
+    }
+
+    private static void updateAnnotation( Class<? extends Annotation> annot ) {
+        // update annotationToMMFSets from annotationToMMF and subgroupsTC
+        Set<MethodMonitorFactory> mmfs = new HashSet<MethodMonitorFactory>() ;
+        annotationToMMFSets.put( annot, mmfs ) ;
+
+        final Set<Class<? extends Annotation>> relatedAnnos =
+            subgroupsTC.get( annot ) ;
+        for (Class<? extends Annotation> key : relatedAnnos) {
+            MethodMonitorFactory mmf = annotationToMMF.get( key ) ;
+            if (mmf != null) {
+                mmfs.add( annotationToMMF.get( key ) ) ;
+            }
+        }
+
+        // update annotationsToMMFComposition from annotationToMMFSets
+        annotationToMMFComposition.put( annot,
+            MethodMonitorFactoryDefaults.compose( mmfs ) ) ;
+    }
+
+    // Called after the subgroups relation has changed.  This forces 
+    // recomputation of annotationToMMFSets and annotationsToMMFComposition,
+    // and also updates to all registered classes in the
+    // annotationToClasses map.
+    private static void doFullUpdate() {
+        for (Class<? extends Annotation> annot : annotationToMMF.keySet() ) {
+            updateAnnotation( annot ) ;
+        }
+
+        for (Class<?> key : classToAnnoMM.keySet()) {
+            updateTracedClass( key ) ;
+        }
+    }
+
+    private static boolean scanClassAnnotations( final Class<?> cls ) {
+        boolean updated = false ;
+        for (Annotation anno : cls.getAnnotations()) {
+            Set<Class<?>> target = annotationToClasses.get( anno.getClass() ) ;
+            if (target == null) {
+                target = new HashSet<Class<?>>() ;
+                annotationToClasses.put( anno.getClass(), target ) ;
+            }
+            target.add( cls ) ;
+
+            if (scanAnnotation( anno.getClass() ) ) {
+                updated = true ;
+            }
+        }
+
+        return updated ;
+    }
+
+    private static boolean scanAnnotation(
+        final Class<? extends Annotation> annoClass ) {
+
+        final MethodMonitorGroup mmg =
+            annoClass.getAnnotation( MethodMonitorGroup.class ) ;
+        boolean updated = false ;
+
+        if (mmg != null) {
+            if (!subgroups.containsKey( annoClass )) {
+                updated = true ;
+                Set<Class<? extends Annotation>> acs =
+                    new HashSet<Class<? extends Annotation>>( Arrays.asList(
+                    mmg.value() ) ) ;
+                subgroups.put( annoClass, acs ) ;
+
+                computeTransitiveClosure() ;
+            }
+        }
+
+        return updated ;
+    }
+
+    private static void computeTransitiveClosure() {
+        subgroupsTC.clear() ;
+        for (Class<? extends Annotation> anno : subgroups.keySet()) {
+            Set<Class<? extends Annotation>> memset =
+                new HashSet<Class<? extends Annotation>>() ;
+            subgroupsTC.put( anno, memset ) ;
+        }
+
+        for (Class<? extends Annotation> anno : subgroupsTC.keySet()) {
+            dfs( anno, anno ) ;
+        }
+    }
+
+    private static void dfs( Class<? extends Annotation> src,
+        Class<? extends Annotation> dest ) {
+
+        Set<Class<? extends Annotation>> images = subgroupsTC.get( src ) ;
+        images.add( dest ) ;
+
+        for (Class<? extends Annotation> anno : subgroups.get(dest)) {
+            if (!images.contains( anno )) {
+                dfs( src, anno ) ;
+            }
+        }
+    }
+
+    /** Register a class with the tracing facility.  The class must be an
+     * instrumented class that is annotated with an annotation with a
      * meta-annotation of @MethodMonitorGroup.  Note that this method should
      * only be called from the enhanced class, not directly by the user.
-     * 
+     *
      * @param cls  Class to register, which must have 1 or more MM annotations.
      * @param methodNames The list of method names used in the enhanced code.
      * The index of the name is the value used in the method.
      * @param annoMM The MM holders for each MM annotation on the class.
      */
-    public static void registerClass( Class<?> cls, List<String> methodNames,
-        Map<Class<? extends Annotation>,SynchronizedHolder<MethodMonitor>> annoMM ) {
-        // XXX define me
+    public static void registerClass( final Class<?> cls,
+        final List<String> methodNames,
+        final Map<Class<? extends Annotation>,
+            SynchronizedHolder<MethodMonitor>> annoMM ) {
+
         classToMNames.put( cls, methodNames ) ;
         classToAnnoMM.put( cls, annoMM ) ;
-        scanClassAnnotations( cls ) ;
-    }
 
-    private static void scanClassAnnotations( Class<?> cls ) {
-        for (Annotation anno : cls.getAnnotations()) {
-            scanAnnotation( anno ) ;
-        }
-    }
-
-    // XXX Do we really needs subgroups AND subgroupsTC?  This should
-    // probably just directly compute subgroupsTC.
-    private static void scanAnnotation( Annotation anno ) {
-        final Class<? extends Annotation> annoClass = anno.getClass() ;
-        MethodMonitorGroup mmg =
-            annoClass.getAnnotation( MethodMonitorGroup.class ) ;
-        if (mmg != null) {
-            if (!subgroups.containsKey( annoClass )) {
-                List<Class<? extends Annotation>> acs = Arrays.asList(
-                    mmg.value() ) ;
-                subgroups.put( annoClass, acs ) ;
-            }
+        if (scanClassAnnotations( cls )) {
+            doFullUpdate() ;
+        } else {
+            updateTracedClass( cls ) ;
         }
     }
 
@@ -136,7 +255,6 @@ public class MethodMonitorRegistry {
      * @return The name of the method corresponding to the identifier.
      */
     public static String getMethodName( Class<?> cls, Object identifier ) {
-        // XXX define me
         if (!(identifier instanceof Integer)) {
             throw new RuntimeException( "identifier is not an Integer" ) ;
         }
@@ -168,7 +286,14 @@ public class MethodMonitorRegistry {
     public static void register( Class<? extends Annotation> annot,
         MethodMonitorFactory mmf ) {
 
-        // XXX define me
+        final boolean fullUpdate = scanAnnotation(annot);
+        annotationToMMF.put( annot, mmf ) ;
+
+        if (fullUpdate) {
+            doFullUpdate() ;
+        } else {
+            updateAnnotation( annot ) ;
+        }
     }
 
     /** Remove the MethodMonitorFactory (if any) that is associated with annot.
@@ -176,7 +301,15 @@ public class MethodMonitorRegistry {
      * @param annot
      */
     public static void clear( Class<? extends Annotation> annot ) {
-        // XXX define me
+
+        final boolean fullUpdate = scanAnnotation(annot);
+        annotationToMMF.remove( annot ) ;
+
+        if (fullUpdate) {
+            doFullUpdate() ;
+        } else {
+            updateAnnotation( annot ) ;
+        }
     }
 
     /** Return the MethodMonitorFactory registered against the annotation, or
@@ -188,7 +321,11 @@ public class MethodMonitorRegistry {
     public static MethodMonitorFactory registeredFactory(
         Class<? extends Annotation> annot ) {
 
-        // XXX define me
-        return null ;
+        final boolean fullUpdate = scanAnnotation(annot);
+        if (fullUpdate) {
+            doFullUpdate() ;
+        }
+
+        return annotationToMMF.get( annot ) ;
     }
 }

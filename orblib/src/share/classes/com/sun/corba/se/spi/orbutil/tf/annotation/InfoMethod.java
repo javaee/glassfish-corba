@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.spi.orbutil.tf.annotation;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.Target ;
 import java.lang.annotation.Documented ;
 import java.lang.annotation.ElementType ;
@@ -44,7 +43,8 @@ import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
 /** Used to indicate that a method is used for invoking MethodMonitor.info.
- * The method must have a void return type.  Any arguments are passed into the
+ * The method must be private and have a void return type.
+ * Any arguments are passed into the
  * MethodMonitor.info call in the instrumented code.
  *
  * @author ken

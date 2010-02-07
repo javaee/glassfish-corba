@@ -38,7 +38,6 @@ package corba.tf  ;
 
 import corba.framework.TestngRunner;
 import java.io.PrintStream;
-import java.rmi.RemoteException ;
 
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
@@ -68,7 +67,27 @@ public class Client
 	this.err = System.err;
     }
 
+    TestClass getTestClass( boolean isTraced ) {
+        if (isTraced) {
+            return new TestClassImpl_tf() ;
+        } else {
+            return new TestClassImpl() ;
+        }
+    }
+
+    private void doSimpleTest( boolean isTraced ) {
+        TestClass tc = getTestClass( isTraced ) ;
+        Assert.assertEquals( tc.add( 10, 10 ), 20 ) ;
+        Assert.assertEquals( tc.mult( 10, 10 ), 100 ) ;
+    }
+
     @Test
-    public void testEcho() throws RemoteException {
+    public void testSimple() {
+        doSimpleTest( false ) ;
+    }
+
+    @Test
+    public void testSimpleTraced() {
+        doSimpleTest( true ) ;
     }
 }

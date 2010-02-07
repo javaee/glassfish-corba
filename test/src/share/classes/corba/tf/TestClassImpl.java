@@ -7,7 +7,7 @@ import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
  * @author ken
  */
 @A @B @C
-public class TestClass {
+public class TestClassImpl implements TestClass {
     /* This is not needed here, if we instrument the files directly.
     // Set-up for tracing facility
     @A private static MethodMonitor mmA ;

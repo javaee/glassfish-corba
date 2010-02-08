@@ -133,13 +133,21 @@ public class MethodMonitorRegistry {
         for (Class<? extends Annotation> key : relatedAnnos) {
             MethodMonitorFactory mmf = annotationToMMF.get( key ) ;
             if (mmf != null) {
-                mmfs.add( annotationToMMF.get( key ) ) ;
+                mmfs.add( mmf ) ;
             }
         }
 
         // update annotationsToMMFComposition from annotationToMMFSets
         annotationToMMFComposition.put( annot,
             MethodMonitorFactoryDefaults.compose( mmfs ) ) ;
+
+        // update the classes that are annotated by this annotation.
+        final Set<Class<?>> classes = annotationToClasses.get(annot) ;
+        if (classes != null) {
+            for (Class<?> cls : classes) {
+                updateTracedClass( cls ) ;
+            }
+        }
     }
 
     // Called after the subgroups relation has changed.  This forces 
@@ -158,39 +166,49 @@ public class MethodMonitorRegistry {
 
     private static boolean scanClassAnnotations( final Class<?> cls ) {
         boolean updated = false ;
-        for (Annotation anno : cls.getAnnotations()) {
-            Set<Class<?>> target = annotationToClasses.get( anno.getClass() ) ;
-            if (target == null) {
-                target = new HashSet<Class<?>>() ;
-                annotationToClasses.put( anno.getClass(), target ) ;
-            }
-            target.add( cls ) ;
+        boolean hasMMAnnotation = false ;
+        for (Annotation anno : cls.getAnnotations()) { 
+            final Class<? extends Annotation> annoClass =
+                anno.annotationType() ;
+            final MethodMonitorGroup mmg =
+                annoClass.getAnnotation( MethodMonitorGroup.class ) ;
 
-            if (scanAnnotation( anno.getClass() ) ) {
-                updated = true ;
+            if (mmg != null) {
+                hasMMAnnotation = true ;
+                Set<Class<?>> target = annotationToClasses.get( annoClass ) ;
+                if (target == null) {
+                    target = new HashSet<Class<?>>() ;
+                    annotationToClasses.put( annoClass, target ) ;
+                }
+                target.add( cls ) ;
+
+                if (scanAnnotation( annoClass, mmg ) ) {
+                    updated = true ;
+                }
             }
+        }
+
+        if (!hasMMAnnotation) {
+            throw new RuntimeException( "Class " + cls + " is not traceable" ) ;
         }
 
         return updated ;
     }
 
     private static boolean scanAnnotation(
-        final Class<? extends Annotation> annoClass ) {
+        final Class<? extends Annotation> annoClass,
+        final MethodMonitorGroup mmg ) {
 
-        final MethodMonitorGroup mmg =
-            annoClass.getAnnotation( MethodMonitorGroup.class ) ;
         boolean updated = false ;
 
-        if (mmg != null) {
-            if (!subgroups.containsKey( annoClass )) {
-                updated = true ;
-                Set<Class<? extends Annotation>> acs =
-                    new HashSet<Class<? extends Annotation>>( Arrays.asList(
-                    mmg.value() ) ) ;
-                subgroups.put( annoClass, acs ) ;
+        if (!subgroups.containsKey( annoClass )) {
+            updated = true ;
+            Set<Class<? extends Annotation>> acs =
+                new HashSet<Class<? extends Annotation>>( Arrays.asList(
+                mmg.value() ) ) ;
+            subgroups.put( annoClass, acs ) ;
 
-                computeTransitiveClosure() ;
-            }
+            computeTransitiveClosure() ;
         }
 
         return updated ;
@@ -237,10 +255,12 @@ public class MethodMonitorRegistry {
         final Map<Class<? extends Annotation>,
             SynchronizedHolder<MethodMonitor>> annoMM ) {
 
+        final boolean fullUpdate = scanClassAnnotations( cls ) ;
+
         classToMNames.put( cls, methodNames ) ;
         classToAnnoMM.put( cls, annoMM ) ;
 
-        if (scanClassAnnotations( cls )) {
+        if (fullUpdate) {
             doFullUpdate() ;
         } else {
             updateTracedClass( cls ) ;
@@ -274,6 +294,20 @@ public class MethodMonitorRegistry {
         return names.get( idVal ) ;
     }
 
+    private static final MethodMonitorGroup checkAnnotation(
+        Class<? extends Annotation> annoClass ) {
+
+        final MethodMonitorGroup mmg =
+            annoClass.getAnnotation( MethodMonitorGroup.class ) ;
+
+        if (mmg == null) {
+            throw new RuntimeException( "Annotation " + annoClass
+                + " does not have the MethodMonitorGroup annotation" ) ;
+        } else {
+            return mmg ;
+        }
+    }
+
     /** Register a particular MethodMonitorFactory against an annotation.
      * Annot must be annotated with the MethodMonitorGroup meta-annotation.
      * Only a single mmf may be registered against an annotation.  
@@ -286,7 +320,9 @@ public class MethodMonitorRegistry {
     public static void register( Class<? extends Annotation> annot,
         MethodMonitorFactory mmf ) {
 
-        final boolean fullUpdate = scanAnnotation(annot);
+        final boolean fullUpdate = scanAnnotation( annot,
+            checkAnnotation( annot ) );
+
         annotationToMMF.put( annot, mmf ) ;
 
         if (fullUpdate) {
@@ -302,7 +338,9 @@ public class MethodMonitorRegistry {
      */
     public static void clear( Class<? extends Annotation> annot ) {
 
-        final boolean fullUpdate = scanAnnotation(annot);
+        final boolean fullUpdate = scanAnnotation( annot,
+            checkAnnotation( annot ) );
+
         annotationToMMF.remove( annot ) ;
 
         if (fullUpdate) {
@@ -321,7 +359,9 @@ public class MethodMonitorRegistry {
     public static MethodMonitorFactory registeredFactory(
         Class<? extends Annotation> annot ) {
 
-        final boolean fullUpdate = scanAnnotation(annot);
+        final boolean fullUpdate = scanAnnotation( annot,
+            checkAnnotation( annot ) );
+
         if (fullUpdate) {
             doFullUpdate() ;
         }

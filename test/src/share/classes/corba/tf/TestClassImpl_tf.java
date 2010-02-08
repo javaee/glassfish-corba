@@ -17,9 +17,12 @@ import java.util.Map;
 @A @B @C
 public class TestClassImpl_tf implements TestClass {
     // Set-up for tracing facility (generated)
-    private static SynchronizedHolder<MethodMonitor> __mmA ;
-    private static SynchronizedHolder<MethodMonitor> __mmB ;
-    private static SynchronizedHolder<MethodMonitor> __mmC ;
+    private static final SynchronizedHolder<MethodMonitor> __mmA =
+        new SynchronizedHolder<MethodMonitor>() ;
+    private static final SynchronizedHolder<MethodMonitor> __mmB =
+        new SynchronizedHolder<MethodMonitor>() ;
+    private static final SynchronizedHolder<MethodMonitor> __mmC =
+        new SynchronizedHolder<MethodMonitor>() ;
 
     static {
         Class<?> thisClass = TestClassImpl_tf.class ;
@@ -154,7 +157,7 @@ public class TestClassImpl_tf implements TestClass {
     }
 
     @B
-    long add( long a, long b ) {
+    public long add( long a, long b ) {
         long __result = 0 ;
         Object __ident = null ;
         MethodMonitor __mm = __mmB.content() ;
@@ -195,7 +198,7 @@ public class TestClassImpl_tf implements TestClass {
     }
 
     @C
-    long mult( long a, long b ) {
+    public long mult( long a, long b ) {
         long __result = 0 ;
         Object __ident = null ;
         MethodMonitor __mm = __mmC.content() ;

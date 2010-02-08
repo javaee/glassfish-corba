@@ -297,48 +297,57 @@ public class MethodMonitorFactoryDefaults {
 
         return new MethodMonitorFactory() {
             public MethodMonitor create(final Class<?> cls) {
-                final List<MethodMonitor> mms = new ArrayList<MethodMonitor>() ;
-                for (MethodMonitorFactory f : factories) {
-                    mms.add( f.create( cls ) ) ;
+                if (factories.size() == 0) {
+                    // null is a very efficient no-op indicator
+                    return null ;
+                } else if (factories.size() == 1) {
+                    MethodMonitorFactory mmf = factories.toArray( 
+                        new MethodMonitorFactory[1])[0] ;
+                    return mmf.create( cls ) ;
+                } else {
+                    final List<MethodMonitor> mms = new ArrayList<MethodMonitor>() ;
+                    for (MethodMonitorFactory f : factories) {
+                        mms.add( f.create( cls ) ) ;
+                    }
+
+                    return new MethodMonitorBase( cls ) {
+                        public void enter(Object ident, Object... args) {
+                            for (MethodMonitor mm : mms) {
+                                mm.enter( ident, args ) ;
+                            }
+                        }
+
+                        public void info(Object ident, Object... args) {
+                            for (MethodMonitor mm : mms) {
+                                mm.info( ident, args ) ;
+                            }
+                        }
+
+                        public void exit(Object ident) {
+                            for (MethodMonitor mm : mms) {
+                                mm.exit( ident ) ;
+                            }
+                        }
+
+                        public void exit(Object ident, Object result) {
+                            for (MethodMonitor mm : mms) {
+                                mm.exit( ident, result ) ;
+                            }
+                        }
+
+                        public void exception(Object ident, Throwable thr) {
+                            for (MethodMonitor mm : mms) {
+                                mm.exception( ident, thr ) ;
+                            }
+                        }
+
+                        public void clear() {
+                            for (MethodMonitor mm : mms) {
+                                mm.clear() ;
+                            }
+                        }
+                    } ;
                 }
-
-                return new MethodMonitorBase( cls ) {
-                    public void enter(Object ident, Object... args) {
-                        for (MethodMonitor mm : mms) {
-                            mm.enter( ident, args ) ;
-                        }
-                    }
-
-                    public void info(Object ident, Object... args) {
-                        for (MethodMonitor mm : mms) {
-                            mm.info( ident, args ) ;
-                        }
-                    }
-
-                    public void exit(Object ident) {
-                        for (MethodMonitor mm : mms) {
-                            mm.exit( ident ) ;
-                        }
-                    }
-
-                    public void exit(Object ident, Object result) {
-                        for (MethodMonitor mm : mms) {
-                            mm.exit( ident, result ) ;
-                        }
-                    }
-
-                    public void exception(Object ident, Throwable thr) {
-                        for (MethodMonitor mm : mms) {
-                            mm.exception( ident, thr ) ;
-                        }
-                    }
-
-                    public void clear() {
-                        for (MethodMonitor mm : mms) {
-                            mm.clear() ;
-                        }
-                    }
-                } ;
             }
         } ;
     }

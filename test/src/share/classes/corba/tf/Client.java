@@ -36,8 +36,11 @@
 
 package corba.tf  ;
 
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryDefaults;
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
 import corba.framework.TestngRunner;
 import java.io.PrintStream;
+import java.lang.annotation.Annotation;
 
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
@@ -89,5 +92,18 @@ public class Client
     @Test
     public void testSimpleTraced() {
         doSimpleTest( true ) ;
+    }
+
+    @Test
+    public void testWithTracing() {
+        MethodMonitorRegistry.register(A.class, 
+            MethodMonitorFactoryDefaults.dprint() );
+        MethodMonitorRegistry.register(B.class, 
+            MethodMonitorFactoryDefaults.dprint() );
+        MethodMonitorRegistry.register(C.class, 
+            MethodMonitorFactoryDefaults.dprint() );
+
+        TestClass tc = getTestClass( true ) ;
+        System.out.println( "result = " + tc.mult( 10, 10 ) ) ;
     }
 }

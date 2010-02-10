@@ -125,6 +125,23 @@ public class FileWrapper implements Closeable {
 	return file.getAbsolutePath() ;
     }
 
+    public byte[] readAll() {
+        final long length = file.length() ;
+        final byte[] result = new byte[length] ;
+        final FileInputStream fis = new FileInputStream( file ) ;
+        long offset = 0 ;
+        long clean = length ;
+        long actual = 0 ;
+        while (clen > 0) {
+            actual = fis.read( result, offset, clen ) ;
+            offset += actual ;
+            clen -= actual ;
+        }
+    }
+
+    public void writeAll( byte[] ) {
+    }
+
     /** Read the next line from the text file.
      * File state must be FileState OPEN_FOR_READ.
      * Returns null when at the end of file.

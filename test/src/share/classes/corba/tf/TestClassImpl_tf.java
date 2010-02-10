@@ -60,6 +60,11 @@ public class TestClassImpl_tf implements TestClass {
 
         try {
             __result = x + 1 ;
+	} catch (RuntimeException exc) { // Should be Throwable
+	    if (enabled) {
+		__mm.exception( __ident, exc ) ; 
+	    }
+	    throw exc ;
         } finally {
             if (enabled) {
                 __mm.exit( __ident, __result ) ;
@@ -83,6 +88,11 @@ public class TestClassImpl_tf implements TestClass {
 
         try {
             __result = x - 1 ;
+	} catch (RuntimeException exc) {
+	    if (enabled) {
+		__mm.exception( __ident, exc ) ;
+	    }
+	    throw exc ;
         } finally {
             if (enabled) {
                 __mm.exit( __ident, __result ) ;
@@ -139,18 +149,14 @@ public class TestClassImpl_tf implements TestClass {
     }
 
     @InfoMethod
-    @B
-    private void bigAddValue( Object __ident, String msg, long value ) {
-        MethodMonitor __mm = __mmB.content() ;
+    private void bigAddValue( MethodMonitor __mm, Object __ident, String msg, long value ) {
         if (__mm != null) {
             __mm.info( __ident, msg, value ) ;
         }
     }
 
     @InfoMethod
-    @C
-    private void bigMultValue( Object __ident, String msg, long value ) {
-        MethodMonitor __mm = __mmC.content() ;
+    private void bigMultValue( MethodMonitor __mm, Object __ident, String msg, long value ) {
         if (__mm != null) {
             __mm.info( __ident, msg, value ) ;
         }
@@ -170,24 +176,23 @@ public class TestClassImpl_tf implements TestClass {
 
         try {
             if ((a<0) || (b<0)) {
-                RuntimeException exc = new RuntimeException(
-                    "Negative not supported" ) ;
-                if (enabled) {
-                    __mm.exception( __ident, exc ) ;
-                }
-
-                throw exc ;
+                throw new RuntimeException( "Negative not supported" ) ;
             }
 
             if (is0(b)) {
                 __result = a ;
             } else {
                 if (b > 100) {
-                    bigAddValue( __ident, "Large argument for add", b ) ;
+                    bigAddValue( __mm, __ident, "Large argument for add", b ) ;
                 }
 
                 __result = add( increment(a), decrement(b) ) ;
             }
+	} catch (RuntimeException exc) { // Should be Throwable
+	    if (enabled) {
+		__mm.exception( __ident, exc ) ;
+	    }
+	    throw exc ;
         } finally {
             if (enabled) {
                 __mm.exit( __ident, __result ) ;
@@ -211,14 +216,7 @@ public class TestClassImpl_tf implements TestClass {
 
         try {
             if ((a<0) || (b<0)) {
-                RuntimeException exc = new RuntimeException(
-                    "Negative not supported" ) ;
-
-                if (enabled) {
-                    __mm.exception( __ident, exc ) ;
-                }
-
-                throw exc ;
+                throw new RuntimeException( "Negative not supported" ) ;
             }
 
             if (is0(b)) {
@@ -232,6 +230,11 @@ public class TestClassImpl_tf implements TestClass {
 
                 __result = add( a, mult( a, decrement(b) )) ;
             }
+	} catch (RuntimeException exc) { // should be Throwable
+	    if (enabled) {
+		__mm.exception( __ident, exc ) ;
+	    }
+	    throw exc ;
         } finally {
             if (enabled) {
                 __mm.exit( __ident, __result ) ;

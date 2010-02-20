@@ -70,6 +70,7 @@ public class FileWrapper implements Closeable {
     /** Create a new FileWrapper for the given File.  Represents the same file in the
      * filesystem as the underlying File object.  getBase() return the FileWrapper
      * for the file system root.
+     * @param file File to wrap
      */
     public FileWrapper( final File file ) {
 	this.file = file ;
@@ -97,6 +98,7 @@ public class FileWrapper implements Closeable {
 	return file.canWrite() ;
     }
 
+    @Override
     public String toString() {
 	return file.toString() ;
     }
@@ -125,40 +127,63 @@ public class FileWrapper implements Closeable {
 	return file.getAbsolutePath() ;
     }
 
-    public byte[] readAll() {
+    public byte[] readAll() throws IOException {
         final long length = file.length() ;
-        final byte[] result = new byte[length] ;
-        final FileInputStream fis = new FileInputStream( file ) ;
-        long offset = 0 ;
-        long clean = length ;
-        long actual = 0 ;
-        while (clen > 0) {
-            actual = fis.read( result, offset, clen ) ;
-            offset += actual ;
-            clen -= actual ;
+        if (length > Integer.MAX_VALUE) {
+            throw new IOException( "file too large for readAll" ) ;
+        }
+
+        final byte[] result = new byte[(int)length] ;
+        final FileInputStream is = new FileInputStream( file ) ;
+
+        try {
+            int offset = 0 ;
+            int clen = (int)length ;
+            int actual = 0 ;
+            while (clen > 0) {
+                actual = is.read( result, offset, clen ) ;
+                offset += actual ;
+                clen -= actual ;
+            }
+
+            return result ;
+        } finally {
+            is.close() ;
         }
     }
 
-    public void writeAll( byte[] ) {
+    public void writeAll( byte[] data ) throws IOException {
+        final FileOutputStream os = new FileOutputStream( file ) ;
+        try {
+            os.write( data ) ;
+        } finally {
+            os.close() ;
+        }
     }
 
     /** Read the next line from the text file.
      * File state must be FileState OPEN_FOR_READ.
      * Returns null when at the end of file.
+     * @return The String just read.
+     * @throws IOException for IO errors.
      */
     public String readLine() throws IOException {
-	if (state != FileState.OPEN_FOR_READ)
+	if (state != FileState.OPEN_FOR_READ) {
 	    throw new IOException( file + " is not open for reading" ) ;
+        }
 	
 	return reader.readLine() ;
     }
 
     /** Write the line to the end of the file, including a newline.
      * File state must be FileState OPEN_FOR_WRITE.
+     * @param line The line to write.
+     * @throws IOException for IO errors.
      */
     public void writeLine( final String line ) throws IOException {
-	if (state != FileState.OPEN_FOR_WRITE)
-	    throw new IOException( file + " is not open for writing" ) ;
+	if (state != FileState.OPEN_FOR_WRITE) {
+            throw new IOException(file + " is not open for writing");
+        }
 	
 	writer.write( line, 0, line.length() ) ;
 	writer.newLine() ;
@@ -187,7 +212,7 @@ public class FileWrapper implements Closeable {
 
     public enum OpenMode { READ, WRITE } ;
 
-    /** Open the (text) file for I/O.  There are three modes:
+    /** Open the (text) file for I/O.  There are two modes:
      * <ul>
      * <li>READ.  In this mode, the file is prepared for reading,
      * starting from the beginning.
@@ -195,6 +220,8 @@ public class FileWrapper implements Closeable {
      * <li>WRITE.  In this mode, the file is prepared for writing,
      * starting at the end of the file.
      * </ul>
+     * @param mode READ or WRITE mode.
+     * @throws IOException for IO exceptions.
      */
     public void open( final OpenMode mode ) throws IOException {
 	if (state==FileState.CLOSED) {
@@ -210,12 +237,16 @@ public class FileWrapper implements Closeable {
 		state = FileState.OPEN_FOR_WRITE ;
 	    }
 	} else if (state==FileState.OPEN_FOR_READ) {
-	    if (mode != OpenMode.READ)
-		throw new IOException( file + " is already open for reading, cannot open for writing" ) ;
+	    if (mode != OpenMode.READ) {
+                throw new IOException(file
+                    + " is already open for reading, cannot open for writing");
+            }
 	} else {
 	    // state is OPEN_FOR_WRITE
-	    if (mode != OpenMode.WRITE) 
-		throw new IOException( file + " is already open for writing, cannot open for reading" ) ;
+	    if (mode != OpenMode.WRITE) {
+                throw new IOException(file
+                    + " is already open for writing, cannot open for reading");
+            }
 	}
     }
 
@@ -225,24 +256,29 @@ public class FileWrapper implements Closeable {
 
     /** Copy this file to target using buffer to hold data.
      * Does not assume we are using text files.
+     * @param target The FileWrapper to copy data to.
+     * @param buffer The buffer to use for copying the files.
+     * @throws IOException for IO exceptions.
      */
     public void copyTo( FileWrapper target, byte[] buffer ) throws IOException {
-	FileInputStream fis = null ;
-	FileOutputStream fos = null ;
+	FileInputStream is = null ;
+	FileOutputStream os = null ;
 
 	try {
-	    fis = new FileInputStream( this.file ) ;
-	    fos = new FileOutputStream( target.file ) ;
-	    int dataRead = fis.read( buffer ) ;
+	    is = new FileInputStream( this.file ) ;
+	    os = new FileOutputStream( target.file ) ;
+	    int dataRead = is.read( buffer ) ;
 	    while (dataRead > 0) {
-		fos.write( buffer, 0, dataRead ) ;
-		dataRead = fis.read( buffer ) ;
+		os.write( buffer, 0, dataRead ) ;
+		dataRead = is.read( buffer ) ;
 	    }
 	} finally {
-	    if (fis != null)
-		fis.close() ;
-	    if (fos != null)
-		fos.close() ;
+	    if (is != null) {
+                is.close();
+            }
+	    if (os != null) {
+                os.close();
+            }
 	}
     }
 }

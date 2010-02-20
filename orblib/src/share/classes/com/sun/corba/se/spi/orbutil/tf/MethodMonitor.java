@@ -62,7 +62,7 @@ public interface MethodMonitor {
      * @param ident The method identifier.
      * @param args Any information needed in the info call.
      */
-    void info( Object ident, Object... args ) ;
+    void info( Object[] args, Object callerIdent, Object selfIdent ) ;
 
     /** An exit from a method that has a void return type.  Called as the last
      * operation in the method.

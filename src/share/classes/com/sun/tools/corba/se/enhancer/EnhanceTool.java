@@ -39,63 +39,166 @@ package com.sun.tools.corba.se.enhancer ;
 import com.sun.corba.se.spi.orbutil.argparser.DefaultValue ;
 import com.sun.corba.se.spi.orbutil.argparser.Help ;
 import com.sun.corba.se.spi.orbutil.argparser.ArgParser ;
+import com.sun.corba.se.spi.orbutil.file.ActionFactory;
 
 import com.sun.corba.se.spi.orbutil.file.Scanner ;
 import com.sun.corba.se.spi.orbutil.file.Recognizer ;
 import com.sun.corba.se.spi.orbutil.file.FileWrapper ;
+import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class EnhanceTool {
     private interface Arguments {
+        @DefaultValue( "tfannotations.properties" )
+        @Help( "Name of resource file containing information about tf annotations")
+        File rf() ;
+
         @DefaultValue( "false" )
         @Help( "Debug flag" ) 
         boolean debug() ;
 
-        @DefaultValue( "false" )
+        @DefaultValue( "0" )
         @Help( "Verbose flag" ) 
-        boolean verbose() ;
+        int verbose() ;
+
+        @DefaultValue( "false" )
+        @Help( "Indicates a run that only prints out actions, but does not perform them")
+        boolean dryrun() ;
 
         @DefaultValue( "." )
         @Help( "Directory to scan for class file" ) 
         File dir() ;
 
         @DefaultValue( "trace" )
-        @Help( "Class file enhance action to use"
+        @Help( "Class file enhance action to use" )
         String action() ;
     }
 
-    private static Arguments args ;
+    public interface StandardSupport {
+        void setDebug( boolean flag ) ;
 
-    public interface EnhanceAction extends UnaryFunction<byte[],byte[]> { }
+        void setVerbose( int level ) ;
+
+        void setDryrun( boolean flag ) ;
+    }
+
+    public interface ScanAction extends Scanner.Action, StandardSupport {}
+
+    public interface EnhanceFunction extends UnaryFunction<byte[],byte[]>,
+        StandardSupport {
+    }
 
     private static class EnhancerFileAction implements Scanner.Action {
-        private EnhanceAction ea ;
+        private EnhanceFunction ea ;
 
-        public EnhancerFileAction( EnhanceAction ea ) {
+        public EnhancerFileAction( EnhanceFunction ea ) {
             this.ea = ea ;
         }
 
         public boolean evaluate( FileWrapper fw ) {
-            byte[] inputData = fw.readAll() ;
-            byte[] outputData = ea.evaluate( inputData ) ;
-            if (outputData != null) {
-                fw.writeAll() ;
+            try {
+                byte[] inputData = fw.readAll() ;
+                byte[] outputData = ea.evaluate( inputData ) ;
+                if (outputData != null) {
+                    fw.writeAll( outputData ) ;
+                }
+                return true ;
+            } catch (IOException exc) {
+                return false ;
             }
         }
     }
 
     public static void main( String[] strs ) {
-        ArgParser<Arguments> ap = new ArgParser( Arguments.class ) ;
-        args = ap.parse( strs ) ;
-    
-        // XXX Get EnhanceAction from resource file
-        final EnhanceAction ea = null ;
+        try {
+            final ArgParser<Arguments> ap = new ArgParser<Arguments>( Arguments.class ) ;
+            final Arguments args = ap.parse( strs ) ;
+            final ActionFactory af = new ActionFactory( args.verbose(), args.dryrun() ) ;
+            final Scanner scanner = new Scanner( args.verbose(), args.dir() ) ;
 
-        final Scanner.Action act = new EnhancerFileAction( ea ) ;
+            final Scanner.Action ignoreAction = new Scanner.Action() {
+                @Override
+                public String toString() {
+                    return "ignore action (ignore files that don't match)" ;
+                }
 
-        final Recognizer classRecognizer = new Recognizer() ;
-        classRecognizer.addKnownSuffix( "class", act ) ;
+                public boolean evaluate(FileWrapper arg) {
+                    if (args.debug() || args.verbose() > 0) {
+                        System.out.println( "Skipping " + arg ) ;
+                    }
 
-        final Scanner scanner = new Scanner( args.verbose(), args.dir() ) ;
-        scanner.scan( classRecognizer ) ;
+                    return true ;
+                }
+            } ;
+
+            /* Not sure extensibility is worthwhile here
+            final ResourceBundle rb = ResourceBundle.getBundle(
+                "com.sun.tools.corba.se.enhancer.enhance" ) ;
+            final String ename = rb.getString( "enhancer.class." + args.action() ) ;
+            final Class<? extends EnhanceAction> eclass =
+                Class.forName( ename ).asSubclass( EnhanceAction.class ) ;
+            final EnhanceAction ea = eclass.newInstance() ;
+            */
+            AnnotationScannerAction annoAct = new AnnotationScannerAction() ;
+            annoAct.setDebug( args.debug() );
+            annoAct.setDryrun( args.dryrun() );
+            annoAct.setVerbose( args.verbose() );
+
+            final Recognizer recog1 = af.getRecognizerAction() ;
+            recog1.setDefaultAction( ignoreAction ) ;
+            recog1.addKnownSuffix( "class", annoAct ) ;
+
+            scanner.scan( recog1 ) ;
+
+            Set<String> anames = annoAct.getAnnotationNames() ;
+
+            if (args.debug()) {
+                System.out.println( "MM Annotations: " + anames ) ;
+            }
+
+            // Resource file that lists all MM annotations:
+            // com.sun.corba.tf.annotations.size=n
+            // com.sun.corba.tf.annotation.1=...
+            // ...
+            // com.sun.corba.tf.annotation.n=...
+            final FileWrapper fw = new FileWrapper( args.rf() ) ;
+            fw.open( FileWrapper.OpenMode.WRITE )  ;
+
+            try {
+                fw.writeLine( "# Trace Facility Annotations" ) ;
+                fw.writeLine( "# generated by EnhanceTool on " + new Date() ) ;
+                fw.writeLine( "com.sun.corba.tf.annotations.size="
+                    + anames.size() ) ;
+                int ctr=1 ;
+                for (String str : anames) {
+                    fw.writeLine( "com.sun.corba.tf.annotation."
+                        + ctr + "=" + str ) ;
+                    ctr++ ;
+                }
+            } finally {
+                fw.close() ;
+            }
+
+            TraceEnhanceFunction ea = new TraceEnhanceFunction() ;
+            ea.setDebug( args.debug() );
+            ea.setDryrun( args.dryrun() );
+            ea.setVerbose( args.verbose() );
+            ea.setMMGAnnotations( anames );
+
+            final Scanner.Action act = new EnhancerFileAction( ea ) ;
+
+            final Recognizer classRecognizer = af.getRecognizerAction() ;
+            classRecognizer.setDefaultAction( ignoreAction ) ;
+            classRecognizer.addKnownSuffix( "class", act ) ;
+
+            scanner.scan( classRecognizer ) ;
+        } catch (Exception exc) {
+            System.out.println( "Exception: " + exc ) ;
+            exc.printStackTrace() ;
+        }
     }
 }

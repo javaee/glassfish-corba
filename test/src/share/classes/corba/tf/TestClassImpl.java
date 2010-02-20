@@ -39,11 +39,9 @@ public class TestClassImpl implements TestClass {
     }
 
     @InfoMethod
-    @B
     private void bigAddValue( String msg, long value ) { }
 
     @InfoMethod
-    @C
     private void bigMultValue( String msg, long value ) { }
 
     @B

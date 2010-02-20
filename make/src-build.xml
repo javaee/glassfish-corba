@@ -198,7 +198,7 @@
 
     <!-- ========================= COMPILE ========================= -->
 
-    <target name="compile" depends="init, prepare-dirs, get-dependencies, build-jscheme, orb-library, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
+    <target name="compile" depends="init, prepare-dirs, get-dependencies, build-jscheme, orb-library, compile-enhancer, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"
@@ -386,6 +386,19 @@
 		<include name="org/omg/PortableServer/ThreadPolicyValueHolder.java"/>
 	    </fileset>
 	</delete>
+    </target>
+
+    <!-- ========================= COMPILE-ENHANCER ================== -->
+    <target name="compile-enhancer" depends="init">
+	<echo message="Compiling enhancer"/>
+	<javac srcdir="${src.dir}" destdir="${classes.dir}" 
+		classpathref="classpath.master" 
+		deprecation="${deprecation}"
+		debug="${javac.debug}" 
+		optimize="${javac.optimize}"
+		failonerror="true">
+	    <include name="com/sun/tools/corba/se/enhancer/**"/>
+	</javac>
     </target>
 
     <!-- ========================= COMPILE-LOGUTILS ================== -->

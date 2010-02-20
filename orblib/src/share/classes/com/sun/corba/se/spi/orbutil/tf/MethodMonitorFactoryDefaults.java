@@ -222,6 +222,7 @@ public class MethodMonitorFactoryDefaults {
                     return sb.toString() ;
                 }
 
+                @Override
                 public void enter( Object ident, Object... args ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
@@ -229,31 +230,40 @@ public class MethodMonitorFactoryDefaults {
                     dprint( mname, "->" + str ) ;
                 }
 
+                @Override
                 public void exception( Object ident, Throwable thr ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, ":throw:" + thr ) ;
                 }
 
-                public void info( Object ident, Object... args ) {
+                @Override
+                public void info( Object[] args, Object callerId,
+                    Object selfId ) {
+
                     String mname = MethodMonitorRegistry.getMethodName( cls,
-                        ident ) ;
+                        callerId ) ;
+                    String infoName = MethodMonitorRegistry.getMethodName( cls, 
+                        selfId) ;
                     String str = makeString( args ) ;
-                    dprint( mname, "::" + str ) ;
+                    dprint( mname, "::(" + infoName + ")" + str ) ;
                 }
 
+                @Override
                 public void exit( Object ident ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, "<-" ) ;
                 }
 
+                @Override
                 public void exit( Object ident, Object retVal ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, "<-(" + retVal + ")" ) ;
                 }
 
+                @Override
                 public void clear() {
                     // NO-OP
                 }
@@ -267,7 +277,8 @@ public class MethodMonitorFactoryDefaults {
                 return new MethodMonitorBase( cls ) {
                     public void enter(Object ident, Object... args) { }
 
-                    public void info(Object ident, Object... args) { }
+                    public void info(Object[] args, Object callerId,
+                        Object selfId ) { }
 
                     public void exit(Object ident) { }
 
@@ -317,9 +328,11 @@ public class MethodMonitorFactoryDefaults {
                             }
                         }
 
-                        public void info(Object ident, Object... args) {
+                        public void info( Object[] args, Object callerId,
+                            Object selfId ) {
+
                             for (MethodMonitor mm : mms) {
-                                mm.info( ident, args ) ;
+                                mm.info( args, callerId, selfId ) ;
                             }
                         }
 

@@ -106,4 +106,9 @@ public class Client
         TestClass tc = getTestClass( true ) ;
         System.out.println( "result = " + tc.mult( 10, 10 ) ) ;
     }
+
+    @A @B @C
+    public static class TestCombination {
+         
+    }
 }

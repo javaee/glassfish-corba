@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -97,8 +97,9 @@ public class Scanner {
 		    result = action.evaluate( fw ) ;
 		}
 
-		if (!result) 
-		    break ;
+		if (!result) {
+                    break;
+                }
 	    }
 	}
 
@@ -113,8 +114,9 @@ public class Scanner {
 	    if (!skipDirectory(file)) {
 		for (File f : file.listFiles()) {
 		    result = doScan( f, action ) ;
-		    if (!result)
-			break ;
+		    if (!result) {
+                        break;
+                    }
 		}
 	    }
 	} else {
@@ -129,15 +131,16 @@ public class Scanner {
 	for (String pattern : patternsToSkip) {
 	    String absPath = file.getAbsolutePath() ;
 	    if (match( pattern, absPath)) {
-		if (verbose > 0) 
-		    System.out.println( "Scanner: Skipping directory " 
-			+ absPath + "(pattern " + pattern + ")" ) ;
+		if (verbose > 0) {
+                    System.out.println("Scanner: Skipping directory " + absPath + "(pattern " + pattern + ")");
+                }
 		return true ;
 	    }
 	}
 
-	if (verbose > 0) 
-	    System.out.println( "Scanner: Not skipping directory " + file ) ;
+	if (verbose > 0) {
+            System.out.println("Scanner: Not skipping directory " + file);
+        }
 	return false ;
     }
 
@@ -151,9 +154,9 @@ public class Scanner {
 	while (st.hasMoreTokens()) {
 	    final String token = st.nextToken() ;
 	    if (pattern.equals( token )) {
-		if (verbose > 0)
-		    System.out.println( "fname " + fname 
-			+ " matched on pattern " + pattern ) ;
+		if (verbose > 0) {
+                    System.out.println("fname " + fname + " matched on pattern " + pattern);
+                }
 		return true ;
 	    }
 	}

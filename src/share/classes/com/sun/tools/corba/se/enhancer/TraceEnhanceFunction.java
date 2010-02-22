@@ -46,18 +46,24 @@ import java.util.Set;
 
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction;
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
+import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitor;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import java.io.PrintWriter;
+import org.objectweb.asm.ClassAdapter;
 
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
+import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.LocalVariablesSorter;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -68,6 +74,7 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.util.CheckClassAdapter;
 
 /** ClassFile enhancer for the tracing facility.  This modifies the bytecode
  * for an applicable class, then returns the updated bytecode.
@@ -109,17 +116,14 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ken
  */
 public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
-    private static  final String SH_NAME = Type.getInternalName(
-        SynchronizedHolder.class ) ;
-    private static  final String MM_NAME = Type.getInternalName(
-        MethodMonitor.class ) ;
-    private static  final String INFO_METHOD_NAME = Type.getInternalName(
-        InfoMethod.class ) ;
-
-    private boolean debug ;
-    private int verbose ;
     private boolean dryrun ;
-    private Set<String> annotationNames = new HashSet<String>() ;
+    private Set<String> annotationNames = null ;
+
+    private Util util = new Util();
+
+    // These fields are initialized in the evaluate method.
+    private ClassNode currentClass = null ;
+    private EnhancedClassData ecd = null ;
 
     public TraceEnhanceFunction() {
     }
@@ -129,561 +133,34 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
     }
 
     public void setDebug(boolean flag) {
-        debug = flag ;
+        util.setDebug( flag ) ;
     }
 
     public void setVerbose(int level) {
-        verbose = level ;
+        util.setVerbose(level);
     }
 
     public void setDryrun(boolean flag) {
         dryrun = flag ;
     }
 
-    private void info( String str ) {
-        if (verbose > 0) {
-            msg( str ) ;
-        }
+    private boolean hasAccess( int access, int flag ) {
+        return (access & flag) == flag ;
     }
 
-    private void msg( String str ) {
-        System.out.println( str ) ;
-    }
-
-    private void error( String str ) {
-        throw new RuntimeException( str ) ;
-    }
-
-    private void initLocal( MethodVisitor mv, LocalVariableNode var ) {
-        var.accept( mv ) ;
-        Type type = Type.getObjectType( var.desc ) ;
-        switch (type.getSort()) {
-            case Type.BOOLEAN :
-            case Type.CHAR :
-            case Type.SHORT :
-            case Type.INT :
-                mv.visitInsn( Opcodes.ICONST_0 ) ;
-                mv.visitVarInsn( Opcodes.ISTORE, var.index ) ;
-                break ;
-
-            case Type.LONG :
-                mv.visitInsn( Opcodes.LCONST_0 ) ;
-                mv.visitVarInsn( Opcodes.LSTORE, var.index ) ;
-                break ;
-
-            case Type.FLOAT :
-                mv.visitInsn( Opcodes.FCONST_0 ) ;
-                mv.visitVarInsn( Opcodes.FSTORE, var.index ) ;
-                break ;
-
-            case Type.DOUBLE :
-                mv.visitInsn( Opcodes.DCONST_0 ) ;
-                mv.visitVarInsn( Opcodes.DSTORE, var.index ) ;
-                break ;
-
-            default :
-                mv.visitInsn( Opcodes.ACONST_NULL ) ;
-                mv.visitVarInsn( Opcodes.ASTORE, var.index ) ;
-        }
-    }
-
-    private String getFullMethodDescriptor( String name, String desc ) {
-        return name + desc ;        
-    }
-
-    private String getFullMethodDescriptor( MethodNode mn ) {
-        return mn.name + mn.desc ;
-    }
-
-    private String getFullMethodDescriptor( MethodInsnNode mn ) {
-        return mn.name + mn.desc ;
-    }
-
-    private void newWithSimpleConstructor( MethodVisitor mv, Class cls ) {
-        info( "generating new for class " + cls ) ;
-        Type type = Type.getType( ArrayList.class ) ;
-        mv.visitTypeInsn( Opcodes.NEW, type.getInternalName() );
-        mv.visitInsn( Opcodes.DUP ) ;
-        mv.visitMethodInsn( Opcodes.INVOKESPECIAL,
-            type.getInternalName(), "<init>", "()V" );
-    }
-
-    String augmentInfoMethodDescriptor( String desc ) {
-        info( "Augmenting infoMethod descriptor " + desc ) ;
-        // Compute new descriptor
-        Type[] oldArgTypes = Type.getArgumentTypes( desc ) ;
-        Type retType = Type.getReturnType( desc ) ;
-
-        int oldlen = oldArgTypes.length ;
-        Type[] argTypes = new Type[ oldlen + 2 ] ;
-        for (int ctr=0; ctr<oldlen; ctr++) {
-            argTypes[ctr] = oldArgTypes[ctr] ;
-        }
-
-        argTypes[oldlen] = Type.getType( MethodMonitor.class ) ;
-        argTypes[oldlen+1] = Type.getType( Object.class ) ;
-
-        String newDesc = Type.getMethodDescriptor(retType, argTypes) ;
-        info( "    result is " + newDesc ) ;
-        return newDesc ;
-    }
-
-    private void emitIntConstant( MethodVisitor mv, int val ) {
-        info( "Emitting constant " + val ) ;
-        if (val <= 5) {
-            switch (val) {
-                case 0:
-                    mv.visitInsn( Opcodes.ICONST_0 ) ;
-                    break ;
-                case 1:
-                    mv.visitInsn( Opcodes.ICONST_1 ) ;
-                    break ;
-                case 2:
-                    mv.visitInsn( Opcodes.ICONST_2 ) ;
-                    break ;
-                case 3:
-                    mv.visitInsn( Opcodes.ICONST_3 ) ;
-                    break ;
-                case 4:
-                    mv.visitInsn( Opcodes.ICONST_4 ) ;
-                    break ;
-                case 5:
-                    mv.visitInsn( Opcodes.ICONST_5 ) ;
-                    break ;
-            }
-        } else {
-            mv.visitLdcInsn( val );
-        }
-    }
-
-    private void emitMethodConstant( List<String> methodNames,
-        MethodVisitor mv, String name ) {
-
-        info( "Emitting int constant for method " + name ) ;
-
-        int index = -1 ;
-        for (int ctr=0; ctr<=methodNames.size(); ctr++) {
-            if (methodNames.get(ctr).equals(name)) {
-                index = ctr ;
-                break ;
-            }
-        }
-
-        if (index == -1) {
-            error( "Could not find index for method " + name) ;
-        }
-
-        emitIntConstant( mv, index ) ;
-    }
-
-    // Wrap the argument at index argIndex of type atype into
-    // an Object as needed.  Returns the index of the next
-    // argument.
-    private int wrapArg( MethodVisitor mv, int argIndex, Type atype ) {
-        info( "Emitting code to wrap argument at " + argIndex
-            + " of type " + atype ) ;
-
-        switch (atype.getSort() ) {
-            case Type.BOOLEAN :
-                mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    Type.getInternalName( Boolean.class ), "valueOf",
-                    "(Z)Ljava/lang/Boolean;" );
-                break ;
-            case Type.BYTE :
-                mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    Type.getInternalName( Byte.class ), "valueOf",
-                    "(B)Ljava/lang/Byte;" );
-                break ;
-            case Type.CHAR :
-                mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    Type.getInternalName( Character.class ), "valueOf",
-                    "(C)Ljava/lang/Character;" );
-                break ;
-            case Type.SHORT :
-                mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    Type.getInternalName( Short.class ), "valueOf",
-                    "(S)Ljava/lang/Short;" );
-                break ;
-            case Type.INT :
-                mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    Type.getInternalName( Integer.class ), "valueOf",
-                    "(I)Ljava/lang/Integer;" );
-                break ;
-            case Type.LONG :
-                mv.visitVarInsn( Opcodes.LLOAD,  argIndex ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    Type.getInternalName( Long.class ), "valueOf",
-                    "(J)Ljava/lang/Long;" );
-                break ;
-            case Type.DOUBLE :
-                mv.visitVarInsn( Opcodes.DLOAD,  argIndex ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    Type.getInternalName( Double.class ), "valueOf",
-                    "(D)Ljava/lang/Double;" );
-                break ;
-            case Type.FLOAT :
-                mv.visitVarInsn( Opcodes.FLOAD,  argIndex ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    Type.getInternalName( Float.class ), "valueOf",
-                    "(F)Ljava/lang/Float;" );
-                break ;
-            default :
-                mv.visitVarInsn( Opcodes.ALOAD,  argIndex ) ;
-                break ;
-        }
-
-        return argIndex += atype.getSize() ;
-    }
-
-    // Emit code to wrap all of the argumnts as Object[],
-    // which is left on the stack
-    void wrapArgs( MethodVisitor mv, int access, String desc ) {
-        info( "Wrapping args for descriptor " + desc ) ;
-
-        Type[] atypes = Type.getArgumentTypes( desc ) ;
-        emitIntConstant( mv, atypes.length ) ;
-        mv.visitTypeInsn( Opcodes.ANEWARRAY, "java/lang/Object" ) ;
-
-        int argIndex ;
-        if ((access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC) {
-            argIndex = 0 ;
-        } else {
-            argIndex = 1 ;
-        }
-
-        for (int ctr=0; ctr<atypes.length; ctr++) {
-            mv.visitInsn( Opcodes.DUP ) ;
-            emitIntConstant( mv, ctr );
-            argIndex = wrapArg( mv, argIndex, atypes[ctr] ) ;
-            mv.visitInsn( Opcodes.AASTORE ) ;
-        }
-    }
-
-    private void storeFromXReturn( MethodVisitor mv, int returnOpcode,
-        LocalVariableNode holder ) {
-
-        switch (returnOpcode) {
-            case Opcodes.RETURN :
-                // NOP
-                break ;
-            case Opcodes.ARETURN :
-                mv.visitVarInsn( Opcodes.ASTORE, holder.index ) ;
-                break ;
-            case Opcodes.IRETURN :
-                mv.visitVarInsn( Opcodes.ISTORE, holder.index ) ;
-                break ;
-            case Opcodes.LRETURN :
-                mv.visitVarInsn( Opcodes.LSTORE, holder.index ) ;
-                break ;
-            case Opcodes.FRETURN :
-                mv.visitVarInsn( Opcodes.FSTORE, holder.index ) ;
-                break ;
-            case Opcodes.DRETURN :
-                mv.visitVarInsn( Opcodes.DSTORE, holder.index ) ;
-                break ;
-        }
-    }
-
-    private void loadFromXReturn( MethodVisitor mv, int returnOpcode,
-        LocalVariableNode holder ) {
-
-        switch (returnOpcode) {
-            case Opcodes.RETURN :
-                // NOP
-                break ;
-            case Opcodes.ARETURN :
-                mv.visitVarInsn( Opcodes.ALOAD, holder.index ) ;
-                break ;
-            case Opcodes.IRETURN :
-                mv.visitVarInsn( Opcodes.ILOAD, holder.index ) ;
-                break ;
-            case Opcodes.LRETURN :
-                mv.visitVarInsn( Opcodes.LLOAD, holder.index ) ;
-                break ;
-            case Opcodes.FRETURN :
-                mv.visitVarInsn( Opcodes.FLOAD, holder.index ) ;
-                break ;
-            case Opcodes.DRETURN :
-                mv.visitVarInsn( Opcodes.DLOAD, holder.index ) ;
-                break ;
-        }
-    }
-
-    public byte[] evaluate( final byte[] arg) {
-        final ClassNode cn = new ClassNode() ;
-        final ClassReader cr = new ClassReader( arg ) ;
-        cr.accept( cn, 0 ) ;
-
-        EnhancedClassData ecd = new EnhancedClassData( annotationNames, cn ) ;
-
-        // We need EnhancedClassData to hold the results of scanning the class
-        // for various details about annotations.  This makes it easy to write
-        // a one-pass visitor in part 2 to actually add the tracing code.
-        // Note that the ECD can easily be computed either at build time
-        // from the classfile byte[] (using ASM), or at runtime, directly
-        // from a Class object using reflection.
-        //
-        // Enhance the class first (part 1).
-        //     This is ClassNode based, since multiple scans are
-        //     needed, first to find all of the tracing-related methods,
-        //     (which builds the method name list among other things),
-        //     then to modify the schema (and code) as needed.
-        //     This does NOT use the AdviceAdapter.
-        // Run through ASM verifier to check code (debug only?)
-        // Extract the list of methodNames for part 2.
-        //
-        // Only communication from part 1 to part2 is a byte[] and
-        // the EnhancedClassData.  Since the list of methodNames
-        // is registered with the MethodMonitorRegistry, a runtime
-        // version of this code could easily be made.
-        //     Implementation note: runtime would keep byte[] stored of
-        //     original version whenever tracing is enabled, so that
-        //     disabling tracing simply means using a ClassFileTransformer
-        //     to get back to the original code.
-        //
-        // Then add tracing code (part 2).
-        //     This is a pure visitor using the AdviceAdapter.
-        //     It must NOT modify its input visitor (or you get an 
-        //     infinite series of calls to onMethodExit...)
-        // Run through ASM verifier to check code again (debug only?)
-
-        // If the class is updated, return the bytes for the new class.
-
-        Enhancer enhancer = new Enhancer( ecd, cn ) ;
-        if (enhancer.enhance()) {
-            final ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_MAXS +
-                ClassWriter.COMPUTE_FRAMES ) ;
-            cn.accept( cw ) ;
-
-            byte[] enhancedClass = cw.toByteArray() ;
-
-            Tracer tracer = new Tracer( ecd, enhancedClass ) ;
-            enhancedClass = tracer.enhance() ;
-        } else {
-            return null ;
-        }
-    }
-
-    // Class used to collect TF-relevant data on TF annotated classes.
-    // It can be implemented either on an ASM ClassNode, or by reflection
-    // on a standard Class.
-    private class EnhancedClassData {
-        private final Set<String> annoNamesForClass ;
-
-        // Map from MM annotation internal name to
-        // SynchronizedHolder<MethodMonitor> field
-        // name.  Use something like __$mm$__nnn that is unlikely to collide with
-        // another field name that is already in use.
-        private final Map<String,String> annoToHolderName =
-            new HashMap<String,String>() ;
-
-        // List of simple names of MM methods.  Index of method is identifier in
-        // MethodMonitor calls.
-        private final List<String> methodNames =
-            new ArrayList<String>() ;
-
-        // List of descriptors of @InfoMethod-annotated methods.
-        // Needed for validating and transforming calls to such methods.
-        private final Set<String> infoMethodDescs =
-            new HashSet<String>() ;
-
-        private final Set<String> mmMethodDescs =
-            new HashSet<String>() ;
-
-        // Map from method signature to internal name of its MM annotation.
-        private final Map<String,String> methodToAnno =
-            new HashMap<String,String>() ;
-
-        private final ClassNode currentClass ;
-
-        // Get Set<String> for MM annotations present on class
-        private void processClassAnnotations() {
-            final List<AnnotationNode> classAnnotations = currentClass.visibleAnnotations ;
-            if (classAnnotations != null) {
-                for (AnnotationNode an : classAnnotations) {
-                    final String aname = Type.getType( an.desc ).getInternalName() ;
-                    if (annotationNames.contains( aname )) {
-                        annoNamesForClass.add( aname ) ;
-                        annoToHolderName.put( aname,
-                            "__$mm$__" + annoNamesForClass.size() ) ;
-                    }
-                }
-
-                if (debug) {
-                    msg( "Enhancing class " + currentClass.name ) ;
-                    msg( "\tannoNamesForClass = " + annoNamesForClass ) ;
-                    msg( "\tannoToHolderName = " + annoToHolderName ) ;
-                }
-            }
-        }
-
-        // Scan methods:
-        //    - Build List<String> to map names of MM annotated methods to ints
-        //      validate: such methods must have exactly 1 MM annotation that
-        //          is in annoNamesForClass.
-        //    - Build Set<String> of all MethodInfo annotated methods.
-        //      validate: such methods must be private, return void, and have
-        //          an empty body.  May NOT have MM annotation.
-        private void scanMethods() {
-            final List<MethodNode> methods = currentClass.methods ;
-            for (MethodNode mn : methods) {
-                final String mname = mn.name ;
-                final String mdesc = getFullMethodDescriptor( mn ) ;
-
-                String annoForMethod = null ;
-                boolean hasMethodInfoAnno = false ;
-
-                final List<AnnotationNode> annotations = mn.visibleAnnotations ;
-                if (annotations != null) {
-                    for (AnnotationNode an : annotations) {
-                        final String aname =
-                            Type.getType( an.desc ).getInternalName() ;
-
-                        if (aname.equals( INFO_METHOD_NAME)) {
-                            hasMethodInfoAnno = true ;
-                        } else if (annoNamesForClass.contains( aname)) {
-                            if (annoForMethod == null) {
-                                annoForMethod = aname ;
-                            } else {
-                                error( "Method " + mdesc
-                                    + " for Class " + currentClass.name
-                                    + "has multiple MM annotations" ) ;
-                            }
-                        } else if (annotationNames.contains( aname )) {
-                                error( "Method " + mdesc
-                                    + " for Class " + currentClass.name
-                                    + " has an MM annotation which "
-                                    + "is not on its class" ) ;
-                        }
-                    }
-
-                    if (hasMethodInfoAnno && annoForMethod != null) {
-                        error( "Method " + mdesc
-                            + " for Class " + currentClass.name
-                            + " has both @InfoMethod annotation and"
-                            + " a MM annotation" ) ;
-                    }
-
-                    // TF Annotations are not permitted on constructors
-                    if (mname.equals( "<init>" )) {
-                        if (hasMethodInfoAnno) {
-                            error( "Constructors must not have an @InfoMethod annotations") ;
-                        } else if (annoForMethod != null) {
-                            error( "Constructors must not have an MM annotation") ;
-                        }
-                    }
-
-                    // Both infoMethods and MM annotated methods go into methodNames
-                    methodNames.add( mname ) ;
-
-                    // annoForMethod will not be null here
-                    if (hasMethodInfoAnno) {
-                        infoMethodDescs.add( mdesc ) ;
-                    } else {
-                        mmMethodDescs.add( mdesc ) ;
-                        methodToAnno.put( mdesc, annoForMethod ) ;
-                    }
-                }
-            }
-
-            if (debug) {
-                msg( "\tinfoMethodSignature = " + infoMethodDescs ) ;
-                msg( "\tmmMethodSignature = " + mmMethodDescs ) ;
-                msg( "\tmethodNames = " + methodNames ) ;
-                msg( "\tmethodToAnno = " + methodToAnno ) ;
-            }
-        }
-
-        public EnhancedClassData( Set<String> mmAnnotations, ClassNode cn ) {
-            annoNamesForClass = mmAnnotations ;
-            currentClass = cn ;
-
-            // Compute data here: only look at data available to
-            // java reflection.
-            processClassAnnotations() ;
-            scanMethods();
-        }
-
-        public EnhancedClassData( Set<String> mmAnnotations, Class<?> cls ) {
-            annoNamesForClass = mmAnnotations ;
-            currentClass = null ;
-
-            // XXX define me (probably refactor into ABC as usual).
-        }
-
-        public Map<String,String> getAnnotationToHolderName() {
-            return annoToHolderName ;
-        }
-
-        public List<String> getMethodNames() {
-            return methodNames ;
-        }
-
-        public Set<String> getInfoMethodDescriptors() {
-            return infoMethodDescs ;
-        }
-
-        public Set<String> getMMMethodDescriptors() {
-            return mmMethodDescs ;
-        }
-
-        public Map<String,String> getMethodToAnnotation() {
-            return methodToAnno ;
-        }
-    }
-
-    private class Enhancer {
-        private ClassNode currentClass ;
-
-        // Set of internal names of MM annotations in use on currentClass.
-        private final Set<String> annoNamesForClass ;
-
-        // Map from MM annotation internal name to 
-        // SynchronizedHolder<MethodMonitor> field
-        // name.  Use something like __$mm$__nnn that is unlikely to collide with
-        // another field name that is already in use.
-        private final Map<String,String> annoToHolderName ;
-
-        // List of simple names of MM methods.  Index of method is identifier in
-        // MethodMonitor calls.
-        private final List<String> methodNames ;
-
-        // List of descriptors of @InfoMethod-annotated methods.
-        // Needed for validating and transforming calls to such methods.
-        private final Set<String> infoMethodDescs ;
-
-        private final Set<String> mmMethodDescs ;
-
-        // Map from method signature to internal name of its MM annotation.
-        private final Map<String,String> methodToAnno ;
-
-        public List<String> getMethodNames() {
-            return methodNames ;
-        }
-
-        public Enhancer( final ClassNode cn ) {
-            currentClass = cn ;
-
-            annoNamesForClass = new HashSet<String>() ;
-            methodNames = new ArrayList<String>() ;
-            annoToHolderName = new HashMap<String,String>() ;
-            infoMethodDescs = new HashSet<String>() ;
-            mmMethodDescs = new HashSet<String>() ;
-            methodToAnno = new HashMap<String,String>() ;
-        }
-
-        private boolean hasAccess( int access, int flag ) {
-            return (access & flag) == flag ;
+    class ClassEnhancer extends ClassAdapter {
+        private EnhancedClassData ecd ;
+        private boolean hasStaticInitializer = false ;
+
+        public ClassEnhancer( EnhancedClassData ecd, ClassVisitor cv ) {
+            super( cv ) ;
+            this.ecd = ecd ;
         }
 
 
-        // Add SynchronizedHolder<MethodMonitor> fields to class.
-        private void addFieldsToClass() {
+        @Override
+        public void visitEnd() {
+            // Add the additional fields
             final String desc = Type.getDescriptor(
                 SynchronizedHolder.class ) ;
 
@@ -695,126 +172,36 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
             // that we actually need a signature here.
             final String sig = null ;
 
-            for (String fname : annoToHolderName.values()) {
-                info( "Adding field " + fname + " of type " + desc ) ;
-                FieldNode fld = new FieldNode( acc, fname, desc, sig, null ) ;
-                currentClass.fields.add( fld ) ;
-            }
-        }
-
-        private class StaticInitVisitor extends LocalVariablesSorter {
-            public StaticInitVisitor( final int access, final String desc,
-                final MethodVisitor mv ) {
-                super( access, desc, mv ) ;
-                info( "StaticInitVisitor created" ) ;
+            for (String fname : ecd.getAnnotationToHolderName().values()) {
+                util.info( "Adding field " + fname + " of type " + desc ) ;
+                cv.visitField( acc, fname, desc, sig, null ) ;
             }
 
-            @Override
-            public void visitEnd() {
-                info( "StaticInitVisitor.visitEnd" ) ;
-                LabelNode start = new LabelNode() ;
-                LabelNode end = new LabelNode() ;
+            if (!hasStaticInitializer) {
+                int siacc = Opcodes.ACC_STATIC + Opcodes.ACC_PRIVATE ;
+                MethodVisitor mv = cv.visitMethod( siacc, "<clinit>", "()V",
+                    null, null ) ;
+                MethodAdapter ma = new StaticInitVisitor( siacc, "()V", mv,
+                    util, ecd ) ;
 
-                int thisClass = newLocal( Type.getType( Class.class )) ;
-                int mnameList = newLocal( Type.getType( List.class )) ;
-                int holderMap = newLocal( Type.getType( Map.class )) ;
-
-                // initialize the holders
-                for (String str : annoToHolderName.values()) {
-                    info( "Generating code to initiale holder " + str ) ;
-                    newWithSimpleConstructor( mv, SynchronizedHolder.class );
-                    mv.visitFieldInsn( Opcodes.PUTSTATIC,
-                        currentClass.name, str, SH_NAME );
-                }
-
-                mv.visitLdcInsn( Type.getType( "L" + currentClass.name + ";" ));
-                mv.visitVarInsn( Opcodes.ASTORE, thisClass ) ;
-
-                // create list of method names and init
-                newWithSimpleConstructor( mv, ArrayList.class ) ;
-                mv.visitVarInsn( Opcodes.ASTORE, mnameList ) ;
-
-                for (String str : methodNames) {
-                    info( "Generating code to add " + str + " to methodNames" ) ;
-                    mv.visitVarInsn( Opcodes.ALOAD, mnameList ) ;
-                    mv.visitLdcInsn( str );
-                    mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
-                        "java/util/List", "add", "(Ljava/lang/Object;)Z" );
-                    mv.visitInsn( Opcodes.POP ) ;
-                }
-
-                // create map from MM annotation class to Holder and init
-                newWithSimpleConstructor( mv, HashMap.class ) ;
-                mv.visitVarInsn( Opcodes.ASTORE, holderMap ) ;
-
-                for (Map.Entry<String,String> entry :
-                    annoToHolderName.entrySet()) {
-
-                    info( "Generating code to put " + entry.getKey() + "=>" 
-                        + entry.getValue() + " into holderMap" ) ;
-
-
-                    mv.visitVarInsn( Opcodes.ALOAD, holderMap ) ;
-
-                    Type annoType = Type.getType( "L" + entry.getKey() + ";" ) ;
-                    mv.visitLdcInsn( annoType );
-
-                    mv.visitFieldInsn( Opcodes.GETSTATIC, currentClass.name,
-                        entry.getValue(), SH_NAME) ;
-
-                    mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
-                        "/java/util/HashMap", "add",
-                        "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
-
-                    mv.visitInsn( Opcodes.POP ) ;
-                }
-
-                // register with MethodMonitorRegistry
-                info( "Generating code call MethodMonitorRegistry.registerClass" ) ;
-                mv.visitVarInsn( Opcodes.ALOAD, thisClass ) ;
-                mv.visitVarInsn( Opcodes.ALOAD, mnameList ) ;
-                mv.visitVarInsn( Opcodes.ALOAD, holderMap ) ;
-
-                Type mmrType = Type.getType( MethodMonitorRegistry.class ) ;
-                String mdesc = "(Ljava/lang/Class;Ljava/util/List;Ljava/util/Map;)V" ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                    mmrType.getInternalName(), "registerClass", mdesc ) ;
-
-                mv.visitInsn( Opcodes.RETURN ) ;
-            }
-        }
-
-        private void handleStaticInitializer( MethodNode mn ) {
-            // Create fields for SynchronizedHolders
-            String desc = Type.getInternalName( SynchronizedHolder.class ) ;
-            for (String str : annoToHolderName.values()) {
-                int acc = Opcodes.ACC_STATIC + Opcodes.ACC_PRIVATE ;
-                FieldNode fn = new FieldNode( acc, str, SH_NAME, null, null ) ;
-                currentClass.fields.add( fn ) ;
+                ma.visitCode() ;
+                ma.visitMaxs( 0, 0 ) ;
+                ma.visitEnd() ;
             }
 
-            // If mn is null, create a static initializer for currentClass.
-            MethodNode lmn = mn ;
-            if (lmn == null) {
-                final int access = Opcodes.ACC_STATIC + Opcodes.ACC_PRIVATE ;
-                lmn = new MethodNode( access, "<clinit>", "()", null, null )  ;
-                lmn.instructions = new InsnList() ;
-                currentClass.methods.add( lmn ) ;
-            }
-
-            int access = Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC ;
-            MethodVisitor v = new StaticInitVisitor( access, "()", lmn ) ;
-            lmn.accept( v ) ;
+            super.visitEnd() ;
         }
 
         // add MethodMonitor and Object parameters to end of params
         // generate body
-        private void handleInfoMethod( MethodNode mn ) {
-            info( "InfoMethod " + mn.name ) ;
-           
-            // mn.desc is the old unaugmented descriptor (does not have
-            // MethodMonitor and Object at the end)
-            String desc = mn.desc ;
+        private void handleInfoMethod( int access, String name, String desc ) {
+            util.info( "InfoMethod " + name + desc ) ;
+
+            String newDesc = util.augmentInfoMethodDescriptor( desc ) ;
+            MethodVisitor mv = cv.visitMethod( access, name, newDesc,
+                null, null ) ;
+
+            mv.visitCode() ;
 
             Type[] argTypes = Type.getArgumentTypes( desc ) ;
             int argSize = 0 ;
@@ -831,27 +218,213 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
             int cidIndex = argSize + 1 ;
 
             Label jumpLabel = new Label() ;
-            mn.visitVarInsn( Opcodes.ALOAD, mmIndex ) ;
-            mn.visitJumpInsn( Opcodes.IFNULL, jumpLabel) ;
+            mv.visitVarInsn( Opcodes.ALOAD, mmIndex ) ;
+            mv.visitJumpInsn( Opcodes.IFNULL, jumpLabel) ;
 
-            mn.visitVarInsn( Opcodes.ALOAD, mmIndex ) ;
-            wrapArgs( mn, mn.access, mn.desc ) ;
-            mn.visitVarInsn( Opcodes.ALOAD, cidIndex ) ;
-            emitMethodConstant( methodNames, mn, mn.name ) ;
-            mn.visitMethodInsn( Opcodes.INVOKESTATIC,
+            mv.visitVarInsn( Opcodes.ALOAD, mmIndex ) ;
+            util.wrapArgs( mv, access, desc ) ;
+            mv.visitVarInsn( Opcodes.ALOAD, cidIndex ) ;
+            util.emitIntConstant( mv, ecd.getMethodIndex( name )) ;
+            mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                 "java/lang/Integer", "valueOf",
                 "(I)Ljava/lang/Integer;" );
-           
-            String newDesc = augmentInfoMethodDescriptor( mn.desc ) ;
-            mn.visitMethodInsn( Opcodes.INVOKEINTERFACE, MM_NAME, "info",
-                newDesc ) ;
 
-            mn.visitLabel( jumpLabel ) ;
-            mn.visitInsn( Opcodes.RETURN ) ;
-            mn.desc = newDesc ;
+            mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
+                EnhancedClassData.MM_NAME, "info", newDesc ) ;
+
+            mv.visitLabel( jumpLabel ) ;
+            mv.visitInsn( Opcodes.RETURN ) ;
+
+            mv.visitMaxs( 0, 0 ) ;
+            mv.visitEnd() ;
         }
 
+        public class InfoMethodCallRewriter extends GeneratorAdapter {
+            public InfoMethodCallRewriter( MethodVisitor mv,
+                int acc, String name, String desc ) {
+
+                super( mv, acc, name, desc ) ;
+            }
+
+            @Override
+            public void visitMethodInsn( int opcode, String owner,
+                String name, String desc ) {
+                util.info( "MM method: visitMethodInsn: " + owner
+                    + "." + name + desc ) ;
+
+                // If opcode is INVOKESPECIAL, owner is this class, and name/desc
+                // are in the infoMethodDescs set, update the desc for the call
+                // and add the extra parameters to the end of the call.
+                String fullDesc = util.getFullMethodDescriptor( name, desc ) ;
+                if ((opcode == Opcodes.INVOKESPECIAL)
+                    && (owner.equals( currentClass.name )
+                    && (ecd.classifyMethod(fullDesc)
+                        == EnhancedClassData.MethodType.INFO_METHOD))) {
+
+                    util.info( "    rewriting method call" ) ;
+
+                    // For the re-write, just pass nulls.  These instructions
+                    // will be replaced when tracing is enabled.
+                    mv.visitInsn( Opcodes.ACONST_NULL ) ;
+                    mv.visitInsn( Opcodes.ACONST_NULL ) ;
+
+                    // For the tracing case
+                    // mv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
+                    // mv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+
+                    String newDesc = util.augmentInfoMethodDescriptor(desc) ;
+
+                    mv.visitMethodInsn(opcode, owner, name, newDesc );
+                }
+            }
+        }
+
+        public class NormalMethodChecker extends GeneratorAdapter {
+            public NormalMethodChecker( MethodVisitor mv,
+                int acc, String name, String desc ) {
+
+                super( mv, acc, name, desc ) ;
+            }
+
+            @Override
+            public void visitMethodInsn( int opcode, String owner,
+                String name, String desc ) {
+                util.info( "MM method: visitMethodInsn: " + owner
+                    + "." + name + desc ) ;
+
+                // If opcode is INVOKESPECIAL, owner is this class, and name/desc
+                // are in the infoMethodDescs set, update the desc for the call
+                // and add the extra parameters to the end of the call.
+                String fullDesc = util.getFullMethodDescriptor( name, desc ) ;
+                if ((opcode == Opcodes.INVOKESPECIAL)
+                    && (owner.equals( currentClass.name )
+                    && (ecd.classifyMethod(fullDesc)
+                        == EnhancedClassData.MethodType.INFO_METHOD))) {
+
+                    util.error( "Method "
+                        + util.getFullMethodDescriptor(name,desc)
+                        + " in class " + ecd.getClassName() + " makes an "
+                        + " illegal call to an @InfoMethod method" ) ;
+                }
+            }
+        }
+
+        @Override
+        public MethodVisitor visitMethod( final int access, final String name,
+            final String desc, final String sig, final String[] exceptions ) {
+            // Enhance the class first (part 1).
+            // - Modify all of the @InfoMethod methods with extra arguments
+            // - Modify all calls to @InfoMethod methods to add the extra arguments
+            //   or to flag an error if NOT called from an MM method.
+
+            String fullDesc = util.getFullMethodDescriptor(name, desc) ;
+            EnhancedClassData.MethodType mtype =
+                ecd.classifyMethod(fullDesc) ;
+
+            MethodVisitor mv ;
+
+            switch (mtype) {
+                case STATIC_INITIALIZER :
+                    mv = super.visitMethod( access, name, desc,
+                        sig, exceptions ) ;
+                    hasStaticInitializer = true ;
+                    return new StaticInitVisitor( access, desc, mv, util,
+                        ecd ) ;
+
+                case INFO_METHOD :
+                    handleInfoMethod( access, name, desc ) ;
+                    return null ;
+
+                case MONITORED_METHOD :
+                    mv = super.visitMethod( access, name, desc,
+                        sig, exceptions ) ;
+                    return new InfoMethodCallRewriter( mv, access, name, desc ) ;
+
+                case NORMAL_METHOD :
+                    mv = super.visitMethod( access, name, desc,
+                        sig, exceptions ) ;
+                    return new NormalMethodChecker( mv, access, name, desc) ;
+            }
+
+            return null ;
+        }
+    }
+
+    public byte[] evaluate( final byte[] arg) {
+        final ClassNode cn = new ClassNode() ;
+        final ClassReader cr = new ClassReader( arg ) ;
+        cr.accept( cn, 0 ) ;
+
+        // Ignore annotations and interfaces.
+        if (hasAccess(cn.access, Opcodes.ACC_ANNOTATION) ||
+            hasAccess(cn.access, Opcodes.ACC_INTERFACE)) {
+            return null ;
+        }
+
+        // We need EnhancedClassData to hold the results of scanning the class
+        // for various details about annotations.  This makes it easy to write
+        // a one-pass visitor in part 2 to actually add the tracing code.
+        // Note that the ECD can easily be computed either at build time
+        // from the classfile byte[] (using ASM), or at runtime, directly
+        // from a Class object using reflection.
+        ecd = new EnhancedClassDataASMImpl( util, annotationNames, cn ) ;
+
+        // If this class is not annotated as a traced class, ignore it.
+        if (!ecd.isTracedClass()) {
+            return null ;
+        }
+
+        final byte[] phase1 = util.transform( arg,
+            new UnaryFunction<ClassWriter, ClassAdapter>() {
+                public ClassAdapter evaluate(ClassWriter arg) {
+                    return new ClassEnhancer( ecd, arg ) ;
+                }
+            }
+        ) ;
+
+        // Only communication from part 1 to part2 is a byte[] and
+        // the EnhancedClassData.  Since the list of methodNames
+        // is registered with the MethodMonitorRegistry, a runtime
+        // version of this code could easily be made.
+        //     Implementation note: runtime would keep byte[] stored of
+        //     original version whenever tracing is enabled, so that
+        //     disabling tracing simply means using a ClassFileTransformer
+        //     to get back to the original code.
+        //
+        // Then add tracing code (part 2).
+        //     This is a pure visitor using the AdviceAdapter.
+        //     It must NOT modify its input visitor (or you get an
+        //     infinite series of calls to onMethodExit...)
+
+        final byte[] phase2 = util.transform( phase1, new UnaryFunction<ClassWriter, ClassAdapter>() {
+            public ClassAdapter evaluate(ClassWriter arg) {
+                return new ClassTracer( ecd, arg ) ;
+            }
+        }) ;
+
+        return phase2 ;
+    }
+
+    private class ClassTracer extends ClassAdapter {
+        private final EnhancedClassData ecd ;
+
+        public ClassTracer( final EnhancedClassData ecd, ClassVisitor cv ) {
+            super( cv ) ;
+            this.ecd = ecd ;
+        }
+
+        // - Scan method body:
+        //   - for each return, add the finally body
+        //   - for each call to an InfoMethod, add extra parameters to the
+        //     end of the call (note that it is MUCH easier to recognize the
+        //     end than the start of a method call, since nested calls and
+        //     complex expressions make recognizing the start quite difficult)
+        // - add preamble
+        // - add outer exception handler
         private class MonitoredMethodEnhancer extends AdviceAdapter {
+            private int access ;
+            private String name ;
+            private String desc ;
 
             final Set<Integer> returnOpcodes = new HashSet<Integer>() ;
 
@@ -864,15 +437,18 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
             private final Label end = new Label() ;
             private final LabelNode endNode = new LabelNode( end ) ;
            
-            private final MethodNode mn ;
+            private final MethodVisitor lmv ;
             private final LocalVariableNode __result ;
             private final LocalVariableNode __ident ;
             private final LocalVariableNode __mm ;
             private final LocalVariableNode __enabled ;
 
             public MonitoredMethodEnhancer( int access, String name,
-                String desc, MethodNode mn ) {
-                super( mn, access, name, desc ) ;
+                String desc, MethodVisitor mv ) {
+                super( mv, access, name, desc ) ;
+                this.access = access ;
+                this.name = name ;
+                this.desc = desc ;
 
                 returnOpcodes.add( Opcodes.RETURN ) ;
                 returnOpcodes.add( Opcodes.IRETURN ) ;
@@ -881,7 +457,7 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
                 returnOpcodes.add( Opcodes.FRETURN ) ;
                 returnOpcodes.add( Opcodes.DRETURN ) ;
 
-                this.mn = mn ;
+                this.lmv = mv ;
                 Type type = Type.getReturnType( desc ) ;
 
                 // XXX probably need to move these inits to onMethodEnter.
@@ -911,243 +487,213 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
 
             @Override
             public void onMethodEnter() {
-                info( "MM method: onMethodEnter" ) ;
-                mv.visitLabel(start); 
+                util.info( "MM method: onMethodEnter" ) ;
+                lmv.visitLabel(start);
 
                 // __result = null or 0 (type specific, omitted if void return)
                 if (__result != null) {
-                    initLocal( mv, __result ) ;
+                    util.initLocal( lmv, __result ) ;
                 }
 
                 // Object __ident = null ;
-                initLocal( mv, __ident ) ;
+                util.initLocal( lmv, __ident ) ;
 
                 // final MethodMonitor __mm = __mmXX.content() ;
                 // (for the appropriate XX for this method)
-                __mm.accept( mv ) ;
-                final String fullDesc = getFullMethodDescriptor(mn) ;
-                info( "fullDesc = " + fullDesc ) ;
-                final String annoName = methodToAnno.get( fullDesc ) ;
-                final String fname = annoToHolderName.get( annoName ) ;
-                mv.visitFieldInsn( Opcodes.GETSTATIC, currentClass.name,
-                    fname, SH_NAME );
-                mv.visitMethodInsn( Opcodes.INVOKEVIRTUAL, SH_NAME, "content",
+                __mm.accept( lmv ) ;
+                final String fullDesc = util.getFullMethodDescriptor(name,desc) ;
+                util.info( "fullDesc = " + fullDesc ) ;
+
+                final String fname = ecd.getHolderName( fullDesc );
+
+                lmv.visitFieldInsn( Opcodes.GETSTATIC, currentClass.name,
+                    fname, EnhancedClassData.SH_NAME );
+                lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
+                    EnhancedClassData.SH_NAME, "content",
                     "()Ljava/lang/Object;" );
-                mv.visitTypeInsn( Opcodes.CHECKCAST, MM_NAME );
-                mv.visitVarInsn( Opcodes.ISTORE, __mm.index );
+                lmv.visitTypeInsn( Opcodes.CHECKCAST,
+                    EnhancedClassData.MM_NAME );
+                lmv.visitVarInsn( Opcodes.ISTORE, __mm.index );
 
                 // final boolean enabled = __mm != null ;
                 Label lab1 = new Label() ;
                 Label lab2 = new Label() ;
-                mv.visitVarInsn( Opcodes.ILOAD, __mm.index ) ;
-                mv.visitJumpInsn( Opcodes.IFNULL, lab1) ;
-                mv.visitInsn( Opcodes.ICONST_1 );
-                mv.visitJumpInsn( Opcodes.GOTO, lab2);
-                mv.visitLabel( lab1 ) ;
-                mv.visitInsn( Opcodes.ICONST_0 );
-                mv.visitVarInsn( Opcodes.ISTORE, __enabled.index );
-                mv.visitLabel( lab2 ) ;
+                lmv.visitVarInsn( Opcodes.ILOAD, __mm.index ) ;
+                lmv.visitJumpInsn( Opcodes.IFNULL, lab1) ;
+                lmv.visitInsn( Opcodes.ICONST_1 );
+                lmv.visitJumpInsn( Opcodes.GOTO, lab2);
+                lmv.visitLabel( lab1 ) ;
+                lmv.visitInsn( Opcodes.ICONST_0 );
+                lmv.visitVarInsn( Opcodes.ISTORE, __enabled.index );
+                lmv.visitLabel( lab2 ) ;
 
                 // if (enabled) {
                 Label skipPreamble = new Label() ;
-                mv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
-                mv.visitJumpInsn( Opcodes.IFEQ, skipPreamble );
+                lmv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
+                lmv.visitJumpInsn( Opcodes.IFEQ, skipPreamble );
 
                 // __ident = <method constant>
-                emitMethodConstant( methodNames, mv, mn.name ) ;
+                util.emitIntConstant( lmv, ecd.getMethodIndex(name) ) ;
                 String owner = Type.getInternalName( Integer.class ) ;
-                mv.visitMethodInsn( Opcodes.INVOKESTATIC, owner, "valueOf",
+                lmv.visitMethodInsn( Opcodes.INVOKESTATIC, owner, "valueOf",
                     "(I)Ljava.lang.Integer;" ) ;
-                mv.visitVarInsn( Opcodes.ASTORE, __mm.index ) ;
+                lmv.visitVarInsn( Opcodes.ASTORE, __mm.index ) ;
 
                 // __mm.enter( __ident, <array of wrapped args> ) ;
-                mv.visitVarInsn( Opcodes.ALOAD, __mm.index )  ;
-                mv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+                lmv.visitVarInsn( Opcodes.ALOAD, __mm.index )  ;
+                lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
 
-                wrapArgs( mv, mn.access, mn.desc ) ;
+                util.wrapArgs( lmv, access, desc ) ;
 
-                mv.visitMethodInsn( Opcodes.INVOKEINTERFACE, MM_NAME, "enter",
+                lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
+                    EnhancedClassData.MM_NAME, "enter",
                     "(Ljava/lang/Object;[Ljava/lang/Object;)" ) ;
 
                 // }
-                mv.visitLabel( skipPreamble ) ;
+                lmv.visitLabel( skipPreamble ) ;
+            }
+
+            private void emitFinally() {
+                Label skipLabel = new Label() ;
+                lmv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
+                lmv.visitJumpInsn( Opcodes.IFEQ, skipLabel ) ;
+
+                lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
+                lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+
+                Type rtype = Type.getReturnType( desc ) ;
+                if (rtype.equals( Type.VOID_TYPE )) {
+                    lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
+                        EnhancedClassData.MM_NAME, "exit",
+                        "(Ljava/lang/Object;)V" ) ;
+                } else {
+                    util.wrapArg( lmv, __result.index,
+                        Type.getType( __result.desc ) ) ;
+
+                    lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
+                        EnhancedClassData.MM_NAME, "exit",
+                        "(Ljava/lang/Object;Ljava/lang/Object;)V" ) ;
+                }
+
+                lmv.visitLabel( skipLabel ) ;
             }
 
             @Override
-            public void visitMethodInsn( int opcode, String owner, 
+            public void onMethodExit( int opcode ) {
+                util.info( "MM method: onMethodExit" ) ;
+                if (returnOpcodes.contains(opcode )) {
+                    util.info( "    handling return" ) ;
+                    util.storeFromXReturn( lmv, opcode, __result ) ;
+
+                    emitFinally() ;
+
+                    util.loadFromXReturn( lmv, opcode, __result ) ;
+                } else if (opcode == Opcodes.ATHROW) {
+                    util.info( "    handling throw" ) ;
+                    int exc = newLocal( Type.getType(Throwable.class)) ;
+                    lmv.visitVarInsn( Opcodes.ASTORE, exc) ;
+
+                    Label skipLabel = new Label() ;
+                    lmv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
+                    lmv.visitJumpInsn( Opcodes.IFEQ, skipLabel ) ;
+
+                    // emit code for reporting exception
+                    lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
+                    lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+                    lmv.visitVarInsn( Opcodes.ALOAD, exc ) ;
+                    lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
+                         EnhancedClassData.MM_NAME, "exception",
+                         "(Ljava/lang/Object;Ljava/lang/Throwable;)V") ;
+
+                    lmv.visitLabel( skipLabel ) ;
+                    // restore exception from local for following ATHROW
+                    // (this will be caught in the finally exception handler,
+                    // which will handle calling MethodMonitor.exit).
+                    lmv.visitVarInsn( Opcodes.ALOAD, exc ) ;
+                } // all others can be ignored.
+            }
+
+            @Override
+            public void visitMethodInsn( int opcode, String owner,
                 String name, String desc ) {
-                info( "MM method: visitMethodInsn: " + owner + "." + name + desc ) ;
-                
+                util.info( "MM method: visitMethodInsn: " + owner
+                    + "." + name + desc ) ;
+
                 // If opcode is INVOKESPECIAL, owner is this class, and name/desc
                 // are in the infoMethodDescs set, update the desc for the call
                 // and add the extra parameters to the end of the call.
-                String fullDesc = getFullMethodDescriptor( name, desc ) ;
-                if ((opcode == Opcodes.INVOKESPECIAL) 
-                    && (owner.equals( currentClass.name )) 
-                    && (infoMethodDescs.contains( fullDesc ))) {
+                String fullDesc = util.getFullMethodDescriptor( name, desc ) ;
+                if ((opcode == Opcodes.INVOKESPECIAL)
+                    && (owner.equals( currentClass.name )
+                    && (ecd.classifyMethod(fullDesc)
+                        == EnhancedClassData.MethodType.INFO_METHOD))) {
 
-                    info( "    rewriting method call" ) ;
-                    mv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
-                    mv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
-                    String newDesc = augmentInfoMethodDescriptor(desc) ;
+                    util.info( "    rewriting method call" ) ;
+
+                    // For the re-write, just pass nulls.  These instructions
+                    // will be replaced when tracing is enabled.
+                    mv.visitInsn( Opcodes.ACONST_NULL ) ;
+                    mv.visitInsn( Opcodes.ACONST_NULL ) ;
+
+                    // For the tracing case
+                    // mv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
+                    // mv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+
+                    String newDesc = util.augmentInfoMethodDescriptor(desc) ;
 
                     mv.visitMethodInsn(opcode, owner, name, newDesc );
                 }
             }
 
-            private void emitFinally() {
-                Label skipLabel = new Label() ;
-                mv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
-                mv.visitJumpInsn( Opcodes.IFEQ, skipLabel ) ;
-
-                mv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
-                mv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
-
-                Type rtype = Type.getReturnType( mn.desc ) ;
-                if (rtype.equals( Type.VOID_TYPE )) {
-                    mv.visitMethodInsn( Opcodes.INVOKEVIRTUAL, MM_NAME, "exit",
-                        "(Ljava/lang/Object;)V" ) ;
-                } else {
-                    wrapArg( mv, __result.index, Type.getType( __result.desc ) ) ;
-
-                    mv.visitMethodInsn( Opcodes.INVOKEVIRTUAL, MM_NAME, "exit",
-                        "(Ljava/lang/Object;Ljava/lang/Object;)V" ) ;
-                }
-
-                mv.visitLabel( skipLabel ) ;
-            }
-
-            @Override
-            public void onMethodExit( int opcode ) {
-                info( "MM method: onMethodExit" ) ;
-                if (returnOpcodes.contains(opcode )) {
-                    info( "    handling return" ) ;
-                    storeFromXReturn( mv, opcode, __result ) ;
-
-                    emitFinally() ;
-
-                    loadFromXReturn( mv, opcode, __result ) ;
-                } else if (opcode == Opcodes.ATHROW) {
-                    info( "    handling throw" ) ;
-                    int exc = newLocal( Type.getType(Throwable.class)) ;
-                    mv.visitVarInsn( Opcodes.ASTORE, exc) ;
-
-                    Label skipLabel = new Label() ;
-                    mv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
-                    mv.visitJumpInsn( Opcodes.IFEQ, skipLabel ) ;
-
-                    // emit code for reporting exception
-                    mv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
-                    mv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
-                    mv.visitVarInsn( Opcodes.ALOAD, exc ) ;
-                    mv.visitMethodInsn( Opcodes.INVOKEVIRTUAL, MM_NAME, "" +
-                         "exception",
-                         "(Ljava/lang/Object;Ljava/lang/Throwable;)V") ;
-
-                    mv.visitLabel( skipLabel ) ;
-                    // restore exception from local for following ATHROW
-                    // (this will be caught in the finally exception handler,
-                    // which will handle calling MethodMonitor.exit).
-                    mv.visitVarInsn( Opcodes.ALOAD, exc ) ;
-                } // all others can be ignored.
-            }
-
             @Override
             public void visitEnd() {
-                info( "MM method: visitEnd" ) ;
-                mv.visitLabel( excHandler  ) ;
+                util.info( "MM method: visitEnd" ) ;
+                lmv.visitLabel( excHandler  ) ;
 
                 // Store the exception
                 int excIndex = newLocal( Type.getType( Throwable.class ) ) ;
-                mv.visitVarInsn( Opcodes.ASTORE, excIndex ) ;
+                lmv.visitVarInsn( Opcodes.ASTORE, excIndex ) ;
 
                 emitFinally() ;
 
                 // throw the exception
-                mv.visitVarInsn( Opcodes.ALOAD, excIndex ) ;
-                mv.visitInsn( Opcodes.ATHROW ) ;
+                lmv.visitVarInsn( Opcodes.ALOAD, excIndex ) ;
+                lmv.visitInsn( Opcodes.ATHROW ) ;
 
-                mv.visitLabel( end ) ;
+                lmv.visitLabel( end ) ;
 
-                mv.visitTryCatchBlock( start, end, excHandler, null );
+                lmv.visitTryCatchBlock( start, end, excHandler, null );
             }
         }
 
-        // - Scan method body:
-        //   - for each return, add the finally body
-        //   - for each call to an InfoMethod, add extra parameters to the
-        //     end of the call (note that it is MUCH easier to recognize the
-        //     end than the start of a method call, since nested calls and
-        //     complex expressions make recognizing the start quite difficult)
-        // - add preamble
-        // - add outer exception handler
-        private void handleMMMethod( MethodNode mn ) {
-            AdviceAdapter aa = new MonitoredMethodEnhancer( mn.access, 
-                mn.name, mn.desc, mn ) ;
-            mn.accept( aa ) ;
-        }
 
-        // Scan method body:
-        // - ensure that no info methods are called
-        //   (that is an invokespecial
-        private void handleDefaultMethod( MethodNode mn ) {
-            final Iterator<? extends AbstractInsnNode> ilist = 
-                mn.instructions.iterator() ;
-            while (ilist.hasNext()) {
-                AbstractInsnNode anode = ilist.next() ;
-                if (anode instanceof MethodInsnNode) {
-                    final MethodInsnNode mnode = (MethodInsnNode)anode ;
-                    // mnode.opcode should be INVOKESPECIAL, but we really don't
-                    // need to check for that.
-                    String mdesc = getFullMethodDescriptor( mnode ) ;
-                    if (infoMethodDescs.contains(mdesc)) {
-                        error( "Method " + getFullMethodDescriptor(mnode)
-                            + " in class " + currentClass.name + " makes an "
-                            + " illegal call to an @InfoMethod method" ) ;
-                    }
-                }
-            }
-        }
+        @Override
+        public MethodVisitor visitMethod( final int access, final String name,
+            final String desc, final String sig, final String[] exceptions ) {
+            // Enhance the class first (part 1).
+            // - Modify all of the @InfoMethod methods with extra arguments
+            // - Modify all calls to @InfoMethod methods to add the extra arguments
+            //   or to flag an error if NOT called from an MM method.
 
-        public Boolean enhance() {
-            // Ignore annotations and interfaces.
-            if (hasAccess(currentClass.access, Opcodes.ACC_ANNOTATION) ||
-                hasAccess(currentClass.access, Opcodes.ACC_INTERFACE)) {
-                return false ;
+            String fullDesc = util.getFullMethodDescriptor(name, desc) ;
+            EnhancedClassData.MethodType mtype =
+                ecd.classifyMethod(fullDesc) ;
+
+            MethodVisitor mv = super.visitMethod( access, name, desc,
+                sig, exceptions ) ;
+
+            switch (mtype) {
+                case STATIC_INITIALIZER :
+                case INFO_METHOD :
+                case NORMAL_METHOD :
+                    return mv ;
+
+                case MONITORED_METHOD :
+                    return new MonitoredMethodEnhancer( access, name, desc, mv ) ;
+
             }
 
-            processClassAnnotations() ;
-            if (annoNamesForClass.isEmpty()) { 
-                return false ;
-            }
-
-            scanMethods() ;
-
-            addFieldsToClass() ;
-
-            final List<MethodNode> mnodes = currentClass.methods ;
-            boolean hasStaticInit = false ;
-            for (final MethodNode mn : mnodes) {
-                final String desc = getFullMethodDescriptor( mn ) ;
-                info( "Handling method " + desc ) ;
-
-                if (mn.name.equals( "<clinit>")) {
-                    handleStaticInitializer( mn ) ;
-                    hasStaticInit = true ;
-                } else if (infoMethodDescs.contains( desc )) {
-                    handleInfoMethod( mn ) ;
-                } else if (mmMethodDescs.contains( desc )) {
-                    handleMMMethod( mn ) ;
-                } else {
-                    handleDefaultMethod( mn ) ;
-                }
-            }
-
-            if (!hasStaticInit) {
-                handleStaticInitializer( null ) ;
-            }
-
-            return false ; // for initial testing!
+            return null ;
         }
     }
 }

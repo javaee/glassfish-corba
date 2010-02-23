@@ -38,6 +38,7 @@ package com.sun.tools.corba.se.enhancer;
 
 import java.util.List;
 import java.util.Set;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -48,7 +49,8 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
 
     // Get Set<String> for MM annotations present on class
     private void processClassAnnotations() {
-        final List<AnnotationNode> classAnnotations = currentClass.visibleAnnotations ;
+        final List<AnnotationNode> classAnnotations =
+            currentClass.visibleAnnotations ;
         if (classAnnotations != null) {
             for (AnnotationNode an : classAnnotations) {
                 final String aname = Type.getType( an.desc ).getInternalName() ;
@@ -114,12 +116,27 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                         + " a MM annotation" ) ;
                 }
 
+                // This check is not really essential, but it simplifies
+                // passing information to later phases for code generation
+                // if we can assume that all @InfoMethod annotated methods
+                // are non-static. (Simply because we only need to look for
+                // INVOKESPECIAL).
+                final boolean isStatic = 
+                    (mn.access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC ;
+                if (hasMethodInfoAnno && isStatic) {
+                    util.error( "Method " + mdesc            
+                        + " for Class " + currentClass.name
+                        + " is a static method, but must not be" ) ;
+                }
+
                 // TF Annotations are not permitted on constructors
                 if (mname.equals( "<init>" )) {
                     if (hasMethodInfoAnno) {
-                        util.error( "Constructors must not have an @InfoMethod annotations") ;
+                        util.error( "Constructors must not have an "
+                            + "@InfoMethod annotations") ;
                     } else if (annoForMethod != null) {
-                        util.error( "Constructors must not have an MM annotation") ;
+                        util.error( "Constructors must not have an "
+                            + "MM annotation") ;
                     }
                 }
 

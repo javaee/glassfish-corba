@@ -71,7 +71,6 @@ public class AnnotationScannerAction implements EnhanceTool.ScanAction {
     }
 
     private class AnnoScanner extends EmptyVisitor {
-        private AnnotationVisitor empty = new EmptyVisitor() ;
 
         @Override
         public void visit( int version, int access, String name, String signature,

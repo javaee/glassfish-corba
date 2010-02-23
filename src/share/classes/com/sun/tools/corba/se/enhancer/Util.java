@@ -335,7 +335,9 @@ public class Util {
         }
     }
 
-    public byte[] transform( byte[] cls, UnaryFunction<ClassWriter,ClassAdapter> factory ) {
+    public byte[] transform( byte[] cls,
+        UnaryFunction<ClassWriter,ClassAdapter> factory ) {
+
         ClassReader cr = new ClassReader(cls) ;
         ClassWriter cw = new ClassWriter(
             ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS ) ;

@@ -121,8 +121,8 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                 // if we can assume that all @InfoMethod annotated methods
                 // are non-static. (Simply because we only need to look for
                 // INVOKESPECIAL).
-                final boolean isStatic = 
-                    (mn.access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC ;
+                final boolean isStatic = util.hasAccess( mn.access,
+                    Opcodes.ACC_STATIC ) ;
                 if (hasMethodInfoAnno && isStatic) {
                     util.error( "Method " + mdesc            
                         + " for Class " + currentClass.name

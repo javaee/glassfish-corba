@@ -38,10 +38,12 @@ package com.sun.tools.corba.se.enhancer;
 
 import com.sun.corba.se.spi.orbutil.file.FileWrapper;
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.objectweb.asm.AnnotationVisitor;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -56,8 +58,11 @@ import org.objectweb.asm.commons.EmptyVisitor;
  * @author ken
  */
 public class AnnotationScannerAction implements EnhanceTool.ScanAction {
-    private static Class<MethodMonitorGroup> MMG_CLASS = MethodMonitorGroup.class ;
-    private static String MMG_DESCRIPTOR = Type.getType(MMG_CLASS).getDescriptor() ;
+    private static Class<MethodMonitorGroup> MMG_CLASS =
+        MethodMonitorGroup.class ;
+
+    private static String MMG_DESCRIPTOR =
+        Type.getType(MMG_CLASS).getDescriptor() ;
 
     private boolean debug ;
     private int verbose ;

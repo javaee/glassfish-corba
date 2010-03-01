@@ -43,7 +43,7 @@ import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 import org.objectweb.asm.ClassAdapter;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -86,7 +86,7 @@ import org.objectweb.asm.tree.ClassNode;
  *
  * @author ken
  */
-public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
+public class Transformer implements EnhanceTool.EnhanceFunction {
     private boolean dryrun ;
     private Set<String> annotationNames = null ;
 
@@ -96,7 +96,7 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
     private ClassNode currentClass = null ;
     private EnhancedClassData ecd = null ;
 
-    public TraceEnhanceFunction() {
+    public Transformer() {
     }
 
     public void setMMGAnnotations(Set<String> mmgAnnotations) {
@@ -122,11 +122,11 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
     public byte[] evaluate( final byte[] arg) {
         final ClassNode cn = new ClassNode() ;
         final ClassReader cr = new ClassReader( arg ) ;
-        cr.accept( cn, 0 ) ;
+        cr.accept( cn, ClassReader.EXPAND_FRAMES ) ;
 
         // Ignore annotations and interfaces.
-        if (hasAccess(cn.access, Opcodes.ACC_ANNOTATION) ||
-            hasAccess(cn.access, Opcodes.ACC_INTERFACE)) {
+        if (util.hasAccess(cn.access, Opcodes.ACC_ANNOTATION) ||
+            util.hasAccess(cn.access, Opcodes.ACC_INTERFACE)) {
             return null ;
         }
 
@@ -143,9 +143,9 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
             return null ;
         }
 
-        final byte[] phase1 = util.transform( arg,
-            new UnaryFunction<ClassWriter, ClassAdapter>() {
-                public ClassAdapter evaluate(ClassWriter arg) {
+        final byte[] phase1 = util.transform( false, arg,
+            new UnaryFunction<ClassVisitor, ClassAdapter>() {
+                public ClassAdapter evaluate(ClassVisitor arg) {
                     return new ClassEnhancer( util, ecd, arg ) ;
                 }
             }
@@ -165,10 +165,10 @@ public class TraceEnhanceFunction implements EnhanceTool.EnhanceFunction {
         //     It must NOT modify its input visitor (or you get an
         //     infinite series of calls to onMethodExit...)
 
-        final byte[] phase2 = util.transform( phase1,
-            new UnaryFunction<ClassWriter, ClassAdapter>() {
+        final byte[] phase2 = util.transform( util.getDebug(), phase1,
+            new UnaryFunction<ClassVisitor, ClassAdapter>() {
 
-            public ClassAdapter evaluate(ClassWriter arg) {
+            public ClassAdapter evaluate(ClassVisitor arg) {
                 return new ClassTracer( util, ecd, arg ) ;
             }
         }) ;

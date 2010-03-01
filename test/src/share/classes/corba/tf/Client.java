@@ -71,11 +71,11 @@ public class Client
     }
 
     TestClass getTestClass( boolean isTraced ) {
-        if (isTraced) {
-            return new TestClassImpl_tf() ;
-        } else {
+        // if (isTraced) {
+            // return new TestClassImpl_tf() ;
+        // } else {
             return new TestClassImpl() ;
-        }
+        // }
     }
 
     private void doSimpleTest( boolean isTraced ) {

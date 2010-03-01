@@ -1,10 +1,42 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+ * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
  */
 
 package com.sun.tools.corba.se.enhancer;
 
+import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
 import java.util.HashSet;
 import java.util.Set;
 import org.objectweb.asm.ClassAdapter;
@@ -13,37 +45,34 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.AdviceAdapter;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitor ;
+import org.objectweb.asm.MethodAdapter;
+import org.objectweb.asm.commons.AnalyzerAdapter;
+import org.objectweb.asm.commons.LocalVariablesSorter;
+import org.objectweb.asm.util.TraceMethodVisitor;
 
 public class ClassTracer extends ClassAdapter {
-
-    public enum Input {
-        ACONST_NULL_BC,
-        INFO_METHOD_CALL,
-        OTHER
+    private void info( int level, String msg ) {
+        util.info( "ClassTracer: " + msg ) ;
     }
 
-    public enum Action {
-        EMIT_NULL,
-        EMIT_2_NULL,
-        EMIT_CALL,
-        EMIT_NORMAL
-    }
+    public enum Input { ACONST_NULL_BC, INFO_METHOD_CALL, OTHER }
 
     public enum State {
-
         NULL1() {
-            public State transition( MethodVisitor mv, Input input ) {
+            public State transition( Util util, MethodVisitor mv, Input input ) {
+                util.info( 3, "ClassTracer: "
+                    + "State transition: NULL1 state, Input " + input ) ;
                 switch (input) {
                     case ACONST_NULL_BC :
                         return State.NULL2 ;
                     case INFO_METHOD_CALL :
                         return State.NORMAL ;
                     case OTHER :
+                        util.info( 4, "ClassTracer: Emitting 1 ACONST_NULL" ) ;
                         mv.visitInsn( Opcodes.ACONST_NULL ) ;
                         return State.NORMAL ;
                 }
@@ -52,10 +81,13 @@ public class ClassTracer extends ClassAdapter {
         },
 
         NULL2() {
-            public State transition( MethodVisitor mv, Input input ) {
+            public State transition( Util util, MethodVisitor mv, Input input ) {
+                util.info( 3, "ClassTracer: "
+                    + "State transition: NULL2 state, Input " + input ) ;
                 switch (input) {
                     case ACONST_NULL_BC :
                     case OTHER :
+                        util.info( 4, "ClassTracer: Emitting 2 ACONST_NULL" ) ;
                         mv.visitInsn( Opcodes.ACONST_NULL ) ;
                         mv.visitInsn( Opcodes.ACONST_NULL ) ;
                     case INFO_METHOD_CALL :
@@ -66,7 +98,9 @@ public class ClassTracer extends ClassAdapter {
         },
 
         NORMAL() {
-            public State transition( MethodVisitor mv, Input input ) {
+            public State transition( Util util, MethodVisitor mv, Input input ) {
+                util.info( 3, "ClassTracer: "
+                    + "State transition: NORMAL state, Input " + input ) ;
                 switch (input) {
                     case ACONST_NULL_BC :
                         return State.NULL1 ;
@@ -78,75 +112,13 @@ public class ClassTracer extends ClassAdapter {
             }
         } ;
 
-
-        public abstract State transition( MethodVisitor mv, Input input ) ;
-    }
-
-    public enum Input {
-        ACONST_NULL_BC,
-        INFO_METHOD_CALL,
-        OTHER
-    }
-
-    public enum Action {
-        EMIT_NULL,
-        EMIT_2_NULL,
-        EMIT_CALL,
-        EMIT_NORMAL
-    }
-
-    public enum State {
-
-        NULL1() {
-            public State transition( MethodVisitor mv, Input input ) {
-                switch (input) {
-                    case ACONST_NULL_BC :
-                        return State.NULL2 ;
-                    case INFO_METHOD_CALL :
-                        return State.NORMAL ;
-                    case OTHER :
-                        mv.visitInsn( Opcodes.ACONST_NULL ) ;
-                        return State.NORMAL ;
-                }
-                return null ;
-            }
-        },
-
-        NULL2() {
-            public State transition( MethodVisitor mv, Input input ) {
-                switch (input) {
-                    case ACONST_NULL_BC :
-                    case OTHER :
-                        mv.visitInsn( Opcodes.ACONST_NULL ) ;
-                        mv.visitInsn( Opcodes.ACONST_NULL ) ;
-                    case INFO_METHOD_CALL :
-                        return State.NORMAL ;
-                }
-                return null ;
-            }
-        },
-
-        NORMAL() {
-            public State transition( MethodVisitor mv, Input input ) {
-                switch (input) {
-                    case ACONST_NULL_BC :
-                        return State.NULL1 ;
-                    case INFO_METHOD_CALL :
-                    case OTHER :
-                        return State.NORMAL ;
-                }
-                return null ;
-            }
-        } ;
-
-
-        public abstract State transition( MethodVisitor mv, Input input ) ;
+        public abstract State transition( Util util, MethodVisitor mv,
+            Input input ) ;
     }
 
     private final Util util ;
     private final EnhancedClassData ecd ;
     private State current = State.NORMAL ;
-
 
     public ClassTracer( final Util util, final EnhancedClassData ecd,
         ClassVisitor cv ) {
@@ -164,7 +136,7 @@ public class ClassTracer extends ClassAdapter {
     //     complex expressions make recognizing the start quite difficult)
     // - add preamble
     // - add outer exception handler
-    private class MonitoredMethodEnhancer extends AdviceAdapter {
+    private class MonitoredMethodEnhancer extends MethodAdapter {
         private int access ;
         private String name ;
         private String desc ;
@@ -181,14 +153,47 @@ public class ClassTracer extends ClassAdapter {
         private final LabelNode endNode = new LabelNode( end ) ;
 
         private final MethodVisitor lmv ;
-        private final LocalVariableNode __result ;
-        private final LocalVariableNode __ident ;
-        private final LocalVariableNode __mm ;
-        private final LocalVariableNode __enabled ;
+
+        // Values must be set in setLocalVariablesSorter.
+        private LocalVariableNode __result = null ;
+        private LocalVariableNode __ident = null ;
+        private LocalVariableNode __mm = null ;
+        private LocalVariableNode __enabled = null ;
+
+        private LocalVariablesSorter lvs = null ;
+
+        public void setLocalVariablesSorter( LocalVariablesSorter lvs ) {
+            this.lvs = lvs ;
+
+            Type type = Type.getReturnType( desc ) ;
+
+            if (!type.equals( Type.VOID_TYPE)) {
+                __result = new LocalVariableNode( "__$result$__",
+                    type.getDescriptor(),
+                    null, startNode, endNode, lvs.newLocal(type) ) ;
+            } else {
+                __result = null ;
+            }
+
+            type = Type.getType(Object.class) ;
+            __ident = new LocalVariableNode( "__$ident$__",
+                type.getDescriptor(),
+                null, startNode, endNode, lvs.newLocal(type)) ;
+
+            type = Type.getType( MethodMonitor.class );
+            __mm = new LocalVariableNode( "__$mm$__",
+                type.getDescriptor(),
+                null, startNode, endNode, lvs.newLocal(type) ) ;
+
+            type = Type.BOOLEAN_TYPE ;
+            __enabled = new LocalVariableNode( "__$enabled$__",
+                type.getDescriptor(),
+                null, startNode, endNode, lvs.newLocal(type) ) ;
+        }
 
         public MonitoredMethodEnhancer( int access, String name,
             String desc, MethodVisitor mv ) {
-            super( mv, access, name, desc ) ;
+            super( mv ) ;
             this.access = access ;
             this.name = name ;
             this.desc = desc ;
@@ -201,36 +206,11 @@ public class ClassTracer extends ClassAdapter {
             returnOpcodes.add( Opcodes.DRETURN ) ;
 
             this.lmv = mv ;
-            Type type = Type.getReturnType( desc ) ;
-
-            // XXX probably need to move these inits to onMethodEnter.
-            if (!type.equals( Type.VOID_TYPE)) {
-                __result = new LocalVariableNode( "__$result$__",
-                    type.getDescriptor(),
-                    null, startNode, endNode, newLocal(type) ) ;
-            } else {
-                __result = null ;
-            }
-
-            type = Type.getType(Object.class) ;
-            __ident = new LocalVariableNode( "__$ident$__",
-                type.getDescriptor(),
-                null, startNode, endNode, newLocal(type)) ;
-
-            type = Type.getType( MethodMonitor.class );
-            __mm = new LocalVariableNode( "__$mm$__",
-                type.getDescriptor(),
-                null, startNode, endNode, newLocal(type) ) ;
-
-            type = Type.BOOLEAN_TYPE ;
-            __enabled = new LocalVariableNode( "__$enabled$__",
-                type.getDescriptor(),
-                null, startNode, endNode, newLocal(type) ) ;
         }
 
         @Override
-        public void onMethodEnter() {
-            util.info( "MM method: onMethodEnter" ) ;
+        public void visitCode() {
+            info( 1, "MM method: onMethodEnter" ) ;
             lmv.visitLabel(start);
 
             // __result = null or 0 (type specific, omitted if void return)
@@ -245,12 +225,12 @@ public class ClassTracer extends ClassAdapter {
             // (for the appropriate XX for this method)
             __mm.accept( lmv ) ;
             final String fullDesc = util.getFullMethodDescriptor(name,desc) ;
-            util.info( "fullDesc = " + fullDesc ) ;
+            info( 2, "fullDesc = " + fullDesc ) ;
 
             final String fname = ecd.getHolderName( fullDesc );
 
             lmv.visitFieldInsn( Opcodes.GETSTATIC, ecd.getClassName(),
-                fname, EnhancedClassData.SH_NAME );
+                fname, Type.getDescriptor( SynchronizedHolder.class ));
             lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
                 EnhancedClassData.SH_NAME, "content",
                 "()Ljava/lang/Object;" );
@@ -259,6 +239,8 @@ public class ClassTracer extends ClassAdapter {
             lmv.visitVarInsn( Opcodes.ISTORE, __mm.index );
 
             // final boolean enabled = __mm != null ;
+            __enabled.accept( lmv ) ;
+
             Label lab1 = new Label() ;
             Label lab2 = new Label() ;
             lmv.visitVarInsn( Opcodes.ILOAD, __mm.index ) ;
@@ -290,13 +272,14 @@ public class ClassTracer extends ClassAdapter {
 
             lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 EnhancedClassData.MM_NAME, "enter",
-                "(Ljava/lang/Object;[Ljava/lang/Object;)" ) ;
+                "(Ljava/lang/Object;[Ljava/lang/Object;)V" ) ;
 
             // }
             lmv.visitLabel( skipPreamble ) ;
         }
 
         private void emitFinally() {
+            info( 1, "emitFinally called" ) ;
             Label skipLabel = new Label() ;
             lmv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
             lmv.visitJumpInsn( Opcodes.IFEQ, skipLabel ) ;
@@ -322,56 +305,57 @@ public class ClassTracer extends ClassAdapter {
         }
 
         @Override
-        public void onMethodExit( int opcode ) {
-            util.info( "MM method: onMethodExit" ) ;
-            if (returnOpcodes.contains(opcode )) {
-                util.info( "    handling return" ) ;
-                util.storeFromXReturn( lmv, opcode, __result ) ;
-
-                emitFinally() ;
-
-                util.loadFromXReturn( lmv, opcode, __result ) ;
-            } else if (opcode == Opcodes.ATHROW) {
-                util.info( "    handling throw" ) ;
-                int exc = newLocal( Type.getType(Throwable.class)) ;
-                lmv.visitVarInsn( Opcodes.ASTORE, exc) ;
-
-                Label skipLabel = new Label() ;
-                lmv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
-                lmv.visitJumpInsn( Opcodes.IFEQ, skipLabel ) ;
-
-                // emit code for reporting exception
-                lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
-                lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
-                lmv.visitVarInsn( Opcodes.ALOAD, exc ) ;
-                lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
-                     EnhancedClassData.MM_NAME, "exception",
-                     "(Ljava/lang/Object;Ljava/lang/Throwable;)V") ;
-
-                lmv.visitLabel( skipLabel ) ;
-                // restore exception from local for following ATHROW
-                // (this will be caught in the finally exception handler,
-                // which will handle calling MethodMonitor.exit).
-                lmv.visitVarInsn( Opcodes.ALOAD, exc ) ;
-            } // all others can be ignored.
-        }
-
-        @Override
         public void visitInsn(final int opcode) {
+            info( 1, "visitInsn[" + util.opcodeToString(opcode) + "] called") ;
             if (opcode == Opcodes.ACONST_NULL) {
-                current = current.transition( mv, Input.ACONST_NULL_BC ) ;
+                current = current.transition( util, mv, Input.ACONST_NULL_BC ) ;
+
                 if (current == State.NORMAL) {
                     mv.visitInsn(opcode);
                 }
             } else {
-                mv.visitInsn(opcode);
+                current = current.transition( util, mv, Input.OTHER ) ;
+
+                if (opcode == Opcodes.ATHROW) {
+                    info( 2, "handling throw" ) ;
+                    int exc = lvs.newLocal( Type.getType(Throwable.class)) ;
+                    lmv.visitVarInsn( Opcodes.ASTORE, exc) ;
+
+                    Label skipLabel = new Label() ;
+                    lmv.visitVarInsn( Opcodes.ILOAD, __enabled.index ) ;
+                    lmv.visitJumpInsn( Opcodes.IFEQ, skipLabel ) ;
+
+                    // emit code for reporting exception
+                    lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
+                    lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+                    lmv.visitVarInsn( Opcodes.ALOAD, exc ) ;
+                    lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
+                        EnhancedClassData.MM_NAME, "exception",
+                        "(Ljava/lang/Object;Ljava/lang/Throwable;)V") ;
+
+                    lmv.visitLabel( skipLabel ) ;
+                    // restore exception from local for following ATHROW
+                    // (this will be caught in the finally exception handler,
+                    // which will handle calling MethodMonitor.exit).
+                    lmv.visitVarInsn( Opcodes.ALOAD, exc ) ;
+                } else if (returnOpcodes.contains(opcode)) {
+                    info( 2, "handling return" ) ;
+                    util.storeFromXReturn( lmv, opcode, __result ) ;
+
+                    emitFinally() ;
+
+                    util.loadFromXReturn( lmv, opcode, __result ) ;
+                } else {
+                    mv.visitInsn(opcode);
+                }
             }
         }
 
         @Override
         public void visitMethodInsn( int opcode, String owner,
             String name, String desc ) {
-            util.info( "MM method: visitMethodInsn: " + owner
+            info( 1, "MM method: visitMethodInsn[" 
+                + util.opcodeToString(opcode) + "]: " + owner
                 + "." + name + desc ) ;
 
             // If opcode is INVOKESPECIAL, owner is this class, and name/desc
@@ -383,8 +367,9 @@ public class ClassTracer extends ClassAdapter {
                 && (ecd.classifyMethod(fullDesc)
                     == EnhancedClassData.MethodType.INFO_METHOD))) {
 
-                util.info( "    rewriting method call" ) ;
-                current = current.transition( mv, Input.INFO_METHOD_CALL ) ;
+                info( 2, "rewriting method call" ) ;
+                current = current.transition( util, mv,
+                    Input.INFO_METHOD_CALL ) ;
 
                 mv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
                 mv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
@@ -393,7 +378,7 @@ public class ClassTracer extends ClassAdapter {
 
                 mv.visitMethodInsn(opcode, owner, name, newDesc );
             } else {
-                current = current.transition( mv, Input.OTHER ) ;
+                current = current.transition( util, mv, Input.OTHER ) ;
 
                 mv.visitMethodInsn(opcode, owner, name, desc );
             }
@@ -401,11 +386,11 @@ public class ClassTracer extends ClassAdapter {
 
         @Override
         public void visitEnd() {
-            util.info( "MM method: visitEnd" ) ;
+            info( 1, "MM method: visitEnd" ) ;
             lmv.visitLabel( excHandler  ) ;
 
             // Store the exception
-            int excIndex = newLocal( Type.getType( Throwable.class ) ) ;
+            int excIndex = lvs.newLocal( Type.getType( Throwable.class ) ) ;
             lmv.visitVarInsn( Opcodes.ASTORE, excIndex ) ;
 
             emitFinally() ;
@@ -421,19 +406,25 @@ public class ClassTracer extends ClassAdapter {
 
         @Override
         public void visitIntInsn(final int opcode, final int operand) {
-            current = current.transition( mv, Input.OTHER ) ;
+            info( 1, "visitIntInsn[" + util.opcodeToString(opcode) 
+                + "] operand=" + operand ) ;
+            current = current.transition( util, mv, Input.OTHER ) ;
             mv.visitIntInsn(opcode, operand);
         }
 
         @Override
         public void visitVarInsn(final int opcode, final int var) {
-            current = current.transition( mv, Input.OTHER ) ;
+            info( 1, "visitVarInsn[" + util.opcodeToString(opcode)
+                + "] var=" + var ) ;
+            current = current.transition( util, mv, Input.OTHER ) ;
             mv.visitVarInsn(opcode, var);
         }
 
         @Override
         public void visitTypeInsn(final int opcode, final String type) {
-            current = current.transition( mv, Input.OTHER ) ;
+            info( 1, "visitTypeInsn[" + util.opcodeToString(opcode)
+                + "] type=" + type ) ;
+            current = current.transition( util, mv, Input.OTHER ) ;
             mv.visitTypeInsn(opcode, type);
         }
 
@@ -444,25 +435,32 @@ public class ClassTracer extends ClassAdapter {
             final String name,
             final String desc)
         {
-            current = current.transition( mv, Input.OTHER ) ;
+            info( 1, "visitFieldInsn[" + util.opcodeToString(opcode)
+                + "] " + owner + "." + name + desc ) ;
+            current = current.transition( util, mv, Input.OTHER ) ;
             mv.visitFieldInsn(opcode, owner, name, desc);
         }
 
         @Override
         public void visitJumpInsn(final int opcode, final Label label) {
-            current = current.transition(  mv, Input.OTHER ) ;
+            info( 1, "visitTypeInsn[" + util.opcodeToString(opcode)
+                + "] label=" + label ) ;
+            current = current.transition( util,  mv, Input.OTHER ) ;
             mv.visitJumpInsn(opcode, label);
         }
 
         @Override
         public void visitLdcInsn(final Object cst) {
-            current = current.transition(  mv, Input.OTHER ) ;
+            info( 1, "visitLdcInsn " + cst ) ;
+            current = current.transition( util,  mv, Input.OTHER ) ;
             mv.visitLdcInsn(cst);
         }
 
         @Override
         public void visitIincInsn(final int var, final int increment) {
-            current = current.transition( mv, Input.OTHER ) ;
+            info( 1, "visitIincInsn " + " var=" + var
+                + " increment=" + increment ) ;
+            current = current.transition( util, mv, Input.OTHER ) ;
             mv.visitIincInsn(var, increment);
         }
 
@@ -473,7 +471,7 @@ public class ClassTracer extends ClassAdapter {
             final Label dflt,
             final Label[] labels)
         {
-            current = current.transition( mv, Input.OTHER ) ;
+            current = current.transition( util, mv, Input.OTHER ) ;
             mv.visitTableSwitchInsn(min, max, dflt, labels);
         }
 
@@ -483,21 +481,21 @@ public class ClassTracer extends ClassAdapter {
             final int[] keys,
             final Label[] labels)
         {
-            current = current.transition( mv, Input.OTHER ) ;
+            current = current.transition( util, mv, Input.OTHER ) ;
             mv.visitLookupSwitchInsn(dflt, keys, labels);
         }
 
         @Override
         public void visitMultiANewArrayInsn(final String desc, final int dims) {
-            current = current.transition( mv, Input.OTHER ) ;
+            current = current.transition( util, mv, Input.OTHER ) ;
             mv.visitMultiANewArrayInsn(desc, dims);
         }
-    }
-
+    } // end of MonitoredMethodEnhancer
 
     @Override
     public MethodVisitor visitMethod( final int access, final String name,
         final String desc, final String sig, final String[] exceptions ) {
+        info( 1, "visitMethod: " + name + desc ) ;
         // Enhance the class first (part 1).
         // - Modify all of the @InfoMethod methods with extra arguments
         // - Modify all calls to @InfoMethod methods to add the extra arguments
@@ -517,8 +515,22 @@ public class ClassTracer extends ClassAdapter {
                 return mv ;
 
             case MONITORED_METHOD :
-                return new MonitoredMethodEnhancer( access, name, desc, mv ) ;
+                MonitoredMethodEnhancer mme = new MonitoredMethodEnhancer(
+                    access, name, desc, mv ) ;
+                AnalyzerAdapter aa = new AnalyzerAdapter( ecd.getClassName(), 
+                    access, name, desc, mme ) ;
+                LocalVariablesSorter lvs = new LocalVariablesSorter( access,
+                    desc, aa ) ;
+                mme.setLocalVariablesSorter(lvs);
 
+                // This is not useful UNLESS we catch an exception,
+                // and then provide an interface to dig the accumulated
+                // data out of the TraceMethodVisitor (with getText or Print)
+                // if (util.getDebug()) {
+                    // lvs = new TraceMethodVisitor( lvs ) ;
+                // }
+
+                return lvs ;
         }
 
         return null ;

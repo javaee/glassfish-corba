@@ -38,11 +38,11 @@
 package com.sun.tools.corba.se.enhancer;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitor;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import org.glassfish.gmbal.generic.MethodMonitor;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -50,7 +50,9 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.util.AbstractVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
+import org.objectweb.asm.util.TraceClassVisitor;
 
 /** Some useful utilities for generating code using ASM.  Nothing in here
  * should be specific to the classfile enhancer for tracing.
@@ -74,8 +76,15 @@ public class Util {
     }
 
     public void info( String str ) {
-        if (verbose > 0) {
-            msg( str ) ;
+        info( 1, str ) ; 
+    }
+
+    public void info( int level, String str ) {
+        if (verbose >= level) {
+            final String format = level>1 ? "%" + (4*(level-1) + 1) + "s"
+                                          : "%s" ;
+            final String pad = String.format( format, ">" ) ;
+            msg( pad + str ) ;
         }
     }
 
@@ -88,6 +97,7 @@ public class Util {
     }
 
     public void initLocal( MethodVisitor mv, LocalVariableNode var ) {
+        info( 2, "Initializing variable " + var ) ;
         var.accept( mv ) ;
         Type type = Type.getObjectType( var.desc ) ;
         switch (type.getSort()) {
@@ -133,8 +143,8 @@ public class Util {
     }
 
     public void newWithSimpleConstructor( MethodVisitor mv, Class cls ) {
-        info( "generating new for class " + cls ) ;
-        Type type = Type.getType( ArrayList.class ) ;
+        info( 2, "generating new for class " + cls ) ;
+        Type type = Type.getType( cls ) ;
         mv.visitTypeInsn( Opcodes.NEW, type.getInternalName() );
         mv.visitInsn( Opcodes.DUP ) ;
         mv.visitMethodInsn( Opcodes.INVOKESPECIAL,
@@ -142,7 +152,7 @@ public class Util {
     }
 
     String augmentInfoMethodDescriptor( String desc ) {
-        info( "Augmenting infoMethod descriptor " + desc ) ;
+        info( 2, "Augmenting infoMethod descriptor " + desc ) ;
         // Compute new descriptor
         Type[] oldArgTypes = Type.getArgumentTypes( desc ) ;
         Type retType = Type.getReturnType( desc ) ;
@@ -157,12 +167,12 @@ public class Util {
         argTypes[oldlen+1] = Type.getType( Object.class ) ;
 
         String newDesc = Type.getMethodDescriptor(retType, argTypes) ;
-        info( "    result is " + newDesc ) ;
+        info( 3, "result is " + newDesc ) ;
         return newDesc ;
     }
 
     public void emitIntConstant( MethodVisitor mv, int val ) {
-        info( "Emitting constant " + val ) ;
+        info( 2, "Emitting constant " + val ) ;
         if (val <= 5) {
             switch (val) {
                 case 0:
@@ -193,7 +203,7 @@ public class Util {
     // an Object as needed.  Returns the index of the next
     // argument.
     public int wrapArg( MethodVisitor mv, int argIndex, Type atype ) {
-        info( "Emitting code to wrap argument at " + argIndex
+        info( 2, "Emitting code to wrap argument at " + argIndex
             + " of type " + atype ) ;
 
         switch (atype.getSort() ) {
@@ -256,7 +266,7 @@ public class Util {
     // Emit code to wrap all of the argumnts as Object[],
     // which is left on the stack
     void wrapArgs( MethodVisitor mv, int access, String desc ) {
-        info( "Wrapping args for descriptor " + desc ) ;
+        info( 2, "Wrapping args for descriptor " + desc ) ;
 
         Type[] atypes = Type.getArgumentTypes( desc ) ;
         emitIntConstant( mv, atypes.length ) ;
@@ -329,24 +339,59 @@ public class Util {
 
     private void verify( byte[] cls ) {
         if (getDebug()) {
+            info( "Verifying enhanced class") ;
             ClassReader cr = new ClassReader( cls ) ;
             PrintWriter pw = new PrintWriter( System.out ) ;
             CheckClassAdapter.verify( cr, true, pw ) ;
         }
     }
 
-    public byte[] transform( byte[] cls,
-        UnaryFunction<ClassWriter,ClassAdapter> factory ) {
+    public boolean hasAccess( int access, int flag ) {
+        return (access & flag) == flag ;
+    }
 
-        ClassReader cr = new ClassReader(cls) ;
-        ClassWriter cw = new ClassWriter(
+    public String opcodeToString( int opcode ) {
+        String[] opcodes = AbstractVisitor.OPCODES ;
+        if ((opcode < 0) || (opcode > opcodes.length)) {
+            return "ILLEGAL[" + opcode + "]" ;
+        } else {
+            return opcodes[opcode] ;
+        }
+    }
+
+    public byte[] transform( final boolean debug, final byte[] cls,
+        final UnaryFunction<ClassVisitor,ClassAdapter> factory ) {
+
+        final ClassReader cr = new ClassReader(cls) ;
+        final ClassWriter cw = new ClassWriter(
             ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS ) ;
+
+        PrintWriter pw = null ;
+        TraceClassVisitor tcv = null ;
+        ClassVisitor cv = cw ;
+
+        if (debug) {
+            pw = new PrintWriter( System.out ) ;
+            tcv = new TraceClassVisitor( cw, new PrintWriter( System.out ) ) ; 
+            cv = tcv ;
+        }
+
         ClassAdapter xform = factory.evaluate( cw ) ;
-        cr.accept( xform, 0 ) ;
+
+        try {
+            cr.accept( xform, ClassReader.EXPAND_FRAMES ) ;
+        } catch (Exception exc) {
+            System.out.println( "Exception: " + exc ) ;
+            exc.printStackTrace() ;
+        } finally {
+            if (pw != null) {
+                pw.flush() ;
+                pw.close() ;
+            }
+        }
 
         byte[] enhancedClass = cw.toByteArray() ;
 
-        info( "Verifying enhanced class") ;
         verify( enhancedClass ) ;
 
         return enhancedClass ;

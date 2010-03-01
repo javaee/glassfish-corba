@@ -1,6 +1,37 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+ * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
  */
 
 package com.sun.tools.corba.se.enhancer;
@@ -29,8 +60,13 @@ public class ClassEnhancer extends ClassAdapter {
         this.ecd = ecd ;
     }
 
+    private void info( int level, String msg ) {
+        util.info( level, "ClassEnhancer: " + msg ) ;
+    }
+
     @Override
     public void visitEnd() {
+        info( 1, "visitEnd") ;
         // Add the additional fields
         final String desc = Type.getDescriptor(
             SynchronizedHolder.class ) ;
@@ -44,11 +80,12 @@ public class ClassEnhancer extends ClassAdapter {
         final String sig = null ;
 
         for (String fname : ecd.getAnnotationToHolderName().values()) {
-            util.info( "Adding field " + fname + " of type " + desc ) ;
+            info( 2, "Adding field " + fname + " of type " + desc ) ;
             cv.visitField( acc, fname, desc, sig, null ) ;
         }
 
         if (!hasStaticInitializer) {
+            info( 2, "creating static init") ;
             int siacc = Opcodes.ACC_STATIC + Opcodes.ACC_PRIVATE ;
             MethodVisitor mv = cv.visitMethod( siacc, "<clinit>", "()V",
                 null, null ) ;
@@ -63,56 +100,67 @@ public class ClassEnhancer extends ClassAdapter {
         super.visitEnd() ;
     }
 
-    // add MethodMonitor and Object parameters to end of params
-    // generate body
-    private void handleInfoMethod( int access, String name, String desc ) {
-        util.info( "InfoMethod " + name + desc ) ;
+    public class InfoMethodRewriter extends GeneratorAdapter {
+        private int access ;
+        private String name ;
+        private String desc ;
 
-        String newDesc = util.augmentInfoMethodDescriptor( desc ) ;
-        MethodVisitor mv = cv.visitMethod( access, name, newDesc,
-            null, null ) ;
+        // Note that desc is the descriptor of the unaugmented method:
+        // no MethodMonitor or Object at the end of the args.
+        public InfoMethodRewriter( MethodVisitor mv,
+            int acc, String name, String desc ) {
 
-        mv.visitCode() ;
-
-        Type[] argTypes = Type.getArgumentTypes( desc ) ;
-        int argSize = 0 ;
-        for (Type type : argTypes) {
-            argSize += type.getSize() ;
+            super( mv, acc, name, desc ) ;
+            this.access = acc ;
+            this.name = name ;
+            this.desc = desc ;
         }
 
-        // Parameter layout on stack:
-        // 0: this
-        // 1 to argSize: declared args
-        // size: MethodMonitor
-        // size+1: caller ident
-        int mmIndex = argSize ;
-        int cidIndex = argSize + 1 ;
+        // add MethodMonitor and Object parameters to end of params
+        // generate body
+        @Override
+        public void visitCode() {
+            info( 1, "InfoMethodRewriter: visitCode " + name + desc ) ;
 
-        Label jumpLabel = new Label() ;
-        mv.visitVarInsn( Opcodes.ALOAD, mmIndex ) ;
-        mv.visitJumpInsn( Opcodes.IFNULL, jumpLabel) ;
+            final boolean isStatic = util.hasAccess( access, 
+                Opcodes.ACC_STATIC ) ;
+            final Type[] argTypes = Type.getArgumentTypes( desc ) ;
+            int argSize = isStatic ? 0 : 1 ;
+            for (Type type : argTypes) {
+                argSize += type.getSize() ;
+            }
 
-        // mm.info( <args>, callerId, selfId )
-        mv.visitVarInsn( Opcodes.ALOAD, mmIndex ) ;
+            info( 2, "InfoMethodRewriter: initial arg size " + argSize ) ;
 
-        util.wrapArgs( mv, access, desc ) ;
+            int mmIndex = argSize ;
+            int cidIndex = argSize + 1 ;
 
-        mv.visitVarInsn( Opcodes.ALOAD, cidIndex ) ;
+            Label jumpLabel = new Label() ;
+            mv.visitVarInsn( Opcodes.ALOAD, mmIndex ) ;
+            mv.visitJumpInsn( Opcodes.IFNULL, jumpLabel) ;
 
-        util.emitIntConstant( mv, ecd.getMethodIndex( name )) ;
-        mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-            "java/lang/Integer", "valueOf",
-            "(I)Ljava/lang/Integer;" );
+            // mm.info( <args>, callerId, selfId )
+            mv.visitVarInsn( Opcodes.ALOAD, mmIndex ) ;
 
-        mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
-            EnhancedClassData.MM_NAME, "info",
-            "([Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V") ;
+            util.wrapArgs( mv, access, desc ) ;
 
-        mv.visitLabel( jumpLabel ) ;
-        mv.visitInsn( Opcodes.RETURN ) ;
+            mv.visitVarInsn( Opcodes.ALOAD, cidIndex ) ;
 
-        mv.visitMaxs( 0, 0 ) ;
-        mv.visitEnd() ;
+            util.emitIntConstant( mv, ecd.getMethodIndex( name )) ;
+            mv.visitMethodInsn( Opcodes.INVOKESTATIC,
+                "java/lang/Integer", "valueOf",
+                "(I)Ljava/lang/Integer;" );
+
+            mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
+                EnhancedClassData.MM_NAME, "info",
+                "([Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V") ;
+
+            mv.visitLabel( jumpLabel ) ;
+
+            // Method should already have a RETURN at the end, so just let
+            // the default behavior copy it.
+            // mv.visitInsn( Opcodes.RETURN ) ;
+        }
     }
 
     public class InfoMethodCallRewriter extends GeneratorAdapter {
@@ -125,7 +173,7 @@ public class ClassEnhancer extends ClassAdapter {
         @Override
         public void visitMethodInsn( int opcode, String owner,
             String name, String desc ) {
-            util.info( "MM method: visitMethodInsn: " + owner
+            info( 1, "InfoMethodCallRewriter: visitMethodInsn: " + owner
                 + "." + name + desc ) ;
 
             // If opcode is INVOKESPECIAL, owner is this class, and name/desc
@@ -137,7 +185,8 @@ public class ClassEnhancer extends ClassAdapter {
                 && (ecd.classifyMethod(fullDesc)
                     == EnhancedClassData.MethodType.INFO_METHOD))) {
 
-                util.info( "    rewriting method call" ) ;
+                info( 2, "InfoMethodCallRewriter: visitMethodInsn: "
+                    + "rewriting method call" ) ;
 
                 // For the re-write, just pass nulls.  These instructions
                 // will be replaced when tracing is enabled.
@@ -151,6 +200,8 @@ public class ClassEnhancer extends ClassAdapter {
                 String newDesc = util.augmentInfoMethodDescriptor(desc) ;
 
                 mv.visitMethodInsn(opcode, owner, name, newDesc );
+            } else {
+                mv.visitMethodInsn(opcode, owner, name, desc );
             }
         }
     }
@@ -165,7 +216,7 @@ public class ClassEnhancer extends ClassAdapter {
         @Override
         public void visitMethodInsn( int opcode, String owner,
             String name, String desc ) {
-            util.info( "MM method: visitMethodInsn: " + owner
+            info( 1, "NormalMethodChecker: visitMethodInsn: " + owner
                 + "." + name + desc ) ;
 
             // If opcode is INVOKESPECIAL, owner is this class, and name/desc
@@ -188,7 +239,11 @@ public class ClassEnhancer extends ClassAdapter {
     @Override
     public MethodVisitor visitMethod( final int access, final String name,
         final String desc, final String sig, final String[] exceptions ) {
-        // Enhance the class first (part 1).
+        info( 1, "visitMethod " + name + desc ) ;
+
+        // Enhance the class first (this changes the "schema" of the class).
+        // - Enhance the static initializer so that the class will be properly
+        //   registered with the tracing facility.
         // - Modify all of the @InfoMethod methods with extra arguments
         // - Modify all calls to @InfoMethod methods to add the extra arguments
         //   or to flag an error if NOT called from an MM method.
@@ -208,8 +263,10 @@ public class ClassEnhancer extends ClassAdapter {
                     ecd ) ;
 
             case INFO_METHOD :
-                handleInfoMethod( access, name, desc ) ;
-                return null ;
+                String newDesc = util.augmentInfoMethodDescriptor( desc ) ;
+                mv = super.visitMethod( access, name, newDesc,
+                    sig, exceptions ) ;
+                return new InfoMethodRewriter( mv, access, name, desc ) ;
 
             case MONITORED_METHOD :
                 mv = super.visitMethod( access, name, desc,

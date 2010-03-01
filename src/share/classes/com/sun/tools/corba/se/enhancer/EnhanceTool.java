@@ -77,7 +77,13 @@ public class EnhanceTool {
         @DefaultValue( "trace" )
         @Help( "Class file enhance action to use" )
         String action() ;
+
+        @DefaultValue( "false")
+        @Help( "If true, write output to a .class.new file")
+        boolean newout() ;
     }
+
+    private Arguments args ;
 
     public interface StandardSupport {
         void setDebug( boolean flag ) ;
@@ -93,7 +99,7 @@ public class EnhanceTool {
         StandardSupport {
     }
 
-    private static class EnhancerFileAction implements Scanner.Action {
+    private class EnhancerFileAction implements Scanner.Action {
         private EnhanceFunction ea ;
 
         public EnhancerFileAction( EnhanceFunction ea ) {
@@ -105,7 +111,13 @@ public class EnhanceTool {
                 byte[] inputData = fw.readAll() ;
                 byte[] outputData = ea.evaluate( inputData ) ;
                 if (outputData != null) {
-                    fw.writeAll( outputData ) ;
+                    if (args.newout()) {
+                        String fname = fw.getName() + ".new" ;
+                        FileWrapper fwo = new FileWrapper( fname ) ;
+                        fwo.writeAll( outputData ) ;
+                    } else {
+                        fw.writeAll( outputData ) ;
+                    }
                 }
                 return true ;
             } catch (IOException exc) {
@@ -114,7 +126,7 @@ public class EnhanceTool {
         }
     }
 
-    private static void generatePropertiesFile( Arguments args,
+    private void generatePropertiesFile( Arguments args,
         Set<String> anames ) throws IOException {
 
         // Resource file that lists all MM annotations:
@@ -141,7 +153,7 @@ public class EnhanceTool {
         }
     }
 
-    private static final Scanner.Action makeIgnoreAction(
+    private final Scanner.Action makeIgnoreAction(
         final boolean trace ) {
 
         return new Scanner.Action() {
@@ -160,13 +172,13 @@ public class EnhanceTool {
         } ;
     }
 
-    private static void setArgs( Arguments args, StandardSupport ss ) {
+    private void setArgs( Arguments args, StandardSupport ss ) {
         ss.setDebug( args.debug() );
         ss.setVerbose( args.verbose() );
         ss.setDryrun( args.dryrun() );
     }
 
-    private static void doScan( Arguments args, ActionFactory af,
+    private void doScan( Arguments args, ActionFactory af,
         Scanner scanner, Scanner.Action classAct ) throws IOException {
 
         final Recognizer classRecognizer = af.getRecognizerAction() ;
@@ -177,11 +189,11 @@ public class EnhanceTool {
         scanner.scan( classRecognizer ) ;
     }
 
-    public static void main( String[] strs ) {
+    public void run( String[] strs ) {
         try {
             final ArgParser<Arguments> ap = new ArgParser<Arguments>(
                 Arguments.class ) ;
-            final Arguments args = ap.parse( strs ) ;
+            args = ap.parse( strs ) ;
 
             final ActionFactory af = new ActionFactory( args.verbose(),
                 args.dryrun() ) ;
@@ -200,7 +212,7 @@ public class EnhanceTool {
 
             generatePropertiesFile( args, anames ) ;
 
-            TraceEnhanceFunction ea = new TraceEnhanceFunction() ;
+            Transformer ea = new Transformer() ;
             setArgs( args, ea ) ;
             ea.setMMGAnnotations( anames );
 
@@ -211,5 +223,9 @@ public class EnhanceTool {
             System.out.println( "Exception: " + exc ) ;
             exc.printStackTrace() ;
         }
+    }
+
+    public static void main( String[] strs ) {
+        (new EnhanceTool()).run( strs ) ;
     }
 }

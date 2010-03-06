@@ -50,6 +50,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.LocalVariablesSorter;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LocalVariableNode;
 
 /**
  *
@@ -68,14 +70,15 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         util.info( "StaticInitVisitor created" ) ;
     }
 
-    private int defineLocal( MethodVisitor mv, String name, Class<?> cls,
+    private LocalVariableNode defineLocal( MethodVisitor mv, String name, Class<?> cls,
         Label start, Label end ) {
 
         Type type = Type.getType( cls ) ;
         int index = newLocal( type ) ;
-        mv.visitLocalVariable( name, type.getDescriptor(), null,
-            start, end, index) ;
-        return index ;
+        LabelNode snode = new LabelNode( start ) ;
+        LabelNode enode = new LabelNode( end ) ;
+        return new LocalVariableNode( name, type.getDescriptor(), null,
+            snode, enode, index ) ;
     }
 
     @Override
@@ -88,9 +91,12 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 
         mv.visitLabel( start ) ;
 
-        int thisClass = defineLocal( mv, "thisClass", Class.class, start, end ) ;
-        int mnameList = defineLocal( mv, "mnameList", List.class, start, end ) ;
-        int holderMap = defineLocal( mv, "holderMap", Map.class, start, end ) ;
+        LocalVariableNode thisClass = defineLocal( mv, "thisClass",
+            Class.class, start, end ) ;
+        LocalVariableNode mnameList = defineLocal( mv, "mnameList",
+            List.class, start, end ) ;
+        LocalVariableNode holderMap = defineLocal( mv, "holderMap",
+            Map.class, start, end ) ;
 
         // initialize the holders
         for (String str : ecd.getAnnotationToHolderName().values()) {
@@ -102,15 +108,15 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         }
 
         mv.visitLdcInsn( Type.getType( "L" + ecd.getClassName() + ";" ));
-        mv.visitVarInsn( Opcodes.ASTORE, thisClass ) ;
+        mv.visitVarInsn( Opcodes.ASTORE, thisClass.index ) ;
 
         // create list of method names and init
         util.newWithSimpleConstructor( mv, ArrayList.class ) ;
-        mv.visitVarInsn( Opcodes.ASTORE, mnameList ) ;
+        mv.visitVarInsn( Opcodes.ASTORE, mnameList.index ) ;
 
         for (String str : ecd.getMethodNames()) {
             util.info( "Generating code to add " + str + " to methodNames" ) ;
-            mv.visitVarInsn( Opcodes.ALOAD, mnameList ) ;
+            mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
             mv.visitLdcInsn( str );
             mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 "java/util/List", "add", "(Ljava/lang/Object;)Z" );
@@ -119,7 +125,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 
         // create map from MM annotation class to Holder and init
         util.newWithSimpleConstructor( mv, HashMap.class ) ;
-        mv.visitVarInsn( Opcodes.ASTORE, holderMap ) ;
+        mv.visitVarInsn( Opcodes.ASTORE, holderMap.index ) ;
 
         for (Map.Entry<String,String> entry :
             ecd.getAnnotationToHolderName().entrySet()) {
@@ -127,7 +133,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
             util.info( "Generating code to put " + entry.getKey() + "=>"
                 + entry.getValue() + " into holderMap" ) ;
 
-            mv.visitVarInsn( Opcodes.ALOAD, holderMap ) ;
+            mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;
 
             Type annoType = Type.getType( "L" + entry.getKey() + ";" ) ;
             mv.visitLdcInsn( annoType );
@@ -145,9 +151,9 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 
         // register with MethodMonitorRegistry
         util.info( "Generating code call MethodMonitorRegistry.registerClass" ) ;
-        mv.visitVarInsn( Opcodes.ALOAD, thisClass ) ;
-        mv.visitVarInsn( Opcodes.ALOAD, mnameList ) ;
-        mv.visitVarInsn( Opcodes.ALOAD, holderMap ) ;
+        mv.visitVarInsn( Opcodes.ALOAD, thisClass.index ) ;
+        mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
+        mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;
 
         Type mmrType = Type.getType( MethodMonitorRegistry.class ) ;
         String mdesc = "(Ljava/lang/Class;Ljava/util/List;Ljava/util/Map;)V" ;
@@ -155,6 +161,10 @@ public class StaticInitVisitor extends LocalVariablesSorter {
             mmrType.getInternalName(), "registerClass", mdesc ) ;
 
         mv.visitLabel( end ) ;
+
+        thisClass.accept( mv ) ;
+        mnameList.accept( mv ) ;
+        holderMap.accept( mv ) ;
 
         mv.visitInsn( Opcodes.RETURN ) ;
     }

@@ -222,7 +222,6 @@ public class MethodMonitorFactoryDefaults {
                     return sb.toString() ;
                 }
 
-                @Override
                 public void enter( Object ident, Object... args ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
@@ -230,14 +229,12 @@ public class MethodMonitorFactoryDefaults {
                     dprint( mname, "->" + str ) ;
                 }
 
-                @Override
                 public void exception( Object ident, Throwable thr ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, ":throw:" + thr ) ;
                 }
 
-                @Override
                 public void info( Object[] args, Object callerId,
                     Object selfId ) {
 
@@ -249,21 +246,18 @@ public class MethodMonitorFactoryDefaults {
                     dprint( mname, "::(" + infoName + ")" + str ) ;
                 }
 
-                @Override
                 public void exit( Object ident ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, "<-" ) ;
                 }
 
-                @Override
                 public void exit( Object ident, Object retVal ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, "<-(" + retVal + ")" ) ;
                 }
 
-                @Override
                 public void clear() {
                     // NO-OP
                 }

@@ -81,6 +81,10 @@ public class EnhanceTool {
         @DefaultValue( "false")
         @Help( "If true, write output to a .class.new file")
         boolean newout() ;
+
+        @DefaultValue( "true" )
+        @Help( "If true, do second phase (add tracing code) processing")
+        boolean tracegen() ;
     }
 
     private Arguments args ;
@@ -212,7 +216,7 @@ public class EnhanceTool {
 
             generatePropertiesFile( args, anames ) ;
 
-            Transformer ea = new Transformer() ;
+            Transformer ea = new Transformer( args.tracegen() ) ;
             setArgs( args, ea ) ;
             ea.setMMGAnnotations( anames );
 

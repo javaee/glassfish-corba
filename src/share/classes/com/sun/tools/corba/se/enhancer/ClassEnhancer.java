@@ -89,6 +89,9 @@ public class ClassEnhancer extends ClassAdapter {
             int siacc = Opcodes.ACC_STATIC + Opcodes.ACC_PRIVATE ;
             MethodVisitor mv = cv.visitMethod( siacc, "<clinit>", "()V",
                 null, null ) ;
+            if (util.getDebug()) {
+                mv = new SimpleMethodTracer(mv) ;
+            }
             MethodAdapter ma = new StaticInitVisitor( siacc, "()V", mv,
                 util, ecd ) ;
 
@@ -258,6 +261,9 @@ public class ClassEnhancer extends ClassAdapter {
             case STATIC_INITIALIZER :
                 mv = super.visitMethod( access, name, desc,
                     sig, exceptions ) ;
+                if (util.getDebug()) {
+                    mv = new SimpleMethodTracer(mv) ;
+                }
                 hasStaticInitializer = true ;
                 return new StaticInitVisitor( access, desc, mv, util,
                     ecd ) ;
@@ -266,16 +272,25 @@ public class ClassEnhancer extends ClassAdapter {
                 String newDesc = util.augmentInfoMethodDescriptor( desc ) ;
                 mv = super.visitMethod( access, name, newDesc,
                     sig, exceptions ) ;
+                if (util.getDebug()) {
+                    mv = new SimpleMethodTracer(mv) ;
+                }
                 return new InfoMethodRewriter( mv, access, name, desc ) ;
 
             case MONITORED_METHOD :
                 mv = super.visitMethod( access, name, desc,
                     sig, exceptions ) ;
+                if (util.getDebug()) {
+                    mv = new SimpleMethodTracer(mv) ;
+                }
                 return new InfoMethodCallRewriter( mv, access, name, desc ) ;
 
             case NORMAL_METHOD :
                 mv = super.visitMethod( access, name, desc,
                     sig, exceptions ) ;
+                if (util.getDebug()) {
+                    mv = new SimpleMethodTracer(mv) ;
+                }
                 return new NormalMethodChecker( mv, access, name, desc) ;
         }
 

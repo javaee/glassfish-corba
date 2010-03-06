@@ -98,8 +98,7 @@ public class Util {
 
     public void initLocal( MethodVisitor mv, LocalVariableNode var ) {
         info( 2, "Initializing variable " + var ) ;
-        var.accept( mv ) ;
-        Type type = Type.getObjectType( var.desc ) ;
+        Type type = Type.getType( var.desc ) ;
         switch (type.getSort()) {
             case Type.BOOLEAN :
             case Type.CHAR :
@@ -350,7 +349,7 @@ public class Util {
         return (access & flag) == flag ;
     }
 
-    public String opcodeToString( int opcode ) {
+    public static String opcodeToString( int opcode ) {
         String[] opcodes = AbstractVisitor.OPCODES ;
         if ((opcode < 0) || (opcode > opcodes.length)) {
             return "ILLEGAL[" + opcode + "]" ;
@@ -364,6 +363,7 @@ public class Util {
 
         final ClassReader cr = new ClassReader(cls) ;
         final ClassWriter cw = new ClassWriter(
+            // ClassWriter.COMPUTE_MAXS ) ;
             ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS ) ;
 
         PrintWriter pw = null ;
@@ -376,7 +376,7 @@ public class Util {
             cv = tcv ;
         }
 
-        ClassAdapter xform = factory.evaluate( cw ) ;
+        ClassAdapter xform = factory.evaluate( cv ) ;
 
         try {
             cr.accept( xform, ClassReader.EXPAND_FRAMES ) ;

@@ -87,16 +87,18 @@ import org.objectweb.asm.tree.ClassNode;
  * @author ken
  */
 public class Transformer implements EnhanceTool.EnhanceFunction {
+    private final boolean tracegen ;
+
     private boolean dryrun ;
     private Set<String> annotationNames = null ;
-
     private Util util = new Util();
 
     // These fields are initialized in the evaluate method.
     private ClassNode currentClass = null ;
     private EnhancedClassData ecd = null ;
 
-    public Transformer() {
+    public Transformer( boolean tracegen ) {
+        this.tracegen = tracegen ;
     }
 
     public void setMMGAnnotations(Set<String> mmgAnnotations) {
@@ -165,14 +167,18 @@ public class Transformer implements EnhanceTool.EnhanceFunction {
         //     It must NOT modify its input visitor (or you get an
         //     infinite series of calls to onMethodExit...)
 
-        final byte[] phase2 = util.transform( util.getDebug(), phase1,
-            new UnaryFunction<ClassVisitor, ClassAdapter>() {
+        if (tracegen) {
+            final byte[] phase2 = util.transform( util.getDebug(), phase1,
+                new UnaryFunction<ClassVisitor, ClassAdapter>() {
 
-            public ClassAdapter evaluate(ClassVisitor arg) {
-                return new ClassTracer( util, ecd, arg ) ;
-            }
-        }) ;
+                public ClassAdapter evaluate(ClassVisitor arg) {
+                    return new ClassTracer( util, ecd, arg ) ;
+                }
+            }) ;
 
-        return phase2 ;
+            return phase2 ;
+        } else {
+            return phase1 ;
+        }
     }
 }

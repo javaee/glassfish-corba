@@ -363,23 +363,23 @@ public class Util {
 
         final ClassReader cr = new ClassReader(cls) ;
         final ClassWriter cw = new ClassWriter(
-            // ClassWriter.COMPUTE_MAXS ) ;
-            ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS ) ;
+            ClassWriter.COMPUTE_MAXS ) ;
+            // ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS ) ;
 
         PrintWriter pw = null ;
-        TraceClassVisitor tcv = null ;
+        // TraceClassVisitor tcv = null ;
         ClassVisitor cv = cw ;
 
         if (debug) {
             pw = new PrintWriter( System.out ) ;
-            tcv = new TraceClassVisitor( cw, new PrintWriter( System.out ) ) ; 
-            cv = tcv ;
+            // tcv = new TraceClassVisitor( cw, new PrintWriter( System.out ) ) ;
+            // cv = tcv ;
         }
 
         ClassAdapter xform = factory.evaluate( cv ) ;
 
         try {
-            cr.accept( xform, ClassReader.EXPAND_FRAMES ) ;
+            cr.accept( xform, ClassReader.SKIP_FRAMES ) ;
         } catch (Exception exc) {
             System.out.println( "Exception: " + exc ) ;
             exc.printStackTrace() ;

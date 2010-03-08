@@ -48,9 +48,14 @@ import org.objectweb.asm.Type;
  * @author ken
  */
 public interface EnhancedClassData {
-    String SH_NAME = Type.getInternalName( SynchronizedHolder.class ) ;
+    Type OBJECT_TYPE = Type.getType( Object.class ) ;
+    String OBJECT_NAME = OBJECT_TYPE.getInternalName() ;
 
-    String MM_NAME = Type.getInternalName( MethodMonitor.class ) ;
+    Type SH_TYPE = Type.getType( SynchronizedHolder.class ) ;
+    String SH_NAME = SH_TYPE.getInternalName() ;
+
+    Type MM_TYPE = Type.getType( MethodMonitor.class ) ;
+    String MM_NAME = MM_TYPE.getInternalName() ;
 
     String INFO_METHOD_NAME = Type.getInternalName( InfoMethod.class ) ;
 

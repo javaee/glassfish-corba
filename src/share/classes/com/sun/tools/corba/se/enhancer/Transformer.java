@@ -124,7 +124,7 @@ public class Transformer implements EnhanceTool.EnhanceFunction {
     public byte[] evaluate( final byte[] arg) {
         final ClassNode cn = new ClassNode() ;
         final ClassReader cr = new ClassReader( arg ) ;
-        cr.accept( cn, ClassReader.EXPAND_FRAMES ) ;
+        cr.accept( cn, ClassReader.SKIP_FRAMES ) ;
 
         // Ignore annotations and interfaces.
         if (util.hasAccess(cn.access, Opcodes.ACC_ANNOTATION) ||

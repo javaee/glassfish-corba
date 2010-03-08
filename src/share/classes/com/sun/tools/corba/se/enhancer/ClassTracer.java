@@ -205,6 +205,30 @@ public class ClassTracer extends ClassAdapter {
             returnOpcodes.add( Opcodes.DRETURN ) ;
         }
 
+        private Object getTypeForStackMap( Type type ) {
+            switch (type.getSort()) {
+                case Type.VOID :
+                    return null ;
+                case Type.BOOLEAN :
+                case Type.CHAR :
+                case Type.BYTE :
+                case Type.SHORT :
+                case Type.INT :
+                    return Opcodes.INTEGER ;
+                case Type.LONG :
+                    return Opcodes.LONG ;
+                case Type.FLOAT :
+                    return Opcodes.FLOAT ;
+                case Type.DOUBLE :
+                    return Opcodes.DOUBLE ;
+                case Type.ARRAY :
+                case Type.OBJECT :
+                    return type.getInternalName() ;
+            }
+
+            return null ;
+        }
+
         @Override
         public void visitCode() {
             info( 1, "visitCode" ) ;
@@ -213,7 +237,18 @@ public class ClassTracer extends ClassAdapter {
             lmv.visitTryCatchBlock( start, end, excHandler, null );
 
             lmv.visitLabel(start);
+/*
+            final Object rt = getTypeForStackMap( Type.getReturnType( desc ) )  ;
+            final Object[] locals = (rt == null)
+                ? new Object[] { ecd.getClassName(),
+                    EnhancedClassData.OBJECT_NAME, EnhancedClassData.MM_NAME }
+                : new Object[] { ecd.getClassName(), rt,
+                    EnhancedClassData.OBJECT_NAME, EnhancedClassData.MM_NAME } ;
 
+            Object[] stack = new Type[] { } ;
+            lmv.visitFrame(Opcodes.F_NEW, locals.length, locals, 
+                stack.length, stack) ;
+*/
             // __result = null or 0 (type specific, omitted if void return)
             if (__result != null) {
                 util.initLocal( lmv, __result ) ;

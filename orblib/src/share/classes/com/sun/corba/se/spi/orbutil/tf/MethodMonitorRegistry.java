@@ -274,24 +274,18 @@ public class MethodMonitorRegistry {
      * @param identifier An Integer representing the method name.
      * @return The name of the method corresponding to the identifier.
      */
-    public static String getMethodName( Class<?> cls, Object identifier ) {
-        if (!(identifier instanceof Integer)) {
-            throw new RuntimeException( "identifier is not an Integer" ) ;
-        }
-
-        Integer idVal = (Integer)identifier ;
-
+    public static String getMethodName( Class<?> cls, int identifier ) {
         List<String> names = classToMNames.get( cls ) ;
 
         if (names == null) {
             throw new RuntimeException( "Class " + cls + " not found in map" ) ;
         }
 
-        if (idVal < 0 || idVal >= names.size()) {
+        if (identifier < 0 || identifier >= names.size()) {
             throw new RuntimeException( "identifier is out of range" ) ;
         }
 
-        return names.get( idVal ) ;
+        return names.get( identifier ) ;
     }
 
     private static final MethodMonitorGroup checkAnnotation(

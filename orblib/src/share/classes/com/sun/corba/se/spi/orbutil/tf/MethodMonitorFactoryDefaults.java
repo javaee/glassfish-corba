@@ -222,21 +222,21 @@ public class MethodMonitorFactoryDefaults {
                     return sb.toString() ;
                 }
 
-                public void enter( Object ident, Object... args ) {
+                public void enter( int ident, Object... args ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     String str = makeString( args ) ;
                     dprint( mname, "->" + str ) ;
                 }
 
-                public void exception( Object ident, Throwable thr ) {
+                public void exception( int ident, Throwable thr ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, ":throw:" + thr ) ;
                 }
 
-                public void info( Object[] args, Object callerId,
-                    Object selfId ) {
+                public void info( Object[] args, int callerId,
+                    int selfId ) {
 
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         callerId ) ;
@@ -246,13 +246,13 @@ public class MethodMonitorFactoryDefaults {
                     dprint( mname, "::(" + infoName + ")" + str ) ;
                 }
 
-                public void exit( Object ident ) {
+                public void exit( int ident ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, "<-" ) ;
                 }
 
-                public void exit( Object ident, Object retVal ) {
+                public void exit( int ident, Object retVal ) {
                     String mname = MethodMonitorRegistry.getMethodName( cls,
                         ident ) ;
                     dprint( mname, "<-(" + retVal + ")" ) ;
@@ -269,16 +269,16 @@ public class MethodMonitorFactoryDefaults {
         new MethodMonitorFactory() {
             public MethodMonitor create(final Class<?> cls) {
                 return new MethodMonitorBase( cls ) {
-                    public void enter(Object ident, Object... args) { }
+                    public void enter(int ident, Object... args) { }
 
-                    public void info(Object[] args, Object callerId,
-                        Object selfId ) { }
+                    public void info(Object[] args, int callerId,
+                        int selfId ) { }
 
-                    public void exit(Object ident) { }
+                    public void exit(int ident) { }
 
-                    public void exit(Object ident, Object result) { }
+                    public void exit(int ident, Object result) { }
 
-                    public void exception(Object ident, Throwable thr) { }
+                    public void exception(int ident, Throwable thr) { }
 
                     public void clear() { }
                 } ;
@@ -316,33 +316,33 @@ public class MethodMonitorFactoryDefaults {
                     }
 
                     return new MethodMonitorBase( cls ) {
-                        public void enter(Object ident, Object... args) {
+                        public void enter(int ident, Object... args) {
                             for (MethodMonitor mm : mms) {
                                 mm.enter( ident, args ) ;
                             }
                         }
 
-                        public void info( Object[] args, Object callerId,
-                            Object selfId ) {
+                        public void info( Object[] args, int callerId,
+                            int selfId ) {
 
                             for (MethodMonitor mm : mms) {
                                 mm.info( args, callerId, selfId ) ;
                             }
                         }
 
-                        public void exit(Object ident) {
+                        public void exit(int ident) {
                             for (MethodMonitor mm : mms) {
                                 mm.exit( ident ) ;
                             }
                         }
 
-                        public void exit(Object ident, Object result) {
+                        public void exit(int ident, Object result) {
                             for (MethodMonitor mm : mms) {
                                 mm.exit( ident, result ) ;
                             }
                         }
 
-                        public void exception(Object ident, Throwable thr) {
+                        public void exception(int ident, Throwable thr) {
                             for (MethodMonitor mm : mms) {
                                 mm.exception( ident, thr ) ;
                             }

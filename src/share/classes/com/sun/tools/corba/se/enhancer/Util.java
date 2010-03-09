@@ -163,7 +163,7 @@ public class Util {
         }
 
         argTypes[oldlen] = Type.getType( MethodMonitor.class ) ;
-        argTypes[oldlen+1] = Type.getType( Object.class ) ;
+        argTypes[oldlen+1] = Type.INT_TYPE ;
 
         String newDesc = Type.getMethodDescriptor(retType, argTypes) ;
         info( 3, "result is " + newDesc ) ;

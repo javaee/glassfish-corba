@@ -54,7 +54,7 @@ public interface MethodMonitor {
      * @param ident The method identifier.
      * @param args The arguments passed into the method.
      */
-    void enter( Object ident, Object... args ) ;
+    void enter( int ident, Object... args ) ;
 
     /** Invoked anywhere in the method after enter and before exit, to indicate
      * some useful tracing information in the method.
@@ -62,14 +62,14 @@ public interface MethodMonitor {
      * @param ident The method identifier.
      * @param args Any information needed in the info call.
      */
-    void info( Object[] args, Object callerIdent, Object selfIdent ) ;
+    void info( Object[] args, int callerIdent, int selfIdent ) ;
 
     /** An exit from a method that has a void return type.  Called as the last
      * operation in the method.
      *
      * @param ident The method identifier.
      */
-    void exit( Object ident ) ;
+    void exit( int ident ) ;
 
     /** An exit from a method that has a non-void return type.  Called as the last
      * operation in the method.  result will be null if the method terminates
@@ -78,7 +78,7 @@ public interface MethodMonitor {
      * @param ident The method identifier.
      * @param result The method result.
      */
-    void exit( Object ident, Object result ) ;
+    void exit( int ident, Object result ) ;
 
     /** Called to report an exception that is thrown in the method.  If the
      * method throws and catches the exception, it will still be reported.
@@ -86,7 +86,7 @@ public interface MethodMonitor {
      * @param ident The method identifier.
      * @param thr The exception that terminates the method.
      */
-    void exception( Object ident, Throwable thr ) ;
+    void exception( int ident, Throwable thr ) ;
 
     /** Provided for MethodMonitor instances that maintain state.  Simply removes
      * the state and resets the MethodMonitor to its initial state.

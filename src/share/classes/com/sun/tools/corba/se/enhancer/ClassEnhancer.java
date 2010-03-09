@@ -147,16 +147,13 @@ public class ClassEnhancer extends ClassAdapter {
 
             util.wrapArgs( mv, access, desc ) ;
 
-            mv.visitVarInsn( Opcodes.ALOAD, cidIndex ) ;
+            mv.visitVarInsn( Opcodes.ILOAD, cidIndex ) ;
 
             util.emitIntConstant( mv, ecd.getMethodIndex( name )) ;
-            mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-                "java/lang/Integer", "valueOf",
-                "(I)Ljava/lang/Integer;" );
 
             mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 EnhancedClassData.MM_NAME, "info",
-                "([Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V") ;
+                "([Ljava/lang/Object;II)V") ;
 
             mv.visitLabel( jumpLabel ) ;
 
@@ -194,7 +191,7 @@ public class ClassEnhancer extends ClassAdapter {
                 // For the re-write, just pass nulls.  These instructions
                 // will be replaced when tracing is enabled.
                 mv.visitInsn( Opcodes.ACONST_NULL ) ;
-                mv.visitInsn( Opcodes.ACONST_NULL ) ;
+                mv.visitInsn( Opcodes.ICONST_0 ) ;
 
                 // For the tracing case
                 // mv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;

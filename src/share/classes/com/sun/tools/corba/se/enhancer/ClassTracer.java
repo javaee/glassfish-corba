@@ -58,7 +58,10 @@ public class ClassTracer extends ClassAdapter {
         util.info( level, "ClassTracer: " + msg ) ;
     }
 
-    public enum Input { ACONST_NULL_BC, INFO_METHOD_CALL, OTHER }
+    // Sequence to replace: ACONST_NULL, ICONST_0, INVOKESPECIAL to an
+    // InfoMethod.
+
+    public enum Input { ACONST_NULL_BC, ICONST_0_BC, INFO_METHOD_CALL, OTHER }
 
     public enum State {
         NULL1() {
@@ -68,10 +71,11 @@ public class ClassTracer extends ClassAdapter {
                 util.info( 3, "ClassTracer: "
                     + "State transition: NULL1 state, Input " + input ) ;
                 switch (input) {
-                    case ACONST_NULL_BC :
+                    case ICONST_0_BC :
                         return State.NULL2 ;
+
+                    case ACONST_NULL_BC :
                     case INFO_METHOD_CALL :
-                        return State.NORMAL ;
                     case OTHER :
                         util.info( 4, "ClassTracer: Emitting 1 ACONST_NULL" ) ;
                         mv.visitInsn( Opcodes.ACONST_NULL ) ;
@@ -88,11 +92,14 @@ public class ClassTracer extends ClassAdapter {
                 util.info( 3, "ClassTracer: "
                     + "State transition: NULL2 state, Input " + input ) ;
                 switch (input) {
+                    case ICONST_0_BC :
                     case ACONST_NULL_BC :
                     case OTHER :
-                        util.info( 4, "ClassTracer: Emitting 2 ACONST_NULL" ) ;
+                        util.info( 4, 
+                            "ClassTracer: Emitting ACONST_NULL.ICONST_0" ) ;
                         mv.visitInsn( Opcodes.ACONST_NULL ) ;
-                        mv.visitInsn( Opcodes.ACONST_NULL ) ;
+                        mv.visitInsn( Opcodes.ICONST_0 ) ;
+
                     case INFO_METHOD_CALL :
                         return State.NORMAL ;
                 }
@@ -109,7 +116,9 @@ public class ClassTracer extends ClassAdapter {
                 switch (input) {
                     case ACONST_NULL_BC :
                         return State.NULL1 ;
+
                     case INFO_METHOD_CALL :
+                    case ICONST_0_BC :
                     case OTHER :
                         return State.NORMAL ;
                 }
@@ -162,7 +171,7 @@ public class ClassTracer extends ClassAdapter {
         // Values must be set in setLocalVariablesSorter.
         private LocalVariablesSorter lvs = null ;
         private LocalVariableNode __result = null ;
-        private LocalVariableNode __ident = null ;
+        private int identVal ;
         private LocalVariableNode __mm = null ;
 
         public void setLocalVariablesSorter( final LocalVariablesSorter lvs ) {
@@ -178,11 +187,6 @@ public class ClassTracer extends ClassAdapter {
                 __result = null ;
             }
 
-            type = Type.getType(Object.class) ;
-            __ident = new LocalVariableNode( "__$ident$__",
-                type.getDescriptor(),
-                null, startNode, endNode, lvs.newLocal(type)) ;
-
             type = Type.getType( MethodMonitor.class );
             __mm = new LocalVariableNode( "__$mm$__",
                 type.getDescriptor(),
@@ -196,6 +200,8 @@ public class ClassTracer extends ClassAdapter {
             this.name = name ;
             this.desc = desc ;
             this.lmv = mv ;
+            this.identVal = ecd.getMethodIndex(name) ;
+
 
             returnOpcodes.add( Opcodes.RETURN ) ;
             returnOpcodes.add( Opcodes.IRETURN ) ;
@@ -254,9 +260,6 @@ public class ClassTracer extends ClassAdapter {
                 util.initLocal( lmv, __result ) ;
             }
 
-            // Object __ident = null ;
-            util.initLocal( lmv, __ident ) ;
-
             // final MethodMonitor __mm = __mmXX.content() ;
             // (for the appropriate XX for this method)
             final String fullDesc = util.getFullMethodDescriptor(name,desc) ;
@@ -278,22 +281,15 @@ public class ClassTracer extends ClassAdapter {
             lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
             lmv.visitJumpInsn( Opcodes.IFNULL, skipPreamble );
 
-            // __ident = <method constant>
-            util.emitIntConstant( lmv, ecd.getMethodIndex(name) ) ;
-            final String owner = Type.getInternalName( Integer.class ) ;
-            lmv.visitMethodInsn( Opcodes.INVOKESTATIC, owner, "valueOf",
-                "(I)Ljava/lang/Integer;" ) ;
-            lmv.visitVarInsn( Opcodes.ASTORE, __ident.index ) ;
-
             // __mm.enter( __ident, <array of wrapped args> ) ;
             lmv.visitVarInsn( Opcodes.ALOAD, __mm.index )  ;
-            lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+            util.emitIntConstant( lmv, identVal ) ;
 
             util.wrapArgs( lmv, access, desc ) ;
 
             lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 EnhancedClassData.MM_NAME, "enter",
-                "(Ljava/lang/Object;[Ljava/lang/Object;)V" ) ;
+                "(I[Ljava/lang/Object;)V" ) ;
 
             // }
             lmv.visitLabel( skipPreamble ) ;
@@ -306,12 +302,12 @@ public class ClassTracer extends ClassAdapter {
             lmv.visitJumpInsn( Opcodes.IFNULL, skipLabel ) ;
 
             lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
-            lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+            util.emitIntConstant( lmv, identVal ) ;
             lmv.visitVarInsn( Opcodes.ALOAD, excIndex ) ;
 
             lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
                 EnhancedClassData.MM_NAME, "exception",
-                "(Ljava/lang/Object;Ljava/lang/Throwable;)V" ) ;
+                "(ILjava/lang/Throwable;)V" ) ;
 
             lmv.visitLabel( skipLabel ) ;
         }
@@ -323,20 +319,20 @@ public class ClassTracer extends ClassAdapter {
             lmv.visitJumpInsn( Opcodes.IFNULL, skipLabel ) ;
 
             lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
-            lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+            util.emitIntConstant(lmv, identVal ) ;
 
             final Type rtype = Type.getReturnType( desc ) ;
             if (rtype.equals( Type.VOID_TYPE )) {
                 lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
                     EnhancedClassData.MM_NAME, "exit",
-                    "(Ljava/lang/Object;)V" ) ;
+                    "(I)V" ) ;
             } else {
                 util.wrapArg( lmv, __result.index,
                     Type.getType( __result.desc ) ) ;
 
                 lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
                     EnhancedClassData.MM_NAME, "exit",
-                    "(Ljava/lang/Object;Ljava/lang/Object;)V" ) ;
+                    "(ILjava/lang/Object;)V" ) ;
             }
 
             lmv.visitLabel( skipLabel ) ;
@@ -347,6 +343,12 @@ public class ClassTracer extends ClassAdapter {
             info( 1, "visitInsn[" + Util.opcodeToString(opcode) + "] called") ;
             if (opcode == Opcodes.ACONST_NULL) {
                 current = current.transition( util, mv, Input.ACONST_NULL_BC ) ;
+
+                if (current == State.NORMAL) {
+                    lmv.visitInsn(opcode);
+                }
+            } else if (opcode == Opcodes.ICONST_0) {
+                current = current.transition( util, mv, Input.ICONST_0_BC ) ;
 
                 if (current == State.NORMAL) {
                     lmv.visitInsn(opcode);
@@ -401,7 +403,7 @@ public class ClassTracer extends ClassAdapter {
                     Input.INFO_METHOD_CALL ) ;
 
                 lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
-                lmv.visitVarInsn( Opcodes.ALOAD, __ident.index ) ;
+                util.emitIntConstant(lmv, identVal );
 
                 final String newDesc = util.augmentInfoMethodDescriptor(desc) ;
 
@@ -434,7 +436,6 @@ public class ClassTracer extends ClassAdapter {
 
             // visit local variables AFTER visiting end!
             __result.accept( lmv ) ;
-            __ident.accept( lmv ) ;
             __mm.accept( lmv ) ;
 
             lmv.visitMaxs( maxStack, maxLocals ) ;

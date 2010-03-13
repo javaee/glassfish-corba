@@ -50,7 +50,26 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Set;
 
+/** Tool for enhancing classes annotated with tracing facility annotations.
+ * The processing is divided into two phases:
+ * <ol>
+ * <li>The first phase adds code to the static initialized of the class to 
+ * register the class with the TF framework.  This phase also modifies all 
+ * calls to @InfoMethod annotated methods to pass extra arguments needed for
+ * tracing.  Note that this phase <b>must</b> be done at build time, because it
+ * modifies the schema of the class.
+ * <li>The second phase adds the actual trace code to methods annotated with
+ * tracing annotations.  This does not change the schema, so this phase 
+ * could be done either at build time, or at runtime.  Tracing the code only
+ * at runtime may reduce the overhead, since untraced code need not be modified.
+ * </ol>
+ * This tool can do either phase 1, or phase 1 and 2, against ALL classes 
+ * reachable from a starting directory.
+ * @author ken
+ */
 public class EnhanceTool {
+    private Util util ;
+
     private interface Arguments {
         @DefaultValue( "tfannotations.properties" )
         @Help( "Name of resource file containing information "
@@ -89,24 +108,10 @@ public class EnhanceTool {
 
     private Arguments args ;
 
-    public interface StandardSupport {
-        void setDebug( boolean flag ) ;
-
-        void setVerbose( int level ) ;
-
-        void setDryrun( boolean flag ) ;
-    }
-
-    public interface ScanAction extends Scanner.Action, StandardSupport {}
-
-    public interface EnhanceFunction extends UnaryFunction<byte[],byte[]>,
-        StandardSupport {
-    }
-
     private class EnhancerFileAction implements Scanner.Action {
-        private EnhanceFunction ea ;
+        private UnaryFunction<byte[],byte[]> ea ;
 
-        public EnhancerFileAction( EnhanceFunction ea ) {
+        public EnhancerFileAction( UnaryFunction<byte[],byte[]> ea ) {
             this.ea = ea ;
         }
 
@@ -139,7 +144,7 @@ public class EnhanceTool {
         // ...
         // com.sun.corba.tf.annotation.n=...
         final FileWrapper fw = new FileWrapper( args.rf() ) ;
-        fw.open( FileWrapper.OpenMode.WRITE )  ;
+        fw.open( FileWrapper.OpenMode.WRITE_EMPTY )  ;
 
         try {
             fw.writeLine( "# Trace Facility Annotations" ) ;
@@ -168,18 +173,12 @@ public class EnhanceTool {
 
             public boolean evaluate(FileWrapper arg) {
                 if (trace) {
-                    System.out.println( "Skipping " + arg ) ;
+                    util.info( "Skipping " + arg ) ;
                 }
 
                 return true ;
             }
         } ;
-    }
-
-    private void setArgs( Arguments args, StandardSupport ss ) {
-        ss.setDebug( args.debug() );
-        ss.setVerbose( args.verbose() );
-        ss.setDryrun( args.dryrun() );
     }
 
     private void doScan( Arguments args, ActionFactory af,
@@ -198,33 +197,32 @@ public class EnhanceTool {
             final ArgParser<Arguments> ap = new ArgParser<Arguments>(
                 Arguments.class ) ;
             args = ap.parse( strs ) ;
+            util = new Util( args.debug(), args.verbose() ) ;
 
             final ActionFactory af = new ActionFactory( args.verbose(),
                 args.dryrun() ) ;
             final Scanner scanner = new Scanner( args.verbose(), args.dir() ) ;
 
-            AnnotationScannerAction annoAct = new AnnotationScannerAction() ;
-            setArgs( args, annoAct ) ;
+            AnnotationScannerAction annoAct = new AnnotationScannerAction( util ) ;
 
             doScan( args, af, scanner, annoAct ) ;
 
             Set<String> anames = annoAct.getAnnotationNames() ;
 
             if (args.debug()) {
-                System.out.println( "MM Annotations: " + anames ) ;
+                util.info( "MM Annotations: " + anames ) ;
             }
 
             generatePropertiesFile( args, anames ) ;
 
-            Transformer ea = new Transformer( args.tracegen() ) ;
-            setArgs( args, ea ) ;
+            Transformer ea = new Transformer( util, args.tracegen() ) ;
             ea.setMMGAnnotations( anames );
 
             final Scanner.Action act = new EnhancerFileAction( ea ) ;
 
             doScan( args, af, scanner, act ) ;
         } catch (Exception exc) {
-            System.out.println( "Exception: " + exc ) ;
+            util.info( "Exception: " + exc ) ;
             exc.printStackTrace() ;
         }
     }

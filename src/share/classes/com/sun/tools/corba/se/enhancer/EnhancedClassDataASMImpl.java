@@ -36,6 +36,7 @@
 
 package com.sun.tools.corba.se.enhancer;
 
+import com.sun.corba.se.spi.orbutil.tf.annotation.TFEnhanced;
 import java.util.List;
 import java.util.Set;
 import org.objectweb.asm.Opcodes;
@@ -46,6 +47,8 @@ import org.objectweb.asm.tree.MethodNode;
 
 public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
     private final ClassNode currentClass ;
+    private static final String TFENHANCED_ANNO_NAME =
+        Type.getInternalName( TFEnhanced.class ) ;
 
     // Get Set<String> for MM annotations present on class
     private void processClassAnnotations() {

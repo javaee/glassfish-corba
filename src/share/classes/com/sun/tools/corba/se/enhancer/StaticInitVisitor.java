@@ -81,8 +81,24 @@ public class StaticInitVisitor extends LocalVariablesSorter {
             snode, enode, index ) ;
     }
 
+    private static final boolean ENABLED = false ;
+
+    private void generateTraceMsg( MethodVisitor mv, String msg, int num ) {
+        if (ENABLED && util.getDebug()) {
+            final Label start = new Label() ;
+            mv.visitLabel( start ) ;
+            mv.visitLineNumber( num, start ) ;
+            mv.visitFieldInsn( Opcodes.GETSTATIC, "java/lang/System", "out", 
+                "Ljava/io/PrintStream;" ) ;
+            mv.visitLdcInsn( msg );
+            mv.visitMethodInsn( Opcodes.INVOKEVIRTUAL, "java/io/PrintStream",
+                "println", "(Ljava/lang/String;)V");
+        }
+    }
+
     @Override
     public void visitCode() {
+        int line = 1 ;
         util.info( "StaticInitVisitor.visitCode" ) ;
         super.visitCode() ;
 
@@ -98,8 +114,10 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         LocalVariableNode holderMap = defineLocal( mv, "holderMap",
             Map.class, start, end ) ;
 
-        // initialize the holders
+        generateTraceMsg( mv, "initialize the holders", line++ ) ;
         for (String str : ecd.getAnnotationToHolderName().values()) {
+            generateTraceMsg( mv, "Generating to initialize holder " + str, 
+                line++ ) ;
             util.info( "Generating code to initialize holder " + str ) ;
             util.newWithSimpleConstructor( mv, SynchronizedHolder.class );
             mv.visitFieldInsn( Opcodes.PUTSTATIC,
@@ -107,10 +125,11 @@ public class StaticInitVisitor extends LocalVariablesSorter {
                 Type.getDescriptor(SynchronizedHolder.class ) ) ;
         }
 
+        generateTraceMsg( mv, "Store the Class of this class", line++ );
         mv.visitLdcInsn( Type.getType( "L" + ecd.getClassName() + ";" ));
         mv.visitVarInsn( Opcodes.ASTORE, thisClass.index ) ;
 
-        // create list of method names and init
+        generateTraceMsg( mv, "Create list of method names", line++ );
         util.newWithSimpleConstructor( mv, ArrayList.class ) ;
         mv.visitVarInsn( Opcodes.ASTORE, mnameList.index ) ;
 
@@ -123,7 +142,8 @@ public class StaticInitVisitor extends LocalVariablesSorter {
             mv.visitInsn( Opcodes.POP ) ;
         }
 
-        // create map from MM annotation class to Holder and init
+        generateTraceMsg( mv, 
+            "create map from MM annotation class to Holder and init", line++ ) ;
         util.newWithSimpleConstructor( mv, HashMap.class ) ;
         mv.visitVarInsn( Opcodes.ASTORE, holderMap.index ) ;
 
@@ -143,13 +163,13 @@ public class StaticInitVisitor extends LocalVariablesSorter {
                 Type.getDescriptor(SynchronizedHolder.class ) ) ;
 
             mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
-                "java/util/HashMap", "put",
+                "java/util/Map", "put",
                 "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
 
             mv.visitInsn( Opcodes.POP ) ;
         }
 
-        // register with MethodMonitorRegistry
+        generateTraceMsg( mv, "register with MethodMonitorRegistry", line++ ) ;
         util.info( "Generating code call MethodMonitorRegistry.registerClass" ) ;
         mv.visitVarInsn( Opcodes.ALOAD, thisClass.index ) ;
         mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
@@ -165,7 +185,5 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         thisClass.accept( mv ) ;
         mnameList.accept( mv ) ;
         holderMap.accept( mv ) ;
-
-        mv.visitInsn( Opcodes.RETURN ) ;
     }
 }

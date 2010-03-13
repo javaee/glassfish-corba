@@ -130,4 +130,19 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
     public boolean isTracedClass() {
         return !annoNamesForClass.isEmpty() ;
     }
+
+    public void updateInfoDesc() {
+        String[] descs = infoMethodDescs.toArray( 
+            new String[infoMethodDescs.size() ] ) ;
+
+        infoMethodDescs.clear() ;
+
+        for (String desc : descs) {
+            int index = desc.indexOf( '(' ) ;
+            String name = desc.substring( 0, index )  ;
+            String d = desc.substring( index ) ;
+            String fd = util.augmentInfoMethodDescriptor(d) ;
+            infoMethodDescs.add( name + fd ) ;
+        }
+    }
 }

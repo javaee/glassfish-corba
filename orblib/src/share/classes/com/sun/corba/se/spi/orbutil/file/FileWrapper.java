@@ -210,7 +210,7 @@ public class FileWrapper implements Closeable {
 	}
     }
 
-    public enum OpenMode { READ, WRITE } ;
+    public enum OpenMode { READ, WRITE, WRITE_EMPTY } ;
 
     /** Open the (text) file for I/O.  There are two modes:
      * <ul>
@@ -231,7 +231,7 @@ public class FileWrapper implements Closeable {
 		reader = new BufferedReader( isr ) ;
 		state = FileState.OPEN_FOR_READ ;
 	    } else {
-		fos = new FileOutputStream( file, true ) ;
+		fos = new FileOutputStream( file, mode==OpenMode.WRITE ) ;
 		osw = new OutputStreamWriter( fos ) ;
 		writer = new BufferedWriter( osw ) ;
 		state = FileState.OPEN_FOR_WRITE ;

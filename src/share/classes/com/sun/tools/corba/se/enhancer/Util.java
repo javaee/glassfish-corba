@@ -52,7 +52,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.util.AbstractVisitor;
 import org.objectweb.asm.util.CheckClassAdapter;
-import org.objectweb.asm.util.TraceClassVisitor;
 
 /** Some useful utilities for generating code using ASM.  Nothing in here
  * should be specific to the classfile enhancer for tracing.
@@ -60,19 +59,21 @@ import org.objectweb.asm.util.TraceClassVisitor;
  * @author ken
  */
 public class Util {
-    private boolean debug = false ;
-    private int verbose = 0 ;
+    private final boolean debug ;
+    private final int verbose ;
+
+    public Util( final boolean debug, final int verbose ) {
+        this.debug = debug ;
+
+        if (debug && (verbose < 1)) {
+            this.verbose = 1 ;
+        } else {
+            this.verbose = verbose ;
+        }
+    }
 
     public boolean getDebug() {
         return debug ;
-    }
-
-    public void setDebug(boolean flag) {
-        debug = flag ;
-    }
-
-    public void setVerbose(int level) {
-        verbose = level ;
     }
 
     public void info( String str ) {
@@ -380,9 +381,13 @@ public class Util {
 
         try {
             cr.accept( xform, ClassReader.SKIP_FRAMES ) ;
+        } catch (TraceEnhancementException exc) { 
+            throw exc ;
         } catch (Exception exc) {
-            System.out.println( "Exception: " + exc ) ;
-            exc.printStackTrace() ;
+            info( "Exception: " + exc ) ;
+            if (debug) {
+                exc.printStackTrace() ;
+            }
         } finally {
             if (pw != null) {
                 pw.flush() ;

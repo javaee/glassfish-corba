@@ -86,35 +86,22 @@ import org.objectweb.asm.tree.ClassNode;
  *
  * @author ken
  */
-public class Transformer implements EnhanceTool.EnhanceFunction {
+public class Transformer implements UnaryFunction<byte[],byte[]> {
     private final boolean tracegen ;
 
-    private boolean dryrun ;
     private Set<String> annotationNames = null ;
-    private Util util = new Util();
+    private final Util util  ;
 
-    // These fields are initialized in the evaluate method.
-    private ClassNode currentClass = null ;
+    // Initialized in the evaluate method.
     private EnhancedClassData ecd = null ;
 
-    public Transformer( boolean tracegen ) {
+    public Transformer( Util util, boolean tracegen ) {
+        this.util = util ;
         this.tracegen = tracegen ;
     }
 
     public void setMMGAnnotations(Set<String> mmgAnnotations) {
         annotationNames = mmgAnnotations ;
-    }
-
-    public void setDebug(boolean flag) {
-        util.setDebug( flag ) ;
-    }
-
-    public void setVerbose(int level) {
-        util.setVerbose(level);
-    }
-
-    public void setDryrun(boolean flag) {
-        dryrun = flag ;
     }
 
     private boolean hasAccess( int access, int flag ) {
@@ -145,40 +132,48 @@ public class Transformer implements EnhanceTool.EnhanceFunction {
             return null ;
         }
 
-        final byte[] phase1 = util.transform( false, arg,
-            new UnaryFunction<ClassVisitor, ClassAdapter>() {
-                public ClassAdapter evaluate(ClassVisitor arg) {
-                    return new ClassEnhancer( util, ecd, arg ) ;
-                }
-            }
-        ) ;
-
-        // Only communication from part 1 to part2 is a byte[] and
-        // the EnhancedClassData.  A runtime version can be regenerated
-        // as above from the byte[] from the class file as it is presented
-        // to a ClassFileTransformer.
-        //     Implementation note: runtime would keep byte[] stored of
-        //     original version whenever tracing is enabled, so that
-        //     disabling tracing simply means using a ClassFileTransformer
-        //     to get back to the original code.
-        //
-        // Then add tracing code (part 2).
-        //     This is a pure visitor using the AdviceAdapter.
-        //     It must NOT modify its input visitor (or you get an
-        //     infinite series of calls to onMethodExit...)
-
-        if (tracegen) {
-            final byte[] phase2 = util.transform( util.getDebug(), phase1,
+        try {
+            final byte[] phase1 = util.transform( false, arg,
                 new UnaryFunction<ClassVisitor, ClassAdapter>() {
-
-                public ClassAdapter evaluate(ClassVisitor arg) {
-                    return new ClassTracer( util, ecd, arg ) ;
+                    public ClassAdapter evaluate(ClassVisitor arg) {
+                        return new ClassEnhancer( util, ecd, arg ) ;
+                    }
                 }
-            }) ;
+            ) ;
 
-            return phase2 ;
-        } else {
-            return phase1 ;
+            // Only communication from part 1 to part2 is a byte[] and
+            // the EnhancedClassData.  A runtime version can be regenerated
+            // as above from the byte[] from the class file as it is presented
+            // to a ClassFileTransformer.
+            //     Implementation note: runtime would keep byte[] stored of
+            //     original version whenever tracing is enabled, so that
+            //     disabling tracing simply means using a ClassFileTransformer
+            //     to get back to the original code.
+            //
+            // Then add tracing code (part 2).
+            //     This is a pure visitor using the AdviceAdapter.
+            //     It must NOT modify its input visitor (or you get an
+            //     infinite series of calls to onMethodExit...)
+
+            if (tracegen) {
+                final byte[] phase2 = util.transform( util.getDebug(), phase1,
+                    new UnaryFunction<ClassVisitor, ClassAdapter>() {
+
+                    public ClassAdapter evaluate(ClassVisitor arg) {
+                        return new ClassTracer( util, ecd, arg ) ;
+                    }
+                }) ;
+
+                return phase2 ;
+            } else {
+                return phase1 ;
+            }
+        } catch (TraceEnhancementException exc) {
+            if (util.getDebug()) {
+                util.info( 1, "Could not enhance file: " + exc ) ;
+            }
+
+            return null ;
         }
     }
 }

@@ -37,6 +37,7 @@
 package com.sun.tools.corba.se.enhancer;
 
 import com.sun.corba.se.spi.orbutil.file.FileWrapper;
+import com.sun.corba.se.spi.orbutil.file.Scanner;
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 
 import java.io.IOException;
@@ -57,19 +58,22 @@ import org.objectweb.asm.commons.EmptyVisitor;
  *
  * @author ken
  */
-public class AnnotationScannerAction implements EnhanceTool.ScanAction {
+public class AnnotationScannerAction implements Scanner.Action {
     private static Class<MethodMonitorGroup> MMG_CLASS =
         MethodMonitorGroup.class ;
 
     private static String MMG_DESCRIPTOR =
         Type.getType(MMG_CLASS).getDescriptor() ;
 
-    private boolean debug ;
-    private int verbose ;
-    private boolean dryrun ;
+    private final Util util ;
+
     // NOTE: this is a set of annotation class names in INTERNAL format.
     private Set<String> annotationNames = new HashSet<String>() ;
     private String currentClass ;
+
+    public AnnotationScannerAction( final Util util ) {
+        this.util = util ;
+    }
 
     public Set<String> getAnnotationNames() {
         return annotationNames ;
@@ -80,10 +84,10 @@ public class AnnotationScannerAction implements EnhanceTool.ScanAction {
         @Override
         public void visit( int version, int access, String name, String signature,
             String superName, String[] interfaces ) {
-            if (debug) {
-                System.out.println( "Visiting class " + name ) ;
+            if (util.getDebug()) {
+                util.info( "Visiting class " + name ) ;
                 if ((access & Opcodes.ACC_ANNOTATION) == Opcodes.ACC_ANNOTATION) {
-                    System.out.println( "\t(Annotation)") ;
+                    util.info( "\t(Annotation)") ;
                     // We are only interested in classes that are annotations
                     currentClass = name ;
                 }
@@ -92,8 +96,8 @@ public class AnnotationScannerAction implements EnhanceTool.ScanAction {
 
         @Override
         public AnnotationVisitor visitAnnotation( String desc, boolean visible ) {
-            if (debug) {
-                System.out.println( "\tVisiting annotation " + desc ) ;
+            if (util.getDebug()) {
+                util.info( "\tVisiting annotation " + desc ) ;
                 // We are looking for MethodMonitorGroup here
             }
 
@@ -136,18 +140,6 @@ public class AnnotationScannerAction implements EnhanceTool.ScanAction {
         }
 
         return true ;
-    }
-
-    public void setDebug(boolean flag) {
-        debug = flag ;
-    }
-
-    public void setVerbose(int level) {
-        verbose = level ;
-    }
-
-    public void setDryrun(boolean flag) {
-        dryrun = flag ;
     }
 }
 

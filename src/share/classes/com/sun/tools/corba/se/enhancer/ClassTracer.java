@@ -49,11 +49,12 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitor ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.TraceEnhanceLevel;
 import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.commons.AnalyzerAdapter;
 import org.objectweb.asm.commons.LocalVariablesSorter;
 
-public class ClassTracer extends ClassAdapter {
+public class ClassTracer extends TFEnhanceAdapter {
     private void info( final int level, final String msg ) {
         util.info( level, "ClassTracer: " + msg ) ;
     }
@@ -96,7 +97,7 @@ public class ClassTracer extends ClassAdapter {
                     case ACONST_NULL_BC :
                     case OTHER :
                         util.info( 4, 
-                            "ClassTracer: Emitting ACONST_NULL.ICONST_0" ) ;
+                            "ClassTracer: Emitting ACONST_NULL,ICONST_0" ) ;
                         mv.visitInsn( Opcodes.ACONST_NULL ) ;
                         mv.visitInsn( Opcodes.ICONST_0 ) ;
 
@@ -138,7 +139,7 @@ public class ClassTracer extends ClassAdapter {
     public ClassTracer( final Util util, final EnhancedClassData ecd,
         final ClassVisitor cv ) {
 
-        super( cv ) ;
+        super( cv, TraceEnhanceLevel.PHASE1, TraceEnhanceLevel.PHASE2, ecd ) ;
         this.util = util ;
         this.ecd = ecd ;
     }
@@ -156,6 +157,7 @@ public class ClassTracer extends ClassAdapter {
         private final String name ;
         private final String desc ;
         private final MethodVisitor lmv ;
+        private final int identVal ;
 
         private final Set<Integer> returnOpcodes = new HashSet<Integer>() ;
 
@@ -168,11 +170,14 @@ public class ClassTracer extends ClassAdapter {
         private final Label end = new Label() ;
         private final LabelNode endNode = new LabelNode( end ) ;
 
+        private final Label afterExcStore = new Label() ;
+        private final LabelNode afterExcStoreNode = new LabelNode( end ) ;
+
         // Values must be set in setLocalVariablesSorter.
         private LocalVariablesSorter lvs = null ;
         private LocalVariableNode __result = null ;
-        private int identVal ;
         private LocalVariableNode __mm = null ;
+        private LocalVariableNode __exc = null ;
 
         public void setLocalVariablesSorter( final LocalVariablesSorter lvs ) {
             this.lvs = lvs ;
@@ -191,6 +196,11 @@ public class ClassTracer extends ClassAdapter {
             __mm = new LocalVariableNode( "__$mm$__",
                 type.getDescriptor(),
                 null, startNode, endNode, lvs.newLocal(type) ) ;
+
+            type = Type.getType( Throwable.class ) ;
+            __exc = new LocalVariableNode( "__$exc$__",
+                type.getDescriptor(), 
+                null, excHandlerNode, endNode, lvs.newLocal(type) ) ;
         }
 
         public MonitoredMethodEnhancer( final int access, final String name,
@@ -202,7 +212,6 @@ public class ClassTracer extends ClassAdapter {
             this.lmv = mv ;
             this.identVal = ecd.getMethodIndex(name) ;
 
-
             returnOpcodes.add( Opcodes.RETURN ) ;
             returnOpcodes.add( Opcodes.IRETURN ) ;
             returnOpcodes.add( Opcodes.ARETURN ) ;
@@ -211,6 +220,7 @@ public class ClassTracer extends ClassAdapter {
             returnOpcodes.add( Opcodes.DRETURN ) ;
         }
 
+        /*
         private Object getTypeForStackMap( Type type ) {
             switch (type.getSort()) {
                 case Type.VOID :
@@ -234,6 +244,7 @@ public class ClassTracer extends ClassAdapter {
 
             return null ;
         }
+         */
 
         @Override
         public void visitCode() {
@@ -241,10 +252,9 @@ public class ClassTracer extends ClassAdapter {
 
             // visit try-catch block BEFORE visiting start label!
             lmv.visitTryCatchBlock( start, end, excHandler, null );
+            lmv.visitTryCatchBlock( excHandler, afterExcStore, excHandler, null );
 
-            lmv.visitLabel(start);
-/*
-            final Object rt = getTypeForStackMap( Type.getReturnType( desc ) )  ;
+/*            final Object rt = getTypeForStackMap( Type.getReturnType( desc ) )  ;
             final Object[] locals = (rt == null)
                 ? new Object[] { ecd.getClassName(),
                     EnhancedClassData.OBJECT_NAME, EnhancedClassData.MM_NAME }
@@ -277,9 +287,8 @@ public class ClassTracer extends ClassAdapter {
             lmv.visitVarInsn( Opcodes.ASTORE, __mm.index );
 
             // if (__mm != null) {
-            final Label skipPreamble = new Label() ;
             lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
-            lmv.visitJumpInsn( Opcodes.IFNULL, skipPreamble );
+            lmv.visitJumpInsn( Opcodes.IFNULL, start );
 
             // __mm.enter( __ident, <array of wrapped args> ) ;
             lmv.visitVarInsn( Opcodes.ALOAD, __mm.index )  ;
@@ -292,7 +301,7 @@ public class ClassTracer extends ClassAdapter {
                 "(I[Ljava/lang/Object;)V" ) ;
 
             // }
-            lmv.visitLabel( skipPreamble ) ;
+            lmv.visitLabel( start ) ;
         }
 
         private void emitExceptionReport( final int excIndex ) {
@@ -305,7 +314,7 @@ public class ClassTracer extends ClassAdapter {
             util.emitIntConstant( lmv, identVal ) ;
             lmv.visitVarInsn( Opcodes.ALOAD, excIndex ) ;
 
-            lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
+            lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 EnhancedClassData.MM_NAME, "exception",
                 "(ILjava/lang/Throwable;)V" ) ;
 
@@ -323,14 +332,14 @@ public class ClassTracer extends ClassAdapter {
 
             final Type rtype = Type.getReturnType( desc ) ;
             if (rtype.equals( Type.VOID_TYPE )) {
-                lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
+                lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                     EnhancedClassData.MM_NAME, "exit",
                     "(I)V" ) ;
             } else {
                 util.wrapArg( lmv, __result.index,
                     Type.getType( __result.desc ) ) ;
 
-                lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
+                lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                     EnhancedClassData.MM_NAME, "exit",
                     "(ILjava/lang/Object;)V" ) ;
             }
@@ -399,17 +408,15 @@ public class ClassTracer extends ClassAdapter {
                     == EnhancedClassData.MethodType.INFO_METHOD))) {
 
                 info( 2, "rewriting method call" ) ;
-                current = current.transition( util, mv,
+                current = current.transition( util, lmv,
                     Input.INFO_METHOD_CALL ) ;
 
                 lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
                 util.emitIntConstant(lmv, identVal );
 
-                final String newDesc = util.augmentInfoMethodDescriptor(desc) ;
-
-                lmv.visitMethodInsn(opcode, owner, name, newDesc );
+                lmv.visitMethodInsn(opcode, owner, name, desc );
             } else {
-                current = current.transition( util, mv, Input.OTHER ) ;
+                current = current.transition( util, lmv, Input.OTHER ) ;
 
                 lmv.visitMethodInsn(opcode, owner, name, desc );
             }
@@ -418,25 +425,24 @@ public class ClassTracer extends ClassAdapter {
         @Override
         public void visitMaxs( final int maxStack, final int maxLocals ) {
             info( 1, "MM method: visitMaxs" ) ;
+            lmv.visitLabel( end  ) ;
             lmv.visitLabel( excHandler  ) ;
 
             // Store the exception
-            int excIndex = lvs.newLocal( Type.getType( Throwable.class ) ) ;
-            lmv.visitVarInsn( Opcodes.ASTORE, excIndex ) ;
+            lmv.visitVarInsn( Opcodes.ASTORE, __exc.index ) ;
+
+            lmv.visitLabel( afterExcStore ) ;
 
             emitFinally() ;
 
             // throw the exception
-            lmv.visitVarInsn( Opcodes.ALOAD, excIndex ) ;
+            lmv.visitVarInsn( Opcodes.ALOAD, __exc.index ) ;
             lmv.visitInsn( Opcodes.ATHROW ) ;
-
-            // This must be here so that variables are in range of the finally
-            // block.  That puts the exception handler inside its own range.
-            lmv.visitLabel( end ) ;
 
             // visit local variables AFTER visiting end!
             __result.accept( lmv ) ;
             __mm.accept( lmv ) ;
+            __exc.accept( lmv ) ;
 
             lmv.visitMaxs( maxStack, maxLocals ) ;
         }
@@ -545,7 +551,7 @@ public class ClassTracer extends ClassAdapter {
         MethodVisitor mv = super.visitMethod( access, name, desc,
             sig, exceptions ) ;
         if (util.getDebug()) {
-            mv = new SimpleMethodTracer(mv) ;
+            mv = new SimpleMethodTracer(mv, util) ;
         }
 
         switch (mtype) {

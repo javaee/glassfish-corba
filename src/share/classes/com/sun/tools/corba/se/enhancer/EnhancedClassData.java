@@ -99,4 +99,8 @@ public interface EnhancedClassData {
     /** Returns true iff this class is monitored.
      */
     boolean isTracedClass() ;
+
+    /** Enhance all of the descriptors for infoMethods.
+     */
+    void updateInfoDesc() ;
 }

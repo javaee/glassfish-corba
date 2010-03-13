@@ -36,7 +36,6 @@
 
 package com.sun.tools.corba.se.enhancer;
 
-import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodAdapter;
@@ -46,16 +45,18 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.TraceEnhanceLevel;
 
-public class ClassEnhancer extends ClassAdapter {
+public class ClassEnhancer extends TFEnhanceAdapter {
     private Util util ;
     private EnhancedClassData ecd ;
     private boolean hasStaticInitializer = false ;
+    private boolean hasTFAnnotation = false ;
 
     public ClassEnhancer( Util util, EnhancedClassData ecd,
         ClassVisitor cv ) {
 
-        super( cv ) ;
+        super( cv, TraceEnhanceLevel.NONE, TraceEnhanceLevel.PHASE1, ecd ) ;
         this.util = util ;
         this.ecd = ecd ;
     }
@@ -90,17 +91,21 @@ public class ClassEnhancer extends ClassAdapter {
             MethodVisitor mv = cv.visitMethod( siacc, "<clinit>", "()V",
                 null, null ) ;
             if (util.getDebug()) {
-                mv = new SimpleMethodTracer(mv) ;
+                mv = new SimpleMethodTracer(mv, util) ;
             }
             MethodAdapter ma = new StaticInitVisitor( siacc, "()V", mv,
                 util, ecd ) ;
 
             ma.visitCode() ;
+            ma.visitInsn( Opcodes.RETURN ) ; // Only if creating a <clinit>!
+
             ma.visitMaxs( 0, 0 ) ;
             ma.visitEnd() ;
         }
 
         super.visitEnd() ;
+
+        ecd.updateInfoDesc() ;
     }
 
     public class InfoMethodRewriter extends GeneratorAdapter {
@@ -123,6 +128,7 @@ public class ClassEnhancer extends ClassAdapter {
         // generate body
         @Override
         public void visitCode() {
+            super.visitCode() ;
             info( 1, "InfoMethodRewriter: visitCode " + name + desc ) ;
 
             final boolean isStatic = util.hasAccess( access, 
@@ -233,6 +239,8 @@ public class ClassEnhancer extends ClassAdapter {
                     + " in class " + ecd.getClassName() + " makes an "
                     + " illegal call to an @InfoMethod method" ) ;
             }
+
+            mv.visitMethodInsn( opcode, owner, name, desc ) ;
         }
     }
 
@@ -259,7 +267,7 @@ public class ClassEnhancer extends ClassAdapter {
                 mv = super.visitMethod( access, name, desc,
                     sig, exceptions ) ;
                 if (util.getDebug()) {
-                    mv = new SimpleMethodTracer(mv) ;
+                    mv = new SimpleMethodTracer(mv,util) ;
                 }
                 hasStaticInitializer = true ;
                 return new StaticInitVisitor( access, desc, mv, util,
@@ -270,7 +278,7 @@ public class ClassEnhancer extends ClassAdapter {
                 mv = super.visitMethod( access, name, newDesc,
                     sig, exceptions ) ;
                 if (util.getDebug()) {
-                    mv = new SimpleMethodTracer(mv) ;
+                    mv = new SimpleMethodTracer(mv,util) ;
                 }
                 return new InfoMethodRewriter( mv, access, name, desc ) ;
 
@@ -278,7 +286,7 @@ public class ClassEnhancer extends ClassAdapter {
                 mv = super.visitMethod( access, name, desc,
                     sig, exceptions ) ;
                 if (util.getDebug()) {
-                    mv = new SimpleMethodTracer(mv) ;
+                    mv = new SimpleMethodTracer(mv,util) ;
                 }
                 return new InfoMethodCallRewriter( mv, access, name, desc ) ;
 
@@ -286,7 +294,7 @@ public class ClassEnhancer extends ClassAdapter {
                 mv = super.visitMethod( access, name, desc,
                     sig, exceptions ) ;
                 if (util.getDebug()) {
-                    mv = new SimpleMethodTracer(mv) ;
+                    mv = new SimpleMethodTracer(mv,util) ;
                 }
                 return new NormalMethodChecker( mv, access, name, desc) ;
         }

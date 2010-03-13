@@ -8,15 +8,9 @@ import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
  */
 @A @B @C
 public class TestClassImpl implements TestClass {
-    /* This is not needed here, if we instrument the files directly.
-    // Set-up for tracing facility
-    @A private static MethodMonitor mmA ;
-    @B private static MethodMonitor mmB ;
-    @C private static MethodMonitor mmC ;
-
-    @MethodNames private static List<String> mnames ;
-    // end of set-up
-    */
+    static {
+        System.out.println( "Start of <clinit>" ) ;
+    }
 
     @A
     private long increment( long x ) {
@@ -76,7 +70,9 @@ public class TestClassImpl implements TestClass {
                 bigMultValue( "Large argument for mult", b ) ;
             }
 
-            return add( a, mult( a, decrement(b) )) ;
+            long decRes = decrement(b) ;
+            long multRes = mult( a, decRes ) ;
+            return add( a, multRes ) ;
         }
     }
 }

@@ -288,6 +288,23 @@ public class MethodMonitorRegistry {
         return names.get( identifier ) ;
     }
 
+    public static int getMethodIdentifier( Class<?> cls, String mname ) {
+        List<String> names = classToMNames.get( cls ) ;
+
+        if (names == null) {
+            throw new RuntimeException( "Class " + cls + " not found in map" ) ;
+        }
+
+        for (int ctr=0; ctr<names.size(); ctr++) {
+            String str = names.get(ctr) ;
+            if (str.equals( mname )) {
+                return ctr ;
+            }
+        }
+
+        return -1 ;
+    }
+
     private static final MethodMonitorGroup checkAnnotation(
         Class<? extends Annotation> annoClass ) {
 

@@ -36,6 +36,8 @@
 
 package corba.tf  ;
 
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitor;
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactory;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryDefaults;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
 import corba.framework.TestngRunner;
@@ -107,8 +109,26 @@ public class Client
         System.out.println( "result = " + tc.mult( 10, 10 ) ) ;
     }
 
+    MethodMonitorFactory tracingMonitorFactory = new MethodMonitorFactory() {
+        public MethodMonitor create(Class<?> cls) {
+            return new MethodMonitorTracingImpl( cls ) ;
+        }
+    } ;
+
     @A @B @C
     public static class TestCombination {
          
     }
+
+    // Tests:
+    // Single MM annotation enabled:
+    // 1. Single method, no return type
+    // 2. Single method, has return
+    // 3. Single method, info call
+    // 4. Single method, throws exception
+    // 5. Method A calls method B
+    // 6. Method A calls method B, which throws exception
+    // Two MM annotations, MM1 enabled, MM2 disabled
+    // 7. Method (MM1) A calls (MM2) B calls (MM1) A
+
 }

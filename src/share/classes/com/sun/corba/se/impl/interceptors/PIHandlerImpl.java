@@ -228,7 +228,12 @@ public class PIHandlerImpl implements PIHandler
             wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
             orbutilWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
             omgWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
-            arguments = args.clone() ;
+
+            if (args == null) {
+                arguments = null ;
+            } else {
+                arguments = args.clone() ;
+            }
 
             // Create codec factory:
             codecFactory = new CodecFactoryImpl( orb );

@@ -908,7 +908,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 		poa.initialize( newManager, POAPolicies ) ;
 
-                // Must come after poa.initialize!
+                // Issue 11334: Must come after poa.initialize!
                 registerMBean( getORB(), poa ) ;
 
 		return poa;

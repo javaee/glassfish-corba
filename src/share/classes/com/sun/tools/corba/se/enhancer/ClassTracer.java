@@ -55,6 +55,16 @@ import org.objectweb.asm.commons.AnalyzerAdapter;
 import org.objectweb.asm.commons.LocalVariablesSorter;
 
 public class ClassTracer extends TFEnhanceAdapter {
+    // Worst case: call to MethodMonitor.info requires 4 words on the stack.
+    // MethodMonitor.enter requires creating an Object[],
+    // which means the stack can be
+    //
+    // mm int Object[] Object[] int long
+    //
+    // during the construction of the call to enter. This adds at most
+    // 7 words to the stack.
+    private static final int MAX_EXTRA_STACK = 7 ;
+
     private void info( final int level, final String msg ) {
         util.info( level, "ClassTracer: " + msg ) ;
     }
@@ -439,12 +449,15 @@ public class ClassTracer extends TFEnhanceAdapter {
             lmv.visitVarInsn( Opcodes.ALOAD, __exc.index ) ;
             lmv.visitInsn( Opcodes.ATHROW ) ;
 
-            // visit local variables AFTER visiting end!
-            __result.accept( lmv ) ;
+            // visit local variables AFTER visiting labels!
+            if (__result != null) {
+                __result.accept( lmv ) ;
+            }
+
             __mm.accept( lmv ) ;
             __exc.accept( lmv ) ;
 
-            lmv.visitMaxs( maxStack, maxLocals ) ;
+            lmv.visitMaxs( maxStack + MAX_EXTRA_STACK, maxLocals ) ;
         }
 
         @Override
@@ -563,10 +576,10 @@ public class ClassTracer extends TFEnhanceAdapter {
             case MONITORED_METHOD :
                 final MonitoredMethodEnhancer mme = new MonitoredMethodEnhancer(
                     access, name, desc, mv ) ;
-                // AnalyzerAdapter aa = new AnalyzerAdapter( ecd.getClassName(),
-                    // access, name, desc, mme ) ;
+                AnalyzerAdapter aa = new AnalyzerAdapter( ecd.getClassName(),
+                    access, name, desc, mme ) ;
                 final LocalVariablesSorter lvs = new LocalVariablesSorter( access,
-                    desc, mme ) ;
+                    desc, aa ) ;
                 mme.setLocalVariablesSorter(lvs);
 
                 return lvs ;

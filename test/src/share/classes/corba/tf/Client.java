@@ -40,9 +40,11 @@ import com.sun.corba.se.spi.orbutil.tf.MethodMonitor;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactory;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryDefaults;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+
 import corba.framework.TestngRunner;
+
 import java.io.PrintStream;
-import java.lang.annotation.Annotation;
 
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
@@ -115,9 +117,112 @@ public class Client
         }
     } ;
 
-    @A @B @C
+    @A @B
     public static class TestCombination {
-         
+        @A
+        void single1( int arg1 ) {
+            arg1++ ;
+        }
+
+        private static final MethodMonitor mm = new MethodMonitorTracingImpl(
+            TestCombination.class ) ;
+
+        void singl1_instr( int arg1 ) {
+            final MethodMonitor __mm = mm  ;
+            if (__mm != null) {
+                __mm.enter( 1, arg1 )  ;
+            }
+
+            try {
+            } finally {
+                if (__mm != null) {
+                    __mm.exit( 1 ) ;
+                } 
+            }
+        }
+/*
+        @A
+        int single2( int arg1 ) { return arg1 ; }
+
+        @InfoMethod
+        void someInfo( int arg1 ) { }
+
+        @A
+        int single3( int arg1 ) { someInfo( arg1 ) ; return arg1 ; }
+
+        @A
+        int single4( int arg1 ) {
+            throw new RuntimeException( "arg1 = " + arg1 ) ;
+        }
+
+        @A
+        int call2( int arg1 ) { return call3( arg1 ) ; }
+
+        @A
+        int call3( int arg1 ) {
+            if (arg1 == 0) {
+                throw new RuntimeException( "argument was 0") ;
+            }
+
+            return arg1 ;
+        }
+
+        @A
+        void methodA() { methodB() ; }
+
+        @B
+        void methodB() { methodC() ; }
+
+        @A
+        void methodC() { }
+ */
+    }
+
+    private static final int SINGLE1 ;
+    private static final int SINGLE2 ;
+    private static final int SINGLE3 ;
+    private static final int SINGLE4 ;
+    private static final int CALL2 ;
+    private static final int CALL3 ;
+    private static final int METHODA ;
+    private static final int METHODB ;
+    private static final int METHODC ;
+
+    private static final MethodMonitor expected =
+        new MethodMonitorTracingImpl( TestCombination.class ) ;
+
+    private static final TestCombination tc ;
+
+    static {
+        Class<?> cls = TestCombination.class ;
+        tc = new TestCombination() ;
+        SINGLE1 = MethodMonitorRegistry.getMethodIdentifier( cls, "single1" ) ;
+        SINGLE2 = MethodMonitorRegistry.getMethodIdentifier( cls, "single2" ) ;
+        SINGLE3 = MethodMonitorRegistry.getMethodIdentifier( cls, "single3" ) ;
+        SINGLE4 = MethodMonitorRegistry.getMethodIdentifier( cls, "single4" ) ;
+        CALL2 = MethodMonitorRegistry.getMethodIdentifier( cls, "call2" ) ;
+        CALL3 = MethodMonitorRegistry.getMethodIdentifier( cls, "call3" ) ;
+        METHODA = MethodMonitorRegistry.getMethodIdentifier( cls, "methodA" ) ;
+        METHODB = MethodMonitorRegistry.getMethodIdentifier( cls, "methodB" ) ;
+        METHODC = MethodMonitorRegistry.getMethodIdentifier( cls, "methodC" ) ;
+    }
+
+    @Test
+    public void singleMethodNoReturn() {
+        int arg = 42 ;
+
+        expected.clear() ;
+        expected.enter( SINGLE1, arg ) ;
+        expected.exit( SINGLE1 ) ;
+
+        MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;
+
+        tc.single1( arg ) ;
+
+        MethodMonitor actual = MethodMonitorRegistry.getMethodMonitorForClass(
+            TestCombination.class, A.class ) ;
+
+        Assert.assertEquals( actual, expected );
     }
 
     // Tests:
@@ -129,6 +234,6 @@ public class Client
     // 5. Method A calls method B
     // 6. Method A calls method B, which throws exception
     // Two MM annotations, MM1 enabled, MM2 disabled
-    // 7. Method (MM1) A calls (MM2) B calls (MM1) A
+    // 7. Method (MM1) A calls (MM2) B calls (MM1) C
 
 }

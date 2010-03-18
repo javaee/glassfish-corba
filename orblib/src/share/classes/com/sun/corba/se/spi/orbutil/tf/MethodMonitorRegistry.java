@@ -379,4 +379,33 @@ public class MethodMonitorRegistry {
 
         return annotationToMMF.get( annot ) ;
     }
+
+    /** Return the current MethodMonitor in use for the given cls and annot.
+     * Returns null if no MethodMonitor is in use. Throws an exception if
+     * either cls is not a traced class, or annot is not a tracing annotation
+     * on cls.
+     *
+     * @param cls The Traced class.
+     * @param annot A trace annotation on cls.
+     * @return The MethodMonitor, if any.
+     */
+    public static MethodMonitor getMethodMonitorForClass( final Class<?> cls,
+        final Class<? extends Annotation> annot ) {
+        Map<Class<? extends Annotation>,SynchronizedHolder<MethodMonitor>> map =
+            classToAnnoMM.get( cls ) ;
+
+        if (map == null) {
+            throw new RuntimeException( "Class "
+                + cls + " is not a traced class.") ;
+        }
+
+        SynchronizedHolder<MethodMonitor> holder = map.get( annot ) ;
+
+        if (holder == null) {
+            throw new RuntimeException( "Annotation " + annot
+                + " is not a tracing annotation defined on class " + cls ) ;
+        }
+
+        return holder.content() ;
+    }
 }

@@ -73,7 +73,7 @@
 	    (NOT_SERIALIZABLE		    6  WARNING "Class {0} is not Serializable")
 	    (SO_BAD_SCHEME_NAME		    7  FINE "string_to_object conversion failed due to bad scheme name {0}")
 	    (SO_BAD_ADDRESS		    8  FINE "string_to_object conversion failed due to bad address in name {0}")
-	    (SO_BAD_SCHEMA_SPECIFIC	    9  FINE "string_to_object conversion failed due to bad bad schema specific part in name {0}")
+	    (SO_BAD_SCHEMA_SPECIFIC	    9  FINE "string_to_object conversion failed due to bad schema specific part in name {0}")
 	    (SO_NON_SPECIFIC		    10 WARNING "string_to_object conversion failed due to non specific reason")
 	    (IR_DERIVE_ABS_INT_BASE	    11 WARNING "Attempt to derive abstract interface from non-abstract base interface in the Interface Repository")
 	    (IR_VALUE_SUPPORT		    12 WARNING "Attempt to let a ValueDef support more than one non-abstract interface in the Interface Repository")

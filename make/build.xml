@@ -181,6 +181,16 @@
 	</javac>
     </target>
 
+    <target name="enhance-tests" depends="compile-tests-main">
+        <!-- Run the tracing enhancer on the class files for corba.tf -->
+	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool" classpathref="test-classpath.master" fork="true" dir="${test-classes.dir}">
+            <arg value="-dir"/>
+            <arg value="corba.tf"/>
+            <arg value="-debug"/>
+            <arg value="true"/>
+        </java>
+    </target>
+
     <target name="compile-tests-experimental" depends="init, prepare-dirs">
 	<mkdir dir="${experimentaltestclasses.dir}"/>
 	<javac destdir="${experimentaltestclasses.dir}" 

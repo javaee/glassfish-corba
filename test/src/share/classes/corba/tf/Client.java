@@ -124,6 +124,7 @@ public class Client
             arg1++ ;
         }
 
+        /*
         private static final MethodMonitor mm = new MethodMonitorTracingImpl(
             TestCombination.class ) ;
 
@@ -140,19 +141,20 @@ public class Client
                 } 
             }
         }
-/*
+        */
+
         @A
         int single2( int arg1 ) { return arg1 ; }
 
         @InfoMethod
-        void someInfo( int arg1 ) { }
+        private void someInfo( int arg1 ) { }
 
         @A
         int single3( int arg1 ) { someInfo( arg1 ) ; return arg1 ; }
 
         @A
         int single4( int arg1 ) {
-            throw new RuntimeException( "arg1 = " + arg1 ) ;
+            throw new RuntimeException() ;
         }
 
         @A
@@ -161,7 +163,7 @@ public class Client
         @A
         int call3( int arg1 ) {
             if (arg1 == 0) {
-                throw new RuntimeException( "argument was 0") ;
+                throw new RuntimeException() ;
             }
 
             return arg1 ;
@@ -175,12 +177,12 @@ public class Client
 
         @A
         void methodC() { }
- */
     }
 
     private static final int SINGLE1 ;
     private static final int SINGLE2 ;
     private static final int SINGLE3 ;
+    private static final int SOMEINFO ;
     private static final int SINGLE4 ;
     private static final int CALL2 ;
     private static final int CALL3 ;
@@ -199,6 +201,7 @@ public class Client
         SINGLE1 = MethodMonitorRegistry.getMethodIdentifier( cls, "single1" ) ;
         SINGLE2 = MethodMonitorRegistry.getMethodIdentifier( cls, "single2" ) ;
         SINGLE3 = MethodMonitorRegistry.getMethodIdentifier( cls, "single3" ) ;
+        SOMEINFO = MethodMonitorRegistry.getMethodIdentifier( cls, "someInfo" ) ;
         SINGLE4 = MethodMonitorRegistry.getMethodIdentifier( cls, "single4" ) ;
         CALL2 = MethodMonitorRegistry.getMethodIdentifier( cls, "call2" ) ;
         CALL3 = MethodMonitorRegistry.getMethodIdentifier( cls, "call3" ) ;
@@ -209,7 +212,7 @@ public class Client
 
     @Test
     public void singleMethodNoReturn() {
-        int arg = 42 ;
+        final int arg = 42 ;
 
         expected.clear() ;
         expected.enter( SINGLE1, arg ) ;
@@ -225,14 +228,136 @@ public class Client
         Assert.assertEquals( actual, expected );
     }
 
+    @Test
+    public void singleMethodReturn() {
+        final int arg = 42 ;
+
+        expected.clear() ;
+        expected.enter( SINGLE2, arg ) ;
+        expected.exit( SINGLE2, arg ) ;
+
+        MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;
+
+        tc.single2( arg ) ;
+
+        MethodMonitor actual = MethodMonitorRegistry.getMethodMonitorForClass(
+            TestCombination.class, A.class ) ;
+
+        Assert.assertEquals( actual, expected );
+    }
+
+    @Test
+    public void singleMethodInfoCall() {
+        final int arg = 42 ;
+
+        expected.clear() ;
+        expected.enter( SINGLE3, arg ) ;
+        Object[] args = { arg } ;
+        expected.info( args, SINGLE3, SOMEINFO ) ;
+        expected.exit( SINGLE3, arg ) ;
+
+        MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;
+
+        tc.single3( arg ) ;
+
+        MethodMonitor actual = MethodMonitorRegistry.getMethodMonitorForClass(
+            TestCombination.class, A.class ) ;
+
+        Assert.assertEquals( actual, expected );
+    }
+
+    @Test
+    public void singleMethodThrowsException() {
+        final int arg = 42 ;
+
+        expected.clear() ;
+        expected.enter( SINGLE4, arg ) ;
+        expected.exception( SINGLE4, new RuntimeException() ) ;
+        expected.exit( SINGLE4, 0 ) ;
+
+        MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;
+
+        try {
+            tc.single4( arg ) ;
+            Assert.fail( "Unexpected normal completion") ;
+        } catch (RuntimeException exc) {
+            MethodMonitor actual =
+                MethodMonitorRegistry.getMethodMonitorForClass(
+                    TestCombination.class, A.class ) ;
+
+            Assert.assertEquals( actual, expected );
+        } catch (Exception exc) {
+            Assert.fail( "Unexpected exception " + exc ) ;
+        }
+    }
+
+    @Test
+    public void twoCalls() {
+        final int arg = 42 ;
+
+        expected.clear() ;
+        expected.enter( CALL2, arg ) ;
+        expected.enter( CALL3, arg ) ;
+        expected.exit( CALL3, arg ) ;
+        expected.exit( CALL2, arg ) ;
+
+        MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;
+
+        tc.call2( arg ) ;
+
+        MethodMonitor actual = MethodMonitorRegistry.getMethodMonitorForClass(
+            TestCombination.class, A.class ) ;
+
+        Assert.assertEquals( actual, expected );
+    }
+
+    @Test
+    public void twoCallsException() {
+        final int arg = 0 ;
+
+        expected.clear() ;
+        expected.enter( CALL2, arg ) ;
+        expected.enter( CALL3, arg ) ;
+        expected.exception( CALL3, new RuntimeException() ) ;
+        expected.exit( CALL3, arg ) ;
+        expected.exit( CALL2, arg ) ;
+
+        MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;
+
+        try {
+            tc.call2( arg ) ;
+            Assert.fail( "Unexpected normal completion") ;
+        } catch (RuntimeException exc) {
+            MethodMonitor actual =
+                MethodMonitorRegistry.getMethodMonitorForClass(
+                    TestCombination.class, A.class ) ;
+
+            Assert.assertEquals( actual, expected );
+        } catch (Exception exc) {
+            Assert.fail( "Unexpected exception " + exc ) ;
+        }
+    }
+
+    @Test
+    public void twoAnnotations() {
+        expected.clear() ;
+        expected.enter( METHODA ) ;
+        expected.enter( METHODC ) ;
+        expected.exit( METHODC ) ;
+        expected.exit( METHODA ) ;
+
+        MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;
+
+        tc.methodA() ;
+
+        MethodMonitor actual = MethodMonitorRegistry.getMethodMonitorForClass(
+            TestCombination.class, A.class ) ;
+
+        Assert.assertEquals( actual, expected );
+
+    }
+
     // Tests:
-    // Single MM annotation enabled:
-    // 1. Single method, no return type
-    // 2. Single method, has return
-    // 3. Single method, info call
-    // 4. Single method, throws exception
-    // 5. Method A calls method B
-    // 6. Method A calls method B, which throws exception
     // Two MM annotations, MM1 enabled, MM2 disabled
     // 7. Method (MM1) A calls (MM2) B calls (MM1) C
 

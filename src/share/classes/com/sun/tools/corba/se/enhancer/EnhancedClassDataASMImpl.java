@@ -95,6 +95,13 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                         Type.getType( an.desc ).getInternalName() ;
 
                     if (aname.equals( INFO_METHOD_NAME)) {
+                        // Check for private method!
+                        if (!util.hasAccess( mn.access, Opcodes.ACC_PRIVATE )) {
+                            util.error( "Method " + mdesc
+                                + " for Class " + currentClass.name
+                                + " is a non-private @InfoMethod,"
+                                + " which is not allowed" ) ;
+                        }
                         hasMethodInfoAnno = true ;
                     } else if (annoNamesForClass.contains( aname)) {
                         if (annoForMethod == null) {

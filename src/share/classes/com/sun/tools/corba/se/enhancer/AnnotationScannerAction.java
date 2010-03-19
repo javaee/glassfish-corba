@@ -86,11 +86,12 @@ public class AnnotationScannerAction implements Scanner.Action {
             String superName, String[] interfaces ) {
             if (util.getDebug()) {
                 util.info( "Visiting class " + name ) ;
-                if ((access & Opcodes.ACC_ANNOTATION) == Opcodes.ACC_ANNOTATION) {
-                    util.info( "\t(Annotation)") ;
-                    // We are only interested in classes that are annotations
-                    currentClass = name ;
-                }
+            }
+
+            if ((access & Opcodes.ACC_ANNOTATION) == Opcodes.ACC_ANNOTATION) {
+                util.info( "\t(Annotation)") ;
+                // We are only interested in classes that are annotations
+                currentClass = name ;
             }
         }
 

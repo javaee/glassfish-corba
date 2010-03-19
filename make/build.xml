@@ -127,7 +127,7 @@
     <!-- This target compiles all the ORB unit tests -->
     <target name="build-tests" depends="init, prepare-dirs, run-all-test-idl, run-all-test-rmic, compile-tests"/>
 
-    <target name="compile-tests" depends="init, prepare-dirs, compile-tests-main, compile-tests-values"/>
+    <target name="compile-tests" depends="init, prepare-dirs, compile-tests-main, enhance-tests, compile-tests-values"/>
 
     <target name="compile-tests-main" depends="init, prepare-dirs">
 	<echo message="Compiling all tests"/>
@@ -185,9 +185,9 @@
         <!-- Run the tracing enhancer on the class files for corba.tf -->
 	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool" classpathref="test-classpath.master" fork="true" dir="${test-classes.dir}">
             <arg value="-dir"/>
-            <arg value="corba.tf"/>
+            <arg value="corba/tf"/>
             <arg value="-debug"/>
-            <arg value="true"/>
+            <arg value="false"/>
         </java>
     </target>
 

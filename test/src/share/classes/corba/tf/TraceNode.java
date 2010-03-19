@@ -36,18 +36,23 @@
 
 package corba.tf;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class TraceNode {
-
     private MethodMonitorTracingImpl.EntryType type;
-    private int ident; // selfIdent in INFO
-    private int callerIdent; // Only used in INFO for callerIdent
-    private Object data; // Object[] for ENTER, INFO
-    // Object for EXIT_RESULT
+    private int ident;          // selfIdent in INFO
+    private int callerIdent;    // Only used in INFO for callerIdent
+    private Object data;        // Object[] for ENTER, INFO
+                                // Object for EXIT_RESULT
+                                // Throwable for EXCEPTION
 
-    private TraceNode(final MethodMonitorTracingImpl.EntryType type, final int ident, final int callerIdent, final Object data) {
+    private TraceNode( final MethodMonitorTracingImpl.EntryType type,
+        final int ident, final int callerIdent, final Object data) {
+
         this.type = type;
         this.ident = ident;
-        this.callerIdent = ident;
+        this.callerIdent = callerIdent;
         this.data = data;
     }
 
@@ -69,6 +74,52 @@ public class TraceNode {
 
     public TraceNode(int ident, Throwable thr) {
         this(MethodMonitorTracingImpl.EntryType.EXCEPTION, ident, -1, thr);
+    }
+
+    public MethodMonitorTracingImpl.EntryType type() {
+        return type ;
+    }
+
+    public int ident() {
+        return ident ;
+    }
+
+    public int callerIdent() {
+        return callerIdent ;
+    }
+
+    public Object data() {
+        return data ;
+    }
+
+    @Override 
+    public String toString() {
+        final StringBuffer sb = new StringBuffer() ;
+        sb.append( "TraceNode[" ) ;
+        sb.append( type ) ;
+
+        sb.append( " ident=" ) ;
+        sb.append( ident ) ;
+
+        if (callerIdent >= 0) {
+            sb.append( " callerIdent=") ;
+            sb.append( callerIdent ) ;
+        }
+
+        if (data != null) {
+            sb.append( " data=" ) ;
+            if (data instanceof Object[]) {
+                Object[] arr = (Object[])data ;
+                List<Object> list = Arrays.asList( arr ) ;
+                sb.append( list ) ;
+            } else {
+                sb.append( data ) ;
+            }
+        }
+
+        sb.append( ']' ) ;
+
+        return sb.toString() ;
     }
 
     @Override
@@ -97,23 +148,34 @@ public class TraceNode {
         if (this == obj) {
             return true;
         }
+
         if (!(obj instanceof TraceNode)) {
             return false;
         }
+
         TraceNode other = (TraceNode) obj;
-        boolean partRes = type == other.type && ident == other.ident && callerIdent == other.callerIdent;
+        final boolean partRes = type == other.type
+            && ident == other.ident
+            && callerIdent == other.callerIdent;
         if (partRes == false) {
             return partRes;
         }
+
+        if ((data == null) || (other.data == null)) {
+            return other.data == data ;
+        }
+
         if (data instanceof Object[]) {
             if (!(other.data instanceof Object[])) {
                 return false;
             }
+
             Object[] td = (Object[]) data;
             Object[] od = (Object[]) other.data;
             if (td.length != od.length) {
                 return false;
             }
+
             for (int ctr = 0; ctr < td.length; ctr++) {
                 if ((td[ctr] == null) && (od[ctr] != null)) {
                     return false;
@@ -122,7 +184,10 @@ public class TraceNode {
                     return false;
                 }
             }
+
             return true;
+        } else if (data instanceof Throwable) {
+            return data.getClass().equals( other.data.getClass() ) ;
         } else {
             if (data == null) {
                 return other.data == null;

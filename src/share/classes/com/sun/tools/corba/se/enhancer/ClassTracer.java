@@ -576,10 +576,10 @@ public class ClassTracer extends TFEnhanceAdapter {
             case MONITORED_METHOD :
                 final MonitoredMethodEnhancer mme = new MonitoredMethodEnhancer(
                     access, name, desc, mv ) ;
-                AnalyzerAdapter aa = new AnalyzerAdapter( ecd.getClassName(),
-                    access, name, desc, mme ) ;
+                // AnalyzerAdapter aa = new AnalyzerAdapter( ecd.getClassName(),
+                    // access, name, desc, mme ) ;
                 final LocalVariablesSorter lvs = new LocalVariablesSorter( access,
-                    desc, aa ) ;
+                    desc, mme ) ;
                 mme.setLocalVariablesSorter(lvs);
 
                 return lvs ;

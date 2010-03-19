@@ -103,4 +103,9 @@ public class MethodMonitorTracingImpl extends MethodMonitorBase
 
         return state.equals( other.state ) ;
     }
+
+    @Override 
+    public String toString() {
+        return "MethodMonitorTracingImpl[" + state.toString() + "]" ;
+    }
 }

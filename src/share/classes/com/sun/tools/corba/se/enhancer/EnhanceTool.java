@@ -153,8 +153,9 @@ public class EnhanceTool {
                 + anames.size() ) ;
             int ctr=1 ;
             for (String str : anames) {
+                String cname = str.replace( '/', '.' ) ;
                 fw.writeLine( "com.sun.corba.tf.annotation."
-                    + ctr + "=" + str ) ;
+                    + ctr + "=" + cname ) ;
                 ctr++ ;
             }
         } finally {

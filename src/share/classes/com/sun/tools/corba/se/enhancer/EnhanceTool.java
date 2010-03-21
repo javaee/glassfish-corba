@@ -93,10 +93,6 @@ public class EnhanceTool {
         @Help( "Directory to scan for class file" ) 
         File dir() ;
 
-        @DefaultValue( "trace" )
-        @Help( "Class file enhance action to use" )
-        String action() ;
-
         @DefaultValue( "false")
         @Help( "If true, write output to a .class.new file")
         boolean newout() ;
@@ -223,6 +219,10 @@ public class EnhanceTool {
 
             doScan( args, af, scanner, act ) ;
         } catch (Exception exc) {
+            if (util == null) {
+                util = new Util( true, 1 ) ;
+            }
+
             util.info( "Exception: " + exc ) ;
             exc.printStackTrace() ;
         }

@@ -1,0 +1,290 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+ * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
+package com.sun.corba.se.impl.encoding.fast ;
+
+/** Codes used for fast marshaling. Code defines (usually) a type,
+ * which may be followed by a value.  LABEL denotes a positive int,
+ * while LEN[TYPE] denotes a non-negative int followed by that
+ * many values of the TYPE.
+ * <p>
+ * This is a flat marshalling scheme.  By that I mean that each object
+ * is fully marshalled without ever starting to marshal nested objects.
+ * This is an experiment to see what works more quickly.
+ * <p>
+ * This class provides the definition of the format, some enums used
+ * to represent elements of the format, and some basic methods for manipulating
+ * these codes and representations.
+ * <p>All Codes are represented in 8 bits:
+ * <ul>
+ * <li>bit 7: 0=primitive 1=non primitive
+ * <li>bits 6-3: Primitive or NonPrimitive enum ordinal
+ * <li>bits 2-0: encoded value, if any (7 = no value)
+ * </ul>
+ * 3 bits can represent 0...6, but we subtract 1 to get -1...5.
+ * <p>
+ * We will also need some way to delimit argument in messages, otherwise 
+ * parallel marshaling will be impossible.  Something like:
+ * 
+ * NUM_ARGS var-octet 
+ * 
+ * at the start, and 
+ * 
+ * ARG var-octet 
+ *
+ * immediately before the start of an argument.
+ * NUM_ARGS could also directly encode an arg count of 0-6 without any problems
+ * in the byte structure (or more: MSB 0 next 4 8-15 are unused.  That could encode
+ * 6*7 = 42 as the arg number.  But I don't really want to do that.
+ * Instead, we can treat ARG and NUM_ARG as Primitives.
+ */
+public final class Codes {
+    private Codes() {}
+
+    /** Codes representing primitive types.  Can also represent common small
+     * values for values of primitive type.  ARG is used to indicate that a
+     * marshaled value is an argument to the message.
+     */
+    enum Primitive { BOOL, BYTE, CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, ARG } ;
+
+    /** Code representing reference values, including Objects and Arrays.
+     * INDIR is used to represent a reference inside an Object to another
+     * non-primitive value.
+     */
+    enum NonPrimitive { NULL, INDIR, REF, BOOL_ARR, BYTE_ARR, CHAR_ARR, SHORT_ARR,
+	INT_ARR, LONG_ARR, FLOAT_ARR, DOUBLE_ARR, REF_ARR, MSG, FLIST, CLOSE_SESSION,
+	REJECT_REQUEST } ;
+
+    /** Determine whether a byte represents a primitive or non-primitive type,
+     * possibly with an attached value.
+     */
+    public static boolean isPrimitive( byte code ) {
+	return code > 0 ;
+    }
+
+    /** Returns true if a value is encoded with this type.
+     * Returns false if code represents a NonPrimitive.
+     */
+    public static boolean hasEncodedValue( byte code ) {
+	return isPrimitive( code ) && ((code & 7) != 7) ;
+    }
+
+    /** Encode a NonPrimitive as a byte.
+     */
+    public static byte encodeNonPrimitive( NonPrimitive np ) {
+	return (byte)((np.ordinal() << 3) & (byte)0x80) ;
+    }
+
+    /** Decode a Primitive from a byte.
+     */
+    public static NonPrimitive decodeNonPrimitive( byte code ) {
+	return NonPrimitive.values()[ (code & 0x7F) >> 3 ] ;
+    }
+   
+// Primitives
+    private static final byte BOOL_TRUE = (byte)((Primitive.BOOL.ordinal() << 3) & 1) ;
+    private static final byte BOOL_FALSE = (byte)((Primitive.BOOL.ordinal() << 3) & 0) ;
+
+// boolean
+    /** Return the code for a boolean value.
+     */
+    public static byte encodeBoolean( boolean value ) {
+	if (value)
+	    return BOOL_TRUE ;
+	else 
+	    return BOOL_FALSE ;
+    }
+
+    /** Return true if code represents a BOOL.
+     */
+    public static boolean isBoolean( byte code ) {
+	return isPrimitive( code ) && ((code >> 3) == Primitive.BOOL.ordinal()) ;
+    }
+
+    /** If code represents a BOOL, return the value, otherwise
+     * throw IllegalArgumentException.
+     */
+    public static boolean decodeBoolean( byte code ) {
+	if (code == BOOL_TRUE)
+	    return true ;
+	else if (code == BOOL_FALSE)
+	    return false ;
+	else
+	    throw new IllegalArgumentException( "Code " + code 
+		+ " is not a boolean" ) ;
+    }
+
+// byte
+    /** Return true iff value is in the range -1...5, which is 
+     * encodable as a single byte.
+     */
+    public static boolean byteValueIsEncodable( byte value ) {
+	return (value >= (byte)(-1)) && (value <= (byte)5) ;
+    }
+
+    /** If byteValueIsEncodable( value ), return the encoded byte,
+     * otherwise throw IllegalArgumentException.
+     */
+    public static byte encodeByte( byte value ) {
+	if (!byteValueIsEncodable( value )) 
+	    throw new IllegalArgumentException( "Value " + value 
+		+ " cannot be encoded in the BYTE primitive" ) ;
+
+	byte encValue = (byte)(value + (byte)1) ;
+	byte code =(byte)((Primitive.BYTE.ordinal() << 3) & encValue) ;
+	return code ;
+    }
+
+    /** Return true if code represent a byte.
+     */
+    public static boolean isByte( byte code ) {
+	return (code >> 3) == Primitive.BYTE.ordinal() ;
+    }
+
+    /** If isByte(code) and hasEncodedValue(code),
+     * return the encoded byte value, otherwise throw IllegalArgumentException.
+     */
+    public static byte decodeByte( byte code ) {
+	if (isByte(code) && hasEncodedValue(code)) {
+	    byte value = (byte)(code & 7) ;
+	    return (byte)(value-1) ;
+	}
+
+	throw new IllegalArgumentException( "Code " + code 
+	    + " does not contain a byte value" ) ;
+    }
+
+// char
+    public static boolean charValueIsEncodable( char value ) {
+	return false ;
+    }
+
+    public static char encodeChar( char value ) {
+	return ' '  ;
+    }
+
+    public static boolean isChar( byte code ) {
+	return false ;
+    }
+
+    public static char decodeChar( byte code ) {
+	return ' '  ;
+    }
+
+    // short
+    public static boolean shortValueIsEncodable( short value ) {
+	return false ;
+    }
+
+    public static short encodeShort( short value ) {
+	return 0 ;
+    }
+
+    public static boolean isShort( byte code ) {
+	return false ;
+    }
+
+    public static short decodeShort( byte code ) {
+	return 0 ;
+    }
+
+    // int
+    public static boolean intValueIsEncodable( int value ) {
+	return false ;
+    }
+
+    public static int encodeInt( int value ) {
+	return 0 ;
+    }
+
+    public static boolean isInt( byte code ) {
+	return false ;
+    }
+
+    public static int decodeInt( byte code ) {
+	return 0 ;
+    }
+
+    // long
+    public static boolean longValueIsEncodable( long value ) {
+	return false ;
+    }
+
+    public static long encodeLong( long value ) {
+	return 0 ;
+    }
+
+    public static boolean isLong( byte code ) {
+	return false ;
+    }
+
+    public static long decodeLong( byte code ) {
+	return 0 ;
+    }
+
+    // float
+    public static boolean floatValueIsEncodable( float value ) {
+	return false ;
+    }
+
+    public static float encodeFloat( float value ) {
+	return 0 ;
+    }
+
+    public static boolean isFloat( byte code ) {
+	return false ;
+    }
+
+    public static float decodeFloat( byte code ) {
+	return 0 ;
+    }
+
+    // double
+    public static boolean doubleValueIsEncodable( double value ) {
+	return false ;
+    }
+
+    public static double encodeDouble( double value ) {
+	return 0 ;
+    }
+
+    public static boolean isDouble( byte code ) {
+	return false ;
+    }
+
+    public static double decodeDouble( byte code ) {
+	return 0 ;
+    }
+}

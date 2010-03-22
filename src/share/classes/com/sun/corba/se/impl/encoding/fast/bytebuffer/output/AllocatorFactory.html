@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head>
+<title></title>
+  <style type="text/css">
+    <!--code { font-family: Courier New, Courier; font-size: 10pt; margin: 0px; }-->
+  </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head><body>
+
+
+<!-- ======================================================== -->
+<!-- = Java Sourcecode to HTML automatically converted code = -->
+<!-- =   Java2Html Converter 5.0 [2006-02-26] by Markus Gebhard  markus@jave.de   = -->
+<!-- =     Further information: http://www.java2html.de     = -->
+<div align="left" class="java">
+<table border="2" cellpadding="3" cellspacing="0" bgcolor="#ffffff">
+  <!-- start headline -->
+   <tr>
+    <td colspan="2">
+     <center><font size="+2">
+      <code><b>
+AllocatorFactory.java
+      </b></code>
+     </font></center>
+    </td>
+   </tr>
+  <!-- end headline -->
+   <tr>
+  <!-- start source code -->
+   <td nowrap="nowrap" valign="top" align="left">
+    <code>
+<font color="#808080">001</font>&nbsp;<font color="#3f7f5f">/*</font><br />
+<font color="#808080">002</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;DO&nbsp;NOT&nbsp;ALTER&nbsp;OR&nbsp;REMOVE&nbsp;COPYRIGHT&nbsp;NOTICES&nbsp;OR&nbsp;THIS&nbsp;HEADER.</font><br />
+<font color="#808080">003</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">004</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Copyright&nbsp;1997-2007&nbsp;Sun&nbsp;Microsystems,&nbsp;Inc.&nbsp;All&nbsp;rights&nbsp;reserved.</font><br />
+<font color="#808080">005</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">006</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;The&nbsp;contents&nbsp;of&nbsp;this&nbsp;file&nbsp;are&nbsp;subject&nbsp;to&nbsp;the&nbsp;terms&nbsp;of&nbsp;either&nbsp;the&nbsp;GNU</font><br />
+<font color="#808080">007</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;General&nbsp;Public&nbsp;License&nbsp;Version&nbsp;2&nbsp;only&nbsp;(&#34;GPL&#34;)&nbsp;or&nbsp;the&nbsp;Common&nbsp;Development</font><br />
+<font color="#808080">008</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;and&nbsp;Distribution&nbsp;License(&#34;CDDL&#34;)&nbsp;(collectively,&nbsp;the&nbsp;&#34;License&#34;).&nbsp;&nbsp;You</font><br />
+<font color="#808080">009</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;may&nbsp;not&nbsp;use&nbsp;this&nbsp;file&nbsp;except&nbsp;in&nbsp;compliance&nbsp;with&nbsp;the&nbsp;License.&nbsp;You&nbsp;can&nbsp;obtain</font><br />
+<font color="#808080">010</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;License&nbsp;at&nbsp;https://glassfish.dev.java.net/public/CDDL+GPL.html</font><br />
+<font color="#808080">011</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;or&nbsp;glassfish/bootstrap/legal/LICENSE.txt.&nbsp;&nbsp;See&nbsp;the&nbsp;License&nbsp;for&nbsp;the&nbsp;specific</font><br />
+<font color="#808080">012</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;language&nbsp;governing&nbsp;permissions&nbsp;and&nbsp;limitations&nbsp;under&nbsp;the&nbsp;License.</font><br />
+<font color="#808080">013</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">014</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;When&nbsp;distributing&nbsp;the&nbsp;software,&nbsp;include&nbsp;this&nbsp;License&nbsp;Header&nbsp;Notice&nbsp;in&nbsp;each</font><br />
+<font color="#808080">015</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;file&nbsp;and&nbsp;include&nbsp;the&nbsp;License&nbsp;file&nbsp;at&nbsp;glassfish/bootstrap/legal/LICENSE.txt.</font><br />
+<font color="#808080">016</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Sun&nbsp;designates&nbsp;this&nbsp;particular&nbsp;file&nbsp;as&nbsp;subject&nbsp;to&nbsp;the&nbsp;&#34;Classpath&#34;&nbsp;exception</font><br />
+<font color="#808080">017</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;as&nbsp;provided&nbsp;by&nbsp;Sun&nbsp;in&nbsp;the&nbsp;GPL&nbsp;Version&nbsp;2&nbsp;section&nbsp;of&nbsp;the&nbsp;License&nbsp;file&nbsp;that</font><br />
+<font color="#808080">018</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;accompanied&nbsp;this&nbsp;code.&nbsp;&nbsp;If&nbsp;applicable,&nbsp;add&nbsp;the&nbsp;following&nbsp;below&nbsp;the&nbsp;License</font><br />
+<font color="#808080">019</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Header,&nbsp;with&nbsp;the&nbsp;fields&nbsp;enclosed&nbsp;by&nbsp;brackets&nbsp;[]&nbsp;replaced&nbsp;by&nbsp;your&nbsp;own</font><br />
+<font color="#808080">020</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;identifying&nbsp;information:&nbsp;&#34;Portions&nbsp;Copyrighted&nbsp;[year]</font><br />
+<font color="#808080">021</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;[name&nbsp;of&nbsp;copyright&nbsp;owner]&#34;</font><br />
+<font color="#808080">022</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">023</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Contributor(s):</font><br />
+<font color="#808080">024</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">025</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;If&nbsp;you&nbsp;wish&nbsp;your&nbsp;version&nbsp;of&nbsp;this&nbsp;file&nbsp;to&nbsp;be&nbsp;governed&nbsp;by&nbsp;only&nbsp;the&nbsp;CDDL&nbsp;or</font><br />
+<font color="#808080">026</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;only&nbsp;the&nbsp;GPL&nbsp;Version&nbsp;2,&nbsp;indicate&nbsp;your&nbsp;decision&nbsp;by&nbsp;adding&nbsp;&#34;[Contributor]</font><br />
+<font color="#808080">027</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;elects&nbsp;to&nbsp;include&nbsp;this&nbsp;software&nbsp;in&nbsp;this&nbsp;distribution&nbsp;under&nbsp;the&nbsp;[CDDL&nbsp;or&nbsp;GPL</font><br />
+<font color="#808080">028</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Version&nbsp;2]&nbsp;license.&#34;&nbsp;&nbsp;If&nbsp;you&nbsp;don't&nbsp;indicate&nbsp;a&nbsp;single&nbsp;choice&nbsp;of&nbsp;license,&nbsp;a</font><br />
+<font color="#808080">029</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;recipient&nbsp;has&nbsp;the&nbsp;option&nbsp;to&nbsp;distribute&nbsp;your&nbsp;version&nbsp;of&nbsp;this&nbsp;file&nbsp;under</font><br />
+<font color="#808080">030</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;either&nbsp;the&nbsp;CDDL,&nbsp;the&nbsp;GPL&nbsp;Version&nbsp;2&nbsp;or&nbsp;to&nbsp;extend&nbsp;the&nbsp;choice&nbsp;of&nbsp;license&nbsp;to</font><br />
+<font color="#808080">031</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;its&nbsp;licensees&nbsp;as&nbsp;provided&nbsp;above.&nbsp;&nbsp;However,&nbsp;if&nbsp;you&nbsp;add&nbsp;GPL&nbsp;Version&nbsp;2&nbsp;code</font><br />
+<font color="#808080">032</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;and&nbsp;therefore,&nbsp;elected&nbsp;the&nbsp;GPL&nbsp;Version&nbsp;2&nbsp;license,&nbsp;then&nbsp;the&nbsp;option&nbsp;applies</font><br />
+<font color="#808080">033</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;only&nbsp;if&nbsp;the&nbsp;new&nbsp;code&nbsp;is&nbsp;made&nbsp;subject&nbsp;to&nbsp;such&nbsp;option&nbsp;by&nbsp;the&nbsp;copyright</font><br />
+<font color="#808080">034</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;holder.</font><br />
+<font color="#808080">035</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*/</font><br />
+<font color="#808080">036</font>&nbsp;<font color="#7f0055"><b>package&nbsp;</b></font><font color="#000000">com.sun.corba.se.impl.encoding.fast.bytebuffer&nbsp;;</font><br />
+<font color="#808080">037</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">038</font>&nbsp;<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.io.Closeable&nbsp;;</font><br />
+<font color="#808080">039</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">040</font>&nbsp;<font color="#3f5fbf">/**&nbsp;Factory&nbsp;for&nbsp;Allocators&nbsp;(pooled&nbsp;and&nbsp;non-pooled)&nbsp;and&nbsp;SlabPools.</font><br />
+<font color="#808080">041</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">042</font>&nbsp;<font color="#7f0055"><b>public&nbsp;class&nbsp;</b></font><font color="#000000">AllocatorFactory&nbsp;</font><font color="#000000">{</font><br />
+<font color="#808080">043</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;makeAllocator&nbsp;and&nbsp;makePoolAllocator&nbsp;must&nbsp;always&nbsp;have&nbsp;headerSize&nbsp;at&nbsp;least&nbsp;MIN_HEADER_SIZE.</font><br />
+<font color="#808080">044</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">045</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">MIN_HEADER_SIZE&nbsp;=&nbsp;</font><font color="#990000">8&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">046</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">047</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#000000">AllocatorFactory</font><font color="#000000">()&nbsp;{}</font><br />
+<font color="#808080">048</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">049</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Return&nbsp;an&nbsp;Allocator&nbsp;that&nbsp;allocates&nbsp;from&nbsp;one&nbsp;slab&nbsp;at&nbsp;a&nbsp;time,&nbsp;creating&nbsp;a&nbsp;new&nbsp;slab</font><br />
+<font color="#808080">050</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;as&nbsp;needed.&nbsp;&nbsp;Space&nbsp;is&nbsp;recovered&nbsp;by&nbsp;the&nbsp;garbage&nbsp;collector.</font><br />
+<font color="#808080">051</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;This&nbsp;version&nbsp;will&nbsp;create&nbsp;a&nbsp;new&nbsp;slab&nbsp;allocator&nbsp;when&nbsp;available&nbsp;space&nbsp;is&nbsp;exhausted.</font><br />
+<font color="#808080">052</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;It&nbsp;will&nbsp;only&nbsp;return&nbsp;null&nbsp;if&nbsp;an&nbsp;attempt&nbsp;is&nbsp;made&nbsp;to&nbsp;allocate&nbsp;a&nbsp;BufferWrapper&nbsp;larger</font><br />
+<font color="#808080">053</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;than&nbsp;allocatorSize&nbsp;-&nbsp;headerSize&nbsp;bytes.</font><br />
+<font color="#808080">054</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;trim&nbsp;is&nbsp;supported,&nbsp;but&nbsp;only&nbsp;for&nbsp;the&nbsp;last&nbsp;BufferWrapper&nbsp;returned&nbsp;from&nbsp;an&nbsp;allocate&nbsp;call.</font><br />
+<font color="#808080">055</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">headerSize&nbsp;The&nbsp;size&nbsp;of&nbsp;the&nbsp;reserved&nbsp;header&nbsp;space&nbsp;in&nbsp;an&nbsp;allocated&nbsp;BufferWraper.</font><br />
+<font color="#808080">056</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">allocatorSize&nbsp;The&nbsp;total&nbsp;size&nbsp;available&nbsp;for&nbsp;all&nbsp;allocate&nbsp;calls&nbsp;in&nbsp;a&nbsp;single&nbsp;Allocator.</font><br />
+<font color="#808080">057</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">bt&nbsp;The&nbsp;buffer&nbsp;type&nbsp;of&nbsp;the&nbsp;slabs&nbsp;created&nbsp;for&nbsp;this&nbsp;allocator.</font><br />
+<font color="#808080">058</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">059</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;static&nbsp;</b></font><font color="#000000">Allocator&nbsp;makeAllocator</font><font color="#000000">(&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">headerSize,&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">allocatorSize,&nbsp;</font><br />
+<font color="#808080">060</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Allocator.BufferType&nbsp;bt&nbsp;</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#808080">061</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;new&nbsp;</b></font><font color="#000000">AllocatorImpl</font><font color="#000000">(&nbsp;</font><font color="#000000">headerSize,&nbsp;allocatorSize,&nbsp;bt&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">062</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">063</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">064</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Create&nbsp;an&nbsp;Allocator&nbsp;that&nbsp;allocates&nbsp;from&nbsp;a&nbsp;pool&nbsp;of&nbsp;slabs.&nbsp;&nbsp;All&nbsp;space&nbsp;is&nbsp;managed&nbsp;by</font><br />
+<font color="#808080">065</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;the&nbsp;Slabs&nbsp;and&nbsp;SlabPool,&nbsp;and&nbsp;Slabs&nbsp;are&nbsp;recycled&nbsp;once&nbsp;they&nbsp;have&nbsp;been&nbsp;completely&nbsp;freed.</font><br />
+<font color="#808080">066</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">headerSize&nbsp;The&nbsp;size&nbsp;of&nbsp;the&nbsp;reserved&nbsp;header&nbsp;space&nbsp;in&nbsp;an&nbsp;allocated&nbsp;BufferWraper.</font><br />
+<font color="#808080">067</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">pool&nbsp;The&nbsp;SlabPool&nbsp;to&nbsp;use&nbsp;for&nbsp;Slabs&nbsp;for&nbsp;this&nbsp;Allocator.</font><br />
+<font color="#808080">068</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">069</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;static&nbsp;</b></font><font color="#000000">Allocator&nbsp;makePoolAllocator</font><font color="#000000">(&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">headerSize,&nbsp;SlabPool&nbsp;pool&nbsp;</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#808080">070</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;new&nbsp;</b></font><font color="#000000">AllocatorPoolImpl</font><font color="#000000">(&nbsp;</font><font color="#000000">headerSize,&nbsp;pool&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">071</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">072</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">073</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Obtain&nbsp;useful&nbsp;statistics&nbsp;about&nbsp;the&nbsp;SlabPool.</font><br />
+<font color="#808080">074</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">075</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;interface&nbsp;</b></font><font color="#000000">SlabPool&nbsp;</font><font color="#7f0055"><b>extends&nbsp;</b></font><font color="#000000">Closeable&nbsp;</font><font color="#000000">{</font><br />
+<font color="#808080">076</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;The&nbsp;maxAllocationSize&nbsp;of&nbsp;every&nbsp;Slab&nbsp;in&nbsp;this&nbsp;pool.</font><br />
+<font color="#808080">077</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">078</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">maxAllocationSize</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">079</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">080</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;The&nbsp;BufferType&nbsp;of&nbsp;every&nbsp;Slab&nbsp;in&nbsp;this&nbsp;pool.</font><br />
+<font color="#808080">081</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">082</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Allocator.BufferType&nbsp;bufferType</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">083</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">084</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Minimum&nbsp;size&nbsp;of&nbsp;pool,&nbsp;as&nbsp;specified&nbsp;when&nbsp;the&nbsp;SlabPool&nbsp;was&nbsp;created.&nbsp;&nbsp;</font><br />
+<font color="#808080">085</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">086</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">minSize</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">087</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">088</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Maximum&nbsp;size&nbsp;to&nbsp;which&nbsp;pool&nbsp;may&nbsp;expand&nbsp;as&nbsp;specified&nbsp;when&nbsp;the&nbsp;SlabPool&nbsp;was&nbsp;created.&nbsp;&nbsp;</font><br />
+<font color="#808080">089</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">090</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">maxSize</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">091</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">092</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Current&nbsp;free&nbsp;space&nbsp;in&nbsp;pool.</font><br />
+<font color="#808080">093</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">094</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">freeSpace</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">095</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">096</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Total&nbsp;bytes&nbsp;disposed&nbsp;but&nbsp;not&nbsp;yet&nbsp;available&nbsp;for&nbsp;use.&nbsp;&nbsp;This&nbsp;is&nbsp;always&nbsp;less</font><br />
+<font color="#808080">097</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;than&nbsp;allocatedSpace.</font><br />
+<font color="#808080">098</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">099</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">inUseSpace</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">100</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">101</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Total&nbsp;bytes&nbsp;allocated&nbsp;but&nbsp;not&nbsp;yet&nbsp;disposed.</font><br />
+<font color="#808080">102</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">103</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">allocatedSpace</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">104</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">105</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">106</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Create&nbsp;a&nbsp;SlabPool&nbsp;from&nbsp;which&nbsp;Allocators&nbsp;may&nbsp;be&nbsp;created.</font><br />
+<font color="#808080">107</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">maxAllocationSize&nbsp;The&nbsp;maximum&nbsp;size&nbsp;that&nbsp;can&nbsp;be&nbsp;satisfied&nbsp;by&nbsp;a&nbsp;call&nbsp;to&nbsp;Allocator.allocate().</font><br />
+<font color="#808080">108</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">minSize&nbsp;The&nbsp;minimum&nbsp;size&nbsp;of&nbsp;the&nbsp;pool&nbsp;in&nbsp;bytes.</font><br />
+<font color="#808080">109</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">maxSize&nbsp;The&nbsp;maximum&nbsp;size&nbsp;to&nbsp;which&nbsp;a&nbsp;pool&nbsp;may&nbsp;grow.</font><br />
+<font color="#808080">110</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@param&nbsp;</font><font color="#3f5fbf">by&nbsp;The&nbsp;buffer&nbsp;type&nbsp;used&nbsp;in&nbsp;this&nbsp;pool.</font><br />
+<font color="#808080">111</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">112</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">SlabPool&nbsp;makeSlabPool</font><font color="#000000">(&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">maxAllocationSize,&nbsp;</font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">minSize,&nbsp;</font><font color="#7f0055"><b>long&nbsp;</b></font><font color="#000000">maxSize,&nbsp;</font><br />
+<font color="#808080">113</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Allocator.BufferType&nbsp;bt&nbsp;</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#808080">114</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">115</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;new&nbsp;</b></font><font color="#000000">SlabPoolImpl</font><font color="#000000">(&nbsp;</font><font color="#000000">maxAllocationSize,&nbsp;minSize,&nbsp;maxSize,&nbsp;bt&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">116</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">117</font>&nbsp;<font color="#000000">}</font></code>
+    
+   </td>
+  <!-- end source code -->
+   </tr>
+  <!-- start Java2Html link -->
+   <tr>
+    <td align="right">
+<small>
+<a href="http://www.java2html.de" target="_blank">Java2html</a>
+</small>
+    </td>
+   </tr>
+  <!-- end Java2Html link -->
+</table>
+</div>
+<!-- =       END of automatically generated HTML code       = -->
+<!-- ======================================================== -->
+
+
+</body></html>

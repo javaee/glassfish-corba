@@ -1,0 +1,93 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
+ * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
+package com.sun.corba.se.impl.encoding.fast ;
+
+import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
+
+public final class ClassMarshalerFactory {
+    private static final UnaryFunction<Class,ClassAnalyzer> caLookupFunc ;
+    private static final LookupTable<Class,ClassAnalyzer> caTable ; 
+    private static final UnaryFunction<Class,ClassMarshaler> cmLookupFunc ;
+    private static final LookupTable<Class,ClassMarshaler> cmTable ; 
+
+    static {
+        caLookupFunc =
+            new UnaryFunction<Class,ClassAnalyzer>() {
+                public ClassAnalyzer evaluate ( Class arg ) { 
+                    return new ClassAnalyzerImpl( cmTable, arg ) ;
+                } 
+            };
+
+        cmLookupFunc =
+            new UnaryFunction<Class,ClassMarshaler>() {
+                public ClassMarshaler evaluate ( Class arg ) { 
+                    return new ClassMarshaler( 
+                        new ClassAnalyzerImpl( cmTable, arg ) ) ;
+                } 
+            };
+
+        caTable = 
+            new LookupTableConcurrentImpl<Class,ClassAnalyzer>(
+                caLookupFunc, ClassAnalyzer.class) ;
+
+        cmTable = 
+            new LookupTableConcurrentImpl<Class,ClassMarshaler>(
+                cmLookupFunc, ClassMarshaler.class) ;
+    }
+
+    public static ClassMarshaler getClassMarshaler( Class cls ) {
+	return cmTable.lookup( null, cls ) ;
+    }
+
+    public static ClassAnalyzer getClassAnalyzer( Class cls ) {
+	return caTable.lookup( null, cls ) ;
+    }
+
+    public static ClassMarshaler getClassMarshaler( char[] typeLabel ) {
+	// XXX for now, we will just treat typeLabel as the name
+	// of the class and load it.  A full implementation should
+	// use a repository ID, which contains the serialization and
+	// RMI-IIOP hashcodes.  We'll use the existing FVD mechanism
+	// to fetch info about the class from the sender, and do
+	// some variant of the IIOPInputStream diff code or the equivalent
+	// in the java.io classes to handle the class evolution.
+	
+	// convert typeLabel to string
+	// load the class
+	// use getMarshaler( cls ) to get the result.
+	return null ;
+    }
+}

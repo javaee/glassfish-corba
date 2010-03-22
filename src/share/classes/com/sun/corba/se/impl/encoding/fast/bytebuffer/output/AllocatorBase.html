@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head>
+<title></title>
+  <style type="text/css">
+    <!--code { font-family: Courier New, Courier; font-size: 10pt; margin: 0px; }-->
+  </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head><body>
+
+
+<!-- ======================================================== -->
+<!-- = Java Sourcecode to HTML automatically converted code = -->
+<!-- =   Java2Html Converter 5.0 [2006-02-26] by Markus Gebhard  markus@jave.de   = -->
+<!-- =     Further information: http://www.java2html.de     = -->
+<div align="left" class="java">
+<table border="2" cellpadding="3" cellspacing="0" bgcolor="#ffffff">
+  <!-- start headline -->
+   <tr>
+    <td colspan="2">
+     <center><font size="+2">
+      <code><b>
+AllocatorBase.java
+      </b></code>
+     </font></center>
+    </td>
+   </tr>
+  <!-- end headline -->
+   <tr>
+  <!-- start source code -->
+   <td nowrap="nowrap" valign="top" align="left">
+    <code>
+<font color="#808080">001</font>&nbsp;<font color="#3f7f5f">/*</font><br />
+<font color="#808080">002</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;DO&nbsp;NOT&nbsp;ALTER&nbsp;OR&nbsp;REMOVE&nbsp;COPYRIGHT&nbsp;NOTICES&nbsp;OR&nbsp;THIS&nbsp;HEADER.</font><br />
+<font color="#808080">003</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">004</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Copyright&nbsp;1997-2007&nbsp;Sun&nbsp;Microsystems,&nbsp;Inc.&nbsp;All&nbsp;rights&nbsp;reserved.</font><br />
+<font color="#808080">005</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">006</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;The&nbsp;contents&nbsp;of&nbsp;this&nbsp;file&nbsp;are&nbsp;subject&nbsp;to&nbsp;the&nbsp;terms&nbsp;of&nbsp;either&nbsp;the&nbsp;GNU</font><br />
+<font color="#808080">007</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;General&nbsp;Public&nbsp;License&nbsp;Version&nbsp;2&nbsp;only&nbsp;(&#34;GPL&#34;)&nbsp;or&nbsp;the&nbsp;Common&nbsp;Development</font><br />
+<font color="#808080">008</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;and&nbsp;Distribution&nbsp;License(&#34;CDDL&#34;)&nbsp;(collectively,&nbsp;the&nbsp;&#34;License&#34;).&nbsp;&nbsp;You</font><br />
+<font color="#808080">009</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;may&nbsp;not&nbsp;use&nbsp;this&nbsp;file&nbsp;except&nbsp;in&nbsp;compliance&nbsp;with&nbsp;the&nbsp;License.&nbsp;You&nbsp;can&nbsp;obtain</font><br />
+<font color="#808080">010</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;License&nbsp;at&nbsp;https://glassfish.dev.java.net/public/CDDL+GPL.html</font><br />
+<font color="#808080">011</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;or&nbsp;glassfish/bootstrap/legal/LICENSE.txt.&nbsp;&nbsp;See&nbsp;the&nbsp;License&nbsp;for&nbsp;the&nbsp;specific</font><br />
+<font color="#808080">012</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;language&nbsp;governing&nbsp;permissions&nbsp;and&nbsp;limitations&nbsp;under&nbsp;the&nbsp;License.</font><br />
+<font color="#808080">013</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">014</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;When&nbsp;distributing&nbsp;the&nbsp;software,&nbsp;include&nbsp;this&nbsp;License&nbsp;Header&nbsp;Notice&nbsp;in&nbsp;each</font><br />
+<font color="#808080">015</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;file&nbsp;and&nbsp;include&nbsp;the&nbsp;License&nbsp;file&nbsp;at&nbsp;glassfish/bootstrap/legal/LICENSE.txt.</font><br />
+<font color="#808080">016</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Sun&nbsp;designates&nbsp;this&nbsp;particular&nbsp;file&nbsp;as&nbsp;subject&nbsp;to&nbsp;the&nbsp;&#34;Classpath&#34;&nbsp;exception</font><br />
+<font color="#808080">017</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;as&nbsp;provided&nbsp;by&nbsp;Sun&nbsp;in&nbsp;the&nbsp;GPL&nbsp;Version&nbsp;2&nbsp;section&nbsp;of&nbsp;the&nbsp;License&nbsp;file&nbsp;that</font><br />
+<font color="#808080">018</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;accompanied&nbsp;this&nbsp;code.&nbsp;&nbsp;If&nbsp;applicable,&nbsp;add&nbsp;the&nbsp;following&nbsp;below&nbsp;the&nbsp;License</font><br />
+<font color="#808080">019</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Header,&nbsp;with&nbsp;the&nbsp;fields&nbsp;enclosed&nbsp;by&nbsp;brackets&nbsp;[]&nbsp;replaced&nbsp;by&nbsp;your&nbsp;own</font><br />
+<font color="#808080">020</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;identifying&nbsp;information:&nbsp;&#34;Portions&nbsp;Copyrighted&nbsp;[year]</font><br />
+<font color="#808080">021</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;[name&nbsp;of&nbsp;copyright&nbsp;owner]&#34;</font><br />
+<font color="#808080">022</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">023</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Contributor(s):</font><br />
+<font color="#808080">024</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*</font><br />
+<font color="#808080">025</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;If&nbsp;you&nbsp;wish&nbsp;your&nbsp;version&nbsp;of&nbsp;this&nbsp;file&nbsp;to&nbsp;be&nbsp;governed&nbsp;by&nbsp;only&nbsp;the&nbsp;CDDL&nbsp;or</font><br />
+<font color="#808080">026</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;only&nbsp;the&nbsp;GPL&nbsp;Version&nbsp;2,&nbsp;indicate&nbsp;your&nbsp;decision&nbsp;by&nbsp;adding&nbsp;&#34;[Contributor]</font><br />
+<font color="#808080">027</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;elects&nbsp;to&nbsp;include&nbsp;this&nbsp;software&nbsp;in&nbsp;this&nbsp;distribution&nbsp;under&nbsp;the&nbsp;[CDDL&nbsp;or&nbsp;GPL</font><br />
+<font color="#808080">028</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;Version&nbsp;2]&nbsp;license.&#34;&nbsp;&nbsp;If&nbsp;you&nbsp;don't&nbsp;indicate&nbsp;a&nbsp;single&nbsp;choice&nbsp;of&nbsp;license,&nbsp;a</font><br />
+<font color="#808080">029</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;recipient&nbsp;has&nbsp;the&nbsp;option&nbsp;to&nbsp;distribute&nbsp;your&nbsp;version&nbsp;of&nbsp;this&nbsp;file&nbsp;under</font><br />
+<font color="#808080">030</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;either&nbsp;the&nbsp;CDDL,&nbsp;the&nbsp;GPL&nbsp;Version&nbsp;2&nbsp;or&nbsp;to&nbsp;extend&nbsp;the&nbsp;choice&nbsp;of&nbsp;license&nbsp;to</font><br />
+<font color="#808080">031</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;its&nbsp;licensees&nbsp;as&nbsp;provided&nbsp;above.&nbsp;&nbsp;However,&nbsp;if&nbsp;you&nbsp;add&nbsp;GPL&nbsp;Version&nbsp;2&nbsp;code</font><br />
+<font color="#808080">032</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;and&nbsp;therefore,&nbsp;elected&nbsp;the&nbsp;GPL&nbsp;Version&nbsp;2&nbsp;license,&nbsp;then&nbsp;the&nbsp;option&nbsp;applies</font><br />
+<font color="#808080">033</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;only&nbsp;if&nbsp;the&nbsp;new&nbsp;code&nbsp;is&nbsp;made&nbsp;subject&nbsp;to&nbsp;such&nbsp;option&nbsp;by&nbsp;the&nbsp;copyright</font><br />
+<font color="#808080">034</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*&nbsp;holder.</font><br />
+<font color="#808080">035</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f7f5f">*/</font><br />
+<font color="#808080">036</font>&nbsp;<font color="#7f0055"><b>package&nbsp;</b></font><font color="#000000">com.sun.corba.se.impl.encoding.fast.bytebuffer&nbsp;;</font><br />
+<font color="#808080">037</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">038</font>&nbsp;<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.nio.ByteBuffer&nbsp;;</font><br />
+<font color="#808080">039</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">040</font>&nbsp;<font color="#3f5fbf">/**&nbsp;Base&nbsp;class&nbsp;for&nbsp;implementing&nbsp;an&nbsp;Allocator.</font><br />
+<font color="#808080">041</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*&nbsp;All&nbsp;subclasses&nbsp;must&nbsp;implement&nbsp;dispose,&nbsp;releaseSlab&nbsp;and&nbsp;obtainSlab,&nbsp;as&nbsp;well&nbsp;as&nbsp;the&nbsp;undefined</font><br />
+<font color="#808080">042</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*&nbsp;methods&nbsp;in&nbsp;the&nbsp;Allocator&nbsp;interface:&nbsp;maxAllocationSize,&nbsp;bufferType,&nbsp;and&nbsp;close.</font><br />
+<font color="#808080">043</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*&nbsp;This&nbsp;class&nbsp;handles&nbsp;allocation&nbsp;of&nbsp;BufferWrappers&nbsp;from&nbsp;the&nbsp;current&nbsp;Slab.</font><br />
+<font color="#808080">044</font>&nbsp;<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#808080">045</font>&nbsp;<font color="#7f0055"><b>public&nbsp;abstract&nbsp;class&nbsp;</b></font><font color="#000000">AllocatorBase&nbsp;</font><font color="#7f0055"><b>implements&nbsp;</b></font><font color="#000000">Allocator&nbsp;</font><font color="#000000">{</font><br />
+<font color="#808080">046</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">headerSize&nbsp;;</font><br />
+<font color="#808080">047</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#000000">Slab&nbsp;currentSlab&nbsp;;</font><br />
+<font color="#808080">048</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">closed&nbsp;=&nbsp;</font><font color="#7f0055"><b>false&nbsp;</b></font><font color="#000000">;</font><br />
+<font color="#808080">049</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">050</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;final&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">checkClosed</font><font color="#000000">()&nbsp;{</font><br />
+<font color="#808080">051</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">closed</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#808080">052</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>throw&nbsp;new&nbsp;</b></font><font color="#000000">IllegalStateException</font><font color="#000000">(&nbsp;</font><font color="#2a00ff">&#34;Allocator&nbsp;is&nbsp;closed&#34;&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">053</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">054</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">055</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">056</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">AllocatorBase</font><font color="#000000">(&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">headerSize&nbsp;</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#808080">057</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.headerSize&nbsp;=&nbsp;headerSize&nbsp;;</font><br />
+<font color="#808080">058</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">059</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">currentSlab&nbsp;=&nbsp;obtainSlab</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">060</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">061</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">062</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;final&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">headerSize</font><font color="#000000">()&nbsp;{</font><br />
+<font color="#808080">063</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">checkClosed</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">064</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">headerSize&nbsp;;</font><br />
+<font color="#808080">065</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">066</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">067</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//&nbsp;Used&nbsp;only&nbsp;by&nbsp;BufferWrapperImpl</font><br />
+<font color="#808080">068</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>abstract&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">dispose</font><font color="#000000">(&nbsp;</font><font color="#000000">Slab&nbsp;slab,&nbsp;ByteBuffer&nbsp;store&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">069</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">070</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>abstract&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">releaseSlab</font><font color="#000000">(&nbsp;</font><font color="#000000">Slab&nbsp;slab&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">071</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">072</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>abstract&nbsp;</b></font><font color="#000000">Slab&nbsp;obtainSlab</font><font color="#000000">()&nbsp;</font><font color="#000000">;&nbsp;</font><br />
+<font color="#808080">073</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">074</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;final&nbsp;</b></font><font color="#000000">BufferWrapper&nbsp;allocate</font><font color="#000000">(&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">size&nbsp;</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#808080">075</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">checkClosed</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">076</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">077</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">size&nbsp;&gt;&nbsp;maxAllocationSize</font><font color="#000000">())&nbsp;{</font><br />
+<font color="#808080">078</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>throw&nbsp;new&nbsp;</b></font><font color="#000000">IllegalArgumentException</font><font color="#000000">(&nbsp;</font><font color="#2a00ff">&#34;Request&nbsp;size&nbsp;&#34;&nbsp;</font><font color="#000000">+&nbsp;size&nbsp;</font><br />
+<font color="#808080">079</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">+&nbsp;</font><font color="#2a00ff">&#34;&nbsp;is&nbsp;larger&nbsp;than&nbsp;maximum&nbsp;allocation&nbsp;size&nbsp;&#34;&nbsp;</font><font color="#000000">+&nbsp;maxAllocationSize</font><font color="#000000">()&nbsp;)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">080</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">081</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">082</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">currentSlab.sizeAvailable</font><font color="#000000">()&nbsp;</font><font color="#000000">&lt;&nbsp;</font><font color="#000000">(</font><font color="#000000">size&nbsp;+&nbsp;headerSize</font><font color="#000000">))&nbsp;{</font><br />
+<font color="#808080">083</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">currentSlab.markFull</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">084</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">releaseSlab</font><font color="#000000">(&nbsp;</font><font color="#000000">currentSlab&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">085</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">currentSlab&nbsp;=&nbsp;obtainSlab</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">086</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">087</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">088</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">BufferWrapper&nbsp;result&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">BufferWrapper</font><font color="#000000">(&nbsp;</font><font color="#000000">this,&nbsp;currentSlab,&nbsp;headerSize,&nbsp;size&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">089</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">result&nbsp;;</font><br />
+<font color="#808080">090</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">091</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">092</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;final&nbsp;</b></font><font color="#000000">BufferWrapper&nbsp;allocate</font><font color="#000000">(&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">minSize,&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">maxSize&nbsp;</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#808080">093</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">checkClosed</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">094</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">095</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">minSize&nbsp;&gt;&nbsp;maxAllocationSize</font><font color="#000000">())&nbsp;{</font><br />
+<font color="#808080">096</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>throw&nbsp;new&nbsp;</b></font><font color="#000000">IllegalArgumentException</font><font color="#000000">(&nbsp;</font><font color="#2a00ff">&#34;Minimum&nbsp;request&nbsp;size&nbsp;&#34;&nbsp;</font><font color="#000000">+&nbsp;minSize&nbsp;</font><br />
+<font color="#808080">097</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">+&nbsp;</font><font color="#2a00ff">&#34;&nbsp;is&nbsp;larger&nbsp;than&nbsp;maximum&nbsp;allocation&nbsp;size&nbsp;&#34;&nbsp;</font><font color="#000000">+&nbsp;maxAllocationSize</font><font color="#000000">()&nbsp;)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">098</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">099</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">100</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">remaining&nbsp;=&nbsp;currentSlab.sizeAvailable</font><font color="#000000">()&nbsp;</font><font color="#000000">-&nbsp;headerSize&nbsp;;&nbsp;</font><br />
+<font color="#808080">101</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">allocSize&nbsp;=&nbsp;maxSize&nbsp;;</font><br />
+<font color="#808080">102</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">((</font><font color="#000000">remaining&nbsp;&gt;=&nbsp;minSize</font><font color="#000000">)&nbsp;</font><font color="#000000">&amp;&amp;&nbsp;</font><font color="#000000">(</font><font color="#000000">remaining&nbsp;&lt;=&nbsp;maxSize</font><font color="#000000">))&nbsp;{</font><br />
+<font color="#808080">103</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">allocSize&nbsp;=&nbsp;remaining&nbsp;;</font><br />
+<font color="#808080">104</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">105</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">106</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">allocate</font><font color="#000000">(&nbsp;</font><font color="#000000">allocSize&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">107</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">108</font>&nbsp;<font color="#ffffff"></font><br />
+<font color="#808080">109</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;final&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">close</font><font color="#000000">()&nbsp;{</font><br />
+<font color="#808080">110</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">checkClosed</font><font color="#000000">()&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">111</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">releaseSlab</font><font color="#000000">(&nbsp;</font><font color="#000000">currentSlab&nbsp;</font><font color="#000000">)&nbsp;</font><font color="#000000">;</font><br />
+<font color="#808080">112</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">closed&nbsp;=&nbsp;</font><font color="#7f0055"><b>true&nbsp;</b></font><font color="#000000">;</font><br />
+<font color="#808080">113</font>&nbsp;<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#808080">114</font>&nbsp;<font color="#000000">}</font></code>
+    
+   </td>
+  <!-- end source code -->
+   </tr>
+  <!-- start Java2Html link -->
+   <tr>
+    <td align="right">
+<small>
+<a href="http://www.java2html.de" target="_blank">Java2html</a>
+</small>
+    </td>
+   </tr>
+  <!-- end Java2Html link -->
+</table>
+</div>
+<!-- =       END of automatically generated HTML code       = -->
+<!-- ======================================================== -->
+
+
+</body></html>

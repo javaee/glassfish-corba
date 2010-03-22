@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,8 +38,6 @@ package com.sun.corba.se.impl.dynamicany;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.portable.OutputStream;
 
@@ -54,6 +52,8 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
 {
+    private static final long serialVersionUID = 7435214669604617358L;
+
     protected static final int NO_INDEX = -1;
     // A DynAny is destroyable if it is the root of a DynAny hierarchy.
     protected static final byte STATUS_DESTROYABLE = 0;
@@ -90,10 +90,11 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
         this.orb = orb;
 	wrapper = orb.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
 
-        if (copyValue)
+        if (copyValue) {
             this.any = DynAnyUtil.copy(any, orb);
-        else
+        } else {
             this.any = any;
+        }
         // set the current position to 0 if any has components, otherwise to -1.
         index = NO_INDEX;
     }
@@ -121,14 +122,11 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
     // Uses getAny() if this is our implementation, otherwise uses to_any()
     // which copies the Any.
     protected Any getAny(DynAny dynAny) {
-        if (dynAny instanceof DynAnyImpl)
+        if (dynAny instanceof DynAnyImpl) {
             return ((DynAnyImpl)dynAny).getAny();
-        else
-            // _REVISIT_ Nothing we can do about copying at this point
-            // if this is not our implementation of DynAny.
-            // To prevent this we would need another representation,
-            // one where component DynAnys are initialized but not the component Anys.
+        } else {
             return dynAny.to_any();
+        }
     }
 
     protected void writeAny(OutputStream out) {

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -64,7 +64,7 @@ public interface NamingContextDataStore {
      * @param bt Type of binding (as object or as context).
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
-    void Bind(NameComponent n, org.omg.CORBA.Object obj, BindingType bt)
+    void bindImpl(NameComponent n, org.omg.CORBA.Object obj, BindingType bt)
 	throws org.omg.CORBA.SystemException;
 
     /**
@@ -77,7 +77,7 @@ public interface NamingContextDataStore {
      * @return the object reference bound under the supplied name.
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
-    org.omg.CORBA.Object Resolve(NameComponent n,BindingTypeHolder bth)
+    org.omg.CORBA.Object resolveImpl(NameComponent n,BindingTypeHolder bth)
 	throws org.omg.CORBA.SystemException;
 
     /**
@@ -85,7 +85,7 @@ public interface NamingContextDataStore {
      * @return the object reference bound to the name, or null if not found.
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
-    org.omg.CORBA.Object Unbind(NameComponent n)
+    org.omg.CORBA.Object unbindImpl(NameComponent n)
 	throws org.omg.CORBA.SystemException;
 
     /**
@@ -96,7 +96,7 @@ public interface NamingContextDataStore {
      * @param bi The BindingIterator as an out parameter.
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
-    void List(int how_many, BindingListHolder bl, BindingIteratorHolder bi)
+    void listImpl(int how_many, BindingListHolder bl, BindingIteratorHolder bi)
 	throws org.omg.CORBA.SystemException;
 
     /**
@@ -105,14 +105,14 @@ public interface NamingContextDataStore {
      * by this Name Server.
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
-    NamingContext NewContext()
+    NamingContext newContextImpl()
 	throws org.omg.CORBA.SystemException;
 
     /**
      * Method which implements destroying this NamingContext.
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
      */
-    void Destroy()
+    void destroyImpl()
 	throws org.omg.CORBA.SystemException;
   
     /**
@@ -120,7 +120,7 @@ public interface NamingContextDataStore {
      * or not.
      * @return true if this NamingContext contains no bindings.
      */
-    boolean IsEmpty();
+    boolean isEmptyImpl();
 
     POA getNSPOA( );
 }

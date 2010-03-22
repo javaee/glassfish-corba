@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,18 +40,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PrivilegedExceptionAction ;
 import java.security.AccessController ;
-import java.util.Collection ;
-import java.util.Iterator ;
-
-import org.omg.CORBA.CompletionStatus ;
 
 import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
-
-import com.sun.corba.se.spi.activation.Locator ;
-import com.sun.corba.se.spi.activation.Activator ;
-import com.sun.corba.se.spi.activation.LocatorHelper ;
-import com.sun.corba.se.spi.activation.ActivatorHelper ;
-import com.sun.corba.se.spi.activation.EndPointInfo ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.copyobject.CopyobjectDefaults ;
@@ -119,6 +109,10 @@ import com.sun.corba.se.spi.transport.CorbaAcceptor;
 public class ORBConfiguratorImpl implements ORBConfigurator {
     private ORBUtilSystemException wrapper ;
 
+    protected void persistentServerInitialization(ORB theOrb) {
+        // Does nothing, but can be overridden in subclass.
+    }
+
     public static class ConfigParser extends ParserImplBase {
         private ORB orb ;
 
@@ -126,7 +120,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
             this.orb = orb ;
         } ;
 
-	public Class[] userConfigurators = null ;
+	public Class<?>[] userConfigurators = null ;
 
 	public PropertyParser makeParser()
 	{
@@ -159,11 +153,19 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	initServiceContextRegistry( theOrb ) ;
 	initRequestDispatcherRegistry( theOrb ) ;
 	registerInitialReferences( theOrb ) ;
-
-	persistentServerInitialization( theOrb ) ;
+        
+        // Set up the PIHandler now.  The user configurator call is the
+        // earliest point at which an invocation on this ORB can occur due to
+        // external code extending the ORB through a configurator.
+        // persistentServerInitialization also needs to make invocations to ORBD.
+        // ORB invocations can also occur during the execution of
+        // the ORBInitializers.  
+        theOrb.createPIHandler() ;
 
 	theOrb.setInvocationInterceptor( 
 	    PresentationDefaults.getNullInvocationInterceptor() ) ;
+
+	persistentServerInitialization( theOrb ) ;
 
 	runUserConfigurators( collector, theOrb ) ;
     }
@@ -188,58 +190,6 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	}
     }
 
-    private void persistentServerInitialization( ORB orb )
-    {
-	ORBData data = orb.getORBData() ;
-
-	// determine the ORBD port so that persistent objrefs can be
-	// created.
-	if (data.getServerIsORBActivated()) {
-	    try {
-                Locator locator = LocatorHelper.narrow(
-		    orb.resolve_initial_references( 
-			ORBConstants.SERVER_LOCATOR_NAME )) ;
-                Activator activator = ActivatorHelper.narrow(
-		    orb.resolve_initial_references( 
-			ORBConstants.SERVER_ACTIVATOR_NAME )) ;
-		Collection serverEndpoints = 
-		    orb.getCorbaTransportManager().getAcceptors(null, null);
-		EndPointInfo[] endpointList = 
-		    new EndPointInfo[serverEndpoints.size()];
-		Iterator iterator = serverEndpoints.iterator();
-		int i = 0 ;
-		while (iterator.hasNext()) {
-		    Object n = iterator.next();
-		    if (! (n instanceof LegacyServerSocketEndPointInfo)) {
-			continue;
-		    }
-		    LegacyServerSocketEndPointInfo ep = 
-			(LegacyServerSocketEndPointInfo) n;
-		    // REVISIT - use exception instead of -1.
-		    int port = locator.getEndpoint(ep.getType());
-		    if (port == -1) {
-			port = locator.getEndpoint(SocketInfo.IIOP_CLEAR_TEXT);
-			if (port == -1) {
-			    throw new Exception(
-				"ORBD must support IIOP_CLEAR_TEXT");
-			}
-		    }
-
-		    ep.setLocatorPort(port);
-		    
-		    endpointList[i++] = 
-			new EndPointInfo(ep.getType(), ep.getPort());
-		}
-
-	        activator.registerEndpoints(
-		    data.getPersistentServerId(), data.getORBId(), 
-			endpointList);
-	    } catch (Exception ex) {
-		throw wrapper.persistentServerInitError( 
-		    CompletionStatus.COMPLETED_MAYBE, ex ) ;
-	    }
-	}
-    }
 
     /**
      * This is made somewhat complex because we are currently supporting
@@ -260,10 +210,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	setLegacySocketFactoryORB(orb, legacySocketFactory);
 	// END Legacy
 
-	//
 	// Check for incorrect configuration.
-	//
-
 	if (legacySocketFactory != null && contactInfoListFactory != null) {
 	    throw wrapper.socketFactoryAndContactInfoListAtSameTime();
 	}
@@ -272,17 +219,10 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    throw wrapper.acceptorsAndLegacySocketFactoryAtSameTime();
 	}
 
-
-	//
 	// Client and Server side setup.
-	//
-
 	od.getSocketFactory().setORB(orb);
 
-	//
 	// Set up client side.
-	//
-
 	if (legacySocketFactory != null) {
 	    // BEGIN Legacy
 	    // Since the user specified a legacy socket factory we need to
@@ -389,7 +329,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 
 	try {
     	    AccessController.doPrivileged(
-                new PrivilegedExceptionAction() {
+                new PrivilegedExceptionAction<Object>() {
 	            public Object run()
 		        throws InstantiationException, IllegalAccessException
 		    {

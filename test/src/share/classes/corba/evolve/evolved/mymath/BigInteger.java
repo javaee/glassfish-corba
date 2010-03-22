@@ -1,15 +1,4 @@
 /*
- * @(#)src/classes/sov/mymath/BigInteger.java, math, asdev, 20051029 1.28
- * ===========================================================================
- * Licensed Materials - Property of IBM
- * "Restricted Materials of IBM"
- *
- * IBM SDK, Java(tm) 2 Technology Edition, v5.0
- * (C) Copyright IBM Corp. 1998, 2005. All Rights Reserved
- * ===========================================================================
- */
-
-/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
@@ -45,10 +34,16 @@
  * holder.
  */
 
-
-
-
-
+/*
+ * @(#)src/classes/sov/mymath/BigInteger.java, math, asdev, 20051029 1.28
+ * ===========================================================================
+ * Licensed Materials - Property of IBM
+ * "Restricted Materials of IBM"
+ *
+ * IBM SDK, Java(tm) 2 Technology Edition, v5.0
+ * (C) Copyright IBM Corp. 1998, 2005. All Rights Reserved
+ * ===========================================================================
+ */
 
 /*
  *

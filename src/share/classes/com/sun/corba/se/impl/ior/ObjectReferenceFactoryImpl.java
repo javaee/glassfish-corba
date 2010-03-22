@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,17 +45,10 @@ import org.omg.CORBA.TypeCode ;
 import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ObjectReferenceFactoryHelper ;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
 
-import com.sun.corba.se.spi.ior.ObjectId ;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
-import com.sun.corba.se.spi.ior.ObjectAdapterId ;
-import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactory;
 import com.sun.corba.se.spi.ior.IORTemplateList;
 import com.sun.corba.se.spi.ior.IORFactories;
-
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -70,6 +63,8 @@ import com.sun.corba.se.spi.orb.ORB ;
 public class ObjectReferenceFactoryImpl extends ObjectReferenceProducerBase
     implements ObjectReferenceFactory, StreamableValue 
 {
+    // private static long serialVersionUID = 0 ;
+
     transient private IORTemplateList iorTemplates ;
 
     public ObjectReferenceFactoryImpl( InputStream is )
@@ -84,6 +79,7 @@ public class ObjectReferenceFactoryImpl extends ObjectReferenceProducerBase
 	iorTemplates = iortemps ;
     }
 
+    @Override
     public boolean equals( Object obj )
     {
 	if (!(obj instanceof ObjectReferenceFactoryImpl))
@@ -95,6 +91,7 @@ public class ObjectReferenceFactoryImpl extends ObjectReferenceProducerBase
 	    iorTemplates.equals( other.iorTemplates ) ;
     }
 
+    @Override
     public int hashCode()
     {
 	return iorTemplates.hashCode() ;

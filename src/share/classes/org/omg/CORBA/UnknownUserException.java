@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -67,7 +67,7 @@ public final class UnknownUserException extends UserException {
      * Constructs an <code>UnknownUserException</code> object that contains the given
      * <code>Any</code> object.
      *
-     * @ param a an <code>Any</code> object that contains a user exception returned
+     * @param a an <code>Any</code> object that contains a user exception returned
      *         by the server
      */
     public UnknownUserException(Any a) {

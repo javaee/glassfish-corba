@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -95,8 +95,12 @@ public class InterceptorInvoker {
     /**
      * Enables or disables the interceptor invoker
      */
-    void setEnabled( boolean enabled ) {
+    synchronized void setEnabled( boolean enabled ) {
 	this.enabled = enabled;
+    }
+
+    synchronized boolean getEnabled() {
+        return this.enabled ;
     }
     
     /*
@@ -116,7 +120,7 @@ public class InterceptorInvoker {
 
         try {
             // If invocation is not yet enabled, don't do anything.
-            if( enabled ) {
+            if( getEnabled() ) {
                 // Create IORInfo object to pass to IORInterceptors:
                 IORInfoImpl info = new IORInfoImpl( oa );
 
@@ -176,7 +180,7 @@ public class InterceptorInvoker {
         }
 
         try {
-            if (enabled) {
+            if (getEnabled()) {
                 IORInterceptor[] interceptors = 
                     (IORInterceptor[])interceptorList.getInterceptors( 
                     InterceptorList.INTERCEPTOR_TYPE_IOR );
@@ -209,7 +213,7 @@ public class InterceptorInvoker {
         }
 
         try {
-            if (enabled) {
+            if (getEnabled()) {
                 IORInterceptor[] interceptors = 
                     (IORInterceptor[])interceptorList.getInterceptors( 
                     InterceptorList.INTERCEPTOR_TYPE_IOR );
@@ -249,9 +253,11 @@ public class InterceptorInvoker {
                 "info", info ) ;
         }
 
+        info.interceptorsEnabledForThisRequest = getEnabled() ;
+
         try {
             // If invocation is not yet enabled, don't do anything.
-            if( enabled ) {
+            if( info.interceptorsEnabledForThisRequest ) {
                 try {
                     // Make a a fresh slot table available to TSC in case
                     // interceptors need to make out calls.
@@ -386,7 +392,7 @@ public class InterceptorInvoker {
 
         try {
             // If invocation is not yet enabled, don't do anything.
-            if( enabled ) {
+            if( info.interceptorsEnabledForThisRequest ) {
                 try {
                     // NOTE: It is assumed someplace else prepared a
                     // fresh TSC slot table.
@@ -472,7 +478,7 @@ public class InterceptorInvoker {
                 } finally {
                     // See doc for setPICurrentPushed as to why this is necessary.
                     // Check info for null in case errors happen before initiate.
-                    if (info != null && info.isPICurrentPushed()) {
+                    if (info.isPICurrentPushed()) {
                         current.popSlotTable( );
                         // After the pop, original client's TSC slot table
                         // remains avaiable via PICurrent.
@@ -500,9 +506,11 @@ public class InterceptorInvoker {
                 "info", info ) ;
         }
 
+        info.interceptorsEnabledForThisRequest = getEnabled() ;
+
         try {
             // If invocation is not yet enabled, don't do anything.
-            if( enabled ) {
+            if( info.interceptorsEnabledForThisRequest ) {
                 try {
                     // Make a fresh slot table for RSC.
                     current.pushSlotTable();
@@ -618,7 +626,7 @@ public class InterceptorInvoker {
         try {
             int intermediatePointCall = info.getIntermediatePointCall();
             // If invocation is not yet enabled, don't do anything.
-            if( enabled && ( intermediatePointCall != 
+            if( info.interceptorsEnabledForThisRequest && ( intermediatePointCall != 
                              ServerRequestInfoImpl.CALL_INTERMEDIATE_NONE ) ) {
 
                 // NOTE: do not touch the slotStack.  The RSC and TSC are
@@ -707,7 +715,7 @@ public class InterceptorInvoker {
 
         try {
             // If invocation is not yet enabled, don't do anything.
-            if( enabled ) {
+            if( info.interceptorsEnabledForThisRequest ) {
                 try {
                     // NOTE: do not touch the slotStack.  The RSC and TSC are
                     // equivalent at this point.

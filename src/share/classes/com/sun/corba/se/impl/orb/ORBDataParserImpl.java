@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -130,12 +130,16 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private boolean blockingReadCheckMessageParser;
     private boolean timingPointsEnabled;
     private boolean useEnumDesc ;
+    private boolean environmentIsGFServer ;
     private boolean noDefaultAcceptors ;
     private boolean registerMBeans ;
     private int fragmentReadTimeout ;
 
     // This is not initialized from ParserTable.
     private CodeSetComponentInfo codesets ;
+
+    private String[] orbInitArgs ;
+    private boolean disableORBD;
 
 // Public accessor methods ========================================================================
 
@@ -527,6 +531,10 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
         return useEnumDesc ;
     }
 
+    public boolean environmentIsGFServer() {
+        return environmentIsGFServer ;
+    }
+
     public boolean noDefaultAcceptors() {
         return noDefaultAcceptors ;
     }
@@ -537,6 +545,18 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public int fragmentReadTimeout() {
         return fragmentReadTimeout ;
+    }
+
+    public void setOrbInitArgs( String[] args ) {
+        orbInitArgs = args ;
+    }
+
+    public String[] getOrbInitArgs() {
+        return orbInitArgs ;
+    }
+
+    public boolean disableORBD() {
+        return disableORBD ;
     }
 }
 

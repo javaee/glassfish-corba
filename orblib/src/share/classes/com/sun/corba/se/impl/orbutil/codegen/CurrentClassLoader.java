@@ -62,7 +62,7 @@ public class CurrentClassLoader {
 	    cl = LibraryClassLoader.getClassLoader() ;
 	current.set( cl ) ;
 
-	// This is essential for propert operation of codegen when multiple
+	// This is essential for proper operation of codegen when multiple
 	// ClassLoaders are in use.  The problem is that Type maintains a cache
 	// the maps class names to Types.  The same class name may of course refer
 	// to different classes in different ClassLoaders.  The Type interface

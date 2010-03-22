@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -56,8 +56,8 @@ public final class CodecFactoryImpl
     implements CodecFactory 
 {
     // The ORB that created this Codec Factory
-    private ORB orb;
-    private ORBUtilSystemException wrapper ;
+    private transient ORB orb;
+    private transient ORBUtilSystemException wrapper ;
 
     // The maximum minor version of GIOP supported by this codec factory.
     // Currently, this is 1.2.

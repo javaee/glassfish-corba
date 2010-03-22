@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -51,6 +51,8 @@ import org.omg.PortableInterceptor.HOLDING ;
 import org.omg.PortableInterceptor.INACTIVE ;
 import org.omg.PortableInterceptor.NON_EXISTENT ;
 
+import com.sun.corba.se.spi.orb.ORB ;
+
 import com.sun.corba.se.spi.protocol.PIHandler ;
 
 import com.sun.corba.se.spi.orbutil.generic.MultiSet ;
@@ -80,7 +82,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
     private final POAFactory factory ;	// factory which contains global state 
 					// for all POAManagers 
-    private PIHandler pihandler ;	// for adapterManagerStateChanged
+    private ORB orb ;
     private State state;		// current state of this POAManager
     private Set<POAImpl> poas =
         new HashSet<POAImpl>(4) ;       // all poas controlled by this POAManager
@@ -151,7 +153,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * Another possible route to fix the app server bug (more globally) is to have the RFM 
      * suspend method use discard instead of hold.  This may be better in some ways, 
      * but early tests with that approach led to some problems (which I can't recall right now).  
-     * I suspect e the issues may have been related to problems with the client-side retry logic,
+     * I suspect the issues may have been related to problems with the client-side retry logic,
      * but those problems have now been fixed.  In any case, we need to fix the POAManager
      * issues.
      */
@@ -215,7 +217,14 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
     PIHandler getPIHandler()
     {
-	return pihandler ;
+	return orb.getPIHandler() ;
+    }
+
+    private void reportStateChange() {
+        final PIHandler pih = getPIHandler() ;
+        if (pih != null) {
+	    pih.adapterManagerStateChanged( myId, getORTState() ) ;
+        }
     }
 
     private void countedWait()
@@ -260,11 +269,11 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	return myId ;
     }
 
-    POAManagerImpl( POAFactory factory, PIHandler pihandler )
+    POAManagerImpl( POAFactory factory, ORB orb )
     {
 	this.factory = factory ;
         factory.addPoaManager(this);
-	this.pihandler = pihandler ;
+	this.orb = orb ;
 	myId = factory.newPOAManagerId() ;
 	state = State.HOLDING;
 	debug = factory.getORB().poaDebugFlag ;
@@ -348,7 +357,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    // set the state to ACTIVE
 	    state = State.ACTIVE;
 	    
-	    pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+            reportStateChange() ;
 
 	    // Notify any invocations that were waiting because the previous
 	    // state was HOLDING, as well as notify any threads that were waiting
@@ -384,7 +393,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    // set the state to HOLDING
 	    state  = State.HOLDING;
 
-	    pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+            reportStateChange() ;
 
 	    // Notify any threads that were waiting in the wait() inside
 	    // discard_requests. This will cause discard_requests to return
@@ -428,7 +437,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    // set the state to DISCARDING
 	    state = State.DISCARDING;
 
-	    pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+            reportStateChange() ;
 
 	    // Notify any invocations that were waiting because the previous
 	    // state was HOLDING. Those invocations will henceforth be rejected with
@@ -458,10 +467,10 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     public void deactivate(boolean etherealize_objects, boolean wait_for_completion)
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
-	explicitStateChange = true ;
-
 	try {
 	    synchronized( this ) {
+                explicitStateChange = true ;
+
 		if (debug) {
 		    ORBUtility.dprint( this, 
 			"Calling deactivate on POAManager " + this ) ;
@@ -472,7 +481,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
 		state = State.INACTIVE;
 
-		pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+                reportStateChange() ;
 
 		// Notify any invocations that were waiting because the previous
 		// state was HOLDING. Those invocations will then be rejected with
@@ -500,7 +509,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	}
     }
 
-    private class POAManagerDeactivator implements Runnable
+    private static class POAManagerDeactivator implements Runnable
     {
 	private boolean etherealize_objects ;
 	private final POAManagerImpl pmi ;
@@ -525,7 +534,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 		    }
 
 		    while ( pmi.nInvocations > 0 ) { 
-			countedWait() ;
+			pmi.countedWait() ;
 		    }
 		}
 
@@ -559,8 +568,8 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 				"with pmi=" + pmi ) ;
 			}
 
-			factory.removePoaManager(pmi);
-			poas.clear();
+			pmi.factory.removePoaManager(pmi);
+			pmi.poas.clear();
 		    }
 		}
 	    } finally {

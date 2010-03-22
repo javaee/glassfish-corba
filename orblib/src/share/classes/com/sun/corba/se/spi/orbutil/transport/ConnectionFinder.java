@@ -45,7 +45,7 @@ import java.io.IOException ;
  */
 public interface ConnectionFinder<C extends Connection> {
     /** Method that searches idleConnections and busyConnections for 
-     * the best connection.  May return null if no best connections
+     * the best connection.  May return null if no best connection
      * exists.  May create a new connection and return it.
      */
     C find( ContactInfo<C> cinfo, Collection<C> idleConnections, 

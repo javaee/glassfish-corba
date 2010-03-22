@@ -173,6 +173,10 @@
              77 FINE "The OSGi PackageAdmin service is not available")
             (SET_PARAMETER_CALLED_AGAIN
              78 WARNING "The ORBImpl.set_parameters method was called more than once")
+            (INSERT_BUNDLE_PACKAGE
+             79 FINE "Inserting exported package {0} from bundle {1} into packageNameMap")
+            (REMOVE_BUNDLE_PACKAGE
+             80 FINE "Removing exported package {0} from bundle {1} from packageNameMap") 
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 
@@ -332,7 +336,7 @@
             (UNEXPECTED_EXCEPTION_CANCEL_AND_FLUSH_TEMP_SELECTOR
 	     32 FINE "Unexpected exception when canceling SelectionKey and flushing temporary Selector")
             (MAXIMUM_READ_BYTE_BUFFER_SIZE_EXCEEDED
-	     33 WARNING "Ignoring request to read a message which exceeds read size threshold of {0} bytes, requested size was {1}. Use ORB property -D{3}=<# of bytes> to set threshold higher.")
+	     33 WARNING "Ignoring request to read a message which exceeds read size threshold of {0} bytes, requested size was {1}. Use ORB property -D{2}=<# of bytes> to set threshold higher.")
             (BLOCKING_READ_END_OF_STREAM
 	     34 FINE "Received {0}, in a blocking read on connection, {1}, because an 'end of stream' was detected")
             (NONBLOCKING_READ_END_OF_STREAM
@@ -638,7 +642,7 @@
             (EXCEPTION_IN_LISTENER_THREAD
              133 FINE "Exception occurred in listener thread")
             (ORB_LIFECYCLE_TRACE
-             134 WARNING "ORB Lifecycle for ORB {0}: {1}" )
+             134 INFO "ORB Lifecycle for ORB {0}: {1}" )
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 

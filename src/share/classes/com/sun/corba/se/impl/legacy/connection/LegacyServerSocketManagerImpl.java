@@ -119,6 +119,13 @@ public class LegacyServerSocketManagerImpl
     // Used in IIOPProfileImpl, ORBImpl.
     public boolean legacyIsLocalServerPort(int port) 
     {
+        // If port is 0 (which signifies in CSIv2 that clear text
+        // communication is not allowed), we must return true, because
+        // this check is not meaningful.
+        if (port == 0) {
+            return true ;
+        }
+
 	Iterator iterator = getAcceptorIterator();
 	while (iterator.hasNext()) { 
 	    LegacyServerSocketEndPointInfo endPoint = cast(iterator.next());

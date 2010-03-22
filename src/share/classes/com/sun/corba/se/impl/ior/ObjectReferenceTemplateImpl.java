@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,18 +45,13 @@ import org.omg.CORBA.TypeCode ;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.ObjectReferenceTemplateHelper ;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
 
-import com.sun.corba.se.spi.ior.ObjectId ;
-import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.ior.ObjectAdapterId ;
-import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactory;
 import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.IORTemplateList;
 import com.sun.corba.se.spi.ior.IORFactories;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -71,6 +66,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 public class ObjectReferenceTemplateImpl extends ObjectReferenceProducerBase
     implements ObjectReferenceTemplate, StreamableValue 
 {
+    private static final long serialVersionUID = 6441570404699638098L;
     transient private IORTemplate iorTemplate ;
 
     public ObjectReferenceTemplateImpl( InputStream is )
@@ -85,10 +81,12 @@ public class ObjectReferenceTemplateImpl extends ObjectReferenceProducerBase
 	iorTemplate = iortemp ;
     }
 
+    @Override
     public boolean equals( Object obj )
     {
-	if (!(obj instanceof ObjectReferenceTemplateImpl))
+	if (!(obj instanceof ObjectReferenceTemplateImpl)) {
 	    return false ;
+        }
 
 	ObjectReferenceTemplateImpl other = (ObjectReferenceTemplateImpl)obj ;
 
@@ -96,6 +94,7 @@ public class ObjectReferenceTemplateImpl extends ObjectReferenceProducerBase
 	    iorTemplate.equals( other.iorTemplate ) ;
     }
 
+    @Override
     public int hashCode()
     {
 	return iorTemplate.hashCode() ;
@@ -119,9 +118,8 @@ public class ObjectReferenceTemplateImpl extends ObjectReferenceProducerBase
 	return ObjectReferenceTemplateHelper.type() ;
     }
 
-    /** Read the data into a (presumably) empty ORTImpl.  This sets the 
-    * orb to the ORB of the InputStream.  
-    */
+    // Read the data into a (presumably) empty ORTImpl.  This sets the
+    // orb to the ORB of the InputStream.
     public void _read( InputStream is ) 
     {
 	org.omg.CORBA_2_3.portable.InputStream istr =
@@ -130,8 +128,6 @@ public class ObjectReferenceTemplateImpl extends ObjectReferenceProducerBase
 	orb = (ORB)(istr.orb()) ;
     }
 
-    /** Write the state to the OutputStream.  
-     */
     public void _write( OutputStream os ) 
     {
 	org.omg.CORBA_2_3.portable.OutputStream ostr = 

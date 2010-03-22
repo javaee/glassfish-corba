@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -517,6 +517,10 @@ public class ParserTable {
 		OperationFactory.booleanAction(),
 		"useEnumDesc", Boolean.TRUE,
 		Boolean.TRUE, "TRUE"),
+	    ParserDataFactory.make( ORBConstants.ENV_IS_SERVER_PROPERTY,
+		OperationFactory.booleanAction(),
+		"environmentIsGFServer", Boolean.FALSE,
+		Boolean.TRUE, "TRUE"),
             ParserDataFactory.make( ORBConstants.NO_DEFAULT_ACCEPTORS,
                 OperationFactory.booleanAction(),
                 "noDefaultAcceptors", Boolean.FALSE,
@@ -530,7 +534,11 @@ public class ParserTable {
                 OperationFactory.integerAction(), 
 		"fragmentReadTimeout",
                 Integer.valueOf(ORBConstants.DEFAULT_FRAGMENT_READ_TIMEOUT ),
-		Integer.valueOf(23000), "23000")
+		Integer.valueOf(23000), "23000"),
+            ParserDataFactory.make( ORBConstants.DISABLE_ORBD_INIT_PROPERTY,
+                OperationFactory.booleanAction(),
+                "disableORBD", Boolean.FALSE,
+                Boolean.TRUE, "TRUE" )
 	} ;
 
 	parserData = pd ;

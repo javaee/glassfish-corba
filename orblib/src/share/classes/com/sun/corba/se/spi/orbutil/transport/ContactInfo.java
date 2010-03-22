@@ -42,6 +42,8 @@ import java.io.IOException ;
  * to a (possibly different) process.  This is a subset of the PEPt 2.0 connection.
  * Any implemetnation of this interface must define hashCode and equals properly so that
  * it may be used in a Map.
+ * It is also recommended that toString() be defined to return a useful summary
+ * of the contact info (e.g. address information).
  */
 public interface ContactInfo<C extends Connection> {
     /** Create a new Connection from this ContactInfo.

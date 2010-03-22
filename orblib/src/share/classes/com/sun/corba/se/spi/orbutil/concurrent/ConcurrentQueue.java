@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -61,6 +61,12 @@ public interface ConcurrentQueue<V> {
 	 * poll or remove on this element.
 	 */
 	boolean remove() ;
+
+        /** Time at which the element will expire 
+         * 
+         * @return time in milliseconds since 1/1/70 when this item expires.
+         */
+        long expiration() ;
     }
 
     /** Return the number of elements in the queue.
@@ -72,8 +78,13 @@ public interface ConcurrentQueue<V> {
      */
     Handle<V> offer( V arg ) ;
 
-    /** Return an element from the head of the queue.
+    /** Return the handle for the head of the queue.
      * The element is removed from the queue.
      */
-    V poll() ;
+    Handle<V> poll() ;
+
+    /** Return the handle for the head of the queue.
+     * The element is not removed from the queue.
+     */
+    Handle<V> peek() ;
 } 

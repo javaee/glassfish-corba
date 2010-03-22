@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,7 +39,6 @@ package com.sun.corba.se.spi.orb;
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.Properties ;
-import java.util.WeakHashMap;
 
 import java.util.logging.Logger ;
 
@@ -54,18 +53,15 @@ import org.omg.PortableServer.Servant ;
 import org.omg.CORBA.portable.ObjectImpl;
 
 import com.sun.corba.se.spi.transport.ByteBufferPool;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory ;
 import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator ;
 import com.sun.corba.se.spi.protocol.PIHandler ;
 import com.sun.corba.se.spi.resolver.LocalResolver ;
 import com.sun.corba.se.spi.resolver.Resolver ;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory ;
-import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 
 import com.sun.corba.se.spi.ior.IdentifiableFactoryFinder ;
@@ -77,13 +73,7 @@ import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.TaggedProfile ;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
-import com.sun.corba.se.spi.orbutil.closure.Closure ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
-import com.sun.corba.se.spi.orb.Operation ;
-import com.sun.corba.se.spi.orb.ORBData ;
-import com.sun.corba.se.spi.orb.ORBVersion ;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
@@ -132,7 +122,6 @@ import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
-import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
 
 import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
 import java.lang.reflect.Field;
@@ -140,7 +129,6 @@ import org.glassfish.gmbal.ManagedObjectManager ;
 import org.glassfish.gmbal.ManagedObjectManagerFactory ;
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedData ;
-import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.InheritedAttributes ;
 import org.glassfish.gmbal.InheritedAttribute ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -165,8 +153,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // 3. Logging support is here so that we can avoid problems with
     //    incompletely initialized ORBs that need to perform logging.
     
-    // Flag set at compile time to debug flag processing: this can't
-    // be one of the xxxDebugFlags because it is used to debug the mechanism
+    // This is not one of the xxxDebugFlags because it is used to debug the mechanism
     // that sets the xxxDebugFlags!
     public static final boolean orbInitDebug = AccessController.doPrivileged( 
 	new PrivilegedAction<Boolean>() {
@@ -183,18 +170,15 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean transportDebugFlag = false ;
     public boolean subcontractDebugFlag = false ;
     public boolean poaDebugFlag = false ;
-    public boolean poaConcurrencyDebugFlag = false ;
     public boolean poaFSMDebugFlag = false ;
     public boolean orbdDebugFlag = false ;
     public boolean namingDebugFlag = false ;
     public boolean serviceContextDebugFlag = false ;
     public boolean transientObjectManagerDebugFlag = false ;
-    public boolean giopVersionDebugFlag = false;
     public boolean shutdownDebugFlag = false;
     public boolean giopDebugFlag = false;
     public boolean giopSizeDebugFlag = false;
     public boolean giopReadDebugFlag = false;
-    public boolean invocationTimingDebugFlag = false ;
     public boolean interceptorDebugFlag = false ;
     public boolean folbDebugFlag = false ;
     public boolean cdrCacheDebugFlag = false ;
@@ -304,6 +288,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     private UnaryFunction<String,Class<?>> classNameResolver = defaultClassNameResolver ;
     private ClassCodeBaseHandler ccbHandler = null ;
 
+    @Override
     public synchronized void destroy() {
         logWrapperTable = null ;
         wrapper = null ;
@@ -315,6 +300,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     }
 
     /** Get the single instance of the PresentationManager
+     * @return The PresentationManager.
      */
     @ManagedAttribute
     @Description( "The presentation manager, which handles stub creation" ) 
@@ -326,6 +312,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     /** Get the appropriate StubFactoryFactory.  This 
      * will be dynamic or static depending on whether
      * com.sun.corba.se.ORBUseDynamicStub is true or false.
+     * @return The stub factory factory.
      */
     public static PresentationManager.StubFactoryFactory 
 	getStubFactoryFactory()
@@ -337,12 +324,14 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     /** Obtain the InvocationInterceptor for this ORB instance.
      * By default this does nothing.  XXX this would be a good 
      * place for the ORB timing system to gather data.
+     * @return The InvocationInterceptor.
      */
     public abstract InvocationInterceptor getInvocationInterceptor() ;
 
     /** Set the InvocationInterceptor for this ORB instance.
      * This will be used around all dynamic RMI-IIOP calls that
      * are mediated by this ORB instance.
+     * @param interceptor The InvocationInterceptor to add.
      */
     public abstract void setInvocationInterceptor( 
 	InvocationInterceptor interceptor ) ;
@@ -471,6 +460,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      * always through an exception: either a ForwardException to
      * allow another server to handle the request, or else an error
      * indication.  XXX Remove after ORT for ORBD work is integrated.
+     * @param okey The ObjectKey to check for a valid server id.
      */
     public abstract void handleBadServerId( ObjectKey okey ) ;
     public abstract void setBadServerIdHandler( BadServerIdHandler handler ) ;
@@ -482,7 +472,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     @Description( "The PortableInterceptor Handler" ) 
     public abstract PIHandler getPIHandler() ;
 
-    public abstract void checkShutdownState();
+    public abstract void createPIHandler() ;
 
     // Dispatch support: in the ORB because it is needed for shutdown.
     // This is used by the first level server side subcontract.
@@ -492,6 +482,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     /** Return this ORB's transient server ID.  This is needed for 
      * initializing object adapters.
+     * @return The transient server id.
      */
     @ManagedAttribute
     @Description( "The transient ServerId of this ORB instance" ) 
@@ -719,6 +710,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
         mom.suspendJMXRegistration() ;
 
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "MBean registration suspended" ) ;
+        }     
+
         mom.createRoot( this, getUniqueOrbId() ) ;
     }
 
@@ -869,6 +865,8 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public abstract void releaseOrDecrementInvocationInfo();
 
     public abstract CorbaTransportManager getTransportManager();
+
+    
 }
 
 // End of file.

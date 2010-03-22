@@ -25,12 +25,12 @@
         <dependency>
             <groupId>org.glassfish.external</groupId>
             <artifactId>management-api</artifactId>
-            <version>3.0.0-b004</version>
+            <version>3.0.0-b012</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.gmbal</groupId>
             <artifactId>gmbal</artifactId>
-            <version>3.0.0-b011</version>
+            <version>3.0.0-b023</version>
         </dependency>
     </dependencies>
 </project>

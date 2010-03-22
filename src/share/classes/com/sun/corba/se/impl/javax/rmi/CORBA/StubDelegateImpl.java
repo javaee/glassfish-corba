@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -79,12 +79,12 @@ public class StubDelegateImpl implements javax.rmi.CORBA.StubDelegate
 
     private StubIORImpl ior ;
 
-    public StubIORImpl getIOR() 
+    public synchronized StubIORImpl getIOR() 
     {
 	return ior ;
     }
     
-    public void setIOR( StubIORImpl ior ) 
+    public synchronized void setIOR( StubIORImpl ior ) 
     {
 	this.ior = ior ;
     }
@@ -97,7 +97,7 @@ public class StubDelegateImpl implements javax.rmi.CORBA.StubDelegate
     /**
      * Sets the IOR components if not already set.
      */
-    private void init (javax.rmi.CORBA.Stub self) 
+    private synchronized void init (javax.rmi.CORBA.Stub self) 
     {
         // If the Stub is not connected to an ORB, BAD_OPERATION exception
         // will be raised by the code below.
@@ -164,7 +164,7 @@ public class StubDelegateImpl implements javax.rmi.CORBA.StubDelegate
 	    return ior.equals( other.ior ) ;
     }
 
-    public int hashCode() {
+    public synchronized int hashCode() {
 	if (ior == null)
 	    return 0 ;
 	else

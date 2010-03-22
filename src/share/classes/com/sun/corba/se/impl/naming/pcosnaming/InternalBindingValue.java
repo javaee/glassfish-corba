@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1993-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1993-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,25 +33,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/*
- * @(#)InternalBindingValue.java	1.17 99/07/16
- * 
- * Copyright 1993-1997 Sun Microsystems, Inc. 901 San Antonio Road, 
- * Palo Alto, California, 94303, U.S.A.  All Rights Reserved.
- * 
- * This software is the confidential and proprietary information of Sun
- * Microsystems, Inc. ("Confidential Information").  You shall not
- * disclose such Confidential Information and shall use it only in
- * accordance with the terms of the license agreement you entered into
- * with Sun.
- * 
- * CopyrightVersion 1.2
- * 
- */
 
 package com.sun.corba.se.impl.naming.pcosnaming;
 
-import org.omg.CORBA.Object;
 import org.omg.CosNaming.BindingType;
 import java.io.Serializable;
 
@@ -63,6 +47,8 @@ import java.io.Serializable;
 public class InternalBindingValue
 		implements Serializable
 {
+    private static final long serialVersionUID = -2545360261776178726L;
+
     public BindingType theBindingType;
     // The value stores both Stringified Object Reference and
     // Non-Stringified Object Reference. This is done to avoid

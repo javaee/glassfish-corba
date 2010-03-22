@@ -397,7 +397,9 @@ public class CorbaContactInfoListImpl
 	    getSubcontractId() ;
 	LocalClientRequestDispatcherFactory lcsf = 
             orb.getRequestDispatcherRegistry().getLocalClientRequestDispatcherFactory( scid ) ;
-	localClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
+        if (lcsf != null) {
+            localClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
+        }
     }
 
     // For timing test.

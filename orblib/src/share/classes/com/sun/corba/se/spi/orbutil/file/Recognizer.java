@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -35,11 +35,8 @@
  */
 package com.sun.corba.se.spi.orbutil.file ;
 
-import java.io.File ;
 import java.io.IOException ;
 
-import java.util.List ;
-import java.util.ArrayList ;
 import java.util.Map ;
 import java.util.HashMap ;
 
@@ -62,6 +59,7 @@ public class Recognizer implements Scanner.Action {
 	suffixActions = new HashMap<String,Scanner.Action>() ;
 	shellScriptAction = null ;
 	defaultAction = new Scanner.Action() {
+            @Override
 	    public String toString() {
 		return "Built-in Default Action" ;
 	    }
@@ -94,6 +92,7 @@ public class Recognizer implements Scanner.Action {
 	System.out.println( "Default action:" + defaultAction ) ;
     }
 
+    @Override
     public String toString() {
 	return "Recognizer()" ;
     }
@@ -110,6 +109,7 @@ public class Recognizer implements Scanner.Action {
      * patter "#!", which is the standard for all *nix shell scripts.
      * If not set, such files are handled by the default action (if not otherwise
      * handled by name or suffix match.
+     * @param action The action to perform on shell scripts.
      */
     public void setShellScriptAction( final Scanner.Action action ) {
 	shellScriptAction = action ;
@@ -118,14 +118,18 @@ public class Recognizer implements Scanner.Action {
     /** This defines the default action.  The standard default action prints
      * a message identifying the File that was not processed, and returns false.
      * This allows overriding the default action.
+     * @param action The default action is nothing else matches.
      */
     public void setDefaultAction( final Scanner.Action action ) {
-	if (action != null)
-	    defaultAction = action ;
+	if (action != null) {
+            defaultAction = action;
+        }
     }
 
     /** Apply the action that matches the classification of this file.
      * Returns the result of that action.
+     * @param file The file to act upon.
+     * @return result of matching action.
      */
     public boolean evaluate( final FileWrapper file ) {
 	final String name = file.getName() ;
@@ -155,8 +159,9 @@ public class Recognizer implements Scanner.Action {
 	    }
 	}
 
-	if (action == null) 
-	    action = defaultAction ;
+	if (action == null) {
+            action = defaultAction;
+        }
 
 	if (verbose > 0) {
 	    System.out.println( 
@@ -164,8 +169,9 @@ public class Recognizer implements Scanner.Action {
 		+ " on file " + file ) ;
 	}
 
-	if (!dryRun)
-	    return action.evaluate( file ) ;
+	if (!dryRun) {
+            return action.evaluate(file);
+        }
 
 	return true ;
     }

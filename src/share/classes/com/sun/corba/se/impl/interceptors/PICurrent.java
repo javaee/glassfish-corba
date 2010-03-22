@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,9 +59,9 @@ public class PICurrent extends org.omg.CORBA.LocalObject
     private int slotCounter;
 
     // The ORB associated with this PICurrent object.
-    private ORB myORB;
+    private transient ORB myORB;
 
-    private OMGSystemException wrapper ;
+    private transient OMGSystemException wrapper ;
 
     // True if the orb is still initialzing and get_slot and set_slot are not
     // to be called.
@@ -69,11 +69,10 @@ public class PICurrent extends org.omg.CORBA.LocalObject
 
     // ThreadLocal contains a stack of SlotTable which are used
     // for resolve_initial_references( "PICurrent" );
-    private ThreadLocal threadLocalSlotTable
-        = new ThreadLocal( ) {
-            protected Object initialValue( ) {
-                SlotTable table = new SlotTable( myORB, slotCounter );
-                return new SlotTableStack( myORB, table );
+    private transient ThreadLocal<SlotTableStack> threadLocalSlotTable
+        = new ThreadLocal<SlotTableStack>() {
+            protected SlotTableStack initialValue( ) {
+                return new SlotTableStack( myORB, PICurrent.this );
             }
         };
 
@@ -88,25 +87,26 @@ public class PICurrent extends org.omg.CORBA.LocalObject
         slotCounter = 0;
     }
 
+    synchronized int getTableSize() {
+        return slotCounter ;
+    }
 
     /**
      * This method will be called from ORBInitInfo.allocate_slot_id( ).
      * simply returns a slot id by incrementing slotCounter.
      */
-    int allocateSlotId( ) {
+    synchronized int allocateSlotId( ) {
         int slotId = slotCounter;
         slotCounter = slotCounter + 1;
         return slotId;
     }
-
 
     /**
      * This method gets the SlotTable which is on the top of the
      * ThreadLocalStack.
      */
     SlotTable getSlotTable( ) {
-        SlotTable table = (SlotTable)
-                ((SlotTableStack)threadLocalSlotTable.get()).peekSlotTable();
+        SlotTable table = threadLocalSlotTable.get().peekSlotTable();
         return table;
     }
 
@@ -116,7 +116,7 @@ public class PICurrent extends org.omg.CORBA.LocalObject
      * PICurrent will be returned.
      */
     void pushSlotTable( ) {
-        SlotTableStack st = (SlotTableStack)threadLocalSlotTable.get();
+        SlotTableStack st = threadLocalSlotTable.get();
         st.pushSlotTable( );
     }
 
@@ -125,7 +125,7 @@ public class PICurrent extends org.omg.CORBA.LocalObject
      * This method pops a SlotTable on the SlotTableStack.
      */
     void popSlotTable( ) {
-        SlotTableStack st = (SlotTableStack)threadLocalSlotTable.get();
+        SlotTableStack st = threadLocalSlotTable.get();
         st.popSlotTable( );
     }
 

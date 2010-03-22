@@ -1,2 +1,3 @@
 -include bnd.properties
-Export-Package: org.omg.CosTransactions, org.omg.CosTSInteroperation, org.omg.CosTSPortability, com.sun.corba.se.org.omg.CORBA, com.sun.corba.se.spi.costransactions, com.sun.corba.se.impl.txpoa, org.omg.CORBA, org.omg.CORBA.TSIdentificationPackage
+Export-Package: org.omg.CosTransactions, org.omg.stub.*, org.omg.DynamicAny.*, org.omg.CosTSPortability, org.omg.CORBA_2_3.*, org.omg.CosTSInteroperation, org.omg.Dynamic, org.omg.SendingContext, org.omg.IOP.*, org.omg.PortableServer.*, org.omg.CosNaming.*, org.omg.Messaging, org.omg.PortableInterceptor.*, org.omg.CORBA.*, com.sun.corba.se.org.omg.CORBA, com.sun.corba.se.spi.costransactions, com.sun.corba.se.impl.txpoa 
+

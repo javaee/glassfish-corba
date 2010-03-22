@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,14 +38,10 @@ package com.sun.corba.se.impl.naming.cosnaming;
 
 // Import general CORBA classes
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.Object;
 
 // Import org.omg.CosNaming classes
 import org.omg.CosNaming.Binding;
-import org.omg.CosNaming.BindingType;
 import org.omg.CosNaming.BindingHolder;
-import org.omg.CosNaming.BindingListHolder;
-import org.omg.CosNaming.BindingIteratorHolder;
 import org.omg.CosNaming.BindingIteratorPOA;
 import org.omg.CORBA.BAD_PARAM;
 
@@ -96,18 +92,17 @@ public abstract class BindingIteratorImpl extends BindingIteratorPOA
     public synchronized boolean next_one(org.omg.CosNaming.BindingHolder b)
     {
 	// NextOne actually returns the next one
-	return NextOne(b);
+	return nextOneImpl(b);
     }
   
     /**
      * Return the next n bindings. It also returns true or false, indicating
      * whether there were more bindings.
      * @param how_many The number of requested bindings in the BindingList.
-     * @param bl The BindingList as an out parameter.
+     * @param blh The BindingList as an out parameter.
      * @return true if there were more bindings.
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
-     * @see NextOne
      */
     public synchronized boolean next_n(int how_many, 
         org.omg.CosNaming.BindingListHolder blh)
@@ -125,20 +120,20 @@ public abstract class BindingIteratorImpl extends BindingIteratorPOA
      * scope, It will be called from NamingContext.list() operation or
      * this.next_n().
      * @param how_many The number of requested bindings in the BindingList.
-     * @param bl The BindingList as an out parameter.
+     * @param blh The BindingList as an out parameter.
      * @return true if there were more bindings.
      */
     public boolean list( int how_many, org.omg.CosNaming.BindingListHolder blh) 
     {
 	// Take the smallest of what's left and what's being asked for
-	int numberToGet = Math.min(RemainingElements(),how_many);
+	int numberToGet = Math.min(remainingElementsImpl(),how_many);
     
         // Create a resulting BindingList
 	Binding[] bl = new Binding[numberToGet];
 	BindingHolder bh = new BindingHolder();
 	int i = 0;
 	// Keep iterating as long as there are entries
-	while (i < numberToGet && this.NextOne(bh) == true) {
+	while (i < numberToGet && this.nextOneImpl(bh) == true) {
 	    bl[i] = bh.value;
 	    i++;
 	}
@@ -168,7 +163,7 @@ public abstract class BindingIteratorImpl extends BindingIteratorPOA
     public synchronized void destroy()
     {
 	// Destroy actually destroys
-	this.Destroy();
+	this.destroyImpl();
     }
 
     /**
@@ -179,18 +174,18 @@ public abstract class BindingIteratorImpl extends BindingIteratorPOA
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    protected abstract boolean NextOne(org.omg.CosNaming.BindingHolder b);
+    protected abstract boolean nextOneImpl(org.omg.CosNaming.BindingHolder b);
 
     /**
      * Abstract method for destroying this BindingIterator.
      * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA 
      * system exceptions.
      */
-    protected abstract void Destroy();
+    protected abstract void destroyImpl();
 
     /**
      * Abstract method for returning the remaining number of elements.
      * @return the remaining number of elements in the iterator.
      */
-    protected abstract int RemainingElements();
+    protected abstract int remainingElementsImpl();
 }

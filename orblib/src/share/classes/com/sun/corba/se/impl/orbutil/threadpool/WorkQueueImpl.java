@@ -106,6 +106,9 @@ public class WorkQueueImpl implements WorkQueue
         }
     }
 
+    // XXX Re-write this to use a simple poll( waitTime, TimeUnit.MILLISECONDS )
+    // and avoid the race conditions.  The change is a little too large to make
+    // right now (a few days before GFv3 HCF).  See issue 7722.
     synchronized Work requestWork(long waitTime) throws WorkerThreadNotNeededException, 
         InterruptedException {
 
@@ -121,7 +124,7 @@ public class WorkQueueImpl implements WorkQueue
                             workerThreadPool.numberOfAvailableThreads();
                     int minThreads = workerThreadPool.minimumNumberOfThreads();
                     if (availableThreads > minThreads) {
-                        // This thread has timed out and can die cause 
+                        // This thread has timed out and can die because 
                         // we have enough available idle threads.
                         // NOTE: It is expected the WorkerThread calling this
                         //       method will gracefully exit as a result of
@@ -129,36 +132,24 @@ public class WorkQueueImpl implements WorkQueue
                         ((ThreadPoolImpl)workerThreadPool).
                                               decrementCurrentNumberOfThreads();
                         throw new WorkerThreadNotNeededException();
-                    } else {
-                        // Keep this thread available.
-                        return null;
-                    }
-                } // else
-                  // If wait(waitTime) returns before waitTime expired,
-                  // then there "should" be Work on the WorkQueue ready to be
-                  // returned because some other WorkerThread has notified
-                  // the WorkerThread executing this method. However, there is
-                  // the possibility of a "spurious wakeup", (see JavaDoc
-                  // Object.wait(long timeout) for a description of "spurious
-                  // wakeup".
-                  // If a "spurious wakeup" there are two possible outcomes
-                  // of proceeding. One is that there is at least one Work
-                  // item on this WorkQueue or there is no Work on this
-                  // WorkQueue. If there is Work on this WorkQueue, then
-                  // the WorkerThread that has called this method will
-                  // execute the Work item returned.  If this WorkQueue is
-                  // empty, a null Work item is returned.  When a null Work
-                  // item is returned, the WorkerThread simply returns back
-                  // to this method and waits for additional Work. Hence,
-                  // a "spurious wakeup" is handled appropriately.
+                    } 
+                }
+                
+                // We still want to keep this thread, but let it do a
+                // poll in case we waited at least as long
+                // as timeOutTime, and then we were awakened by addWork.
+                // In that case, we still want to do the queue.poll().
             } finally {
                 ((ThreadPoolImpl)workerThreadPool).decrementNumberOfAvailableThreads();
             }
         }
         
         Work work = queue.poll();
-        workItemsDequeued++ ;
-        totalTimeInQueue += System.currentTimeMillis() - work.getEnqueueTime() ;
+        if (work != null) {
+            workItemsDequeued++ ;
+            totalTimeInQueue += System.currentTimeMillis() - work.getEnqueueTime() ;
+        }
+
         return work ;
     }
 

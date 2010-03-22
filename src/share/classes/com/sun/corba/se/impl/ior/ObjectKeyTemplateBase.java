@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.impl.ior;
 
-import java.util.Iterator ;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
@@ -50,12 +49,11 @@ import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBVersion ;
 
-import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 
 import com.sun.corba.se.impl.logging.IORSystemException ;
 
 /**
- * @author 
+ * @author Ken Cavanaugh
  */
 public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate 
 {
@@ -75,7 +73,7 @@ public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate
 
     private byte[] adapterId ;
 
-    public byte[] getAdapterId()
+    public synchronized byte[] getAdapterId()
     {
         if (adapterId == null) {
 	    adapterId = computeAdapterId();
@@ -197,8 +195,11 @@ public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate
 	return result ;
     }
 
-    public CorbaServerRequestDispatcher getServerRequestDispatcher( ORB orb, ObjectId id ) 
+    public CorbaServerRequestDispatcher getServerRequestDispatcher(
+        ObjectId id )
     {
-	return orb.getRequestDispatcherRegistry().getServerRequestDispatcher( scid ) ;
+	return 
+            orb.getRequestDispatcherRegistry().getServerRequestDispatcher(
+                scid ) ;
     }
 }

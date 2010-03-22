@@ -33,15 +33,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/*
- * @(#)FactoryForRetainAndUseActiveMapOnly.java	1.3 99/10/29
- *
- * Copyright 1997-1999 Sun Microsystems, Inc. All Rights Reserved.
- * 
- * This software is the proprietary information of Sun Microsystems, Inc.  
- * Use is subject to license terms.
- * 
- */
 package corba.poapolicies;
 
 import org.omg.CORBA.*;

@@ -513,6 +513,7 @@ public class ThreadPoolImpl implements ThreadPool
                         closeCalled = true ;
                         continue ;
                     } catch (InterruptedException exc) {
+                        Thread.interrupted() ;
                         Exceptions.self.workQueueThreadInterrupted( exc, super.getName(), 
                             Boolean.valueOf( closeCalled ) ) ;
 

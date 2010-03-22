@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -60,15 +60,20 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
 {
     private ORB orb ;
     private IORSystemException wrapper ;
+    private static ObjectAdapterId NULL_OBJECT_ADAPTER_ID = 
+        new ObjectAdapterIdArray( new String[0] ) ;
 
+    @Override
     public boolean equals( Object obj )
     {
-	if (obj == null)
+	if (obj == null) {
 	    return false ;
+        }
 
 	return obj instanceof WireObjectKeyTemplate ;
     }
 
+    @Override
     public int hashCode()
     {
 	return 53 ; // All WireObjectKeyTemplates are the same, so they should 
@@ -102,11 +107,10 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
 	return ORBConstants.DEFAULT_SCID ;
     }
 
-    /** While it might make sense to throw an exception here, this causes
-    * problems since we need to check whether unusual object references
-    * are local or not.  It seems that the easiest way to handle this is
-    * to return an invalid server id.
-    */
+    // While it might make sense to throw an exception here, this causes
+    // problems since we need to check whether unusual object references
+    // are local or not.  It seems that the easiest way to handle this is
+    // to return an invalid server id.
     public int getServerId() 
     {
 	return -1 ;
@@ -119,12 +123,13 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
 
     public ObjectAdapterId getObjectAdapterId() 
     {
-	throw wrapper.objectAdapterIdNotAvailable() ;
+        return NULL_OBJECT_ADAPTER_ID ;
+
+	// throw wrapper.objectAdapterIdNotAvailable() ;
     }
 
-    /** Adapter ID is not available, since our
-    * ORB did not implement the object carrying this key.
-    */
+    // Adapter ID is not available, since our
+    // ORB did not implement the object carrying this key.
     public byte[] getAdapterId()
     {
 	throw wrapper.adapterIdNotAvailable() ;
@@ -135,7 +140,7 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
 	return ORBVersionFactory.getFOREIGN() ;
     }
 
-    public CorbaServerRequestDispatcher getServerRequestDispatcher( ORB orb, ObjectId id ) 
+    public CorbaServerRequestDispatcher getServerRequestDispatcher( ObjectId id ) 
     {
 	byte[] bid = id.getId() ;
 	String str = new String( bid ) ;

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -57,17 +57,26 @@ public class ConcurrentQueueNonBlockingImpl<V> implements ConcurrentQueue<V> {
     // Structure: Head points to a node containing a null value, which is a special marker.
     // head.next is the first element, head.prev is the last.  The queue is empty if
     // head.next == head.prev == head.
-    final Entry<V> head = new Entry<V>( null ) ;
+    final Entry<V> head = new Entry<V>( null, 0 ) ;
     final Object lock = new Object() ;
     int count = 0 ;
+    private long ttl ;
+
+    public ConcurrentQueueNonBlockingImpl( long ttl ) {
+	head.next = head ;
+	head.prev = head ;
+        this.ttl = ttl ;
+    }
 
     private final class Entry<V> {
 	Entry<V> next = null ;
 	Entry<V> prev = null ;
 	private HandleImpl<V> handle ;
+        private long expiration ;
 
-	Entry( V value ) {
-	    handle = new HandleImpl<V>( this, value ) ;
+	Entry( V value, long expiration ) {
+	    handle = new HandleImpl<V>( this, value, expiration ) ;
+            this.expiration = expiration ;
 	}
 
 	HandleImpl<V> handle() {
@@ -79,11 +88,13 @@ public class ConcurrentQueueNonBlockingImpl<V> implements ConcurrentQueue<V> {
 	private Entry<V> entry ;
 	private final V value ;
 	private boolean valid ;
+        private long expiration ;
 
-	HandleImpl( Entry<V> entry, V value ) {
+	HandleImpl( Entry<V> entry, V value, long expiration ) {
 	    this.entry = entry ;
 	    this.value = value ;
 	    this.valid = true ;
+            this.expiration = expiration ;
 	}
 
 	Entry<V> entry() {
@@ -117,6 +128,10 @@ public class ConcurrentQueueNonBlockingImpl<V> implements ConcurrentQueue<V> {
 	    valid = false ;
 	    return true ;
 	}
+
+        public long expiration() {
+            return expiration ;
+        }
     }
 
     public int size() {
@@ -132,7 +147,7 @@ public class ConcurrentQueueNonBlockingImpl<V> implements ConcurrentQueue<V> {
 	if (arg == null)
 	    throw new IllegalArgumentException( "Argument cannot be null" ) ;
 
-	Entry<V> entry = new Entry<V>( arg ) ;
+	Entry<V> entry = new Entry<V>( arg, System.currentTimeMillis() + ttl ) ;
 	
 	synchronized (lock) {
 	    entry.next = head ;
@@ -148,7 +163,7 @@ public class ConcurrentQueueNonBlockingImpl<V> implements ConcurrentQueue<V> {
     /** Return an element from the head of the queue.
      * The element is removed from the queue.
      */
-    public V poll() {
+    public Handle<V> poll() {
 	Entry<V> first = null ;
 
 	synchronized (lock) {
@@ -156,17 +171,21 @@ public class ConcurrentQueueNonBlockingImpl<V> implements ConcurrentQueue<V> {
 	    if (first == head)
 		return null ;
 	    else {
-		// assert that the following expression returns true!
-		first.handle().remove() ;
+                final Handle<V> result = first.handle() ;
+                result.remove() ;
+                return result ;
 	    }
 	}
+    }
 
-	// Once first is removed from the queue, it is invisible to other threads,
-	// so we don't need to synchronize here.
-	first.next = null ;
-	first.prev = null ;
-	V value = first.handle().value() ;
-	return value ;
+    public Handle<V> peek() {
+        synchronized (lock) {
+            Entry<V> first = head.next ;
+            if (first == head) 
+                return null ;
+            else
+                return first.handle() ;
+        }
     }
 } 
 

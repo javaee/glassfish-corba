@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -46,6 +46,7 @@ import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 import com.sun.corba.se.impl.orb.ORBImpl ;
 
 import com.sun.corba.se.impl.osgi.loader.OSGIListener;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 /** A simple factory for creating our ORB that avoids the ClassLoader
  * problems with org.omg.CORBA.ORB.init, which must load the ORB impl class.
@@ -63,6 +64,7 @@ public class ORBFactory {
     }
 
     /** Create but do not initialize an ORB instance.
+     * @return The newly created uninitialized ORB.
      */
     public static ORB create() {
         ORB result = new ORBImpl() ;
@@ -72,10 +74,17 @@ public class ORBFactory {
     /** Complete the initialization of the ORB.  
      * isGFv3 if true will cause an ORB initialization
      * suitable for use in GlassFish v3.
+     * @param orb The orb to initialize.
+     * @param args Usual args passed to an ORB.init() call.
+     * @param props Usual props passed to an ORB.init() call.
+     * @param isGFv3 true if the ORB is running in GFv3 or later (generally means an OSGI environment).
      */
     @SuppressWarnings("static-access")
     public static void initialize( ORB orb, String[] args, Properties props, boolean isGFv3 ) {
         if (isGFv3) {
+            props.setProperty( ORBConstants.DISABLE_ORBD_INIT_PROPERTY,
+                "true" ) ;
+
             orb.classNameResolver(
                 orb.makeCompositeClassNameResolver(
                     OSGIListener.classNameResolver(),

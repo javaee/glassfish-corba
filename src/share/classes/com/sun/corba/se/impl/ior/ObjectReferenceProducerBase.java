@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,10 +45,15 @@ import com.sun.corba.se.spi.ior.IORTemplateList ;
 import com.sun.corba.se.spi.ior.ObjectId ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import java.io.Serializable;
 
-import com.sun.corba.se.impl.logging.IORSystemException ;
 
-public abstract class ObjectReferenceProducerBase {
+// Made this serializable so that derived class ObjectReferenceFactoryImpl
+// does not require a void constructor.  Instead, this class is Serializable,
+// and Object is its superclass, so Object provides the void constructor.
+// This change cleans up a findbugs issue.
+public abstract class ObjectReferenceProducerBase implements Serializable {
+    private static final long serialVersionUID = 6478965304620421549L;
     transient protected ORB orb ;
 
     public abstract IORFactory getIORFactory() ;

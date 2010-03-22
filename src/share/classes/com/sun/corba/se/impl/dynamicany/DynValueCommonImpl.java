@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,20 +37,15 @@
 package com.sun.corba.se.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.TCKind;
 import org.omg.CORBA.Any;
-import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.TypeCodePackage.Bounds;
-import org.omg.DynamicAny.*;
-import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
-import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import org.omg.DynamicAny.DynValueCommon;
 
 abstract class DynValueCommonImpl extends DynAnyComplexImpl implements DynValueCommon
 {
+    private static final long serialVersionUID = -6538058649606934141L;
     //
     // Constructors
     //
@@ -136,6 +131,7 @@ abstract class DynValueCommonImpl extends DynAnyComplexImpl implements DynValueC
     //
 
     // Overridden to change to non-null status.
+    @Override
     public void set_members (org.omg.DynamicAny.NameValuePair[] value)
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
                org.omg.DynamicAny.DynAnyPackage.InvalidValue
@@ -146,6 +142,7 @@ abstract class DynValueCommonImpl extends DynAnyComplexImpl implements DynValueC
     }
 
     // Overridden to change to non-null status.
+    @Override
     public void set_members_as_dyn_any (org.omg.DynamicAny.NameDynAnyPair[] value)
         throws org.omg.DynamicAny.DynAnyPackage.TypeMismatch,
                org.omg.DynamicAny.DynAnyPackage.InvalidValue

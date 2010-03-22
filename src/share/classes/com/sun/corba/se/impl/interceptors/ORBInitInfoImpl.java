@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -71,11 +71,11 @@ public final class ORBInitInfoImpl
     implements ORBInitInfo, ORBInitInfoExt
 {
     // The ORB we are initializing
-    private ORB orb;
+    private transient ORB orb;
     
-    private InterceptorsSystemException wrapper ;
-    private ORBUtilSystemException orbutilWrapper ;
-    private OMGSystemException omgWrapper ;
+    private transient InterceptorsSystemException wrapper ;
+    private transient ORBUtilSystemException orbutilWrapper ;
+    private transient OMGSystemException omgWrapper ;
 
     // The arguments passed to ORB_init
     private String[] args;
@@ -160,7 +160,7 @@ public final class ORBInitInfoImpl
      */
     public String[] arguments () {
 	checkStage();
-	return args;
+	return args.clone() ;
     }
 
     /**

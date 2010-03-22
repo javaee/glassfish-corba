@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -51,7 +51,7 @@ import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 import com.sun.corba.se.impl.logging.IORSystemException;
 
 /**
- * @author 
+ * @author  Ken Cavanaugh
  */
 public class ObjectKeyImpl implements ObjectKey 
 {
@@ -64,6 +64,7 @@ public class ObjectKeyImpl implements ObjectKey
 	this.id = id ;
     }
 
+    @Override
     public boolean equals( Object obj )
     {
 	if (obj == null)
@@ -78,6 +79,7 @@ public class ObjectKeyImpl implements ObjectKey
 	    id.equals( other.id ) ;
     }
 
+    @Override
     public int hashCode()
     {
 	return oktemp.hashCode() ^ id.hashCode() ;
@@ -115,11 +117,11 @@ public class ObjectKeyImpl implements ObjectKey
 		}
 	    }
 	} 
-	return array;
+	return (byte[])array.clone() ;
     }
 
-    public CorbaServerRequestDispatcher getServerRequestDispatcher( ORB orb ) 
+    public CorbaServerRequestDispatcher getServerRequestDispatcher() 
     {
-	return oktemp.getServerRequestDispatcher( orb, id ) ;
+	return oktemp.getServerRequestDispatcher( id ) ;
     }
 }

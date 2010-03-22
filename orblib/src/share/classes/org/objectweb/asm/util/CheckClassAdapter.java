@@ -31,7 +31,11 @@ package org.objectweb.asm.util;
 
 import java.io.FileInputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -137,7 +141,18 @@ public class CheckClassAdapter extends ClassAdapter {
      * <tt>true</tt> if the visitEnd method has been called.
      */
     private boolean end;
+    
+    /**
+     * The already visited labels. This map associate Integer values to Label
+     * keys.
+     */
+    private Map labels;
 
+    /**
+     * <tt>true</tt> if the method code must be checked with a BasicVerifier.
+     */
+    private boolean checkDataFlow;
+    
     /**
      * Checks a given class. <p> Usage: CheckClassAdapter &lt;fully qualified
      * class name or class file name&gt;
@@ -161,9 +176,63 @@ public class CheckClassAdapter extends ClassAdapter {
             cr = new ClassReader(args[0]);
         }
 
-        verify(cr, false, new PrintWriter(System.err));
+        verify(cr, true, new PrintWriter(System.err));
     }
 
+    /**
+     * Checks a given class
+     * 
+     * @param cr a <code>ClassReader</code> that contains bytecode for the
+     *        analysis.
+     * @param loader a <code>ClassLoader</code> which will be used to load
+     *        referenced classes. This is useful if you are verifiying multiple
+     *        interdependent classes.
+     * @param dump true if bytecode should be printed out not only when errors
+     *        are found.
+     * @param pw write where results going to be printed
+     */
+    public static void verify(
+        final ClassReader cr,
+        final ClassLoader loader,
+        final boolean dump,
+        final PrintWriter pw)
+    {
+        ClassNode cn = new ClassNode();
+        cr.accept(new CheckClassAdapter(cn, false), ClassReader.SKIP_DEBUG);
+
+        Type syperType = cn.superName == null
+                ? null
+                : Type.getObjectType(cn.superName);
+        List methods = cn.methods;
+
+        List interfaces = new ArrayList();
+        for (Iterator i = cn.interfaces.iterator(); i.hasNext();) {
+            interfaces.add(Type.getObjectType(i.next().toString()));
+        }
+
+        for (int i = 0; i < methods.size(); ++i) {
+            MethodNode method = (MethodNode) methods.get(i);
+            SimpleVerifier verifier = new SimpleVerifier(Type.getObjectType(cn.name),
+                    syperType,
+                    interfaces,
+                    false);
+            Analyzer a = new Analyzer(verifier);
+            if (loader != null) {
+                verifier.setClassLoader(loader);
+            }
+            try {
+                a.analyze(cn.name, method);
+                if (!dump) {
+                    continue;
+                }
+            } catch (Exception e) {
+                e.printStackTrace(pw);
+            }
+            printAnalyzerResult(method, a, pw);
+        }
+        pw.flush();
+    }
+    
     /**
      * Checks a given class
      * 
@@ -178,62 +247,47 @@ public class CheckClassAdapter extends ClassAdapter {
         final boolean dump,
         final PrintWriter pw)
     {
-        ClassNode cn = new ClassNode();
-        cr.accept(new CheckClassAdapter(cn), ClassReader.SKIP_DEBUG);
+        verify(cr, null, dump, pw);
+    }
+    
+    static void printAnalyzerResult(
+        MethodNode method,
+        Analyzer a,
+        final PrintWriter pw)
+    {
+        Frame[] frames = a.getFrames();
+        TraceMethodVisitor mv = new TraceMethodVisitor();
 
-        Type syperType = cn.superName == null
-                ? null
-                : Type.getObjectType(cn.superName);
-        List methods = cn.methods;
-        for (int i = 0; i < methods.size(); ++i) {
-            MethodNode method = (MethodNode) methods.get(i);
-            Analyzer a = new Analyzer(new SimpleVerifier(Type.getObjectType(cn.name),
-                    syperType,
-                    false));
-            try {
-                a.analyze(cn.name, method);
-                if (!dump) {
-                    continue;
+        pw.println(method.name + method.desc);
+        for (int j = 0; j < method.instructions.size(); ++j) {
+            method.instructions.get(j).accept(mv);
+
+            StringBuffer s = new StringBuffer();
+            Frame f = frames[j];
+            if (f == null) {
+                s.append('?');
+            } else {
+                for (int k = 0; k < f.getLocals(); ++k) {
+                    s.append(getShortName(f.getLocal(k).toString()))
+                            .append(' ');
                 }
-            } catch (Exception e) {
-                e.printStackTrace(pw);
-            }
-            Frame[] frames = a.getFrames();
-
-            TraceMethodVisitor mv = new TraceMethodVisitor();
-
-            pw.println(method.name + method.desc);
-            for (int j = 0; j < method.instructions.size(); ++j) {
-                method.instructions.get(j).accept(mv);
-
-                StringBuffer s = new StringBuffer();
-                Frame f = frames[j];
-                if (f == null) {
-                    s.append('?');
-                } else {
-                    for (int k = 0; k < f.getLocals(); ++k) {
-                        s.append(getShortName(f.getLocal(k).toString()))
-                                .append(' ');
-                    }
-                    s.append(" : ");
-                    for (int k = 0; k < f.getStackSize(); ++k) {
-                        s.append(getShortName(f.getStack(k).toString()))
-                                .append(' ');
-                    }
+                s.append(" : ");
+                for (int k = 0; k < f.getStackSize(); ++k) {
+                    s.append(getShortName(f.getStack(k).toString()))
+                            .append(' ');
                 }
-                while (s.length() < method.maxStack + method.maxLocals + 1) {
-                    s.append(' ');
-                }
-                pw.print(Integer.toString(j + 100000).substring(1));
-                pw.print(" " + s + " : " + mv.buf); // mv.text.get(j));
             }
-            for (int j = 0; j < method.tryCatchBlocks.size(); ++j) {
-                ((TryCatchBlockNode) method.tryCatchBlocks.get(j)).accept(mv);
-                pw.print(" " + mv.buf);
+            while (s.length() < method.maxStack + method.maxLocals + 1) {
+                s.append(' ');
             }
-            pw.println();
+            pw.print(Integer.toString(j + 100000).substring(1));
+            pw.print(" " + s + " : " + mv.buf); // mv.text.get(j));
         }
-        pw.flush();
+        for (int j = 0; j < method.tryCatchBlocks.size(); ++j) {
+            ((TryCatchBlockNode) method.tryCatchBlocks.get(j)).accept(mv);
+            pw.print(" " + mv.buf);
+        }
+        pw.println();
     }
 
     private static String getShortName(final String name) {
@@ -251,7 +305,21 @@ public class CheckClassAdapter extends ClassAdapter {
      * @param cv the class visitor to which this adapter must delegate calls.
      */
     public CheckClassAdapter(final ClassVisitor cv) {
+        this(cv, true);
+    }
+
+    /**
+     * Constructs a new {@link CheckClassAdapter}.
+     * 
+     * @param cv the class visitor to which this adapter must delegate calls.
+     * @param checkDataFlow <tt>true</tt> to perform basic data flow checks, or
+     *        <tt>false</tt> to not perform any data flow check (see
+     *        {@link CheckMethodAdapter}).
+     */
+    public CheckClassAdapter(final ClassVisitor cv, boolean checkDataFlow) {
         super(cv);
+        this.labels = new HashMap();
+        this.checkDataFlow = checkDataFlow;
     }
 
     // ------------------------------------------------------------------------
@@ -403,11 +471,19 @@ public class CheckClassAdapter extends ClassAdapter {
                         "exception name at index " + i);
             }
         }
-        return new CheckMethodAdapter(cv.visitMethod(access,
-                name,
-                desc,
-                signature,
-                exceptions));
+        if (checkDataFlow) {
+            return new CheckMethodAdapter(access,
+                    name,
+                    desc,
+                    cv.visitMethod(access, name, desc, signature, exceptions),
+                    labels);
+        } else {
+            return new CheckMethodAdapter(cv.visitMethod(access,
+                    name,
+                    desc,
+                    signature,
+                    exceptions), labels);
+        }
     }
 
     public AnnotationVisitor visitAnnotation(

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -145,7 +145,7 @@ public final class ServerRequestInfoImpl
      * Reset the info object so that it can be reused for a retry,
      * for example.
      */
-    void reset() {
+    synchronized void reset() {
         super.reset();
 
         // Please keep these in the same order as declared above.
@@ -308,7 +308,7 @@ public final class ServerRequestInfoImpl
 	// interceptors will not change the resulting byte[] array.
 	// Otherwise, we would need to make a clone of this array.
 
-	return objectId;
+	return objectId.clone() ;
     }
 
     private void checkForNullTemplate()
@@ -322,7 +322,7 @@ public final class ServerRequestInfoImpl
 	}
     }
     
-    public String server_id()
+    public synchronized String server_id()
     {
 	checkAccess( MID_SERVER_ID ) ;
 	checkForNullTemplate() ;
@@ -352,7 +352,7 @@ public final class ServerRequestInfoImpl
 	    adapterName = oaid.getAdapterName() ;
 	}
 
-	return adapterName ;
+	return adapterName.clone() ;
     }
 
     /**
@@ -367,7 +367,7 @@ public final class ServerRequestInfoImpl
 	    adapterId = oktemp.getAdapterId() ;
 	}
 
-	return adapterId;
+	return adapterId.clone() ;
     }
     
     /**
@@ -551,7 +551,7 @@ public final class ServerRequestInfoImpl
 	// modify the contents of the Parameter[] array.  We also assume 
 	// they will not change the values of the containing Anys.
 
-	return cachedArguments;
+	return cachedArguments.clone() ;
     }
 
     /**
@@ -671,7 +671,7 @@ public final class ServerRequestInfoImpl
     // A command encapsulating a request to add a reply service context.
     // These commands are enqueued until we have a handle on the actual
     // reply service context, at which point they are executed.
-    private class AddReplyServiceContextCommand {
+    private static class AddReplyServiceContextCommand {
 	ServiceContext service_context;
 	boolean replace;
     }
@@ -754,7 +754,7 @@ public final class ServerRequestInfoImpl
     /** 
      * Stores the various sources of information used for this info object.
      */
-    protected void setInfo( CorbaMessageMediator request, ObjectAdapter oa,
+    protected synchronized void setInfo( CorbaMessageMediator request, ObjectAdapter oa,
 	byte[] objectId, ObjectKeyTemplate oktemp ) 
     {
         this.request = request;

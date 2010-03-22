@@ -34,15 +34,7 @@
  * holder.
  */
 
-/*
- * @(#)BigDecimal.java  1.x 01/xx/xx
- *
- * Copyright 1996-2001 Sun Microsystems, Inc. All Rights Reserved.
- * Portions Copyright IBM Corporation, 2001. All Rights Reserved.
- *
- * This software is the proprietary information of Sun Microsystems, Inc.
- * Use is subject to license terms.
- *
+/* Portions Copyright IBM Corporation, 2001. All Rights Reserved.
  */
 
 package mymath;

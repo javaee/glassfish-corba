@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,10 +48,10 @@ import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
 {
+    private static final long serialVersionUID = -6968157558291435722L;
     //
     // Instance variables
     //
@@ -175,25 +175,25 @@ abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
                 String expectedMemberName = null;
                 try {
                     expectedMemberName = expectedTypeCode.member_name(i);
+                    if ( ! (expectedMemberName.equals(memberName) || memberName.equals(""))) {
+                        clearData();
+                        // _REVISIT_ More info
+                        throw new TypeMismatch();
+                    }
                 } catch (BadKind badKind) { // impossible
                 } catch (Bounds bounds) { // impossible
-                }
-                if ( ! (expectedMemberName.equals(memberName) || memberName.equals(""))) {
-                    clearData();
-                    // _REVISIT_ More info
-                    throw new TypeMismatch();
                 }
                 memberAny = value[i].value;
                 TypeCode expectedMemberType = null;
                 try {
                     expectedMemberType = expectedTypeCode.member_type(i);
+                    if (! expectedMemberType.equal(memberAny.type())) {
+                        clearData();
+                        // _REVISIT_ More info
+                        throw new TypeMismatch();
+                    }
                 } catch (BadKind badKind) { // impossible
                 } catch (Bounds bounds) { // impossible
-                }
-                if (! expectedMemberType.equal(memberAny.type())) {
-                    clearData();
-                    // _REVISIT_ More info
-                    throw new TypeMismatch();
                 }
                 try {
                     // Creates the appropriate subtype without copying the Any
@@ -249,26 +249,26 @@ abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
                 String expectedMemberName = null;
                 try {
                     expectedMemberName = expectedTypeCode.member_name(i);
+                    if ( ! (expectedMemberName.equals(memberName) || memberName.equals(""))) {
+                        clearData();
+                        // _REVISIT_ More info
+                        throw new TypeMismatch();
+                    }
                 } catch (BadKind badKind) { // impossible
                 } catch (Bounds bounds) { // impossible
-                }
-                if ( ! (expectedMemberName.equals(memberName) || memberName.equals(""))) {
-                    clearData();
-                    // _REVISIT_ More info
-                    throw new TypeMismatch();
                 }
                 memberDynAny = value[i].value;
                 memberAny = getAny(memberDynAny);
                 TypeCode expectedMemberType = null;
                 try {
                     expectedMemberType = expectedTypeCode.member_type(i);
+                    if (! expectedMemberType.equal(memberAny.type())) {
+                        clearData();
+                        // _REVISIT_ More info
+                        throw new TypeMismatch();
+                    }
                 } catch (BadKind badKind) { // impossible
                 } catch (Bounds bounds) { // impossible
-                }
-                if (! expectedMemberType.equal(memberAny.type())) {
-                    clearData();
-                    // _REVISIT_ More info
-                    throw new TypeMismatch();
                 }
 
                 addComponent(i, memberName, memberAny, memberDynAny);
@@ -324,8 +324,9 @@ abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
         nameValuePairs[i].value = memberAny;
         nameDynAnyPairs[i].id = memberName;
         nameDynAnyPairs[i].value = memberDynAny;
-        if (memberDynAny instanceof DynAnyImpl)
-            ((DynAnyImpl)memberDynAny).setStatus(STATUS_UNDESTROYABLE);
+        if (memberDynAny instanceof DynAnyImpl) {
+            ((DynAnyImpl) memberDynAny).setStatus(STATUS_UNDESTROYABLE);
+        }
     }
 
     // Initializes components, names, nameValuePairs and nameDynAnyPairs representation
@@ -422,6 +423,7 @@ abstract class DynAnyComplexImpl extends DynAnyConstructedImpl
     // It is probably right not to destroy the released component DynAnys.
     // Some other DynAny or a user variable might still hold onto them
     // and if not then the garbage collector will take care of it.
+    @Override
     protected void clearData() {
         super.clearData();
         names = null;

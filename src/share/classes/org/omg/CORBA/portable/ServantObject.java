@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,7 +54,6 @@ public class ServantObject
     /** The real servant. The local stub may cast this field to the expected type, and then
      * invoke the operation directly. Note, the object may or may not be the actual servant
      * instance. 
-     * @return The real servant
      */
     public java.lang.Object servant;
 }

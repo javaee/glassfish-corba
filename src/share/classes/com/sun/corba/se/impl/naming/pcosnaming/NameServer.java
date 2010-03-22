@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,7 +37,6 @@
 package com.sun.corba.se.impl.naming.pcosnaming;
 
 import java.io.File;
-import java.util.Properties;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
@@ -85,7 +84,13 @@ public class NameServer
 	    props.getProperty("file.separator");
 
 	dbDir = new File(dbDirName);
-	if (!dbDir.exists()) dbDir.mkdir();
+	if (!dbDir.exists()) {
+            boolean result = dbDir.mkdir();
+            if (!result) {
+                throw new RuntimeException( "Could not create directory "
+                    + dbDirName ) ;
+            }
+        }
     }
 
     protected void run() 

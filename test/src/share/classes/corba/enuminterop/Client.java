@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2003-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,49 +36,17 @@
 
 package corba.enuminterop  ;
 
-import java.rmi.Remote ;
+import corba.framework.TestngRunner;
+import java.io.PrintStream;
 import java.rmi.RemoteException ;
-import java.rmi.UnexpectedException ;
 
-import java.io.Serializable ;
-import java.io.Externalizable ;
-
-import javax.rmi.CORBA.Tie ;
-
-import org.omg.CORBA.BAD_PARAM ;
-import org.omg.CORBA.BAD_OPERATION ;
-import org.omg.CORBA.SystemException ;
-import org.omg.CORBA.portable.ApplicationException ;
-import org.omg.CORBA.portable.ResponseHandler ;
-import org.omg.CORBA.portable.UnknownException ;
-import org.omg.CORBA.portable.Delegate ;
-import org.omg.CORBA_2_3.portable.InputStream ;
-import org.omg.CORBA_2_3.portable.OutputStream ;
-
-import org.omg.CosNaming.*;
 import org.omg.CORBA.ORB;
 
-import java.util.Map ;
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.Properties ;
-
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException ;
-
-import javax.naming.NamingException;
-import javax.naming.InitialContext;
-import javax.naming.Context;
-
 import javax.rmi.PortableRemoteObject;
-import javax.rmi.CORBA.Util;
-
-import corba.framework.*;
-import java.util.*;
-import java.io.*;
-
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextHelper;
 
 import org.testng.Assert ;
 import org.testng.annotations.Test ;

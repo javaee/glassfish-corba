@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1996-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1996-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -56,6 +56,7 @@ import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 
@@ -67,16 +68,32 @@ public class CDRInputObject
     implements com.sun.corba.se.impl.encoding.MarshalInputStream,
                org.omg.CORBA.DataInputStream, org.omg.CORBA.portable.ValueInputStream
 {
-    private ORB orb ;
-    private TimingPoints tp ;
-    private ORBUtilSystemException wrapper ;
-    private OMGSystemException omgWrapper ;
-    private CDRInputStreamBase impl;
+    private static final long serialVersionUID = 3654171034620991056L;
 
-    private CorbaConnection corbaConnection;
-    private Message header;
+    private transient ORB orb ;
+    private transient TimingPoints tp ;
+    private transient ORBUtilSystemException wrapper ;
+    private transient OMGSystemException omgWrapper ;
+    private transient CDRInputStreamBase impl;
+    private transient CorbaConnection corbaConnection;
+    private transient Message header;
+    protected transient CorbaMessageMediator messageMediator;
+
+    // Present only to suppress FindBugs errors
+    private void readObject( ObjectInputStream is ) throws IOException,
+        ClassNotFoundException {
+
+        orb = null ;
+        tp = null ;
+        wrapper = null ;
+        omgWrapper = null ;
+        impl = null ;
+        corbaConnection = null ;
+        header = null ;
+        messageMediator = null ;
+    }
+
     private boolean unmarshaledHeader;
-    protected CorbaMessageMediator messageMediator;
 
     private static class InputStreamFactory {
         public static CDRInputStreamBase newInputStream(
@@ -240,6 +257,7 @@ public class CDRInputObject
      *
      * In the local case, there is no Connection, so use the
      * local code sets.
+     * @return The converter.
      */
     protected CodeSetConversion.BTCConverter createCharBTCConverter() {
         CodeSetComponentInfo.CodeSetContext codesets = getCodeSets();
@@ -247,15 +265,17 @@ public class CDRInputObject
         // If the connection doesn't have its negotiated
         // code sets by now, fall back on the defaults defined
         // in CDRInputStream.
-        if (codesets == null)
+        if (codesets == null) {
             return CodeSetConversion.impl().getBTCConverter(
                 OSFCodeSetRegistry.ISO_8859_1, impl.isLittleEndian());
+        }
         
         OSFCodeSetRegistry.Entry charSet
             = OSFCodeSetRegistry.lookupEntry(codesets.getCharCodeSet());
 
-        if (charSet == null)
-	    throw wrapper.unknownCodeset( charSet ) ;
+        if (charSet == null) {
+            throw wrapper.unknownCodeset(codesets.getCharCodeSet());
+        }
 
         return CodeSetConversion.impl().getBTCConverter(charSet, isLittleEndian());
     }
@@ -268,17 +288,19 @@ public class CDRInputObject
         // code sets by now, we have to throw an exception.
         // See CORBA formal 00-11-03 13.9.2.6.
         if (codesets == null) {
-            if (getConnection().isServer())
-		throw omgWrapper.noClientWcharCodesetCtx() ;
-            else
-		throw omgWrapper.noServerWcharCodesetCmp() ;
+            if (getConnection().isServer()) {
+                throw omgWrapper.noClientWcharCodesetCtx();
+            } else {
+                throw omgWrapper.noServerWcharCodesetCmp();
+            }
         }
 
         OSFCodeSetRegistry.Entry wcharSet
             = OSFCodeSetRegistry.lookupEntry(codesets.getWCharCodeSet());
 
-        if (wcharSet == null)
-	    throw wrapper.unknownCodeset( wcharSet ) ;
+        if (wcharSet == null) {
+            throw wrapper.unknownCodeset(codesets.getWCharCodeSet());
+        }
 
         // For GIOP 1.2 and UTF-16, use big endian if there is no byte
         // order marker.  (See issue 3405b)
@@ -289,8 +311,9 @@ public class CDRInputObject
         // GIOP 1.0 doesn't have wchars.  If we're talking to a legacy ORB,
         // we do what our old ORBs did.
         if (wcharSet == OSFCodeSetRegistry.UTF_16) {
-            if (getGIOPVersion().equals(GIOPVersion.V1_2))
+            if (getGIOPVersion().equals(GIOPVersion.V1_2)) {
                 return CodeSetConversion.impl().getBTCConverter(wcharSet, false);
+            }
         }
 
         return CodeSetConversion.impl().getBTCConverter(wcharSet, isLittleEndian());
@@ -302,17 +325,19 @@ public class CDRInputObject
     // yet, then we use ISO8859-1 for char/string and wchar/wstring
     // are illegal.
     private CodeSetComponentInfo.CodeSetContext getCodeSets() {
-        if (getConnection() == null)
+        if (getConnection() == null) {
             return CodeSetComponentInfo.LOCAL_CODE_SETS;
-        else
+        } else {
             return getConnection().getCodeSetContext();
+        }
     }    
 
     public CodeBase getCodeBase() {
-        if (getConnection() == null)
+        if (getConnection() == null) {
             return null;
-        else
+        } else {
             return getConnection().getCodeBase();
+        }
     }
 
     public CDRInputObject dup() {
@@ -617,6 +642,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final org.omg.CORBA.Context read_Context() {
 	tp.enter_readContextFromCDRStream() ;
 	try {
@@ -626,6 +652,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final org.omg.CORBA.Object read_Object(java.lang.Class clz) {
 	tp.enter_readObjectWithClassFromCDRStream() ;
 	try {
@@ -635,11 +662,13 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final org.omg.CORBA.ORB orb() {
 	return impl.orb();
     }
 
     // org.omg.CORBA_2_3.portable.InputStream
+    @Override
     public final java.io.Serializable read_value() {
 	tp.enter_readValueFromCDRStream() ;
 	try {
@@ -649,6 +678,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final java.io.Serializable read_value(java.lang.Class clz) {
 	tp.enter_readValueWithClassFromCDRStream() ;
 	try {
@@ -658,7 +688,10 @@ public class CDRInputObject
 	}
     }
 
-    public final java.io.Serializable read_value(org.omg.CORBA.portable.BoxedValueHelper factory) {
+    @Override
+    public final java.io.Serializable read_value(
+        org.omg.CORBA.portable.BoxedValueHelper factory) {
+
 	tp.enter_readValueWithFactoryFromCDRStream() ;
 	try {
 	    return impl.read_value(factory);
@@ -667,6 +700,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final java.io.Serializable read_value(java.lang.String rep_id) {
 	tp.enter_readValueWithRepidFromCDRStream() ;
 	try {
@@ -676,6 +710,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final java.io.Serializable read_value(java.io.Serializable value) {
 	tp.enter_readValueWithSerializableFromCDRStream() ;
 	try {
@@ -685,6 +720,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final java.lang.Object read_abstract_interface() {
 	tp.enter_readAbstractInterfaceFromCDRStream() ;
 	try {
@@ -694,6 +730,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final java.lang.Object read_abstract_interface(java.lang.Class clz) {
 	tp.enter_readAbstractInterfaceWithClassFromCDRStream() ;
 	try {
@@ -860,6 +897,7 @@ public class CDRInputObject
     }
 
     // java.io.InputStream
+    @Override
     public final int read(byte b[]) throws IOException {
 	tp.enter_readByteArrayFromCDRStream() ;
 	try {
@@ -869,6 +907,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final int read(byte b[], int off, int len) throws IOException {
 	tp.enter_readByteArrayWithOffsetFromCDRStream() ;
 	try {
@@ -878,6 +917,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final long skip(long n) throws IOException {
 	tp.enter_skipCDRStream() ;
 	try {
@@ -887,10 +927,12 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final int available() throws IOException {
 	return impl.available();
     }
 
+    @Override
     public void close() throws IOException {
 	tp.enter_closeCDRInputStream() ;
 	try {
@@ -900,6 +942,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final void mark(int readlimit) {
 	tp.enter_markCDRStream() ;
 	try {
@@ -909,6 +952,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final void reset() {
 	tp.enter_resetCDRStream() ;
 	try {
@@ -918,6 +962,7 @@ public class CDRInputObject
 	}
     }
 
+    @Override
     public final boolean markSupported() {
         return impl.markSupported();
     }
@@ -981,6 +1026,7 @@ public class CDRInputObject
      * if there are enough bytes available to do so.  Otherwise,
      * it just returns.  This is used for some (but not all)
      * GIOP 1.2 message headers.
+     * @param octetBoundary alignment boundary.
      */
     public void alignOnBoundary(int octetBoundary) {
 	tp.enter_alignOnBoundaryCDRStream() ;
@@ -1013,8 +1059,9 @@ public class CDRInputObject
     public void performORBVersionSpecificInit() {
         // In the case of SystemExceptions, a stream is created
         // with its default constructor (and thus no impl is set).
-        if (impl != null)
+        if (impl != null) {
             impl.performORBVersionSpecificInit();
+        }
     }
 
     /**
@@ -1029,7 +1076,7 @@ public class CDRInputObject
 
     public void setMessageMediator(CorbaMessageMediator messageMediator)
     {
-        this.messageMediator = (CorbaMessageMediator) messageMediator;
+        this.messageMediator = messageMediator;
     }
 
     public CorbaMessageMediator getMessageMediator()

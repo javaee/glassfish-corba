@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -58,6 +58,8 @@ import java.util.HashMap ;
 import java.util.WeakHashMap ;
 
 import java.net.InetAddress ;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.rmi.CORBA.ValueHandler;
 
@@ -338,6 +340,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	return pihandler ;
     }
 
+    public void createPIHandler() 
+    {
+        this.pihandler = new PIHandlerImpl( this, configData.getOrbInitArgs() ) ;
+    }
+
     /**
      * Create a new ORB. Should be followed by the appropriate
      * set_parameters() call.
@@ -359,8 +366,18 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 
     private void initManagedObjectManager() {
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "starting ManagedObjectManager initialization" ) ;
+        }
+
         createORBManagedObjectManager() ;
         mom.registerAtRoot( configData ) ;
+
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "ManagedObjectManager initialization complete" ) ;
+        }
     }
 
 /****************************************************************************
@@ -371,15 +388,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     // of the property parsing.
     private void preInit( String[] params, Properties props )
     {
-        // Before ORBConfiguration we need to set a PINoOpHandlerImpl,
-        // because PersisentServer Initialization inside configurator will
-        // invoke orb.resolve_initial_references( ) which will result in a 
-        // check on piHandler to invoke Interceptors. We do not want any
-        // Interceptors to be invoked before the complete ORB initialization.
-        // piHandler will be replaced by a real PIHandler implementation at the
-        // end of this method.
-	pihandler = new PINoOpHandlerImpl( );
-
 	// This is the unique id of this server (JVM). Multiple incarnations
 	// of this server will get different ids.
 	// Compute transientServerId = milliseconds since Jan 1, 1970
@@ -407,7 +415,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 	requestDispatcherRegistry = new RequestDispatcherRegistryImpl( 
 	    this, ORBConstants.DEFAULT_SCID);
-	copierManager = new CopierManagerImpl( this ) ;
+	copierManager = new CopierManagerImpl() ;
 
 	taggedComponentFactoryFinder = 
 	    new TaggedComponentFactoryFinderImpl(this) ;
@@ -448,9 +456,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             try {
                 Field fld = this.getClass().getField( token + "DebugFlag" ) ;
                 int mod = fld.getModifiers() ;
-                if (Modifier.isPublic( mod ) && !Modifier.isStatic( mod ))
-                    if (fld.getType() == boolean.class)
-                        fld.setBoolean( this, true ) ;
+                if (Modifier.isPublic( mod ) && !Modifier.isStatic( mod )) {
+                    if (fld.getType() == boolean.class) {
+                        fld.setBoolean(this, true);
+                    }
+                }
             } catch (Exception exc) {
                 // ignore it XXX log this as info
             }
@@ -462,7 +472,21 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private static class ConfigParser extends ParserImplBase {
 	// The default here is the ORBConfiguratorImpl that we define,
 	// but this can be replaced.
-	public Class configurator = ORBConfiguratorImpl.class ;
+	public Class<?> configurator ;
+
+        public ConfigParser( boolean disableORBD ) {
+            if (disableORBD) {
+                configurator = ORBConfiguratorImpl.class ;            
+            } else {
+                String cname = 
+                    "com.sun.corba.se.impl.activation.ORBConfiguratorPersistentImpl" ;
+                try {
+                    configurator = Class.forName(cname);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ORBImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
 
 	public PropertyParser makeParser()
 	{
@@ -518,10 +542,16 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    System.out.println( "Contents of ORB configData:" ) ;
 	    System.out.println( ObjectUtility.defaultObjectToString( configData ) ) ;
 	}
+        configData.setOrbInitArgs( params ) ;
 
 	// Set the debug flags early so they can be used by other
 	// parts of the initialization.
 	setDebugFlags( configData.getORBDebugFlags() ) ;
+
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "Config data parsing complete" ) ;
+        }
 
         initManagedObjectManager() ;
 
@@ -540,11 +570,16 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	transportManager = new CorbaTransportManagerImpl(this);
 	getLegacyServerSocketManager();
 
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "Transport initialization complete" ) ;
+        }
+
         super.getByteBufferPool();
 	serviceContextsCache = new ServiceContextsCache(this);
 
 	// Create a parser to get the configured ORBConfigurator.
-	ConfigParser parser = new ConfigParser() ;
+	ConfigParser parser = new ConfigParser( configData.disableORBD() ) ;
 	parser.init( dataCollector ) ;
 
 	ORBConfigurator configurator =  null ;
@@ -564,19 +599,37 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    throw wrapper.orbConfiguratorError( exc ) ;
 	}
 
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "User configurator execution complete" ) ;
+        }
+
         // Initialize the thread manager pool 
         // so it may be initialized & accessed without synchronization.
         // This must take place here so that a user conifigurator can 
         // set the threadpool manager first.
         getThreadPoolManager();
 
-	// Last of all, create the PIHandler and run the ORB initializers.
-	pihandler = new PIHandlerImpl( this, params) ;
+	// Last of all, run the ORB initializers.
+        // Interceptors will not be executed until 
+        // after pihandler.initialize().  A request that starts before
+        // initialize completes and completes after initialize completes does
+        // not see any interceptors.
 	pihandler.initialize() ;
+
+        if (orbLifecycleDebugFlag) {
+            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                "Interceptor initialization complete" ) ;
+        }
 
         // Now the ORB is ready, so finish all of the MBean registration
         if (configData.registerMBeans()) {
             mom.resumeJMXRegistration() ;
+
+            if (orbLifecycleDebugFlag) {
+                wrapper.orbLifecycleTrace( getORBData().getORBId(), 
+                    "MBeans should be registered" ) ;
+            }
         }
     }
 
@@ -1404,7 +1457,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     }
 
     // Note that the caller must hold the ORBImpl lock.
-    public void checkShutdownState() 
+    private void checkShutdownState()
     {
         if (status == STATUS_DESTROYED) {
 	    throw wrapper.orbDestroyed() ;
@@ -1515,55 +1568,57 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
         super.destroy() ;
 
-        badServerIdHandlerAccessLock = null ;
-        clientDelegateFactoryAccessorLock = null ;
-        corbaContactInfoListFactoryAccessLock = null ; 
-        corbaContactInfoListFactoryReadLock = null ;
-        corbaContactInfoListFactoryWriteLock = null ;
+        synchronized (this) {
+            badServerIdHandlerAccessLock = null ;
+            clientDelegateFactoryAccessorLock = null ;
+            corbaContactInfoListFactoryAccessLock = null ; 
+            corbaContactInfoListFactoryReadLock = null ;
+            corbaContactInfoListFactoryWriteLock = null ;
 
-        objectKeyFactoryAccessLock = null ;
-        legacyServerSocketManagerAccessLock = null ;
-        threadPoolManagerAccessLock = null ;
-        transportManager = null ;
-        legacyServerSocketManager = null ;
-        OAInvocationInfoStack  = null ; 
-        clientInvocationInfoStack  = null ; 
-        codeBase = null ; 
-        codeBaseIOR = null ;
-        dynamicRequests  = null ; 
-        svResponseReceived  = null ;
-        runObj = null ;
-        shutdownObj = null ;
-        waitForCompletionObj = null ;
-        invocationObj = null ;
-        isProcessingInvocation = null ;
-        typeCodeForClassMap  = null ;
-        valueFactoryCache = null ;
-        orbVersionThreadLocal = null ; 
-        requestDispatcherRegistry = null ;
-        copierManager = null ;
-        serviceContextFactoryRegistry = null ;
-        serviceContextsCache= null ;
-        toaFactory = null ;
-        poaFactory = null ;
-        pihandler = null ;
-        configData = null ;
-        badServerIdHandler = null ;
-        clientDelegateFactory = null ;
-        corbaContactInfoListFactory = null ;
-        resolver = null ;
-        localResolver = null ;
-        insNamingDelegate = null ;
-        resolverLock = null ;
-        urlOperation = null ;
-        urlOperationLock = null ;
-        taggedComponentFactoryFinder = null ;
-        taggedProfileFactoryFinder = null ;
-        taggedProfileTemplateFactoryFinder = null ;
-        objectKeyFactory = null ;
-        invocationInterceptor = null ;
-        objectKeyCache = null ; 
-        objectKeyCacheLock = null ;
+            objectKeyFactoryAccessLock = null ;
+            legacyServerSocketManagerAccessLock = null ;
+            threadPoolManagerAccessLock = null ;
+            transportManager = null ;
+            legacyServerSocketManager = null ;
+            OAInvocationInfoStack  = null ; 
+            clientInvocationInfoStack  = null ; 
+            codeBase = null ; 
+            codeBaseIOR = null ;
+            dynamicRequests  = null ; 
+            svResponseReceived  = null ;
+            runObj = null ;
+            shutdownObj = null ;
+            waitForCompletionObj = null ;
+            invocationObj = null ;
+            isProcessingInvocation = null ;
+            typeCodeForClassMap  = null ;
+            valueFactoryCache = null ;
+            orbVersionThreadLocal = null ; 
+            requestDispatcherRegistry = null ;
+            copierManager = null ;
+            serviceContextFactoryRegistry = null ;
+            serviceContextsCache= null ;
+            toaFactory = null ;
+            poaFactory = null ;
+            pihandler = null ;
+            configData = null ;
+            badServerIdHandler = null ;
+            clientDelegateFactory = null ;
+            corbaContactInfoListFactory = null ;
+            resolver = null ;
+            localResolver = null ;
+            insNamingDelegate = null ;
+            resolverLock = null ;
+            urlOperation = null ;
+            urlOperationLock = null ;
+            taggedComponentFactoryFinder = null ;
+            taggedProfileFactoryFinder = null ;
+            taggedProfileTemplateFactoryFinder = null ;
+            objectKeyFactory = null ;
+            invocationInterceptor = null ;
+            objectKeyCache = null ; 
+            objectKeyCacheLock = null ;
+        }
 
         try {
             mom.close() ;

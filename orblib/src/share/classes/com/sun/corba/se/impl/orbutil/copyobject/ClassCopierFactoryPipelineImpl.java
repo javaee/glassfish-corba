@@ -84,6 +84,7 @@ public class ClassCopierFactoryPipelineImpl implements
 	Thread.class, 
 	ThreadGroup.class, 
 	ProcessBuilder.class,
+        LinkedHashMap.class     // recursive copy may lead to stack overflow: bug 6917814
     } ;
 
     // List of some immutable classes that are copied simply

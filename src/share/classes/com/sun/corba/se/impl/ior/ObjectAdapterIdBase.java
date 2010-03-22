@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,6 +43,7 @@ import org.omg.CORBA_2_3.portable.OutputStream ;
 import com.sun.corba.se.spi.ior.ObjectAdapterId ;
 
 abstract class ObjectAdapterIdBase implements ObjectAdapterId {
+    @Override
     public boolean equals( Object other ) 
     {
 	if (!(other instanceof ObjectAdapterId)) 
@@ -64,6 +65,7 @@ abstract class ObjectAdapterIdBase implements ObjectAdapterId {
 	return iter1.hasNext() == iter2.hasNext() ;
     }
 
+    @Override
     public int hashCode() 
     {
 	int result = 17 ;
@@ -73,6 +75,7 @@ abstract class ObjectAdapterIdBase implements ObjectAdapterId {
 	return result ;
     }
 
+    @Override
     public String toString()
     {
 	StringBuffer buff = new StringBuffer() ;

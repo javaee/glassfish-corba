@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,9 +59,9 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 public class AsynchInvoke implements Runnable {
 
-    private RequestImpl _req;
-    private ORB         _orb;
-    private boolean     _notifyORB;
+    private final RequestImpl _req;
+    private final ORB         _orb;
+    private final boolean     _notifyORB;
 
     public AsynchInvoke (ORB o, RequestImpl reqToInvokeOn, boolean n)
     {

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -56,21 +56,21 @@ public final class ConcurrentQueueFactory {
      * Currently not fully implemented: the NonBlocking and Blocking
      * impls are basically the same.
      */
-    public static <V> ConcurrentQueue makeNonBlockingConcurrentQueue() {
-	return new ConcurrentQueueNonBlockingImpl<V>() ;
+    public static <V> ConcurrentQueue makeNonBlockingConcurrentQueue(final long ttl ) {
+	return new ConcurrentQueueNonBlockingImpl<V>( ttl ) ;
     }
 
     /** Create a ConcurrentQueue whose implementation uses conventional
      * locking to protect the data structure.
      */
-    public static <V> ConcurrentQueue makeBlockingConcurrentQueue() {
-	return new ConcurrentQueueBlockingImpl<V>() ;
+    public static <V> ConcurrentQueue makeBlockingConcurrentQueue(final long ttl ) {
+	return new ConcurrentQueueBlockingImpl<V>( ttl ) ;
     }
 
     /** Create a ConcurrentQueue that does no locking at all.
      * For use in data structures that manage their own locking.
      */
-    public static <V> ConcurrentQueue makeConcurrentQueue() {
-	return new ConcurrentQueueImpl<V>() ;
+    public static <V> ConcurrentQueue makeConcurrentQueue(final long ttl ) {
+	return new ConcurrentQueueImpl<V>( ttl ) ;
     }
 }

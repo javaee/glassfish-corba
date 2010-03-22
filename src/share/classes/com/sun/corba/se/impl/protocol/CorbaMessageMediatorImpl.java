@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -90,6 +90,7 @@ import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.impl.encoding.BufferManagerFactory;
 import com.sun.corba.se.impl.encoding.BufferManagerReadStream;
+import com.sun.corba.se.impl.encoding.BufferManagerWrite;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
@@ -447,7 +448,16 @@ public class CorbaMessageMediatorImpl
 
     public boolean sentFragment()
     {
-	return outputObject.getBufferManager().sentFragment();
+        if (outputObject != null) {
+            BufferManagerWrite buffMan = 
+                outputObject.getBufferManager() ;
+
+            if (buffMan != null) {
+                return outputObject.getBufferManager().sentFragment();
+            }
+        }
+
+        return false ;
     }
 
     public void setDIIInfo(org.omg.CORBA.Request diiRequest)
@@ -1808,7 +1818,7 @@ public class CorbaMessageMediatorImpl
 		    + ": dispatching to scid: " + oktemp.getSubcontractId());
 	}
 
-	CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher(myOrb);
+	CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher();
 
 	if (myOrb.subcontractDebugFlag) {
 	    dprint(".handleRequest: " + opAndId(messageMediator)
@@ -1846,8 +1856,7 @@ public class CorbaMessageMediatorImpl
 	try {
 	    ((CDRInputObject)messageMediator.getInputObject()).unmarshalHeader();
 	    ObjectKey okey = msg.getObjectKeyCacheEntry().getObjectKey() ;
-	    CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher(
-                myOrb ) ;
+	    CorbaServerRequestDispatcher sc = okey.getServerRequestDispatcher() ;
 	    if (sc == null) {
 		return;
 	    }

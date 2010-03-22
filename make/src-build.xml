@@ -83,6 +83,7 @@
     </description>
 
     <property name="root.dir"			value="${basedir}"/>
+    <property name="jscheme-jar"                value="${root.dir}/jscheme/lib/jscheme.jar"/>
 
     <!-- ========================= set up for the maven ant tasks ============================ -->
 
@@ -93,7 +94,7 @@
         classpathref="maven-ant-tasks.classpath">
     </typedef>
 
-    <target name="build" depends="init, prepare-dirs, compile"/>
+    <target name="build" depends="init, prepare-dirs, compile, orb-jar"/>
 
     <target name="init">
         <property file="make/build.properties"/>
@@ -103,21 +104,19 @@
         <property environment="env"/>
         <property name="java.home"                      value="${env.JAVA_HOME}"/>
         <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
-        <property name="local.maven"                    value="${env.HOME}/.m2"/>
-        <echo message="local.maven=${local.maven}"/> 
+        <property name="maven.repo.local"                    value="${env.HOME}/.m2"/>
+        <echo message="maven.repo.local=${maven.repo.local}"/> 
 
         <!-- Required JAR files -->
         <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
         <property name="emma-jar"			value="${root.dir}/lib/emma.jar"/>
-        <property name="bnd-jar"                        value="${root.dir}/lib/bnd.jar"/>
-        <property name="gmbal-jar"                      value="${root.dir}/lib/gmbal.jar"/>
-        <property name="management-api-jar"             value="${root.dir}/lib/management-api.jar"/>
-        <property name="felix-jar"                      value="${root.dir}/lib/felix.jar"/>
-        <property name="jscheme-jar"                    value="${root.dir}/jscheme/lib/jscheme.jar"/>
 
         <!-- Places where the build puts things -->
         <property name="build.dir"                      location="build"/>
         <property name="lib.dir"                        location="${build.dir}/lib"/>
+        <property name="libcache.dir"                   location="${build.dir}/libcache"/>
+        <property name="gmbal-jar"                      location="${libcache.dir}/gmbal.jar"/>
+        <property name="management-api-jar"             location="${libcache.dir}/management-api.jar"/>
 	<property name="gensrc.dir"                     location="${build.dir}/gensrc"/>
 	<property name="classes.dir"                    location="${build.dir}/classes"/>
 	<property name="releaselib.dir"                 location="${build.dir}/release/lib"/>   
@@ -134,7 +133,7 @@
 
         <!-- javac flags -->
         <property name="deprecation"                    value="off"/>
-        <property name="javac.optimize"		        value="false"/>
+        <property name="javac.optimize"		        value="true"/>
         <property name="javac.debug"		        value="true"/>
 
 	<!-- properties needed for updating and validating copyright headers -->
@@ -147,19 +146,43 @@
         <property name="orb.groupId"                    value="com.sun.corba"/>
         <property name="repo.url"                       value="java-net:/maven2-repository/trunk/repository"/>
         <property name="file.url"                       value="file:/tmp/maven"/>
-        <property name="local.url"                      value="file:${local.maven}"/>
+        <property name="local.url"                      value="file:${maven.repo.local}"/>
         <property name="bundle.name.prefix"             value="glassfish-corba-"/>
         <property name="bnd.properties.file"            value="make/bnd/bnd.properties"/>
+        
+        <artifact:remoteRepository id="gf.repo" url="${gf.repository}"/>
+        <artifact:remoteRepository id="aqute.repo" url="${aqute.repository}"/>
+
+        <artifact:dependencies versionsId="dependency.versions" filesetId="dependency.fileset" pathId="dependency.classpath">
+            <remoteRepository refid="gf.repo"/>
+            <dependency groupId="${gmbal.groupid}" artifactId="${gmbal.artifactid}" version="${gmbal.version}" scope="runtime"/>
+            <dependency groupId="${management-api.groupid}" artifactId="${management-api.artifactid}" version="${management-api.version}" scope="runtime"/>
+            <dependency groupId="${felix.groupid}" artifactId="${felix.artifactid}" version="${felix.version}" scope="runtime"/>
+        </artifact:dependencies>
+
+        <artifact:dependencies pathId="bnd.classpath">
+            <remoteRepository refid="aqute.repo"/>
+            <dependency groupId="${bnd.groupid}" artifactId="${bnd.artifactid}" version="${bnd.version}" scope="compile"/>
+        </artifact:dependencies>
 
 	<path id="classpath.master">
-	    <pathelement location="${management-api-jar}"/>
-	    <pathelement location="${gmbal-jar}"/>
-	    <pathelement location="${felix-jar}"/>
+            <path refid="dependency.classpath"/>
+
 	    <pathelement location="${orblib.classes.dir}"/>
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${jscheme-jar}"/>        <!-- needed to build logutils -->
 	    <pathelement location="${tools-jar}"/>          <!-- needed to build rmic -->
 	</path>
+    </target>
+
+    <target name="get-dependencies" depends="init">
+            <mkdir dir="${libcache.dir}"/>
+            <copy todir="${libcache.dir}">
+                <fileset refid="dependency.fileset"/>
+                <mapper classpathref="maven-ant-tasks.classpath" 
+                    classname="org.apache.maven.artifact.ant.VersionMapper"
+                    from="${dependency.versions}" to="flatten"/>
+            </copy>
     </target>
 
     <target name="prepare-dirs" depends="init">
@@ -175,7 +198,7 @@
 
     <!-- ========================= COMPILE ========================= -->
 
-    <target name="compile" depends="init, prepare-dirs, build-jscheme, orb-library, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
+    <target name="compile" depends="init, prepare-dirs, get-dependencies, build-jscheme, orb-library, compile-enhancer, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"
@@ -365,6 +388,19 @@
 	</delete>
     </target>
 
+    <!-- ========================= COMPILE-ENHANCER ================== -->
+    <target name="compile-enhancer" depends="init">
+	<echo message="Compiling enhancer"/>
+	<javac srcdir="${src.dir}" destdir="${classes.dir}" 
+		classpathref="classpath.master" 
+		deprecation="${deprecation}"
+		debug="${javac.debug}" 
+		optimize="${javac.optimize}"
+		failonerror="true">
+	    <include name="com/sun/tools/corba/se/enhancer/**"/>
+	</javac>
+    </target>
+
     <!-- ========================= COMPILE-LOGUTILS ================== -->
     <target name="compile-logutils" depends="init">
 	<echo message="Compiling logutils"/>
@@ -406,7 +442,7 @@
         <attribute name="classpath"/>
         <attribute name="file"/>
             <sequential>
-                <java jar="${bnd-jar}" fork="true" failonerror="true">
+                <java classpathref="bnd.classpath" classname="aQute.bnd.main.bnd" fork="true" failonerror="true">
                     <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
                     <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
                     <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
@@ -465,6 +501,15 @@
 	<jar jarfile="${releaselib.dir}/orblib.jar"
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
+		<include name="**"/>
+	    </fileset>
+	</jar>
+    </target>
+   
+    <target name="orb-jar" depends="init, compile"> 
+	<jar jarfile="${releaselib.dir}/orb.jar"
+		    duplicate="fail">
+	    <fileset dir="${classes.dir}">
 		<include name="**"/>
 	    </fileset>
 	</jar>
@@ -667,7 +712,7 @@
     <target name="rename" depends="init">
 	<mkdir dir="build/rename/ee"/>
 	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
-	    dir="${root.dir}">
+	    dir="${root.dir}" failonerror="true">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1993-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1993-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,20 +40,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Hashtable;
 
-import org.omg.CORBA.Policy;
-import org.omg.CORBA.LocalObject;
+import java.util.HashMap;
 
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
 import org.omg.PortableServer.ForwardRequest;
 import org.omg.PortableServer.ServantLocator;
-import org.omg.PortableServer.LifespanPolicyValue;
-import org.omg.PortableServer.RequestProcessingPolicyValue;
-import org.omg.PortableServer.IdAssignmentPolicyValue;
-import org.omg.PortableServer.ServantRetentionPolicyValue;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
 
 import com.sun.corba.se.spi.orb.ORB;
@@ -66,19 +59,17 @@ import com.sun.corba.se.spi.orb.ORB;
 
 public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements ServantLocator
 {
-
-    // computed using serialver tool
-
     private static final long serialVersionUID = 4028710359865748280L;
-    private ORB orb;
 
-    private NameService theNameService;
+    private transient ORB orb;
+
+    private transient NameService theNameService;
 
     private File logDir;
 
-    private Hashtable contexts;
+    private HashMap<String,NamingContextImpl> contexts;
 
-    private CounterDB counterDb;
+    private transient CounterDB counterDb;
 
     private int counter;
 
@@ -90,7 +81,7 @@ public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements Ser
 	this.orb    = orb;
 	// initialize the counter database
 	counterDb   = new CounterDB(logDir);
-	contexts    = new Hashtable();
+	contexts    = new HashMap<String,NamingContextImpl>();
 	theNameService = aNameService;
     }
 
@@ -101,11 +92,10 @@ public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements Ser
 
 	String objKey = new String(oid);
 
-	Servant servant = (Servant) contexts.get(objKey);
+	Servant servant = contexts.get(objKey);
 
-	if (servant == null)
-	{
-		 servant =  readInContext(objKey);
+	if (servant == null) {
+            servant =  readInContext(objKey);
 	}
 
 	return servant;
@@ -119,11 +109,10 @@ public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements Ser
 
     public NamingContextImpl readInContext(String objKey)
     {
-	NamingContextImpl context = (NamingContextImpl) contexts.get(objKey);
-	if( context != null )
-	{
-		// Returning Context from Cache
-		return context;
+	NamingContextImpl context = contexts.get(objKey);
+	if( context != null ) {
+            // Returning Context from Cache
+            return context;
 	}	
 
 	File contextFile = new File(logDir, objKey);
@@ -137,12 +126,12 @@ public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements Ser
 		context.setRootNameService( theNameService );
 		ois.close();
 	    } catch (Exception ex) {
+                throw new RuntimeException( "No file for context " + objKey ) ;
 	    }
 	}
 
-	if (context != null)
-	{
-		contexts.put(objKey, context);
+	if (context != null) {
+            contexts.put(objKey, context);
 	}
 	return context;
     }
@@ -152,26 +141,27 @@ public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements Ser
     {
 	File contextFile =  new File(logDir, objKey);
 
-	if (contextFile.exists()) 
-	{
+	if (contextFile.exists()) {
 	    context = readInContext(objKey);
-	}
-	else {
+	} else {
 	    try {
 		FileOutputStream fos = new FileOutputStream(contextFile);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(context);
 		oos.close();
 	    } catch (Exception ex) {
+                throw new RuntimeException( "Error in adding new context " 
+                    + objKey, ex) ;
 	    }
 	}
-	try
-	{
-		contexts.remove( objKey );
+
+	try {
+            contexts.remove( objKey );
+	} catch( Exception e) {
+            throw new RuntimeException( "Error in removing old context "
+                + objKey, e) ;
 	}
-	catch( Exception e)
-	{
-	}
+
 	contexts.put(objKey, context);
 
 	return context;
@@ -181,20 +171,20 @@ public class ServantManagerImpl extends org.omg.CORBA.LocalObject implements Ser
 				   NamingContextImpl context )
     {
 	File contextFile =  new File(logDir, objKey);
-	if (contextFile.exists()) 
-	{
+	if (contextFile.exists()) {
 		contextFile.delete( );
 		contextFile =  new File(logDir, objKey);
 	}
 		
         try {
-		FileOutputStream fos = new FileOutputStream(contextFile);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(context);
-		oos.close();
-	    } catch (Exception ex) {
-		ex.printStackTrace( );
-	    }
+            FileOutputStream fos = new FileOutputStream(contextFile);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(context);
+            oos.close();
+        } catch (Exception ex) {
+            throw new RuntimeException( "Could not update context " + objKey,
+                ex ) ;
+        }
     }
 
     public static String getRootObjectKey()
@@ -235,7 +225,9 @@ class CounterDB {
 	    counter = (Integer) ois.readObject();
 	    ois.close();
 	} catch (Exception ex) {
-				}
+            throw new RuntimeException( "Could not read counter",
+                ex ) ;
+        }
     }
 
     private void writeCounter()
@@ -249,6 +241,8 @@ class CounterDB {
 	    oos.close();
 
 	} catch (Exception ex) {
+            throw new RuntimeException( "Could not write counter",
+                ex ) ;
 	}
     }
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -207,6 +207,15 @@ public class PIHandlerImpl implements PIHandler
         // value indicates they are enabled.
 	// NOTE: The is only currently used on the client side.
         public int disableCount = 0;
+
+        // Get FindBugs to shut up about not overridding equals.
+        public boolean equals( Object o ) {
+            return super.equals( o ) ;
+        }
+        
+        public int hashCode() {
+            return super.hashCode() ;
+        }
     }
         
     public PIHandlerImpl( ORB orb, String[] args ) {
@@ -219,7 +228,12 @@ public class PIHandlerImpl implements PIHandler
             wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
             orbutilWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
             omgWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
-            arguments = args ;
+
+            if (args == null) {
+                arguments = null ;
+            } else {
+                arguments = args.clone() ;
+            }
 
             // Create codec factory:
             codecFactory = new CodecFactoryImpl( orb );
@@ -239,6 +253,17 @@ public class PIHandlerImpl implements PIHandler
                 ClosureFactory.makeConstant( current ) ) ;
             orb.getLocalResolver().register( ORBConstants.CODEC_FACTORY_NAME, 
                 ClosureFactory.makeConstant( codecFactory ) ) ;
+            hasClientInterceptors = true ;  // Issue 11033: with the other changes,
+                                            // make sure this is true in case
+                                            // initialize gets called between
+                                            // initiateClientPIRequest and 
+                                            // cleanupClientPIRequest.
+            hasServerInterceptors = true ;  // same as hasClientInterceptors.
+                                            
+            // XXX We could just remove the optimization, or perhaps we should 
+            // solve this as in InterceptorInvoker?  But that would still
+            // require the creation of a stack entry.   Perhaps we should
+            // merge the PI and request stacks and then re-visit this question.
         } finally {
             if (orb.interceptorDebugFlag) {
                 dputil.exit() ;
@@ -286,11 +311,12 @@ public class PIHandlerImpl implements PIHandler
                 // framework invocation stack.  Temporary until Harold fixes 
                 // this.  Note that this must never be true until after the
                 // ORBInitializer instances complete executing.
+                // (KMC 11/17/09 (probably 5 years later): temporary is a long time!
                 //hasClientInterceptors = interceptorList.hasInterceptorsOfType(
                     //InterceptorList.INTERCEPTOR_TYPE_CLIENT );
-                hasClientInterceptors = true;
-                hasServerInterceptors = interceptorList.hasInterceptorsOfType(
-                    InterceptorList.INTERCEPTOR_TYPE_SERVER );
+                // hasClientInterceptors = true;
+                // hasServerInterceptors = interceptorList.hasInterceptorsOfType(
+                    // InterceptorList.INTERCEPTOR_TYPE_SERVER );
 
                 // Enable interceptor invoker (not necessary if no interceptors 
                 // are registered).  This should be the last stage of ORB

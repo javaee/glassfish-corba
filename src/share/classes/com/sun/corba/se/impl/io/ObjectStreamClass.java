@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -101,6 +101,9 @@ public class ObjectStreamClass implements java.io.Serializable {
 
     private static Map<java.io.ObjectStreamField[], ObjectStreamField[]> translatedFields;
 
+    // True if this is an Enum type (6877056)
+    private boolean isEnum ;
+
     private static final Bridge bridge = 
 	AccessController.doPrivileged(
 	    new PrivilegedAction<Bridge>() {
@@ -138,7 +141,7 @@ public class ObjectStreamClass implements java.io.Serializable {
                 /* Check if it's serializable */
 		ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
                 boolean serializable = cinfo.isASerializable(cl) ;
-
+                
                 /* If the class is only Serializable,
                  * lookup the descriptor for the superclass.
                  */
@@ -380,6 +383,9 @@ public class ObjectStreamClass implements java.io.Serializable {
         }
 
 	name = cl.getName();
+        // 6877056
+	final ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cl ) ;
+        isEnum = cinfo.isEnum() ;
 	superclass = superdesc;
 	serializable = serial;
         if (!forProxyClass) {
@@ -412,7 +418,8 @@ public class ObjectStreamClass implements java.io.Serializable {
 
 	    final Class cl = ofClass;
 
-	    if (!serializable || externalizable || forProxyClass ||
+            // 6877056
+	    if (!serializable || externalizable || forProxyClass || isEnum ||
 		name.equals("java.lang.String")) {
 		fields = NO_FIELDS;
 	    } else if (serializable) {
@@ -509,7 +516,8 @@ public class ObjectStreamClass implements java.io.Serializable {
 	     *
 	     * NonSerializable classes have a serialVerisonUID of 0L.
 	     */
-	     if (isNonSerializable()) {
+             // 6877056
+	     if (isNonSerializable() || isEnum) {
 		 suid = 0L;
 	     } else {
 		 // Lookup special Serializable members using reflection.

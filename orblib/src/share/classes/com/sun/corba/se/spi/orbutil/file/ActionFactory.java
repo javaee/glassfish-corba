@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -35,8 +35,6 @@
  */
 package com.sun.corba.se.spi.orbutil.file ;
 
-import java.io.File ;
-
 public class ActionFactory {
     private final int verbose ;
     private final boolean dryRun ;
@@ -56,16 +54,19 @@ public class ActionFactory {
 
     /** returns an action that returns true.  If verbose is true, the action
      * also displays the FileWrapper that was passed to it.
+     * @return The skip action.
      */
-    public Scanner.Action getSkipAction() {
+   public Scanner.Action getSkipAction() {
 	return new Scanner.Action() {
+            @Override
 	    public String toString() {
 		return "SkipAction" ;
 	    }
 
 	    public boolean evaluate( final FileWrapper fw ) {
-		if (verbose > 0)
-		    System.out.println( "SkipAction called on " + fw ) ;
+		if (verbose > 0) {
+                    System.out.println("SkipAction called on " + fw);
+                }
 		
 		return true ;
 	    }
@@ -74,16 +75,19 @@ public class ActionFactory {
 
     /** returns an action that returns false.  If verbose is true, the action
      * also displays the FileWrapper that was passed to it.
+     * @return The stop action.
      */
-    public Scanner.Action getStopAction() {
+   public Scanner.Action getStopAction() {
 	return new Scanner.Action() {
+            @Override
 	    public String toString() {
 		return "StopAction" ;
 	    }
 
 	    public boolean evaluate( final FileWrapper fw ) {
-		if (verbose > 0)
-		    System.out.println( "StopAction called on " + fw ) ;
+		if (verbose > 0) {
+                    System.out.println("StopAction called on " + fw);
+                }
 
 		return false ;
 	    }

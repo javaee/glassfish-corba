@@ -101,7 +101,7 @@ public class StubFactoryCodegenImpl extends StubFactoryDynamicBase
                 final Class theClass = classData.getMyClass() ;
                 final String stubClassName = Utility.dynamicStubName(
 			theClass.getName() ) ; 
-                final String baseClassName = CodegenStubBase.class.getName() ;
+                final Class baseClass = CodegenStubBase.class ;
                 final Class[] interfaces = nt.getInterfaces() ;
                 final Method[] methods = nt.getMethods() ;
 
@@ -116,7 +116,7 @@ public class StubFactoryCodegenImpl extends StubFactoryDynamicBase
 
                 // Create a StubGenerator that generates this stub class
 		final CodegenProxyCreator creator = new CodegenProxyCreator( 
-		    stubClassName, baseClassName, interfaces, methods ) ;
+		    stubClassName, baseClass, interfaces, methods ) ;
 
 		// Invoke creator in a doPrivileged block if there is a security 
 		// manager installed.

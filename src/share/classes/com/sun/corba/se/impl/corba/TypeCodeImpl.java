@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -66,10 +66,14 @@ import com.sun.corba.se.spi.orbutil.copyobject.Copy;
 import com.sun.corba.se.spi.orbutil.copyobject.CopyType;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 // no chance of subclasses, so no problems with runtime helper lookup
 public final class TypeCodeImpl extends TypeCode 
 {
+    private static final long serialVersionUID = -5320808494290154449L;
+
     //static final boolean debug = false;
 
     // the indirection TCKind, needed for recursive typecodes. 
@@ -205,6 +209,14 @@ public final class TypeCodeImpl extends TypeCode
     @Copy( CopyType.IDENTITY )
     private transient TimingPoints tp ;
 
+    // Present only to suppress FindBugs warnings
+    private void readObject( ObjectInputStream is ) throws IOException,
+        ClassNotFoundException  {
+        _orb = null ;
+        wrapper = null ;
+        tp = null ;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Constructors...
 
@@ -214,13 +226,14 @@ public final class TypeCodeImpl extends TypeCode
 	_orb = orb;
 	wrapper = orb.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
 
-	TimerManager tm = orb.getTimerManager() ;
-	if (tm == null)
-	    throw wrapper.timerManagerNotInitialized() ;
-	else {
+	TimerManager<TimingPoints> tm = orb.getTimerManager() ;
+	if (tm == null) {
+            throw wrapper.timerManagerNotInitialized();
+        } else {
 	    tp = orb.getTimerManager().points() ;
-	    if (tp == null)
-		throw wrapper.timingPointsAreNull() ;
+	    if (tp == null) {
+                throw wrapper.timingPointsAreNull();
+            }
 	}
     }
       
@@ -239,10 +252,12 @@ public final class TypeCodeImpl extends TypeCode
 	    // _REVISIT_ We should make this constructor private
 	    if (tc instanceof TypeCodeImpl) {
 		TypeCodeImpl tci = (TypeCodeImpl)tc;
-		if (tci._kind == tk_indirect)
-		    throw wrapper.badRemoteTypecode() ;
-		if (tci._kind == TCKind._tk_sequence && tci._contentType == null)
-		    throw wrapper.badRemoteTypecode() ;
+		if (tci._kind == tk_indirect) {
+                    throw wrapper.badRemoteTypecode();
+                }
+		if (tci._kind == TCKind._tk_sequence && tci._contentType == null) {
+                    throw wrapper.badRemoteTypecode();
+                }
 	    }
 
 	    // set up kind
@@ -299,8 +314,9 @@ public final class TypeCodeImpl extends TypeCode
 		    _discriminator = convertToNative(_orb, tc.discriminator_type());
 		    _defaultIndex  = tc.default_index();
 		    _unionLabels = new AnyImpl[_memberCount];
-		    for (int i=0; i < _memberCount; i++)
-			_unionLabels[i] = new AnyImpl(_orb, tc.member_label(i));
+		    for (int i=0; i < _memberCount; i++) {
+                        _unionLabels[i] = new AnyImpl(_orb, tc.member_label(i));
+                    }
 		    break;
 		}
 	      
@@ -493,18 +509,18 @@ public final class TypeCodeImpl extends TypeCode
 
 	tp.enter_createEnumTypeCode() ;
 	try {
-	    if (creationKind == TCKind._tk_enum)
-		{
-		    _kind		= creationKind;
-		    setId(id);
-		    _name		= name;
-		    _memberCount	= members.length;
+	    if (creationKind == TCKind._tk_enum) {
+                _kind		= creationKind;
+                setId(id);
+                _name		= name;
+                _memberCount	= members.length;
 
-		    _memberNames = new String[_memberCount];
+                _memberNames = new String[_memberCount];
 
-		    for (int i = 0 ; i < _memberCount ; i++)
-			_memberNames[i] = members[i];
-		} // else initializes to null
+                for (int i = 0 ; i < _memberCount ; i++) {
+                    _memberNames[i] = members[i];
+                }
+            } // else initializes to null
 	} finally {
 	    tp.exit_createEnumTypeCode() ;
 	}
@@ -521,13 +537,14 @@ public final class TypeCodeImpl extends TypeCode
 
 	tp.enter_createAliasTypeCode() ;
 	try {
-	    if ( creationKind == TCKind._tk_alias || creationKind == TCKind._tk_value_box )
-		{
-		    _kind		= creationKind;
-		    setId(id);
-		    _name		= name;
-		    _contentType	= convertToNative(_orb, original_type);
-		}
+	    if (creationKind == TCKind._tk_alias 
+                || creationKind == TCKind._tk_value_box) {
+
+                _kind		= creationKind;
+                setId(id);
+                _name		= name;
+                _contentType	= convertToNative(_orb, original_type);
+            }
 	    // else initializes to null
 
 	} finally {
@@ -567,8 +584,9 @@ public final class TypeCodeImpl extends TypeCode
 
 	tp.enter_createStringTypeCode() ;
 	try {
-	    if (bound < 0)
-		throw wrapper.negativeBounds() ;
+	    if (bound < 0) {
+                throw wrapper.negativeBounds();
+            }
 
 	    if ((creationKind == TCKind._tk_string) || (creationKind == TCKind._tk_wstring)) {
 		_kind		= creationKind;
@@ -672,14 +690,15 @@ public final class TypeCodeImpl extends TypeCode
     protected static TypeCodeImpl convertToNative(ORB orb,
 						  TypeCode tc) 
     {
-	if (tc instanceof TypeCodeImpl)
-	    return (TypeCodeImpl) tc;
-	else
-	    return new TypeCodeImpl(orb, tc);
+	if (tc instanceof TypeCodeImpl) {
+            return (TypeCodeImpl) tc;
+        } else {
+            return new TypeCodeImpl(orb, tc);
+        }
     }
 
     public static CDROutputObject newOutputStream(ORB orb) {
-	TypeCodeOutputStream tcos = new TypeCodeOutputStream((ORB)orb);
+	TypeCodeOutputStream tcos = new TypeCodeOutputStream(orb);
 	//if (debug) System.out.println("Created TypeCodeOutputStream " + tcos + 
 	// " with no parent");
 	return tcos;
@@ -698,8 +717,9 @@ public final class TypeCodeImpl extends TypeCode
 
     private TypeCodeImpl tryIndirectType() {
 	// Assert that _kind == tk_indirect
-	if (_indirectType != null)
-	    return _indirectType;
+	if (_indirectType != null) {
+            return _indirectType;
+        }
 
 	setIndirectType(_orb.getTypeCode(_id));
 
@@ -728,11 +748,13 @@ public final class TypeCodeImpl extends TypeCode
     }
 
     private TypeCodeImpl getParentAtLevel(int level) {
-	if (level == 0)
-	    return this;
+	if (level == 0) {
+            return this;
+        }
 
-	if (_parent == null)
-	    throw wrapper.unresolvedRecursiveTypecode() ;
+	if (_parent == null) {
+            throw wrapper.unresolvedRecursiveTypecode();
+        }
 
 	return _parent.getParentAtLevel(level - 1);
     }
@@ -747,7 +769,7 @@ public final class TypeCodeImpl extends TypeCode
 		    // Create a recursive type code object as the content type.
 		    // This is when the recursive sequence typecode morphes
 		    // into a sequence typecode containing a recursive typecode.
-		    _contentType = new TypeCodeImpl((ORB)_orb, realParent._id);
+		    _contentType = new TypeCodeImpl(_orb, realParent._id);
 		}
 	    }
 	}
@@ -779,15 +801,17 @@ public final class TypeCodeImpl extends TypeCode
     {
 	tp.enter_typeCodeEquals() ;
 	try {
-	    if (tc == this)
-		return true;
+	    if (tc == this) {
+                return true;
+            }
 
 	    try {
 
 		if (_kind == tk_indirect) {
 		    //return indirectType().equal(tc);
-		    if (_id != null && tc.id() != null)
-			return _id.equals(tc.id());
+		    if (_id != null && tc.id() != null) {
+                        return _id.equals(tc.id());
+                    }
 		    return (_id == null && tc.id() == null);
 		}
 
@@ -856,15 +880,19 @@ public final class TypeCodeImpl extends TypeCode
 		    case TCKind._tk_except:
 			{
 			    // check for member count
-			    if (_memberCount != tc.member_count())
-				return false;
+			    if (_memberCount != tc.member_count()) {
+                                return false;
+                            }
 			    // check for repository id
-			    if (_id.compareTo(tc.id()) != 0)
-				return false;
+			    if (_id.compareTo(tc.id()) != 0) {
+                                return false;
+                            }
 			    // check for member types.
-			    for (int i = 0 ; i < _memberCount ; i++)
-				if (! _memberTypes[i].equal(tc.member_type(i)))
-				    return false;
+			    for (int i = 0 ; i < _memberCount ; i++) {
+                                if (!_memberTypes[i].equal(tc.member_type(i))) {
+                                    return false;
+                                }
+                            }
 			    // ignore id and names since those are optional.
 			    return true;
 			}
@@ -872,25 +900,33 @@ public final class TypeCodeImpl extends TypeCode
 		    case TCKind._tk_union:
 			{
 			    // check for member count
-			    if (_memberCount != tc.member_count())
-				return false;
+			    if (_memberCount != tc.member_count()) {
+                                return false;
+                            }
 			    // check for repository id
-			    if (_id.compareTo(tc.id()) != 0)
-				return false;
+			    if (_id.compareTo(tc.id()) != 0) {
+                                return false;
+                            }
 			    // check for default index
-			    if (_defaultIndex != tc.default_index())
-				return false;
+			    if (_defaultIndex != tc.default_index()) {
+                                return false;
+                            }
 			    // check for discriminator type
-			    if (!_discriminator.equal(tc.discriminator_type()))
-				return false;
+			    if (!_discriminator.equal(tc.discriminator_type())) {
+                                return false;
+                            }
 			    // check for label types and values
-			    for (int i = 0 ; i < _memberCount ; i++)
-				if (! _unionLabels[i].equal(tc.member_label(i)))
-				    return false;
+			    for (int i = 0 ; i < _memberCount ; i++) {
+                                if (!_unionLabels[i].equal(tc.member_label(i))) {
+                                    return false;
+                                }
+                            }
 			    // check for branch types
-			    for (int i = 0 ; i < _memberCount ; i++)
-				if (! _memberTypes[i].equal(tc.member_type(i)))
-				    return false;
+			    for (int i = 0 ; i < _memberCount ; i++) {
+                                if (!_memberTypes[i].equal(tc.member_type(i))) {
+                                    return false;
+                                }
+                            }
 			    // ignore id and names since those are optional.
 			    return true;
 			}
@@ -898,11 +934,13 @@ public final class TypeCodeImpl extends TypeCode
 		    case TCKind._tk_enum:
 			{
 			    // check for repository id
-			    if (_id.compareTo(tc.id()) != 0)
-				return false;
+			    if (_id.compareTo(tc.id()) != 0) {
+                                return false;
+                            }
 			    // check member count
-			    if (_memberCount != tc.member_count())
-				return false;
+			    if (_memberCount != tc.member_count()) {
+                                return false;
+                            }
 			    // ignore names since those are optional.
 			    return true;
 			}
@@ -925,20 +963,24 @@ public final class TypeCodeImpl extends TypeCode
 		    case TCKind._tk_value:
 			{
 			    // check for member count
-			    if (_memberCount != tc.member_count())
-				return false;
+			    if (_memberCount != tc.member_count()) {
+                                return false;
+                            }
 
 			    // check for repository id
-			    if (_id.compareTo(tc.id()) != 0)
-				return false;
+			    if (_id.compareTo(tc.id()) != 0) {
+                                return false;
+                            }
                             
 			    // check for member types.
-			    for (int i = 0 ; i < _memberCount ; i++)
-				if (_memberAccess[i] != tc.member_visibility(i) ||
-				    ! _memberTypes[i].equal(tc.member_type(i)))
-				    return false;
-			    if (_type_modifier == tc.type_modifier())
-				return false;
+			    for (int i = 0 ; i < _memberCount ; i++) {
+                                if (_memberAccess[i] != tc.member_visibility(i) || !_memberTypes[i].equal(tc.member_type(i))) {
+                                    return false;
+                                }
+                            }
+			    if (_type_modifier == tc.type_modifier()) {
+                                return false;
+                            }
                             
 			    // concrete_base may be null
 			    TypeCode tccb = tc.concrete_base_type();
@@ -1029,45 +1071,52 @@ public final class TypeCodeImpl extends TypeCode
 		    myKind == TCKind._tk_except ||
 		    myKind == TCKind._tk_value)
 		{
-		    if (myRealType.member_count() != otherRealType.member_count())
-			return false;
+		    if (myRealType.member_count() != otherRealType.member_count()) {
+                        return false;
+                    }
 		}
 		if (myKind == TCKind._tk_union)
 		{
-		    if (myRealType.default_index() != otherRealType.default_index())
-			return false;
+		    if (myRealType.default_index() != otherRealType.default_index()) {
+                        return false;
+                    }
 		}
 		if (myKind == TCKind._tk_string ||
 		    myKind == TCKind._tk_wstring ||
 		    myKind == TCKind._tk_sequence ||
 		    myKind == TCKind._tk_array)
 		{
-		    if (myRealType.length() != otherRealType.length())
-			return false;
+		    if (myRealType.length() != otherRealType.length()) {
+                        return false;
+                    }
 		}
 		if (myKind == TCKind._tk_fixed)
 		{
 		    if (myRealType.fixed_digits() != otherRealType.fixed_digits() ||
-			myRealType.fixed_scale() != otherRealType.fixed_scale())
-			return false;
+			myRealType.fixed_scale() != otherRealType.fixed_scale()) {
+                        return false;
+                    }
 		}
 		if (myKind == TCKind._tk_union)
 		{
 		    for (int i=0; i<myRealType.member_count(); i++) {
-			if (myRealType.member_label(i) != otherRealType.member_label(i))
-			    return false;
+			if (myRealType.member_label(i) != otherRealType.member_label(i)) {
+                            return false;
+                        }
 		    }
 		    if ( ! myRealType.discriminator_type().equivalent(
-			otherRealType.discriminator_type()))
-			return false;
+			otherRealType.discriminator_type())) {
+                        return false;
+                    }
 		}
 		if (myKind == TCKind._tk_alias ||
 		    myKind == TCKind._tk_value_box ||
 		    myKind == TCKind._tk_sequence ||
 		    myKind == TCKind._tk_array)
 		{
-		    if ( ! myRealType.content_type().equivalent(otherRealType.content_type()))
-			return false;
+		    if ( ! myRealType.content_type().equivalent(otherRealType.content_type())) {
+                        return false;
+                    }
 		}
 		if (myKind == TCKind._tk_struct ||
 		    myKind == TCKind._tk_union ||
@@ -1076,8 +1125,9 @@ public final class TypeCodeImpl extends TypeCode
 		{
 		    for (int i=0; i<myRealType.member_count(); i++) {
 			if ( ! myRealType.member_type(i).equivalent(
-			    otherRealType.member_type(i)))
-			    return false;
+			    otherRealType.member_type(i))) {
+                            return false;
+                        }
 		    }
 		}
 	    } catch (BadKind e) {
@@ -1104,8 +1154,9 @@ public final class TypeCodeImpl extends TypeCode
 
     public TCKind kind() 
     {
-	if (_kind == tk_indirect)
-	    return indirectType().kind();
+	if (_kind == tk_indirect) {
+            return indirectType().kind();
+        }
 	return TCKind.from_int(_kind);
     }
       
@@ -1357,14 +1408,16 @@ public final class TypeCodeImpl extends TypeCode
     public void read_value(InputStream is) {
 	if (is instanceof TypeCodeReader) {
 	    // hardly possible unless caller knows our "private" stream classes.
-	    if (read_value_kind((TypeCodeReader)is))
-		read_value_body(is);
+	    if (read_value_kind((TypeCodeReader)is)) {
+                read_value_body(is);
+            }
 	} else if (is instanceof CDRInputObject) {
-	    WrapperInputStream wrapper = new WrapperInputStream((CDRInputObject)is);
-	    //if (debug) System.out.println("Created WrapperInputStream " + wrapper + 
+	    WrapperInputStream wis = new WrapperInputStream((CDRInputObject)is);
+	    //if (debug) System.out.println("Created WrapperInputStream " + wis +
 	    // " with no parent");
-	    if (read_value_kind((TypeCodeReader)wrapper))
-		read_value_body(wrapper);
+	    if (read_value_kind((TypeCodeReader)wis)) {
+                read_value_body(wis);
+            }
 	} else {
 	    read_value_kind(is);
 	    read_value_body(is);
@@ -1373,8 +1426,9 @@ public final class TypeCodeImpl extends TypeCode
 
     private void read_value_recursive(TypeCodeInputStream is) {
 	// don't wrap a CDRInputStream reading "inner" TypeCodes.
-        if (read_value_kind((TypeCodeReader)is))
+        if (read_value_kind((TypeCodeReader)is)) {
             read_value_body(is);
+        }
     }
 
     boolean read_value_kind(TypeCodeReader tcis) 
@@ -1392,8 +1446,9 @@ public final class TypeCodeImpl extends TypeCode
 	    }
 
 	    // Don't do any work if this is native
-	    if (_kind == TCKind._tk_native)
-		throw wrapper.cannotMarshalNative() ;
+	    if (_kind == TCKind._tk_native) {
+                throw wrapper.cannotMarshalNative();
+            }
 
 	    // We have to remember the stream and position for EVERY type code
 	    // in case some recursive or indirect type code references it.
@@ -1401,8 +1456,9 @@ public final class TypeCodeImpl extends TypeCode
 
 	    if (_kind == tk_indirect) {
 		int streamOffset = tcis.read_long();
-		if (streamOffset > -4)
-		    throw wrapper.invalidIndirection( streamOffset ) ;
+		if (streamOffset > -4) {
+                    throw wrapper.invalidIndirection(streamOffset);
+                }
 
 		// The encoding used for indirection is the same as that used for recursive ,
 		// TypeCodes i.e., a 0xffffffff indirection marker followed by a long offset
@@ -1417,8 +1473,9 @@ public final class TypeCodeImpl extends TypeCode
 		// "TypeCodeImpl looking up indirection at position topPos " +
 		//topPos + " - 4 + offset " + streamOffset + " = " + indirectTypePosition);
 		TypeCodeImpl type = topStream.getTypeCodeAtPosition(indirectTypePosition);
-		if (type == null)
-		    throw wrapper.indirectionNotFound( indirectTypePosition ) ;
+		if (type == null) {
+                    throw wrapper.indirectionNotFound(indirectTypePosition);
+                }
 		setIndirectType(type);
 		return false;
 	    }
@@ -1438,9 +1495,11 @@ public final class TypeCodeImpl extends TypeCode
 	if ((_kind < 0 || _kind > typeTable.length) && _kind != tk_indirect) {
 	    throw wrapper.cannotMarshalBadTckind() ;
 	}
+
 	// Don't do any work if this is native
-	if (_kind == TCKind._tk_native)
-	    throw wrapper.cannotMarshalNative() ;
+	if (_kind == TCKind._tk_native) {
+            throw wrapper.cannotMarshalNative();
+        }
 
 	if (_kind == tk_indirect) {
 	    throw wrapper.recursiveTypecodeError() ;
@@ -1534,10 +1593,9 @@ public final class TypeCodeImpl extends TypeCode
 				// read off label values, names and types
 				for (int i=0; i < _memberCount; i++) {
 				    _unionLabels[i] = new AnyImpl((ORB)is.orb());
-				    if (i == _defaultIndex) 
-					// for the default case, read off the zero octet
-					_unionLabels[i].insert_octet(_encap.read_octet());
-				    else {
+				    if (i == _defaultIndex) {
+                                        _unionLabels[i].insert_octet(_encap.read_octet());
+                                    } else {
 					switch (realType(_discriminator).kind().value()) {
 					case TCKind._tk_short:
 					    _unionLabels[i].insert_short(_encap.read_short());
@@ -1612,8 +1670,9 @@ public final class TypeCodeImpl extends TypeCode
 				_memberNames = new String[_memberCount];
 
 				// read off identifier names
-				for (int i=0; i < _memberCount; i++)
-				    _memberNames[i] = _encap.read_string();
+				for (int i=0; i < _memberCount; i++) {
+                                    _memberNames[i] = _encap.read_string();
+                                }
 			    } finally {
 				tp.exit_typeCodeReadValueBodyComplexEnum() ;
 			    }
@@ -1805,8 +1864,9 @@ public final class TypeCodeImpl extends TypeCode
 	tp.enter_typeCodeWriteValue2() ;
 	try {
 	    // Don't do any work if this is native
-	    if (_kind == TCKind._tk_native)
-		throw wrapper.cannotMarshalNative() ;
+	    if (_kind == TCKind._tk_native) {
+                throw wrapper.cannotMarshalNative();
+            }
 
 	    TypeCodeOutputStream topStream = tcos.getTopLevelStream();
 
@@ -1901,10 +1961,9 @@ public final class TypeCodeImpl extends TypeCode
 			    for (int i=0; i < _memberCount; i++) {
 
 				// for the default case, marshal the zero octet
-				if (i == _defaultIndex)
-				    _encap.write_octet(_unionLabels[i].extract_octet());
-
-				else {
+				if (i == _defaultIndex) {
+                                    _encap.write_octet(_unionLabels[i].extract_octet());
+                                } else {
 				    switch (realType(_discriminator).kind().value()) {
 				    case TCKind._tk_short:
 					_encap.write_short(_unionLabels[i].extract_short());
@@ -1968,8 +2027,9 @@ public final class TypeCodeImpl extends TypeCode
 			    _encap.write_long(_memberCount);
 
 			    // marshal identifier names
-			    for (int i=0; i < _memberCount; i++)
-				_encap.write_string(_memberNames[i]);
+			    for (int i=0; i < _memberCount; i++) {
+                                _encap.write_string(_memberNames[i]);
+                            }
 			}
 			break;
 
@@ -2081,6 +2141,8 @@ public final class TypeCodeImpl extends TypeCode
      * See AnyImpl read_value and write_value for usage.
      * The state of this TypeCodeImpl instance isn't changed, only used
      * by the Any to do the correct copy.
+     * @param src InputStream to copy.
+     * @param dst target for copy.
      */
     protected void copy(org.omg.CORBA.portable.InputStream src, 
 	org.omg.CORBA.portable.OutputStream dst)
@@ -2142,8 +2204,9 @@ public final class TypeCodeImpl extends TypeCode
 		    String s;
 		    s = src.read_string();
 		    // make sure length bound in typecode is not violated
-		    if ((_length != 0) && (s.length() > _length))
-			throw wrapper.badStringBounds( s.length(), _length ) ;
+		    if ((_length != 0) && (s.length() > _length)) {
+                        throw wrapper.badStringBounds(s.length(), _length);
+                    }
 		    dst.write_string(s);
 		}
 		break;
@@ -2153,8 +2216,9 @@ public final class TypeCodeImpl extends TypeCode
 		    String s;
 		    s = src.read_wstring();
 		    // make sure length bound in typecode is not violated
-		    if ((_length != 0) && (s.length() > _length))
-			throw wrapper.badStringBounds( s.length(), _length ) ;
+		    if ((_length != 0) && (s.length() > _length)) {
+                        throw wrapper.badStringBounds(s.length(), _length);
+                    }
 		    dst.write_wstring(s);
 		}
 		break;
@@ -2346,12 +2410,11 @@ public final class TypeCodeImpl extends TypeCode
 
 		    if (labelIndex == _unionLabels.length) {
 			// check if label has not been found
-			if (_defaultIndex == -1)
-			    // throw exception if default was not expected
-			    throw wrapper.unexpectedUnionDefault() ;
-			else 
-			    // must be of the default branch type
-			    _memberTypes[_defaultIndex].copy(src, dst);
+			if (_defaultIndex == -1) {
+                            throw wrapper.unexpectedUnionDefault();
+                        } else {
+                            _memberTypes[_defaultIndex].copy(src, dst);
+                        }
 		    }
 		    break;
 		}
@@ -2365,22 +2428,25 @@ public final class TypeCodeImpl extends TypeCode
 		int seqLength = src.read_long();
 
 		// check for sequence bound violated
-		if ((_length != 0) && (seqLength > _length))
-		    throw wrapper.badSequenceBounds( seqLength, _length ) ;
+		if ((_length != 0) && (seqLength > _length)) {
+                    throw wrapper.badSequenceBounds(seqLength, _length);
+                }
 
 		// write the length of the sequence
 		dst.write_long(seqLength);
 
 		// copy each element of the seq using content type
 		lazy_content_type(); // make sure it's resolved
-		for (int i=0; i < seqLength; i++)
-		    _contentType.copy(src, dst);
+		for (int i=0; i < seqLength; i++) {
+                    _contentType.copy(src, dst);
+                }
 		break;
 
 	    case TCKind._tk_array:
 		// copy each element of the array using content type
-		for (int i=0; i < _length; i++)
-		    _contentType.copy(src, dst);
+		for (int i=0; i < _length; i++) {
+                    _contentType.copy(src, dst);
+                }
 		break;
 
 	    case TCKind._tk_alias:
@@ -2407,17 +2473,20 @@ public final class TypeCodeImpl extends TypeCode
 
 
     static protected short digits(java.math.BigDecimal value) {
-        if (value == null)
+        if (value == null) {
             return 0;
+        }
         short length = (short)value.unscaledValue().toString().length();
-        if (value.signum() == -1)
+        if (value.signum() == -1) {
             length--;
+        }
         return length;
     }
 
     static protected short scale(java.math.BigDecimal value) {
-        if (value == null)
+        if (value == null) {
             return 0;
+        }
         return (short)value.scale();
     }
 
@@ -2427,8 +2496,9 @@ public final class TypeCodeImpl extends TypeCode
     // corresponding to the discriminator. If not found returns the
     // default index or -1 if there is no default index.
     int currentUnionMemberIndex(Any discriminatorValue) throws BadKind {
-        if (_kind != TCKind._tk_union)
+        if (_kind != TCKind._tk_union) {
             throw new BadKind();
+        }
 
         try {
             for (int i=0; i<member_count(); i++) {
@@ -2449,6 +2519,7 @@ public final class TypeCodeImpl extends TypeCode
         return "TypeCodeImpl with kind " + _kind + " and id " + _id;
     }
 
+    @Override
     public String toString() {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream(1024);
         PrintStream printOut = new PrintStream(byteOut, true);
@@ -2497,10 +2568,12 @@ public final class TypeCodeImpl extends TypeCode
                 for(int i=0; i<_memberCount; i++) {
                     // memberName might differ from the name of the member.
                     s.print(indent(level + 1));
-                    if (_memberTypes[i] != null)
+                    if (_memberTypes[i] != null) {
                         _memberTypes[i].printStream(s, level + 1);
-                    else
+                    } else {
                         s.print("<unknown type>");
+                    }
+
                     s.println(" " + _memberNames[i] + ";");
                 }
                 s.print(indent(level) + "}");
@@ -2515,10 +2588,11 @@ public final class TypeCodeImpl extends TypeCode
 	        break;
 
             case TCKind._tk_string:
-                if (_length == 0)
+                if (_length == 0) {
                     s.print("unbounded string " + _name);
-                else
+                } else {
                     s.print("bounded string(" + _length + ") " + _name);
+                }
 	        break;
 
             case TCKind._tk_sequence:
@@ -2559,16 +2633,17 @@ public final class TypeCodeImpl extends TypeCode
     }
 
     private String indent(int level) {
-        String indent = "";
+        StringBuffer sb = new StringBuffer() ;
         for(int i=0; i<level; i++) {
-            indent += "  ";
+            sb.append( "  " ) ;
         }
-        return indent;
+        return sb.toString() ;
     }
 
     protected void setCaching(boolean enableCaching) {
         cachingEnabled = enableCaching;
-        if (enableCaching == false)
+        if (enableCaching == false) {
             outBuffer = null;
+        }
     }
 }

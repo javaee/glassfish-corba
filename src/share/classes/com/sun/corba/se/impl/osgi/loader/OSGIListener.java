@@ -258,10 +258,12 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
 
         if (pkgAdmin != null) {
-            ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
+            final ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
             if (epkgs != null) {
                 for (ExportedPackage ep : epkgs) {
-                    packageNameMap.put( ep.getName(), bundle ) ;
+                    final String pname = ep.getName() ;
+                    packageNameMap.put( pname, bundle ) ;
+                    wrapper.insertBundlePackage( pname, bundle.getSymbolicName() ) ;
                 }
             }
         }
@@ -281,10 +283,12 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
 
         if (pkgAdmin != null) {
-            ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
+            final ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
             if (epkgs != null) {
                 for (ExportedPackage ep : epkgs) {
-                    packageNameMap.remove( ep.getName() ) ;
+                    final String pname = ep.getName() ;
+                    packageNameMap.remove( pname ) ;
+                    wrapper.removeBundlePackage( pname, bundle.getSymbolicName() ) ;
                 }
             }
         }

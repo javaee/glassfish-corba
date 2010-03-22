@@ -36,8 +36,6 @@
 
 package com.sun.corba.se.impl.copyobject ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
 import com.sun.corba.se.spi.orbutil.misc.DenseIntMapImpl ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
@@ -48,13 +46,11 @@ public class CopierManagerImpl implements CopierManager
 {
     private int defaultId ;
     private DenseIntMapImpl<ObjectCopierFactory> map ;
-    private ORB orb ;
 
-    public CopierManagerImpl( ORB orb )
+    public CopierManagerImpl()
     {
 	defaultId = 0 ;
 	map = new DenseIntMapImpl<ObjectCopierFactory>() ;
-	this.orb = orb ;
     }
 
     public void setDefaultId( int id ) 

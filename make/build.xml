@@ -3,7 +3,7 @@
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
-  Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
+  Copyright 2003-2010 Sun Microsystems, Inc. All rights reserved.
  
   The contents of this file are subject to the terms of either the GNU
   General Public License Version 2 only ("GPL") or the Common Development
@@ -127,7 +127,7 @@
     <!-- This target compiles all the ORB unit tests -->
     <target name="build-tests" depends="init, prepare-dirs, run-all-test-idl, run-all-test-rmic, compile-tests"/>
 
-    <target name="compile-tests" depends="init, prepare-dirs, compile-tests-main, compile-tests-values"/>
+    <target name="compile-tests" depends="init, prepare-dirs, compile-tests-main, enhance-tests, compile-tests-values"/>
 
     <target name="compile-tests-main" depends="init, prepare-dirs">
 	<echo message="Compiling all tests"/>
@@ -179,6 +179,16 @@
 
             <!--exclude name="corba/dynamicrmiiiop/testclasses/**"/-->
 	</javac>
+    </target>
+
+    <target name="enhance-tests" depends="compile-tests-main">
+        <!-- Run the tracing enhancer on the class files for corba.tf -->
+	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool" classpathref="test-classpath.master" fork="true" dir="${test-classes.dir}">
+            <arg value="-dir"/>
+            <arg value="corba/tf"/>
+            <arg value="-debug"/>
+            <arg value="false"/>
+        </java>
     </target>
 
     <target name="compile-tests-experimental" depends="init, prepare-dirs">
@@ -1885,14 +1895,16 @@
 	    <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.CodegenCopier*"/>
 	    <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.FastCache*"/>
 	    <filter excludes="com.sun.corba.se.spi.orbutil.proxy.*"/>
-	    <filter excludes="com.sun.corba.se.impl.orbutil.*1_3"/>
-	    <filter excludes="com.sun.corba.se.impl.orbutil.*1_3_1"/>
 	    <filter excludes="com.sun.corba.se.impl.dynamicany.*"/>
 	    <filter excludes="com.sun.corba.se.impl.naming.pcosnaming.*"/>
 	    <filter excludes="com.sun.corba.se.internal.*.*"/>
 	    <filter excludes="com.sun.corba.se.org.omg"/>
 	    <filter excludes="com.sun.org.omg"/>
 	    <filter excludes="com.sun.corba.se.org.objectweb"/>
+	    <filter excludes="com.sun.corba.se.impl.osgi.main"/>
+	    <filter excludes="com.sun.corba.se.impl.presentation.proxy"/>
+	    <filter excludes="com.sun.corba.se.impl.orbutil.file"/>
+	    <filter excludes="com.sun.corba.se.impl.orbutil.argparser"/>
 	</instr>
     </emma>
   </target>

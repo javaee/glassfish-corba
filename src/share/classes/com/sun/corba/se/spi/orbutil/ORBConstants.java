@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2005-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -231,6 +231,9 @@ public class ORBConstants {
     // to GIOP 1.1 fragments, as well.
     public static final int GIOP_FRAGMENT_DIVISOR = 8;
     public static final int GIOP_FRAGMENT_MINIMUM_SIZE = 32;
+
+    public static final String ENV_IS_SERVER_PROPERTY = 
+        SUN_PREFIX + "ORBEnvironmentIsGlassFishServer" ;
 
     // connection management properties
     public static final String HIGH_WATER_MARK_PROPERTY	=
@@ -470,6 +473,9 @@ public class ORBConstants {
     public static final int PERSISTENT                            = 2;
 
     // Constants for ORBD properties ****************************************************************
+
+    // Used to disable ORBD, which is the normal case when the ORBFactory is used to create an ORB.
+    public static final String DISABLE_ORBD_INIT_PROPERTY       = SUN_PREFIX + "activation.ORBDisableORBD" ;
 
     // These properties are never passed on ORB init: they are only passed to ORBD.
 

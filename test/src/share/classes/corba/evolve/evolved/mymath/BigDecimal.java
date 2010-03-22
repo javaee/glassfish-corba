@@ -1,15 +1,4 @@
 /*
- * @(#)src/classes/sov/mymath/BigDecimal.java, math, asdev, 20051029 1.57
- * ===========================================================================
- * Licensed Materials - Property of IBM
- * "Restricted Materials of IBM"
- *
- * IBM SDK, Java(tm) 2 Technology Edition, v5.0
- * (C) Copyright IBM Corp. 1998, 2005. All Rights Reserved
- * ===========================================================================
- */
-
-/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
@@ -43,6 +32,17 @@
  * and therefore, elected the GPL Version 2 license, then the option applies
  * only if the new code is made subject to such option by the copyright
  * holder.
+ */
+
+/*
+ * @(#)src/classes/sov/mymath/BigDecimal.java, math, asdev, 20051029 1.57
+ * ===========================================================================
+ * Licensed Materials - Property of IBM
+ * "Restricted Materials of IBM"
+ *
+ * IBM SDK, Java(tm) 2 Technology Edition, v5.0
+ * (C) Copyright IBM Corp. 1998, 2005. All Rights Reserved
+ * ===========================================================================
  */
 
  /* defect  Date   Author  Why

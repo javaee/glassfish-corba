@@ -47,9 +47,16 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.AMXMetadata ;
+import org.glassfish.gmbal.Description ;
+
 /**
  * @author Harold Carr
  */
+@ManagedObject
+@Description( "Cache of connections originated by the ORB" ) 
+@AMXMetadata( type="corba-outbound-connection-cache-mon", group="monitoring" )
 public class CorbaOutboundConnectionCacheImpl
     extends
 	CorbaConnectionCacheBase

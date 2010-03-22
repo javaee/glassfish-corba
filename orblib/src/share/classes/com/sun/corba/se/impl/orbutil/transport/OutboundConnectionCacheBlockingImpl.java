@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,522 +40,281 @@ import java.io.IOException ;
 
 import java.util.Map ;
 import java.util.HashMap ;
-import java.util.Queue ;
-import java.util.Collection ;
-import java.util.Collections ;
 
-import java.util.concurrent.LinkedBlockingQueue ;
-
-import java.util.logging.Logger ;
+import java.util.concurrent.locks.ReentrantLock ;
 
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.ConnectionFinder ;
 import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
 import com.sun.corba.se.spi.orbutil.transport.OutboundConnectionCache ;
 
-import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
 
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitor ;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory ;
+
+import org.glassfish.gmbal.Description ;
+import org.glassfish.gmbal.ManagedObject ;
+import org.glassfish.gmbal.ManagedAttribute ;
+
+@ManagedObject
+@Description( "Outbound connection cache for connections opened by the client" ) 
 public final class OutboundConnectionCacheBlockingImpl<C extends Connection> 
     extends ConnectionCacheBlockingBase<C> 
     implements OutboundConnectionCache<C> {
-    
+   
+    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil( 
+        OutboundConnectionCacheBlockingImpl.class ) ;
+
+    private ReentrantLock lock = new ReentrantLock() ;
+
     // Configuration data
     // XXX we may want this data to be dynamically re-configurable
     private final int maxParallelConnections ;	// Maximum number of 
 						// connections we will open 
 						// to the same endpoint
 
-    private Map<ContactInfo<C>,CacheEntry<C>> entryMap ;
-    private Map<C,ConnectionState<C>> connectionMap ;
+    @ManagedAttribute
+    public int maxParallelConnections() { return maxParallelConnections ; }
+    
+    private Map<ContactInfo<C>,OutboundCacheEntry<C>> entryMap ;
 
-    public int maxParallelConnections() {
-	return maxParallelConnections ;
+    @ManagedAttribute( id="cacheEntries" ) 
+    private Map<ContactInfo<C>,OutboundCacheEntry<C>> entryMap() {
+        return new HashMap<ContactInfo<C>,OutboundCacheEntry<C>>( entryMap ) ;
+    }
+    
+    private Map<C,OutboundConnectionState<C>> connectionMap ;
+
+    @ManagedAttribute( id="connections" ) 
+    private Map<C,OutboundConnectionState<C>> connectionMap() {
+        return new HashMap<C,OutboundConnectionState<C>>( connectionMap ) ;
     }
 
     protected String thisClassName() {
 	return "OutboundConnectionCacheBlockingImpl" ;
     }
 
-    // NEW: connection was just created; currently not queued
-    // BUSY: connection queued on busyConnections queue
-    // IDLE: connection queued on idleConnections queue
-    private enum ConnectionStateValue { NEW, BUSY, IDLE } 
-
-    private static final class ConnectionState<C extends Connection> {
-	ConnectionStateValue csv ;			// Indicates state of
-							// connection
-	final ContactInfo<C> cinfo ;			// ContactInfo used to 
-							// create this 
-							// Connection
-	final C connection ;				// Connection of the 
-							// ConnectionState
-	final CacheEntry<C> entry ;			// This Connection's 
-							// CacheEntry
-
-	int busyCount ;					// Number of calls to 
-							// get without release
-	int expectedResponseCount ;			// Number of expected 
-							// responses not yet 
-							// received
-
-	// At all times, a connection is either on the busy or idle queue in 
-	// its ConnectionEntry.  If the connection is on the idle queue, 
-	// reclaimableHandle may also be non-null if the Connection is also on 
-	// the reclaimableConnections queue.
-	ConcurrentQueue.Handle<C> reclaimableHandle ;	// non-null iff 
-							// connection is not 
-							// in use and has no
-							// outstanding requests
-
-	ConnectionState( final ContactInfo<C> cinfo, final CacheEntry<C> entry, 
-	    final C conn ) {
-
-	    this.csv = ConnectionStateValue.NEW ;
-	    this.cinfo = cinfo ;
-	    this.connection = conn ;
-	    this.entry = entry ;
-
-	    busyCount = 0 ;
-	    expectedResponseCount = 0 ;
-	    reclaimableHandle = null ;
-	}
-
-	public String toString() {
-	    return "ConnectionState[" 
-		+ "cinfo=" + cinfo 
-		+ " connection=" + connection
-		+ " busyCount=" + busyCount 
-		+ " expectedResponseCount=" + expectedResponseCount 
-		+ "]" ;
-	}
-    }
-
-    // Represents an entry in the outbound connection cache.  
-    // This version handles normal shareable ContactInfo 
-    // (we also need to handle no share).
-    private static final class CacheEntry<C extends Connection> {
-	final Queue<C> idleConnections = new LinkedBlockingQueue<C>() ;
-	final Collection<C> idleConnectionsView =
-	    Collections.unmodifiableCollection( idleConnections ) ;
-
-	final Queue<C> busyConnections = new LinkedBlockingQueue<C>() ;
-	final Collection<C> busyConnectionsView =
-	    Collections.unmodifiableCollection( busyConnections ) ;
-
-	public int totalConnections() {
-	    return idleConnections.size() + busyConnections.size() ;
-	}
-    }
-
     public OutboundConnectionCacheBlockingImpl( final String cacheType, 
 	final int highWaterMark, final int numberToReclaim, 
-	final int maxParallelConnections, Logger logger ) {
+	final int maxParallelConnections, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, logger ) ;
+	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
 
+        mm.enter( debug(), "<init>", cacheType, highWaterMark, 
+            numberToReclaim, maxParallelConnections ) ;
+            
 	if (maxParallelConnections < 1) 
 	    throw new IllegalArgumentException( 
 		"maxParallelConnections must be > 0" ) ;
 
 	this.maxParallelConnections = maxParallelConnections ;
 
-	this.entryMap = new HashMap<ContactInfo<C>,CacheEntry<C>>() ;
-	this.connectionMap = new HashMap<C,ConnectionState<C>>() ;
+	this.entryMap = 
+            new HashMap<ContactInfo<C>,OutboundCacheEntry<C>>() ;
+	this.connectionMap = new HashMap<C,OutboundConnectionState<C>>() ;
+        this.reclaimableConnections = 
+            ConcurrentQueueFactory.<C>makeConcurrentQueue( ttl ) ;
 
-	if (debug()) {
-	    dprint(".constructor completed: " + cacheType );
-	}
+        mm.exit( debug() ) ;
     }
 
     public boolean canCreateNewConnection( ContactInfo<C> cinfo ) {
-	CacheEntry<C> entry = entryMap.get( cinfo ) ;
-	if (entry == null)
-	    return true ;
+        lock.lock() ;
+        try {
+            OutboundCacheEntry<C> entry = entryMap.get( cinfo ) ;
+            if (entry == null)
+                return true ;
 
-	return internalCanCreateNewConnection( entry ) ;
+            return internalCanCreateNewConnection( entry ) ;
+        } finally {
+            lock.unlock() ;
+        }
     }
 
-    private boolean internalCanCreateNewConnection( final CacheEntry<C> entry ) {
-	final int totalConnectionsInEntry = entry.totalConnections() ;
+    private boolean internalCanCreateNewConnection( 
+        final OutboundCacheEntry<C> entry ) {
+        lock.lock() ;
+        try {
+            final boolean createNewConnection = (entry.totalConnections() == 0) ||
+                ((numberOfConnections() < highWaterMark()) &&
+                (entry.totalConnections() < maxParallelConnections)) ;
 
-	final boolean createNewConnection = 
-	    (totalConnectionsInEntry == 0) || 
-	    ((numberOfConnections() < highWaterMark()) && 
-	     (totalConnectionsInEntry < maxParallelConnections)) ;
-
-	return createNewConnection ;
+            return createNewConnection ;
+        } finally {
+            lock.unlock() ;
+        }
     }
 
-    private CacheEntry<C> getEntry( final ContactInfo<C> cinfo 
+    public C get( final ContactInfo<C> cinfo) throws IOException {
+        return get( cinfo, null ) ;
+    }
+
+    public C get( final ContactInfo<C> cinfo,
+	final ConnectionFinder<C> finder ) throws IOException {
+        lock.lock() ;
+        mm.enter( debug(), "get", cinfo ) ;
+        C result = null ;
+
+	try {
+            while (true) {
+                final OutboundCacheEntry<C> entry = getEntry( cinfo ) ;
+
+                if (finder != null) {
+                    mm.info( debug(), "calling finder to get a connection" ) ;
+                        
+                    entry.startConnect() ; 
+                    // Finder may block, especially on opening a new 
+                    // connection, so we can't hold the lock during the
+                    // finder call.
+                    lock.unlock() ;
+                    try {
+                        result = finder.find( cinfo, 
+                            entry.idleConnectionsView,
+                            entry.busyConnectionsView ) ;
+                    } finally {
+                        lock.lock() ;
+                        entry.finishConnect() ;
+                    }
+
+                    if (result != null) {
+                        mm.info( debug(), "finder got connection", result ) ;
+                    }
+                }
+
+                if (result == null) {
+                    result = entry.idleConnections.poll() ;
+                }
+                if (result == null) {
+                    result = tryNewConnection( entry, cinfo ) ;
+                }
+                if (result == null) {
+                    result = entry.busyConnections.poll() ;
+                }
+
+                if (result == null)  {
+                    mm.info( debug(), "No connection available: "
+                        + "awaiting a pending connection" ) ;
+                    entry.waitForConnection() ;
+                    continue ;
+                } else {
+                    OutboundConnectionState<C> cs = getConnectionState( 
+                        cinfo, entry, result ) ;
+
+                    if (cs.isBusy()) {
+                        // Nothing to do in this case
+                    } else if (cs.isIdle()) {
+                        totalBusy++ ;
+                        decrementTotalIdle() ;
+                    } else { // state is NEW
+                        totalBusy++ ;
+                    }
+
+                    cs.acquire() ;
+                    break ;
+                }
+            }
+	} finally {
+            mm.info( debug(), "totalIdle", totalIdle,
+                "totalBusy", totalBusy ) ;
+            mm.exit( debug(), result ) ;
+            lock.unlock() ;
+	}
+
+        return result ;
+    }
+
+    private OutboundCacheEntry<C> getEntry( final ContactInfo<C> cinfo 
 	) throws IOException {
 
-	if (debug()) {
-	    dprint( "->getEntry: " + cinfo ) ;
-	}
-	
+        mm.enter( debug(), "getEntry", cinfo ) ;
+        OutboundCacheEntry<C> result = null ;
 	try {
-	    // This should be the only place a CacheEntry is constructed.
-	    CacheEntry<C> result = entryMap.get( cinfo ) ;
+	    // This is the only place a OutboundCacheEntry is constructed.
+	    result = entryMap.get( cinfo ) ;
 	    if (result == null) {
-		if (debug()) {
-		    dprint( ".getEntry: " + cinfo 
-			+ " creating new CacheEntry" ) ;
-		}
-
-		result = new CacheEntry<C>() ;
+		result = new OutboundCacheEntry<C>( lock ) ;
+                mm.info( debug(), "creating new OutboundCacheEntry", result ) ;
 		entryMap.put( cinfo, result ) ;
 	    } else {
-		if (debug()) {
-		    dprint( ".getEntry: " + cinfo + 
-			" re-using existing CacheEntry" ) ;
-		}
+                mm.info( debug(), "re-using existing OutboundCacheEntry", result ) ;
 	    }
-
-	    return result ;
 	} finally {
-	    if (debug()) {
-		dprint( "<-getEntry: " + cinfo ) ;
-	    }
+            mm.exit( debug(), result ) ;
 	}
+
+        return result ;
     }
 
     // Note that tryNewConnection will ALWAYS create a new connection if
     // no connection currently exists.
-    private C tryNewConnection( final CacheEntry<C> entry, 
+    private C tryNewConnection( final OutboundCacheEntry<C> entry, 
 	final ContactInfo<C> cinfo ) throws IOException {
-
-	if (debug())
-	    dprint( "->tryNewConnection: " + cinfo ) ;
 	
+        mm.enter( debug(), "tryNewConnection", cinfo ) ;
+        C conn = null ;
 	try {
-	    C conn = null ;
-
 	    if (internalCanCreateNewConnection(entry)) {
 		// If this throws an exception just let it
 		// propagate: let a higher layer handle a
 		// connection creation failure.
-		conn = cinfo.createConnection() ; 
-
-		if (debug()) {
-		    dprint( ".tryNewConnection: " + cinfo 
-			+ " created connection " + conn ) ;
-		}
+                entry.startConnect() ;
+                lock.unlock() ;
+                try {
+                    conn = cinfo.createConnection() ; 
+                } finally {
+                    lock.lock() ;
+                    entry.finishConnect() ;
+                }
 	    }
-
-	    return conn ;
 	} finally {
-	    if (debug())
-		dprint( "<-tryNewConnection: " + cinfo ) ;
+            mm.exit( debug(), conn ) ;
 	}
+
+        return conn ;
     }
 
-    private void decrementTotalIdle() {
-	if (debug()) 
-	    dprint( "->decrementTotalIdle: totalIdle = " 
-		+ totalIdle ) ;
+    private OutboundConnectionState<C> getConnectionState( 
+	ContactInfo<C> cinfo, OutboundCacheEntry<C> entry, C conn ) {
+        lock.lock() ;
+        mm.enter( debug(), "getConnectionState", "cinfo", cinfo,
+            "entry", entry, "conn", conn ) ;
 	
 	try {
-	    if (totalIdle > 0) {
-		totalIdle-- ;
-	    } else {
-		if (debug()) {
-		    dprint( ".decrementTotalIdle: " 
-			+ "incorrect idle count: was already 0" ) ;
-		}
-	    }
-	} finally {
-	    dprint( "<-decrementTotalIdle: totalIdle = " 
-		+ totalIdle ) ;
-	}
-    }
-
-    private void decrementTotalBusy() {
-	if (debug()) 
-	    dprint( "->decrementTotalBusy: totalBusy = " 
-		+ totalBusy ) ;
-	
-	try {
-	    if (totalBusy > 0) {
-		totalBusy-- ;
-	    } else {
-		if (debug()) {
-		    dprint( ".decrementTotalBusy: " 
-			+ "incorrect idle count: was already 0" ) ;
-		}
-	    }
-	} finally {
-	    dprint( "<-decrementTotalBusy: totalBusy = " 
-		+ totalBusy ) ;
-	}
-    }
-
-    // Update queues and counts to make the result busy.
-    private void makeResultBusy( C result, ConnectionState<C> cs,
-	CacheEntry<C> entry ) {
-
-	if (debug())
-	    dprint( "->makeResultBusy: " + result 
-		+ " was previously " + cs.csv ) ;
-
-	try {
-	    switch (cs.csv) {
-		case NEW :
-		    totalBusy++ ;
-		    break ;
-
-		case IDLE :
-		    totalBusy++ ;
-		    decrementTotalIdle() ;
-
-		    final ConcurrentQueue.Handle<C> handle = 
-			cs.reclaimableHandle ;
-
-		    if (handle != null) {
-			if (!handle.remove()) {
-			    if (debug()) {
-				dprint( ".makeResultBusy: " + cs.cinfo  
-				    + " result was not on reclaimable Q" ) ;
-			    }
-			}   	
-			cs.reclaimableHandle = null ;
-		    }
-		    break ;
-
-		case BUSY :
-		    // Nothing to do here
-		    break ;
-	    }
-
-	    entry.busyConnections.offer( result ) ;
-	    cs.csv = ConnectionStateValue.BUSY ;
-	    cs.busyCount++ ;
-	} finally {
-	    if (debug())
-		dprint( "<-makeResultBusy: " + result ) ;
-	}
-    }
-
-    private C tryIdleConnections( CacheEntry<C> entry ) {
-	if (debug()) {
-	    dprint( "->tryIdleConnections" ) ;
-	}
-
-	try {
-	    return entry.idleConnections.poll() ;
-	} finally {
-	    if (debug()) {
-		dprint( "<-tryIdleConnections" ) ;
-	    }
-	}
-    }
-
-    private C tryBusyConnections( CacheEntry<C> entry ) {
-	// Use a busy connection.  Note that there MUST be a busy 
-	// connection available at this point, because 
-	// tryNewConnection did not create a new connection.
-	if (debug()) {
-	    dprint( "->tryBusyConnections" ) ;
-	}
-
-	try {
-	    C result = entry.busyConnections.poll() ;
-
-	    if (result == null) {
-		throw new RuntimeException( 
-		    "INTERNAL ERROR: no busy connection available" ) ;
-	    }
-
-	    return result ;
-	} finally {
-	    if (debug()) {
-		dprint( "<-tryBusyConnections" ) ;
-	    }
-	}
-    }
-
-    public synchronized C get( final ContactInfo<C> cinfo
-	) throws IOException {
-
-	return get( cinfo, null ) ;
-    }
-
-    public synchronized ConnectionState<C> getConnectionState( 
-	ContactInfo<C> cinfo, CacheEntry<C> entry, C conn ) {
-
-	if (debug()) 
-	    dprint( "->getConnectionState: " + conn ) ;
-	
-	try {
-	    ConnectionState<C> cs = connectionMap.get( conn ) ;
+	    OutboundConnectionState<C> cs = connectionMap.get( conn ) ;
 	    if (cs == null) {
-		if (debug())
-		    dprint( ".getConnectionState: " + conn 
-			+ " creating new ConnectionState" + cs ) ;
-
-		cs = new ConnectionState<C>( cinfo, entry, conn ) ;
+		cs = new OutboundConnectionState<C>( cinfo, entry, conn ) ;
+                mm.info( debug(), "creating new OutboundConnectionState ", cs ) ;
 		connectionMap.put( conn, cs ) ;
 	    } else {
-		if (debug())
-		    dprint( ".getConnectionState: " + conn 
-			+ " found ConnectionState" + cs ) ;
+                mm.info( debug(), "found OutboundConnectionState ", cs ) ;
 	    }
 
 	    return cs ;
 	} finally {
-	    if (debug()) 
-		dprint( "<-getConnectionState: " + conn ) ;
+            mm.exit( debug() ) ;
+            lock.unlock() ;
 	}
     }
-
-    public synchronized C get( final ContactInfo<C> cinfo,
-	final ConnectionFinder<C> finder ) throws IOException {
-
-	if (debug()) {
-	    dprint( "->get: " + cinfo ) ;
-	}
-
-	ConnectionState<C> cs = null ; 
-
-	try {
-	    final CacheEntry<C> entry = getEntry( cinfo ) ;
-	    C result = null ;
-
-	    if (numberOfConnections() >= highWaterMark()) {
-		// This reclaim probably does nothing, because
-		// connections are reclaimed on release in the
-		// overflow state.
-		reclaim() ;
-	    }
-
-	    if (finder != null) {
-		// Try the finder if present.
-		if (debug()) {
-		    dprint( ".get: " + cinfo + 
-			" Calling the finder to get a connection" ) ;
-		}
-		
-		result = finder.find( cinfo, entry.idleConnectionsView,
-		    entry.busyConnectionsView ) ;
-
-		if (result != null) {
-		    cs = getConnectionState( cinfo, entry, result ) ;
-
-		    // Dequeue from cache entry if not NEW
-		    if (cs.csv == ConnectionStateValue.BUSY)
-			entry.busyConnections.remove( result ) ;
-		    else if (cs.csv == ConnectionStateValue.IDLE)
-			entry.idleConnections.remove( result ) ;
-		}
-	    }
-
-	    if (result == null) {
-		result = tryIdleConnections( entry ) ;
-	    }
-
-	    if (result == null) {
-		result = tryNewConnection( entry, cinfo ) ;
-	    }
-
-	    if (result == null) {
-		result = tryBusyConnections( entry ) ;
-	    }
-	    
-	    if (cs == null) 
-		cs = getConnectionState( cinfo, entry, result ) ;
-
-	    makeResultBusy( result, cs, entry ) ;
-	    return result ;
-	} finally {
-	    if (debug()) {
-		dprint( ".get " + cinfo 
-		    + " totalIdle=" + totalIdle
-		    + " totalBusy=" + totalBusy ) ;
-
-		dprint( "<-get " + cinfo + " ConnectionState=" + cs ) ;
-	    }
-	}
-    }
-
-    // If overflow, close conn and return true,
-    // otherwise enqueue on reclaimable queue and return false.
-    private boolean reclaimOrClose( ConnectionState<C> cs, final C conn ) {
-	if (debug())
-	    dprint( "->reclaimOrClose: " + conn ) ;
-
-	try {
-	    final boolean isOverflow = numberOfConnections() > 
-		highWaterMark() ;
-
-	    if (isOverflow) {
-		if (debug()) {
-		    dprint( ".reclaimOrClose: closing overflow connection "
-			+ conn ) ;
-		}
-
-		close( conn ) ;
-	    } else {
-		if (debug()) {
-		    dprint( ".reclaimOrClose: queuing reclaimable connection "
-			+ conn ) ;
-		}
-
-		cs.reclaimableHandle = 
-		    reclaimableConnections.offer( conn ) ;
-	    }
-
-	    return isOverflow ;
-	} finally {
-	    if (debug())
-		dprint( "<-reclaimOrClose: " + conn ) ;
-	}
-    }
-
-    public synchronized void release( final C conn, 
+    
+    public void release( final C conn, 
 	final int numResponsesExpected ) {
+        lock.lock() ;
+        mm.enter( debug(), "release", "conn", conn, "numResponsesExpected",
+            numResponsesExpected ) ;
 
-	if (debug()) {
-	    dprint( "->release: " + conn 
-		+ " expecting " + numResponsesExpected + " responses" ) ;
-	}
-
-	final ConnectionState<C> cs = connectionMap.get( conn ) ;
+        OutboundConnectionState<C> cs = null ;
 
 	try {
+            cs = connectionMap.get( conn ) ;
 	    if (cs == null) {
-		if (debug()) {
-		    dprint( ".release: " + conn + " was closed" ) ;
-		}
-
+                mm.info( debug(), "connection was already closed" ) ;
 		return ; 
 	    } else {
-		cs.expectedResponseCount += numResponsesExpected ;
-		int numResp = cs.expectedResponseCount ;
-		int numBusy = --cs.busyCount ;
-		if (numBusy < 0) {
-		    if (debug()) {
-			dprint( ".release: " + conn + " numBusy=" +
-			    numBusy + " is < 0: error" ) ;
-		    }
+                int numResp = cs.release( numResponsesExpected ) ;
+                mm.info( debug(), "numResponsesExpected", numResponsesExpected ) ;
 
-		    cs.busyCount = 0 ;
-		    return ;
-		}
-
-		if (debug()) {
-		    dprint( ".release: " + numResp + " responses expected" ) ;
-		    dprint( ".release: " + numBusy + " busy count" ) ;
-		}
-
-		if (numBusy == 0) {
-		    final CacheEntry<C> entry = cs.entry ;
-		    boolean wasOnBusy = entry.busyConnections.remove( conn ) ;
-		    if (!wasOnBusy)
-			if (debug())
-			    dprint( ".release: " + conn
-				+ " was NOT on busy queue, "
-				+ "but should have been" ) ;
-
+		if (!cs.isBusy()) {
 		    boolean connectionClosed = false ;
 		    if (numResp == 0) {
 			connectionClosed = reclaimOrClose( cs, conn ) ;
@@ -564,140 +323,123 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
 		    decrementTotalBusy() ;
 
 		    if (!connectionClosed) {
-			if (debug()) {
-			    dprint( ".release: queuing idle connection "
-				+ conn ) ;
-			}
-
+                        mm.info( debug(), "idle connection queued" ) ;
 			totalIdle++ ;
-			entry.idleConnections.offer( conn ) ;
-			cs.csv = ConnectionStateValue.IDLE ;
 		    }
 		}
 	    }
 	} finally {
-	    if (debug()) {
-		dprint( ".release " + conn 
-		    + " cs=" + cs 
-		    + " totalIdle=" + totalIdle
-		    + " totalBusy=" + totalBusy ) ;
-
-		dprint( "<-release" + conn ) ;
-	    }
+            mm.info( debug(), "cs", cs, "totalIdle", totalIdle,
+                "totalBusy", totalBusy ) ;
+            mm.exit( debug() ) ;
+            lock.unlock() ;
 	}
     }
 
     /** Decrement the number of expected responses.  When a connection is idle 
      * and has no expected responses, it can be reclaimed.
      */
-    public synchronized void responseReceived( final C conn ) {
-	if (debug()) {
-	    dprint( "->responseReceived: " + conn ) ;
-	}
-
+    public void responseReceived( final C conn ) {
+        lock.lock() ;
+        mm.enter( debug(), "responseReceived", conn ) ;
 	try {
-	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
+	    final OutboundConnectionState<C> cs = connectionMap.get( conn ) ;
 	    if (cs == null) {
-		if (debug()) {
-		    dprint( 
-			".responseReceived: " 
-			+ "received response on closed connection " 
-			+ conn ) ;
-		}
-
+                mm.info( debug(), "response received on closed connection" ) ;
 		return ;
 	    }
 
-	    final int waitCount = --cs.expectedResponseCount ;
-
-	    if (debug())  {
-		dprint( ".responseReceived: " + conn 
-		    + " waitCount=" + waitCount ) ;
-	    }
-
-	    if (waitCount < 0) {
-		if (debug())  {
-		    dprint( ".responseReceived: " + conn 
-			+ " incorrect call: error" ) ;
-		}
-		cs.expectedResponseCount = 0 ;
-		return ;
-	    }
-
-	    if ((waitCount == 0) && (cs.busyCount == 0)) {
+            if (cs.responseReceived()) {
 		reclaimOrClose( cs, conn ) ;
-	    }
+            }
 	} finally {
-	    if (debug()) {
-		dprint( "<-responseReceived: " + conn ) ;
-	    }
+            mm.exit( debug() ) ;
+            lock.unlock() ;
 	}
     }
+    
+    // If overflow, close conn and return true,
+    // otherwise enqueue on reclaimable queue and return false.
+    private boolean reclaimOrClose( OutboundConnectionState<C> cs, 
+        final C conn ) {
+
+        mm.enter( debug(), "reclaimOrClose", "cs", cs, "conn", conn ) ;
+
+	try {
+	    final boolean isOverflow = numberOfConnections() > 
+		highWaterMark() ;
+
+	    if (isOverflow) {
+                mm.info( debug(), "closing overflow connection" ) ;
+		close( conn ) ;
+	    } else {
+                mm.info( debug(), "queuing reclaimable connection" ) ;
+		cs.setReclaimableHandle( 
+		    reclaimableConnections.offer( conn ) ) ;
+	    }
+
+	    return isOverflow ;
+	} finally {
+            mm.exit( debug() ) ;
+	}
+    }
+
 
     /** Close a connection, regardless of whether the connection is busy
      * or not.
      */
-    public synchronized void close( final C conn ) {
-	if (debug()) {
-	    dprint( "->close: " + conn ) ;
-	}
-	
+    public void close( final C conn ) {
+        lock.lock() ;
+        mm.enter( debug(), "close", conn ) ;
 	try {
-	    final ConnectionState<C> cs = connectionMap.remove( conn ) ;
+	    final OutboundConnectionState<C> cs = connectionMap.remove( conn ) ;
 	    if (cs == null) {
-		if (debug()) {
-		    dprint( ".close: " + conn + " was already closed" ) ;
-		}
-
+                mm.info( debug(), "connection was already closed" ) ;
 		return ;
 	    }
+            mm.info( debug(), "cs", cs ) ;
 
-	    if (debug()) {
-		dprint( ".close: " + conn 
-		    + "Connection state=" + cs ) ;
-	    }
-
-	    final ConcurrentQueue.Handle rh = cs.reclaimableHandle ;
-	    if (rh != null) {
-		boolean result = rh.remove() ;
-		if (debug()) {
-		    dprint( ".close: " + conn 
-			+ "reclaimableHandle .remove = " + result ) ;
-		}
-	    }
-
-	    if (cs.entry.busyConnections.remove( conn )) {
-		if (debug()) {
-		    dprint( ".close: " + conn 
-			+ " removed from busyConnections" ) ;
-		}
-
+            if (cs.isBusy()) {
+                mm.info( debug(), "connection removed from busy connections" ) ;
 		decrementTotalBusy() ;
-	    }
-
-	    if (cs.entry.idleConnections.remove( conn )) {
-		if (debug()) {
-		    dprint( ".close: " + conn 
-			+ " removed from idleConnections" ) ;
-		}
-
+            } else if (cs.isIdle()) {
+                mm.info( debug(), "connection removed from idle connections" ) ;
 		decrementTotalIdle() ;
-	    }
+            }
 
-	    try {
-		conn.close() ;
-	    } catch (IOException exc) {
-		if (debug())
-		    dprint( ".close: " + conn + ": Caught IOException on close:"
-			+ exc ) ;
-	    }
+            cs.close() ;
 	} finally {
-	    if (debug()) {
-		dprintStatistics() ;
-		dprint( "<-close: " + conn ) ;
-	    }
+            mm.exit( debug() ) ;
+            lock.unlock() ;
 	}
     }
+
+    private void decrementTotalIdle() {
+        mm.enter( debug(), "decrementTotalIdle", totalIdle ) ;
+	try {
+	    if (totalIdle > 0) {
+		totalIdle-- ;
+	    } else {
+                mm.info( debug(), "ERROR: was already 0!" ) ;
+	    }
+	} finally {
+            mm.exit( debug(), totalIdle ) ;
+	}
+    }
+
+    private void decrementTotalBusy() {
+        mm.enter( debug(), "decrementTotalBusy", totalBusy ) ;
+	try {
+	    if (totalBusy > 0) {
+		totalBusy-- ;
+	    } else {
+                mm.info( debug(), "ERROR: count was already 0!" ) ;
+	    }
+	} finally {
+            mm.exit( debug() ) ;
+	}
+    }
+
 }
 
 // End of file.

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2007-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -52,6 +52,8 @@ import com.sun.corba.se.spi.orbutil.transport.OutboundConnectionCache ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
+import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory;
 
 /** Manage connections that are initiated from this VM. Connections are managed 
  * by a get/release mechanism and cached by the ContactInfo used to create them.
@@ -82,13 +84,16 @@ import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
 public final class OutboundConnectionCacheImpl<C extends Connection> 
     extends ConnectionCacheNonBlockingBase<C> 
     implements OutboundConnectionCache<C> {
+
+    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil(
+        OutboundConnectionCacheImpl.class ) ;
     
     private final int maxParallelConnections ;	// Maximum number of connections 
 						// we will open to the same 
 						// endpoint
 
-    private ConcurrentMap<ContactInfo<C>,CacheEntry<C>> entryMap ;
-    private ConcurrentMap<C,ConnectionState<C>> connectionMap ;
+    private final ConcurrentMap<ContactInfo<C>,CacheEntry<C>> entryMap ;
+    private final ConcurrentMap<C,ConnectionState<C>> connectionMap ;
 
     public int maxParallelConnections() {
 	return maxParallelConnections ;
@@ -117,13 +122,13 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 	// non-null.  If idleHandle is non-null, reclaimableHandle may also 
 	// be non-null if the Connection is also on the 
 	// reclaimableConnections queue.
-	ConcurrentQueue.Handle reclaimableHandle ;  // non-null iff connection 
-						    // is not in use and has no
-						    // outstanding requests
-	ConcurrentQueue.Handle idleHandle ;	    // non-null iff connection 
-						    // is not in use
-	ConcurrentQueue.Handle busyHandle ;	    // non-null iff connection 
-						    // is in use
+	volatile ConcurrentQueue.Handle reclaimableHandle ;  // non-null iff connection 
+						             // is not in use and has no
+						             // outstanding requests
+	volatile ConcurrentQueue.Handle idleHandle ;	     // non-null iff connection 
+						             // is not in use
+	volatile ConcurrentQueue.Handle busyHandle ;	     // non-null iff connection 
+						             // is in use
 
 	ConnectionState( final ContactInfo<C> cinfo, final CacheEntry<C> entry, 
 	    final C conn ) {
@@ -145,10 +150,10 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
     // (we also need to handle no share).
     private static final class CacheEntry<C extends Connection> {
 	final ConcurrentQueue<C> idleConnections =
-	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue() ;
+	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue(0) ;
 
 	final ConcurrentQueue<C> busyConnections =
-	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue() ;
+	    ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue(0) ;
 
 	public int totalConnections() {
 	    return idleConnections.size() + busyConnections.size() ;
@@ -157,19 +162,17 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 
     public OutboundConnectionCacheImpl( final String cacheType, 
 	final int highWaterMark, final int numberToReclaim, 
-	final int maxParallelConnections, Logger logger ) {
+	final int maxParallelConnections, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, logger ) ;
+	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
 	this.maxParallelConnections = maxParallelConnections ;
 
 	this.entryMap = 
 	    new ConcurrentHashMap<ContactInfo<C>,CacheEntry<C>>() ;
 	this.connectionMap = 
 	    new ConcurrentHashMap<C,ConnectionState<C>>() ;
-
-	if (debug()) {
-	    dprint(".constructor completed: " + cacheType );
-	}
+        this.reclaimableConnections = 
+            ConcurrentQueueFactory.<C>makeBlockingConcurrentQueue( ttl ) ;
     }
 
     // We do not need to define equals or hashCode for this class.
@@ -189,7 +192,7 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 	    reclaim() ;
 
 	do {
-	    entry.idleConnections.poll() ;
+	    result = entry.idleConnections.poll().value() ;
 	    if (result == null) {
 		if (canCreateNewConnection( entry )) { 
 		    // If this throws an exception just let it
@@ -200,8 +203,6 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 		    final ConnectionState<C> cs = new ConnectionState<C>( cinfo, 
 			entry, result ) ;
 		    connectionMap.put( result, cs ) ;
-		    if (debug())
-			dprint( ".get: created connection " + result ) ;
 
 		    // Make sure this connection is busy: it is
 		    // available to other get calls as soon as
@@ -213,59 +214,47 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 		    totalBusy.incrementAndGet() ;
 		} else { 
 		    // use a busy connection, move to end of busyConnections
+                    // to indicate that the connection has been used recently.
 
-		    if (debug())
-			dprint( ".get: re-using busy connection " + result ) ;
-
-		    result = entry.busyConnections.poll() ;
+		    result = entry.busyConnections.poll().value() ;
 		    if (result != null) {
 			entry.busyConnections.offer( result ) ;
 		    }
 		}
 	    } else { // got result from idlConnections; update queues and counts
 		final ConnectionState<C> cs = connectionMap.get( result ) ;
-		final ConcurrentQueue.Handle<C> handle = cs.reclaimableHandle ;
-		if (handle != null) {
-		    if (handle.remove()) {
-			totalIdle.decrementAndGet() ;
-			totalBusy.incrementAndGet() ;
-			entry.busyConnections.offer( result ) ;
-		    } else {
-			// another thread reclaimed this connection: try again
-			result = null ;
-			
-			if (debug())
-			    dprint( ".get: using idle connection " + result ) ;
-		    }   	
+                if (cs == null) {
+                    // Connection was closed, so we can't use it
+                    result = null ;
+                } else {
+                    final ConcurrentQueue.Handle<C> handle = cs.reclaimableHandle ;
+                    if (handle != null) {
+                        if (handle.remove()) {
+                            totalIdle.decrementAndGet() ;
+                            totalBusy.incrementAndGet() ;
+                            entry.busyConnections.offer( result ) ;
+                        } else {
+                            // another thread closed this connection: try again
+                            result = null ;
+                        }   	
+                    }
 		}
 	    }
-	} while (result != null) ;
+	} while (result == null) ;
 
 	return result ;
     }
 
     public void release( final C conn, final int numResponsesExpected ) {
-	if (debug())
-	    dprint( "->release: connection " + conn 
-		+ " expecting " + numResponsesExpected + " responses" ) ;
-
 	try {
 	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
 
 	    if (cs == null) {
-		if (debug())
-		    dprint( ".release: connection " + conn + " was closed" ) ;
-
 		return ; 
 	    } else {
 		int numResp = cs.expectedResponseCount.addAndGet( 
 		    numResponsesExpected ) ;
 		int numBusy = cs.busyCount.decrementAndGet() ;
-
-		if (debug()) {
-		    dprint( ".release: " + numResp + " responses expected" ) ;
-		    dprint( ".release: " + numBusy + " responses expected" ) ;
-		}
 
 		if (numBusy == 0) {
 		    final ConcurrentQueue.Handle busyHandle = cs.busyHandle ;
@@ -285,11 +274,6 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 			// it cannot again change state.
 		    
 			if (cs.busyCount.get() > 0) {
-			    if (debug()) 
-				dprint( 
-				    ".release: re-queuing busy connection " 
-				    + conn ) ;
-
 			    cs.busyHandle = entry.busyConnections.offer( conn ) ;
 			} else {
 			    // If the connection does not have waiters, put it on
@@ -299,19 +283,10 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 			    // release usually requires some response before 
 			    // the connection is eligible for reclamation.
 			    if (cs.expectedResponseCount.get() == 0) {
-				if (debug())
-				    dprint( ".release: "
-					+ "queuing reclaimable connection "
-					+ conn ) ;
-
 				cs.reclaimableHandle = 
 				    reclaimableConnections.offer( conn ) ;
 				totalBusy.decrementAndGet() ;
 			    }
-
-			    if (debug())
-				dprint( ".release: queuing idle connection "
-				    + conn ) ;
 
 			    cs.idleHandle = entry.idleConnections.offer( conn ) ;
 			}
@@ -319,8 +294,6 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 		}
 	    }
 	} finally {
-	    if (debug())
-		dprint( "<-release" ) ;
 	}
     }
 
@@ -329,6 +302,10 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
      */
     public void responseReceived( final C conn ) {
 	final ConnectionState<C> cs = connectionMap.get( conn ) ;
+        if (cs == null) {
+            return ;
+        }
+
 	final ConcurrentQueue.Handle<C> idleHandle = cs.idleHandle ;
 	final CacheEntry<C> entry = cs.entry ;
 	final int waitCount = cs.expectedResponseCount.decrementAndGet() ;
@@ -347,6 +324,10 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
      */
     public void close( final C conn ) {
 	final ConnectionState<C> cs = connectionMap.remove( conn ) ;
+        if (cs == null) {
+            return ;
+        }
+
 	final CacheEntry<C> entry = entryMap.remove( cs.cinfo ) ;
 
 	final ConcurrentQueue.Handle rh = cs.reclaimableHandle ;
@@ -364,8 +345,7 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 	try { 
 	    conn.close() ;
 	} catch (IOException exc) {
-	    if (debug())
-		dprint( ".close: " + conn + " close threw " + exc ) ;
+            // XXX log this
 	}
     }
 

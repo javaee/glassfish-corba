@@ -75,10 +75,13 @@ public final class ReflectiveTie extends Servant implements Tie
 
     public ReflectiveTie( PresentationManager pm, ORBUtilSystemException wrapper )
     {
-	SecurityManager s = System.getSecurityManager();
- 	if (!PresentationDefaults.inAppServer() && (s != null)) {
- 	    s.checkPermission(new DynamicAccessPermission("access"));
- 	}
+        if (!PresentationDefaults.inAppServer()) {
+            SecurityManager s = System.getSecurityManager();
+            if (s != null) {
+                s.checkPermission(new DynamicAccessPermission("access"));
+            }
+        }
+
 	this.pm = pm ;
 	this.wrapper = wrapper ;
     }
@@ -135,7 +138,23 @@ public final class ReflectiveTie extends Servant implements Tie
 	    throw wrapper.badOrbForServant( e ) ;
         }
     }
-    
+   
+    public Object dispatchToMethod( Method javaMethod, Remote target, Object[] args ) 
+        throws InvocationTargetException {
+
+        try {
+            return javaMethod.invoke( target, args ) ;
+	} catch (IllegalAccessException ex) {
+	    throw wrapper.invocationErrorInReflectiveTie( ex, 
+		javaMethod.getName(), 
+		    javaMethod.getDeclaringClass().getName() ) ;
+	} catch (IllegalArgumentException ex) {
+	    throw wrapper.invocationErrorInReflectiveTie( ex, 
+		javaMethod.getName(), 
+		    javaMethod.getDeclaringClass().getName() ) ;
+        }
+    }
+
     public org.omg.CORBA.portable.OutputStream  _invoke(String method, 
 	org.omg.CORBA.portable.InputStream _in, ResponseHandler reply) 
     {
@@ -154,21 +173,13 @@ public final class ReflectiveTie extends Servant implements Tie
 
 	    Object[] args = dmm.readArguments( in ) ;
 
-	    Object result = javaMethod.invoke( target, args ) ;
+            Object result = dispatchToMethod( javaMethod, target, args ) ;
 
 	    OutputStream os = (OutputStream)reply.createReply() ;
 
 	    dmm.writeResult( os, result ) ; 
 
 	    return os ;
-	} catch (IllegalAccessException ex) {
-	    throw wrapper.invocationErrorInReflectiveTie( ex, 
-		javaMethod.getName(), 
-		    javaMethod.getDeclaringClass().getName() ) ;
-	} catch (IllegalArgumentException ex) {
-	    throw wrapper.invocationErrorInReflectiveTie( ex, 
-		javaMethod.getName(), 
-		    javaMethod.getDeclaringClass().getName() ) ;
 	} catch (InvocationTargetException ex) {
 	    // Unwrap the actual exception so that it can be wrapped by an
 	    // UnknownException or thrown if it is a system exception.

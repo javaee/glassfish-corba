@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,20 +37,18 @@
 package com.sun.corba.se.impl.dynamicany;
 
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.TCKind;
 import org.omg.CORBA.Any;
-import org.omg.CORBA.TypeCodePackage.BadKind;
-import org.omg.CORBA.TypeCodePackage.Bounds;
-import org.omg.DynamicAny.*;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import org.omg.DynamicAny.DynAnyFactoryPackage.InconsistentTypeCode;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import org.omg.DynamicAny.DynAny;
+import org.omg.DynamicAny.DynValueBox;
 
 public class DynValueBoxImpl extends DynValueCommonImpl implements DynValueBox
 {
+    private static final long serialVersionUID = 670401668768259219L;
     //
     // Constructors
     //
@@ -117,6 +115,7 @@ public class DynValueBoxImpl extends DynValueCommonImpl implements DynValueBox
         isNull = false;
     }
 
+    @Override
     protected boolean initializeComponentsFromAny() {
         try {
             components = new DynAny[] {DynAnyUtil.createMostDerivedDynAny(any, orb, false)};
@@ -126,6 +125,7 @@ public class DynValueBoxImpl extends DynValueCommonImpl implements DynValueBox
         return true;
     }
 
+    @Override
     protected boolean initializeComponentsFromTypeCode() {
         try {
             any = DynAnyUtil.createDefaultAnyOfType(any.type(), orb);
@@ -136,6 +136,7 @@ public class DynValueBoxImpl extends DynValueCommonImpl implements DynValueBox
         return true;
     }
 
+    @Override
     protected boolean initializeAnyFromComponents() {
         any = getAny(components[0]);
         return true;

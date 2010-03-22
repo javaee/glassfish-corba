@@ -967,15 +967,17 @@ public class Client
 
     private Set makeSetFromArray( Object array )
     {
-	if (!array.getClass().isArray())
-		throw new Error( "makeSetFromArray called with non-array argument" ) ;
-
 	Set result = new HashSet() ;
-	int size = Array.getLength( array ) ;
-	for (int ctr=0; ctr<size; ctr++ ) {
-	    Object element = Array.get( array, ctr ) ;
-	    result.add( element ) ;
-	}
+        if (array != null) {
+            if (!array.getClass().isArray())
+                throw new Error( "makeSetFromArray called with non-array argument" ) ;
+
+            int size = Array.getLength( array ) ;
+            for (int ctr=0; ctr<size; ctr++ ) {
+                Object element = Array.get( array, ctr ) ;
+                result.add( element ) ;
+            }
+        }
 
 	return result ;
     }

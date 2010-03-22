@@ -39,6 +39,7 @@ package corba.fastencoding  ;
 import java.util.List ;
 import java.util.ArrayList ;
 
+import java.io.Closeable ;
 import java.nio.ByteBuffer ;
 
 import org.testng.annotations.Test ;
@@ -161,8 +162,12 @@ public class ByteBufferTest {
         }
 
         public void close() {
-            reader.close() ;
-            writer.close() ;
+            try {
+                reader.close() ;
+                writer.close() ;
+            } catch (Exception exc) {
+                // ignore
+            }
         }
     }
 

@@ -88,7 +88,41 @@ public class MethodMonitorFactoryDefaults {
     }
 
     // XXX define me
-    private static MethodMonitorFactory operationTracerImpl = null ;
+    private static MethodMonitorFactory operationTracerImpl =
+        new MethodMonitorFactory() {
+            public MethodMonitor create( final Class<?> cls) {
+                return new MethodMonitor() {
+                    public Class<?> myClass() {
+                        return cls ;
+                    }
+
+                    public void enter(int ident, Object... args) {
+                        String mname = MethodMonitorRegistry.getMethodName(
+                            cls, ident) ;
+
+                        OperationTracer.enter( mname, args ) ;
+                    }
+
+                    public void info(Object[] args, int callerIdent, int selfIdent) {
+                        // Should we do something here?
+                    }
+
+                    public void exit(int ident) {
+                        OperationTracer.exit() ;
+                    }
+
+                    public void exit(int ident, Object result) {
+                        OperationTracer.exit() ;
+                    }
+
+                    public void exception(int ident, Throwable thr) { }
+
+                    public void clear() {
+                        OperationTracer.clear() ;
+                    }
+                } ;
+            }
+        };
 
     public static class OperationTracer {
         private static boolean enabled = true ;
@@ -177,6 +211,7 @@ public class MethodMonitorFactoryDefaults {
 
     private static MethodMonitorFactory dprintImpl = new MethodMonitorFactory() {
         private static final boolean USE_LOGGER = false ;
+
         public MethodMonitor create( final Class<?> cls ) {
             return new MethodMonitorBase( cls ) {
                 final String loggerName =

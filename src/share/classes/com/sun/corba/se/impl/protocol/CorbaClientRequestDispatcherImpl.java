@@ -47,54 +47,27 @@ package com.sun.corba.se.impl.protocol;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.rmi.RemoteException;
 
-import javax.rmi.CORBA.Tie;
-
-import org.omg.CORBA.COMM_FAILURE;
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.SystemException;
-import org.omg.CORBA.Request;
-import org.omg.CORBA.NamedValue;
-import org.omg.CORBA.NVList;
-import org.omg.CORBA.Context;
-import org.omg.CORBA.ContextList;
-import org.omg.CORBA.ExceptionList;
-import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.RemarshalException;
 import org.omg.CORBA_2_3.portable.InputStream;
-import org.omg.CORBA_2_3.portable.OutputStream;
-import org.omg.CORBA.portable.Delegate;
-import org.omg.CORBA.portable.ServantObject;
 import org.omg.CORBA.portable.ApplicationException;
 import org.omg.CORBA.portable.UnknownException;
 import org.omg.IOP.ExceptionDetailMessage;
 import org.omg.IOP.TAG_CODE_SETS;
 
-import com.sun.org.omg.SendingContext.CodeBase;
-
-
-import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.ior.iiop.CodeSetsComponent;
-import com.sun.corba.se.spi.oa.OAInvocationInfo;
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersion;
-import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
 import com.sun.corba.se.spi.transport.CorbaContactInfo ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator ;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 
@@ -113,8 +86,6 @@ import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.CodeSetConversion;
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
-import com.sun.corba.se.impl.encoding.MarshalOutputStream;
-import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
@@ -123,10 +94,6 @@ import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.orbutil.DprintUtil;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ProfileAddr;
-import com.sun.corba.se.impl.protocol.giopmsgheaders.ReferenceAddr;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
 
 /**
  * ClientDelegate is the RMI client-side subcontract or representation
@@ -151,8 +118,8 @@ public class CorbaClientRequestDispatcherImpl
     public CDROutputObject beginRequest(Object self, String opName,
 	boolean isOneWay, CorbaContactInfo contactInfo) {
 
-        final CorbaContactInfo corbaContactInfo = (CorbaContactInfo) contactInfo;
-        final ORB orb = (ORB)contactInfo.getBroker();
+        final CorbaContactInfo corbaContactInfo = contactInfo;
+        final ORB orb = contactInfo.getBroker();
 
         if (orb.subcontractDebugFlag) {
             dputil.enter("beginRequest", "op", opName, "isOneWay", isOneWay, 

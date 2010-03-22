@@ -119,6 +119,7 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
 import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
+
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 
 import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
@@ -128,7 +129,7 @@ import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
-
+import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.corba.TypeCodeImpl;
 import com.sun.corba.se.impl.corba.NVListImpl;
@@ -141,7 +142,6 @@ import com.sun.corba.se.impl.corba.AnyImpl;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.encoding.CachedCodeBase;
 import com.sun.corba.se.impl.interceptors.PIHandlerImpl;
-import com.sun.corba.se.impl.interceptors.PINoOpHandlerImpl;
 import com.sun.corba.se.impl.ior.TaggedComponentFactoryFinderImpl;
 import com.sun.corba.se.impl.ior.TaggedProfileFactoryFinderImpl;
 import com.sun.corba.se.impl.ior.TaggedProfileTemplateFactoryFinderImpl;
@@ -159,6 +159,7 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.copyobject.CopierManagerImpl;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
+import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
          
 
 /**
@@ -221,8 +222,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private RequestDispatcherRegistry requestDispatcherRegistry ;
 
     private CopierManager copierManager ;
-
-    private ManagedObjectManager mom ;
 
     private TimerManager<TimingPoints> timerManager ;
 
@@ -469,7 +468,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     // Class that defines a parser that gets the name of the
     // ORBConfigurator class.
-    private static class ConfigParser extends ParserImplBase {
+    private class ConfigParser extends ParserImplBase {
 	// The default here is the ORBConfiguratorImpl that we define,
 	// but this can be replaced.
 	public Class<?> configurator ;
@@ -492,7 +491,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	{
 	    PropertyParser parser = new PropertyParser() ;
 	    parser.add( ORBConstants.SUN_PREFIX + "ORBConfigurator",
-		OperationFactory.classAction(), "configurator" ) ;
+		OperationFactory.classAction( classNameResolver() ),
+                    "configurator" ) ;
 	    return parser ;
 	}
     }
@@ -678,6 +678,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	DataCollector dataCollector = 
 	    DataCollectorFactory.create( app, props, getLocalHostName() ) ;
 	postInit( null, dataCollector ) ;
+    }
+
+    public void setParameters( String[] params, Properties props ) {
+        set_parameters( params, props ) ;
     }
 
   /** 
@@ -1511,19 +1515,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
         if (shutdownFirst) {
             shutdown(true);
-        }
-
-        // Destroy threadpool early: all pending transactions should have been
-        // stopped already, but destroy before transport.
-        synchronized (threadPoolManagerAccessLock) {
-            if (orbOwnsThreadPoolManager) {
-                try {
-                    threadpoolMgr.close() ;
-                    threadpoolMgr = null ;
-                } catch (IOException exc) {
-                    wrapper.ioExceptionOnClose( exc ) ;
-                }
-            }
         }
 
         synchronized (this) {

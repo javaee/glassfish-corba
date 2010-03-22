@@ -44,6 +44,7 @@ import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
+import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
 public class ListenerThreadImpl
     implements
@@ -54,12 +55,14 @@ public class ListenerThreadImpl
     private CorbaAcceptor acceptor;
     private boolean keepRunning;
     private long enqueueTime;
+    private ORBUtilSystemException wrapper;
 
     public ListenerThreadImpl(ORB orb, CorbaAcceptor acceptor)
     {
 	this.orb = orb;
 	this.acceptor = acceptor;
 	keepRunning = true;
+        wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
 
     ////////////////////////////////////////////////////
@@ -111,12 +114,23 @@ public class ListenerThreadImpl
 			dprint(".doWork: AFTER ACCEPT CYCLE: " + acceptor);
 		    }
 		} catch (Throwable t) {
+                    wrapper.exceptionInListenerThread( t ) ;
+
 		    if (orb.transportDebugFlag) {
 			dprint(".doWork: Exception in accept: " + acceptor,t);
 		    }
+
+
 		    orb.getTransportManager().getSelector(0)
 			.unregisterForEvent(getAcceptor().getEventHandler());
-		    getAcceptor().close();
+
+                    try {
+                        if (isRunning()) {
+                            getAcceptor().close();
+                        }
+                    } catch (Exception exc) {
+                        wrapper.ioExceptionOnClose( exc ) ;
+                    }
 		}
 	    }
 	} finally {

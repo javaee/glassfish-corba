@@ -46,6 +46,8 @@ import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
+import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+
 public class ReaderThreadImpl
     implements
 	ReaderThread,
@@ -55,6 +57,7 @@ public class ReaderThreadImpl
     private CorbaConnection connection;
     private boolean keepRunning;
     private long enqueueTime;
+    private ORBUtilSystemException wrapper;
 
     public ReaderThreadImpl(ORB orb, 
 			    CorbaConnection connection)
@@ -62,6 +65,7 @@ public class ReaderThreadImpl
 	this.orb = orb;
 	this.connection = connection;
 	keepRunning = true;
+        wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
 
     ////////////////////////////////////////////////////
@@ -107,7 +111,6 @@ public class ReaderThreadImpl
 	    }
 	    while (isRunning()) {
 		try {
-
 		    if (orb.transportDebugFlag) {
 			dprint(".doWork: Start ReaderThread cycle: " 
 			       + connection);
@@ -122,14 +125,23 @@ public class ReaderThreadImpl
 			dprint(".doWork: End ReaderThread cycle: "
 			       + connection);
 		    }
-
 		} catch (Throwable t) {
+                    wrapper.exceptionInReaderThread( t ) ;
+
 		    if (orb.transportDebugFlag) {
 			dprint(".doWork: exception in read: " + connection,t);
 		    }
+
 		    orb.getTransportManager().getSelector(0)
 			.unregisterForEvent(getConnection().getEventHandler());
-		    getConnection().close();
+
+                    try {
+                        if (isRunning()) {
+                            getConnection().close();
+                        }
+                    } catch (Exception exc) {
+                        wrapper.ioExceptionOnClose( exc ) ;
+                    }
 		}
 	    }
 	} finally {

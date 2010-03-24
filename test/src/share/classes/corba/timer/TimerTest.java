@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,9 +36,9 @@
 
 package corba.timer;
 
-import test.Test;
-import corba.framework.*;
-import java.util.*;
+import corba.framework.CORBATest;
+import corba.framework.Controller;
+import corba.framework.Options;
 
 public class TimerTest extends CORBATest
 {
@@ -46,6 +46,7 @@ public class TimerTest extends CORBATest
 	"ActivationSuite.java", "ControllableBaseSuite.java",
 	"NamedBaseSuite.java", "TimerFactorySuite.java", "TimerTest.java" };
 
+    @Override
     protected void doTest() throws Throwable
     {
 	Options.setJavaFiles( javaFiles ) ;

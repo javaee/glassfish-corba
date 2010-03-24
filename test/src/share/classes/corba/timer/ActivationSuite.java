@@ -131,7 +131,7 @@ public class ActivationSuite {
     // 
     private List<String> evOut = asList( 
 	"t1<", "t1>", 
-	"t3<", "t1<", "t1>", "t3>", 
+	"t2<", "t3<", "t1<", "t1>", "t3>", "t2>",
 	"t1<", "t1<", "t1<", "t1>", "t1>", "t1>" ) ;
     private String controllerName = "TestController" ;
 

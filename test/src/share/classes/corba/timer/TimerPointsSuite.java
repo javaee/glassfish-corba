@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,29 +36,13 @@
 
 package corba.timer ;
 
-import java.util.Iterator ;
 
 import java.io.IOException ;
 
-import org.testng.TestNG ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
-import org.testng.annotations.Configuration ;
-import org.testng.annotations.ExpectedExceptions ;
 
-import com.sun.corba.se.spi.orbutil.newtimer.Controllable ;
-import com.sun.corba.se.spi.orbutil.newtimer.LogEventHandler ;
-import com.sun.corba.se.spi.orbutil.newtimer.Named ;
-import com.sun.corba.se.spi.orbutil.newtimer.NamedBase ;
-import com.sun.corba.se.spi.orbutil.newtimer.Statistics ;
-import com.sun.corba.se.spi.orbutil.newtimer.StatsEventHandler ;
-import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
 // source is in optional directory
 import com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator ;

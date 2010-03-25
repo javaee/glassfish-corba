@@ -39,15 +39,10 @@ package corba.timer ;
 import java.util.Iterator ;
 import java.util.Properties ;
 import java.util.Map ;
-import java.util.List ;
-import java.util.ArrayList ;
 
-import java.io.PrintWriter ;
 
-import org.testng.TestNG ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
-import org.testng.annotations.Configuration ;
 import org.testng.annotations.ExpectedExceptions ;
 
 import com.sun.corba.se.spi.orb.ORB ;
@@ -56,12 +51,9 @@ import com.sun.corba.se.spi.orbutil.newtimer.Statistics ;
 import com.sun.corba.se.spi.orbutil.newtimer.StatsEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.VersionedHashSet ;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
@@ -72,7 +64,6 @@ import corba.framework.TestngRunner ;
 
 // import corba.framework.TimerUtils ;
 
-import static java.util.Arrays.asList ;
 
 public class Client {
     // Test TimerFactoryBuilder

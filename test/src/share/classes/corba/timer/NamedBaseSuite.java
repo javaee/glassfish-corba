@@ -36,25 +36,14 @@
 
 package corba.timer ;
 
-import org.testng.TestNG ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
 import org.testng.annotations.Configuration ;
 import org.testng.annotations.ExpectedExceptions ;
 
-import com.sun.corba.se.spi.orbutil.newtimer.Controllable ;
-import com.sun.corba.se.spi.orbutil.newtimer.LogEventHandler ;
-import com.sun.corba.se.spi.orbutil.newtimer.Named ;
 import com.sun.corba.se.spi.orbutil.newtimer.NamedBase ;
-import com.sun.corba.se.spi.orbutil.newtimer.Statistics ;
-import com.sun.corba.se.spi.orbutil.newtimer.StatsEventHandler ;
-import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
 // Test NamedBase
 public class NamedBaseSuite {

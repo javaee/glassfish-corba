@@ -49,11 +49,11 @@ public class CopyObjectTest extends CORBATest
     {
 	// Run the tests: no ORBD or server needed.
 	doSingleTest( "NewReflectTest" ) ;
-	doSingleTest( "NewReflectFallbackTest" ) ;
-	doSingleTest( "OldReflectTest" ) ;
-	doSingleTest( "ORBStreamTest" ) ;
-	doSingleTest( "JavaStreamTest" ) ;
-	doSingleTest( "JbossStreamTest" ) ;
+	// doSingleTest( "NewReflectFallbackTest" ) ;
+	// doSingleTest( "OldReflectTest" ) ;
+	// doSingleTest( "ORBStreamTest" ) ;
+	// doSingleTest( "JavaStreamTest" ) ;
+	// doSingleTest( "JbossStreamTest" ) ;
 	System.out.println() ;
     }
 

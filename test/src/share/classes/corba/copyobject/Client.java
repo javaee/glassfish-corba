@@ -101,6 +101,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 public abstract class Client extends TestCase
 {
+    private static final boolean SIMULATED_TIMING = false ;
     private static final boolean DEBUG = false ;
     private static final int REP_COUNT = 200 ;
     private static ORB orb ;
@@ -1365,10 +1366,12 @@ public abstract class Client extends TestCase
 	testSimulatedTiming( data, TEST_COUNT ) ;
 	long stopTime = System.nanoTime() ; ;
     
-	System.out.println( 
-	    "\nTime per iteration for simulated generated copy method on " 
-	    + msg + " " 
-	    + (((float)(stopTime - startTime))/TEST_COUNT)/1000 + " microseconds" ) ;
+        if (SIMULATED_TIMING) {
+            System.out.println( 
+                "\nTime per iteration for simulated generated copy method on " 
+                + msg + " " 
+                + (((float)(stopTime - startTime))/TEST_COUNT)/1000 + " microseconds" ) ;
+        }
     }
 
     public void testSimulatedTimingGraph() {
@@ -1451,10 +1454,12 @@ public abstract class Client extends TestCase
 	testSimulatedIsDirty( data, TEST_COUNT ) ;
 	long stopTime = System.nanoTime() ; ;
     
-	System.out.println( 
-	    "\nTimer per iteration for simulated generated isDirty method on " 
-	    + msg + " " 
-	    + (((float)(stopTime - startTime))/TEST_COUNT)/1000 + " microseconds" ) ;
+        if (SIMULATED_TIMING) {
+            System.out.println( 
+                "\nTimer per iteration for simulated generated isDirty method on " 
+                + msg + " " 
+                + (((float)(stopTime - startTime))/TEST_COUNT)/1000 + " microseconds" ) ;
+        }
     }
 
     public void testSimulatedTimingIsDirty() {

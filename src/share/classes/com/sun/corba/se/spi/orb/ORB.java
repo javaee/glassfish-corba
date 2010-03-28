@@ -121,9 +121,30 @@ import com.sun.corba.se.impl.logging.LogWrapperTableImpl ;
 import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
-
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryDefaults;
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
+import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 
 import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
+import com.sun.corba.se.spi.trace.Cdr;
+
+import com.sun.corba.se.spi.trace.Folb;
+import com.sun.corba.se.spi.trace.Giop;
+import com.sun.corba.se.spi.trace.TraceInterceptor;
+import com.sun.corba.se.spi.trace.Naming;
+import com.sun.corba.se.spi.trace.OrbLifeCycle;
+import com.sun.corba.se.spi.trace.Orbd;
+import com.sun.corba.se.spi.trace.Poa;
+import com.sun.corba.se.spi.trace.PoaFSM;
+import com.sun.corba.se.spi.trace.ServiceContext;
+import com.sun.corba.se.spi.trace.Shutdown;
+import com.sun.corba.se.spi.trace.StreamFormatVersion;
+import com.sun.corba.se.spi.trace.Subcontract;
+import com.sun.corba.se.spi.trace.TraceValueHandler;
+import com.sun.corba.se.spi.trace.TransientObjectManager;
+import com.sun.corba.se.spi.trace.Transport;
+import java.lang.annotation.Annotation;
+
 import java.lang.reflect.Field;
 import org.glassfish.gmbal.ManagedObjectManager ;
 import org.glassfish.gmbal.ManagedObjectManagerFactory ;
@@ -167,28 +188,71 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     // All debug flags must be public boolean types.
     // These are set by passing the flag -ORBDebug x,y,z in the ORB init args.
     // Note that x,y,z must not contain spaces.
+    // 
+    // The annotations (when present) connect the ORB debug flags to the tracing
+    // system.  Whenever a flag is set, the corresponding tracing annotation
+    // is also set in the MethodMonitorRegistry to a standard tracing
+    // MethodMonitorFactory.  A few cases still make direct access to this
+    // flags, and the flags are much faster to test than the state of the
+    // MethodMonitorRegistry.
+
+    @Transport
     public boolean transportDebugFlag = false ;
+
+    @Subcontract
     public boolean subcontractDebugFlag = false ;
+
+    @Poa
     public boolean poaDebugFlag = false ;
+    
+    @PoaFSM
     public boolean poaFSMDebugFlag = false ;
+
+    @Orbd
     public boolean orbdDebugFlag = false ;
+
+    @Naming
     public boolean namingDebugFlag = false ;
+
+    @ServiceContext
     public boolean serviceContextDebugFlag = false ;
+
+    @TransientObjectManager
     public boolean transientObjectManagerDebugFlag = false ;
+
+    @Shutdown
     public boolean shutdownDebugFlag = false;
+
+    @Giop
     public boolean giopDebugFlag = false;
+
     public boolean giopSizeDebugFlag = false;
     public boolean giopReadDebugFlag = false;
+
+    @TraceInterceptor
     public boolean interceptorDebugFlag = false ;
+
+    @Folb
     public boolean folbDebugFlag = false ;
+
     public boolean cdrCacheDebugFlag = false ;
+
+    @Cdr
     public boolean cdrDebugFlag = false ;
+
+    @StreamFormatVersion
     public boolean streamFormatVersionDebugFlag = false ;
+
+    @TraceValueHandler
     public boolean valueHandlerDebugFlag = false ;
+
     public boolean mbeanDebugFlag = false ;
     public boolean mbeanFineDebugFlag = false ;
     public boolean mbeanRuntimeDebugFlag = false ;
+
+    @OrbLifeCycle
     public boolean orbLifecycleDebugFlag = false ;
+
     public boolean operationTraceDebugFlag = false ;
 
     @ManagedAttribute
@@ -209,17 +273,17 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         return result ;
     }
 
-    private enum DebugFlagResult { OK, BAD_NAME }
+    public enum DebugFlagResult { OK, BAD_NAME }
 
     @ManagedOperation
     @Description( "Enable debugging for a particular ORB debug flag")
-    private DebugFlagResult setDebugFlag( String name ) {
+    public DebugFlagResult setDebugFlag( String name ) {
         return setDebugFlag( name, true ) ;
     }
 
     @ManagedOperation
     @Description( "Disable debugging for a particular ORB debug flag")
-    private DebugFlagResult clearDebugFlag( String name ) {
+    public DebugFlagResult clearDebugFlag( String name ) {
         return setDebugFlag( name, false ) ;
     }
    
@@ -227,6 +291,22 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         try {
             Field fld = this.getClass().getField( name + "DebugFlag" ) ;
             fld.set( this, value ) ;
+
+            Annotation[] annots = fld.getAnnotations() ;
+	    for (Annotation anno : annots) {
+		Class<? extends Annotation> annoClass = anno.getClass() ;
+
+		if (annoClass.isAnnotationPresent(
+		    MethodMonitorGroup.class )) {
+		    if (value) {
+			MethodMonitorRegistry.register( annoClass,
+			    MethodMonitorFactoryDefaults.dprint() );
+		    } else {
+			MethodMonitorRegistry.clear( annoClass ) ;
+		    }
+		}
+	    }
+
             return DebugFlagResult.OK ;
         } catch (Exception exc) {
             return DebugFlagResult.BAD_NAME ;

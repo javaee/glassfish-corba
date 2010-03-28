@@ -60,6 +60,8 @@ import com.sun.corba.se.spi.orbutil.generic.MultiSet ;
 import com.sun.corba.se.impl.logging.POASystemException ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Poa;
 
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -73,6 +75,7 @@ import org.glassfish.gmbal.NameValue ;
  *  and deactivate().
  */
 
+@Poa
 @ManagedObject
 @Description( "A POAManager which controls invocations of its POAs")
 public class POAManagerImpl extends org.omg.CORBA.LocalObject implements 
@@ -90,12 +93,9 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     private int nWaiters=0;		// Number of threads waiting for 
 					// invocations to complete
     private int myId = 0 ;		// This POAManager's ID
-    private boolean debug ;
     private boolean explicitStateChange ; // initially false, set true as soon as 
 					// one of activate, hold_request, 
 					// discard_request, or deactivate is called.
-
-    private static final boolean AM_DEBUG = false ;
 
     @ManagedAttribute
     @Description( "The set of POAs managed by this POAManager" )
@@ -227,14 +227,10 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
         }
     }
 
+    @Poa
     private void countedWait()
     {
 	try {
-	    if (debug) {
-		ORBUtility.dprint( this, "Calling countedWait on POAManager " +
-		    this + " nWaiters=" + nWaiters ) ;
-	    }
-
 	    nWaiters++ ;
             // 6878245: I can see some sense in the timeout, but why this value?
 	    wait(nWaiters*1000L); 
@@ -242,20 +238,16 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    // NOP
 	} finally {
 	    nWaiters-- ;
-
-	    if (debug) {
-		ORBUtility.dprint( this, "Exiting countedWait on POAManager " +
-		    this + " nWaiters=" + nWaiters ) ;
-	    }
 	}
     }
 
+    @InfoMethod
+    private void nWaiters( int value ) { }
+
+    @Poa
     private void notifyWaiters() 
     {
-	if (debug) {
-	    ORBUtility.dprint( this, "Calling notifyWaiters on POAManager " +
-		this + " nWaiters=" + nWaiters ) ;
-	}
+	nWaiters( nWaiters ) ;
 
 	if (nWaiters >0)
 	    notifyAll() ;
@@ -276,12 +268,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	this.orb = orb ;
 	myId = factory.newPOAManagerId() ;
 	state = State.HOLDING;
-	debug = factory.getORB().poaDebugFlag ;
 	explicitStateChange = false ;
-	
-	if (debug) {
-	    ORBUtility.dprint( this, "Creating POAManagerImpl " + this ) ;
-	}
     }
 
     synchronized void addPOA(POA poa)
@@ -338,6 +325,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * <code>activate</code>
      * <b>Spec: pages 3-14 thru 3-18</b>
      */
+    @Poa
     @ManagedOperation
     @Description( "Make this POAManager active, so it can handle new requests" ) 
     public synchronized void activate()
@@ -345,36 +333,25 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     {
 	explicitStateChange = true ;
 
-	if (debug) {
-	    ORBUtility.dprint( this, 
-		"Calling activate on POAManager " + this ) ;
-	}
+	if ( state.value() == State._INACTIVE )
+	    throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
 
-	try {
-	    if ( state.value() == State._INACTIVE )
-		throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+	// set the state to ACTIVE
+	state = State.ACTIVE;
 
-	    // set the state to ACTIVE
-	    state = State.ACTIVE;
-	    
-            reportStateChange() ;
+	reportStateChange() ;
 
-	    // Notify any invocations that were waiting because the previous
-	    // state was HOLDING, as well as notify any threads that were waiting
-	    // inside hold_requests() or discard_requests(). 
-	    notifyWaiters();
-	} finally {
-	    if (debug) {
-		ORBUtility.dprint( this, 
-		    "Exiting activate on POAManager " + this ) ;
-	    }
-	}
+	// Notify any invocations that were waiting because the previous
+	// state was HOLDING, as well as notify any threads that were waiting
+	// inside hold_requests() or discard_requests().
+	notifyWaiters();
     }
 
     /**
      * <code>hold_requests</code>
      * <b>Spec: pages 3-14 thru 3-18</b>
      */
+    @Poa
     @ManagedOperation
     @Description( "Hold all requests to this POAManager" ) 
     public synchronized void hold_requests(boolean wait_for_completion)
@@ -382,33 +359,21 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     {
 	explicitStateChange = true ;
 
-	if (debug) {
-	    ORBUtility.dprint( this, 
-		"Calling hold_requests on POAManager " + this ) ;
-	}
+	if ( state.value() == State._INACTIVE )
+	    throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+	// set the state to HOLDING
+	state  = State.HOLDING;
 
-	try {
-	    if ( state.value() == State._INACTIVE )
-		throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
-	    // set the state to HOLDING
-	    state  = State.HOLDING;
+	reportStateChange() ;
 
-            reportStateChange() ;
+	// Notify any threads that were waiting in the wait() inside
+	// discard_requests. This will cause discard_requests to return
+	// (which is in conformance with the spec).
+	notifyWaiters();
 
-	    // Notify any threads that were waiting in the wait() inside
-	    // discard_requests. This will cause discard_requests to return
-	    // (which is in conformance with the spec).
-	    notifyWaiters(); 
-
-	    if ( wait_for_completion ) {
-		while ( state.value() == State._HOLDING && nInvocations > 0 ) {
-		    countedWait() ;
-		}
-	    }
-	} finally {
-	    if (debug) {
-		ORBUtility.dprint( this, 
-		    "Exiting hold_requests on POAManager " + this ) ;
+	if ( wait_for_completion ) {
+	    while ( state.value() == State._HOLDING && nInvocations > 0 ) {
+		countedWait() ;
 	    }
 	}
     }
@@ -417,6 +382,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * <code>discard_requests</code>
      * <b>Spec: pages 3-14 thru 3-18</b>
      */
+    @Poa
     @ManagedOperation
     @ParameterNames( { "waitForCompletion" } )
     @Description( "Make this POAManager discard all incoming requests" ) 
@@ -425,35 +391,23 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     {
 	explicitStateChange = true ;
 
-	if (debug) {
-	    ORBUtility.dprint( this, 
-		"Calling hold_requests on POAManager " + this ) ;
-	}
-	 
-	try {
-	    if ( state.value() == State._INACTIVE )
-		throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+	if ( state.value() == State._INACTIVE )
+	    throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
 
-	    // set the state to DISCARDING
-	    state = State.DISCARDING;
+	// set the state to DISCARDING
+	state = State.DISCARDING;
 
-            reportStateChange() ;
+	reportStateChange() ;
 
-	    // Notify any invocations that were waiting because the previous
-	    // state was HOLDING. Those invocations will henceforth be rejected with
-	    // a TRANSIENT exception. Also notify any threads that were waiting
-	    // inside hold_requests().
-	    notifyWaiters(); 
+	// Notify any invocations that were waiting because the previous
+	// state was HOLDING. Those invocations will henceforth be rejected with
+	// a TRANSIENT exception. Also notify any threads that were waiting
+	// inside hold_requests().
+	notifyWaiters();
 
-	    if ( wait_for_completion ) {
-		while ( state.value() == State._DISCARDING && nInvocations > 0 ) {
-		    countedWait() ;
-		}
-	    }
-	} finally {
-	    if (debug) {
-		ORBUtility.dprint( this, 
-		    "Exiting hold_requests on POAManager " + this ) ;
+	if ( wait_for_completion ) {
+	    while ( state.value() == State._DISCARDING && nInvocations > 0 ) {
+		countedWait() ;
 	    }
 	}
     }
@@ -464,119 +418,93 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * Note: INACTIVE is a permanent state.
      */
 
+    @Poa
     public void deactivate(boolean etherealize_objects, boolean wait_for_completion)
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
-	try {
-	    synchronized( this ) {
-                explicitStateChange = true ;
+	synchronized( this ) {
+	    explicitStateChange = true ;
 
-		if (debug) {
-		    ORBUtility.dprint( this, 
-			"Calling deactivate on POAManager " + this ) ;
-		}
+	    if ( state.value() == State._INACTIVE )
+		throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
 
-		if ( state.value() == State._INACTIVE )
-		    throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+	    state = State.INACTIVE;
 
-		state = State.INACTIVE;
+	    reportStateChange() ;
 
-                reportStateChange() ;
+	    // Notify any invocations that were waiting because the previous
+	    // state was HOLDING. Those invocations will then be rejected with
+	    // an OBJ_ADAPTER exception. Also notify any threads that were waiting
+	    // inside hold_requests() or discard_requests().
+	    notifyWaiters();
+	}
 
-		// Notify any invocations that were waiting because the previous
-		// state was HOLDING. Those invocations will then be rejected with
-		// an OBJ_ADAPTER exception. Also notify any threads that were waiting
-		// inside hold_requests() or discard_requests().
-		notifyWaiters();
-	    }
+	POAManagerDeactivator deactivator = new POAManagerDeactivator( this,
+	    etherealize_objects ) ;
 
-	    POAManagerDeactivator deactivator = new POAManagerDeactivator( this,
-		etherealize_objects, debug ) ;
-
-	    if (wait_for_completion)
-		deactivator.run() ;
-	    else {
-		Thread thr = new Thread(deactivator) ;
-		thr.start() ;
-	    }
-	} finally { 
-	    synchronized(this) {
-		if (debug) {
-		    ORBUtility.dprint( this, 
-			"Exiting deactivate on POAManager " + this ) ;
-		}
-	    }
+	if (wait_for_completion)
+	    deactivator.run() ;
+	else {
+	    Thread thr = new Thread(deactivator) ;
+	    thr.start() ;
 	}
     }
 
+    @Poa
     private static class POAManagerDeactivator implements Runnable
     {
 	private boolean etherealize_objects ;
 	private final POAManagerImpl pmi ;
-	private boolean debug ;
 
-	POAManagerDeactivator( POAManagerImpl pmi, boolean etherealize_objects,
-	    boolean debug )
+	@InfoMethod
+	private void poaManagerDeactivatorCall(
+	    boolean etherealizeObjects, POAManagerImpl pmi ) { }
+
+	@InfoMethod
+	private void preparingToEtherealize( POAManagerImpl pmi ) { }
+
+	@InfoMethod
+	private void removeAndClear( POAManagerImpl pmi ) { }
+
+	POAManagerDeactivator( POAManagerImpl pmi, boolean etherealize_objects )
 	{
 	    this.etherealize_objects = etherealize_objects ;
 	    this.pmi = pmi ;
-	    this.debug = debug ;
 	}
 
+	@Poa
 	public void run() 
 	{
-	    try {
+	    synchronized (pmi) {
+		poaManagerDeactivatorCall( etherealize_objects, pmi ) ;
+		while ( pmi.nInvocations > 0 ) {
+		    pmi.countedWait() ;
+		}
+	    }
+
+	    if (etherealize_objects) {
+		Set<POAImpl> copyOfPOAs ;
+
+		// Make sure that poas cannot change while we copy it!
 		synchronized (pmi) {
-		    if (debug) {
-			ORBUtility.dprint( this,
-			    "Calling run with etherealize_objects=" +
-			    etherealize_objects + " pmi=" + pmi ) ;
-		    }
-
-		    while ( pmi.nInvocations > 0 ) { 
-			pmi.countedWait() ;
-		    }
+		    preparingToEtherealize( pmi ) ;
+		    copyOfPOAs = new HashSet<POAImpl>( pmi.poas ) ;
 		}
 
-		if (etherealize_objects) {
-                    Set<POAImpl> copyOfPOAs ;
-
-		    // Make sure that poas cannot change while we copy it!
-		    synchronized (pmi) {
-			if (debug) {
-			    ORBUtility.dprint( this,
-				"run: Preparing to etherealize with pmi=" + 
-				pmi ) ;
-			}
-
-                        copyOfPOAs = new HashSet<POAImpl>( pmi.poas ) ;
-		    } 
-
-                    for (POAImpl poa : copyOfPOAs) {
-			// Each RETAIN+USE_SERVANT_MGR poa
-			// must call etherealize for all its objects
-                        poa.etherealizeAll();
-                    }
-
-                    // XXX What if a new POA is created here before 
-                    // etherealization completes?  We would fail to call 
-                    // etherealize!
-		    synchronized (pmi) {
-			if (debug) {
-			    ORBUtility.dprint( this,
-				"run: removing POAManager and clearing poas " +
-				"with pmi=" + pmi ) ;
-			}
-
-			pmi.factory.removePoaManager(pmi);
-			pmi.poas.clear();
-		    }
+		for (POAImpl poa : copyOfPOAs) {
+		    // Each RETAIN+USE_SERVANT_MGR poa
+		    // must call etherealize for all its objects
+		    poa.etherealizeAll();
 		}
-	    } finally {
-		if (debug) {
-		    synchronized (pmi) {
-			ORBUtility.dprint( this, "Exiting run" ) ;
-		    }
+
+		// XXX What if a new POA is created here before
+		// etherealization completes?  We would fail to call
+		// etherealize!
+		synchronized (pmi) {
+		    removeAndClear( pmi ) ;
+
+		    pmi.factory.removePoaManager(pmi);
+		    pmi.poas.clear();
 		}
 	    }
 	}
@@ -595,23 +523,27 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
  * The following methods are used on the invocation path.
  ****************************************************************************/
 
+    @InfoMethod
+    private void activeManagers( MultiSet<POAManagerImpl> am ) { }
+
+    @InfoMethod
+    private void alreadyActive( POAManagerImpl pm ) { }
+
+    @InfoMethod
+    private void activeInDifferentPoaManager() { }
+
+    @Poa
     private void checkState()
     {
 	MultiSet<POAManagerImpl> am = activeManagers.get() ;
-	if (AM_DEBUG) {
-	    ORBUtility.dprint( this, "6586417: in checkState: am = " + am ) ;
-	}
+	activeManagers( am ) ;
 
 	while ( state.value() != State._ACTIVE ) {
 	    switch ( state.value() ) {
 		case State._HOLDING:
 		    // Never block a thread that is already active in this POAManager.
 		    if (am.contains( this )) {
-			if (AM_DEBUG) {
-			    ORBUtility.dprint( this, 
-				"6586417: thread is already active in POAManager "
-				    + this ) ;
-			}
+			alreadyActive( this ) ;
 
 			return ;
 		    } else {
@@ -620,11 +552,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 				countedWait() ;
 			    }
 			} else {
-			    if (AM_DEBUG) {
-				ORBUtility.dprint( this, 
-				    "6586417: thread is active in POAManagers other than " 
-				    + this + ": throwing TRANSIENT exception " ) ;
-			    }
+			    activeInDifferentPoaManager() ;
 
 			    // This thread is already active in one or more other POAManagers.
 			    // This could cause a deadlock, so throw a TRANSIENT exception 
@@ -643,44 +571,28 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	}
     }
 
+    @InfoMethod
+    private void addingThreadToActiveManagers( POAManagerImpl pmi ) { }
+
+    @InfoMethod
+    private void removingThreadFromActiveManagers( POAManagerImpl pmi ) { }
+
+    @Poa
     synchronized void enter()
     {
-	try {
-	    if (debug) {
-		ORBUtility.dprint( this,
-		    "Calling enter for POAManagerImpl " + this ) ;
-	    } 
+	checkState();
+	nInvocations++;
 
-	    checkState();
-	    nInvocations++;
-
-	    activeManagers.get().add( this ) ;
-	    if (AM_DEBUG) {
-		ORBUtility.dprint( this, "6586417: thread is adding " + this 
-		    + " to activeManagers" ) ;
-	    }
-	} finally {
-	    if (debug) {
-		ORBUtility.dprint( this,
-		    "Exiting enter for POAManagerImpl " + this ) ;
-	    } 
-	}
+	activeManagers.get().add( this ) ;
+	addingThreadToActiveManagers( this ) ;
     }
 
+    @Poa
     synchronized void exit()
     {
 	try {
-	    if (debug) {
-		ORBUtility.dprint( this,
-		    "Calling exit for POAManagerImpl " + this ) ;
-	    } 
-
 	    activeManagers.get().remove( this ) ;
-
-	    if (AM_DEBUG) {
-		ORBUtility.dprint( this, "6586417: Thread is removing " 
-		    + this + " from activeManagers" ) ;
-	    }
+	    removingThreadFromActiveManagers( this ) ;
 	} finally {
             // 6878245: moved finally above the decrement.  I don't see the need for this.
 	    nInvocations--; 
@@ -690,11 +602,6 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 		// wait_for_completion loop in hold/discard/deactivate().
 		notifyWaiters();
 	    }
-
-	    if (debug) {
-		ORBUtility.dprint( this,
-		    "Exiting exit for POAManagerImpl " + this ) ;
-	    } 
 	}
     }
 

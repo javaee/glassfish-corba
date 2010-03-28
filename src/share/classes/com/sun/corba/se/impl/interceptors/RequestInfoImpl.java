@@ -107,7 +107,6 @@ public abstract class RequestInfoImpl
 
     // The ORB from which to get PICurrent and other info
     protected ORB myORB;
-    protected DprintUtil dputil ;
     protected InterceptorsSystemException wrapper ;
     protected OMGSystemException stdWrapper ;
 
@@ -241,7 +240,6 @@ public abstract class RequestInfoImpl
         super();
         
         this.myORB = myORB;
-        dputil = new DprintUtil(this) ;
 	wrapper = myORB.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
 	stdWrapper = myORB.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
 

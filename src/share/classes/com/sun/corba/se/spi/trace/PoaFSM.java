@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,57 +33,20 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.corba.se.spi.trace ;
 
-package com.sun.corba.se.spi.orbutil.fsm ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
+import java.lang.annotation.Target ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-/**
- * This is the main class that represents an instance of a state machine
- * using a state engine.  It may be used as a base class, in which case
- * the guards and actions have access to the derived class.
- * Note that this is optional; an FSM implementation may directly
- * implement the FSM interface if desired.
- *
- * @author Ken Cavanaugh
+/** This annotation is applied to a class or interface to indicate
+ * that its methods are classified as part of the CDR implementation in the ORB.
  */
-public class FSMImpl implements FSM
-{
-    private FSM parent ;
-    private State state ;
-    private StateEngine stateEngine ;
-
-    public FSMImpl( StateEngine se, State initialState )
-    {
-	parent = null ;
-	state = initialState ;
-	stateEngine = se ;
-	if (!(se.getStates( State.Kind.INITIAL ).contains( initialState )))
-	    throw new IllegalStateException(
-		"Error: State " + initialState + " is not an initial state" ) ;
-    }
-
-    public FSM getParent() {
-	return parent ;
-    }
-
-    public void setParent( FSM fsm ) {
-	parent = fsm ;
-    }
-    
-    public StateEngine getStateEngine() {
-	return stateEngine ;
-    }
-
-    /** Return the current state.
-    */
-    public State getState() {
-	return state ;
-    }
-
-    public void setState( State nextState ) 
-    {
-	state = nextState ;
-    }
+@Target({ElementType.METHOD,ElementType.TYPE,ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@MethodMonitorGroup
+public @interface PoaFSM {
 }
-
-// end of FSMImpl.java
 

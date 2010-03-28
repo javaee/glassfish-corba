@@ -113,14 +113,17 @@ public class EnhanceTool {
 
         public boolean evaluate( FileWrapper fw ) {
             try {
+                util.info( 2, "Processing class " + fw.getName() ) ;
                 byte[] inputData = fw.readAll() ;
                 byte[] outputData = ea.evaluate( inputData ) ;
                 if (outputData != null) {
                     if (args.newout()) {
                         String fname = fw.getName() + ".new" ;
+                        util.info( 1, "Writing to class file " + fname ) ;
                         FileWrapper fwo = new FileWrapper( fname ) ;
                         fwo.writeAll( outputData ) ;
                     } else {
+                        util.info( 1, "Writing to class file " + fw.getName() ) ;
                         fw.writeAll( outputData ) ;
                     }
                 }
@@ -170,7 +173,7 @@ public class EnhanceTool {
 
             public boolean evaluate(FileWrapper arg) {
                 if (trace) {
-                    util.info( "Skipping " + arg ) ;
+                    util.info( 1, "Skipping " + arg ) ;
                 }
 
                 return true ;
@@ -183,7 +186,7 @@ public class EnhanceTool {
 
         final Recognizer classRecognizer = af.getRecognizerAction() ;
         final Scanner.Action ignoreAction = makeIgnoreAction(
-            args.debug() || args.verbose() > 0 ) ;
+            args.debug() || args.verbose() > 2 ) ;
         classRecognizer.setDefaultAction( ignoreAction ) ;
         classRecognizer.addKnownSuffix( "class", classAct ) ;
         scanner.scan( classRecognizer ) ;
@@ -196,9 +199,8 @@ public class EnhanceTool {
             args = ap.parse( strs ) ;
             util = new Util( args.debug(), args.verbose() ) ;
 
-            final ActionFactory af = new ActionFactory( args.verbose(),
-                args.dryrun() ) ;
-            final Scanner scanner = new Scanner( args.verbose(), args.dir() ) ;
+            final ActionFactory af = new ActionFactory( 0, args.dryrun() ) ;
+            final Scanner scanner = new Scanner( 0, args.dir() ) ;
 
             AnnotationScannerAction annoAct = new AnnotationScannerAction( util ) ;
 
@@ -207,7 +209,7 @@ public class EnhanceTool {
             Set<String> anames = annoAct.getAnnotationNames() ;
 
             if (args.debug()) {
-                util.info( "MM Annotations: " + anames ) ;
+                util.info( 1, "MM Annotations: " + anames ) ;
             }
 
             generatePropertiesFile( args, anames ) ;
@@ -223,7 +225,7 @@ public class EnhanceTool {
                 util = new Util( true, 1 ) ;
             }
 
-            util.info( "Exception: " + exc ) ;
+            util.info( 1, "Exception: " + exc ) ;
             exc.printStackTrace() ;
         }
     }

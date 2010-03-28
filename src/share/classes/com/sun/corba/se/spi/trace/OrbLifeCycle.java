@@ -33,7 +33,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.corba.se.spi.btrace ;
+package com.sun.corba.se.spi.trace ;
 
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 import java.lang.annotation.Target ;
@@ -42,12 +42,11 @@ import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
 /** This annotation is applied to a class or interface to indicate
- * that its methods are classified as part of the CDR implementation in the ORB
- * for use in btrace scripts.
+ * that its methods are classified as part of the CDR implementation in the ORB.
  */
-@Target({ElementType.METHOD,ElementType.CONSTRUCTOR}) 
+@Target({ElementType.METHOD,ElementType.TYPE,ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@MethodMonitorGroup({ CDRRead.class, CDRWrite.class })
-public @interface CDR {
+@MethodMonitorGroup
+public @interface OrbLifeCycle {
 }
 

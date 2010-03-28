@@ -76,10 +76,6 @@ public class Util {
         return debug ;
     }
 
-    public void info( String str ) {
-        info( 1, str ) ; 
-    }
-
     public void info( int level, String str ) {
         if (verbose >= level) {
             final String format = level>1 ? "%" + (4*(level-1) + 1) + "s"
@@ -339,7 +335,7 @@ public class Util {
 
     private void verify( byte[] cls ) {
         if (getDebug()) {
-            info( "Verifying enhanced class") ;
+            info( 2, "Verifying enhanced class") ;
             ClassReader cr = new ClassReader( cls ) ;
             PrintWriter pw = new PrintWriter( System.out ) ;
             CheckClassAdapter.verify( cr, true, pw ) ;
@@ -384,7 +380,7 @@ public class Util {
         } catch (TraceEnhancementException exc) { 
             throw exc ;
         } catch (Exception exc) {
-            info( "Exception: " + exc ) ;
+            info( 1, "Exception: " + exc ) ;
             if (debug) {
                 exc.printStackTrace() ;
             }

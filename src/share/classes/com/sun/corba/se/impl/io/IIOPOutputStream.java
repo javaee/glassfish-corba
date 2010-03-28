@@ -64,7 +64,7 @@ import sun.corba.Bridge ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.btrace.* ;
+import com.sun.corba.se.spi.trace.* ;
 
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.RepositoryId;
@@ -83,7 +83,7 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
  * @since   JDK1.1.6
  */
 
-@Traceable
+@ValueHandlerWrite
 public class IIOPOutputStream
     extends com.sun.corba.se.impl.io.OutputStreamHook
 {
@@ -124,7 +124,6 @@ public class IIOPOutputStream
     // the ORB stream (which must be a ValueOutputStream) to
     // begin a new valuetype to contain the optional data
     // of the writeObject method.
-    @TraceValueHandler
     @ValueHandlerWrite
     protected void beginOptionalCustomData() {
         if (valueHandlerDebug()) 
@@ -183,7 +182,6 @@ public class IIOPOutputStream
      * in ObjectOutputStream.
      * @since     JDK1.1.6
      */
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeObjectOverride(Object obj)
@@ -206,7 +204,6 @@ public class IIOPOutputStream
      * in ObjectOutputStream.
      * @since     JDK1.1.6
      */
-    @TraceValueHandler
     @ValueHandlerWrite
     public final void simpleWriteObject(Object obj, byte formatVersion)
     {
@@ -262,7 +259,6 @@ public class IIOPOutputStream
      * in ObjectOutputStream.
      * @since     JDK1.1.6
      */
-    @TraceValueHandler
     @ValueHandlerWrite
     public final void defaultWriteObjectDelegate()
     /* throws IOException */
@@ -318,7 +314,6 @@ public class IIOPOutputStream
         // no op
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void flush() throws IOException{
@@ -331,7 +326,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     protected final Object replaceObject(Object obj) throws IOException{
@@ -349,7 +343,6 @@ public class IIOPOutputStream
      * will be written to the stream again.
      * @since     JDK1.1
      */
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void reset() throws IOException{
@@ -374,7 +367,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void write(byte b[]) throws IOException{
@@ -389,7 +381,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void write(byte b[], int off, int len) throws IOException{
@@ -404,7 +395,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void write(int data) throws IOException{
@@ -419,7 +409,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeBoolean(boolean data) throws IOException{
@@ -434,7 +423,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeByte(int data) throws IOException{
@@ -449,7 +437,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeBytes(String data) throws IOException{
@@ -465,7 +452,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeChar(int data) throws IOException{
@@ -480,7 +466,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeChars(String data) throws IOException{
@@ -496,7 +481,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeDouble(double data) throws IOException{
@@ -511,7 +495,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeFloat(float data) throws IOException{
@@ -526,7 +509,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeInt(int data) throws IOException{
@@ -541,7 +523,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeLong(long data) throws IOException{
@@ -556,7 +537,6 @@ public class IIOPOutputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeShort(int data) throws IOException{
@@ -588,7 +568,6 @@ public class IIOPOutputStream
         stream.write_wstring(data);
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     @Override
     public final void writeUTF(String data) throws IOException{
@@ -643,7 +622,6 @@ public class IIOPOutputStream
     /*
      * Write out the object
      */
-    @TraceValueHandler
     @ValueHandlerWrite
     private void outputObject(final Object obj) throws IOException{
         if (valueHandlerDebug())
@@ -738,7 +716,6 @@ public class IIOPOutputStream
      * _REVISIT_ invokeObjectWriter and invokeObjectReader behave inconsistently with each other since
      * the reader returns a boolean...fix later
      */
-    @TraceValueHandler
     @ValueHandlerWrite
     private void invokeObjectWriter(ObjectStreamClass osc, Object obj)
 	throws IOException
@@ -782,7 +759,6 @@ public class IIOPOutputStream
     }
 
     // This is needed for the OutputStreamHook interface.
-    @TraceValueHandler
     @ValueHandlerWrite
     void writeField(ObjectStreamField field, Object value) throws IOException {
         switch (field.getTypeCode()) {
@@ -845,7 +821,6 @@ public class IIOPOutputStream
 	    }
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     private void writeObjectField(ObjectStreamField field,
                                   Object objectValue) throws IOException {
@@ -901,7 +876,6 @@ public class IIOPOutputStream
     /* Write the fields of the specified class by invoking the appropriate
      * write* method on this class.
      */
-    @TraceValueHandler
     @ValueHandlerWrite
     private void outputClassFields(Object o, Class cl,
 				   ObjectStreamField[] fields)

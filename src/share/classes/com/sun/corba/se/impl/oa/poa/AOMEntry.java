@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,9 +37,7 @@ package com.sun.corba.se.impl.oa.poa ;
 
 import java.util.concurrent.locks.Condition ;
 
-import org.omg.CORBA.INTERNAL ;
 
-import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.fsm.Action ;
 import com.sun.corba.se.spi.orbutil.fsm.Guard ;
@@ -49,6 +47,8 @@ import com.sun.corba.se.spi.orbutil.fsm.FSM ;
 import com.sun.corba.se.spi.orbutil.fsm.FSMImpl ;
 import com.sun.corba.se.spi.orbutil.fsm.Runner ;
 import com.sun.corba.se.spi.orbutil.fsm.StateEngine ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.PoaFSM;
 
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 
@@ -61,6 +61,7 @@ import static com.sun.corba.se.spi.orbutil.fsm.Guard.Base.* ;
 * machine rather than the more usual state pattern so that the state machine
 * transitions are explicitly visible.
 */
+@PoaFSM
 public class AOMEntry extends FSMImpl {
     private Runner runner ;
     private final Thread[] etherealizer ;   // The actual etherealize operation 
@@ -76,6 +77,7 @@ public class AOMEntry extends FSMImpl {
 
     public static final State INVALID = new State( "Invalid", State.Kind.INITIAL ) ;
     public static final State INCARN  = new State( "Incarnating" ) {
+	@Override
 	public void postAction( FSM fsm ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    entry.wait.signalAll() ;
@@ -84,6 +86,7 @@ public class AOMEntry extends FSMImpl {
     public static final State VALID   = new State( "Valid" ) ;
     public static final State ETHP    = new State( "EtherealizePending" ) ;
     public static final State ETH     = new State( "Etherealizing" ) {
+        @Override
 	public FSM preAction( FSM fsm ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    Thread etherealizer = entry.etherealizer[0] ;
@@ -92,6 +95,7 @@ public class AOMEntry extends FSMImpl {
 	    return null ;
 	}
 
+        @Override
 	public void postAction( FSM fsm ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    entry.wait.signalAll() ;
@@ -210,7 +214,7 @@ public class AOMEntry extends FSMImpl {
 
     public AOMEntry( POAImpl poa )
     {
-	super( engine, INVALID, ((ORB)poa.getORB()).poaFSMDebugFlag ) ;
+	super( engine, INVALID ) ;
 	runner = new Runner( this ) ;
 	this.poa = poa ;
 	etherealizer = new Thread[1] ;
@@ -218,6 +222,16 @@ public class AOMEntry extends FSMImpl {
 	counter = new int[1] ;
 	counter[0] = 0 ;
 	wait = poa.poaMutex.newCondition() ;
+    }
+
+    @InfoMethod
+    private void state( State state ) { }
+
+    @PoaFSM
+    @Override
+    public void setState( State state ) {
+	super.setState( state ) ;
+	state( getState() ) ;
     }
 
     // Methods that drive the FSM: the real interface to this class

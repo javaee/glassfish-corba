@@ -119,20 +119,20 @@ public class Transformer implements UnaryFunction<byte[],byte[]> {
             return null ;
         }
 
-        // We need EnhancedClassData to hold the results of scanning the class
-        // for various details about annotations.  This makes it easy to write
-        // a one-pass visitor in part 2 to actually add the tracing code.
-        // Note that the ECD can easily be computed either at build time
-        // from the classfile byte[] (using ASM), or at runtime, directly
-        // from a Class object using reflection.
-        ecd = new EnhancedClassDataASMImpl( util, annotationNames, cn ) ;
-
-        // If this class is not annotated as a traced class, ignore it.
-        if (!ecd.isTracedClass()) {
-            return null ;
-        }
-
         try {
+            // We need EnhancedClassData to hold the results of scanning the class
+            // for various details about annotations.  This makes it easy to write
+            // a one-pass visitor in part 2 to actually add the tracing code.
+            // Note that the ECD can easily be computed either at build time
+            // from the classfile byte[] (using ASM), or at runtime, directly
+            // from a Class object using reflection.
+            ecd = new EnhancedClassDataASMImpl( util, annotationNames, cn ) ;
+
+            // If this class is not annotated as a traced class, ignore it.
+            if (!ecd.isTracedClass()) {
+                return null ;
+            }
+
             final byte[] phase1 = util.transform( false, arg,
                 new UnaryFunction<ClassVisitor, ClassAdapter>() {
                     public ClassAdapter evaluate(ClassVisitor arg) {

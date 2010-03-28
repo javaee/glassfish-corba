@@ -64,7 +64,6 @@ import java.security.PrivilegedAction;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
  
@@ -77,12 +76,11 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 import com.sun.corba.se.impl.orbutil.DprintUtil ;
 
-import com.sun.corba.se.spi.btrace.Traceable ;
-import com.sun.corba.se.spi.btrace.ValueHandlerWrite ;
-import com.sun.corba.se.spi.btrace.ValueHandlerRead ;
-import com.sun.corba.se.spi.btrace.TraceValueHandler ;
+import com.sun.corba.se.spi.trace.ValueHandlerWrite ;
+import com.sun.corba.se.spi.trace.ValueHandlerRead ;
 
-@Traceable
+@ValueHandlerRead
+@ValueHandlerWrite
 public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat {
     private DprintUtil dputil = new DprintUtil( this ) ;
 
@@ -174,7 +172,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
     }
 
     // See javax.rmi.CORBA.ValueHandlerMultiFormat
-    @TraceValueHandler
     @ValueHandlerWrite
     public void writeValue(org.omg.CORBA.portable.OutputStream out,
                            java.io.Serializable value,
@@ -200,7 +197,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * @param out The stream to write the value to
      * @param value The value to be written to the stream
      **/
-    @TraceValueHandler
     @ValueHandlerWrite
     public void writeValue(org.omg.CORBA.portable.OutputStream _out, 
                            java.io.Serializable value) {
@@ -208,7 +204,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         writeValueWithVersion( _out, value, STREAM_FORMAT_VERSION_1);
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     private void writeValueWithVersion( org.omg.CORBA.portable.OutputStream _out, 
         java.io.Serializable value, byte streamFormatVersion) {
@@ -250,7 +245,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         }
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     private void writeValueInternal( IIOPOutputStream bridge, 
 	org.omg.CORBA_2_3.portable.OutputStream out, 
@@ -278,7 +272,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * @param clazz The type of the value to be read in
      * @param sender The sending context runtime
      **/
-    @TraceValueHandler
     @ValueHandlerRead
     public java.io.Serializable readValue(org.omg.CORBA.portable.InputStream _in, 
 	int offset, java.lang.Class clazz, String repositoryID, 
@@ -332,7 +325,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         }
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private java.io.Serializable readValueInternal(IIOPInputStream bridge, 
 	org.omg.CORBA_2_3.portable.InputStream in, int offset, 
@@ -480,7 +472,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * is returned.  Otherwise, the value itself is returned.
      * @return the true value to marshal on the wire.
      **/
-    @TraceValueHandler
     @ValueHandlerWrite
     public java.io.Serializable writeReplace(java.io.Serializable value) {
 	return ObjectStreamClass.lookup(value.getClass()).writeReplace(value);
@@ -491,7 +482,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * can override it without exposing internals across packages.  This
      * is a fix for bug 4367783.
      */
-    @TraceValueHandler
     @ValueHandlerWrite
     protected void writeCharArray(org.omg.CORBA_2_3.portable.OutputStream out,
                                 char[] array,
@@ -501,7 +491,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         out.write_wchar_array(array, offset, length);
     }
 
-    @TraceValueHandler
     @ValueHandlerWrite
     private void write_Array(org.omg.CORBA_2_3.portable.OutputStream out, 
 	java.io.Serializable obj, Class type) {
@@ -615,7 +604,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
      * can override it without exposing internals across packages.  This
      * is a fix for bug 4367783.
      */
-    @TraceValueHandler
     @ValueHandlerRead
     protected void readCharArray(org.omg.CORBA_2_3.portable.InputStream in,
                                  char[] array,
@@ -625,7 +613,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         in.read_wchar_array(array, offset, length);
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private java.lang.Object read_Array( IIOPInputStream bridge, 
 	org.omg.CORBA_2_3.portable.InputStream in, 

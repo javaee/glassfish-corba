@@ -44,13 +44,10 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.POAPackage.ObjectNotActive ;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Poa;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
-
-import com.sun.corba.se.impl.oa.NullServantImpl ;
-
+@Poa
 public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     protected ActiveObjectMap activeObjectMap ;
     
@@ -91,14 +88,10 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 	return internalKeyToServant( key ) ;
     }
 
+    @Poa
     protected void activateServant( ActiveObjectMap.Key key, AOMEntry entry, Servant servant )
     {
 	setDelegate(servant, key.id );
-
-        if (orb.shutdownDebugFlag) {
-            System.out.println("Activating object " + servant + 
-	        " with POA " + poa);
-        }
 
 	activeObjectMap.putServant( servant, entry ) ;
 
@@ -107,6 +100,7 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 	factory.registerPOAForServant(poa, servant);
     }
 
+    @Poa
     public final void activateObject(byte[] id, Servant servant) 
 	throws WrongPolicy, ServantAlreadyActive, ObjectAlreadyActive
     {
@@ -122,6 +116,7 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 	activateServant( key, entry, servant ) ;
     }
     
+    @Poa
     public Servant deactivateObject( byte[] id ) 
 	throws ObjectNotActive, WrongPolicy 
     {
@@ -129,6 +124,7 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 	return deactivateObject( key ) ;
     }
     
+    @Poa
     protected void deactivateHelper( ActiveObjectMap.Key key, AOMEntry entry, 
 	Servant s ) throws ObjectNotActive, WrongPolicy
     {
@@ -142,38 +138,29 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 	factory.unregisterPOAForServant(poa, s);
     }
 
+    @InfoMethod
+    private void deactivatingObject( Servant s, POAImpl poa ) { }
+
+    @Poa
     public Servant deactivateObject( ActiveObjectMap.Key key ) 
-	throws ObjectNotActive, WrongPolicy 
-    {
-	if (orb.poaDebugFlag) {
-	    ORBUtility.dprint( this, 
-		"Calling deactivateObject for key " + key ) ;
-	}
+	throws ObjectNotActive, WrongPolicy {
 
-	try {
-	    AOMEntry entry = activeObjectMap.get(key);
-	    if (entry == null)
-		throw new ObjectNotActive();
+	AOMEntry entry = activeObjectMap.get(key);
+	if (entry == null)
+	    throw new ObjectNotActive();
 
-	    Servant s = activeObjectMap.getServant( entry ) ;
-	    if (s == null)
-		throw new ObjectNotActive();
+	Servant s = activeObjectMap.getServant( entry ) ;
+	if (s == null)
+	    throw new ObjectNotActive();
 
-	    if (orb.poaDebugFlag) {
-		System.out.println("Deactivating object " + s + " with POA " + poa);
-	    }
+	deactivatingObject( s, poa ) ;
 
-	    deactivateHelper( key, entry, s ) ;
+	deactivateHelper( key, entry, s ) ;
 
-	    return s ;
-	} finally {
-	    if (orb.poaDebugFlag) {
-		ORBUtility.dprint( this, 
-		    "Exiting deactivateObject" ) ;
-	    }
-	}
+	return s ;
     }
 
+    @Poa
     public byte[] servantToId( Servant servant ) throws ServantNotActive, WrongPolicy
     {	
 	// XXX needs to handle call from an invocation on this POA

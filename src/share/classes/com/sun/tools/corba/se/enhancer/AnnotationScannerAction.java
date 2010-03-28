@@ -84,12 +84,10 @@ public class AnnotationScannerAction implements Scanner.Action {
         @Override
         public void visit( int version, int access, String name, String signature,
             String superName, String[] interfaces ) {
-            if (util.getDebug()) {
-                util.info( "Visiting class " + name ) ;
-            }
+            util.info( 3, "Visiting class " + name ) ;
 
             if ((access & Opcodes.ACC_ANNOTATION) == Opcodes.ACC_ANNOTATION) {
-                util.info( "\t(Annotation)") ;
+                util.info( 2, "\t(Annotation)") ;
                 // We are only interested in classes that are annotations
                 currentClass = name ;
             }
@@ -97,10 +95,7 @@ public class AnnotationScannerAction implements Scanner.Action {
 
         @Override
         public AnnotationVisitor visitAnnotation( String desc, boolean visible ) {
-            if (util.getDebug()) {
-                util.info( "\tVisiting annotation " + desc ) ;
-                // We are looking for MethodMonitorGroup here
-            }
+            util.info( 3, "\tVisiting annotation " + desc ) ;
 
             if (desc.equals( MMG_DESCRIPTOR )) {
                 // Leave name in internal form.

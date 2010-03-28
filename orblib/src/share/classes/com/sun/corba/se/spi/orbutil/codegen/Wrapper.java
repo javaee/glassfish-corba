@@ -409,9 +409,6 @@ public final class Wrapper {
     // 3. If/Try/Switch/While StatementContext as needed.
     //
 
-    // Flag for FSM debugging
-    private static boolean DEBUG = false;
-
     private static abstract class Context {
 	private final Runner runner ;
 	private final Context parent ;
@@ -445,7 +442,7 @@ public final class Wrapper {
 	}
 
 	public Context( Stack<Context> contexts, State start ) {
-	    FSM fsm = new FSMImpl( engine, start, DEBUG ) ;
+	    FSM fsm = new FSMImpl( engine, start ) ;
 	    this.runner = new Runner( fsm ) ;
 
 	    this.contexts = contexts ;

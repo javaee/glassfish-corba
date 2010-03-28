@@ -445,25 +445,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    ServiceContextDefaults.makeServiceContextFactoryRegistry( this ) ;
     }
 
-    protected void setDebugFlags( String[] args )
-    {
-	for (int ctr=0; ctr<args.length; ctr++ ) {
-            String token = args[ctr] ;
-
-            // If there is a public boolean data member in this class
-            // named token + "DebugFlag", set it to true.
-            try {
-                Field fld = this.getClass().getField( token + "DebugFlag" ) ;
-                int mod = fld.getModifiers() ;
-                if (Modifier.isPublic( mod ) && !Modifier.isStatic( mod )) {
-                    if (fld.getType() == boolean.class) {
-                        fld.setBoolean(this, true);
-                    }
-                }
-            } catch (Exception exc) {
-                // ignore it XXX log this as info
-            }
-        }
+    protected void setDebugFlags( String[] args ) {
+	for (String str : args) {
+	    setDebugFlag( str ) ;
+	}
     }
 
     // Class that defines a parser that gets the name of the

@@ -67,7 +67,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         super( access, desc, mv ) ;
         this.util = util ;
         this.ecd = ecd ;
-        util.info( "StaticInitVisitor created" ) ;
+        util.info( 2, "StaticInitVisitor created" ) ;
     }
 
     private LocalVariableNode defineLocal( MethodVisitor mv, String name, Class<?> cls,
@@ -99,7 +99,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
     @Override
     public void visitCode() {
         int line = 1 ;
-        util.info( "StaticInitVisitor.visitCode" ) ;
+        util.info( 2, "StaticInitVisitor.visitCode" ) ;
         super.visitCode() ;
 
         Label start = new Label() ;
@@ -118,7 +118,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         for (String str : ecd.getAnnotationToHolderName().values()) {
             generateTraceMsg( mv, "Generating to initialize holder " + str, 
                 line++ ) ;
-            util.info( "Generating code to initialize holder " + str ) ;
+            util.info( 2, "Generating code to initialize holder " + str ) ;
             util.newWithSimpleConstructor( mv, SynchronizedHolder.class );
             mv.visitFieldInsn( Opcodes.PUTSTATIC,
                 ecd.getClassName(), str,
@@ -134,7 +134,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         mv.visitVarInsn( Opcodes.ASTORE, mnameList.index ) ;
 
         for (String str : ecd.getMethodNames()) {
-            util.info( "Generating code to add " + str + " to methodNames" ) ;
+            util.info( 2, "Generating code to add " + str + " to methodNames" ) ;
             mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
             mv.visitLdcInsn( str );
             mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
@@ -150,7 +150,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         for (Map.Entry<String,String> entry :
             ecd.getAnnotationToHolderName().entrySet()) {
 
-            util.info( "Generating code to put " + entry.getKey() + "=>"
+            util.info( 2, "Generating code to put " + entry.getKey() + "=>"
                 + entry.getValue() + " into holderMap" ) ;
 
             mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;
@@ -170,7 +170,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         }
 
         generateTraceMsg( mv, "register with MethodMonitorRegistry", line++ ) ;
-        util.info( "Generating code call MethodMonitorRegistry.registerClass" ) ;
+        util.info( 2, "Generating code call MethodMonitorRegistry.registerClass" ) ;
         mv.visitVarInsn( Opcodes.ALOAD, thisClass.index ) ;
         mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
         mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;

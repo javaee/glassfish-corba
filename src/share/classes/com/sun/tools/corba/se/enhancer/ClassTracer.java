@@ -258,7 +258,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitCode() {
-            info( 1, "visitCode" ) ;
+            info( 2, "visitCode" ) ;
 
             // visit try-catch block BEFORE visiting start label!
             lmv.visitTryCatchBlock( start, end, excHandler, null );
@@ -315,7 +315,7 @@ public class ClassTracer extends TFEnhanceAdapter {
         }
 
         private void emitExceptionReport( final int excIndex ) {
-            info( 1, "emitExceptionReport called" ) ;
+            info( 2, "emitExceptionReport called" ) ;
             final Label skipLabel = new Label() ;
             lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
             lmv.visitJumpInsn( Opcodes.IFNULL, skipLabel ) ;
@@ -332,7 +332,7 @@ public class ClassTracer extends TFEnhanceAdapter {
         }
 
         private void emitFinally() {
-            info( 1, "emitFinally called" ) ;
+            info( 2, "emitFinally called" ) ;
             final Label skipLabel = new Label() ;
             lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
             lmv.visitJumpInsn( Opcodes.IFNULL, skipLabel ) ;
@@ -359,7 +359,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitInsn(final int opcode) {
-            info( 1, "visitInsn[" + Util.opcodeToString(opcode) + "] called") ;
+            info( 2, "visitInsn[" + Util.opcodeToString(opcode) + "] called") ;
             if (opcode == Opcodes.ACONST_NULL) {
                 current = current.transition( util, mv, Input.ACONST_NULL_BC ) ;
 
@@ -404,7 +404,7 @@ public class ClassTracer extends TFEnhanceAdapter {
         @Override
         public void visitMethodInsn( final int opcode, final String owner,
             final String name, final String desc ) {
-            info( 1, "MM method: visitMethodInsn[" 
+            info( 2, "MM method: visitMethodInsn["
                 + Util.opcodeToString(opcode) + "]: " + owner
                 + "." + name + desc ) ;
 
@@ -434,7 +434,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitMaxs( final int maxStack, final int maxLocals ) {
-            info( 1, "MM method: visitMaxs" ) ;
+            info( 2, "MM method: visitMaxs" ) ;
             lmv.visitLabel( end  ) ;
             lmv.visitLabel( excHandler  ) ;
 
@@ -462,7 +462,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitIntInsn(final int opcode, final int operand) {
-            info( 1, "visitIntInsn[" + Util.opcodeToString(opcode)
+            info( 2, "visitIntInsn[" + Util.opcodeToString(opcode)
                 + "] operand=" + operand ) ;
             current = current.transition( util, mv, Input.OTHER ) ;
             lmv.visitIntInsn(opcode, operand);
@@ -470,7 +470,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitVarInsn(final int opcode, final int var) {
-            info( 1, "visitVarInsn[" + Util.opcodeToString(opcode)
+            info( 2, "visitVarInsn[" + Util.opcodeToString(opcode)
                 + "] var=" + var ) ;
             current = current.transition( util, mv, Input.OTHER ) ;
             lmv.visitVarInsn(opcode, var);
@@ -478,7 +478,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitTypeInsn(final int opcode, final String type) {
-            info( 1, "visitTypeInsn[" + Util.opcodeToString(opcode)
+            info( 2, "visitTypeInsn[" + Util.opcodeToString(opcode)
                 + "] type=" + type ) ;
             current = current.transition( util, mv, Input.OTHER ) ;
             lmv.visitTypeInsn(opcode, type);
@@ -491,7 +491,7 @@ public class ClassTracer extends TFEnhanceAdapter {
             final String name,
             final String desc)
         {
-            info( 1, "visitFieldInsn[" + Util.opcodeToString(opcode)
+            info( 2, "visitFieldInsn[" + Util.opcodeToString(opcode)
                 + "] " + owner + "." + name + desc ) ;
             current = current.transition( util, mv, Input.OTHER ) ;
             lmv.visitFieldInsn(opcode, owner, name, desc);
@@ -499,7 +499,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitJumpInsn(final int opcode, final Label label) {
-            info( 1, "visitTypeInsn[" + Util.opcodeToString(opcode)
+            info( 2, "visitTypeInsn[" + Util.opcodeToString(opcode)
                 + "] label=" + label ) ;
             current = current.transition( util,  mv, Input.OTHER ) ;
             lmv.visitJumpInsn(opcode, label);
@@ -507,14 +507,14 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitLdcInsn(final Object cst) {
-            info( 1, "visitLdcInsn " + cst ) ;
+            info( 2, "visitLdcInsn " + cst ) ;
             current = current.transition( util,  mv, Input.OTHER ) ;
             lmv.visitLdcInsn(cst);
         }
 
         @Override
         public void visitIincInsn(final int var, final int increment) {
-            info( 1, "visitIincInsn " + " var=" + var
+            info( 2, "visitIincInsn " + " var=" + var
                 + " increment=" + increment ) ;
             current = current.transition( util, mv, Input.OTHER ) ;
             lmv.visitIincInsn(var, increment);
@@ -551,7 +551,7 @@ public class ClassTracer extends TFEnhanceAdapter {
     @Override
     public MethodVisitor visitMethod( final int access, final String name,
         final String desc, final String sig, final String[] exceptions ) {
-        info( 1, "visitMethod: " + name + desc ) ;
+        info( 2, "visitMethod: " + name + desc ) ;
         // Enhance the class first (part 1).
         // - Modify all of the @InfoMethod methods with extra arguments
         // - Modify all calls to @InfoMethod methods to add the extra arguments

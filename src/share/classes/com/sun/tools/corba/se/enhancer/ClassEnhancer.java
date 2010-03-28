@@ -67,7 +67,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
 
     @Override
     public void visitEnd() {
-        info( 1, "visitEnd") ;
+        info( 2, "visitEnd") ;
         // Add the additional fields
         final String desc = Type.getDescriptor(
             SynchronizedHolder.class ) ;
@@ -129,7 +129,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         @Override
         public void visitCode() {
             super.visitCode() ;
-            info( 1, "InfoMethodRewriter: visitCode " + name + desc ) ;
+            info( 2, "InfoMethodRewriter: visitCode " + name + desc ) ;
 
             final boolean isStatic = util.hasAccess( access, 
                 Opcodes.ACC_STATIC ) ;
@@ -179,7 +179,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         @Override
         public void visitMethodInsn( int opcode, String owner,
             String name, String desc ) {
-            info( 1, "InfoMethodCallRewriter: visitMethodInsn: " + owner
+            info( 2, "InfoMethodCallRewriter: visitMethodInsn: " + owner
                 + "." + name + desc ) ;
 
             // If opcode is INVOKESPECIAL, owner is this class, and name/desc
@@ -213,16 +213,19 @@ public class ClassEnhancer extends TFEnhanceAdapter {
     }
 
     public class NormalMethodChecker extends GeneratorAdapter {
+	private final String mname ;
         public NormalMethodChecker( MethodVisitor mv,
             int acc, String name, String desc ) {
 
             super( mv, acc, name, desc ) ;
+
+	    mname = util.getFullMethodDescriptor(name, desc ) ;
         }
 
         @Override
         public void visitMethodInsn( int opcode, String owner,
             String name, String desc ) {
-            info( 1, "NormalMethodChecker: visitMethodInsn: " + owner
+            info( 2, "NormalMethodChecker: visitMethodInsn: " + owner
                 + "." + name + desc ) ;
 
             // If opcode is INVOKESPECIAL, owner is this class, and name/desc
@@ -234,9 +237,8 @@ public class ClassEnhancer extends TFEnhanceAdapter {
                 && (ecd.classifyMethod(fullDesc)
                     == EnhancedClassData.MethodType.INFO_METHOD))) {
 
-                util.error( "Method "
-                    + util.getFullMethodDescriptor(name,desc)
-                    + " in class " + ecd.getClassName() + " makes an "
+                util.error( "Method " + mname
+                    + " in class " + ecd.getClassName() + " makes an"
                     + " illegal call to an @InfoMethod method" ) ;
             }
 
@@ -247,7 +249,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
     @Override
     public MethodVisitor visitMethod( final int access, final String name,
         final String desc, final String sig, final String[] exceptions ) {
-        info( 1, "visitMethod " + name + desc ) ;
+        info( 2, "visitMethod " + name + desc ) ;
 
         // Enhance the class first (this changes the "schema" of the class).
         // - Enhance the static initializer so that the class will be properly

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -93,7 +93,7 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 import com.sun.corba.se.impl.util.Utility ;
 
-import com.sun.corba.se.spi.btrace.* ;
+import com.sun.corba.se.spi.trace.* ;
 
 /**
  * IIOPInputStream is used by the ValueHandlerImpl to handle Java serialization
@@ -103,7 +103,7 @@ import com.sun.corba.se.spi.btrace.* ;
  * @since   JDK1.1.6
  */
 
-@Traceable
+@ValueHandlerRead
 public class IIOPInputStream
     extends com.sun.corba.se.impl.io.InputStreamHook
 {
@@ -210,7 +210,7 @@ public class IIOPInputStream
                         
                         boolCtor.setAccessible(true);
                         
-                        return Return.value(boolCtor);
+                        return boolCtor;
                     }
 		}
 	    );
@@ -219,7 +219,7 @@ public class IIOPInputStream
 		// XXX I18N, logging needed.
                 throw new Error("Unable to find OptionalDataException constructor");
         
-            return Return.value(result);
+            return result;
 
         } catch (Exception ex) {
 	    // XXX I18N, logging needed.
@@ -240,7 +240,7 @@ public class IIOPInputStream
 		// XXX I18N, logging needed.
                 throw new Error("Created null OptionalDataException");
 
-            return Return.value(result);
+            return result;
 
         } catch (Exception ex) {
 	    // XXX I18N, logging needed.
@@ -257,7 +257,7 @@ public class IIOPInputStream
     // At the beginning of data sent by a writeObject or
     // writeExternal method there is a byte telling the
     // reader the stream format version.
-    @TraceValueHandler
+    @ValueHandlerRead
     private void readFormatVersion() throws IOException {
         if (valueHandlerDebug()) {
             dputil.enter( "readFormatVersion" ) ;
@@ -338,14 +338,14 @@ public class IIOPInputStream
 	return (javax.rmi.CORBA.ValueHandler) vhandler;
     }
 	
-    @TraceValueHandler
+    @ValueHandlerRead
     public final void increaseRecursionDepth(){
 	recursionDepth++;
         if (valueHandlerDebug())
             dputil.dprint( "Incremented recursionDepth to " + recursionDepth ) ;
     }
 
-    @TraceValueHandler
+    @ValueHandlerRead
     public final int decreaseRecursionDepth(){
 	--recursionDepth;
         if (valueHandlerDebug())
@@ -388,7 +388,6 @@ public class IIOPInputStream
      * @exception IOException Any of the usual Input/Output related exceptions.
      * @since     JDK1.1
      */
-    @TraceValueHandler
     @ValueHandlerRead
     public final Object readObjectDelegate() throws IOException
     {
@@ -399,7 +398,7 @@ public class IIOPInputStream
 
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_abstract_interface());
+            return orbStream.read_abstract_interface();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, true);
             throw marshalException;
@@ -414,7 +413,6 @@ public class IIOPInputStream
         }
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     final Object simpleReadObject(Class clz,
 				  ClassInfoCache.ClassInfo cinfo,
@@ -452,11 +450,11 @@ public class IIOPInputStream
                 obj = currentClassDesc.readResolve(obj);
             } catch(ClassNotFoundException cnfe) {
                 bridge.throwException( cnfe ) ;
-                return Return.value(null);
+                return null;
             } catch(IOException ioe) {
                 // System.out.println("CLZ = " + clz + "; " + ioe.toString());
                 bridge.throwException(ioe) ;
-                return Return.value(null);
+                return null;
             } finally {
                 simpleReadDepth --;
                 currentObject = prevObject;
@@ -474,7 +472,7 @@ public class IIOPInputStream
                 abortIOException = null;
             if (exIOE != null){
                 bridge.throwException( exIOE ) ;
-                return Return.value(null);
+                return null;
             }
 
 
@@ -483,17 +481,16 @@ public class IIOPInputStream
                 abortClassNotFoundException = null;
             if (exCNF != null) {
                 bridge.throwException( exCNF ) ;
-                return Return.value(null);
+                return null;
             }
 
-            return Return.value(obj);
+            return obj;
         } finally {
             if (valueHandlerDebug()) 
                 dputil.exit() ;
         }
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     public final void simpleSkipObject( String repositoryID, 
         com.sun.org.omg.SendingContext.CodeBase sender)
@@ -574,7 +571,7 @@ public class IIOPInputStream
     protected final Object readObjectOverride()
  	throws OptionalDataException, ClassNotFoundException, IOException
     {
-        return Return.value(readObjectDelegate());
+        return readObjectDelegate();
     }
 
     /**
@@ -594,7 +591,7 @@ public class IIOPInputStream
      *              objects.
      * @since     JDK1.1
      */
-    @TraceValueHandler
+    @ValueHandlerRead
     public final void defaultReadObjectDelegate() {
         if (valueHandlerDebug())
             dputil.enter( "defaultReadObjectDelegate" ) ;
@@ -703,19 +700,18 @@ public class IIOPInputStream
         // no op
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final int read() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value((orbStream.read_octet() << 0) & 0x000000FF);
+            return (orbStream.read_octet() << 0) & 0x000000FF;
         } catch (MARSHAL marshalException) {
             if (marshalException.minor 
                 == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1) {
                 setState(IN_READ_OBJECT_NO_MORE_OPT_DATA);
-                return Return.value(-1);
+                return -1;
             }
 
             throw marshalException;
@@ -726,7 +722,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final int read(byte data[], int offset, int length) throws IOException{
@@ -734,12 +729,12 @@ public class IIOPInputStream
             readObjectState.readData(this);
 
             orbStream.read_octet_array(data, offset, length);
-            return Return.value(length);
+            return length;
         } catch (MARSHAL marshalException) {
             if (marshalException.minor 
                 == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1) {
                 setState(IN_READ_OBJECT_NO_MORE_OPT_DATA);
-                return Return.value(-1);
+                return -1;
             }
 
             throw marshalException;
@@ -751,14 +746,13 @@ public class IIOPInputStream
 
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final boolean readBoolean() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_boolean());
+            return orbStream.read_boolean();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -770,14 +764,13 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final byte readByte() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_octet());
+            return orbStream.read_octet();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -789,14 +782,13 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final char readChar() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_wchar());
+            return orbStream.read_wchar();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -808,14 +800,13 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final double readDouble() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_double());
+            return orbStream.read_double();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -826,14 +817,13 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final float readFloat() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_float());
+            return orbStream.read_float();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -844,7 +834,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final void readFully(byte data[]) throws IOException{
@@ -853,7 +842,6 @@ public class IIOPInputStream
         readFully(data, 0, data.length);
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final void readFully(byte data[],  int offset,  int size) throws IOException{
@@ -873,14 +861,13 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final int readInt() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_long());
+            return orbStream.read_long();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -897,14 +884,13 @@ public class IIOPInputStream
         throw new IOException("Method readLine not supported");
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final long readLong() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_longlong());
+            return orbStream.read_longlong();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -915,14 +901,13 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final short readShort() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(orbStream.read_short());
+            return orbStream.read_short();
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -938,14 +923,13 @@ public class IIOPInputStream
         // no op
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final int readUnsignedByte() throws IOException{
         try{
             readObjectState.readData(this);
 
-    	    return Return.value((orbStream.read_octet() << 0) & 0x000000FF);
+    	    return (orbStream.read_octet() << 0) & 0x000000FF;
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -956,14 +940,13 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final int readUnsignedShort() throws IOException{
         try{
             readObjectState.readData(this);
 
-    	    return Return.value((orbStream.read_ushort() << 0) & 0x0000FFFF);
+    	    return (orbStream.read_ushort() << 0) & 0x0000FFFF;
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -980,21 +963,19 @@ public class IIOPInputStream
      * in orbutil.IIOPInputStream_1_3 in order to interoperate with
      * our legacy ORBs.
      */
-    @TraceValueHandler
     @ValueHandlerRead
     protected String internalReadUTF(org.omg.CORBA.portable.InputStream stream)
     {
-        return Return.value(stream.read_wstring());
+        return stream.read_wstring();
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final String readUTF() throws IOException{
         try{
             readObjectState.readData(this);
 
-            return Return.value(internalReadUTF(orbStream));
+            return internalReadUTF(orbStream);
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
@@ -1061,7 +1042,6 @@ public class IIOPInputStream
         throw new IOException("Method resolveObject not supported");
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     @Override
     public final int skipBytes(int len) throws IOException{
@@ -1070,7 +1050,7 @@ public class IIOPInputStream
 
             byte buf[] = new byte[len];
             orbStream.read_octet_array(buf, 0, len);
-            return Return.value(len);
+            return len;
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             
@@ -1082,7 +1062,6 @@ public class IIOPInputStream
         }
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private Object inputObject(Class clz, ClassInfoCache.ClassInfo cinfo,
         String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender, 
@@ -1113,7 +1092,7 @@ public class IIOPInputStream
                 String value = (String)orbStream.read_value( String.class ) ;
                 // Need to skip any other data marshaled from the enum, 
                 // if the enum type has non-static non-transient state.
-                return Return.value(Enum.valueOf( clz, value ) );
+                return Enum.valueOf( clz, value );
             } else if (currentClassDesc.isExternalizable()) {
                 if (valueHandlerDebug()) {
                     dputil.info( "reading Externalizable object" ) ;
@@ -1346,13 +1325,12 @@ public class IIOPInputStream
             if (valueHandlerDebug())
                 dputil.exit() ;
         }
-        return Return.value(currentObject);
+        return currentObject;
     }
 
     // This retrieves a vector of FVD's for the hierarchy of serializable 
     // classes stemming from repositoryID.  It is assumed that the sender 
     // will not provide base_value id's for non-serializable classes!
-    @TraceValueHandler
     @ValueHandlerRead
     private List<FullValueDescription> getOrderedDescriptions(
 	String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender) {
@@ -1366,7 +1344,7 @@ public class IIOPInputStream
                 new ArrayList<FullValueDescription>();
 
             if (sender == null) {
-                return Return.value(descs);
+                return descs;
             }
             
             FullValueDescription aFVD = sender.meta(repositoryID);
@@ -1375,7 +1353,7 @@ public class IIOPInputStream
                 if ((aFVD.base_value != null) && !kEmptyStr.equals(aFVD.base_value)) {
                     aFVD = sender.meta(aFVD.base_value);
                 } else 
-                    return Return.value(descs);
+                    return descs;
             }
 
             if (valueHandlerDebug()) {
@@ -1385,7 +1363,7 @@ public class IIOPInputStream
                 }
             }
 
-            return Return.value(descs);
+            return descs;
         } finally {
             if (valueHandlerDebug()) {
                 dputil.exit() ;
@@ -1545,7 +1523,6 @@ public class IIOPInputStream
      * a form of custom marshaling.
      *
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private Object inputObjectUsingFVD(final Class clz, 
         final ClassInfoCache.ClassInfo cinfo,
@@ -1575,7 +1552,7 @@ public class IIOPInputStream
                 // Only for backwards compatibility with JDK: int ordinal = orbStream.read_long() ;
                 String value = (String)orbStream.read_value( String.class ) ;
                 // Need to skip any other data marshaled from the enum, if the enum type has non-static non-transient state.
-                return Return.value(Enum.valueOf( clz, value ) );
+                return Enum.valueOf( clz, value );
             } else if (currentClassDesc.isExternalizable()) {
                 if (valueHandlerDebug()) {
                     dputil.info( "reading Externalizable object" ) ;
@@ -1778,7 +1755,7 @@ public class IIOPInputStream
 				fvd = fvdsList.next();
 				repIDForFVD = vhandler.getClassName(fvd.id);
 			    } else {
-                                return Return.value(currentObject);
+                                return currentObject;
                             }
 			}
 		    }
@@ -1872,7 +1849,7 @@ public class IIOPInputStream
                 dputil.exit() ;
         }
 
-        return Return.value(currentObject);
+        return currentObject;
     }
 
     /**
@@ -1885,7 +1862,6 @@ public class IIOPInputStream
      * a form of custom marshaling.
      *
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private Object skipObjectUsingFVD(String repositoryID,
 	com.sun.org.omg.SendingContext.CodeBase sender)
@@ -1921,22 +1897,21 @@ public class IIOPInputStream
 
 	} 
 
-	return Return.value(null);
+	return null;
     }
 
     ///////////////////
 
-    @TraceValueHandler
     @ValueHandlerRead
     private int findNextClass(String classname, Class classes[], int _spClass, int _spBase){
 
 	for (int i = _spClass; i > _spBase; i--){
 	    if (classname.equals(classes[i].getName())) {
-		return Return.value(i);
+		return i ;
 	    }
 	}
 
-	return Return.value(-1);
+	return -1 ;
     }
 
     /*
@@ -1944,7 +1919,6 @@ public class IIOPInputStream
      * marshaling, the format version and defaultWriteObject indicator were already
      * removed.
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private boolean invokeObjectReader(ObjectStreamClass osc, Object obj, Class aclass,
         ValueMember[] valueMembers )
@@ -1990,7 +1964,7 @@ public class IIOPInputStream
                 }
             }
 
-            return Return.value( result ) ;
+            return result  ;
         } finally {
             if (valueHandlerDebug())
                 dputil.exit( result ) ;
@@ -2000,7 +1974,6 @@ public class IIOPInputStream
     /*
      * Reset the stream to be just like it was after the constructor.
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private void resetStream() throws IOException {
 
@@ -2029,7 +2002,6 @@ public class IIOPInputStream
      * Note that reflection cannot be used here, because reflection cannot be used
      * to set final fields. 
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private void inputPrimitiveField(Object o, Class cl, ObjectStreamField field)
         throws InvalidClassException, IOException {
@@ -2094,7 +2066,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private Object inputObjectField(org.omg.CORBA.ValueMember field,
 	com.sun.org.omg.SendingContext.CodeBase sender)
@@ -2205,7 +2176,7 @@ public class IIOPInputStream
                 }
             }
 
-            return Return.value(objectValue);
+            return objectValue;
         } finally {
             if (valueHandlerDebug()) {
                 dputil.exit() ;
@@ -2218,16 +2189,15 @@ public class IIOPInputStream
      * inputCurrentClassFieldsForReadFields.
      *
      * Reads the field (which is of an Object type as opposed to a primitive) 
-     * described by ObjectStreamField field and returns Return.value(it.
+     * described by ObjectStreamField field and returns it.
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private Object inputObjectField(ObjectStreamField field) 
         throws InvalidClassException, StreamCorruptedException,
                ClassNotFoundException, IndirectionException, IOException {
 
         if (ObjectStreamClassCorbaExt.isAny(field.getTypeString())) {
-            return Return.value(Util.getInstance().readAny(orbStream));
+            return Util.getInstance().readAny(orbStream);
         }
 
         Object objectValue = null;
@@ -2302,7 +2272,7 @@ public class IIOPInputStream
                 throw new StreamCorruptedException("Unknown callType: " + callType);
         }
 
-        return Return.value(objectValue);
+        return objectValue;
     }
 
     // Note that this is need for getFields support.
@@ -2316,7 +2286,6 @@ public class IIOPInputStream
             inputCurrentClassFieldsForReadFields(fieldToValueMap);
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private final void inputRemoteMembersForReadFields(
 	Map<String,Object> fieldToValueMap)
@@ -2417,7 +2386,6 @@ public class IIOPInputStream
      * the given Map, name to value.  Wraps primitives in the
      * corresponding java.lang Objects.
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private final void inputCurrentClassFieldsForReadFields(
 	Map<String,Object> fieldToValueMap) throws InvalidClassException, 
@@ -2506,7 +2474,6 @@ public class IIOPInputStream
      * REVISIT -- This code doesn't do what the comment says to when
      * getField() is null!
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private void inputClassFields(Object o, Class cl,
 				  ObjectStreamField[] fields, 
@@ -2607,7 +2574,6 @@ public class IIOPInputStream
      * any ObjectStreamField does not have a reflected Field, don't try to set
      * that field in the object.
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private void inputClassFields(Object o, Class cl, 
 				  ObjectStreamClass osc,
@@ -2751,7 +2717,6 @@ public class IIOPInputStream
         }
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private void skipCustomUsingFVD(ValueMember[] fields,
 	com.sun.org.omg.SendingContext.CodeBase sender
@@ -2775,7 +2740,6 @@ public class IIOPInputStream
      * Read the fields of the specified class from the input stream throw data 
      * away.  This must handle same switch logic as above.
      */
-    @TraceValueHandler
     @ValueHandlerRead
     private void throwAwayData(ValueMember[] fields, 
 	com.sun.org.omg.SendingContext.CodeBase sender
@@ -2917,7 +2881,6 @@ public class IIOPInputStream
 		
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setObjectField(Object o, Class c, String fieldName, 
 	Object v) {
@@ -2933,7 +2896,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setBooleanField(Object o, Class c, String fieldName, boolean v)
     {
@@ -2947,7 +2909,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setByteField(Object o, Class c, String fieldName, byte v)
     {
@@ -2961,7 +2922,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setCharField(Object o, Class c, String fieldName, char v)
     {
@@ -2975,7 +2935,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setShortField(Object o, Class c, String fieldName, short v)
     {
@@ -2989,7 +2948,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setIntField(Object o, Class c, String fieldName, int v)
     {
@@ -3003,7 +2961,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setLongField(Object o, Class c, String fieldName, long v)
     {
@@ -3017,7 +2974,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setFloatField(Object o, Class c, String fieldName, float v)
     {
@@ -3031,7 +2987,6 @@ public class IIOPInputStream
 	}
     }
 
-    @TraceValueHandler
     @ValueHandlerRead
     private static void setDoubleField(Object o, Class c, String fieldName, double v)
     {

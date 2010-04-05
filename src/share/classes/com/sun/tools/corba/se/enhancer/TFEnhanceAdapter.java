@@ -36,6 +36,8 @@
 
 package com.sun.tools.corba.se.enhancer;
 
+import com.sun.corba.se.spi.orbutil.tf.EnhancedClassData;
+import com.sun.corba.se.spi.orbutil.tf.TraceEnhancementException;
 import com.sun.corba.se.spi.orbutil.tf.annotation.TFEnhanced;
 import com.sun.corba.se.spi.orbutil.tf.annotation.TraceEnhanceLevel;
 import org.objectweb.asm.AnnotationVisitor;

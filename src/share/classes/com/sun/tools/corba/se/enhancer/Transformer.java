@@ -39,6 +39,10 @@ package com.sun.tools.corba.se.enhancer;
 import java.util.Set;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.orbutil.tf.EnhancedClassData;
+import com.sun.corba.se.spi.orbutil.tf.EnhancedClassDataASMImpl;
+import com.sun.corba.se.spi.orbutil.tf.TraceEnhancementException;
+import com.sun.corba.se.spi.orbutil.tf.Util;
 
 import org.objectweb.asm.ClassAdapter;
 

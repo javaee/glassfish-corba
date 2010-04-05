@@ -38,7 +38,9 @@
 package com.sun.tools.corba.se.enhancer;
 
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
+import com.sun.corba.se.spi.orbutil.tf.EnhancedClassData;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
+import com.sun.corba.se.spi.orbutil.tf.Util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,94 +98,105 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         }
     }
 
+    private static final boolean SHORT_FORM = true ;
+
     @Override
     public void visitCode() {
-        int line = 1 ;
-        util.info( 2, "StaticInitVisitor.visitCode" ) ;
-        super.visitCode() ;
+	if (SHORT_FORM) {
+	    super.visitCode() ;
+	    mv.visitLdcInsn( Type.getType( "L" + ecd.getClassName() + ";" ));
+	    Type mmrType = Type.getType( MethodMonitorRegistry.class ) ;
+	    String mdesc = "(Ljava/lang/Class;)V" ;
+	    mv.visitMethodInsn( Opcodes.INVOKESTATIC,
+		mmrType.getInternalName(), "registerClass", mdesc ) ;
+	} else {
+	    int line = 1 ;
+	    util.info( 2, "StaticInitVisitor.visitCode" ) ;
+	    super.visitCode() ;
 
-        Label start = new Label() ;
-        Label end = new Label() ;
+	    Label start = new Label() ;
+	    Label end = new Label() ;
 
-        mv.visitLabel( start ) ;
+	    mv.visitLabel( start ) ;
 
-        LocalVariableNode thisClass = defineLocal( mv, "thisClass",
-            Class.class, start, end ) ;
-        LocalVariableNode mnameList = defineLocal( mv, "mnameList",
-            List.class, start, end ) ;
-        LocalVariableNode holderMap = defineLocal( mv, "holderMap",
-            Map.class, start, end ) ;
+	    LocalVariableNode thisClass = defineLocal( mv, "thisClass",
+		Class.class, start, end ) ;
+	    LocalVariableNode mnameList = defineLocal( mv, "mnameList",
+		List.class, start, end ) ;
+	    LocalVariableNode holderMap = defineLocal( mv, "holderMap",
+		Map.class, start, end ) ;
 
-        generateTraceMsg( mv, "initialize the holders", line++ ) ;
-        for (String str : ecd.getAnnotationToHolderName().values()) {
-            generateTraceMsg( mv, "Generating to initialize holder " + str, 
-                line++ ) ;
-            util.info( 2, "Generating code to initialize holder " + str ) ;
-            util.newWithSimpleConstructor( mv, SynchronizedHolder.class );
-            mv.visitFieldInsn( Opcodes.PUTSTATIC,
-                ecd.getClassName(), str,
-                Type.getDescriptor(SynchronizedHolder.class ) ) ;
-        }
+	    generateTraceMsg( mv, "initialize the holders", line++ ) ;
+	    for (String str : ecd.getAnnotationToHolderName().values()) {
+		generateTraceMsg( mv, "Generating to initialize holder " + str,
+		    line++ ) ;
+		util.info( 2, "Generating code to initialize holder " + str ) ;
+		util.newWithSimpleConstructor( mv, SynchronizedHolder.class );
+		mv.visitFieldInsn( Opcodes.PUTSTATIC,
+		    ecd.getClassName(), str,
+		    Type.getDescriptor(SynchronizedHolder.class ) ) ;
+	    }
 
-        generateTraceMsg( mv, "Store the Class of this class", line++ );
-        mv.visitLdcInsn( Type.getType( "L" + ecd.getClassName() + ";" ));
-        mv.visitVarInsn( Opcodes.ASTORE, thisClass.index ) ;
+	    generateTraceMsg( mv, "Store the Class of this class", line++ );
+	    mv.visitLdcInsn( Type.getType( "L" + ecd.getClassName() + ";" ));
+	    mv.visitVarInsn( Opcodes.ASTORE, thisClass.index ) ;
 
-        generateTraceMsg( mv, "Create list of method names", line++ );
-        util.newWithSimpleConstructor( mv, ArrayList.class ) ;
-        mv.visitVarInsn( Opcodes.ASTORE, mnameList.index ) ;
+	    generateTraceMsg( mv, "Create list of method names", line++ );
+	    util.newWithSimpleConstructor( mv, ArrayList.class ) ;
+	    mv.visitVarInsn( Opcodes.ASTORE, mnameList.index ) ;
 
-        for (String str : ecd.getMethodNames()) {
-            util.info( 2, "Generating code to add " + str + " to methodNames" ) ;
-            mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
-            mv.visitLdcInsn( str );
-            mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
-                "java/util/List", "add", "(Ljava/lang/Object;)Z" );
-            mv.visitInsn( Opcodes.POP ) ;
-        }
+	    for (String str : ecd.getMethodNames()) {
+		util.info( 2, "Generating code to add " + str + " to methodNames" ) ;
+		mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
+		mv.visitLdcInsn( str );
+		mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
+		    "java/util/List", "add", "(Ljava/lang/Object;)Z" );
+		mv.visitInsn( Opcodes.POP ) ;
+	    }
 
-        generateTraceMsg( mv, 
-            "create map from MM annotation class to Holder and init", line++ ) ;
-        util.newWithSimpleConstructor( mv, HashMap.class ) ;
-        mv.visitVarInsn( Opcodes.ASTORE, holderMap.index ) ;
+	    generateTraceMsg( mv,
+		"create map from MM annotation class to Holder and init", line++ ) ;
+	    util.newWithSimpleConstructor( mv, HashMap.class ) ;
+	    mv.visitVarInsn( Opcodes.ASTORE, holderMap.index ) ;
 
-        for (Map.Entry<String,String> entry :
-            ecd.getAnnotationToHolderName().entrySet()) {
+	    for (Map.Entry<String,String> entry :
+		ecd.getAnnotationToHolderName().entrySet()) {
 
-            util.info( 2, "Generating code to put " + entry.getKey() + "=>"
-                + entry.getValue() + " into holderMap" ) ;
+		util.info( 2, "Generating code to put " + entry.getKey() + "=>"
+		    + entry.getValue() + " into holderMap" ) ;
 
-            mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;
+		mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;
 
-            Type annoType = Type.getType( "L" + entry.getKey() + ";" ) ;
-            mv.visitLdcInsn( annoType );
+		Type annoType = Type.getType( "L" + entry.getKey() + ";" ) ;
+		mv.visitLdcInsn( annoType );
 
-            mv.visitFieldInsn( Opcodes.GETSTATIC, ecd.getClassName(),
-                entry.getValue(), 
-                Type.getDescriptor(SynchronizedHolder.class ) ) ;
+		mv.visitFieldInsn( Opcodes.GETSTATIC, ecd.getClassName(),
+		    entry.getValue(),
+		    Type.getDescriptor(SynchronizedHolder.class ) ) ;
 
-            mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
-                "java/util/Map", "put",
-                "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
+		mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
+		    "java/util/Map", "put",
+		    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
 
-            mv.visitInsn( Opcodes.POP ) ;
-        }
+		mv.visitInsn( Opcodes.POP ) ;
+	    }
 
-        generateTraceMsg( mv, "register with MethodMonitorRegistry", line++ ) ;
-        util.info( 2, "Generating code call MethodMonitorRegistry.registerClass" ) ;
-        mv.visitVarInsn( Opcodes.ALOAD, thisClass.index ) ;
-        mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
-        mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;
+	    generateTraceMsg( mv, "register with MethodMonitorRegistry", line++ ) ;
+	    util.info( 2, "Generating code call MethodMonitorRegistry.registerClass" ) ;
+	    mv.visitVarInsn( Opcodes.ALOAD, thisClass.index ) ;
+	    mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
+	    mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;
 
-        Type mmrType = Type.getType( MethodMonitorRegistry.class ) ;
-        String mdesc = "(Ljava/lang/Class;Ljava/util/List;Ljava/util/Map;)V" ;
-        mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-            mmrType.getInternalName(), "registerClass", mdesc ) ;
+	    Type mmrType = Type.getType( MethodMonitorRegistry.class ) ;
+	    String mdesc = "(Ljava/lang/Class;Ljava/util/List;Ljava/util/Map;)V" ;
+	    mv.visitMethodInsn( Opcodes.INVOKESTATIC,
+		mmrType.getInternalName(), "registerClass", mdesc ) ;
 
-        mv.visitLabel( end ) ;
+	    mv.visitLabel( end ) ;
 
-        thisClass.accept( mv ) ;
-        mnameList.accept( mv ) ;
-        holderMap.accept( mv ) ;
+	    thisClass.accept( mv ) ;
+	    mnameList.accept( mv ) ;
+	    holderMap.accept( mv ) ;
+	}
     }
 }

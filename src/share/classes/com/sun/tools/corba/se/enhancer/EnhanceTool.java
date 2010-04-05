@@ -45,6 +45,7 @@ import com.sun.corba.se.spi.orbutil.file.Scanner ;
 import com.sun.corba.se.spi.orbutil.file.Recognizer ;
 import com.sun.corba.se.spi.orbutil.file.FileWrapper ;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.orbutil.tf.Util;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -226,7 +227,9 @@ public class EnhanceTool {
             }
 
             util.info( 1, "Exception: " + exc ) ;
-            exc.printStackTrace() ;
+            if (args.debug()) {
+                exc.printStackTrace() ;
+            }
         }
     }
 

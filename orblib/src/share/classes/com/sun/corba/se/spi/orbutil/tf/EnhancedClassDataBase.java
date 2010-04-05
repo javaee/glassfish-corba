@@ -34,8 +34,9 @@
  * holder.
  */
 
-package com.sun.tools.corba.se.enhancer;
+package com.sun.corba.se.spi.orbutil.tf ;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +61,9 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
 
     protected final Set<String> annoNamesForClass =
         new HashSet<String>() ;
+
+    protected final Map<String,Class<? extends Annotation>> annoNameMap =
+	new HashMap<String,Class<? extends Annotation>>() ;
 
     // Map from MM annotation internal name to
     // SynchronizedHolder<MethodMonitor> field
@@ -91,6 +95,10 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
 
     public Map<String,String> getAnnotationToHolderName() {
         return annoToHolderName ;
+    }
+
+    public Map<String,Class<? extends Annotation>> getAnnoNameMap() {
+        return annoNameMap ;
     }
 
     public List<String> getMethodNames() {

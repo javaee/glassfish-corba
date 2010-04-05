@@ -45,6 +45,8 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder ;
+import com.sun.corba.se.spi.orbutil.tf.EnhancedClassData;
+import com.sun.corba.se.spi.orbutil.tf.Util;
 import com.sun.corba.se.spi.orbutil.tf.annotation.TraceEnhanceLevel;
 
 public class ClassEnhancer extends TFEnhanceAdapter {
@@ -72,10 +74,9 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         final String desc = Type.getDescriptor(
             SynchronizedHolder.class ) ;
 
-        final int acc = Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC
-            + Opcodes.ACC_FINAL ;
+        final int acc = Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC ;
 
-        // Signature is actually L../SynchronizedHolder<L.../MethodMonitor;>
+        // Signature is actually L../SynchronizedHolder;<L.../MethodMonitor;>
         // where the ... are replaced with appropriate packages.  Not
         // that we actually need a signature here.
         final String sig = null ;

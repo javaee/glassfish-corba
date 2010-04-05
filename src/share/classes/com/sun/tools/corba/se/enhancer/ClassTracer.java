@@ -37,9 +37,9 @@
 package com.sun.tools.corba.se.enhancer;
 
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
+import com.sun.corba.se.spi.orbutil.tf.EnhancedClassData;
 import java.util.HashSet;
 import java.util.Set;
-import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -49,9 +49,9 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitor ;
+import com.sun.corba.se.spi.orbutil.tf.Util;
 import com.sun.corba.se.spi.orbutil.tf.annotation.TraceEnhanceLevel;
 import org.objectweb.asm.MethodAdapter;
-import org.objectweb.asm.commons.AnalyzerAdapter;
 import org.objectweb.asm.commons.LocalVariablesSorter;
 
 public class ClassTracer extends TFEnhanceAdapter {
@@ -79,8 +79,7 @@ public class ClassTracer extends TFEnhanceAdapter {
             public State transition( final Util util, final MethodVisitor mv,
                 final Input input ) {
 
-                util.info( 3, "ClassTracer: "
-                    + "State transition: NULL1 state, Input " + input ) ;
+                info( util, 3, "State transition: NULL1 state, Input " + input ) ;
                 switch (input) {
                     case ICONST_0_BC :
                         return State.NULL2 ;
@@ -88,7 +87,7 @@ public class ClassTracer extends TFEnhanceAdapter {
                     case ACONST_NULL_BC :
                     case INFO_METHOD_CALL :
                     case OTHER :
-                        util.info( 4, "ClassTracer: Emitting 1 ACONST_NULL" ) ;
+                        info( util, 4, "Emitting 1 ACONST_NULL" ) ;
                         mv.visitInsn( Opcodes.ACONST_NULL ) ;
                         return State.NORMAL ;
                 }
@@ -100,14 +99,12 @@ public class ClassTracer extends TFEnhanceAdapter {
             public State transition( final Util util, final MethodVisitor mv,
                 final Input input ) {
 
-                util.info( 3, "ClassTracer: "
-                    + "State transition: NULL2 state, Input " + input ) ;
+                info( util, 3, "State transition: NULL2 state, Input " + input ) ;
                 switch (input) {
                     case ICONST_0_BC :
                     case ACONST_NULL_BC :
                     case OTHER :
-                        util.info( 4, 
-                            "ClassTracer: Emitting ACONST_NULL,ICONST_0" ) ;
+                        info( util, 4, "Emitting ACONST_NULL,ICONST_0" ) ;
                         mv.visitInsn( Opcodes.ACONST_NULL ) ;
                         mv.visitInsn( Opcodes.ICONST_0 ) ;
 
@@ -122,8 +119,7 @@ public class ClassTracer extends TFEnhanceAdapter {
             public State transition( final Util util, final MethodVisitor mv,
                 final Input input ) {
 
-                util.info( 3, "ClassTracer: "
-                    + "State transition: NORMAL state, Input " + input ) ;
+                info( util, 3, "State transition: NORMAL state, Input " + input ) ;
                 switch (input) {
                     case ACONST_NULL_BC :
                         return State.NULL1 ;
@@ -136,6 +132,13 @@ public class ClassTracer extends TFEnhanceAdapter {
                 return null ;
             }
         } ;
+
+	private static void info( final Util util, final int level,
+            final String msg ) {
+
+	    util.info( level, "ClassTracer.State: " + msg ) ;
+	}
+
 
         public abstract State transition( Util util, MethodVisitor mv,
             Input input ) ;

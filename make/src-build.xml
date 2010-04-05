@@ -96,7 +96,7 @@
 
     <target name="build" depends="init, prepare-dirs, compile, enhance-orb, orb-jar"/>
 
-    <target name="enhance-orb" depends="compile">
+    <target name="enhance-orb" depends="init">
         <!-- Run the tracing enhancer on the class files for corba.tf -->
 	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool" classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
             <arg value="-dir"/>
@@ -107,6 +107,8 @@
             <arg value="1"/>
 	    <arg value="-rf"/>
 	    <arg value="com/sun/corba/se/spi/tfannotations.properties"/>
+            <arg value="-tracegen"/>
+            <arg value="true"/>
         </java>
     </target>
 

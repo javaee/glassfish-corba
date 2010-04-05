@@ -38,6 +38,7 @@ package com.sun.tools.corba.se.enhancer;
 
 import com.sun.corba.se.spi.orbutil.file.FileWrapper;
 import com.sun.corba.se.spi.orbutil.file.Scanner;
+import com.sun.corba.se.spi.orbutil.tf.Util;
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 
 import java.io.IOException;

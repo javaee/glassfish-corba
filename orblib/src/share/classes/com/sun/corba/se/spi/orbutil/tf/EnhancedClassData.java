@@ -34,11 +34,12 @@
  * holder.
  */
 
-package com.sun.tools.corba.se.enhancer;
+package com.sun.corba.se.spi.orbutil.tf ;
 
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitor;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import org.objectweb.asm.Type;
@@ -68,6 +69,17 @@ public interface EnhancedClassData {
      * corresponding MethodMonitor.
      */
     Map<String,String> getAnnotationToHolderName() ;
+
+    /** Some implementations of this interface may choose to reveal this
+     * information.  It is convenient to get in the reflective case (where
+     * it is needed for the MethodMonitorRegistry.registerClass( Class<?> ) 
+     * method), but not so convenient in the ASM case (where it is not 
+     * needed in any case).
+     * 
+     * @return A map from annotation name to corresponding annotations
+     * class.  May be empty even for classes that have MM annotations.
+     */
+    Map<String,Class<? extends Annotation>> getAnnoNameMap() ;
 
     /** List of method names for all MM methods and info methods 
      * in the class.  Order is significant, as the index of the

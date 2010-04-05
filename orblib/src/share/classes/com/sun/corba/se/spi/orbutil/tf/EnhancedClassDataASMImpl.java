@@ -34,9 +34,11 @@
  * holder.
  */
 
-package com.sun.tools.corba.se.enhancer;
+package com.sun.corba.se.spi.orbutil.tf ;
 
 import com.sun.corba.se.spi.orbutil.tf.annotation.TFEnhanced;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.objectweb.asm.Opcodes;
@@ -59,9 +61,16 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                 final String aname = Type.getType( an.desc ).getInternalName() ;
                 if (annotationNames.contains( aname )) {
                     annoNamesForClass.add( aname ) ;
-                    annoToHolderName.put( aname,
-                        "__$mm$__" + annoNamesForClass.size() ) ;
-                }
+		}
+	    }
+
+	    List<String> acnames = new ArrayList( annoNamesForClass ) ;
+	    Collections.sort( acnames ) ;
+
+	    int ctr=0 ;
+	    for (String aname : acnames ) {
+	        annoToHolderName.put( aname, "__$mm$__" + ctr ) ;
+		ctr++ ;
             }
 
             if (util.getDebug()) {
@@ -76,7 +85,7 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
     //    - Build List<String> to map names of MM annotated methods to ints
     //      validate: such methods must have exactly 1 MM annotation that
     //          is in annoNamesForClass.
-    //    - Build Set<String> of all MethodInfo annotated methods.
+    //    - Build Set<String> of all InfoMethod annotated methods.
     //      validate: such methods must be private, return void, and have
     //          an empty body.  May NOT have MM annotation.
     private void scanMethods() {
@@ -150,17 +159,24 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                     }
                 }
 
-                // Both infoMethods and MM annotated methods go into methodNames
-                methodNames.add( mname ) ;
+                // We could have a method at this point that is annotated with
+                // something OTHER than tracing annotations.  Do not add
+                // such methods to the ECD.
+                if (hasMethodInfoAnno || (annoForMethod != null)) {
+                    // Both infoMethods and MM annotated methods go into methodNames
+                    methodNames.add( mname ) ;
 
-                // annoForMethod will not be null here
-                if (hasMethodInfoAnno) {
-                    infoMethodDescs.add( mdesc ) ;
-                } else {
-                    mmMethodDescs.add( mdesc ) ;
-                    methodToAnno.put( mdesc, annoForMethod ) ;
+                    // annoForMethod will not be null here
+                    if (hasMethodInfoAnno) {
+                        infoMethodDescs.add( mdesc ) ;
+                    } else {
+                        mmMethodDescs.add( mdesc ) ;
+                        methodToAnno.put( mdesc, annoForMethod ) ;
+                    }
                 }
             }
+
+	    Collections.sort( methodNames ) ;
         }
 
         if (util.getDebug()) {
@@ -179,7 +195,8 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
         currentClass = cn ;
 
         // Compute data here: only look at data available to
-        // java reflection.
+        // java reflection, so that a runtime version of 
+        // EnhancedClassData using reflection can be created.
         className = cn.name ;
         processClassAnnotations() ;
         scanMethods();

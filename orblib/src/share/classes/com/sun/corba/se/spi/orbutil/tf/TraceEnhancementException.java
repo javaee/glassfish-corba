@@ -34,7 +34,7 @@
  * holder.
  */
 
-package com.sun.tools.corba.se.enhancer;
+package com.sun.corba.se.spi.orbutil.tf ;
 
 /** Exception used when an attempt is made to enhance a class file to a level that
  * is not appropriate for the class.

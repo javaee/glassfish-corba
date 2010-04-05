@@ -36,6 +36,7 @@
 
 package com.sun.tools.corba.se.enhancer;
 
+import com.sun.corba.se.spi.orbutil.tf.Util;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;

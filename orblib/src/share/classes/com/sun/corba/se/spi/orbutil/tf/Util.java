@@ -35,10 +35,9 @@
  */
 
 
-package com.sun.tools.corba.se.enhancer;
+package com.sun.corba.se.spi.orbutil.tf ;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
-import com.sun.corba.se.spi.orbutil.tf.MethodMonitor;
 import java.io.PrintWriter;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
@@ -138,6 +137,11 @@ public class Util {
         return mn.name + mn.desc ;
     }
 
+    public String getFullMethodDescriptor( java.lang.reflect.Method method ) {
+	final String desc = Type.getMethodDescriptor(method) ;
+	return method.getName() + desc ;
+    }
+
     public void newWithSimpleConstructor( MethodVisitor mv, Class cls ) {
         info( 2, "generating new for class " + cls ) ;
         Type type = Type.getType( cls ) ;
@@ -147,7 +151,7 @@ public class Util {
             type.getInternalName(), "<init>", "()V" );
     }
 
-    String augmentInfoMethodDescriptor( String desc ) {
+    public String augmentInfoMethodDescriptor( String desc ) {
         info( 2, "Augmenting infoMethod descriptor " + desc ) ;
         // Compute new descriptor
         Type[] oldArgTypes = Type.getArgumentTypes( desc ) ;
@@ -261,7 +265,7 @@ public class Util {
 
     // Emit code to wrap all of the argumnts as Object[],
     // which is left on the stack
-    void wrapArgs( MethodVisitor mv, int access, String desc ) {
+    public void wrapArgs( MethodVisitor mv, int access, String desc ) {
         info( 2, "Wrapping args for descriptor " + desc ) ;
 
         Type[] atypes = Type.getArgumentTypes( desc ) ;

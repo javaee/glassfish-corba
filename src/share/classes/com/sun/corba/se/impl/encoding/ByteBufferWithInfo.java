@@ -43,6 +43,8 @@ import com.sun.corba.se.impl.encoding.BufferManagerWrite;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.transport.ByteBufferPool;
 import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 
 // Notes about the class.
@@ -60,7 +62,6 @@ import com.sun.corba.se.spi.orb.ORB;
 public class ByteBufferWithInfo
 {
     private ORB orb;
-    private boolean debug;
     private ByteBuffer byteBuffer;// Marshal buffer.
     private int     needed;     // How many more bytes are needed on overflow.
     private boolean fragmented; // Did the overflow operation fragment?
@@ -70,7 +71,6 @@ public class ByteBufferWithInfo
                               int index)
     {
         this.orb = (com.sun.corba.se.spi.orb.ORB)orb;
-        debug = this.orb.transportDebugFlag;
 	this.setByteBuffer(byteBuffer);
         position(index);
 	this.setNumberOfBytesNeeded(0);
@@ -88,6 +88,21 @@ public class ByteBufferWithInfo
         this(orb, bufferManager, true);
     }
 
+    @InfoMethod
+    private void bufferMessage( String head, int bbAddr, String tail ) {
+    }
+
+    @Transport
+    private void bbinfo( ByteBuffer buff ) {
+        if (orb.transportDebugFlag) {
+            // print address of ByteBuffer gotten from pool
+            int bbAddress = System.identityHashCode( buff ) ;
+            bufferMessage(
+                "constructor (ORB, BufferManagerWrite) - got ByteBuffer id (",
+                bbAddress, ") from ByteBufferPool." ) ;
+        }
+    }
+
     // Right now, EncapsOutputStream's do not use pooled byte buffers.
     // EncapsOutputStream's is the only one that does not use pooled
     // byte buffers. Hence, the reason for the boolean 'usePooledByteBuffers'.
@@ -98,29 +113,15 @@ public class ByteBufferWithInfo
                               boolean usePooledByteBuffers)
     {
         this.orb = (com.sun.corba.se.spi.orb.ORB)orb;
-        debug = this.orb.transportDebugFlag;
 
         int bufferSize = bufferManager.getBufferSize();
 
-        if (usePooledByteBuffers)
-        {
+        if (usePooledByteBuffers) {
             ByteBufferPool byteBufferPool = this.orb.getByteBufferPool();
             this.setByteBuffer(byteBufferPool.getByteBuffer(bufferSize));
 
-            if (debug)
-            {
-                // print address of ByteBuffer gotten from pool
-                int bbAddress = System.identityHashCode(getByteBuffer());
-                StringBuffer sb = new StringBuffer(80);
-                sb.append("constructor (ORB, BufferManagerWrite) - got ")
-                  .append("ByteBuffer id (").append(bbAddress)
-                  .append(") from ByteBufferPool.");
-                String msgStr = sb.toString();
-                dprint(msgStr);
-            }
-        }
-        else
-        {
+            bbinfo( getByteBuffer() ) ;
+        } else {
              // don't allocate from pool, allocate non-direct ByteBuffer
              this.setByteBuffer(ByteBuffer.allocate(bufferSize));
         }
@@ -135,7 +136,6 @@ public class ByteBufferWithInfo
     public ByteBufferWithInfo (ByteBufferWithInfo bbwi)
     {
         this.orb = bbwi.orb;
-        this.debug = bbwi.debug;
 	// IMPORTANT: Cannot simply assign the reference of
 	//            bbwi.byteBuffer to this.byteBuffer since
 	//            bbwi's can be restored via restore-able
@@ -226,6 +226,7 @@ public class ByteBufferWithInfo
     }
     
     // Grow byteBuffer to a size larger than position() + needed
+    @Transport
     public void growBuffer(com.sun.corba.se.spi.orb.ORB orb)
     {
         int newLength = getLength() * 2;
@@ -236,28 +237,22 @@ public class ByteBufferWithInfo
         ByteBufferPool byteBufferPool = orb.getByteBufferPool();
         ByteBuffer newBB = byteBufferPool.getByteBuffer(newLength);
 
-        if (debug) {
+        if (orb.transportDebugFlag) {
             // print address of ByteBuffer just gotten
             int newbbAddress = System.identityHashCode(newBB);
-            StringBuffer sb = new StringBuffer(80);
-            sb.append("growBuffer() - got ByteBuffer id (");
-            sb.append(newbbAddress).append(") from ByteBufferPool.");
-            String msgStr = sb.toString();
-            dprint(msgStr);
+            bufferMessage( "growBuffer() - got ByteBuffer id (",
+                newbbAddress, ") from ByteBufferPool." );
         }
 
 	this.flip();
         newBB.put(getByteBuffer());
 
         // return 'old' byteBuffer reference to the ByteBuffer pool
-        if (debug) {
+        if (orb.transportDebugFlag) {
             // print address of ByteBuffer being released
             int bbAddress = System.identityHashCode(getByteBuffer());
-            StringBuffer sb = new StringBuffer(80);
-            sb.append("growBuffer() - releasing ByteBuffer id (");
-            sb.append(bbAddress).append(") to ByteBufferPool.");
-            String msgStr2 = sb.toString();
-            dprint(msgStr2);
+            bufferMessage( "growBuffer() - releasing ByteBuffer id (",
+                bbAddress, ") to ByteBufferPool.");
         }
         byteBufferPool.releaseByteBuffer(getByteBuffer());
 

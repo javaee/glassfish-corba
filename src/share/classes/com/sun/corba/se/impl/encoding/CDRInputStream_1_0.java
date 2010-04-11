@@ -296,127 +296,109 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         return bbwi.position();
     }
 
+    @InfoMethod
+    private void notChunked() { }
+
+    @CdrRead
     protected void checkBlockLength(int align, int dataSize) {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("checkBlockLength", "align", align, "dataSize", dataSize);
+        // Since chunks can end at arbitrary points (though not within
+        // primitive CDR types, arrays of primitives, strings, wstrings,
+        // or indirections),
+        // we must check here for termination of the current chunk.
+        if (!isChunked) {
+            notChunked() ;
+            return;
         }
 
-        try {
-            // Since chunks can end at arbitrary points (though not within
-            // primitive CDR types, arrays of primitives, strings, wstrings,
-            // or indirections),
-            // we must check here for termination of the current chunk.
-            if (!isChunked) {
-                if (orb.cdrDebugFlag) {
-                    dputil.info("not chunked");
-                }
-                return;
+        // RMI-IIOP stream format version 2 case in which we know
+        // that there is no more optional data available.  If the
+        // Serializable's readObject method tries to read anything,
+        // we must throw a MARSHAL exception with the special minor code
+        // so that the ValueHandler can give the correct exception
+        // to readObject.  The state is cleared when the ValueHandler
+        // calls end_value after the readObject method exits.
+        if (specialNoOptionalDataState) {
+            throw omgWrapper.rmiiiopOptionalDataIncompatible1() ;
+        }
+
+        boolean checkForEndTag = false;
+
+        // Are we at the end of the current chunk?  If so,
+        // try to interpret the next long as a chunk length.
+        // (It has to be either a chunk length, end tag,
+        // or valuetag.)
+        //
+        // If it isn't a chunk length, blockLength will
+        // remain set to maxBlockLength.
+        if (blockLength == get_offset()) {
+
+            blockLength = maxBlockLength;
+            start_block();
+
+            // What's next is either a valuetag or
+            // an end tag.  If it's a valuetag, we're
+            // probably being called as part of the process
+            // to read the valuetag.  If it's an end tag,
+            // then there isn't enough data left in
+            // this valuetype to read!
+            if (blockLength == maxBlockLength) {
+                checkForEndTag = true;
             }
 
-            // RMI-IIOP stream format version 2 case in which we know
-            // that there is no more optional data available.  If the
-            // Serializable's readObject method tries to read anything,
-            // we must throw a MARSHAL exception with the special minor code
-            // so that the ValueHandler can give the correct exception
-            // to readObject.  The state is cleared when the ValueHandler
-            // calls end_value after the readObject method exits.
-            if (specialNoOptionalDataState) {
-                throw omgWrapper.rmiiiopOptionalDataIncompatible1() ;
-            }
+        } else if (blockLength < get_offset()) {
+            // Are we already past the end of the current chunk?
+            // This is always an error.
+            throw wrapper.chunkOverflow() ;
+        }
 
-            boolean checkForEndTag = false;
+        // If what's next on the wire isn't a chunk length or
+        // what we want to read (which can't be split across chunks)
+        // won't fit in the current chunk, throw this exception.
+        // This probably means that we're in an RMI-IIOP
+        // Serializable's readObject method or a custom marshaled
+        // IDL type is reading too much/in an incorrect order
+        int requiredNumBytes =
+                            computeAlignment(bbwi.position(), align) + dataSize;
 
-            // Are we at the end of the current chunk?  If so,
-            // try to interpret the next long as a chunk length.
-            // (It has to be either a chunk length, end tag,
-            // or valuetag.)
-            //
-            // If it isn't a chunk length, blockLength will
-            // remain set to maxBlockLength.
-            if (blockLength == get_offset()) {
+        if (blockLength != maxBlockLength &&
+            blockLength < get_offset() + requiredNumBytes) {
+            throw omgWrapper.rmiiiopOptionalDataIncompatible2() ;
+        }
 
-                blockLength = maxBlockLength;
-                start_block();
+        // IMPORTANT - read_long() will advance the position of the ByteBuffer.
+        //             Hence, in the logic below, we need to reset the position
+        //             back to its original location.
+        if (checkForEndTag) {
+            int nextLong = read_long();
+            bbwi.position(bbwi.position() - 4);
 
-                // What's next is either a valuetag or
-                // an end tag.  If it's a valuetag, we're
-                // probably being called as part of the process
-                // to read the valuetag.  If it's an end tag,
-                // then there isn't enough data left in
-                // this valuetype to read!
-                if (blockLength == maxBlockLength) {
-                    checkForEndTag = true;
-                }
-
-            } else if (blockLength < get_offset()) {
-                // Are we already past the end of the current chunk?
-                // This is always an error.
-                throw wrapper.chunkOverflow() ;
-            }
-
-            // If what's next on the wire isn't a chunk length or
-            // what we want to read (which can't be split across chunks)
-            // won't fit in the current chunk, throw this exception.
-            // This probably means that we're in an RMI-IIOP
-            // Serializable's readObject method or a custom marshaled
-            // IDL type is reading too much/in an incorrect order
-            int requiredNumBytes = 
-                                computeAlignment(bbwi.position(), align) + dataSize;
-
-            if (blockLength != maxBlockLength &&
-                blockLength < get_offset() + requiredNumBytes) {
-                throw omgWrapper.rmiiiopOptionalDataIncompatible2() ;
-            }
-
-            // IMPORTANT - read_long() will advance the position of the ByteBuffer.
-            //             Hence, in the logic below, we need to reset the position
-            //             back to its original location.
-            if (checkForEndTag) {
-                int nextLong = read_long();
-                bbwi.position(bbwi.position() - 4);
-
-                // It was an end tag, so there wasn't enough data
-                // left in the valuetype's encoding on the wire
-                // to read what we wanted
-                if (nextLong < 0) {
-                    throw omgWrapper.rmiiiopOptionalDataIncompatible3();
-                }
-            }
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit();
+            // It was an end tag, so there wasn't enough data
+            // left in the valuetype's encoding on the wire
+            // to read what we wanted
+            if (nextLong < 0) {
+                throw omgWrapper.rmiiiopOptionalDataIncompatible3();
             }
         }
     }
 
+    @CdrRead
     protected void alignAndCheck(int align, int n) {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("alignAndCheck", "align", align, "n", n);
-        }
+        checkBlockLength(align, n);
 
-        try {
-            checkBlockLength(align, n);
+        // WARNING: Must compute real alignment after calling
+        // checkBlockLength since it may move the position
+        int alignResult = computeAlignment(bbwi.position(), align);
+        bbwi.position(bbwi.position() + alignResult);
 
-            // WARNING: Must compute real alignment after calling
-            // checkBlockLength since it may move the position
-            int alignResult = computeAlignment(bbwi.position(), align);
-            bbwi.position(bbwi.position() + alignResult);
-
-            if (bbwi.position() + n > bbwi.getLength()) {
-                grow(align, n);
-            }
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit();
-            }
+        if (bbwi.position() + n > bbwi.getLength()) {
+            grow(align, n);
         }
     }
 
     //
     // This can be overridden....
-    //
+    @CdrRead
     protected void grow(int align, int n) {
-                
         bbwi.setNumberOfBytesNeeded(n);
 
         bbwi = bufferManagerRead.underflow(bbwi);
@@ -446,137 +428,96 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         return getConvertedChars(1, getCharConverter())[0];
     }
 
-    @PrimitiveRead
+    @CdrRead
     public char read_wchar() {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("read_wchar");
-        }
-
         char result = ' ' ;
 
-        try {
-            // Don't allow transmission of wchar/wstring data with
-            // foreign ORBs since it's against the spec.
-            if (ORBUtility.isForeignORB(orb)) {
-                throw wrapper.wcharDataInGiop10( CompletionStatus.COMPLETED_MAYBE);
-            }
-
-            // If we're talking to one of our legacy ORBs, do what
-            // they did:
-            int b1, b2;
-
-            alignAndCheck(2, 2);
-
-            if (littleEndian) {
-                b2 = bbwi.getByteBuffer().get() & 0x00FF;
-                b1 = bbwi.getByteBuffer().get() & 0x00FF;
-            } else {
-                b1 = bbwi.getByteBuffer().get() & 0x00FF;
-                b2 = bbwi.getByteBuffer().get() & 0x00FF;
-            }
-
-            result = (char)((b1 << 8) + (b2 << 0));
-            return result ;
-        } finally {
-            if (orb.cdrDebugFlag)  {
-                dputil.exit( result ) ;
-            }
+        // Don't allow transmission of wchar/wstring data with
+        // foreign ORBs since it's against the spec.
+        if (ORBUtility.isForeignORB(orb)) {
+            throw wrapper.wcharDataInGiop10( CompletionStatus.COMPLETED_MAYBE);
         }
+
+        // If we're talking to one of our legacy ORBs, do what
+        // they did:
+        int b1, b2;
+
+        alignAndCheck(2, 2);
+
+        if (littleEndian) {
+            b2 = bbwi.getByteBuffer().get() & 0x00FF;
+            b1 = bbwi.getByteBuffer().get() & 0x00FF;
+        } else {
+            b1 = bbwi.getByteBuffer().get() & 0x00FF;
+            b2 = bbwi.getByteBuffer().get() & 0x00FF;
+        }
+
+        result = (char)((b1 << 8) + (b2 << 0));
+        return result ;
     }
 
-    @PrimitiveRead
+    @CdrRead
     public final byte read_octet() {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("read_octet");
-        }
-
         byte result = 0 ;
 
-        try {
-            alignAndCheck(1, 1);
-            byte b = bbwi.getByteBuffer().get();
-            result = b;
-            return result ;
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit(result);
-            }
-        }
+        alignAndCheck(1, 1);
+        byte b = bbwi.getByteBuffer().get();
+        result = b;
+        return result ;
     }
 
-    @PrimitiveRead
+    @CdrRead
     public final short read_short() {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("read_short");
-        }
-
         short result = 0 ;
+        int b1, b2;
 
-        try {
-            int b1, b2;
+        alignAndCheck(2, 2);
 
-            alignAndCheck(2, 2);
-
-            if (littleEndian) {
-                b2 = (bbwi.getByteBuffer().get() << 0) & 0x000000FF;
-                b1 = (bbwi.getByteBuffer().get() << 8) & 0x0000FF00;
-            } else {
-                b1 = (bbwi.getByteBuffer().get() << 8) & 0x0000FF00;
-                b2 = (bbwi.getByteBuffer().get() << 0) & 0x000000FF;
-            }
-
-            result = (short)(b1 | b2);
-            return result ;
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit(result);
-            }
+        if (littleEndian) {
+            b2 = (bbwi.getByteBuffer().get() << 0) & 0x000000FF;
+            b1 = (bbwi.getByteBuffer().get() << 8) & 0x0000FF00;
+        } else {
+            b1 = (bbwi.getByteBuffer().get() << 8) & 0x0000FF00;
+            b2 = (bbwi.getByteBuffer().get() << 0) & 0x000000FF;
         }
+
+        result = (short)(b1 | b2);
+        return result ;
     }
 
     public final short read_ushort() {
 	return read_short();
     }
 
-    @PrimitiveRead
+    @CdrRead
     public final int read_long() {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("read_long");
-        }
-
         int result = 0 ;
 
-        try {
-            int b1, b2, b3, b4;
+        int b1, b2, b3, b4;
 
-            alignAndCheck(4, 4);
+        alignAndCheck(4, 4);
 
-            if (littleEndian) {
-                b4 = bbwi.getByteBuffer().get() & 0xFF;
-                b3 = bbwi.getByteBuffer().get() & 0xFF;
-                b2 = bbwi.getByteBuffer().get() & 0xFF;
-                b1 = bbwi.getByteBuffer().get() & 0xFF;
-            } else {
-                b1 = bbwi.getByteBuffer().get() & 0xFF;
-                b2 = bbwi.getByteBuffer().get() & 0xFF;
-                b3 = bbwi.getByteBuffer().get() & 0xFF;
-                b4 = bbwi.getByteBuffer().get() & 0xFF;
-            } 
-            
-            result = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
-            return result ;
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit(result);
-            }
+        if (littleEndian) {
+            b4 = bbwi.getByteBuffer().get() & 0xFF;
+            b3 = bbwi.getByteBuffer().get() & 0xFF;
+            b2 = bbwi.getByteBuffer().get() & 0xFF;
+            b1 = bbwi.getByteBuffer().get() & 0xFF;
+        } else {
+            b1 = bbwi.getByteBuffer().get() & 0xFF;
+            b2 = bbwi.getByteBuffer().get() & 0xFF;
+            b3 = bbwi.getByteBuffer().get() & 0xFF;
+            b4 = bbwi.getByteBuffer().get() & 0xFF;
         }
+
+        result = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
+        return result ;
     }
 
     public final int read_ulong() {
 	return read_long();
     }
 
-    @PrimitiveRead
+    @CdrRead
     public final long read_longlong() {
     	long i1, i2;
 
@@ -612,44 +553,35 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     // Note that this has the side effect of setting the value of stringIndirection.
-    @PrimitiveRead
+    @CdrRead
     protected final String readStringOrIndirection(boolean allowIndirection) {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("readStringOrIndirection", "allowIndirection", allowIndirection);
-        }
-
         String result = "" ;
 
-        try {
-            int len = read_long();
+        int len = read_long();
 
-            //
-            // Check for indirection
-            //
-            if (allowIndirection) {
-                if (len == 0xffffffff) {
-                    return null;
-                } else {
-                    stringIndirection = get_offset() - 4;
-                }
-            }
-
-            checkForNegativeLength(len);
-
-            if (orb != null && ORBUtility.isLegacyORB(orb)) {
-                result = legacyReadString(len);
+        //
+        // Check for indirection
+        //
+        if (allowIndirection) {
+            if (len == 0xffffffff) {
+                return null;
             } else {
-                result = internalReadString(len);
-            }
-
-            return result ;
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit(result);
+                stringIndirection = get_offset() - 4;
             }
         }
+
+        checkForNegativeLength(len);
+
+        if (orb != null && ORBUtility.isLegacyORB(orb)) {
+            result = legacyReadString(len);
+        } else {
+            result = internalReadString(len);
+        }
+
+        return result ;
     }
 
+    @CdrRead
     private final String internalReadString(int len) {
     	// Workaround for ORBs which send string lengths of
     	// zero to mean empty string.
@@ -669,6 +601,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         return new String(result, 0, getCharConverter().getNumChars());
     }
 
+    @CdrRead
     private final String legacyReadString(int len) {
 
     	//
@@ -722,6 +655,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         return readStringOrIndirection(false);
     }
 
+    @CdrRead
     public String read_wstring() {
         // Don't allow transmission of wchar/wstring data with
         // foreign ORBs since it's against the spec.
@@ -759,6 +693,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         return new String(c);
     }
 
+    @CdrRead
     public final void read_octet_array(byte[] b, int offset, int length) {
     	if ( b == null ) {
             throw wrapper.nullParam();
@@ -807,71 +742,56 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     @CdrRead
     public TypeCode read_TypeCode() {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("read_TypeCode");
-        }
-
         TypeCode result = null ;
 
-        try {
-            TypeCodeImpl tc = new TypeCodeImpl(orb);
-            tc.read_value(parent);
-            return tc ;
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit(result);
-            }
-        }
+        TypeCodeImpl tc = new TypeCodeImpl(orb);
+        tc.read_value(parent);
+        return tc ;
     }
   
     @CdrRead
     public Any read_any() {
-	tp.enter_readAny() ;
-        if (orb.cdrDebugFlag) {
-            dputil.enter("read_any");
-        }
-
         Any any = null ;
 
-	try {
-	    any = orb.create_any();
-	    TypeCodeImpl tc = new TypeCodeImpl(orb);
+        any = orb.create_any();
+        TypeCodeImpl tc = new TypeCodeImpl(orb);
 
-	    // read off the typecode
+        // read off the typecode
 
-	    // REVISIT We could avoid this try-catch if we could peek the typecode 
-	    // kind off this stream and see if it is a tk_value.  Looking at the 
-	    // code we know that for tk_value the Any.read_value() below
-	    // ignores the tc argument anyway (except for the kind field).
-	    // But still we would need to make sure that the whole typecode, 
-	    // including encapsulations, is read off.
-	    try {
-		tc.read_value(parent);
-	    } catch (MARSHAL ex) {
-		if (tc.kind().value() != TCKind._tk_value) {
-                    throw ex;
-                }
-		// We can be sure that the whole typecode encapsulation has been 
-		// read off.
-		dprintThrowable(ex);
-	    }
-	    // read off the value of the any
-	    any.read_value(parent, tc);
-
-	    return any;
-	} finally {
-	    tp.exit_readAny() ;
-            if (orb.cdrDebugFlag) {
-                dputil.exit(any);
+        // REVISIT We could avoid this try-catch if we could peek the typecode
+        // kind off this stream and see if it is a tk_value.  Looking at the
+        // code we know that for tk_value the Any.read_value() below
+        // ignores the tc argument anyway (except for the kind field).
+        // But still we would need to make sure that the whole typecode,
+        // including encapsulations, is read off.
+        try {
+            tc.read_value(parent);
+        } catch (MARSHAL ex) {
+            if (tc.kind().value() != TCKind._tk_value) {
+                throw ex;
             }
-	}
-    }
+            // We can be sure that the whole typecode encapsulation has been
+            // read off.
+        }
+        // read off the value of the any
+        any.read_value(parent, tc);
 
+        return any;
+    }
 
     @CdrRead
     public org.omg.CORBA.Object read_Object() { 
         return read_Object(null);
     }
+
+    @InfoMethod
+    private void nullIOR() { }
+
+    @InfoMethod
+    private void className( String name ) { }
+
+    @InfoMethod
+    private void stubFactory( PresentationManager.StubFactory fact ) { }
 
     // ------------ RMI related methods --------------------------
 
@@ -888,11 +808,13 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     //    IDLEntity.class.isAssignableFrom( clz ).
     // 3. If clz is an interface, use it to create the appropriate
     //    stub factory.
+    @CdrRead
     public org.omg.CORBA.Object read_Object(Class clz) 
     {
 	// In any case, we must first read the IOR.
 	IOR ior = IORFactories.makeIOR( orb, (InputStream)parent) ;
 	if (ior.isNil()) {
+            nullIOR() ;
             return null;
         }
 
@@ -903,6 +825,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         if (clz == null) {
 	    RepositoryId rid = RepositoryId.cache.getId( ior.getTypeId() ) ;
 	    String className = rid.getClassName() ;
+            className( className ) ;
 	    boolean isIDLInterface = rid.isIDLType() ;
 
 	    if (className == null || className.equals( "" )) {
@@ -916,15 +839,18 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                     stubFactory = null;
                 }
             }
+            stubFactory( stubFactory ) ;
         } else if (StubAdapter.isStubClass( clz )) {
 	    stubFactory = PresentationDefaults.makeStaticStubFactory(
 		clz ) ;
+            stubFactory( stubFactory ) ;
 	} else {
 	    // clz is an interface class
 	    boolean isIDL = ClassInfoCache.get( clz ).isAIDLEntity(clz) ;
 
 	    stubFactory = sff.createStubFactory( clz.getName(), 
 		isIDL, codeBase, clz, clz.getClassLoader() ) ;
+            stubFactory( stubFactory ) ;
 	}
 
 	return internalIORToObject( ior, stubFactory, orb );
@@ -935,6 +861,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
      * implementation uses it.   If stubFactory is null, the ior's
      * IIOPProfile must support getServant.
      */
+    @CdrRead
     public static org.omg.CORBA.Object internalIORToObject(
         IOR ior, PresentationManager.StubFactory stubFactory, ORB orb)
     {
@@ -1086,9 +1013,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     @CdrRead
     private Object readRMIIIOPValueType( int indirection, 
 	Class<?> valueClass, String repositoryIDString ) {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("readRMIIIOPValueType");
-        }
 
 	try {
 	    if (valueHandler == null) {
@@ -1112,198 +1036,192 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	} catch(Error e) {
 	    throw wrapper.valuehandlerReadError( 
 		CompletionStatus.COMPLETED_MAYBE, e ) ;
-	} finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit();
-            }
         }
     }
 
+    @InfoMethod
+    private void repositoryIdString( String str ) { } 
+
+    @InfoMethod
+    private void valueClass( Class cls ) { }
+
+    @InfoMethod
+    private void noProxyInterfaces() { }
+
     @CdrRead
     public Serializable read_value(Class expectedType) {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("read_value(Class)", "expectedType", expectedType);
+        Object value = null ;
+        int vType = readValueTag();
+        if (vType == 0) {
+            return null;
         }
 
-        try {
-            Object value = null ;
-            int vType = readValueTag();
-            if (vType == 0) {
+        if (vType == 0xffffffff) {
+            value = handleIndirection();
+        } else {
+            ClassInfoCache.ClassInfo cinfo = null ;
+            if (expectedType != null) {
+                cinfo = ClassInfoCache.get(expectedType);
+            }
+
+            int indirection = get_offset() - 4;
+
+            // Need to save this special marker variable
+            // to restore its value during recursion
+            boolean saveIsChunked = isChunked;
+            isChunked = repIdUtil.isChunkedEncoding(vType);
+
+            String codebase_URL = null;
+            if (repIdUtil.isCodeBasePresent(vType)) {
+                codebase_URL = read_codebase_URL();
+            }
+
+            // Read repository id(s)
+            String repositoryIDString = readRepositoryIds(vType, expectedType,
+                cinfo, null);
+            repositoryIdString( repositoryIDString ) ;
+
+            // If isChunked was determined to be true based
+            // on the valuetag, this will read a chunk length
+            start_block();
+
+            // Remember that end_flag keeps track of all nested
+            // valuetypes and is used for older ORBs
+            end_flag--;
+            if (isChunked) {
+                chunkedValueNestingLevel--;
+            }
+
+            if (repositoryIDString.equals(repIdStrs.getWStringValueRepId())) {
+                value = read_wstring();
+            } else if (repositoryIDString.equals(
+                repIdStrs.getClassDescValueRepId())) {
+                value = readClass();
+            } else {
+                Class<?> valueClass = expectedType;
+
+                // By this point, either the expectedType or repositoryIDString
+                // is guaranteed to be non-null.
+                if (valueClass == null ||
+                    !repositoryIDString.equals(repIdStrs.createForAnyType(
+                        expectedType,cinfo))) {
+
+                    valueClass = getClassFromString(repositoryIDString,
+                        codebase_URL, expectedType);
+                }
+
+                valueClass( valueClass ) ;
+
+                if (valueClass == null) {
+                    // No point attempting to use value handler below, since the
+                    // class information is not available.
+                    // Fix for issue 1828: pass the class name for a better log
+                    // message.
+                    RepositoryIdInterface repositoryID
+                        = repIdStrs.getFromString(repositoryIDString);
+
+                    throw wrapper.couldNotFindClass(
+                        CompletionStatus.COMPLETED_MAYBE,
+                        repositoryID.getClassName()) ;
+                }
+
+                if (cinfo == null) {
+                    cinfo = ClassInfoCache.get(valueClass);
+                }
+
+                if (valueClass != null && cinfo.isAIDLEntity(valueClass)) {
+                    value = readIDLValue(indirection, repositoryIDString,
+                        valueClass, cinfo, codebase_URL);
+                } else {
+                    value = readRMIIIOPValueType( indirection,
+                        valueClass, repositoryIDString ) ;
+                }
+            }
+
+            // Skip any remaining chunks until we get to
+            // an end tag or a valuetag.  If we see a valuetag,
+            // that means there was another valuetype in the sender's
+            // version of this class that we need to skip over.
+            handleEndOfValue();
+
+            // Read and process the end tag if we're chunking.
+            // Assumes that we're at the position of the end tag
+            // (handleEndOfValue should assure this)
+            readEndTag();
+
+            // Cache the valuetype that we read
+            if (valueCache == null) {
+                valueCache = new CacheTable<Object>("Input valueCache", orb,
+                    false);
+            }
+            valueCache.put(value, indirection);
+
+            // Allow for possible continuation chunk.
+            // If we're a nested valuetype inside of a chunked
+            // valuetype, and that enclosing valuetype has
+            // more data to write, it will need to have this
+            // new chunk begin after we wrote our end tag.
+            isChunked = saveIsChunked;
+            start_block();
+        }
+
+        // Convert an EnumDesc into the enum instance it represents
+        if (value.getClass()==EnumDesc.class) {
+            EnumDesc desc = EnumDesc.class.cast( value ) ;
+
+            Class cls = null ;
+            try {
+                cls = JDKBridge.loadClass( desc.className, null, null ) ;
+            } catch (ClassNotFoundException cnfe) {
+                throw wrapper.enumClassNotFound( cnfe, desc.className ) ;
+            }
+
+            value = Enum.valueOf( cls, desc.value ) ;
+        }
+
+        // Convert ProxyDesc into the proxy instance it represents
+        if (value.getClass()==ProxyDesc.class) {
+            ProxyDesc desc = ProxyDesc.class.cast( value ) ;
+            int numberOfInterfaces = desc.interfaces.length;
+
+            // Write code if the number is Zero. Unusual case
+            if (numberOfInterfaces==0) {
+                noProxyInterfaces() ;
                 return null;
             }
 
-            if (vType == 0xffffffff) {
-                value = handleIndirection();
-            } else { 
-                ClassInfoCache.ClassInfo cinfo = null ;
-                if (expectedType != null) {
-                    cinfo = ClassInfoCache.get(expectedType);
-                }
-
-                int indirection = get_offset() - 4;
-
-                // Need to save this special marker variable
-                // to restore its value during recursion
-                boolean saveIsChunked = isChunked;
-                isChunked = repIdUtil.isChunkedEncoding(vType);
-                                
-                String codebase_URL = null;			
-                if (repIdUtil.isCodeBasePresent(vType)) {
-                    codebase_URL = read_codebase_URL();
-                }
-                                
-                // Read repository id(s)
-                String repositoryIDString = readRepositoryIds(vType, expectedType, 
-                    cinfo, null);
-                if (orb.cdrDebugFlag) {
-                    dputil.info("repositoryIDString", repositoryIDString);
-                }
-
-                // If isChunked was determined to be true based
-                // on the valuetag, this will read a chunk length
-                start_block();
-
-                // Remember that end_flag keeps track of all nested
-                // valuetypes and is used for older ORBs
-                end_flag--;
-                if (isChunked) {
-                    chunkedValueNestingLevel--;
-                }
-
-                if (repositoryIDString.equals(repIdStrs.getWStringValueRepId())) {
-                    value = read_wstring();
-                } else if (repositoryIDString.equals(
-                    repIdStrs.getClassDescValueRepId())) {
-                    value = readClass();
-                } else {       
-                    Class<?> valueClass = expectedType;
-
-                    // By this point, either the expectedType or repositoryIDString
-                    // is guaranteed to be non-null.
-                    if (valueClass == null || 
-                        !repositoryIDString.equals(repIdStrs.createForAnyType(
-                            expectedType,cinfo))) {
-
-                        valueClass = getClassFromString(repositoryIDString, 
-                            codebase_URL, expectedType);
-                    }
-
-                    if (orb.cdrDebugFlag) {
-                        dputil.info("valueClass", valueClass);
-                    }
-
-                    if (valueClass == null) {
-                        // No point attempting to use value handler below, since the
-                        // class information is not available.
-                        // Fix for issue 1828: pass the class name for a better log
-                        // message.
-                        RepositoryIdInterface repositoryID 
-                            = repIdStrs.getFromString(repositoryIDString);
-
-                        throw wrapper.couldNotFindClass( 
-                            CompletionStatus.COMPLETED_MAYBE,
-                            repositoryID.getClassName()) ;
-                    }
-                    
-                    if (cinfo == null) {
-                        cinfo = ClassInfoCache.get(valueClass);
-                    }
-
-                    if (valueClass != null && cinfo.isAIDLEntity(valueClass)) {
-                        value = readIDLValue(indirection, repositoryIDString, 
-                            valueClass, cinfo, codebase_URL);
-                    } else {
-                        value = readRMIIIOPValueType( indirection, 
-                            valueClass, repositoryIDString ) ;
-                    }
-                }
-                
-                // Skip any remaining chunks until we get to
-                // an end tag or a valuetag.  If we see a valuetag,
-                // that means there was another valuetype in the sender's
-                // version of this class that we need to skip over.
-                handleEndOfValue();
-                
-                // Read and process the end tag if we're chunking.
-                // Assumes that we're at the position of the end tag
-                // (handleEndOfValue should assure this)
-                readEndTag();
-                    
-                // Cache the valuetype that we read
-                if (valueCache == null) {
-                    valueCache = new CacheTable<Object>("Input valueCache", orb, false);
-                }
-                valueCache.put(value, indirection);
-                
-                // Allow for possible continuation chunk.
-                // If we're a nested valuetype inside of a chunked
-                // valuetype, and that enclosing valuetype has
-                // more data to write, it will need to have this
-                // new chunk begin after we wrote our end tag.
-                isChunked = saveIsChunked;
-                start_block();
-            }
-                
-            // Convert an EnumDesc into the enum instance it represents
-            if (value.getClass()==EnumDesc.class) {
-                EnumDesc desc = EnumDesc.class.cast( value ) ;
-
-                Class cls = null ;
-                try {
-                    cls = JDKBridge.loadClass( desc.className, null, null ) ;
-                } catch (ClassNotFoundException cnfe) {
-                    throw wrapper.enumClassNotFound( cnfe, desc.className ) ;
-                }
-
-                value = Enum.valueOf( cls, desc.value ) ;
-            }
-            
-            // Convert ProxyDesc into the proxy instance it represents
-            if (value.getClass()==ProxyDesc.class) {
-                ProxyDesc desc = ProxyDesc.class.cast( value ) ;
-                int numberOfInterfaces = desc.interfaces.length;
-
-                // Write code if the number is Zero. Unusual case
-                if (numberOfInterfaces==0) {
-                    if (orb.cdrDebugFlag) {
-                        dprint("The proxy does not have any interfaces that are implemented dynamically! Check the Proxy implementation");
-                    }
-                    return null;
-                }
-
-                ClassLoader cl = Thread.currentThread().getContextClassLoader();
-                try {
-                    RMIClassLoader.loadProxyClass( desc.codebase, desc.interfaces, value.getClass().getClassLoader()) ;
-                } catch (ClassNotFoundException cnfe) {
-                    throw wrapper.proxyClassNotFound( cnfe, getInterfacesList(desc.interfaces)) ;
-                } catch (MalformedURLException mue) {
-                    throw wrapper.malformedProxyUrl( mue, getInterfacesList(desc.interfaces), desc.codebase) ;
-                }
-
-                Class[] list = new Class[desc.interfaces.length];
-                for(int i=0; i < numberOfInterfaces; ++i) {
-                    try {
-                        list[i] = JDKBridge.loadClass(desc.interfaces[i], desc.codebase, cl);
-                     } catch (ClassNotFoundException cnfe) {
-                         throw wrapper.proxyClassNotFound(cnfe, desc.interfaces[i]);
-                     }
-                }
-
-                try {
-                    value = Proxy.newProxyInstance(cl, list, desc.handler);
-                } catch (IllegalArgumentException iage) {
-                    throw wrapper.proxyWithIllegalArgs(iage);
-                } catch (NullPointerException npe) {
-                    throw wrapper.emptyProxyInterfaceList(npe);
-                }
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            try {
+                RMIClassLoader.loadProxyClass( desc.codebase, desc.interfaces,
+                    value.getClass().getClassLoader()) ;
+            } catch (ClassNotFoundException cnfe) {
+                throw wrapper.proxyClassNotFound( cnfe,
+                    getInterfacesList(desc.interfaces)) ;
+            } catch (MalformedURLException mue) {
+                throw wrapper.malformedProxyUrl( mue,
+                    getInterfacesList(desc.interfaces), desc.codebase) ;
             }
 
-            return (java.io.Serializable)value;
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit();
+            Class[] list = new Class[desc.interfaces.length];
+            for(int i=0; i < numberOfInterfaces; ++i) {
+                try {
+                    list[i] = JDKBridge.loadClass(desc.interfaces[i],
+                        desc.codebase, cl);
+                 } catch (ClassNotFoundException cnfe) {
+                     throw wrapper.proxyClassNotFound(cnfe, desc.interfaces[i]);
+                 }
+            }
+
+            try {
+                value = Proxy.newProxyInstance(cl, list, desc.handler);
+            } catch (IllegalArgumentException iage) {
+                throw wrapper.proxyWithIllegalArgs(iage);
+            } catch (NullPointerException npe) {
+                throw wrapper.emptyProxyInterfaceList(npe);
             }
         }
+
+        return (java.io.Serializable)value;
     }
 
     private List<String> getInterfacesList(String [] interfaces) {
@@ -1490,6 +1408,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         }		
     }
 
+    @InfoMethod
+    private void readClassCodebases( String codebases, String repoId ) { }
+
     @CdrRead
     private Class<?> readClass() {
 
@@ -1508,12 +1429,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             codebases = (String)read_value(java.lang.String.class);
         }
 
-        if (orb.cdrDebugFlag) {
-            dprint("readClass codebases: " 
-		   + codebases
-		   + " rep Id: "
-		   + classRepId);
-        }
+        readClassCodebases( codebases, classRepId ) ;
 
         Class<?> cl = null;
 
@@ -1584,9 +1500,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	    readMethod.invoke(helper, parent, val );
             return val;
 	} catch(IllegalAccessException iae2) {
-	    throw wrapper.couldNotInvokeHelperReadMethod( iae2, helper.get_class() ) ;
+	    throw wrapper.couldNotInvokeHelperReadMethod( iae2,
+                helper.get_class() ) ;
 	} catch(InvocationTargetException ite){
-	    throw wrapper.couldNotInvokeHelperReadMethod( ite, helper.get_class() ) ;
+	    throw wrapper.couldNotInvokeHelperReadMethod( ite,
+                helper.get_class() ) ;
 	}
     }
 
@@ -1599,12 +1517,12 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             ClassLoader clazzLoader = clazz.getClassLoader();
 
 	    cls = Utility.loadClassForClass(clazz.getName()+"Helper", codebase,
-                                                   clazzLoader, clazz, clazzLoader);
+                clazzLoader, clazz, clazzLoader);
 	    final Class<?> helperClass = cls ;
 
-
-            // getDeclaredMethod requires RuntimePermission accessDeclaredMembers
-            // if a different class loader is used (even though the javadoc says otherwise)
+            // getDeclaredMethod requires RuntimePermission 
+            // accessDeclaredMembers if a different class loader is used
+            // (even though the javadoc says otherwise)
             Method readMethod = null;
             try {
                 readMethod = AccessController.doPrivileged(
@@ -1641,13 +1559,14 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	ValueFactory factory ;
 
 	// Always try to find a ValueFactory first, as required by the spec.
-	// There are some complications here in the IDL 3.0 mapping (see 1.13.8),
-	// but basically we must always be able to override the DefaultFactory
-	// or Helper mappings that are also used.  This appears to be the case
-	// even in the boxed value cases.  The original code only did the lookup
-	// in the case of class implementing either StreamableValue or CustomValue,
-	// but abstract valuetypes only implement ValueBase, and really require
-	// the use of the repId to find a factory (including the DefaultFactory).
+	// There are some complications here in the IDL 3.0 mapping 
+        // (see 1.13.8), but basically we must always be able to override the
+        // DefaultFactory or Helper mappings that are also used.  This appears
+        // to be the case even in the boxed value cases.  The original code
+        // only did the lookup in the case of class implementing either
+        // StreamableValue or CustomValue, but abstract valuetypes only
+        // implement ValueBase, and really require the use of the repId to
+        // find a factory (including the DefaultFactory).
 	try {
 	    // use new-style OBV support (factory object)
 	    factory = Utility.getFactory(clazz, codebase, orb, repId);
@@ -1770,47 +1689,41 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     @InfoMethod
     private void blockLength( int value ) { }
 
+    @InfoMethod
+    private void unreadLastLong() { }
+
     @CdrRead
     private void start_block() {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("start_block");
+        // if (outerValueDone)
+        if (!isChunked) {
+            return;
         }
-		
-        try {
-            // if (outerValueDone)
-            if (!isChunked) {
-                return;
-            }
-            
-            // if called from alignAndCheck, need to reset blockLength
-            // to avoid an infinite recursion loop on read_long() call
+
+        // if called from alignAndCheck, need to reset blockLength
+        // to avoid an infinite recursion loop on read_long() call
+        blockLength = maxBlockLength;
+
+        blockLength = read_long();
+        blockLength( blockLength ) ;
+
+        // Must remember where we began the chunk to calculate how far
+        // along we are.  See notes above about chunkBeginPos.
+
+        if (blockLength > 0 && blockLength < maxBlockLength) {
+            blockLength += get_offset();  // _REVISIT_ unsafe, should use a Java long
+            // inBlock = true;
+        } else {
+            // System.out.println("start_block snooped a " + Integer.toHexString(blockLength));
+            // not a chunk length field
             blockLength = maxBlockLength;
 
-            blockLength = read_long();
-	    blockLength( blockLength ) ;
-
-            // Must remember where we began the chunk to calculate how far
-            // along we are.  See notes above about chunkBeginPos.
-
-            if (blockLength > 0 && blockLength < maxBlockLength) {
-                blockLength += get_offset();  // _REVISIT_ unsafe, should use a Java long
-                // inBlock = true;
-            } else {
-                // System.out.println("start_block snooped a " + Integer.toHexString(blockLength));
-                // not a chunk length field
-                blockLength = maxBlockLength;
-
-                bbwi.position(bbwi.position() - 4);
-                if (orb.cdrDebugFlag) {
-                    dputil.info("unread last long!");
-                }
-            }
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit();
-            }
+            bbwi.position(bbwi.position() - 4);
+            unreadLastLong() ;
         }
     }
+
+    @InfoMethod
+    private void peekNextLong( long val ) { }
 
     // Makes sure that if we were reading a chunked value, we end up
     // at the right place in the stream, no matter how little the
@@ -1820,100 +1733,78 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     // in position to read the end tag.
     @CdrRead
     private void handleEndOfValue() {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("handleEndOfValue");
+        // If we're not chunking, we don't have to worry about
+        // skipping remaining chunks or finding end tags
+        if (!isChunked) {
+            return;
         }
 
-        try {
-            // If we're not chunking, we don't have to worry about
-            // skipping remaining chunks or finding end tags
-            if (!isChunked) {
-                return;
-            }
+        // Skip any remaining chunks
+        while (blockLength != maxBlockLength) {
+            end_block();
+            start_block();
+        }
 
-            // Skip any remaining chunks
-            while (blockLength != maxBlockLength) {
-                end_block();
-                start_block();
-            }
+        // Now look for the end tag
 
-            // Now look for the end tag
+        // This is a little wasteful since we're reading
+        // this long up to 3 times in the worst cases (once
+        // in start_block, once here, and once in readEndTag
+        //
+        // Peek next long
+        int nextLong = read_long();
+        peekNextLong( nextLong ) ;
+        bbwi.position(bbwi.position() - 4);
 
-            // This is a little wasteful since we're reading
-            // this long up to 3 times in the worst cases (once
-            // in start_block, once here, and once in readEndTag
-            // 
-            // Peek next long
-            if (orb.cdrDebugFlag) {
-                dputil.info("peeking (not reading!) next long!");
-            }
-            int nextLong = read_long();
-            bbwi.position(bbwi.position() - 4);
+        // We did find an end tag, so we're done.  readEndTag
+        // should take care of making sure it's the correct
+        // end tag, etc.  Remember that since end tags,
+        // chunk lengths, and valuetags have non overlapping
+        // ranges, we can tell by the value what the longs are.
+        if (nextLong < 0) {
+            return;
+        }
 
-            // We did find an end tag, so we're done.  readEndTag
-            // should take care of making sure it's the correct
-            // end tag, etc.  Remember that since end tags,
-            // chunk lengths, and valuetags have non overlapping
-            // ranges, we can tell by the value what the longs are.
-            if (nextLong < 0) {
-                return;
-            }
+        if (nextLong == 0 || nextLong >= maxBlockLength) {
 
-            if (nextLong == 0 || nextLong >= maxBlockLength) {
-
-                // A custom marshaled valuetype left extra data
-                // on the wire, and that data had another
-                // nested value inside of it.  We've just
-                // read the value tag or null of that nested value.
-                //
-                // In an attempt to get by it, we'll try to call
-                // read_value() to get the nested value off of
-                // the wire.  Afterwards, we must call handleEndOfValue
-                // recursively to read any further chunks that the containing
-                // valuetype might still have after the nested
-                // value.  
-                read_value();
-                handleEndOfValue();
-            } else {
-                // This probably means that the code to skip chunks has
-                // an error, and ended up setting blockLength to something
-                // other than maxBlockLength even though we weren't 
-                // starting a new chunk.
-                throw wrapper.couldNotSkipBytes( CompletionStatus.COMPLETED_MAYBE,
-                                                         nextLong , get_offset() ) ;
-            }
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit();
-            }
+            // A custom marshaled valuetype left extra data
+            // on the wire, and that data had another
+            // nested value inside of it.  We've just
+            // read the value tag or null of that nested value.
+            //
+            // In an attempt to get by it, we'll try to call
+            // read_value() to get the nested value off of
+            // the wire.  Afterwards, we must call handleEndOfValue
+            // recursively to read any further chunks that the containing
+            // valuetype might still have after the nested
+            // value.
+            read_value();
+            handleEndOfValue();
+        } else {
+            // This probably means that the code to skip chunks has
+            // an error, and ended up setting blockLength to something
+            // other than maxBlockLength even though we weren't
+            // starting a new chunk.
+            throw wrapper.couldNotSkipBytes( CompletionStatus.COMPLETED_MAYBE,
+                                                     nextLong , get_offset() ) ;
         }
     }
 
     @CdrRead
     private void end_block() {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("end_block");
-        }
-
-        try {
-            // if in a chunk, check for underflow or overflow
-            if (blockLength != maxBlockLength) {
-                if (blockLength == get_offset()) {
-                    // Chunk ended correctly
-                    blockLength = maxBlockLength;
+        // if in a chunk, check for underflow or overflow
+        if (blockLength != maxBlockLength) {
+            if (blockLength == get_offset()) {
+                // Chunk ended correctly
+                blockLength = maxBlockLength;
+            } else {
+                // Skip over anything left by bad unmarshaling code (ex:
+                // a buggy custom unmarshaler).  See handleEndOfValue.
+                if (blockLength > get_offset()) {
+                    skipToOffset(blockLength);
                 } else {
-                    // Skip over anything left by bad unmarshaling code (ex:
-                    // a buggy custom unmarshaler).  See handleEndOfValue.
-                    if (blockLength > get_offset()) {
-                        skipToOffset(blockLength);
-                    } else {
-                        throw wrapper.badChunkLength( blockLength, get_offset() ) ;
-                    }
+                    throw wrapper.badChunkLength( blockLength, get_offset() ) ;
                 }
-            }
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit();
             }
         }
     }
@@ -2266,37 +2157,28 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         return bufferManagerRead;
     }
 
+    @CdrRead
     private void skipToOffset(int offset) {
-        if (orb.cdrDebugFlag) {
-            dputil.enter("skipToOffset", "offset", offset);
-        }
+        // Number of bytes to skip
+        int len = offset - get_offset();
 
-        try {
-            // Number of bytes to skip
-            int len = offset - get_offset();
+        int n = 0;
 
-            int n = 0;
+        while (n < len) {
+            int avail;
+            int bytes;
+            int wanted;
 
-            while (n < len) {
-                int avail;
-                int bytes;
-                int wanted;
-
+            avail = bbwi.getLength() - bbwi.position();
+            if (avail <= 0) {
+                grow(1, 1);
                 avail = bbwi.getLength() - bbwi.position();
-                if (avail <= 0) {
-                    grow(1, 1);
-                    avail = bbwi.getLength() - bbwi.position();
-                }
+            }
 
-                wanted = len - n;
-                bytes = (wanted < avail) ? wanted : avail;
-                bbwi.position(bbwi.position() + bytes);
-                n += bytes;
-            }
-        } finally {
-            if (orb.cdrDebugFlag) {
-                dputil.exit();
-            }
+            wanted = len - n;
+            bytes = (wanted < avail) ? wanted : avail;
+            bbwi.position(bbwi.position() + bytes);
+            n += bytes;
         }
     }
 
@@ -2381,6 +2263,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
      * on the URL that came with the value.  The second
      * attempt is to use a URL from the remote CodeBase.
      */
+    @CdrRead
     private Class<?> getClassFromString(String repositoryIDString,
                                      String codebaseURL,
                                      Class<?> expectedType)
@@ -2424,7 +2307,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                     return repositoryID.getClassFromType(expectedType,
                                                          codebaseURL);
                 } catch (ClassNotFoundException cnfeInner) {
-                    dprintThrowable(cnfeInner);
                     // Failed to load the class
                     return null;
                 }
@@ -2483,18 +2365,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         }
     
         return wcharConverter;
-    }
-
-    protected void dprintThrowable(Throwable t) {
-        if (orb.cdrDebugFlag && t != null) {
-            t.printStackTrace();
-        }
-    }
-
-    protected void dprint(String msg) {
-        if (orb.cdrDebugFlag) {
-            ORBUtility.dprint(this, msg);
-	}
     }
 
     /**
@@ -2591,7 +2461,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         start_block();
     }
 
+    @InfoMethod
+    private void bufferMessage( String head, int bbAddr, String tail ) { }
+
     @Override
+    @CdrRead
     public void close() throws IOException
     {
 
@@ -2626,15 +2500,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
             // release this stream's ByteBuffer to the pool
             ByteBufferPool byteBufferPool = orb.getByteBufferPool();
-            if (orb.cdrDebugFlag)
-            {
+            if (orb.cdrDebugFlag) {
                 // print address of ByteBuffer being released
                 int bbAddress = System.identityHashCode(bbwi.getByteBuffer());
-                StringBuffer sb = new StringBuffer(80);
-                sb.append(".close - releasing ByteBuffer id (");
-                sb.append(bbAddress).append(") to ByteBufferPool.");
-                String msg = sb.toString();
-                dprint(msg);
+                bufferMessage(".close - releasing ByteBuffer id (",
+                    bbAddress, ") to ByteBufferPool." );
             }
             byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
             bbwi.setByteBuffer(null);

@@ -59,33 +59,10 @@ import com.sun.corba.se.impl.logging.UtilSystemException;
 import com.sun.corba.se.impl.logging.OMGSystemException;
 
 import com.sun.corba.se.impl.orbutil.DprintUtil ;
+import com.sun.corba.se.spi.trace.StreamFormatVersion;
 
 public abstract class InputStreamHook extends ObjectInputStream
 {
-    protected final DprintUtil dputil = new DprintUtil( this ) ;
-
-    // Set to the SUN ORB if the ORB is from Sun, otherwise null.
-    // Used for debugging purposes.
-    private com.sun.corba.se.spi.orb.ORB sunORB = null ;
-    private boolean sfvDebug = false ;
-    private boolean vhDebug = false ;
-
-    protected void setORB( org.omg.CORBA.ORB orb ) {
-        if (orb instanceof com.sun.corba.se.spi.orb.ORB) {
-            sunORB = (com.sun.corba.se.spi.orb.ORB)orb ;
-            sfvDebug = sunORB.streamFormatVersionDebugFlag ;
-            vhDebug = sunORB.valueHandlerDebugFlag ;
-        }
-    }
-
-    protected boolean streamFormatVersionDebug() {
-        return sfvDebug ;
-    }
-
-    protected boolean valueHandlerDebug() {
-        return vhDebug ;
-    }
-
     // These should be visible in all the nested classes
     static final OMGSystemException omgWrapper = 
 	ORB.getStaticLogWrapperTable().get_RPC_ENCODING_OMG() ;
@@ -228,22 +205,15 @@ public abstract class InputStreamHook extends ObjectInputStream
     }
 
     @Override
+    @StreamFormatVersion
     public void defaultReadObject()
 	throws IOException, ClassNotFoundException, NotActiveException
     {
-        if (sunORB.streamFormatVersionDebugFlag)
-            dputil.enter( "defaultReadObject" ) ;
+        readObjectState.beginDefaultReadObject(this);
 
-        try {
-            readObjectState.beginDefaultReadObject(this);
+        defaultReadObjectDelegate();
 
-            defaultReadObjectDelegate();
-
-            readObjectState.endDefaultReadObject(this);
-        } finally {
-            if (sunORB.streamFormatVersionDebugFlag)
-                dputil.exit() ;
-        }
+        readObjectState.endDefaultReadObject(this);
     }
 
     public abstract void defaultReadObjectDelegate();
@@ -292,24 +262,17 @@ public abstract class InputStreamHook extends ObjectInputStream
     // we have a readObject method and whether or not the
     // sender wrote default data
 
+    @StreamFormatVersion
     protected void setState(ReadObjectState newState) {
-        if (sunORB.streamFormatVersionDebugFlag) {
-            dputil.enter( "setState", "newState" + newState ) ;
-        }
-
         readObjectState = newState;
-
-        if (sunORB.streamFormatVersionDebugFlag) {
-            dputil.exit() ;
-        }
     }
 
     protected abstract byte getStreamFormatVersion();
     protected abstract org.omg.CORBA_2_3.portable.InputStream getOrbStream();
 
     // Description of possible actions
+    @StreamFormatVersion
     protected static class ReadObjectState {
-        private final DprintUtil dputil = new DprintUtil( this ) ;
         private final String name ;
 
         public ReadObjectState() {
@@ -318,76 +281,30 @@ public abstract class InputStreamHook extends ObjectInputStream
             name = className.substring( index + 1 ) ;
         }
 
+        @StreamFormatVersion
         public final void beginUnmarshalCustomValue(InputStreamHook stream, boolean calledDefaultWriteObject, 
             boolean hasReadObject) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "beginUnmarshalCustomValue", "calledDefaultWriteObject", 
-                    calledDefaultWriteObject, "hasReadObject", hasReadObject ) ;
-            }
-    
-            try {
-                beginUnmarshalCustomValueOverride( stream, calledDefaultWriteObject, hasReadObject ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            beginUnmarshalCustomValueOverride( stream, calledDefaultWriteObject, hasReadObject ) ;
         }
 
+        @StreamFormatVersion
         public final void endUnmarshalCustomValue(InputStreamHook stream) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "endUnmarshalCustomValue" ) ;
-            }
-    
-            try {
-                endUnmarshalCustomValueOverride( stream ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            endUnmarshalCustomValueOverride( stream ) ;
         }
 
+        @StreamFormatVersion
         public final void beginDefaultReadObject(InputStreamHook stream) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "beginDefaultReadObject" ) ;
-            }
-    
-            try {
-                beginDefaultReadObjectOverride( stream ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            beginDefaultReadObjectOverride( stream ) ;
         }
 
+        @StreamFormatVersion
         public final void endDefaultReadObject(InputStreamHook stream) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "endDefaultReadObject" ) ;
-            }
-    
-            try {
-                endDefaultReadObjectOverride( stream ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            endDefaultReadObjectOverride( stream ) ;
         }
 
+        @StreamFormatVersion
         public final void readData(InputStreamHook stream) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "readData" ) ;
-            }
-    
-            try {
-                readDataOverride( stream ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            readDataOverride( stream ) ;
         }
 
         public void beginUnmarshalCustomValueOverride(InputStreamHook stream, 

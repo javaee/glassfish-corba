@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -46,10 +46,12 @@ package com.sun.corba.se.impl.oa.toa;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedData;
 
+@com.sun.corba.se.spi.trace.TransientObjectManager
 @ManagedData
 @Description( "Maintains mapping from Object ID to servant")
 public final class TransientObjectManager {
@@ -64,9 +66,6 @@ public final class TransientObjectManager {
     private synchronized Element[] getElements() {
         return elementArray.clone() ;
     }
-    void dprint( String msg ) {
-	ORBUtility.dprint( this, msg ) ;
-    }
 
     public TransientObjectManager( ORB orb )
     {
@@ -79,6 +78,7 @@ public final class TransientObjectManager {
         freeList = elementArray[0];
     }
 
+    @com.sun.corba.se.spi.trace.TransientObjectManager
     public synchronized byte[] storeServant(java.lang.Object servant, java.lang.Object servantData)
     {
         if ( freeList == null ) 
@@ -88,58 +88,47 @@ public final class TransientObjectManager {
         freeList = (Element)freeList.servant;
         
         byte[] result = elem.getKey(servant, servantData);
-	if (orb.transientObjectManagerDebugFlag)
-	    dprint( "storeServant returns key for element " + elem ) ;
 	return result ;
     }
 
+    @com.sun.corba.se.spi.trace.TransientObjectManager
     public synchronized java.lang.Object lookupServant(byte transientKey[]) 
     {
         int index = ORBUtility.bytesToInt(transientKey,0);
         int counter = ORBUtility.bytesToInt(transientKey,4);
 
-	if (orb.transientObjectManagerDebugFlag)
-	    dprint( "lookupServant called with index=" + index + ", counter=" + counter ) ;
-
         if (elementArray[index].counter == counter &&
             elementArray[index].valid ) {
-	    if (orb.transientObjectManagerDebugFlag)
-	        dprint( "\tcounter is valid" ) ;
             return elementArray[index].servant;
 	}
 
         // servant not found 
-	if (orb.transientObjectManagerDebugFlag)
-	    dprint( "\tcounter is invalid" ) ;
         return null;
     }
 
+    @com.sun.corba.se.spi.trace.TransientObjectManager
     public synchronized java.lang.Object lookupServantData(byte transientKey[])
     {
         int index = ORBUtility.bytesToInt(transientKey,0);
         int counter = ORBUtility.bytesToInt(transientKey,4);
 
-	if (orb.transientObjectManagerDebugFlag)
-	    dprint( "lookupServantData called with index=" + index + ", counter=" + counter ) ;
-
         if (elementArray[index].counter == counter &&
             elementArray[index].valid ) {
-	    if (orb.transientObjectManagerDebugFlag)
-	        dprint( "\tcounter is valid" ) ;
             return elementArray[index].servantData;
 	}
 
         // servant not found 
-	if (orb.transientObjectManagerDebugFlag)
-	    dprint( "\tcounter is invalid" ) ;
         return null;
     }
 
+    @InfoMethod
+    private void deleteAtIndex( int index ) { }
+
+    @com.sun.corba.se.spi.trace.TransientObjectManager
     public synchronized void deleteServant(byte transientKey[])
     {
         int index = ORBUtility.bytesToInt(transientKey,0);
-	if (orb.transientObjectManagerDebugFlag)
-	    dprint( "deleting servant at index=" + index ) ;
+        deleteAtIndex(index);
 
         elementArray[index].delete(freeList);
         freeList = elementArray[index];
@@ -248,6 +237,7 @@ final class Element {
         servant = freeList;
     }
 
+    @Override
     public String toString() 
     {
 	return "Element[" + index + ", " + counter + "]" ;

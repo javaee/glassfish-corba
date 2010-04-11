@@ -48,12 +48,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.DigestOutputStream;
 import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
-import java.security.PrivilegedActionException;
 import java.security.PrivilegedAction;
 
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -64,7 +61,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.io.IOException;
 import java.io.DataOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InvalidClassException;
 import java.io.Serializable;
 import java.io.Externalizable;
 
@@ -81,6 +77,7 @@ import org.omg.CORBA.ValueMember;
 import sun.corba.Bridge;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.spi.trace.TraceValueHandler;
 
 /**
  * A ObjectStreamClass describes a class that can be serialized to a stream
@@ -94,6 +91,7 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
  * @(#)ObjectStreamClass.java	1.17 99/06/07
  * @since   JDK1.1
  */
+@TraceValueHandler
 public class ObjectStreamClass implements java.io.Serializable {
     private static final boolean DEBUG_SVUID = false ;
 
@@ -117,6 +115,7 @@ public class ObjectStreamClass implements java.io.Serializable {
      * is returned if the specified class does not implement
      * java.io.Serializable or java.io.Externalizable.
      */
+    @TraceValueHandler
     static final ObjectStreamClass lookup(Class cl) {
 	ObjectStreamClass desc = lookupInternal(cl);
 	if (desc.isSerializable() || desc.isExternalizable())
@@ -359,6 +358,7 @@ public class ObjectStreamClass implements java.io.Serializable {
     /**
      * Return a string describing this ObjectStreamClass.
      */
+    @Override
     public final String toString() {
 	StringBuffer sb = new StringBuffer();
 
@@ -1282,7 +1282,7 @@ public class ObjectStreamClass implements java.io.Serializable {
     /*
      * Cache of Class -> ClassDescriptor Mappings.
      */
-    static private SoftCache<Class<?>,ObjectStreamClass> descriptorFor = 
+    static private final SoftCache<Class<?>,ObjectStreamClass> descriptorFor =
 	new SoftCache<Class<?>,ObjectStreamClass>() ;
 
     private static Field[] getDeclaredFields(final Class clz) {
@@ -1356,7 +1356,7 @@ public class ObjectStreamClass implements java.io.Serializable {
     private boolean initialized = false;
 
     /* Internal lock object. */
-    private Object lock = new Object();
+    private final Object lock = new Object();
 
     /* In JDK 1.1, external data was not written in block mode.
      * As of JDK 1.2, external data is written in block data mode. This

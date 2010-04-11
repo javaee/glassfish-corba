@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,52 +45,25 @@
 package com.sun.corba.se.impl.io;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectOutput;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.omg.CORBA.INTERNAL;
-
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.orbutil.DprintUtil ;
+import com.sun.corba.se.spi.trace.StreamFormatVersion;
 
+@StreamFormatVersion
 public abstract class OutputStreamHook extends ObjectOutputStream
 {
-    protected final DprintUtil dputil = new DprintUtil( this ) ;
-
     private HookPutFields putFields = null;
     
-    // Set to the SUN ORB if the ORB is from Sun, otherwise null.
-    // Used for debugging purposes.
-    private ORB sunORB = null ;
-    private boolean sfvDebug = false ;
-    private boolean vhDebug = false ;
-
-    protected void setORB( org.omg.CORBA.ORB orb ) {
-        if (orb instanceof ORB) {
-            sunORB = (ORB)orb ;
-            sfvDebug = sunORB.streamFormatVersionDebugFlag ;
-            vhDebug = sunORB.valueHandlerDebugFlag ;
-        }
-    }
-
-    protected boolean streamFormatVersionDebug() {
-        return sfvDebug ;
-    }
-
-    protected boolean valueHandlerDebug() {
-        return vhDebug ;
-    }
-
     /**
      * Since ObjectOutputStream.PutField methods specify no exceptions,
      * we are not checking for null parameters on put methods.
      */
-    private class HookPutFields extends ObjectOutputStream.PutField
-    {
+    private class HookPutFields extends ObjectOutputStream.PutField {
 	private Map<String,Object> fields = new HashMap<String,Object>();
 
 	/**
@@ -185,22 +158,17 @@ public abstract class OutputStreamHook extends ObjectOutputStream
 		
     }
 
+    @StreamFormatVersion
+    @Override
     public void defaultWriteObject() throws IOException {
-        if (sunORB.streamFormatVersionDebugFlag)
-            dputil.enter( "defaultWriteObject" ) ;
+        writeObjectState.defaultWriteObject(this);
 
-        try {
-            writeObjectState.defaultWriteObject(this);
-
-            defaultWriteObjectDelegate();
-        } finally {
-            if (sunORB.streamFormatVersionDebugFlag)
-                dputil.exit() ;
-        }
+        defaultWriteObjectDelegate();
     }
 
     public abstract void defaultWriteObjectDelegate();
 	
+    @Override
     public ObjectOutputStream.PutField putFields()
 	throws IOException {
 	putFields = new HookPutFields();
@@ -220,6 +188,8 @@ public abstract class OutputStreamHook extends ObjectOutputStream
 
     // User uses PutFields to simulate default data.
     // See java.io.ObjectOutputStream.PutFields
+    @Override
+    @StreamFormatVersion
     public void writeFields()
 	throws IOException {
 
@@ -241,16 +211,9 @@ public abstract class OutputStreamHook extends ObjectOutputStream
 
     protected WriteObjectState writeObjectState = NOT_IN_WRITE_OBJECT;
     
+    @StreamFormatVersion
     protected void setState(WriteObjectState newState) {
-        if (sunORB.streamFormatVersionDebugFlag) {
-            dputil.enter( "setState", "newState", newState ) ;
-        }
-
         writeObjectState = newState;
-
-        if (sunORB.streamFormatVersionDebugFlag) {
-            dputil.exit() ;
-        }
     }
 
     protected static final WriteObjectState NOT_IN_WRITE_OBJECT = new DefaultState();
@@ -259,8 +222,8 @@ public abstract class OutputStreamHook extends ObjectOutputStream
     protected static final WriteObjectState WROTE_CUSTOM_DATA = new WroteCustomDataState();
 
     // Description of possible actions
+    @StreamFormatVersion
     protected static class WriteObjectState {
-        private final DprintUtil dputil = new DprintUtil( this ) ;
         private final String name ;
 
         public WriteObjectState() {
@@ -269,60 +232,24 @@ public abstract class OutputStreamHook extends ObjectOutputStream
             name = className.substring( index + 1 ) ;
         }
 
+        @StreamFormatVersion
         public final void enterWriteObject(OutputStreamHook stream) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "enterWriteObject" ) ;
-            }
-
-            try {
-                enterWriteObjectOverride( stream ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            enterWriteObjectOverride( stream ) ;
         }
 
+        @StreamFormatVersion
         public final void exitWriteObject(OutputStreamHook stream) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "exitWriteObject" ) ;
-            }
-
-            try {
-                exitWriteObjectOverride( stream ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            exitWriteObjectOverride( stream ) ;
         }
 
+        @StreamFormatVersion
         public final void defaultWriteObject(OutputStreamHook stream) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "defaultWriteObject" ) ;
-            }
-
-            try {
-                defaultWriteObjectOverride( stream ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            defaultWriteObjectOverride( stream ) ;
         }
 
+        @StreamFormatVersion
         public final void writeData(OutputStreamHook stream) throws IOException {
-            if (stream.streamFormatVersionDebug()) {
-                dputil.enter( "writeData" ) ;
-            }
-
-            try {
-                writeDataOverride( stream ) ;
-            } finally {
-                if (stream.streamFormatVersionDebug()) {
-                    dputil.exit() ;
-                }
-            }
+            writeDataOverride( stream ) ;
         }
 
         public void enterWriteObjectOverride(OutputStreamHook stream) throws IOException {}
@@ -330,24 +257,33 @@ public abstract class OutputStreamHook extends ObjectOutputStream
         public void defaultWriteObjectOverride(OutputStreamHook stream) throws IOException {}
         public void writeDataOverride(OutputStreamHook stream) throws IOException {}
 
+        @Override
         public String toString() {
             return name ;
         }
     }
 
+    @StreamFormatVersion
     protected static class DefaultState extends WriteObjectState {
+        @Override
+        @StreamFormatVersion
         public void enterWriteObjectOverride(OutputStreamHook stream) throws IOException {
             stream.setState(IN_WRITE_OBJECT);
         }
     }
 
+    @StreamFormatVersion
     protected static class InWriteObjectState extends WriteObjectState {
 
+        @Override
+        @StreamFormatVersion
         public void enterWriteObjectOverride(OutputStreamHook stream) throws IOException {
 	    // XXX I18N, logging needed.
             throw new IOException("Internal state failure: Entered writeObject twice");
         }
         
+        @Override
+        @StreamFormatVersion
         public void exitWriteObjectOverride(OutputStreamHook stream) throws IOException {
 
             // We didn't write any data, so write the
@@ -363,6 +299,8 @@ public abstract class OutputStreamHook extends ObjectOutputStream
             stream.setState(NOT_IN_WRITE_OBJECT);
         }
 
+        @Override
+        @StreamFormatVersion
         public void defaultWriteObjectOverride(OutputStreamHook stream) throws IOException {
 
             // The writeObject method called defaultWriteObject
@@ -373,6 +311,8 @@ public abstract class OutputStreamHook extends ObjectOutputStream
             stream.setState(WROTE_DEFAULT_DATA);
         }
 
+        @Override
+        @StreamFormatVersion
         public void writeDataOverride(OutputStreamHook stream) throws IOException {
 
             // The writeObject method first called a direct
@@ -386,8 +326,10 @@ public abstract class OutputStreamHook extends ObjectOutputStream
         }
     }
 
+    @StreamFormatVersion
     protected static class WroteDefaultDataState extends InWriteObjectState {
-        
+        @Override
+        @StreamFormatVersion
         public void exitWriteObjectOverride(OutputStreamHook stream) throws IOException {
 
             // We only wrote default data, so if in stream format
@@ -399,11 +341,15 @@ public abstract class OutputStreamHook extends ObjectOutputStream
             stream.setState(NOT_IN_WRITE_OBJECT);
         }
 
+        @Override
+        @StreamFormatVersion
         public void defaultWriteObjectOverride(OutputStreamHook stream) throws IOException {
 	    // XXX I18N, logging needed.
             throw new IOException("Called defaultWriteObject/writeFields twice");
         }
 
+        @Override
+        @StreamFormatVersion
         public void writeDataOverride(OutputStreamHook stream) throws IOException {
 
             // The writeObject method called a direct write operation.
@@ -415,8 +361,10 @@ public abstract class OutputStreamHook extends ObjectOutputStream
         }
     }
 
+    @StreamFormatVersion
     protected static class WroteCustomDataState extends InWriteObjectState {
-
+        @Override
+        @StreamFormatVersion
         public void exitWriteObjectOverride(OutputStreamHook stream) throws IOException {
             // In stream format version 2, we must tell the ORB
             // stream to close the fake custom valuetype.
@@ -426,6 +374,8 @@ public abstract class OutputStreamHook extends ObjectOutputStream
             stream.setState(NOT_IN_WRITE_OBJECT);
         }
 
+        @Override
+        @StreamFormatVersion
         public void defaultWriteObjectOverride(OutputStreamHook stream) 
 	    throws IOException {
 	    
@@ -437,6 +387,7 @@ public abstract class OutputStreamHook extends ObjectOutputStream
 
         // We don't have to do anything special here, just let
         // the stream write the data.
+        @Override
         public void writeDataOverride(OutputStreamHook stream) throws IOException {}
     }
 }

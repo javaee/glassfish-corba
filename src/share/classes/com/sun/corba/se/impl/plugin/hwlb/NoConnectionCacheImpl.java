@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2005-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -46,7 +46,6 @@ import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
 
 import com.sun.corba.se.spi.transport.CorbaConnection ;
 import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache ;
-import com.sun.corba.se.spi.transport.CorbaContactInfo ;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject ;
 
@@ -62,7 +61,6 @@ import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 import com.sun.corba.se.spi.ior.IOR ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 import com.sun.corba.se.impl.transport.CorbaConnectionCacheBase ;
 import com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl ;
@@ -74,31 +72,29 @@ import com.sun.corba.se.impl.protocol.CorbaClientRequestDispatcherImpl ;
 
 import com.sun.corba.se.impl.transport.SocketOrChannelContactInfoImpl ;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 
 /** Install this in an ORB using the property 
  * ORBConstants.USER_CONFIGURATOR_PREFIX + "corba.lb.NoConnectionCacheImpl" = "dummy"
  */
+@Transport
 public class NoConnectionCacheImpl
     extends LocalObject
     implements ORBConfigurator
 {
+    @Transport
     private static class NCCConnectionCacheImpl extends CorbaConnectionCacheBase
 	implements CorbaOutboundConnectionCache {
 	// store is a dummy variable
 	private Map store = new HashMap() ;
-	private boolean debug ;
 
 	// holds only one connection
 	private CorbaConnection connection = null ;
 
-	public void dprint( String msg ) {
-	    ORBUtility.dprint("NCCConnectionCacheImpl",msg) ;
-	}
-
 	public NCCConnectionCacheImpl( ORB orb ) {
 	    super( orb, "Dummy", "Dummy" ) ;
-	    debug = orb.transportDebugFlag ;
 	}
 
 	public Collection values() {
@@ -113,42 +109,27 @@ public class NoConnectionCacheImpl
 	    return connection ;
 	}
 
+        @Transport
 	public void put(CorbaContactInfo contactInfo, CorbaConnection conn ) {
-	    if (debug) {
-		dprint( "put-> " + conn ) ;
-	    }
-
-	    try {
-		remove( contactInfo ) ;
-		connection = conn ;
-	    } finally {
-		if (debug) {
-		    dprint( "put<-" ) ;
-		}
-	    }
+            remove( contactInfo ) ;
+            connection = conn ;
 	}
 
+        @InfoMethod
+        private void removeConnectionInfo( CorbaConnection conn ) { }
+
+        @InfoMethod
+        private void connectionIsNull() { }
+
+        @Transport
 	public void remove(CorbaContactInfo contactInfo) {
-	    if (debug) {
-		dprint( "remove->" ) ;
-	    }
-	    try {
-		if (connection != null) {
-		    if (debug) {
-			dprint( "remove: closing connection " + connection ) ;
-		    }
-		    connection.close() ;
-		    connection = null ;
-		} else {
-		    if (debug) {
-			dprint( "remove: connection is null" ) ;
-		    }
-		}
-	    } finally {
-		if (debug) {
-		    dprint( "remove<-" ) ;
-		}
-	    }
+            if (connection != null) {
+                removeConnectionInfo(connection);
+                connection.close() ;
+                connection = null ;
+            } else {
+                connectionIsNull();
+            }
 	}
     }
 
@@ -164,51 +145,38 @@ public class NoConnectionCacheImpl
 	return result ;
     }
 
+    @Transport
     private static class NCCConnectionImpl extends SocketOrChannelConnectionImpl {
 	private static int count = 0 ;
 	private int myCount ;
-	private boolean debug ;
 
-	public void dprint( String msg ) {
-	    ORBUtility.dprint( "NCCConnectionImpl", msg ) ;
-	}
+        @Transport
+        private void constructedNCCConnectionImpl( String str ) {
+        }
 
         public NCCConnectionImpl(ORB orb, CorbaContactInfo contactInfo, 
 		String socketType, String hostname, int port) {
 
 	    super(orb,contactInfo, socketType, hostname, port);
 	    myCount = count++ ;
-
-	    if (debug) {
-		dprint( "constructed new NCCConnectionImpl: " + toString() ) ;
-	    }
+            constructedNCCConnectionImpl(toString());
 	}
 
+        @Override
 	public String toString() {
 	    return "NCCConnectionImpl(" + myCount + ")["
 		+ super.toString() + "]" ;
 	}
 
+        @Transport
+        @Override
         public synchronized void close() {  
-	    if (debug) {
-		dprint( "close->: " + this ) ;
-	    }
-
             super.closeConnectionResources() ;
-            
-            if (debug) {
-		    dprint( "close<-: " + this ) ;
-            }
 	}
     }
 
+    @Transport
     private static class NCCContactInfoImpl extends SocketOrChannelContactInfoImpl {
-	private boolean debug ;
-
-	public void dprint( String msg ) {
-	    ORBUtility.dprint( "NCCContactInfoImpl", msg ) ;
-	}
-
 	public NCCContactInfoImpl( ORB orb,
 	    CorbaContactInfoList contactInfoList, IOR effectiveTargetIOR,
 	    short addressingDisposition, String socketType, String hostname,
@@ -216,36 +184,28 @@ public class NoConnectionCacheImpl
 
 	    super( orb, contactInfoList, effectiveTargetIOR, addressingDisposition,
 		    socketType, hostname, port ) ;
-	    debug = orb.transportDebugFlag ;
 	}
 
+        @Transport
+        @Override
 	public boolean shouldCacheConnection() {
-	    if (debug) {
-		dprint("shouldCacheConnection : returns false" ) ; 
-	    }
 	    return false ;
 	}
 
-	public CorbaConnection createConnection() {
-	    if (debug) {
-		dprint( "createConnection->" ) ;
-	    }
-	    try {
-		CorbaConnection connection = new NCCConnectionImpl( orb, this,
-		    socketType, hostname, port ) ;
-		if (debug) {
-		    dprint( "createConnection: created " + connection ) ;
-		}
-		NCCConnectionCacheImpl cc = NoConnectionCacheImpl.getConnectionCache( orb ) ;
-		cc.put( this, connection ) ;
-		connection.setConnectionCache( cc ) ;
+        @InfoMethod
+        private void createdConnection( CorbaConnection conn ) { }
 
-		return connection ;
-	    } finally {
-		if (debug) {
-		    dprint( "createConnection<-" ) ;
-		}
-	    }
+        @Transport
+        @Override
+	public CorbaConnection createConnection() {
+            CorbaConnection connection = new NCCConnectionImpl( orb, this,
+                socketType, hostname, port ) ;
+            createdConnection(connection);
+            NCCConnectionCacheImpl cc = NoConnectionCacheImpl.getConnectionCache( orb ) ;
+            cc.put( this, connection ) ;
+            connection.setConnectionCache( cc ) ;
+
+            return connection ;
 	}
     }
 
@@ -254,6 +214,7 @@ public class NoConnectionCacheImpl
 	    super( orb, ior ) ;
 	}
 
+        @Override
 	public CorbaContactInfo createContactInfo( String type, String hostname, 
 	    int port ) {
 
@@ -263,6 +224,7 @@ public class NoConnectionCacheImpl
     }
 
     private static class NCCClientRequestDispatcherImpl extends CorbaClientRequestDispatcherImpl {
+        @Override
 	public void endRequest( ORB broker, Object self, CDRInputObject inputObject ) {
 	    super.endRequest( broker, self, inputObject) ;
 	    getConnectionCache( broker ).remove( null ) ;

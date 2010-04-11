@@ -136,7 +136,7 @@ import com.sun.corba.se.spi.trace.OrbLifeCycle;
 import com.sun.corba.se.spi.trace.Orbd;
 import com.sun.corba.se.spi.trace.Poa;
 import com.sun.corba.se.spi.trace.PoaFSM;
-import com.sun.corba.se.spi.trace.ServiceContext;
+import com.sun.corba.se.spi.trace.TraceServiceContext;
 import com.sun.corba.se.spi.trace.Shutdown;
 import com.sun.corba.se.spi.trace.StreamFormatVersion;
 import com.sun.corba.se.spi.trace.Subcontract;
@@ -214,7 +214,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     @Naming
     public boolean namingDebugFlag = false ;
 
-    @ServiceContext
+    @TraceServiceContext
     public boolean serviceContextDebugFlag = false ;
 
     @TransientObjectManager

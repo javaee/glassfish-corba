@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1996-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1996-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,6 +44,7 @@ import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.oa.poa.Policies;
 import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
+import com.sun.corba.se.spi.trace.Transport;
 
 /**
  * @author Harold Carr
@@ -58,14 +59,12 @@ public class SocketFactoryAcceptorImpl
 	super(orb, port, name, type);
     }
 
+    @Transport
     @Override
     public boolean initialize()
     {
 	if (initialized) {
 	    return false;
-	}
-	if (orb.transportDebugFlag) {
-	    dprint("initialize: " + this);
 	}
 	try {
 	    serverSocket = orb.getORBData()

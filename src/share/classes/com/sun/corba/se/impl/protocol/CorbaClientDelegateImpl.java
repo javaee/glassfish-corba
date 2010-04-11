@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1996-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1996-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,9 +37,7 @@
 package com.sun.corba.se.impl.protocol;
 
 import java.util.Iterator;
-import java.util.HashMap;
 
-import javax.rmi.CORBA.Tie;
 
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.Context;
@@ -48,7 +46,6 @@ import org.omg.CORBA.ExceptionList;
 import org.omg.CORBA.NamedValue;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.Request;
-import org.omg.CORBA.TypeCode;
 
 import org.omg.CORBA.portable.ApplicationException;
 import org.omg.CORBA.portable.Delegate;
@@ -61,9 +58,6 @@ import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
 import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
 
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.ior.IOR;
@@ -76,14 +70,14 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
 import com.sun.corba.se.impl.util.JDKBridge;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Subcontract;
 
 // implements com.sun.corba.se.impl.core.ClientRequestDispatcher
 // so RMI-IIOP Util.isLocal can call ClientRequestDispatcher.useLocalInvocation.
@@ -126,16 +120,21 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     // CORBA_2_3.portable.Delegate
     //
     
+    @InfoMethod
+    private void requestInfo( String operation, CorbaContactInfo info ) { }
+
+    @InfoMethod
+    private void retryingRequest( Exception exc ) { }
+
+
+    @Subcontract
+    @Override
     public OutputStream request(org.omg.CORBA.Object self, 
 				String operation, 
 				boolean responseExpected) 
     {
 	tp.enter_totalInvocation() ;
 	try {
-       	    if (orb.subcontractDebugFlag) {
-	        dprint(".request->: op/" + operation);
-	    }
-
 	    OutputStream result = null;
 	    boolean retry;
 	    do {
@@ -168,9 +167,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 			}
 			contactInfo = (CorbaContactInfo)
 			    contactInfoListIterator.next();
-                        if (orb.folbDebugFlag) {
-                            dprint( ".request: op/" + operation + " contactInfo/" + contactInfo ) ;
-                        }
+                        requestInfo( operation, contactInfo ) ;
 		    } finally {
 			tp.exit_hasNextNext() ;
 		    }
@@ -188,19 +185,12 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 						 !responseExpected,
 						 contactInfo);
 		} catch (RuntimeException e) {
-		    if (orb.subcontractDebugFlag) {
-			dprint(".request: op/" + operation 
-			       + ": caught RuntimeException: " + e);
-		    }
 		    // REVISIT: 
 		    // this part similar to BufferManagerWriteStream.overflow()
 		    retry = ((CorbaContactInfoListIterator) 
 			     contactInfoListIterator).reportException(contactInfo, e);
 		    if (retry) {
-			if (orb.subcontractDebugFlag) {
-			    dprint(".request: op/" + operation 
-				   + ": retry as a result of : " + e);
-			}
+                        retryingRequest(e);
 			invocationInfo.setIsRetryInvocation(true);
 		    } else {
 			throw e;
@@ -209,10 +199,6 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    } while (retry);
 	    return result;
 	} finally {
-       	    if (orb.subcontractDebugFlag) {
-	        dprint(".request<- op/" + operation);
-	    }
-
             // Enable operation tracing for argument marshaling
             if (orb.operationTraceDebugFlag) {
                 OperationTracer.enable() ;
@@ -221,6 +207,8 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	}
     }
     
+    @Subcontract
+    @Override
     public InputStream invoke(org.omg.CORBA.Object self, OutputStream output)
 	throws
 	    ApplicationException,
@@ -243,6 +231,8 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
         }
     }
     
+    @Subcontract
+    @Override
     public void releaseReply(org.omg.CORBA.Object self, InputStream input) 
     {
 	try {
@@ -310,82 +300,75 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	return stub;
     }
 
-    public boolean is_a(org.omg.CORBA.Object obj, String dest) 
-    {
-	if (orb.subcontractDebugFlag) {
-	    dprint( ".is_a->: type = " + dest ) ;
-	}
+    @InfoMethod
+    private void foundMyId() { }
 
-	try {
-	    while (true) {
-		// dest is the typeId of the interface to compare against.
-		// repositoryIds is the list of typeIds that the stub knows about.
+    @InfoMethod
+    private void foundIdInRepostioryId() { }
 
-		// First we look for an answer using local information.
+    @InfoMethod
+    private void callingServer() { }
 
-		String [] repositoryIds = StubAdapter.getTypeIds( obj ) ;
-		String myid = contactInfoList.getTargetIOR().getTypeId();
-		if ( dest.equals(myid) ) {
-		    if (orb.subcontractDebugFlag) {
-			dprint( ".is_a: found myid" ) ;
-		    }
-		    return true;
-		}
-		for ( int i=0; i<repositoryIds.length; i++ ) {
-		    if ( dest.equals(repositoryIds[i]) ) {
-			if (orb.subcontractDebugFlag) {
-			    dprint( ".is_a: found id in repository IDs" ) ;
-			}
-			return true;
-		    }
-		}
+    @InfoMethod
+    private void serverReturned() { }
 
-		// But repositoryIds may not be complete, so it may be necessary to
-		// go to server.
+    @InfoMethod
+    private void retryingRequest() { }
 
-		InputStream is = null;
-		try {
-		    if (orb.subcontractDebugFlag) {
-			dprint( ".is_a: calling server for is_a" ) ;
-		    }
+    @Subcontract
+    public boolean is_a(org.omg.CORBA.Object obj, String dest) {
+        while (true) {
+            // dest is the typeId of the interface to compare against.
+            // repositoryIds is the list of typeIds that the stub knows about.
 
-		    OutputStream os = request(null, "_is_a", true);
-		    os.write_string(dest);
-		    is = (InputStream) invoke((org.omg.CORBA.Object) null, os);
+            // First we look for an answer using local information.
+            String [] repositoryIds = StubAdapter.getTypeIds( obj ) ;
+            String myid = contactInfoList.getTargetIOR().getTypeId();
+            if ( dest.equals(myid) ) {
+                foundMyId();
+                return true;
+            }
 
-		    boolean result = is.read_boolean();
-		    if (orb.subcontractDebugFlag) {
-			dprint( ".is_a: server returned " + result ) ;
-		    }
+            for ( int i=0; i<repositoryIds.length; i++ ) {
+                if ( dest.equals(repositoryIds[i]) ) {
+                    foundIdInRepostioryId();
+                    return true;
+                }
+            }
 
-		    return result ;
-		} catch (ApplicationException e) {
-		    // This cannot happen.
-		    throw wrapper.applicationExceptionInSpecialMethod( e ) ;
-		} catch (RemarshalException e) {
-		    // Fall through and retry the operation after a short
-		    // pause
-		    if (orb.subcontractDebugFlag) {
-			dprint( ".is_a: retrying" ) ;
-		    }
-		    try {
-			Thread.sleep( 5 ) ;
-		    } catch (Exception exc) {
-			// ignore the exception
-		    }
-		} finally {
-		    releaseReply((org.omg.CORBA.Object)null, (InputStream)is);
-		}
-	    }
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint( ".is_a<-:" ) ;
-	    }
-	}
+            // But repositoryIds may not be complete, so it may be necessary to
+            // go to server.
+            InputStream is = null;
+            try {
+                callingServer() ;
+
+                OutputStream os = request(null, "_is_a", true);
+                os.write_string(dest);
+                is = (InputStream) invoke((org.omg.CORBA.Object) null, os);
+                boolean result = is.read_boolean();
+
+                serverReturned() ;
+
+                return result ;
+            } catch (ApplicationException e) {
+                // This cannot happen.
+                throw wrapper.applicationExceptionInSpecialMethod( e ) ;
+            } catch (RemarshalException e) {
+                // Fall through and retry the operation after a short
+                // pause
+                retryingRequest();
+                try {
+                    Thread.sleep( 5 ) ;
+                } catch (Exception exc) {
+                    // ignore the exception
+                }
+            } finally {
+                releaseReply((org.omg.CORBA.Object)null, (InputStream)is);
+            }
+        }
     }
     
-    public boolean non_existent(org.omg.CORBA.Object obj) 
-    {
+    public boolean non_existent(org.omg.CORBA.Object obj) {
 	InputStream is = null;
         try {
             OutputStream os = request(null, "_non_existent", true);
@@ -403,11 +386,9 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
         }
     }
     
-    public org.omg.CORBA.Object duplicate(org.omg.CORBA.Object obj) 
-    {
+    public org.omg.CORBA.Object duplicate(org.omg.CORBA.Object obj) {
 	return obj;
     }
-    
     public void release(org.omg.CORBA.Object obj) 
     {
 	// DO NOT clear out internal variables to release memory
@@ -417,8 +398,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     // obj._get_delegate() == this due to the argument passing conventions in
     // portable.ObjectImpl, so we just ignore obj here.
     public boolean is_equivalent(org.omg.CORBA.Object obj,
-				 org.omg.CORBA.Object ref)
-    {
+				 org.omg.CORBA.Object ref) {
 	if ( ref == null )
 	    return false;
 
@@ -449,8 +429,8 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
      * This method overrides the org.omg.CORBA.portable.Delegate.equals method,
      * and does the equality check based on IOR equality.
      */
-    public boolean equals(org.omg.CORBA.Object self, java.lang.Object other) 
-    {
+    @Override
+    public boolean equals(org.omg.CORBA.Object self, java.lang.Object other) {
 	if (other == null)
 	    return false ;
 
@@ -473,21 +453,19 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
         return false;
     }
 
-    public int hashCode(org.omg.CORBA.Object obj)
-    {
+    @Override
+    public int hashCode(org.omg.CORBA.Object obj) {
 	return this.hashCode() ;
     }
 
-    public int hash(org.omg.CORBA.Object obj, int maximum) 
-    {
+    public int hash(org.omg.CORBA.Object obj, int maximum) {
 	int h = this.hashCode();
 	if ( h > maximum )
 	    return 0;
 	return h;
     }
     
-    public Request request(org.omg.CORBA.Object obj, String operation) 
-    {
+    public Request request(org.omg.CORBA.Object obj, String operation) {
 	return new RequestImpl(orb, obj, null, operation, null, null, null,
 			       null);
     }
@@ -496,8 +474,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 				  Context ctx,
 				  String operation,
 				  NVList arg_list,
-				  NamedValue result) 
-    {
+				  NamedValue result) {
 	return new RequestImpl(orb, obj, ctx, operation, arg_list,
 			       result, null, null);
     }
@@ -508,14 +485,13 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 				  NVList arg_list,
 				  NamedValue result,
 				  ExceptionList exclist, 
-				  ContextList ctxlist) 
-    {
+				  ContextList ctxlist) {
 	return new RequestImpl(orb, obj, ctx, operation, arg_list, result,
 			       exclist, ctxlist);
     }
     
-    public org.omg.CORBA.ORB orb(org.omg.CORBA.Object obj) 
-    {
+    @Override
+    public org.omg.CORBA.ORB orb(org.omg.CORBA.Object obj) {
 	return this.orb;
     }
     
@@ -529,25 +505,25 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
      * @return true only if the servant incarnating this object is located in
      * this ORB. 
      */
-    public boolean is_local(org.omg.CORBA.Object self) 
-    {
+    @Override
+    public boolean is_local(org.omg.CORBA.Object self) {
 	// XXX this needs to check isNextCallValid
         return contactInfoList.getEffectiveTargetIOR().getProfile().
 	    isLocal();
     }
     
+    @Override
     public ServantObject servant_preinvoke(org.omg.CORBA.Object self,
 					   String operation,
-					   Class expectedType) 
-    {
+					   Class expectedType) {
 	return
 	    contactInfoList.getLocalClientRequestDispatcher()
 	    .servant_preinvoke(self, operation, expectedType);
     }
     
+    @Override
     public void servant_postinvoke(org.omg.CORBA.Object self,
-				   ServantObject servant) 
-    {
+				   ServantObject servant) {
 	contactInfoList.getLocalClientRequestDispatcher()
 	    .servant_postinvoke(self, servant);
     }
@@ -558,34 +534,23 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
      * @return the codebase as a space delimited list of url strings or
      * null if none.
      */
-    public String get_codebase(org.omg.CORBA.Object self) 
-    {
+    @Override
+    public String get_codebase(org.omg.CORBA.Object self) {
 	if (contactInfoList.getTargetIOR() != null) {
 	    return contactInfoList.getTargetIOR().getProfile().getCodebase();
 	}
 	return null;
     }
 
-    public String toString(org.omg.CORBA.Object self) 
-    {
+    @Override
+    public String toString(org.omg.CORBA.Object self) {
 	return contactInfoList.getTargetIOR().stringify();
     }
-    
-    ////////////////////////////////////////////////////
-    //
-    // java.lang.Object
-    //
 
-    public int hashCode()
-    {
+    @Override
+    public int hashCode() {
 	return this.contactInfoList.hashCode();
     }
-
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaClientDelegateImpl", msg);
-    }
-
 }
 
 // End of file.

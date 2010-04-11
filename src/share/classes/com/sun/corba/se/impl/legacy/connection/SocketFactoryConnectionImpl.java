@@ -46,6 +46,8 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl;
+import com.sun.corba.se.spi.trace.Transport;
+import java.net.Socket;
 
 /**
  * @author Harold Carr
@@ -54,6 +56,9 @@ public class SocketFactoryConnectionImpl
     extends
 	SocketOrChannelConnectionImpl
 {
+    @Transport
+    private void connectionCreated( Socket socket ) { }
+
     // Socket-factory client constructor.
     public SocketFactoryConnectionImpl(ORB orb,
 				       CorbaContactInfo contactInfo,
@@ -81,9 +86,7 @@ public class SocketFactoryConnectionImpl
 		// dedicated reader threads.
 		setUseSelectThreadToWait(false);
 	    }
-	    if (orb.transportDebugFlag) {
-		dprint(".initialize: connection created: " + socket);
-	    }
+            connectionCreated( socket ) ;
 	} catch (GetEndPointInfoAgainException ex) {
 	    throw wrapper.connectFailure(
                 ex, socketInfo.getType(), socketInfo.getHost(),
@@ -109,13 +112,6 @@ public class SocketFactoryConnectionImpl
 		+ "]" ;
         }
     }
-
-    // Note: public to override parent.
-    public void dprint(String msg)
-    {
-	ORBUtility.dprint("SocketFactoryConnectionImpl", msg);
-    }
-
 }
 
 // End of file.

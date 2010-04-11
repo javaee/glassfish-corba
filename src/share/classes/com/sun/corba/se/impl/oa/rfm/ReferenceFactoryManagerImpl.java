@@ -68,10 +68,11 @@ import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 
 import com.sun.corba.se.impl.logging.POASystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.trace.Poa;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedObject;
 
+@Poa
 @ManagedObject
 @Description( "The ReferenceFactoryManager, used to handle dynamic cluster membership updates")
 public class ReferenceFactoryManagerImpl 
@@ -86,16 +87,16 @@ public class ReferenceFactoryManagerImpl
 
     // Initialized in the constructor
     private RFMState state ;
-    private ReentrantLock lock ;
-    private Condition suspendCondition ;
-    private ORB orb ;
-    private POASystemException wrapper ;
+    private final ReentrantLock lock ;
+    private final Condition suspendCondition ;
+    private final ORB orb ;
+    private final POASystemException wrapper ;
     // poatable contains the mapping from the ReferenceFactory name to
     // the ServantLocator and list of policies.  Note that the policy
     // list is stored in the form passed to the create() call: that is,
     // it does not contain the standard policies.
-    private Map<String,Pair<ServantLocator,List<Policy>>> poatable ;
-    private Map<String,ReferenceFactory> factories ;
+    private final Map<String,Pair<ServantLocator,List<Policy>>> poatable ;
+    private final Map<String,ReferenceFactory> factories ;
 
     private volatile boolean isActive ;
 
@@ -113,41 +114,35 @@ public class ReferenceFactoryManagerImpl
     {
         private static final long serialVersionUID = 7922226881290146012L;
 
+        @Poa
 	public boolean unknown_adapter( POA parent, String name ) {
-	    dprint(".unknown_adapter->: " + parent + " " + name);
-	    // lock.lock() ;
-	    try {
-		Pair<ServantLocator,List<Policy>> data = null ;
-		synchronized (poatable) {
-		    // REVISIT: make sure that data can't change concurrently!
-		    // Should be OK because Pair is immutable.
-		    data = poatable.get( name ) ;
-		} 
+            Pair<ServantLocator,List<Policy>> data = null ;
+            synchronized (poatable) {
+                // REVISIT: make sure that data can't change concurrently!
+                // Should be OK because Pair is immutable.
+                data = poatable.get( name ) ;
+            }
 
-		if (data == null) {
-		    return false ;
-		} else {
-		    try {
-			List<Policy> policies = new ArrayList<Policy>() ;
-			// XXX What should we do if data.second() contains
-			// policies with the same ID as standard policies?
-			if (data.second() != null)
-			    policies.addAll( data.second() ) ;
-			policies.addAll( standardPolicies ) ;
-			Policy[] arr = policies.toArray( new Policy[policies.size()] ) ;
+            if (data == null) {
+                return false ;
+            } else {
+                try {
+                    List<Policy> policies = new ArrayList<Policy>() ;
+                    // XXX What should we do if data.second() contains
+                    // policies with the same ID as standard policies?
+                    if (data.second() != null)
+                        policies.addAll( data.second() ) ;
+                    policies.addAll( standardPolicies ) ;
+                    Policy[] arr = policies.toArray( new Policy[policies.size()] ) ;
 
-			POA child = parentPOA.create_POA( name, manager, arr ) ;
-			child.set_servant_manager( data.first() ) ; 
-			return true ;
-		    } catch (Exception exc) {
-			wrapper.rfmAdapterActivatorFailed( exc ) ;
-			return false ;
-		    }
-		}
-	    } finally {
-		// lock.unlock() ;
-		dprint(".unknown_adapter<-: " + parent + " " + name);
-	    }
+                    POA child = parentPOA.create_POA( name, manager, arr ) ;
+                    child.set_servant_manager( data.first() ) ;
+                    return true ;
+                } catch (Exception exc) {
+                    wrapper.rfmAdapterActivatorFailed( exc ) ;
+                    return false ;
+                }
+            }
 	}
     } ;
 
@@ -197,9 +192,9 @@ public class ReferenceFactoryManagerImpl
 	return manager.get_state();
     }
 
+    @Poa
     public void activate() 
     {
-	dprint(".activate->:");
 	lock.lock() ;
 	try {
 	    if (isActive)
@@ -236,7 +231,6 @@ public class ReferenceFactoryManagerImpl
 	    throw wrapper.rfmActivateFailed( exc ) ;
 	} finally {
 	    lock.unlock() ;
-	    dprint(".activate<-:");
 	}
     }
 
@@ -246,12 +240,12 @@ public class ReferenceFactoryManagerImpl
     // It may also be better to get rid of separate suspend/resume calls, instead
     // passing an object to a method that does suspend/resume (as in 
     // doPrivileged).  See GF issue 4560.
+    @Poa
     public ReferenceFactory create( final String name, 
 				    final String repositoryId,
 				    final List<Policy> policies,
 				    final ServantLocator manager ) 
     {
-	dprint(".create->:");
 	lock.lock() ;
 	try {
 	    if (state == RFMState.SUSPENDED)
@@ -275,13 +269,12 @@ public class ReferenceFactoryManagerImpl
 	    return factory ;
 	} finally {
 	    lock.unlock() ;
-	    dprint(".create<-:");
 	}
     }
 
+    @Poa
     public ReferenceFactory find( String[] adapterName ) 
     {
-	dprint(".find->:");
 	lock.lock() ;
 	try {
 	    if (state == RFMState.SUSPENDED)
@@ -303,7 +296,6 @@ public class ReferenceFactoryManagerImpl
 	    return factories.get( adapterName[expectedLength-1] ) ;
 	} finally {
 	    lock.unlock() ;
-	    dprint(".find<-:");
 	}
     }
 
@@ -335,82 +327,75 @@ public class ReferenceFactoryManagerImpl
     // on the client side to the same endpoint.
     // manager.discard_requests( true ) ; 
 
+    @Poa
     public void suspend() 
     {
-	try {
-	    dprint(".suspend->:");
+        lock.lock() ;
 
-	    lock.lock() ;
-	
-	    // wait until all requests in the manager have completed.
-	    try {
-		if (!isActive) {
-		    throw wrapper.rfmNotActive() ;
-		}
+        // wait until all requests in the manager have completed.
+        try {
+            if (!isActive) {
+                throw wrapper.rfmNotActive() ;
+            }
 
-		while (state == RFMState.SUSPENDED)
-		    try {
-			suspendCondition.await() ;
-		    } catch (InterruptedException exc) {
-			throw wrapper.rfmSuspendConditionWaitInterrupted() ;
-		    }
+            while (state == RFMState.SUSPENDED)
+                try {
+                    suspendCondition.await() ;
+                } catch (InterruptedException exc) {
+                    throw wrapper.rfmSuspendConditionWaitInterrupted() ;
+                }
 
-		// At this point, the state must be READY, and any other
-		// suspending thread has released the lock.  So now
-		// we set the state back to SUSPENDED, drop the lock,
-		// and continue.
+            // At this point, the state must be READY, and any other
+            // suspending thread has released the lock.  So now
+            // we set the state back to SUSPENDED, drop the lock,
+            // and continue.
 
-		state = RFMState.SUSPENDED ;
-	    } finally {
-		lock.unlock() ;
-	    }
+            state = RFMState.SUSPENDED ;
+        } finally {
+            lock.unlock() ;
+        }
 
-	    // do NOT hold the RFM lock here, because then we would hold
-	    // first the RFM, and then the POAManager lock.  Another thread
-	    // could reverse the order, leading to a deadlock.  See bug
-	    // 6586417.
-	    try {
-		manager.hold_requests( true ) ;
-	    } catch (AdapterInactive ai) {
-		// This should never happen
-		throw wrapper.rfmManagerInactive( ai ) ;
-	    }
-	} finally {
-	    dprint(".suspend<-:");
-	}
+        // do NOT hold the RFM lock here, because then we would hold
+        // first the RFM, and then the POAManager lock.  Another thread
+        // could reverse the order, leading to a deadlock.  See bug
+        // 6586417.
+        try {
+            manager.hold_requests( true ) ;
+        } catch (AdapterInactive ai) {
+            // This should never happen
+            throw wrapper.rfmManagerInactive( ai ) ;
+        }
     }
 
+    @Poa
     public void resume() 
     {
-	try {
-	    dprint(".resume->:");
+        lock.lock() ;
 
-	    lock.lock() ;
-	    try {
-		if (!isActive)
-		    throw wrapper.rfmNotActive() ;
+        try {
+            if (!isActive)
+                throw wrapper.rfmNotActive() ;
 
-		state = RFMState.READY ;
-		suspendCondition.signalAll() ;
-	    } finally {
-		lock.unlock() ;
-	    }
+            state = RFMState.READY ;
+            suspendCondition.signalAll() ;
+        } finally {
+            lock.unlock() ;
+        }
 
-	    // Allow new requests to start.  This will lazily 
-	    // re-create POAs as needed through the parentPOA's 
-	    // AdapterActivator.
-	    try {
-		manager.activate() ;
-	    } catch (AdapterInactive ai) {
-		// This should never happen
-		throw wrapper.rfmManagerInactive( ai ) ;
-	    } 
-	} finally {
-	    dprint(".resume<-:");
-	}
+        // Allow new requests to start.  This will lazily
+        // re-create POAs as needed through the parentPOA's
+        // AdapterActivator.
+        try {
+            manager.activate() ;
+        } catch (AdapterInactive ai) {
+            // This should never happen
+            throw wrapper.rfmManagerInactive( ai ) ;
+        }
     }
 
-    public void restartFactories( Map<String,Pair<ServantLocator,List<Policy>>> updates ) 
+    @Poa
+    public void restartFactories(
+        Map<String,Pair<ServantLocator,List<Policy>>> updates )
     {
 	lock.lock() ;
 	try {
@@ -423,29 +408,23 @@ public class ReferenceFactoryManagerImpl
 	    lock.unlock() ;
 	}
 
-	try {
-	    dprint(".restartFactories->:");
+        if (updates == null)
+            throw wrapper.rfmNullArgRestart() ;
 
-	    if (updates == null)
-		throw wrapper.rfmNullArgRestart() ; 
+        synchronized (poatable) {
+            // Update the poatable with the updates information.
+            poatable.putAll( updates ) ;
+        }
 
-	    synchronized (poatable) {
-		// Update the poatable with the updates information.
-		poatable.putAll( updates ) ;
-	    }
-
-	    try {
-		// Now destroy all POAs that are used to 
-		// implement ReferenceFactory instances.
-		for (POA poa : parentPOA.the_children()) {
-		    poa.destroy( false, true ) ;
-		}
-	    } catch (Exception exc) {
-		throw wrapper.rfmRestartFailed( exc ) ;
-	    }
-	} finally {
-	    dprint(".restartFactories<-:");
-	}
+        try {
+            // Now destroy all POAs that are used to
+            // implement ReferenceFactory instances.
+            for (POA poa : parentPOA.the_children()) {
+                poa.destroy( false, true ) ;
+            }
+        } catch (Exception exc) {
+            throw wrapper.rfmRestartFailed( exc ) ;
+        }
     }
 
     public void restartFactories() {
@@ -460,20 +439,15 @@ public class ReferenceFactoryManagerImpl
      * some or all of the ReferenceFactory instances in this ReferenceFactoryManager.
      * This parameter must not be null.
      */
+    @Poa
     public void restart( Map<String,Pair<ServantLocator,List<Policy>>> updates ) 
     {
-	try {
-	    dprint(".restart->:");
-
-	    suspend() ;
-	    try {
-		restartFactories( updates ) ;
-	    } finally {
-		resume() ;
-	    }
-	} finally {
-	    dprint(".restart<-:");
-	}
+        suspend() ;
+        try {
+            restartFactories( updates ) ;
+        } finally {
+            resume() ;
+        }
     }
 
     /** Restart all ReferenceFactories.  This is done safely, so that
@@ -487,52 +461,40 @@ public class ReferenceFactoryManagerImpl
 
     // Methods used to implement the ReferenceFactory interface.
     // ReferenceFactoryImpl just delegates to these methods.
+    @Poa
     org.omg.CORBA.Object createReference( String name, byte[] key,
 	String repositoryId ) 
     {
-	dprint(".createReference->: " + name);
-	// lock.lock() ;
-	try {
-	    try {
-		POA child = parentPOA.find_POA( name, true ) ;
-		return child.create_reference_with_id( key, repositoryId ) ;
-	    } catch (Exception exc) {
-		throw wrapper.rfmCreateReferenceFailed( exc ) ;
-	    }
-	} finally {
-	    // lock.unlock() ;
-	    dprint(".createReference<-: " + name);
-	}
+        try {
+            POA child = parentPOA.find_POA( name, true ) ;
+            return child.create_reference_with_id( key, repositoryId ) ;
+        } catch (Exception exc) {
+            throw wrapper.rfmCreateReferenceFailed( exc ) ;
+        }
     }
 
     // Called from ReferenceFactoryImpl.
+    @Poa
     void destroy( String name ) {
-	dprint(".destroy->: " + name);
-	// lock.lock() ;
-	try {
-	    try {
-		POA child = parentPOA.find_POA( name, true ) ;
-		synchronized (poatable) {
-		    poatable.remove( name ) ;
-		}
-		
-		lock.lock() ;
-		try {
-		    factories.remove( name ) ;
-		} finally {
-		    lock.unlock() ;
-		}
+        try {
+            POA child = parentPOA.find_POA( name, true ) ;
+            synchronized (poatable) {
+                poatable.remove( name ) ;
+            }
 
-		// Wait for all requests to complete before completing 
-		// destruction of the POA.
-		child.destroy( false, true ) ;
-	    } catch (Exception exc) {
-		throw wrapper.rfmDestroyFailed( exc ) ;
-	    }
-	} finally {
-	    // lock.unlock() ;
-	    dprint(".destroy<-: " + name);
-	}
+            lock.lock() ;
+            try {
+                factories.remove( name ) ;
+            } finally {
+                lock.unlock() ;
+            }
+
+            // Wait for all requests to complete before completing
+            // destruction of the POA.
+            child.destroy( false, true ) ;
+        } catch (Exception exc) {
+            throw wrapper.rfmDestroyFailed( exc ) ;
+        }
     }
 
     // Called from ReferenceManagerConfigurator.
@@ -567,36 +529,24 @@ public class ReferenceFactoryManagerImpl
 	    throw wrapper.rfmIllegalPoaManagerUsage() ;
     }
 
-    private void dprint(String msg)
-    {
-	if (orb.poaDebugFlag) {
-	    ORBUtility.dprint("ReferenceFactoryManagerImpl", msg);
-	}
-    }
-
     // locking not required
+    @Poa
     public boolean isRfmName( String[] adapterName ) 
     {
-        try {
-	    dprint(".isRfmName->:");
+        if (!isActive) {
+            return false ;
+        }
 
-	    if (!isActive) {
-		return false ;
-	    }
-	    
-	    int expectedLength = parentPOAAdapterName.length + 1 ;
+        int expectedLength = parentPOAAdapterName.length + 1 ;
 
-	    if (expectedLength != adapterName.length)
-		return false ;
+        if (expectedLength != adapterName.length)
+            return false ;
 
-	    for (int ctr=0; ctr<expectedLength-1; ctr++)
-		if (!adapterName[ctr].equals( parentPOAAdapterName[ctr] ))
-		    return false ;
+        for (int ctr=0; ctr<expectedLength-1; ctr++)
+            if (!adapterName[ctr].equals( parentPOAAdapterName[ctr] ))
+                return false ;
 
-	    return true ;
-	} finally {
-	    dprint(".isRfmName<-:");
-	}
+        return true ;
     }
 }
 

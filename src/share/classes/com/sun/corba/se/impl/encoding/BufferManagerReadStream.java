@@ -43,8 +43,11 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.RequestCanceledException;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import java.util.*;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
+import java.util.LinkedList;
 
+@Transport
 public class BufferManagerReadStream
     implements BufferManagerRead, MarkAndResetHandler
 {
@@ -57,21 +60,19 @@ public class BufferManagerReadStream
 
     // XXX Should this be static?  Should we make it configurable?
     // Bug 6372405
-    private long FRAGMENT_TIMEOUT = 6000 ;
+    private static final long FRAGMENT_TIMEOUT = 6000 ;
 
     // REVISIT - This should go in BufferManagerRead. But, since
     //           BufferManagerRead is an interface. BufferManagerRead
     //           might ought to be an abstract class instead of an
     //           interface.
-    private ORB orb ;
-    private ORBUtilSystemException wrapper ;
-    private boolean debug = false;
+    private final ORB orb ;
+    private final ORBUtilSystemException wrapper ;
 
     BufferManagerReadStream( ORB orb ) 
     {
 	this.orb = orb ;
 	this.wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-        debug = orb.transportDebugFlag;
     }
 
     public void cancelProcessing(int requestId) {
@@ -82,21 +83,21 @@ public class BufferManagerReadStream
         }
     }
 
+    @InfoMethod
+    private void bufferMessage( String msg, int bbAddr, String tail ) { }
+
+    @Transport
     public void processFragment(ByteBuffer byteBuffer, FragmentMessage msg)
     {
         ByteBufferWithInfo bbwi =
             new ByteBufferWithInfo(orb, byteBuffer, msg.getHeaderLength());
 
         synchronized (fragmentQueue) {
-            if (debug)
-            {
+            if (orb.transportDebugFlag) {
                 // print address of ByteBuffer being queued
                 int bbAddress = System.identityHashCode(byteBuffer);
-                StringBuffer sb = new StringBuffer(80);
-                sb.append("processFragment() - queueing ByteBuffer id (");
-                sb.append(bbAddress).append(") to fragment queue.");
-                String strMsg = sb.toString();
-                dprint(strMsg);
+                bufferMessage( "processFragment() - queuing ByteByffer id (",
+                    bbAddress, ") to fragment queue." ) ;
             }
             fragmentQueue.enqueue(bbwi);
             endOfStream = !msg.moreFragmentsToFollow();
@@ -104,6 +105,10 @@ public class BufferManagerReadStream
         }
     }
  
+    @InfoMethod
+    private void underflowMessage( String msg, int rid ) { }
+
+    @Transport
     public ByteBufferWithInfo underflow (ByteBufferWithInfo bbwi)
     {
 
@@ -115,8 +120,9 @@ public class BufferManagerReadStream
         synchronized (fragmentQueue) {
 
             if (receivedCancel) {
-		if (debug) {
-		    dprint("underflow() - Cancel request id: " + cancelReqId);
+		if (orb.transportDebugFlag) {
+                    underflowMessage( "underflow() - Cancel request id:",
+                        cancelReqId);
 		}
                 throw new RequestCanceledException(cancelReqId);
             }
@@ -141,9 +147,10 @@ public class BufferManagerReadStream
 		    throw wrapper.bufferReadManagerTimeout() ;
 
                 if (receivedCancel) {
-		    if (debug) {
-		        dprint("underflow() - Cancel request id after wait: " 
-			    + cancelReqId);
+		    if (orb.transportDebugFlag) {
+                        underflowMessage(
+                            "underflow() - Cancel request id after wait:",
+                            cancelReqId);
 		    }
                     throw new RequestCanceledException(cancelReqId);
                 }
@@ -152,14 +159,10 @@ public class BufferManagerReadStream
             result = fragmentQueue.dequeue();
             result.setFragmented(true);
 
-            if (debug) {
-                // print address of ByteBuffer being dequeued
+            if (orb.transportDebugFlag) {
                 int bbAddr = System.identityHashCode(result.getByteBuffer());
-                StringBuffer sb1 = new StringBuffer(80);
-                sb1.append("underflow() - dequeued ByteBuffer id (");
-                sb1.append(bbAddr).append(") from fragment queue.");
-                String msg1 = sb1.toString();
-                dprint(msg1);
+                bufferMessage( "underflow() - dequeued ByteBuffer id (", 
+                    bbAddr, ") from fragment queue." ) ;
             }
 
             // VERY IMPORTANT
@@ -169,14 +172,11 @@ public class BufferManagerReadStream
 		bbwi.getByteBuffer() != null) {
                 ByteBufferPool byteBufferPool = getByteBufferPool();
 
-                if (debug) {
+                if (orb.transportDebugFlag) {
                     // print address of ByteBuffer being released
                     int bbAddress = System.identityHashCode(bbwi.getByteBuffer());
-                    StringBuffer sb = new StringBuffer(80);
-                    sb.append("underflow() - releasing ByteBuffer id (");
-                    sb.append(bbAddress).append(") to ByteBufferPool.");
-                    String msg = sb.toString();
-                    dprint(msg);
+                    bufferMessage( "underflow() - releasing ByteBuffer id (",
+                        bbAddress, ") to ByteBufferPool." ) ;
                 }
 
                 byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
@@ -197,6 +197,7 @@ public class BufferManagerReadStream
 
     // Release any queued ByteBufferWithInfo's byteBuffers to the
     // ByteBufferPoool
+    @Transport
     public void close(ByteBufferWithInfo bbwi)
     {
         int inputBbAddress = 0;
@@ -221,17 +222,12 @@ public class BufferManagerReadStream
                 while (fragmentQueue.size() != 0) {
                     abbwi = fragmentQueue.dequeue();
                     if (abbwi != null && abbwi.getByteBuffer() != null) {
-                        if (debug) { 
+                        if (orb.transportDebugFlag) {
                             int bbAddress = System.identityHashCode(abbwi.getByteBuffer());
                             if (inputBbAddress != bbAddress) {
-                                 // print address of ByteBuffer released
-                                 StringBuffer sb = new StringBuffer(80);
-                                 sb.append("close() - fragmentQueue is ")
-                                   .append("releasing ByteBuffer id (")
-                                   .append(bbAddress).append(") to ")
-                                   .append("ByteBufferPool.");
-                                 String msg = sb.toString();
-                                 dprint(msg);
+                                 bufferMessage( " close() - fragmentQueue is "
+                                     + " releasing ByteBuffer id (", bbAddress,
+                                     ") to ByteBufferPool." ) ;
                             }
                         }
                         byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
@@ -256,14 +252,10 @@ public class BufferManagerReadStream
                 if (abbwi != null && abbwi.getByteBuffer() != null) {
                    int bbAddress = System.identityHashCode(abbwi.getByteBuffer());
                    if (inputBbAddress != bbAddress) {
-                       if (debug) { 
-                            // print address of ByteBuffer being released
-                            StringBuffer sb = new StringBuffer(80);
-                            sb.append("close() - fragmentStack - releasing ")
-                              .append("ByteBuffer id (" + bbAddress + ") to ")
-                              .append("ByteBufferPool.");
-                            String msg = sb.toString();
-                            dprint(msg);
+                       if (orb.transportDebugFlag) {
+                            bufferMessage( "close() - fragmentStack - releasing "
+                                + "ByteBuffer id (", bbAddress, 
+                                ") to ByteBufferPool." ) ;
                        }
                        byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                    }
@@ -277,11 +269,6 @@ public class BufferManagerReadStream
     protected ByteBufferPool getByteBufferPool()
     {
         return orb.getByteBufferPool();
-    }
-
-    private void dprint(String msg)
-    {
-        ORBUtility.dprint("BufferManagerReadStream", msg);
     }
 
     // Mark and reset handler ----------------------------------------

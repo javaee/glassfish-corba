@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2005-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,9 +42,6 @@ import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
 import java.util.Iterator ;
-import java.util.Map ;
-import java.util.HashMap ;
-import java.util.Properties ;
 
 import org.omg.CORBA.LocalObject ;
 
@@ -55,7 +52,6 @@ import org.omg.IOP.TAG_INTERNET_IOP ;
 import org.omg.PortableInterceptor.ORBInitializer ;
 import org.omg.PortableInterceptor.IORInterceptor_3_0 ;
 import org.omg.PortableInterceptor.IORInfo ;
-import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.ORBInitInfo ;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 
@@ -70,7 +66,6 @@ import com.sun.corba.se.spi.orb.OperationFactory ;
 import com.sun.corba.se.spi.ior.Identifiable ;
 import com.sun.corba.se.spi.ior.IdentifiableFactoryFinder ;
 import com.sun.corba.se.spi.ior.EncapsulationFactoryBase ;
-import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
@@ -81,17 +76,12 @@ import com.sun.corba.se.spi.ior.ObjectId ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory ;
 
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileImpl ;
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileTemplateImpl ;
@@ -100,30 +90,26 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.orb.ORBDataParserImpl ;
 
-import com.sun.corba.se.impl.protocol.NotLocalLocalCRDImpl ;
 
-import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl ;
 
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
 
 // Import this to allow running on JDK 1.4, which does
 // not contain the CORBA 3.0 IORInfo.
 import com.sun.corba.se.impl.interceptors.IORInfoImpl ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Subcontract;
 
+@Subcontract
 public class VirtualAddressAgentImpl 
     extends LocalObject 
     implements ORBConfigurator, ORBInitializer, IORInterceptor_3_0
 {
-    private boolean debug = false ;
-
-    private static void dprint( String msg ) {
-	System.out.println( msg ) ;
-    }
-
     public static final String VAA_HOST_PROPERTY = ORBConstants.SUN_PREFIX + 
 	"ORBVAAHost" ;
     public static final String VAA_PORT_PROPERTY = ORBConstants.SUN_PREFIX + 
 	"ORBVAAPort" ;
+    private static final long serialVersionUID = 5670615031510472636L;
 
     private String host = null ;
     private int port = 0 ;
@@ -131,6 +117,7 @@ public class VirtualAddressAgentImpl
     private IIOPAddress addr = null ;
     private ORBInitializer[] newOrbInits = null ;
 
+    @Subcontract
     private class AddressParser extends ParserImplBase {
 	private String _host = null ;
 	private int _port = 0 ;
@@ -144,21 +131,19 @@ public class VirtualAddressAgentImpl
 	    return parser ;
 	}
 
+        @Subcontract
+        @Override
 	protected void complete() {
-	    if (debug) {
-		dprint("VirtualAddressAgentImpl : inside complete..." + _host + ":" + _port);
-	    }
 	    host = _host ;
 	    port = _port ;
 	}
     }
 
-    public void configure( DataCollector dc, final ORB orb ) {
-	debug = orb.subcontractDebugFlag ;
+    @InfoMethod 
+    private void agentAddress( IIOPAddress addr ) { }
 
-	if (debug) {
-	    dprint("VirtualAddressAgentImpl : inside configure...");
-	}
+    @Subcontract
+    public void configure( DataCollector dc, final ORB orb ) {
 	this.orb = orb ;
 
 	orb.setBadServerIdHandler( 
@@ -174,9 +159,7 @@ public class VirtualAddressAgentImpl
 	final AddressParser parser = new AddressParser() ;
 	parser.init( dc ) ;
 	addr = IIOPFactories.makeIIOPAddress( orb, host, port ) ;	
-	if (debug) {
-	    dprint( "Agent address = " + addr ) ;
-	}
+        agentAddress(addr);
 
 	// Register the special IIOPProfile in the TaggedProfileFactoryFinder.
 	// This means that the isLocal check will be handled properly even
@@ -230,18 +213,13 @@ public class VirtualAddressAgentImpl
 	)  ;
     }
 
+    @Subcontract
     public void pre_init( ORBInitInfo info ) {
-	if (debug) {
-	    dprint("VirtualAddressAgentImpl :inside pre_init...");
-	}
 	// NO-OP
     }
 
+    @Subcontract
     public void post_init( ORBInitInfo info ) {
-	if (debug) {
-	    dprint("VirtualAddressAgentImpl :inside post_init...");
-	}
-
 	// register this object as an IORInterceptor.
 	try {
 	    info.add_ior_interceptor( this ) ;
@@ -252,10 +230,8 @@ public class VirtualAddressAgentImpl
 	}
     }
 
+    @Subcontract
     public void establish_components( IORInfo info ) {
-	if (debug) {
-	    dprint("VirtualAddressAgentImpl :inside establish_components..");
-	}
 	// NO-OP
     }
 
@@ -277,6 +253,14 @@ public class VirtualAddressAgentImpl
 	    super( orb, oktemp, id, ptemp ) ;
 	}
 
+        @InfoMethod
+        private void iiopProfileTemplate( IIOPProfileTemplate temp ) { }
+
+        @InfoMethod
+        private void templateAddress( IIOPAddress addr ) { }
+
+        @Subcontract
+        @Override
 	public boolean isLocal() {
 	    if (!isLocalChecked) {
 		isLocalChecked = true ;
@@ -284,12 +268,8 @@ public class VirtualAddressAgentImpl
 		IIOPProfileTemplate ptemp = 
 		    (IIOPProfileTemplate)getTaggedProfileTemplate() ;
 
-		if (debug) {
-		    dprint( "Inside SpecialIIOPProfileImpl.isLocal: ptemp = " 
-			+ ptemp ) ;
-		    dprint( "Inside SpecialIIOPProfileImpl.isLocal: template addr = " 
-			+ ptemp.getPrimaryAddress() ) ;
-		}
+                iiopProfileTemplate(ptemp);
+                templateAddress(addr);
 
 		isLocalCachedValue = addr.equals( ptemp.getPrimaryAddress() ) ;
 	    }
@@ -311,16 +291,14 @@ public class VirtualAddressAgentImpl
 	    this.orb = orb ;
 	}
 
+        @Override
 	public TaggedProfile create( ObjectKeyTemplate oktemp, ObjectId id ) {
 	    return new SpecialIIOPProfileImpl( orb, oktemp, id, this ) ;
 	}
     }
 
+    @Subcontract
     private TaggedProfileTemplate makeCopy( TaggedProfileTemplate temp ) {
-	if (debug) {
-	    dprint("VirtualAddressAgentImpl :inside makeCopy...");
-	}
-
 	if (temp instanceof IIOPProfileTemplate) {
 	    final IIOPProfileTemplate oldTemplate = (IIOPProfileTemplate)temp ;
 
@@ -353,6 +331,7 @@ public class VirtualAddressAgentImpl
 	}
     }
 
+    @Subcontract
     public void components_established( IORInfo info ) {
 	// Cast this to the implementation class in case we are building
 	// this class on JDK 1.4, which has the pre-CORBA 3.0 version of
@@ -360,9 +339,6 @@ public class VirtualAddressAgentImpl
 	// methods.
 	IORInfoImpl myInfo = (IORInfoImpl)info ;
 
-	if (debug) {
-	    dprint("VirtualAddressAgentImpl :inside components_established...");
-	}
 	// Get the object adapter's adapter_template as an IORTemplate
 	final IORTemplate iort = 
 	    (IORTemplate)IORFactories.getIORFactory( 

@@ -59,7 +59,6 @@ import com.sun.corba.se.spi.orbutil.generic.MultiSet ;
 
 import com.sun.corba.se.impl.logging.POASystemException ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
 

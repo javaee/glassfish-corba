@@ -59,6 +59,7 @@ import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.logging.NamingSystemException;
+import com.sun.corba.se.spi.trace.Naming;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -207,6 +208,7 @@ public class NamingContextImpl extends NamingContextExtPOA
    * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
    * @see doBind
    */
+   @Naming
    public void bind(NameComponent[] n, org.omg.CORBA.Object obj)
         throws org.omg.CosNaming.NamingContextPackage.NotFound,
                org.omg.CosNaming.NamingContextPackage.CannotProceed,
@@ -217,9 +219,6 @@ public class NamingContextImpl extends NamingContextExtPOA
 	    throw updateWrapper.objectIsNull() ;
         }
 
-        if (orb.namingDebugFlag) {
-            dprint("bind " + nameToString(n) + " to " + obj);
-        }
         // doBind implements all four flavors of binding
         NamingContextDataStore impl = (NamingContextDataStore)this;
         doBind(impl,n,obj,false,BindingType.nobject);
@@ -246,6 +245,7 @@ public class NamingContextImpl extends NamingContextExtPOA
    * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
    * @see doBind
    */
+   @Naming
    public void bind_context(NameComponent[] n, NamingContext nc)
         throws org.omg.CosNaming.NamingContextPackage.NotFound,
                org.omg.CosNaming.NamingContextPackage.CannotProceed,
@@ -281,6 +281,7 @@ public class NamingContextImpl extends NamingContextExtPOA
    * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
    * @see doBind
    */
+   @Naming
    public  void rebind(NameComponent[] n, org.omg.CORBA.Object obj)
         throws       org.omg.CosNaming.NamingContextPackage.NotFound,
                      org.omg.CosNaming.NamingContextPackage.CannotProceed,
@@ -291,9 +292,6 @@ public class NamingContextImpl extends NamingContextExtPOA
 	    throw updateWrapper.objectIsNull() ;
         }
         try {
-            if (orb.namingDebugFlag) {
-                dprint("rebind " + nameToString(n) + " to " + obj);
-            }
             // doBind implements all four flavors of binding
             NamingContextDataStore impl = (NamingContextDataStore)this;
             doBind(impl,n,obj,true,BindingType.nobject);
@@ -323,15 +321,13 @@ public class NamingContextImpl extends NamingContextExtPOA
    * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
    * @see doBind
    */
+   @Naming
    public  void rebind_context(NameComponent[] n, NamingContext nc)
         throws org.omg.CosNaming.NamingContextPackage.NotFound,
                org.omg.CosNaming.NamingContextPackage.CannotProceed,
                org.omg.CosNaming.NamingContextPackage.InvalidName
     {
         try {
-            if (orb.namingDebugFlag) {
-                dprint("rebind_context " + nameToString(n) + " to " + nc);
-            }
             // doBind implements all four flavors of binding
             NamingContextDataStore impl = (NamingContextDataStore)this;
             doBind(impl,n,nc,true,BindingType.ncontext);
@@ -360,14 +356,12 @@ public class NamingContextImpl extends NamingContextExtPOA
    * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
    * @see doResolve
    */
+   @Naming
    public  org.omg.CORBA.Object resolve(NameComponent[] n)
         throws org.omg.CosNaming.NamingContextPackage.NotFound,
                org.omg.CosNaming.NamingContextPackage.CannotProceed,
                org.omg.CosNaming.NamingContextPackage.InvalidName
     {
-        if (orb.namingDebugFlag) {
-            dprint("resolve " + nameToString(n));
-        }
         // doResolve actually resolves
         NamingContextDataStore impl = (NamingContextDataStore)this;
         return doResolve(impl,n);
@@ -389,14 +383,12 @@ public class NamingContextImpl extends NamingContextExtPOA
    * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
    * @see doUnbind
    */
+   @Naming
    public  void unbind(NameComponent[] n)
         throws org.omg.CosNaming.NamingContextPackage.NotFound,
                org.omg.CosNaming.NamingContextPackage.CannotProceed,
                org.omg.CosNaming.NamingContextPackage.InvalidName
     {
-        if (orb.namingDebugFlag) {
-            dprint("unbind " + nameToString(n));
-        }
         // doUnbind actually unbinds
         NamingContextDataStore impl = (NamingContextDataStore)this;
         doUnbind(impl,n);
@@ -414,18 +406,13 @@ public class NamingContextImpl extends NamingContextExtPOA
    * @see BindingListHolder
    * @see BindingIteratorImpl
    */
+   @Naming
     public  void list(int how_many, BindingListHolder bl, BindingIteratorHolder bi)
     {
-        if (orb.namingDebugFlag) {
-            dprint("list(" + how_many + ")");
-        }
         // List actually generates the list
         NamingContextDataStore impl = (NamingContextDataStore)this;
         synchronized (impl) {
             impl.listImpl(how_many,bl,bi);
-        }
-        if (orb.namingDebugFlag && bl.value != null) {
-            dprint("list(" + how_many + ") -> bindings[" + bl.value.length + "] + iterator: " + bi.value);
         }
     }
 
@@ -436,12 +423,10 @@ public class NamingContextImpl extends NamingContextExtPOA
    * by this Name Server.
    * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
    */
+   @Naming
     public synchronized NamingContext new_context()
     {
         // Create actually creates a new naming context
-        if (orb.namingDebugFlag) {
-            dprint("new_context()");
-        }
         NamingContextDataStore impl = (NamingContextDataStore)this;
         synchronized (impl) {
             return impl.newContextImpl();
@@ -470,6 +455,7 @@ public class NamingContextImpl extends NamingContextExtPOA
    * @see new_context
    * @see bind_context
    */
+   @Naming
     public  NamingContext bind_new_context(NameComponent[] n)
         throws org.omg.CosNaming.NamingContextPackage.NotFound,
                org.omg.CosNaming.NamingContextPackage.AlreadyBound,
@@ -479,9 +465,6 @@ public class NamingContextImpl extends NamingContextExtPOA
         NamingContext nc = null;
         NamingContext rnc = null;
         try {
-            if (orb.namingDebugFlag) {
-                dprint("bind_new_context " + nameToString(n));
-            }
             // The obvious solution:
             nc = this.new_context();
             this.bind_context(n,nc);
@@ -505,12 +488,10 @@ public class NamingContextImpl extends NamingContextExtPOA
    * is not empty (i.e., contains bindings).
    * @exception org.omg.CORBA.SystemException One of a fixed set of CORBA system exceptions.
    */
+   @Naming
     public  void destroy()
         throws org.omg.CosNaming.NamingContextPackage.NotEmpty
     {
-        if (orb.namingDebugFlag) {
-            dprint("destroy ");
-        }
         NamingContextDataStore impl = (NamingContextDataStore)this;
         synchronized (impl) {
             if (impl.isEmptyImpl() == true) {
@@ -1289,7 +1270,7 @@ public class NamingContextImpl extends NamingContextExtPOA
     }
   
    /**
-   * This is a Debugging Method
+   * This is a debugging Method
    */
     public boolean isEmptyImpl()
     {
@@ -1297,7 +1278,7 @@ public class NamingContextImpl extends NamingContextExtPOA
     }
 
    /**
-   * This is a Debugging Method
+   * This is a debugging Method
    */
     public void printSize( )
     {

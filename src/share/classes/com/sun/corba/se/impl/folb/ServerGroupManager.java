@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -83,6 +83,8 @@ import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Folb;
 
 /**
  * @author Harold Carr
@@ -98,8 +100,7 @@ public class ServerGroupManager
 	ServerRequestInterceptor
 {
     private static final String baseMsg = ServerGroupManager.class.getName();
-
-    private boolean debug = false;
+    private static final long serialVersionUID = -3197578705750630503L;
 
     private ORB orb;
     private GroupInfoService gis;
@@ -116,17 +117,19 @@ public class ServerGroupManager
     // these strings.  Should be an official API.
     private static final String ORB_LISTENER = "orb-listener";
     private static final String SSL = "SSL";
-    
-    private void initialize()
-    {
+
+    @InfoMethod
+    private void alreadyInitialized() { }
+
+    @Folb
+    private void initialize() {
+
 	if (initialized) {
+            alreadyInitialized();
 	    return;
 	}
 
 	try {
-
-	    if (debug) { dprint(".initialize->:"); }
-	
 	    initialized = true;
 
 	    updateMembershipLabel();
@@ -157,19 +160,12 @@ public class ServerGroupManager
                         ORBConstants.CSI_V2_SSL_TAGGED_COMPONENT_HANDLER);
 	    } catch (InvalidName e) {
 		csiv2SSLTaggedComponentHandler = null;
-		if (debug) { 
-		    dprint(".initialize: not found: "
-			   + ORBConstants.CSI_V2_SSL_TAGGED_COMPONENT_HANDLER);
-		}
+                // XXX log
 	    }
 	} catch (InvalidName e) {
-	    // REVISIT - error string
-	    dprint(".initialize: " + e);
+            // XXX log
 	} catch (UnknownEncoding e) {
-	    // REVISIT - error string
-	    dprint(".initialize: " + e);
-	} finally {
-	    if (debug) { dprint(".initialize<-:"); }
+            // XXX log
 	}
     }
 
@@ -178,13 +174,11 @@ public class ServerGroupManager
     // Interceptor operations
     //
 
-    public String name() 
-    {
+    public String name() {
 	return baseMsg; 
     }
 
-    public void destroy() 
-    {
+    public void destroy() {
     }
 
     ////////////////////////////////////////////////////
@@ -192,61 +186,51 @@ public class ServerGroupManager
     // IORInterceptor
     //
 
-    public void establish_components(IORInfo iorInfo)
-    {
-	try {
-	    if (debug) { dprint(".establish_components->:"); }
+    @InfoMethod
+    private void adapterName( String[] arr ) { }
 
+    @InfoMethod
+    private void addingAddresses() { }
+
+    @InfoMethod
+    private void notAddingAddress() { }
+
+    @InfoMethod
+    private void addingMembershipLabel( String ml ) { }
+
+    @InfoMethod
+    private void notAddingMembershipLabel( ) { }
+
+    @Folb
+    public void establish_components(IORInfo iorInfo) {
+	try {
 	    initialize();
 
-	    //
 	    // Only handle ReferenceFactory adapters.
-	    //
-
-	    // REVISIT
-
 	    String[] adapterName = 
 	        ((com.sun.corba.se.impl.interceptors.IORInfoImpl)iorInfo)
 	            .getObjectAdapter().getAdapterTemplate().adapter_name();
-	    /* 
-	    String[] adapterName = ((com.sun.corba.se.spi.legacy.interceptor.IORInfoExt)iorInfo)
-	            .getObjectAdapter().getAdapterTemplate().adapter_name();
-	    */
-	    if (debug) {
-		dprint(".establish_components: adapterName: ", adapterName);
-	    }
+
+            adapterName( adapterName ) ;
 
 	    ReferenceFactory rf = referenceFactoryManager.find(adapterName);
 	    if (rf == null) {
 	        if (gis.shouldAddAddressesToNonReferenceFactory(adapterName)) {
-		    if (debug) {
-		        dprint(".establish_components: "
-			       + "not managed by ReferenceFactory but adding addresses:",
-			       adapterName);
-		    }
+                    addingAddresses() ;
 		} else {
-		    if (debug) {
-		        dprint(".establish_components: "
-			       + "not managed by ReferenceFactory:",
-			       adapterName);
-		    }
+                    notAddingAddress();
 		    return;
 		}
 	    }
 
-	    //
 	    // Get all addressing information.
-	    //
 
 	    // both CLEAR and SSL
 	    List<ClusterInstanceInfo> info = 
 		gis.getClusterInstanceInfo(adapterName);
 
-	    //
 	    // Let security handle SSL infomation.
-	    //
 	    if (csiv2SSLTaggedComponentHandler != null) {
-
 		TaggedComponent csiv2 = 
 		    csiv2SSLTaggedComponentHandler.insert(iorInfo, info);
 		if (csiv2 != null) {
@@ -254,12 +238,9 @@ public class ServerGroupManager
 		}
 	    }
 
-	    //
 	    // Handle CLEAR_TEXT addresses.
-	    //
-
 	    for (ClusterInstanceInfo clusterInstanceInfo : info) {
-		if (debug) {
+		if (orb.folbDebugFlag) {
 		    dprint(".establish_components: adding instance info for: " 
 			   + clusterInstanceInfo.name 
 			   + "; " + clusterInstanceInfo.weight 
@@ -273,7 +254,7 @@ public class ServerGroupManager
 		    if (clusterInstanceInfo.endpoints[i].type.startsWith(SSL)){
 			// NOTE: The standalone ORB test depends on accepting
 			// types such as "t0", "W", etc.
-			if (debug) {
+			if (orb.folbDebugFlag) {
 			    dprint(".establish_components: skipping: "
 				   +       clusterInstanceInfo.endpoints[i].type
 				   + "/" + clusterInstanceInfo.endpoints[i].host
@@ -281,7 +262,7 @@ public class ServerGroupManager
 			}
 			continue;
 		    }
-		    if (debug) {
+		    if (orb.folbDebugFlag) {
 			dprint(".establish_components: "
 			       +       clusterInstanceInfo.endpoints[i].type
 			       + "/" + clusterInstanceInfo.endpoints[i].host
@@ -304,8 +285,7 @@ public class ServerGroupManager
 		try {
 		    data = codec.encode_value(any);
 		} catch (InvalidTypeForEncoding e) {
-		    // REVISIT - error string
-		    dprint(".establish_components: " + e);
+                    // XXX log
 		}
 		TaggedComponent tc = new TaggedComponent(
 	            ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID,
@@ -313,51 +293,31 @@ public class ServerGroupManager
 		iorInfo.add_ior_component(tc);
 	    }
 
-	    //
 	    // Handle membership label.
-	    //
-
 	    if (gis.shouldAddMembershipLabel(adapterName)) {
-	    
-		// REVISIT - "internationalize" getBytes
+		// XXX "internationalize" getBytes
 		TaggedComponent tc = new TaggedComponent(
                     ORBConstants.FOLB_MEMBERSHIP_LABEL_TAGGED_COMPONENT_ID,
 		    membershipLabel.getBytes());
 
-		if (debug) {
-		    dprint(".establish_components: adding membership label: "
-			   + membershipLabel);
-		}
-
+                addingMembershipLabel( membershipLabel );
 		iorInfo.add_ior_component(tc);
 	    } else {
-		if (debug) {
-		    dprint(".establish_components: NOT adding membership label");
-		}
+                notAddingMembershipLabel();
 	    }
 	} catch (RuntimeException e) {
-
-	    // REVISIT - error string
-	    dprint(".establish_components: exception: " + e);
-
-	} finally { 
-
-	    if (debug) { dprint(".establish_components<-:"); }
-
+            // XXX log me
 	}
     }
 
-    public void components_established( IORInfo iorInfo )
-    {
+    public void components_established( IORInfo iorInfo ) {
     }
 
-    public void adapter_manager_state_changed( int managerId, short state )
-    {
+    public void adapter_manager_state_changed( int managerId, short state ) {
     }
 
     public void adapter_state_changed( ObjectReferenceTemplate[] templates,
-	short state ) 
-    {
+        short state ) {
     }
 
     ////////////////////////////////////////////////////
@@ -365,20 +325,25 @@ public class ServerGroupManager
     // GroupInfoServiceObserver
     //
 
-    public void membershipChange()
-    {
-	try {
-	    if (debug) { dprint(".membershipChange->:"); }
+    @InfoMethod
+    private void alreadyChangingMembership() { }
 
+    @InfoMethod
+    private void loopingForMembershipChange() { }
+
+    @InfoMethod
+    private void unexpectedStateForMembershipChange() { }
+
+    @Folb
+    public void membershipChange() {
+	try {
 	    synchronized (this) {
 		if (membershipChangeState == MembershipChangeState.IDLE) {
 		    membershipChangeState = MembershipChangeState.DOING_WORK;
 		} else {
 		    // State is DOING_WORK or RETRY_REQUIRED.
 		    membershipChangeState = MembershipChangeState.RETRY_REQUIRED;
-		    if (debug) {
-			dprint(".membershipChange: already changing");
-		    }
+                    alreadyChangingMembership();
 		    return;
 		}
 	    }
@@ -396,32 +361,67 @@ public class ServerGroupManager
 			// One or more notifies arrived while processing
 			// this notify.  Therefore do the restart again.
 			loop = true;
-			if (debug) { dprint(".membershipChange: looping"); }
+                        loopingForMembershipChange();
 		    } else if (membershipChangeState == MembershipChangeState.DOING_WORK) {
 			membershipChangeState = MembershipChangeState.IDLE;
 		    } else if (membershipChangeState == MembershipChangeState.IDLE) {
-			if (debug) { 
-			    dprint(".membershipChange: unexpected state: " 
-				   + membershipChangeState); 
-			}
+                        unexpectedStateForMembershipChange();
 		    }
 		}
 	    } while (loop);
 	    
 	} catch (RuntimeException e) {
-	    // REVISIT - error string
-	    dprint(".membershipChange: " + e);
+            // XXX log
 
 	    // If we get an exception we need to ensure that we do not
 	    // lock out further changes.
 	    synchronized (this) {
 		membershipChangeState = MembershipChangeState.IDLE;
 	    }
-	} finally {
-	    if (debug) { dprint(".membershipChange<-:"); }
 	}
     }
 
+
+    @Folb
+    public class WorkerThread extends Thread {
+        @InfoMethod
+        private void suspendRFM() { }
+
+        @InfoMethod
+        private void updateMembershipLabelInfo() { }
+
+        @InfoMethod
+        private void restartFactories() { }
+
+        @InfoMethod
+        private void resumeRFM() { }
+
+        @Folb
+        public void run() {
+            try {
+                suspendRFM() ;
+                referenceFactoryManager.suspend();
+
+                // Requests have drained so update label.
+                // IMPORTANT: do not update label until requests
+                // have drained.  Otherwise responses will compare
+                // against wrong label.
+                updateMembershipLabelInfo();
+                updateMembershipLabel();
+
+                restartFactories();
+                referenceFactoryManager.restartFactories();
+            } finally {
+                resumeRFM();
+                referenceFactoryManager.resume();
+            }
+        }
+    }
+
+    @InfoMethod
+    private void waitingForWorkerTermination() { }
+
+    @Folb
     private void restartFactories() {
 	//
 	// REVISIT
@@ -445,47 +445,12 @@ public class ServerGroupManager
 	
 	final ReferenceFactoryManager rfm = referenceFactoryManager;
 
-	Thread worker = new Thread() {
-            public void run() {
-		try {
-		    if (debug) { dprint(".membershipChange: rfm.suspend"); }
-		    rfm.suspend();
-		
-		    // Requests have drained so update label.
-		    // IMPORTANT: do not update label until requests
-		    // have drained.  Otherwise responses will compare
-		    // against wrong label.
-		    if (debug) {
-			dprint(".membershipChange: "
-			       + "updating membership label");
-		    }
-		    updateMembershipLabel();
-		    
-		    if (debug) {
-			dprint(".membershipChange: rfm.restartFactories");
-		    }
-		    rfm.restartFactories();
-		    
-		} finally {
-		    if (debug) {
-			dprint(".membershipChange: rfm.resume");
-		    }
-		    rfm.resume();
-		}
-		
-		if (debug) {
-		    dprint(".membershipChange: done with rfm");
-		}
-	    }
-	} ;
+	Thread worker = new WorkerThread() ;
 	
 	worker.start();
 	
-	if (debug) {
-	    dprint(".membershipChange: waiting for worker to terminate");
-	}
-
 	// Make sure the worker terminates before we continue
+        waitingForWorkerTermination();
 	boolean tryAgain;
 	do {
 	    tryAgain = false;
@@ -494,20 +459,18 @@ public class ServerGroupManager
 		worker.join(); 
 	    } catch (InterruptedException e) { 
 		// clear the interrupted status
+                // XXX Is this the correct thread?
 		Thread.currentThread().interrupted() ; 
 		tryAgain = true; 
 	    }
 	} while (tryAgain);
-
-	if (debug) {
-	    dprint(".membershipChange: done waiting for termination");
-	}
     }
 
-    private void updateMembershipLabel()
-    {
-	if (debug) { dprint(".updateMembershipLabel->:"); }
+    @InfoMethod
+    private void newMembershipLabel( String ml ) { }
 
+    @Folb
+    private void updateMembershipLabel() {
 	UID uid = new UID();
 	String hostAddress = null;
 	try {
@@ -516,14 +479,9 @@ public class ServerGroupManager
 	    // Not necessary but easier to debug.
 	    hostAddress = InetAddress.getLocalHost().getHostAddress();
 	    membershipLabel = hostAddress + ":::" + uid;
-	    if (debug) {
-		dprint(".updateMembershipLabel: " + membershipLabel);
-	    }
+            newMembershipLabel( membershipLabel );
 	} catch (UnknownHostException e) {
-	    // REVISIT - error string
-	    dprint(".updateMembershipLabel: " + e);
-	} finally {
-	    if (debug) { dprint(".updateMembershipLabel<-:"); }
+            // XXX log
 	}
     }
 
@@ -532,26 +490,16 @@ public class ServerGroupManager
     // ServerRequestInterceptor
     //
 
+    @Folb
     public void receive_request_service_contexts(ServerRequestInfo ri)
     {
-	if (debug) {
-	    dprint(".receive_request_service_contexts->: " + ri.operation());
-	}
 	initialize();
-	if (debug) {
-	    dprint(".receive_request_service_contexts<-: " + ri.operation());
-	}
     }
 
+    @Folb
     public void receive_request(ServerRequestInfo ri)
     {
-	if (debug) {
-	    dprint(".receive_request->: " + ri.operation());
-	}
 	initialize();
-	if (debug) {
-	    dprint(".receive_request<-: " + ri.operation());
-	}
     }
 
     public void send_reply(ServerRequestInfo ri)
@@ -569,46 +517,51 @@ public class ServerGroupManager
 	send_star(".send_other", ri);
     }
 
+    @InfoMethod
+    private void rfmIsHolding() { }
+
+    @InfoMethod
+    private void notManagedByReferenceFactory( String[] adapterName ) { }
+
+    @InfoMethod 
+    private void membershipLabelsEqual() { }
+    
+    @InfoMethod 
+    private void membershipLabelsNotEqual() { }
+    
+    @InfoMethod 
+    private void membershipLabelsNotPresent() { }
+   
+    @InfoMethod
+    private void sendingUpdatedIOR( String[] adapterName ) { }
+
     /**
      * If the request membership label is out-of-date or missing
      * then return an updated IOR.
      */
+    @Folb
     private void send_star(String point, ServerRequestInfo ri)
     {
 	String[] adapterName = null;
 	try {
 	    adapterName = ri.adapter_name();
 
-	    if (debug) { dprint(point + "->:", adapterName); }
-
 	    if (referenceFactoryManager.getState().value() == 
-		org.omg.PortableServer.POAManagerPackage.State._HOLDING) 
-            {
-		if (debug) {
-		    dprint(point + ": RFM in HOLDING - therefore no action");
-		}
+		org.omg.PortableServer.POAManagerPackage.State._HOLDING) {
+                rfmIsHolding();
 		return;
 	    }
 
 	    ReferenceFactory referenceFactory = 
 		referenceFactoryManager.find(adapterName);
 
-	    //
 	    // Only handle RefenceFactory adapters.
-	    //
-
 	    if (referenceFactory == null) {
-		if (debug) {
-		    dprint(point + ": not managed by ReferenceFactory", 
-			   adapterName);
-		}
+                notManagedByReferenceFactory( adapterName ) ;
 		return;
 	    }
 
-	    //
 	    // Handle membership label from request.
-	    //
-
 	    String requestMembershipLabel = null;
 	    try {
 		ServiceContext sc = ri.get_request_service_context(
@@ -619,31 +572,22 @@ public class ServerGroupManager
 		    requestMembershipLabel = new String(data);
 
 		    if (membershipLabel.equals(requestMembershipLabel)) {
-			if (debug) {
-			    dprint(point + ": membership labels EQUAL", adapterName);
-			}
+                        membershipLabelsEqual();
 			return;
 		    }
-		    if (debug) {
-			dprint(point + ": membership labels NOT equal", adapterName);
-		    }
+                    membershipLabelsNotEqual();
 		}
 	    } catch (BAD_PARAM e) {
-		if (debug) {
-		    dprint(point + ": membership label not present", adapterName);
-		}
+                membershipLabelsNotPresent();
 		// REVISIT: CHECK: if not our ORB then return.  --
 	    }
 
-	    //
 	    // Send IOR UPDATE
 	    //
 	    // At this point either the labels do not match
 	    // or our ORB has sent a request without a label (e.g., bootstrap).
 	    // Therefore send an updated IOR.
-	    //
-
-	    if (debug) { dprint(point + ": sending updated IOR", adapterName);}
+            sendingUpdatedIOR( adapterName ) ;
 	    
 	    byte[] objectId = ri.object_id();
 	    org.omg.CORBA.Object ref = 
@@ -657,16 +601,15 @@ public class ServerGroupManager
 	    try {
 		data = codec.encode_value(any);
 	    } catch (InvalidTypeForEncoding e) {
-		// REVISIT - error string
-		dprint(point + ": " + e);
+                // XXX log me
 	    }
 	    ServiceContext sc = new ServiceContext(
                 ORBConstants.FOLB_IOR_UPDATE_SERVICE_CONTEXT_ID, data);
 	    ri.add_reply_service_context(sc, false);
 	} catch (RuntimeException e) {
-	    if (debug) { dprint(point + ": exception: " + e, adapterName); }
+            // XXX log
 	} finally {
-	    if (debug) { dprint(point + "<-:", adapterName); }
+            // XXX log
 	}
     }
 
@@ -679,16 +622,14 @@ public class ServerGroupManager
     {
     }
 
+    @Folb
     public void post_init(ORBInitInfo info) {
-	if (debug) { dprint(".post_init->:"); }
 	try {
 	    info.add_ior_interceptor(this);
 	    info.add_server_request_interceptor(this);
 	} catch (Exception e) {
-	    // REVISIT - error string
-	    dprint(".post_init: " + e);
+            // XXX log
 	}
-	if (debug) { dprint(".post_init<-:"); }
     }
 
     ////////////////////////////////////////////////////
@@ -696,21 +637,13 @@ public class ServerGroupManager
     // ORBConfigurator
     //
 
+    @Folb
     public void configure(DataCollector collector, ORB orb) 
     {
-	debug = debug || orb.transportDebugFlag;
-
-	if (debug) { dprint(".configure->:"); }
-
 	this.orb = orb;
 
-	//
 	// Setup for IOR and ServerRequest Interceptors
-	//
-
 	orb.getORBData().addORBInitializer(this);
-
-	if (debug) { dprint(".configure<-:"); }
     }
 
     ////////////////////////////////////////////////////

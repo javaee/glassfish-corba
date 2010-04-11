@@ -55,6 +55,8 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.trace.Transport;
+import com.sun.corba.se.spi.trace.MonitorRead ;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import org.omg.CORBA.Any;
@@ -63,6 +65,8 @@ import org.omg.CORBA.TypeCode;
 /**
  * @author Harold Carr
  */
+@Transport
+@MonitorRead
 public class CDRInputObject 
     extends org.omg.CORBA_2_3.portable.InputStream
     implements com.sun.corba.se.impl.encoding.MarshalInputStream,
@@ -147,22 +151,26 @@ public class CDRInputObject
 	this.wrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 	this.omgWrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_OMG() ;
 
-	tp.enter_createCDRInputStream() ;
-	try {
-	    impl = InputStreamFactory.newInputStream(this.orb, version,
-						     encodingVersion, directRead);
-
-	    impl.init(orb, byteBuffer, size, littleEndian, bufMgr);
-
-	    impl.setParent(this);
-	} finally {
-	    tp.exit_createCDRInputStream() ;
-	}
+        createCDRInputStream( version, encodingVersion, directRead,
+            byteBuffer, size, littleEndian, bufMgr ) ;
 
         this.corbaConnection = null ;
         this.header = null ;
         this.unmarshaledHeader = false ;
         this.messageMediator = null ;
+    }
+
+    @MonitorRead
+    private void createCDRInputStream( GIOPVersion version,
+        byte encodingVersion, boolean directRead, ByteBuffer byteBuffer,
+        int size, boolean littleEndian, BufferManagerRead bufMgr ) {
+
+        impl = InputStreamFactory.newInputStream(this.orb, version,
+            encodingVersion, directRead);
+
+        impl.init(orb, byteBuffer, size, littleEndian, bufMgr);
+
+        impl.setParent(this);
     }
 
     public CDRInputObject(org.omg.CORBA.ORB orb, ByteBuffer byteBuffer, int size,
@@ -184,10 +192,6 @@ public class CDRInputObject
 
 	this.corbaConnection = corbaConnection;
         this.header = header ;
-
-	if (orb.transportDebugFlag) {
-	    dprint(".CDRInputObject constructor:");
-	}
 
         getBufferManager().init(header);
         setIndex(Message.GIOPMessageHeaderLength);
@@ -212,34 +216,26 @@ public class CDRInputObject
         return header;
     }
 
+    private void unmarshalledHeader( Message msg ) { }
+
     /**
      * Unmarshal the extended GIOP header
      * NOTE: May be fragmented, so should not be called by the ReaderThread.
      * See CorbaResponseWaitingRoomImpl.waitForResponse.  It is done
      * there in the client thread.
      */
+    @Transport
     public void unmarshalHeader()
     {
         // Unmarshal the extended GIOP message from the buffer.
 
         if (!unmarshaledHeader) {
 	    try {
-		if (((ORB)orb()).transportDebugFlag) {
-		    dprint(".unmarshalHeader->: " + getMessageHeader());
-		}
 		getMessageHeader().read(this);
+                unmarshalledHeader( getMessageHeader() ) ;
 		unmarshaledHeader= true;
 	    } catch (RuntimeException e) {
-		if (((ORB)orb()).transportDebugFlag) {
-		    dprint(".unmarshalHeader: !!ERROR!!: " 
-			   + getMessageHeader()
-			   + ": " + e);
-		}
 		throw e;
-	    } finally {
-		if (((ORB)orb()).transportDebugFlag) {
-		    dprint(".unmarshalHeader<-: " + getMessageHeader());
-		}
 	    }
         }
     }
@@ -350,316 +346,180 @@ public class CDRInputObject
     }
     
     // org.omg.CORBA.portable.InputStream
+    @MonitorRead
     public final boolean read_boolean() {
-	tp.enter_readBooleanFromCDRStream() ;
-	try {
-	    return impl.read_boolean();
-	} finally {
-	    tp.exit_readBooleanFromCDRStream() ;
-	}
+        return impl.read_boolean();
     }
 
+    @MonitorRead
     public final char read_char() {
-	tp.enter_readCharFromCDRStream() ;
-	try {
-	    return impl.read_char();
-	} finally {
-	    tp.exit_readCharFromCDRStream() ;
-	}
+        return impl.read_char();
     }
 
+    @MonitorRead
     public final char read_wchar() {
-	tp.enter_readWideCharFromCDRStream() ;
-	try {
-	    return impl.read_wchar();
-	} finally {
-	    tp.exit_readWideCharFromCDRStream() ;
-	}
+        return impl.read_wchar();
     }
 
+    @MonitorRead
     public final byte read_octet() {
-	tp.enter_readOctetFromCDRStream() ;
-	try {
-	    return impl.read_octet();
-	} finally {
-	    tp.exit_readOctetFromCDRStream() ;
-	}
+        return impl.read_octet();
     }
 
+    @MonitorRead
     public final short read_short() {
-	tp.enter_readShortFromCDRStream() ;
-	try {
-	    return impl.read_short();
-	} finally {
-	    tp.exit_readShortFromCDRStream() ;
-	}
+        return impl.read_short();
     }
 
+    @MonitorRead
     public final short read_ushort() {
-	tp.enter_readUnsignedShortFromCDRStream() ;
-	try {
-	    return impl.read_ushort();
-	} finally {
-	    tp.exit_readUnsignedShortFromCDRStream() ;
-	}
+        return impl.read_ushort();
     }
 
+    @MonitorRead
     public final int read_long() {
-	tp.enter_readLongFromCDRStream() ;
-	try {
-	    return impl.read_long();
-	} finally {
-	    tp.exit_readLongFromCDRStream() ;
-	}
+        return impl.read_long();
     }
 
+    @MonitorRead
     public final int read_ulong() {
-	tp.enter_readUnsignedLongFromCDRStream() ;
-	try {
-	    return impl.read_ulong();
-	} finally {
-	    tp.exit_readUnsignedLongFromCDRStream() ;
-	}
+        return impl.read_ulong();
     }
 
+    @MonitorRead
     public final long read_longlong() {
-	tp.enter_readLongLongFromCDRStream() ;
-	try {
-	    return impl.read_longlong();
-	} finally {
-	    tp.exit_readLongLongFromCDRStream() ;
-	}
+        return impl.read_longlong();
     }
 
+    @MonitorRead
     public final long read_ulonglong() {
-	tp.enter_readUnsignedLongLongFromCDRStream() ;
-	try {
-	    return impl.read_ulonglong();
-	} finally {
-	    tp.exit_readUnsignedLongLongFromCDRStream() ;
-	}
+        return impl.read_ulonglong();
     }
 
+    @MonitorRead
     public final float read_float() {
-	tp.enter_readFloatFromCDRStream() ;
-	try {
-	    return impl.read_float();
-	} finally {
-	    tp.exit_readFloatFromCDRStream() ;
-	}
+        return impl.read_float();
     }
 
+    @MonitorRead
     public final double read_double() {
-	tp.enter_readDoubleFromCDRStream() ;
-	try {
-	    return impl.read_double();
-	} finally {
-	    tp.exit_readDoubleFromCDRStream() ;
-	}
+        return impl.read_double();
     }
 
+    @MonitorRead
     public final String read_string() {
-	tp.enter_readStringFromCDRStream() ;
-	try {
-	    return impl.read_string();
-	} finally {
-	    tp.exit_readStringFromCDRStream() ;
-	}
+        return impl.read_string();
     }
 
+    @MonitorRead
     public final String read_wstring() {
-	tp.enter_readWideStringFromCDRStream() ;
-	try {
-	    return impl.read_wstring();
-	} finally {
-	    tp.exit_readWideStringFromCDRStream() ;
-	}
+        return impl.read_wstring();
     }
 
+    @MonitorRead
     public final void read_boolean_array(boolean[] value, int offset, int length) {
-	tp.enter_readBooleanArrayFromCDRStream() ;
-	try {
-	    impl.read_boolean_array(value, offset, length);
-	} finally {
-	    tp.exit_readBooleanArrayFromCDRStream() ;
-	}
+        impl.read_boolean_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_char_array(char[] value, int offset, int length) {
-	tp.enter_readCharArrayFromCDRStream() ;
-	try {
-	    impl.read_char_array(value, offset, length);
-	} finally {
-	    tp.exit_readCharArrayFromCDRStream() ;
-	}
+        impl.read_char_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_wchar_array(char[] value, int offset, int length) {
-	tp.enter_readWideCharArrayFromCDRStream() ;
-	try {
-	    impl.read_wchar_array(value, offset, length);
-	} finally {
-	    tp.exit_readWideCharArrayFromCDRStream() ;
-	}
+        impl.read_wchar_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_octet_array(byte[] value, int offset, int length) {
-	tp.enter_readOctetArrayFromCDRStream() ;
-	try {
-	    impl.read_octet_array(value, offset, length);
-	} finally {
-	    tp.exit_readOctetArrayFromCDRStream() ;
-	}
+        impl.read_octet_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_short_array(short[] value, int offset, int length) {
-	tp.enter_readShortArrayFromCDRStream() ;
-	try {
-	    impl.read_short_array(value, offset, length);
-	} finally {
-	    tp.exit_readShortArrayFromCDRStream() ;
-	}
+        impl.read_short_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_ushort_array(short[] value, int offset, int length) {
-	tp.enter_readUnsignedShortArrayFromCDRStream() ;
-	try {
-	    impl.read_ushort_array(value, offset, length);
-	} finally {
-	    tp.exit_readUnsignedShortArrayFromCDRStream() ;
-	}
+        impl.read_ushort_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_long_array(int[] value, int offset, int length) {
-	tp.enter_readLongArrayFromCDRStream() ;
-	try {
-	    impl.read_long_array(value, offset, length);
-	} finally {
-	    tp.exit_readLongArrayFromCDRStream() ;
-	}
+        impl.read_long_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_ulong_array(int[] value, int offset, int length) {
-	tp.enter_readUnsignedLongArrayFromCDRStream() ;
-	try {
-	    impl.read_ulong_array(value, offset, length);
-	} finally {
-	    tp.exit_readUnsignedLongArrayFromCDRStream() ;
-	}
+        impl.read_ulong_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_longlong_array(long[] value, int offset, int length) {
-	tp.enter_readLongLongArrayFromCDRStream() ;
-	try {
-	    impl.read_longlong_array(value, offset, length);
-	} finally {
-	    tp.exit_readLongLongArrayFromCDRStream() ;
-	}
+        impl.read_longlong_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_ulonglong_array(long[] value, int offset, int length) {
-	tp.enter_readUnsignedLongLongArrayFromCDRStream() ;
-	try {
-	    impl.read_ulonglong_array(value, offset, length);
-	} finally {
-	    tp.exit_readUnsignedLongLongArrayFromCDRStream() ;
-	}
+        impl.read_ulonglong_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_float_array(float[] value, int offset, int length) {
-	tp.enter_readFloatArrayFromCDRStream() ;
-	try {
-	    impl.read_float_array(value, offset, length);
-	} finally {
-	    tp.exit_readFloatArrayFromCDRStream() ;
-	}
+        impl.read_float_array(value, offset, length);
     }
 
+    @MonitorRead
     public final void read_double_array(double[] value, int offset, int length) {
-	tp.enter_readDoubleArrayFromCDRStream() ;
-	try {
-	    impl.read_double_array(value, offset, length);
-	} finally {
-	    tp.exit_readDoubleArrayFromCDRStream() ;
-	}
+        impl.read_double_array(value, offset, length);
     }
 
+    @MonitorRead
     public final org.omg.CORBA.Object read_Object() {
-	tp.enter_readObjectFromCDRStream() ;
-	try {
-	    return impl.read_Object();
-	} finally {
-	    tp.exit_readObjectFromCDRStream() ;
-	}
+        return impl.read_Object();
     }
 
+    @MonitorRead
     public final TypeCode read_TypeCode() {
-	tp.enter_readTypeCodeFromCDRStream() ;
-	try {
-	    return impl.read_TypeCode();
-	} finally {
-	    tp.exit_readTypeCodeFromCDRStream() ;
-	}
+        return impl.read_TypeCode();
     }
 
+    @MonitorRead
     public final Any read_any() {
-	tp.enter_readAnyFromCDRStream() ;
-	try {
-	    return impl.read_any();
-	} finally {
-	    tp.exit_readAnyFromCDRStream() ;
-	}
+        return impl.read_any();
     }
 
+    @MonitorRead
     @SuppressWarnings({"deprecation"})
     @Override
     public final org.omg.CORBA.Principal read_Principal() {
-	tp.enter_readPrincipalFromCDRStream() ;
-	try {
-	    return impl.read_Principal();
-	} finally {
-	    tp.exit_readPrincipalFromCDRStream() ;
-	}
+        return impl.read_Principal();
     }
 
+    @MonitorRead
     @Override
     public final int read() throws java.io.IOException {
-	tp.enter_readIntFromCDRStream() ;
-	try {
-	    return impl.read();
-	} finally {
-	    tp.exit_readIntFromCDRStream() ;
-	}
+        return impl.read();
     }
 
+    @MonitorRead
     @Override
     public final java.math.BigDecimal read_fixed() {
-	tp.enter_readFixedFromCDRStream() ;
-	try {
-	    return impl.read_fixed();
-	} finally {
-	    tp.exit_readFixedFromCDRStream() ;
-	}
+        return impl.read_fixed();
     }
 
+    @MonitorRead
     @Override
     public final org.omg.CORBA.Context read_Context() {
-	tp.enter_readContextFromCDRStream() ;
-	try {
-	    return impl.read_Context();
-	} finally {
-	    tp.exit_readContextFromCDRStream() ;
-	}
+        return impl.read_Context();
     }
 
+    @MonitorRead
     @Override
     public final org.omg.CORBA.Object read_Object(java.lang.Class clz) {
-	tp.enter_readObjectWithClassFromCDRStream() ;
-	try {
-	    return impl.read_Object(clz);
-	} finally {
-	    tp.exit_readObjectWithClassFromCDRStream() ;
-	}
+        return impl.read_Object(clz);
     }
 
     @Override
@@ -668,86 +528,54 @@ public class CDRInputObject
     }
 
     // org.omg.CORBA_2_3.portable.InputStream
+    @MonitorRead
     @Override
     public final java.io.Serializable read_value() {
-	tp.enter_readValueFromCDRStream() ;
-	try {
-	    return impl.read_value();
-	} finally {
-	    tp.exit_readValueFromCDRStream() ;
-	}
+        return impl.read_value();
     }
 
+    @MonitorRead
     @Override
     public final java.io.Serializable read_value(java.lang.Class clz) {
-	tp.enter_readValueWithClassFromCDRStream() ;
-	try {
-	    return impl.read_value(clz);
-	} finally {
-	    tp.exit_readValueWithClassFromCDRStream() ;
-	}
+        return impl.read_value(clz);
     }
 
+    @MonitorRead
     @Override
     public final java.io.Serializable read_value(
         org.omg.CORBA.portable.BoxedValueHelper factory) {
 
-	tp.enter_readValueWithFactoryFromCDRStream() ;
-	try {
-	    return impl.read_value(factory);
-	} finally {
-	    tp.exit_readValueWithFactoryFromCDRStream() ;
-	}
+        return impl.read_value(factory);
     }
 
+    @MonitorRead
     @Override
     public final java.io.Serializable read_value(java.lang.String rep_id) {
-	tp.enter_readValueWithRepidFromCDRStream() ;
-	try {
-	    return impl.read_value(rep_id);
-	} finally {
-	    tp.exit_readValueWithRepidFromCDRStream() ;
-	}
+        return impl.read_value(rep_id);
     }
 
+    @MonitorRead
     @Override
     public final java.io.Serializable read_value(java.io.Serializable value) {
-	tp.enter_readValueWithSerializableFromCDRStream() ;
-	try {
-	    return impl.read_value(value);
-	} finally {
-	    tp.exit_readValueWithSerializableFromCDRStream() ;
-	}
+        return impl.read_value(value);
     }
 
+    @MonitorRead
     @Override
     public final java.lang.Object read_abstract_interface() {
-	tp.enter_readAbstractInterfaceFromCDRStream() ;
-	try {
-	    return impl.read_abstract_interface();
-	} finally {
-	    tp.exit_readAbstractInterfaceFromCDRStream() ;
-	}
+        return impl.read_abstract_interface();
     }
 
+    @MonitorRead
     @Override
     public final java.lang.Object read_abstract_interface(java.lang.Class clz) {
-	tp.enter_readAbstractInterfaceWithClassFromCDRStream() ;
-	try {
-	    return impl.read_abstract_interface(clz);
-	} finally {
-	    tp.exit_readAbstractInterfaceWithClassFromCDRStream() ;
-	}
+        return impl.read_abstract_interface(clz);
     }
     // com.sun.corba.se.impl.encoding.MarshalInputStream
 
+    @MonitorRead
     public final void consumeEndian() {
-	tp.enter_consumeEndianCDRStream() ;
-	try {
-	    impl.consumeEndian();
-	} finally {
-	    tp.exit_consumeEndianCDRStream() ;
-	}
+        impl.consumeEndian();
     }
 
     public final int getPosition() {
@@ -756,139 +584,79 @@ public class CDRInputObject
 
     // org.omg.CORBA.DataInputStream
 
+    @MonitorRead
     public final java.lang.Object read_Abstract () {
-	tp.enter_readAbstractFromCDRStream() ;
-	try {
-	    return impl.read_Abstract();
-	} finally {
-	    tp.exit_readAbstractFromCDRStream() ;
-	}
+        return impl.read_Abstract();
     }
 
+    @MonitorRead
     public final java.io.Serializable read_Value () {
-	tp.enter_readValue2FromCDRStream() ;
-	try {
-	    return impl.read_Value();
-	} finally {
-	    tp.exit_readValue2FromCDRStream() ;
-	}
+        return impl.read_Value();
     }
 
+    @MonitorRead
     public final void read_any_array (org.omg.CORBA.AnySeqHolder seq, int offset, int length) {
-	tp.enter_readAnyArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_any_array(seq, offset, length);
-	} finally {
-	    tp.exit_readAnyArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_any_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_boolean_array (org.omg.CORBA.BooleanSeqHolder seq, int offset, int length) {
-	tp.enter_readBooleanArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_boolean_array(seq, offset, length);
-	} finally {
-	    tp.exit_readBooleanArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_boolean_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_char_array (org.omg.CORBA.CharSeqHolder seq, int offset, int length) {
-	tp.enter_readCharArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_char_array(seq, offset, length);
-	} finally {
-	    tp.exit_readCharArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_char_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_wchar_array (org.omg.CORBA.WCharSeqHolder seq, int offset, int length) {
-	tp.enter_readWideCharArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_wchar_array(seq, offset, length);
-	} finally {
-	    tp.exit_readWideCharArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_wchar_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_octet_array (org.omg.CORBA.OctetSeqHolder seq, int offset, int length) {
-	tp.enter_readOctetArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_octet_array(seq, offset, length);
-	} finally {
-	    tp.exit_readOctetArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_octet_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_short_array (org.omg.CORBA.ShortSeqHolder seq, int offset, int length) {
-	tp.enter_readShortArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_short_array(seq, offset, length);
-	} finally {
-	    tp.exit_readShortArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_short_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_ushort_array (org.omg.CORBA.UShortSeqHolder seq, int offset, int length) {
-	tp.enter_readUnsignedShortArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_ushort_array(seq, offset, length);
-	} finally {
-	    tp.exit_readUnsignedShortArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_ushort_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_long_array (org.omg.CORBA.LongSeqHolder seq, int offset, int length) {
-	tp.enter_readLongArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_long_array(seq, offset, length);
-	} finally {
-	    tp.exit_readLongArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_long_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_ulong_array (org.omg.CORBA.ULongSeqHolder seq, int offset, int length) {
-	tp.enter_readUnsignedLongArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_ulong_array(seq, offset, length);
-	} finally {
-	    tp.exit_readUnsignedLongArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_ulong_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_ulonglong_array (org.omg.CORBA.ULongLongSeqHolder seq, int offset, int length) {
-	tp.enter_readUnsignedLongLongArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_ulonglong_array(seq, offset, length);
-	} finally {
-	    tp.exit_readUnsignedLongLongArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_ulonglong_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_longlong_array (org.omg.CORBA.LongLongSeqHolder seq, int offset, int length) {
-	tp.enter_readLongLongArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_longlong_array(seq, offset, length);
-	} finally {
-	    tp.exit_readLongLongArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_longlong_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_float_array (org.omg.CORBA.FloatSeqHolder seq, int offset, int length) {
-	tp.enter_readFloatArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_float_array(seq, offset, length);
-	} finally {
-	    tp.exit_readFloatArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_float_array(seq, offset, length);
     }
 
+    @MonitorRead
     public final void read_double_array (org.omg.CORBA.DoubleSeqHolder seq, int offset, int length) {
-	tp.enter_readDoubleArrayWithHolderFromCDRStream() ;
-	try {
-	    impl.read_double_array(seq, offset, length);
-	} finally {
-	    tp.exit_readDoubleArrayWithHolderFromCDRStream() ;
-	}
+        impl.read_double_array(seq, offset, length);
     }
 
     // org.omg.CORBA.portable.ValueBase
@@ -897,34 +665,22 @@ public class CDRInputObject
     }
 
     // java.io.InputStream
+    @MonitorRead
     @Override
     public final int read(byte b[]) throws IOException {
-	tp.enter_readByteArrayFromCDRStream() ;
-	try {
-	    return impl.read(b);
-	} finally {
-	    tp.exit_readByteArrayFromCDRStream() ;
-	}
+        return impl.read(b);
     }
 
+    @MonitorRead
     @Override
     public final int read(byte b[], int off, int len) throws IOException {
-	tp.enter_readByteArrayWithOffsetFromCDRStream() ;
-	try {
-	    return impl.read(b, off, len);
-	} finally {
-	    tp.exit_readByteArrayWithOffsetFromCDRStream() ;
-	}
+        return impl.read(b, off, len);
     }
 
+    @MonitorRead
     @Override
     public final long skip(long n) throws IOException {
-	tp.enter_skipCDRStream() ;
-	try {
-	    return impl.skip(n);
-	} finally {
-	    tp.exit_skipCDRStream() ;
-	}
+        return impl.skip(n);
     }
 
     @Override
@@ -932,34 +688,22 @@ public class CDRInputObject
 	return impl.available();
     }
 
+    @MonitorRead
     @Override
     public void close() throws IOException {
-	tp.enter_closeCDRInputStream() ;
-	try {
-	    impl.close();
-	} finally {
-	    tp.exit_closeCDRInputStream() ;
-	}
+        impl.close();
     }
 
+    @MonitorRead
     @Override
     public final void mark(int readlimit) {
-	tp.enter_markCDRStream() ;
-	try {
-	    impl.mark(readlimit);
-	} finally {
-	    tp.exit_markCDRStream() ;
-	}
+        impl.mark(readlimit);
     }
 
+    @MonitorRead
     @Override
     public final void reset() {
-	tp.enter_resetCDRStream() ;
-	try {
-	    impl.reset();
-	} finally {
-	    tp.exit_resetCDRStream() ;
-	}
+        impl.reset();
     }
 
     @Override
@@ -968,13 +712,9 @@ public class CDRInputObject
     }
 
     // Needed by TCUtility
+    @MonitorRead
     public final java.math.BigDecimal read_fixed(short digits, short scale) {
-	tp.enter_readFixed2FromCDRStream() ;
-	try {
-	    return impl.read_fixed(digits, scale);
-	} finally {
-	    tp.exit_readFixed2FromCDRStream() ;
-	}
+        return impl.read_fixed(digits, scale);
     }
 
     public final boolean isLittleEndian() {
@@ -1028,23 +768,15 @@ public class CDRInputObject
      * GIOP 1.2 message headers.
      * @param octetBoundary alignment boundary.
      */
+    @MonitorRead
     public void alignOnBoundary(int octetBoundary) {
-	tp.enter_alignOnBoundaryCDRStream() ;
-	try {
-	    impl.alignOnBoundary(octetBoundary);
-	} finally {
-	    tp.exit_alignOnBoundaryCDRStream() ;
-	}
+        impl.alignOnBoundary(octetBoundary);
     }
 
     // Needed by request and reply messages for GIOP versions >= 1.2 only.
+    @MonitorRead
     public void setHeaderPadding(boolean headerPadding) {
-	tp.enter_setHeaderPaddingCDRStream() ;
-	try {
-	    impl.setHeaderPadding(headerPadding);
-	} finally {
-	    tp.exit_setHeaderPaddingCDRStream() ;
-	}
+        impl.setHeaderPadding(headerPadding);
     }
     
     /**
@@ -1085,23 +817,15 @@ public class CDRInputObject
     }
 
     // ValueInputStream -----------------------------
-
+    @MonitorRead
     public void start_value() {
-	tp.enter_startValueCDRInputStream() ;
-	try {
-	    impl.start_value();
-	} finally {
-	    tp.exit_startValueCDRInputStream() ;
-	}
+        impl.start_value();
     }
 
+    @MonitorRead
     public void end_value() {
-	tp.enter_endValueCDRInputStream() ;
-	try {
-	    impl.end_value();
-	} finally {
-	    tp.exit_endValueCDRInputStream() ;
-	}
-    }}
+        impl.end_value();
+    }
+}
 
 // End of file.

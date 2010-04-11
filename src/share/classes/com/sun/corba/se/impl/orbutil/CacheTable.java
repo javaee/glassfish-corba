@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -34,14 +34,12 @@
  * holder.
  */
 package com.sun.corba.se.impl.orbutil;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
 
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.spi.trace.Cdr;
 
 /** This is a hash table implementation that simultaneously maps key to value
  * and value to key.  It is used for marshalling and unmarshalling value types,
@@ -59,6 +57,7 @@ import com.sun.corba.se.impl.orbutil.ORBUtility ;
  *
  * @author Ken Cavanaugh
  */
+@Cdr
 public class CacheTable<K> {
     private class Entry<K> {
         K key;
@@ -156,12 +155,8 @@ public class CacheTable<K> {
 	}
     }
 
+    @Cdr
     private boolean put_table(K key, int val) {
-	if (orb.cdrCacheDebugFlag)
-	    ORBUtility.dprint( this, cacheType + " put_table: " 
-		+ "key=" + key + "(" + System.identityHashCode( key ) + ") "
-		+ "val=" + val + "(" + val + ")" ) ;
-
 	int index = hash(key);
 
 	for (Entry e = map[index]; e != null; e = e.next) {

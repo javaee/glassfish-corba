@@ -399,7 +399,13 @@ public class CorbaClientRequestDispatcherImpl
     }
 
     @InfoMethod
-    private void receivedUserExceptio( String repoid ) { }
+    private void receivedUserException( String repoid ) { }
+
+    @InfoMethod
+    private void receivedUserExceptionDII( Throwable exc, Throwable newExc ) { }
+
+    @InfoMethod
+    private void receivedUserExceptionNotDII( Throwable exc, Throwable newExc ) { }
 
     @Subcontract
     protected CDRInputObject processResponse(ORB orb, 
@@ -532,7 +538,7 @@ public class CorbaClientRequestDispatcherImpl
 		    .reportSuccess(messageMediator.getContactInfo());
 
 		String exceptionRepoId = peekUserExceptionId(inputObject);
-                receivedUserExceptio(exceptionRepoId);
+                receivedUserException(exceptionRepoId);
 
 		Exception newException = null;
 
@@ -543,10 +549,7 @@ public class CorbaClientRequestDispatcherImpl
 				       ReplyMessage.USER_EXCEPTION, exception );
 		    messageMediator.setDIIException(newException);
 
-                    if (orb.subcontractDebugFlag) {
-                        dputil.info( "received user exception (DII)", "exception", exception,
-                            "newException", newException );
-                    }
+                    receivedUserExceptionDII(exception, newException);
 		} else {
 		    ApplicationException appException = new ApplicationException(
                         exceptionRepoId, (org.omg.CORBA.portable.InputStream)inputObject);
@@ -556,10 +559,7 @@ public class CorbaClientRequestDispatcherImpl
 		    newException = orb.getPIHandler().invokeClientPIEndingPoint(
 				       ReplyMessage.USER_EXCEPTION, appException );
 
-                    if (orb.subcontractDebugFlag) {
-                        dputil.info( "received user exception (not DII)", "exception", exception,
-                            "newException", newException );
-                    }
+                    receivedUserExceptionNotDII(exception, newException);
 		}
 
 		if (newException != exception) {

@@ -356,18 +356,18 @@ public class ArgParser<T> {
     private T makeProxy( final Map<String,Object> data,	    
 	final Map<String,Object> defaultData ) {
 
-	InvocationHandler ih = new InvocationHandler() {
-	    private Object getValue( String keyword ) {
+	final InvocationHandler ih = new InvocationHandler() {
+	    private Object getValue( final String keyword ) {
 		Object result = data.get( keyword ) ;
 		if (result == null)
 		    result = defaultData.get( keyword ) ;
 		return result ;
 	    }
 
-	    private String getString( Object obj ) {
-		Class cls = obj.getClass() ;
+	    private String getString( final Object obj ) {
+		final Class cls = obj.getClass() ;
 		if (cls.isArray()) {
-		    StringBuilder sb = new StringBuilder() ;
+		    final StringBuilder sb = new StringBuilder() ;
 		    sb.append( "[" ) ;
 		    for (int ctr=0; ctr<Array.getLength( obj ); ctr++) {
 			if (ctr>0) {
@@ -385,10 +385,12 @@ public class ArgParser<T> {
 		}
 	    }
 
-	    public Object invoke( Object proxy, Method method, Object[] args ) {
-		String name = method.getName() ;
+	    public Object invoke( final Object proxy, final Method method, 
+                final Object[] args ) {
+
+		final String name = method.getName() ;
 		if (name == "toString") {
-		    StringBuilder sb = new StringBuilder() ;
+		    final StringBuilder sb = new StringBuilder() ;
 		    for (String keyword : parserData.keySet()) {
 			sb.append( keyword ) ;
 			sb.append( "=" ) ;
@@ -402,9 +404,18 @@ public class ArgParser<T> {
 	    }
 	} ;
 
-	Class<?>[] interfaces = new Class<?>[] { interfaceClass } ;
-	return interfaceClass.cast( Proxy.newProxyInstance( this.getClass().getClassLoader(),
-	    interfaces, ih ) ) ;
+	final Class<?>[] interfaces = new Class<?>[] { interfaceClass } ;
+
+        ClassLoader cl = this.getClass().getClassLoader() ;
+        if (cl == null) {
+            cl = interfaceClass.getClass().getClassLoader() ;
+        }
+        if (cl == null) {
+            ClassLoader.getSystemClassLoader() ;
+        }
+
+	return interfaceClass.cast( 
+            Proxy.newProxyInstance( cl, interfaces, ih ) ) ;
     }
 
 ////////////////////////////////////////////////////////////////////////////////////

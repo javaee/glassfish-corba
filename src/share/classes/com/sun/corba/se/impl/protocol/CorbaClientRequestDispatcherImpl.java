@@ -89,6 +89,7 @@ import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
 import com.sun.corba.se.impl.orbutil.DprintUtil;
@@ -917,7 +918,14 @@ public class CorbaClientRequestDispatcherImpl
     public void endRequest(ORB broker, Object self, CDRInputObject inputObject)
     {
 	ORB orb = (ORB)broker ;
-	TimingPoints tp = orb.getTimerManager().points() ;
+
+        TimerManager<TimingPoints> tm = orb.getTimerManager() ;
+        if (tm == null) {
+            // ORB was shutdown: no action possible
+            return ;
+        }
+
+	TimingPoints tp = tm.points() ;
 
 	try {
 	    tp.exit_clientDecoding();

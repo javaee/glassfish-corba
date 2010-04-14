@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,10 +42,11 @@ import com.sun.corba.se.spi.transport.ListenerThread;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
+@Transport
 public class ListenerThreadImpl
     implements
 	ListenerThread,
@@ -75,12 +76,9 @@ public class ListenerThreadImpl
 	return acceptor;
     }
 
+    @Transport
     public synchronized void close()
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".close: " + acceptor);
-	}
-
 	keepRunning = false;
         acceptor.close() ;
     }
@@ -95,49 +93,37 @@ public class ListenerThreadImpl
     //
 
     // REVISIT - this needs alot more from previous ListenerThread
+    @InfoMethod
+    private void display( String msg ) { }
 
+    @InfoMethod
+    private void display( String msg, Object value ) { }
+
+    @Transport
     public void doWork()
     {
-	try {
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork: Start ListenerThread: " + acceptor);
-	    }
-	    while (isRunning()) {
-		try {
-		    if (orb.transportDebugFlag) {
-			dprint(".doWork: BEFORE ACCEPT CYCLE: " + acceptor);
-		    }
+        while (isRunning()) {
+            display( "acceptor", acceptor ) ;
+            try {
+                display( "Before Accept cycle" ) ;
+                acceptor.processSocket( acceptor.getAcceptedSocket() ) ;
+                display( "After Accept cycle" ) ;
+            } catch (Throwable t) {
+                wrapper.exceptionInListenerThread( t ) ;
+                display( "Exception in accept", t ) ;
 
-                    acceptor.processSocket( acceptor.getAcceptedSocket() ) ;
+                orb.getTransportManager().getSelector(0)
+                    .unregisterForEvent(getAcceptor().getEventHandler());
 
-		    if (orb.transportDebugFlag) {
-			dprint(".doWork: AFTER ACCEPT CYCLE: " + acceptor);
-		    }
-		} catch (Throwable t) {
-                    wrapper.exceptionInListenerThread( t ) ;
-
-		    if (orb.transportDebugFlag) {
-			dprint(".doWork: Exception in accept: " + acceptor,t);
-		    }
-
-
-		    orb.getTransportManager().getSelector(0)
-			.unregisterForEvent(getAcceptor().getEventHandler());
-
-                    try {
-                        if (isRunning()) {
-                            getAcceptor().close();
-                        }
-                    } catch (Exception exc) {
-                        wrapper.ioExceptionOnClose( exc ) ;
+                try {
+                    if (isRunning()) {
+                        getAcceptor().close();
                     }
-		}
-	    }
-	} finally {
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork: Terminated ListenerThread: " + acceptor);
-	    }
-	}
+                } catch (Exception exc) {
+                    wrapper.ioExceptionOnClose( exc ) ;
+                }
+            }
+        }
     }
 
     public void setEnqueueTime(long timeInMillis) 
@@ -156,17 +142,6 @@ public class ListenerThreadImpl
     //
     // Implementation.
     //
-
-    private void dprint(String msg)
-    {
-	ORBUtility.dprint("ListenerThreadImpl", msg);
-    }
-
-    private void dprint(String msg, Throwable t)
-    {
-	dprint(msg);
-	t.printStackTrace(System.out);
-    }
 }
 
 // End of file.

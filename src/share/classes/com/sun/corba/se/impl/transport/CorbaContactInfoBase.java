@@ -38,12 +38,7 @@ package com.sun.corba.se.impl.transport;
 
 import java.nio.ByteBuffer;
 
-import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaConnection;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 
 import com.sun.corba.se.spi.ior.IOR;
@@ -58,10 +53,10 @@ import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.se.spi.trace.Transport;
 
 /**
  * @author Harold Carr
@@ -136,18 +131,14 @@ public abstract class CorbaContactInfoBase
     }
 
     // Called when not using "useNIOToWait" configuration
+    @Transport
     public CorbaMessageMediator createMessageMediator(ORB broker,CorbaConnection conn)
     {
-	ORB orb = (ORB) broker;
+	ORB lorb = (ORB) broker;
 	CorbaConnection connection = (CorbaConnection) conn;
 
-        if (orb.transportDebugFlag) {
-            dprint(".createMessageMediator: waiting for message on connection: " +
-                    connection);
-	}
-
 	// read giop message
-	Message msg = MessageBase.readGIOPMessage(orb, connection);
+	Message msg = MessageBase.readGIOPMessage(lorb, connection);
 
 	ByteBuffer byteBuffer = msg.getByteBuffer();
 	msg.setByteBuffer(null);
@@ -171,9 +162,9 @@ public abstract class CorbaContactInfoBase
 	return outputObject;
     }
 
-    public CDRInputObject createInputObject(ORB broker,
-					 CorbaMessageMediator messageMediator)
-    {
+    public CDRInputObject createInputObject(ORB broker, 
+        CorbaMessageMediator messageMediator) {
+
 	// REVISIT: Duplicate of acceptor code.
 	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
 	    messageMediator;
@@ -188,29 +179,24 @@ public abstract class CorbaContactInfoBase
     // spi.transport.CorbaContactInfo
     //
 
-    public short getAddressingDisposition()
-    {
+    public short getAddressingDisposition() {
 	return addressingDisposition;
     }
 
-    public void setAddressingDisposition(short addressingDisposition)
-    {
+    public void setAddressingDisposition(short addressingDisposition) {
         this.addressingDisposition = addressingDisposition;
     }
 
     // REVISIT - remove this.
-    public IOR getTargetIOR()
-    {
+    public IOR getTargetIOR() {
 	return  contactInfoList.getTargetIOR();
     }
 
-    public IOR getEffectiveTargetIOR()
-    {
+    public IOR getEffectiveTargetIOR() {
 	return effectiveTargetIOR ;
     }
 
-    public IIOPProfile getEffectiveProfile()
-    {
+    public IIOPProfile getEffectiveProfile() {
 	return effectiveTargetIOR.getProfile();
     }
 
@@ -219,22 +205,8 @@ public abstract class CorbaContactInfoBase
     // java.lang.Object
     //
 
-    public String toString()
-    {
-	return
-	    "CorbaContactInfoBase[" 
-	    + "]";
-    }
-
-
-    ////////////////////////////////////////////////////
-    //
-    // Implementation
-    //
-
-    protected void dprint(String msg) 
-    {
-	ORBUtility.dprint("CorbaContactInfoBase", msg);
+    public String toString() {
+	return "CorbaContactInfoBase[" + "]";
     }
 }
 

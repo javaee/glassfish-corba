@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,7 +37,6 @@
 package com.sun.corba.se.impl.transport;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set ;
 import java.util.HashSet ;
@@ -46,9 +45,6 @@ import org.omg.CORBA.COMM_FAILURE;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TRANSIENT;
-
-import com.sun.corba.se.spi.transport.CorbaContactInfo ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.orb.ORB ;
@@ -60,12 +56,14 @@ import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 // REVISIT: create a unit test for this class.
 
+@Transport
 public class CorbaContactInfoListIteratorImpl
     implements
 	CorbaContactInfoListIterator
@@ -77,7 +75,6 @@ public class CorbaContactInfoListIteratorImpl
     private TimingPoints tp ;
     private boolean usePRLB ;
     protected TcpTimeouts tcpTimeouts ;
-    protected boolean debug;
 
     // ITERATOR state
     protected Iterator<CorbaContactInfo> effectiveTargetIORIterator;
@@ -104,7 +101,6 @@ public class CorbaContactInfoListIteratorImpl
 	this.tp = orb.getTimerManager().points() ;
 	this.wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 	this.tcpTimeouts = orb.getORBData().getTransportTcpConnectTimeouts() ;
-	this.debug = orb.transportDebugFlag;
 	this.contactInfoList = corbaContactInfoList;
 	this.primaryContactInfo = primaryContactInfo;
 	if (listOfContactInfos != null) {
@@ -135,34 +131,37 @@ public class CorbaContactInfoListIteratorImpl
         }
     }
 
+    @InfoMethod
+    private void display( String msg ) { }
+
+    @InfoMethod
+    private void display( String msg, Object value ) { }
+
+    @InfoMethod
+    private void display( String msg, long value ) { }
+
     ////////////////////////////////////////////////////
     //
     // java.util.Iterator
     //
 
+    @Transport
     public boolean hasNext() {
 	boolean result = false;
 	try {
 	    tp.enter_contactInfoListIteratorHasNext() ;
 
-	    if (debug) {
-		dprint(".hasNext->:");
-	    }
-
 	    if (retryWithPreviousContactInfo) {
-		if (debug) {
-		    dprint(".hasNext: backoff before retry previous");
-		}
+                display("backoff before retry previous");
 
 		if (waiter.isExpired()) {
-		    if (debug) {
-			dprint(".hasNext: time to wait for connection exceeded " 
-			       + tcpTimeouts.get_max_time_to_wait());
-		    }
+                    display("time to wait for connection exceeded " ,
+                       tcpTimeouts.get_max_time_to_wait());
 		    
 		    // NOTE: Need to indicate the timeout.
 		    // And it needs to break the loop in the delegate.
-		    failureException = wrapper.communicationsRetryTimeout( failureException,
+		    failureException = wrapper.communicationsRetryTimeout(
+                        failureException,
 			    Long.toString(tcpTimeouts.get_max_time_to_wait()));
 		    return false;
 		}
@@ -184,9 +183,7 @@ public class CorbaContactInfoListIteratorImpl
 	    }
 
 	    if (!result && !waiter.isExpired()) {
-		if (debug) {
-		    dprint("Reached end of ContactInfoList list. Starting at beginning");
-		}
+                display("Reached end of ContactInfoList list. Starting at beginning");
 
 		previousContactInfo = null;
 		if (primaryToContactInfo != null) {
@@ -203,13 +200,10 @@ public class CorbaContactInfoListIteratorImpl
 	    return result;
 	} finally {
 	    tp.exit_contactInfoListIteratorHasNext() ;
-
-	    if (debug) {
-		dprint(".hasNext<-: " + result);
-	    }
 	}
     }
 
+    @Transport
     public CorbaContactInfo next()
     {
 	try {
@@ -264,33 +258,29 @@ public class CorbaContactInfoListIteratorImpl
 	return contactInfoList;
     }
 
+    @Transport
     public void reportSuccess(CorbaContactInfo contactInfo)
     {
-	if (debug) {
-	    dprint(".reportSuccess: " + contactInfo);
-	}
+        display( "contactInfo", contactInfo) ;
 	failedEndpoints.clear() ;
 	waiter.reset() ; // not strictly necessary
     }
 
+    @Transport
     public boolean reportException(CorbaContactInfo contactInfo,
 				   RuntimeException ex) {
 	boolean result = false;
 	try {
+            display( "contactInfo", contactInfo) ;
 	    tp.enter_contactInfoListIteratorReportException() ;
-	    if (debug) {
-		dprint(".reportException->: " + contactInfo + " " + ex);
-	    }
 
 	    failedEndpoints.add( contactInfo ) ;
 	    this.failureException = ex;
 	    if (ex instanceof COMM_FAILURE) {
 		SystemException se = (SystemException) ex;
 		if (se.minor == ORBUtilSystemException.CONNECTION_REBIND) {
-		    if (debug) {
-			dprint(".reportException: " + contactInfo + " " + ex
-			    + ": COMM_FAILURE/CONNECTION_REBIND - retryWithPreviousContactInfo");
-		    }
+                    display( "COMM_FAILURE(connection rebind): " 
+                        + "retry with previous contact info", ex ) ;
 
 		    retryWithPreviousContactInfo = true;
 		    result = true;
@@ -298,19 +288,16 @@ public class CorbaContactInfoListIteratorImpl
 		} else {
 		    if (se.completed == CompletionStatus.COMPLETED_NO) {
 			if (hasNext()) {
-			    if (debug) {
-				dprint(".reportException: " + contactInfo + " " + ex
-				    + ": COMM_FAILURE/COMPLETED_NO and hasNext/true - try next ContactInfo");
-			    }
+                            display( "COMM_FAILURE(COMPLETED_NO, hasNext true): "
+                                + "retry with next contact info", ex ) ;
 			    result = true;
 			    return result;
 			}
 			if (contactInfoList.getEffectiveTargetIOR() !=
 			    contactInfoList.getTargetIOR()) {
-			    if (debug) {
-				dprint(".reportException: " + contactInfo + " " + ex
-				    + ": COMM_FAILURE/COMPLETED_NO and hasNext/false and effect != target - retry target");
-			    }
+                            display( "COMM_FAILURE(COMPLETED_NO, hasNext false, " +
+                                "effective != target): "
+                                + "retry with target", ex ) ;
 
 			    // retry from root ior
 			    updateEffectiveTargetIOR(contactInfoList.getTargetIOR());
@@ -320,10 +307,7 @@ public class CorbaContactInfoListIteratorImpl
 		    }
 		}
 	    } else if (ex instanceof TRANSIENT) {
-		if (debug) {
-		    dprint(".reportException: " + contactInfo + " " + ex
-			+ ": TRANSIENT - retryWithPreviousContactInfo");
-		}
+                display( "TRANSIENT: retry with previous contact info", ex ) ;
 		retryWithPreviousContactInfo = true;
 		result = true;
 		return result;
@@ -333,10 +317,6 @@ public class CorbaContactInfoListIteratorImpl
 	    return result;
 	} finally {
 	    tp.exit_contactInfoListIteratorReportException() ;
-	    if (debug) {
-		dprint(".reportException<-: " + contactInfo + " " + ex
-		    + ": " + result);
-	    }
 	}
     }
 
@@ -356,24 +336,19 @@ public class CorbaContactInfoListIteratorImpl
     // spi.CorbaContactInfoListIterator
     //
 
+    @Transport
     public void reportAddrDispositionRetry(CorbaContactInfo contactInfo, 
 					   short disposition)
     {
-	if (debug) {
-	    dprint(".reportAddrDispositionRetry: " 
-		   + contactInfo + " " + disposition);
-	}
 	previousContactInfo.setAddressingDisposition(disposition);
 	isAddrDispositionRetry = true;
 	waiter.reset() ; // necessary
     }
 
+    @Transport
     public void reportRedirect(CorbaContactInfo contactInfo,
 			       IOR forwardedIOR)
     {
-	if (debug) {
-	    dprint(".reportRedirect: " + contactInfo + " " + forwardedIOR);
-	}
 	updateEffectiveTargetIOR(forwardedIOR);
 	waiter.reset() ; // Necessary
     }
@@ -417,11 +392,6 @@ public class CorbaContactInfoListIteratorImpl
 
 	((CorbaInvocationInfo)orb.getInvocationInfo())
 	    .setContactInfoListIterator(contactInfoList.iterator());
-    }
-
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaContactInfoListIteratorImpl", msg);
     }
 }
 

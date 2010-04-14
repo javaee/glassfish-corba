@@ -45,10 +45,12 @@ import com.sun.corba.se.spi.protocol.CorbaRequestId;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.protocol.MessageParser;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Giop;
+import com.sun.corba.se.spi.trace.Transport;
 
 
 /**
@@ -58,6 +60,8 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
  *
  *
  */
+@Transport
+@Giop
 public class MessageParserImpl implements MessageParser {
     final private ORB orb;
     private boolean expectingMoreData;
@@ -94,6 +98,19 @@ public class MessageParserImpl implements MessageParser {
     public boolean isExpectingMoreData() {
         return expectingMoreData;
     }
+
+    @InfoMethod
+    private void display( String msg ) { }
+
+    @InfoMethod
+    private void display( String msg, boolean flag ) { }
+
+    @InfoMethod
+    private void display( String msg, int value ) { }
+
+    @InfoMethod
+    private void display( String msg, Object value ) { }
+
     
     /**
      * If there are sufficient bytes in the <code>ByteBuffer</code> to compose a
@@ -169,10 +186,27 @@ public class MessageParserImpl implements MessageParser {
      * @return <code>Message</code> if one is found in the <code>ByteBuffer</code>.
      *         Otherwise, returns null.
      */
-    public Message parseBytes(ByteBuffer byteBuffer, CorbaConnection connection) {
-        if (orb.transportDebugFlag) {
-            dprint(".parseBytes->: " + stateString(byteBuffer));
+
+    @Giop
+    private void parseBytesGiopInfo( ByteBuffer msgByteBuffer,
+        Message message ) {
+        if (orb.giopDebugFlag) {
+            // For debugging purposes, create view buffer
+            ByteBuffer viewBuf = msgByteBuffer.asReadOnlyBuffer();
+            viewBuf.position(viewBuf.limit());
+            CorbaRequestId requestId = 
+                      MessageBase.getRequestIdFromMessageBytes(message);
+            display( "Message Type", message.getType() ) ;
+            display( "Request Id", requestId.toString() ) ;
+            display( "Successfully parsed with sliced ByteBuffer", 
+                msgByteBuffer.toString() ) ;
+            ORBUtility.printBuffer("GIOP Message Body",
+                    viewBuf, System.out);
         }
+    }
+
+    @Transport
+    public Message parseBytes(ByteBuffer byteBuffer, CorbaConnection connection) {
         Message message = null;
         int bytesInBuffer = byteBuffer.limit() - nextMsgStartPos;
         // is there enough bytes available for a message header?
@@ -193,20 +227,7 @@ public class MessageParserImpl implements MessageParser {
                 byteBuffer.position(nextMsgStartPos).limit(savedLimit);
                 message.setByteBuffer(msgByteBuffer);
 
-                if (orb.giopDebugFlag) {
-                    // For debugging purposes, create view buffer
-                    ByteBuffer viewBuf = msgByteBuffer.asReadOnlyBuffer();
-                    viewBuf.position(viewBuf.limit());
-                    CorbaRequestId requestId = 
-                              MessageBase.getRequestIdFromMessageBytes(message);
-                    dprint(".parseBytes: " + MessageBase.typeToString(
-                            message.getType()) + " with request id/" +
-                            requestId.toString() + 
-                            ": successfully parsed with sliced " +
-                            "ByteBuffer: " + msgByteBuffer.toString() + " :");
-                    ORBUtility.printBuffer("GIOP Message Body",
-                            viewBuf, System.out);
-                }
+                parseBytesGiopInfo( msgByteBuffer, message );
 
                 if (MessageBase.messageSupportsFragments(message)) {
                     // are there more fragments to follow?
@@ -216,15 +237,10 @@ public class MessageParserImpl implements MessageParser {
                               MessageBase.getRequestIdFromMessageBytes(message);
                         if (!fragmentList.contains(requestId)) {
                             fragmentList.add(requestId);
-                            if (orb.transportDebugFlag) {
-                                dprint(".parseBytes: added to fragmentList" +
-                                       " request id/" + requestId);
-                            }
+                            display( "Added to fragmentList", requestId ) ;
                         } else {
-                            if (orb.transportDebugFlag) {
-                                dprint(".parseBytes: fragmentList already has" +
-                                       " an entry for request id/" + requestId);
-                            }
+                            display( "fragmentList alreadty has an entry for",
+                                requestId ) ;
                         }
                     } else {
                         // no fragments to follow
@@ -235,11 +251,8 @@ public class MessageParserImpl implements MessageParser {
                                 MessageBase.getRequestIdFromMessageBytes(message);
                             if (fragmentList.size() > 0 &&
                                 fragmentList.remove(requestId)) {
-                                if (orb.transportDebugFlag) {
-                                    dprint(".parseBytes: removed from " +
-                                           "fragmentList request id/" + 
-                                            requestId);
-                                }
+                                display( "Removed from fragmentList", 
+                                    requestId ) ;
                             }
                         }
                     }
@@ -265,14 +278,15 @@ public class MessageParserImpl implements MessageParser {
                 }
                 sizeNeeded = orb.getORBData().getReadByteBufferSize();
             } else {
-                // not enough bytes available for message body
                 if (orb.transportDebugFlag) {
-                    dprint(".parseBytes: not enough bytes available in " +
-                            "ByteBuffer to parse a complete GIOP message: " +
-                            bytesInBuffer + " : bytes needed: " +
-                            message.getSize() + " ByteBuffer state: " +
-                            byteBuffer.toString());
+                    // not enough bytes available for message body
+                    display( "Not enough bytes available in ByteBuffer for a "
+                        + "complete GIOP message: bytes available ", 
+                        bytesInBuffer ) ;
+                    display( "bytes needed", message.getSize() ) ;
+                    display( "ByteBuffer state", byteBuffer.toString() ) ;
                 }
+
                 // set state for next parseBytes invocation
                 moreBytesToParse = false;
                 expectingMoreData = true;
@@ -284,10 +298,11 @@ public class MessageParserImpl implements MessageParser {
         } else {
             // not enough bytes for message header
             if (orb.transportDebugFlag) {
-                dprint(".parseBytes: not enough bytes available in " +
-                        "ByteBuffer to parse GIOP 12 byte message header: " +
-                        bytesInBuffer + " : ByteBuffer state: " +
-                        byteBuffer.toString());
+                // not enough bytes available for message body
+                display( "Not enough bytes available in ByteBuffer "
+                    + "to parse 12-byte GIOP header" ) ;
+                display( "bytes available", bytesInBuffer) ;
+                display( "ByteBuffer state", byteBuffer.toString() ) ;
             }
             // set state for next parseBytes invocation
             moreBytesToParse = false;
@@ -295,9 +310,6 @@ public class MessageParserImpl implements MessageParser {
             // nextMsgStartPos unchanged
             byteBuffer.position(byteBuffer.limit()).limit(byteBuffer.capacity());
             sizeNeeded = orb.getORBData().getReadByteBufferSize();
-        }
-        if (orb.transportDebugFlag) {
-            dprint(".parseBytes<-: " + stateString(byteBuffer));
         }
         return message;
     }
@@ -334,6 +346,7 @@ public class MessageParserImpl implements MessageParser {
     }
     
     /** Return a string representing this MessageParser's state */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(toStringPrefix()).append("]");
@@ -367,10 +380,5 @@ public class MessageParserImpl implements MessageParser {
      */
     public int getSizeNeeded() {
         return sizeNeeded;
-    }
-    
-    /** print debug info */
-    private void dprint(String msg) {
-        ORBUtility.dprint("MessageParserImpl", msg);
     }
 }

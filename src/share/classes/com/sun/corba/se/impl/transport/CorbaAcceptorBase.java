@@ -63,6 +63,7 @@ import com.sun.corba.se.spi.transport.Selector;
 import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.extension.LoadBalancingPolicy;
+import com.sun.corba.se.spi.trace.Transport;
 import java.nio.channels.SelectionKey;
 import java.util.Iterator;
 import java.net.Socket ;
@@ -72,6 +73,7 @@ import org.omg.IOP.TAG_INTERNET_IOP;
  *
  * @author ken
  */
+@Transport
 public abstract class CorbaAcceptorBase
     extends
 	EventHandlerBase
@@ -138,12 +140,10 @@ public abstract class CorbaAcceptorBase
 	this.type = type;
     }
 
+    @Transport
     public void processSocket( Socket socket ) {
 	CorbaConnection connection = 
 	    new SocketOrChannelConnectionImpl(orb, this, socket);
-	if (orb.transportDebugFlag) {
-	    dprint(".accept: new: " + connection);
-	}
 
 	// NOTE: The connection MUST be put in the cache BEFORE being
 	// registered with the selector.  Otherwise if the bytes
@@ -159,6 +159,7 @@ public abstract class CorbaAcceptorBase
 	getConnectionCache().reclaim();
     }
 
+    @Transport
     public void addToIORTemplate(IORTemplate iorTemplate, Policies policies, String codebase) {
         Iterator iterator = iorTemplate.iteratorById(TAG_INTERNET_IOP.value);
         String hname = orb.getORBData().getORBServerHost();
@@ -177,6 +178,7 @@ public abstract class CorbaAcceptorBase
         }
     }
 
+    @Transport
     protected final IIOPProfileTemplate makeIIOPProfileTemplate(Policies policies, String codebase) {
         GIOPVersion version = orb.getORBData().getGIOPVersion();
         int templatePort;

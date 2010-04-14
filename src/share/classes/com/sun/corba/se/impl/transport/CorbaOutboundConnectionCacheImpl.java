@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2001-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,7 +43,7 @@ import java.util.Map;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.trace.Transport;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache;
 
@@ -54,6 +54,7 @@ import org.glassfish.gmbal.Description ;
 /**
  * @author Harold Carr
  */
+@Transport
 @ManagedObject
 @Description( "Cache of connections originated by the ORB" ) 
 @AMXMetadata( type="corba-outbound-connection-cache-mon", group="monitoring" )
@@ -74,23 +75,18 @@ public class CorbaOutboundConnectionCacheImpl
 	this.connectionCache = new HashMap<CorbaContactInfo,CorbaConnection>();
     }
 
+    @Transport
     public CorbaConnection get(CorbaContactInfo contactInfo)
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".get: " + contactInfo + " " + contactInfo.hashCode());
-	}
 	synchronized (backingStore()) {
 	    dprintStatistics();
 	    return connectionCache.get(contactInfo);
 	}
     }
     
+    @Transport
     public void put(CorbaContactInfo contactInfo, CorbaConnection connection)
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".put: " + contactInfo + " " + contactInfo.hashCode() + " "
-		   + connection);
-	}
 	synchronized (backingStore()) {
 	    connectionCache.put(contactInfo, connection);
 	    connection.setConnectionCache(this);
@@ -99,11 +95,9 @@ public class CorbaOutboundConnectionCacheImpl
 	}
     }
 
+    @Transport
     public void remove(CorbaContactInfo contactInfo)
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".remove: " + contactInfo + " " + contactInfo.hashCode());
-	}
 	synchronized (backingStore()) {
 	    if (contactInfo != null) {
 		CorbaConnection connection = connectionCache.remove(contactInfo);
@@ -134,12 +128,6 @@ public class CorbaOutboundConnectionCacheImpl
 	return "CorbaOutboundConnectionCacheImpl["
 	    + connectionCache
 	    + "]";
-    }
-
-    @Override
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaOutboundConnectionCacheImpl", msg);
     }
 }
 

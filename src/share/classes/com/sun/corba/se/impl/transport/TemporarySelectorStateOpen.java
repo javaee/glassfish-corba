@@ -46,7 +46,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.TemporarySelectorState;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.trace.Transport;
 
 /**
  *
@@ -57,32 +57,28 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
  *
  * A class which models temporary Selector in an open state.
  */
+@Transport
 public class TemporarySelectorStateOpen implements TemporarySelectorState {
 
     final static AtomicInteger tsCount = new AtomicInteger(0);
-    final private boolean debug;
     private ORB itsOrb;
 
+    @Transport
+    private void reportNumTemporarySelectors( int num ) {
+    }
+
     private TemporarySelectorStateOpen () {
-        // must be initialized to rid of compiler complaint
-        debug = true;
+        reportNumTemporarySelectors( tsCount.incrementAndGet() ) ;
     }
 
     /** Creates a new instance of TemporarySelectorStateOpen */
     public TemporarySelectorStateOpen(ORB theOrb) {
         itsOrb = theOrb;
-        debug = itsOrb.transportDebugFlag;
-        if (debug) {
-            dprint("(): number of open temporary selectors : " + 
-                    tsCount.incrementAndGet());
-        }
+        reportNumTemporarySelectors( tsCount.incrementAndGet() ) ;
     }
 
+    @Transport
     public int select(Selector theSelector, long theTimeout) throws IOException {
-        if (debug) {
-            dprint("select()->: selector: " + theSelector + ", timeout: " +
-                    theTimeout);
-        }
         int result = 0;
         if (theSelector.isOpen()) {
             if (theTimeout > 0) {
@@ -90,28 +86,21 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
             } else {
                 ORBUtilSystemException wrapper =
 		     itsOrb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
-                throw wrapper.temporarySelectorSelectTimeoutLessThanOne(theSelector, theTimeout);
+                throw wrapper.temporarySelectorSelectTimeoutLessThanOne(
+                    theSelector, theTimeout);
             }
         } else {
-            throw new TemporarySelectorClosedException("Selector " +
-                                                        theSelector.toString() +
-                                                       " is closed.");
+            throw new TemporarySelectorClosedException(
+                "Selector " + theSelector.toString() + " is closed.");
         }
 
-        if (debug) {
-            dprint("select()<-: selector: " + theSelector +
-                   ", number selected: " + result);
-        }
         return result;
     }
 
-    public SelectionKey registerChannel(Selector theSelector,
-                                        SelectableChannel theSelectableChannel,
-                                        int theOps) throws IOException {
+    @Transport
+    public SelectionKey registerChannel(Selector theSelector, 
+        SelectableChannel theSelectableChannel, int theOps) throws IOException {
 
-        if (debug) {
-            dprint("registerChannel()->: selector: " + theSelector);
-        }
         SelectionKey key = null;
         if (theSelector.isOpen()) {
             key = theSelectableChannel.register(theSelector, theOps);
@@ -120,57 +109,36 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
                                                         theSelector.toString() +
                                                        " is closed.");
         }
-        if (debug) {
-            dprint("registerChannel()<-: selector: " + theSelector +
-                   ", SelectionKey: " + key);
-        }
         return key;
     }
 
+    @Transport
     public TemporarySelectorState cancelKeyAndFlushSelector(Selector theSelector,
                               SelectionKey theSelectionKey) throws IOException {
-        if (debug) {
-            dprint("cancelKeyAndFlushSelector()->: selector: " + theSelector);
-        }
+
         if (theSelectionKey != null) {
-            if (debug) {
-                dprint("cancelKeyAndFlushSelector(): cancel key: " +
-                        theSelectionKey);
-            }
             theSelectionKey.cancel();
         }
+
         if (theSelector.isOpen()) {
             theSelector.selectNow();
         } else {
-            throw new TemporarySelectorClosedException("Selector " +
-                    theSelector.toString() +
-                    " is closed.");
-        }
-        if (debug) {
-            dprint("cancelKeyAndFlushSelector()<-: cancelled and flushed");
-        }
+            throw new TemporarySelectorClosedException(
+                "Selector " + theSelector.toString() + " is closed."); }
+
         return this;
     }
 
+    @Transport
     public TemporarySelectorState close(Selector theSelector) throws IOException {
-        if (debug) {
-            dprint("close()->: selector: " + theSelector);
-        }
         theSelector.close();
-        if (debug) {
-            dprint("close(): number of open temporary selectors : " + 
-                    tsCount.decrementAndGet());
-            dprint("close()<-: changing to closed state");
-        }
+        reportNumTemporarySelectors( tsCount.decrementAndGet() );
         return new TemporarySelectorStateClosed(itsOrb);
     }
 
+    @Transport
     public TemporarySelectorState removeSelectedKey(Selector theSelector,
                               SelectionKey theSelectionKey) throws IOException {
-        if (debug) {
-            dprint("removeSelectedKey()->: selector: " + theSelector +
-                   ", key to remove: " + theSelectionKey);
-        }
         if (theSelector.isOpen()) {
             theSelector.selectedKeys().remove(theSelectionKey);
         } else {
@@ -178,14 +146,6 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
                                                         theSelector.toString() +
                                                        " is closed.");
         }
-        if (debug) {
-            dprint("removeSelectedKey()<-: selector: " + theSelector +
-                   ", key removed: " + theSelectionKey);
-        }
         return this;
-    }
-
-    private void dprint(String theMsg) {
-	ORBUtility.dprint("TemporarySelectorStateOpen", theMsg);
     }
 }

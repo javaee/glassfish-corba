@@ -40,7 +40,6 @@ import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.oa.poa.Policies;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.extension.RequestPartitioningPolicy;
 import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate;
@@ -235,15 +234,6 @@ public abstract class CorbaAcceptorBase
 
     protected String toStringName() {
         return "SocketOrChannelAcceptorImpl";
-    }
-
-    protected void dprint(String msg) {
-        ORBUtility.dprint(toStringName(), msg);
-    }
-
-    protected void dprint(String msg, Throwable t) {
-        dprint(msg);
-        t.printStackTrace(System.out);
     }
 
     public String getHost() {

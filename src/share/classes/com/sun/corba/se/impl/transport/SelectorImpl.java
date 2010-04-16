@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1996-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1996-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,7 +59,8 @@ import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 import java.util.Map;
 import org.glassfish.gmbal.ManagedObject ;
@@ -69,6 +70,7 @@ import org.glassfish.gmbal.Description ;
 /**
  * @author Harold Carr
  */
+@Transport
 @ManagedObject
 @Description( "The Selector, which handles incoming requests to the ORB" )
 public class SelectorImpl
@@ -80,10 +82,10 @@ public class SelectorImpl
     private ORB orb;
     private Selector selector;
     private long timeout;
-    private List deferredRegistrations;
-    private List interestOpsList;
-    private Map<EventHandler,ListenerThread> listenerThreads;
-    private Map<EventHandler,ReaderThread>  readerThreads;
+    private final List<EventHandler> deferredRegistrations;
+    private final List<SelectionKeyAndOp> interestOpsList;
+    private final Map<EventHandler,ListenerThread> listenerThreads;
+    private final Map<EventHandler,ReaderThread>  readerThreads;
     private boolean selectorStarted;
     private volatile boolean closed;
     private ORBUtilSystemException wrapper ;
@@ -131,12 +133,20 @@ public class SelectorImpl
 	return timeout;
     }
 
-    public void registerInterestOps(EventHandler eventHandler)
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".registerInterestOps:-> " + eventHandler);
-	}
+    @InfoMethod
+    private void display( String msg, Object value ) { }
 
+    @InfoMethod
+    private void display( String msg ) { }
+
+    @InfoMethod
+    private void closedEventHandler() { }
+
+    @InfoMethod
+    private void defaultCaseForEventHandler() { }
+
+    @Transport
+    public void registerInterestOps(EventHandler eventHandler) {
 	SelectionKey selectionKey = eventHandler.getSelectionKey();
 	if (selectionKey.isValid()) {
             int ehOps = eventHandler.getInterestOps();
@@ -149,26 +159,15 @@ public class SelectorImpl
 	}
 	else {
             wrapper.selectionKeyInvalid(eventHandler.toString());
-	    if (orb.transportDebugFlag) {
-		dprint(".registerInterestOps: EventHandler SelectionKey not valid " + eventHandler);
-	    }
-	}
-
-	if (orb.transportDebugFlag) {
-	    dprint(".registerInterestOps:<- ");
+            display( "EventHandler SelectionKey not valid", eventHandler);
 	}
     }
 
+    @Transport
     public void registerForEvent(EventHandler eventHandler)
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".registerForEvent: " + eventHandler);
-	}
-
 	if (isClosed()) {
-	    if (orb.transportDebugFlag) {
-		dprint(".registerForEvent: closed: " + eventHandler);
-	    }
+            closedEventHandler();
 	    return;
 	}
 
@@ -191,24 +190,15 @@ public class SelectorImpl
 	    createReaderThread(eventHandler);
 	    break;
 	default:
-	    if (orb.transportDebugFlag) {
-		dprint(".registerForEvent: default: " + eventHandler);
-	    }
+            defaultCaseForEventHandler();
 	    throw new RuntimeException(
                 "SelectorImpl.registerForEvent: unknown interest ops");
 	}
     }
 
-    public void unregisterForEvent(EventHandler eventHandler)
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".unregisterForEvent: " + eventHandler);
-	}
-
+    public void unregisterForEvent(EventHandler eventHandler) {
 	if (isClosed()) {
-	    if (orb.transportDebugFlag) {
-		dprint(".unregisterForEvent: closed: " + eventHandler);
-	    }
+            closedEventHandler();
 	    return;
 	}
 
@@ -230,33 +220,22 @@ public class SelectorImpl
 	    destroyReaderThread(eventHandler);
 	    break;
 	default:
-	    if (orb.transportDebugFlag) {
-		dprint(".unregisterForEvent: default: " + eventHandler);
-	    }
+            defaultCaseForEventHandler();
 	    throw new RuntimeException(
                 "SelectorImpl.uregisterForEvent: unknown interest ops");
 	}
     }
 
-    public void close()
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".close");
-	}
-
+    @Transport
+    public void close() {
 	if (isClosed()) {
-	    if (orb.transportDebugFlag) {
-		dprint(".close: already closed");
-	    }
+	    closedEventHandler() ;
 	    return;
 	}
 
 	setClosed(true);
 
-	Iterator i;
-
 	// Kill listeners.
-
         synchronized (this) {
             for (ListenerThread lthread : listenerThreads.values()) {
                 lthread.close() ;
@@ -264,7 +243,6 @@ public class SelectorImpl
         }
 
 	// Kill readers.
-
         synchronized (this) {
             for (ReaderThread rthread : readerThreads.values()) {
                 rthread.close() ;
@@ -272,16 +250,13 @@ public class SelectorImpl
         }
 
 	// Selector
-
 	try {
 	    if (selector != null) {
 		// wakeup Selector thread to process close request
 		selector.wakeup();
 	    }
 	} catch (Throwable t) {
-	    if (orb.transportDebugFlag) {
-		dprint(".close: selector.close: " + t);
-	    }
+            display( "Exception in close", t ) ;
 	}
     }
 
@@ -290,8 +265,24 @@ public class SelectorImpl
     // Thread methods.
     //
 
-    public void run()
-    {
+    @InfoMethod
+    private void beginSelect() { } 
+
+    @InfoMethod
+    private void endSelect() { }
+
+    @InfoMethod
+    private void selectorClosed() { }
+
+    @InfoMethod
+    private void selectResult( boolean hasNext, int count ) { }
+
+    @InfoMethod
+    private void skippingEventForCancelledKey() { }
+
+    @Transport
+    @Override
+    public void run() {
         java.security.AccessController.doPrivileged(
             new java.security.PrivilegedAction() {
                 public Object run() {
@@ -299,44 +290,29 @@ public class SelectorImpl
                     return null;
                 }
             });
+
 	while (!closed) {
 	    try {
+                beginSelect();
+
 		int n = 0;
-		if (timeout == 0 && orb.transportDebugFlag) {
-		    dprint(".run: Beginning of selection cycle");
-		}
 		handleDeferredRegistrations();
 		enableInterestOps();
 		try {
 		    n = selector.select(timeout);
 		} catch (IOException  e) {
-		    if (orb.transportDebugFlag) {
-			dprint(".run: selector.select: " + e);
-		    }
+                    display( "Exception in select:", e ) ;
 		}
 		if (closed) {
 		    selector.close();
-		    if (orb.transportDebugFlag) {
-			dprint(".run: closed - .run return");
-		    }
+                    selectorClosed();
 		    return;
 		}
-		/*
-		  if (timeout == 0 && orb.transportDebugFlag) {
-		  dprint(".run: selector.select() returned: " + n);
-		  }
-		  if (n == 0) {
-		  continue;
-		  }
-		*/
-		Iterator iterator = selector.selectedKeys().iterator();
-		if (orb.transportDebugFlag) {
-		    if (iterator.hasNext()) {
-			dprint(".run: n = " + n);
-		    }
-		}
+		Iterator<SelectionKey> iterator =
+                    selector.selectedKeys().iterator();
+                selectResult(iterator.hasNext(), n);
 		while (iterator.hasNext()) {
-		    SelectionKey selectionKey = (SelectionKey) iterator.next();
+		    SelectionKey selectionKey = iterator.next();
 		    iterator.remove();
                     
                     // It is possible that a different thread (other than the 
@@ -359,27 +335,22 @@ public class SelectorImpl
                         }
                     } else {
                         wrapper.canceledSelectionKey( selectionKey ) ;
-                        if (orb.transportDebugFlag) {
-                            dprint(".run: skipping event since this " +
-                                   "EventHandler's SelectionKey has been " +
-                                   "found to be cancelled. It will be removed " +
-                                   "from this Selector on the next select() " +
-                                   "operation.");
-                        }
+                        skippingEventForCancelledKey();
+                        // skipping event since this EventHandler's
+                        // SelectionKey has been found to be cancelled.
+                        // It will be removed from this Selector on the
+                        // next select() operation.
                     }
-		}
-		if (timeout == 0 && orb.transportDebugFlag) {
-		    dprint(".run: End of selection cycle");
-		}
-	    } catch (Throwable t) {
-		// IMPORTANT: ignore all errors so the select thread keeps running.
-		// Otherwise a guaranteed hang.
-		if (orb.transportDebugFlag) {
-		    dprint(".run: ignoring", t);
-		}
-	    }
-	}
+                }
+                endSelect();
+            } catch (Throwable t) {
+                // IMPORTANT: ignore all errors so the select thread keeps running.
+                // Otherwise a guaranteed hang.
+                display( "Ignoring exception", t ) ;
+            }
+        }
     }
+
 
     /////////////////////////////////////////////////////
     //
@@ -396,14 +367,11 @@ public class SelectorImpl
 	this.closed = closed;
     }
 
-    private void startSelector()
-    {
+    @Transport
+    private void startSelector() {
 	try {
 	    selector = Selector.open();
 	} catch (IOException e) {
-	    if (orb.transportDebugFlag) {
-		dprint(".startSelector: Selector.open: IOException: " + e);
-	    }
 	    // REVISIT - better handling/reporting
 	    RuntimeException rte =
 		new RuntimeException(".startSelector: Selector.open exception");
@@ -413,32 +381,23 @@ public class SelectorImpl
 	setDaemon(true);
 	start();
 	selectorStarted = true;
-	if (orb.transportDebugFlag) {
-	    dprint(".startSelector: selector.start completed.");
-	}
     }
 
-    private void handleDeferredRegistrations()
-    {
+    @InfoMethod
+    private void registeringEventHandler( EventHandler eh ) { }
+
+    @Transport
+    private void handleDeferredRegistrations() {
 	synchronized (deferredRegistrations) {
-            int deferredListSize = deferredRegistrations.size();
-            for (int i = 0; i < deferredListSize; i++) {
-                EventHandler eventHandler = 
-		    (EventHandler)deferredRegistrations.get(i);
-                if (orb.transportDebugFlag) {
-                    dprint(".handleDeferredRegistrations: " + eventHandler);
-                }
+            for (EventHandler eventHandler : deferredRegistrations ) {
+                registeringEventHandler(eventHandler);
                 SelectableChannel channel = eventHandler.getChannel();
                 SelectionKey selectionKey = null;
                 try {
-                    selectionKey =
-                        channel.register(selector,
-                                         eventHandler.getInterestOps(),
-                                         (Object)eventHandler);
+                    selectionKey = channel.register(selector,
+                        eventHandler.getInterestOps(), eventHandler );
                 } catch (ClosedChannelException e) {
-                    if (orb.transportDebugFlag) {
-                        dprint(".handleDeferredRegistrations: " + e);
-                    }
+                    display( "Exception", e ) ;
                 }
                 eventHandler.setSelectionKey(selectionKey);
             }
@@ -446,73 +405,57 @@ public class SelectorImpl
         }
     }
 
-    private void enableInterestOps()
-    {
+    @InfoMethod
+    private void ignoringCancelledKeyException() { }
+
+    @InfoMethod
+    private void keyAndOpInfo( SelectionKeyAndOp val ) { }
+
+    @Transport
+    private void enableInterestOps() {
 	synchronized (interestOpsList) {
-	    int listSize = interestOpsList.size();
-	    if (listSize > 0) {
-                if (orb.transportDebugFlag) {
-                    dprint(".enableInterestOps:->");
-                }
-                SelectionKey selectionKey = null;
-		SelectionKeyAndOp keyAndOp = null;
-		int keyOp, selectionKeyOps = 0;
-		for (int i = 0; i < listSize; i++) {
-		    keyAndOp = (SelectionKeyAndOp)interestOpsList.get(i);
-		    selectionKey = keyAndOp.selectionKey;
+            for (SelectionKeyAndOp keyAndOp : interestOpsList ) {
+                SelectionKey selectionKey = keyAndOp.selectionKey;
 
-		    // Need to check if the SelectionKey is valid because a
-		    // connection's SelectionKey could be put on the list to
-		    // have its OP enabled and before it's enabled have its
-                    // associated connection reclaimed and/or closed which will
-                    // cancel the SelectionKey.
- 
-		    // Otherwise, the enabling of the OP will throw an exception
-		    // here and exit this method an potentially not enable all
-		    // registered interest ops.
-		    //
-		    // So, we ignore SelectionKeys that are invalid. They will
-                    // get cleaned up and removed from this Selector's key set
-                    // on the next Selector.select() call.
+                // Need to check if the SelectionKey is valid because a
+                // connection's SelectionKey could be put on the list to
+                // have its OP enabled and before it's enabled have its
+                // associated connection reclaimed and/or closed which will
+                // cancel the SelectionKey.
 
-		    if (selectionKey.isValid()) {
-                        if (orb.transportDebugFlag) {
-                            dprint(".enableInterestOps: " + keyAndOp);
-                        }
-		        keyOp = keyAndOp.keyOp;
-                        try {
-		            selectionKeyOps = selectionKey.interestOps();
-		            selectionKey.interestOps(selectionKeyOps | keyOp);
-                        } catch (CancelledKeyException cke) {
-                            // It is possible that between the time when an
-                            // SelectionKey's interestOp was registered to be
-                            // enabled by Thread 1 that the Connection 
-                            // associated with the SelectionKey was closed by
-                            // Thread 2 where Thread 2 will cancel the 
-                            // SelectionKey.  As a result, we catch and 
-                            // ignore this exception condition.
-                            if (orb.transportDebugFlag) {
-                                dprint(".enableInterestOps: ignoring " +
-                                       "CancelledKeyException, connection " +
-                                       "has been closed and its SelectionKey " +
-                                       "cancelled.");
-                            }
-                        }
-		    }
-		}
-		interestOpsList.clear();
-                if (orb.transportDebugFlag) {
-                    dprint(".enableInterestOps:<-");
+                // Otherwise, the enabling of the OP will throw an exception
+                // here and exit this method an potentially not enable all
+                // registered interest ops.
+                //
+                // So, we ignore SelectionKeys that are invalid. They will
+                // get cleaned up and removed from this Selector's key set
+                // on the next Selector.select() call.
+
+                if (selectionKey.isValid()) {
+                    keyAndOpInfo(keyAndOp);
+                    int keyOp = keyAndOp.keyOp;
+                    try {
+                        int selectionKeyOps = selectionKey.interestOps();
+                        selectionKey.interestOps(selectionKeyOps | keyOp);
+                    } catch (CancelledKeyException cke) {
+                        // It is possible that between the time when an
+                        // SelectionKey's interestOp was registered to be
+                        // enabled by Thread 1 that the Connection
+                        // associated with the SelectionKey was closed by
+                        // Thread 2 where Thread 2 will cancel the
+                        // SelectionKey.  As a result, we catch and
+                        // ignore this exception condition.
+                        ignoringCancelledKeyException();
+                    }
                 }
-	    }
+            }
+
+            interestOpsList.clear();
 	}
     }
 
-    private void createListenerThread(EventHandler eventHandler)
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".createListenerThread: " + eventHandler);
-	}
+    @Transport
+    private void createListenerThread(EventHandler eventHandler) {
 	CorbaAcceptor acceptor = (CorbaAcceptor)eventHandler.getAcceptor();
 	ListenerThread listenerThread =
 	    new ListenerThreadImpl(orb, acceptor);
@@ -535,19 +478,16 @@ public class SelectorImpl
 	}
     }
 
-    private void destroyListenerThread(EventHandler eventHandler)
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".destroyListenerThread: " + eventHandler);
-	}
+    @InfoMethod
+    private void cannotFindListenerThread() { }
 
+    @Transport
+    private void destroyListenerThread(EventHandler eventHandler) {
         ListenerThread listenerThread ;
         synchronized (this) {
             listenerThread = listenerThreads.get(eventHandler);
             if (listenerThread == null) {
-                if (orb.transportDebugFlag) {
-                    dprint(".destroyListenerThread: cannot find ListenerThread - ignoring.");
-                }
+                cannotFindListenerThread() ;
                 return;
             }
             listenerThreads.remove(eventHandler);
@@ -556,11 +496,8 @@ public class SelectorImpl
 	listenerThread.close();
     }
 
-    private void createReaderThread(EventHandler eventHandler)
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".createReaderThread: " + eventHandler);
-	}
+    @Transport
+    private void createReaderThread(EventHandler eventHandler) {
 	CorbaConnection connection = eventHandler.getConnection();
 	ReaderThread readerThread = 
 	    new ReaderThreadImpl(orb, connection );
@@ -583,34 +520,21 @@ public class SelectorImpl
 	}
     }
 
-    private void destroyReaderThread(EventHandler eventHandler)
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".destroyReaderThread: " + eventHandler);
-	}
+    @InfoMethod
+    private void cannotFindReaderThread() { }
+
+    @Transport
+    private void destroyReaderThread(EventHandler eventHandler) {
 	ReaderThread readerThread ;
         synchronized (this) {
 	    readerThread = readerThreads.get(eventHandler);
             if (readerThread == null) {
-                if (orb.transportDebugFlag) {
-                    dprint(".destroyReaderThread: cannot find ReaderThread - ignoring.");
-                }
+                cannotFindReaderThread();
                 return;
             }
             readerThreads.remove(eventHandler);
         }
 	readerThread.close();
-    }
-
-    private void dprint(String msg)
-    {
-	ORBUtility.dprint("SelectorImpl", msg);
-    }
-
-    protected void dprint(String msg, Throwable t)
-    {
-	dprint(msg);
-	t.printStackTrace(System.out);
     }
 
     // Private class to contain a SelectionKey and a SelectionKey op.

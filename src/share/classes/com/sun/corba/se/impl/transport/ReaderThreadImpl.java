@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -35,32 +35,25 @@
  */
 package com.sun.corba.se.impl.transport;
 
-import java.io.IOException;
-
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.ReaderThread;
-import com.sun.corba.se.spi.transport.Selector;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
-public class ReaderThreadImpl
-    implements
-	ReaderThread,
-	Work
-{
+@Transport
+public class ReaderThreadImpl implements ReaderThread, Work {
     private ORB orb;
     private CorbaConnection connection;
     private boolean keepRunning;
     private long enqueueTime;
     private ORBUtilSystemException wrapper;
 
-    public ReaderThreadImpl(ORB orb, 
-			    CorbaConnection connection)
+    public ReaderThreadImpl(ORB orb, CorbaConnection connection)
     {
 	this.orb = orb;
 	this.connection = connection;
@@ -73,17 +66,12 @@ public class ReaderThreadImpl
     // ReaderThread methods.
     //
 
-    public CorbaConnection getConnection()
-    {
+    public CorbaConnection getConnection() {
 	return connection;
     }
 
-    public synchronized void close()
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".close: " + connection);
-	}
-
+    @Transport
+    public synchronized void close() {
 	keepRunning = false;
 
         // Note: do not close the connection here, as it may be 
@@ -102,82 +90,54 @@ public class ReaderThreadImpl
     // Work methods.
     //
 
+    @InfoMethod
+    private void display( String msg ) { }
+
+    @InfoMethod
+    private void display( String msg, Object value ) { }
+
+
     // REVISIT - this needs alot more from previous ReaderThread.
+    @Transport
     public void doWork()
     {
-	try {
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork: Start ReaderThread: " + connection);
-	    }
-	    while (isRunning()) {
-		try {
-		    if (orb.transportDebugFlag) {
-			dprint(".doWork: Start ReaderThread cycle: " 
-			       + connection);
-		    }
+        while (isRunning()) {
+            try {
+                display( "Start readerThread cycle", connection ) ;
 
-		    if (connection.read()) {
-			// REVISIT - put in pool;
-			return;
-		    }
+                if (connection.read()) {
+                    // REVISIT - put in pool;
+                    return;
+                }
 
-		    if (orb.transportDebugFlag) {
-			dprint(".doWork: End ReaderThread cycle: "
-			       + connection);
-		    }
-		} catch (Throwable t) {
-                    wrapper.exceptionInReaderThread( t ) ;
+                display( "End readerThread cycle" ) ;
+            } catch (Throwable t) {
+                wrapper.exceptionInReaderThread( t ) ;
+                display( "Exception in read", t ) ;
 
-		    if (orb.transportDebugFlag) {
-			dprint(".doWork: exception in read: " + connection,t);
-		    }
+                orb.getTransportManager().getSelector(0)
+                    .unregisterForEvent(getConnection().getEventHandler());
 
-		    orb.getTransportManager().getSelector(0)
-			.unregisterForEvent(getConnection().getEventHandler());
-
-                    try {
-                        if (isRunning()) {
-                            getConnection().close();
-                        }
-                    } catch (Exception exc) {
-                        wrapper.ioExceptionOnClose( exc ) ;
+                try {
+                    if (isRunning()) {
+                        getConnection().close();
                     }
-		}
-	    }
-	} finally {
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork: Terminated ReaderThread: " + connection);
-	    }
-	}
+                } catch (Exception exc) {
+                    wrapper.ioExceptionOnClose( exc ) ;
+                }
+            }
+        }
     }
 
-    public void setEnqueueTime(long timeInMillis) 
-    {
+    public void setEnqueueTime(long timeInMillis) {
 	enqueueTime = timeInMillis;
     }
 
-    public long getEnqueueTime() 
-    {
+    public long getEnqueueTime() {
 	return enqueueTime;
     }
 
     public String getName() { return "ReaderThread"; }
-
-    ////////////////////////////////////////////////////
-    //
-    // Implementation.
-    //
-
-    private void dprint(String msg)
-    {
-	ORBUtility.dprint("ReaderThreadImpl", msg);
-    }
-
-    protected void dprint(String msg, Throwable t)
-    {
-	dprint(msg);
-	t.printStackTrace(System.out);
-    }
 }
 
 // End of file.

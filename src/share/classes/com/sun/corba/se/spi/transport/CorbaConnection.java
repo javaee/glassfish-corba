@@ -225,8 +225,6 @@ public interface CorbaConnection
     public void write(ByteBuffer byteBuffer)
 	throws IOException;
 
-    public void dprint(String msg);
-
     public int getNextRequestId();
     public ORB getBroker();
     public CodeSetComponentInfo.CodeSetContext getCodeSetContext();

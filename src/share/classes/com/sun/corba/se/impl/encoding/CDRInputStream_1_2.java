@@ -39,6 +39,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.trace.CdrRead;
 
+@CdrRead
 public class CDRInputStream_1_2 extends CDRInputStream_1_1
 {
     // Indicates whether the header is padded. In GIOP 1.2 and above,

@@ -34,27 +34,17 @@
  * holder.
  */
 
-
 package com.sun.corba.se.impl.protocol;
 
-import org.omg.CORBA.TRANSIENT ;
-
 import org.omg.CORBA.portable.ServantObject ;
-
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
-
 import com.sun.corba.se.spi.orb.ORB ;
-
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.spi.oa.OADestroyed;
-
 import com.sun.corba.se.spi.ior.IOR;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Subcontract;
 
-import com.sun.corba.se.impl.logging.POASystemException ;
-
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
-
+@Subcontract
 public class FullServantCacheLocalCRDImpl extends ServantCacheLocalCRDBase
 {
     public FullServantCacheLocalCRDImpl( ORB orb, int scid, IOR ior ) 
@@ -62,45 +52,40 @@ public class FullServantCacheLocalCRDImpl extends ServantCacheLocalCRDBase
 	super( orb, scid, ior ) ;
     }
 
+    @Subcontract
+    @Override
     public ServantObject internalPreinvoke( org.omg.CORBA.Object self,
-	String operation, Class expectedType ) throws OADestroyed
-    {
-	if (debug)
-	    dprint( ".internalPreinvoke->:" ) ;
+	String operation, Class expectedType ) throws OADestroyed {
 
-	try {
-	    OAInvocationInfo cachedInfo = getCachedInfo() ;
-	    if (!checkForCompatibleServant( cachedInfo, expectedType ))
-		return null ;
+        OAInvocationInfo cachedInfo = getCachedInfo() ;
+        if (!checkForCompatibleServant( cachedInfo, expectedType )) {
+            return null;
+        }
 
-	    // Note that info is shared across multiple threads
-	    // using the same subcontract, each of which may
-	    // have its own operation.  Therefore we need to clone it.
-	    OAInvocationInfo newInfo = new OAInvocationInfo( cachedInfo, operation ) ;
-	    newInfo.oa().enter() ;
-	    orb.pushInvocationInfo( newInfo ) ;
-	    if (debug)
-		dprint( ".internalPreinvoke: returning ServantObject" ) ;
-	    return newInfo ;
-	} finally { 
-	    if (debug)
-		dprint( ".internalPreinvoke<-:" ) ;
-	}
+        // Note that info is shared across multiple threads
+        // using the same subcontract, each of which may
+        // have its own operation.  Therefore we need to clone it.
+        OAInvocationInfo newInfo = new OAInvocationInfo( cachedInfo, operation ) ;
+        newInfo.oa().enter() ;
+        orb.pushInvocationInfo( newInfo ) ;
+        return newInfo ;
     }
 
+    @Subcontract
     public void servant_postinvoke(org.omg.CORBA.Object self,
-                                   ServantObject servantobj) 
-    {
+        ServantObject servantobj) {
 	try {
 	    OAInvocationInfo cachedInfo = getCachedInfo() ;
 	    cachedInfo.oa().exit() ;
 	} catch (OADestroyed oades) {
+            caughtOADestroyed() ;
 	    // ignore this: if I can't get the OA, I don't
 	    // need to call exit on it.
-	    if (debug)
-		dprint( ".servant_postinvoke: Caught OADestroyed." ) ;
 	} finally {
 	    orb.popInvocationInfo() ;
 	}
     }
+
+    @InfoMethod
+    private void caughtOADestroyed() { }
 }

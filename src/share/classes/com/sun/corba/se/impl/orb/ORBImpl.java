@@ -166,6 +166,8 @@ import com.sun.corba.se.spi.trace.Subcontract;
 /**
  * The JavaIDL ORB implementation.
  */
+@OrbLifeCycle
+@Subcontract
 public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 {
     private boolean set_parameters_called = false ;

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1996-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1996-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,7 +44,6 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl;
 import com.sun.corba.se.spi.trace.Transport;
 import java.net.Socket;
@@ -52,6 +51,7 @@ import java.net.Socket;
 /**
  * @author Harold Carr
  */
+@Transport
 public class SocketFactoryConnectionImpl
     extends
 	SocketOrChannelConnectionImpl

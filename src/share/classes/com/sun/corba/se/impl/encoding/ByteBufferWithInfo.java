@@ -59,6 +59,7 @@ import com.sun.corba.se.spi.trace.Transport;
 // In other words, getLength and setLength represent the end of the
 // data in this object's ByteBuffer.
 
+@Transport
 public class ByteBufferWithInfo
 {
     private ORB orb;

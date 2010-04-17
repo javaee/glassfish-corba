@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -36,16 +36,7 @@
 
 package com.sun.corba.se.impl.protocol;
 
-import org.omg.CORBA.BAD_OPERATION ;
-import org.omg.CORBA.INTERNAL ;
-import org.omg.CORBA.SystemException ;
-import org.omg.CORBA.CompletionStatus ;
-
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher;
 import com.sun.corba.se.spi.protocol.ForwardException;
-
-// XXX This should be in the SPI
-import com.sun.corba.se.impl.protocol.LocalClientRequestDispatcherBase;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo;
 import com.sun.corba.se.spi.oa.ObjectAdapter;
@@ -54,9 +45,11 @@ import com.sun.corba.se.spi.oa.OADestroyed;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.se.spi.trace.Subcontract;
 
-public abstract class ServantCacheLocalCRDBase extends LocalClientRequestDispatcherBase
-{
+@Subcontract
+public abstract class ServantCacheLocalCRDBase 
+    extends LocalClientRequestDispatcherBase {
 
     private OAInvocationInfo cachedInfo ;
 
@@ -65,91 +58,45 @@ public abstract class ServantCacheLocalCRDBase extends LocalClientRequestDispatc
 	super( orb, scid, ior ) ;
     }
 
+    @Subcontract
     protected void cleanupAfterOADestroyed() {
-	if (debug)
-	    dprint( ".cleanupAfterOADestroyed called" ) ;
 	cachedInfo = null ;
     }
 
-    protected synchronized OAInvocationInfo getCachedInfo(
-	) throws OADestroyed
-    {
-	if (debug) 
-	    dprint( ".getCachedInfo->:" ) ;
-	
-	try {
-	    if (!servantIsLocal) {
-		if (debug)
-		    dprint( ".getCachedInfo: servantIsLocal is false" ) ;
-		throw poaWrapper.servantMustBeLocal() ;
-	    }
+    @Subcontract
+    protected synchronized OAInvocationInfo getCachedInfo() throws OADestroyed {
+        if (!servantIsLocal) {
+            throw poaWrapper.servantMustBeLocal() ;
+        }
 
-	    if (cachedInfo == null) {
-		if (debug)
-		    dprint( ".getCachedInfo: calling updateCachedInfo" ) ;
-		updateCachedInfo() ;
-	    }
+        if (cachedInfo == null) {
+            updateCachedInfo() ;
+        }
 
-	    if (debug)
-		dprint( ".getCachedInfo: returning cachedInfo" ) ;
-
-	    return cachedInfo ;
-	} finally {
-	    if (debug)
-		dprint( ".getCachedInfo<-:" ) ;
-	}
+        return cachedInfo ;
     }
 
+    @Subcontract
     private void updateCachedInfo() throws OADestroyed {
-	if (debug)
-	    dprint( ".updateCachedInfo->:" ) ;
+        // If find throws an exception, just let it propagate out
+        ObjectAdapter oa = oaf.find( oaid ) ;
+        cachedInfo = oa.makeInvocationInfo( objectId ) ;
+        oa.enter( );
 
-	try {
-	    // If find throws an exception, just let it propagate out
-	    ObjectAdapter oa = oaf.find( oaid ) ;
-	    if (debug)
-		dprint( ".updateCachedInfo: find returned " + oa ) ;
+        // InvocationInfo must be pushed before calling getInvocationServant
+        orb.pushInvocationInfo( cachedInfo ) ;
 
-	    cachedInfo = oa.makeInvocationInfo( objectId ) ;
-	    if (debug)
-		dprint( ".updateCachedInfo: cachedInfo = " + cachedInfo ) ;
+        try {
+            oa.getInvocationServant( cachedInfo ) ;
+        } catch (ForwardException freq) {
+            throw poaWrapper.illegalForwardRequest( freq ) ;
+        } finally {
+            oa.returnServant();
+            oa.exit();
+            orb.popInvocationInfo() ;
+        }
 
-	    oa.enter( );
-	    if (debug)
-		dprint( ".updateCachedInfo: oa.enter() called" ) ;
-
-	    // InvocationInfo must be pushed before calling getInvocationServant
-	    orb.pushInvocationInfo( cachedInfo ) ;
-	    if (debug)
-		dprint( ".updateCachedInfo: pushed invocation info" ) ;
-
-	    try {
-		oa.getInvocationServant( cachedInfo ) ;
-		if (debug)
-		    dprint( ".updateCachedInfo: set servant" ) ;
-	    } catch (ForwardException freq) {
-		if (debug)
-		    dprint( ".updateCachedInfo: caught ForwardException" ) ;
-		throw poaWrapper.illegalForwardRequest( freq ) ;
-	    } finally {
-		oa.returnServant();
-		if (debug)
-		    dprint( ".updateCachedInfo: after returnServant" ) ;
-
-		oa.exit();
-		if (debug)
-		    dprint( ".updateCachedInfo: after oa.exit()" ) ;
-
-		orb.popInvocationInfo() ;
-		if (debug)
-		    dprint( ".updateCachedInfo: after popping InvocationInfo" ) ;
-	    }
-
-	    return ;
-	} finally {
-	    if (debug)
-		dprint( ".updateCachedInfo<-:" ) ;
-	}
+        return ;
     }
 }
 

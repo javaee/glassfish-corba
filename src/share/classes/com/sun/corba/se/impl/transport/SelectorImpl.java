@@ -196,6 +196,7 @@ public class SelectorImpl
 	}
     }
 
+    @Transport
     public void unregisterForEvent(EventHandler eventHandler) {
 	if (isClosed()) {
             closedEventHandler();

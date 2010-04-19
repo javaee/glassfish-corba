@@ -97,6 +97,7 @@ public class CorbaResponseWaitingRoomImpl
                Collections.synchronizedMap(new HashMap<Integer, OutCallDesc>());
     }
 
+    @Transport
     public void registerWaiter(CorbaMessageMediator messageMediator)
     {
         display( "messageMediator request ID",

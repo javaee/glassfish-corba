@@ -69,6 +69,7 @@ import java.util.Set;
  * @author ken
  */
 public class EnhanceTool {
+    private static int errorCount = 0 ;
     private Util util ;
 
     private interface Arguments {
@@ -128,10 +129,15 @@ public class EnhanceTool {
                         fw.writeAll( outputData ) ;
                     }
                 }
-                return true ;
-            } catch (IOException exc) {
-                return false ;
+            } catch (Exception exc) {
+                util.info( 2, "Exception " + exc + " while processing class "
+                    + fw.getName() ) ;
+                errorCount++ ;
             }
+
+            // Always succeed, so we keep processing files after the first
+            // error.
+            return true ;
         }
     }
 
@@ -235,5 +241,8 @@ public class EnhanceTool {
 
     public static void main( String[] strs ) {
         (new EnhanceTool()).run( strs ) ;
+        if (errorCount > 0) {
+            System.exit(errorCount);
+        }
     }
 }

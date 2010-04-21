@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1996-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1996-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,17 +45,17 @@ import com.sun.corba.se.spi.oa.OADestroyed;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.se.spi.trace.Subcontract;
 
-public class POALocalCRDImpl extends LocalClientRequestDispatcherBase
-{
+@Subcontract
+public class POALocalCRDImpl extends LocalClientRequestDispatcherBase {
 
-    public POALocalCRDImpl( ORB orb, int scid, IOR ior)
-    {
-	super( (com.sun.corba.se.spi.orb.ORB)orb, scid, ior );
+    public POALocalCRDImpl( ORB orb, int scid, IOR ior) {
+	super( orb, scid, ior );
     }
 
-    private OAInvocationInfo servantEnter( ObjectAdapter oa ) throws OADestroyed
-    {
+    @Subcontract
+    private OAInvocationInfo servantEnter( ObjectAdapter oa ) throws OADestroyed {
 	oa.enter() ;
 
 	OAInvocationInfo info = oa.makeInvocationInfo( objectId ) ;
@@ -64,8 +64,8 @@ public class POALocalCRDImpl extends LocalClientRequestDispatcherBase
 	return info ;
     }
 
-    private void servantExit( ObjectAdapter oa ) 
-    {
+    @Subcontract
+    private void servantExit( ObjectAdapter oa ) {
 	try {
 	    oa.returnServant();
 	} finally {
@@ -81,44 +81,37 @@ public class POALocalCRDImpl extends LocalClientRequestDispatcherBase
     // ObjectAdapter.returnServant calls are paired, as required for
     // Portable Interceptors and Servant Locators in the POA.
     // Thus, this method must call returnServant if it returns null.
-    public ServantObject internalPreinvoke(
-	org.omg.CORBA.Object self, String operation, 
-	Class expectedType) throws OADestroyed
-    {
-	if (debug)
-	    dprint( ".internalPreinvoke->:" ) ;
+    @Subcontract
+    @Override
+    public ServantObject internalPreinvoke( org.omg.CORBA.Object self,
+        String operation, Class expectedType) throws OADestroyed {
 
 	ObjectAdapter oa = null ;
 
-	try {
-	    oa = oaf.find( oaid ) ;
+        oa = oaf.find( oaid ) ;
 
-	    OAInvocationInfo info = servantEnter( oa ) ;
-	    info.setOperation( operation ) ;
+        OAInvocationInfo info = servantEnter( oa ) ;
+        info.setOperation( operation ) ;
 
-	    try {
-		oa.getInvocationServant( info );
-		if (!checkForCompatibleServant( info, expectedType )) {
-		    servantExit( oa ) ;
-		    return null ;
-		}
+        try {
+            oa.getInvocationServant( info );
+            if (!checkForCompatibleServant( info, expectedType )) {
+                servantExit( oa ) ;
+                return null ;
+            }
 
-		return info ;
-	    } catch (Error err) {
-		// Cleanup after this call, then throw to allow
-		// outer try to handle the exception appropriately.
-		servantExit( oa ) ;
-		throw err ;
-	    } catch (RuntimeException re) {
-		// Cleanup after this call, then throw to allow
-		// outer try to handle the exception appropriately.
-		servantExit( oa ) ;
-		throw re ;
-	    }
-	} finally {
-	    if (debug)
-		dprint( ".internalPreinvoke<-:" ) ;
-	}
+            return info ;
+        } catch (Error err) {
+            // Cleanup after this call, then throw to allow
+            // outer try to handle the exception appropriately.
+            servantExit( oa ) ;
+            throw err ;
+        } catch (RuntimeException re) {
+            // Cleanup after this call, then throw to allow
+            // outer try to handle the exception appropriately.
+            servantExit( oa ) ;
+            throw re ;
+        }
     }
 
     public void servant_postinvoke(org.omg.CORBA.Object self,

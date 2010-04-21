@@ -41,7 +41,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
@@ -49,7 +48,6 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent ;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 import com.sun.corba.se.spi.ior.TaggedComponent ;
-import com.sun.corba.se.spi.oa.ObjectAdapterFactory;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory;
@@ -59,16 +57,15 @@ import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.NotLocalLocalCRDImpl;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 /**
  * @author Harold Carr
  */
-public class CorbaContactInfoListImpl 
-    implements
-	CorbaContactInfoList
-{
+@Transport
+public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     protected ORB orb;
     protected LocalClientRequestDispatcher localClientRequestDispatcher;
     protected IOR targetIOR;
@@ -113,10 +110,17 @@ public class CorbaContactInfoListImpl
         skipRotate.set( true ) ;
     }
 
+    @InfoMethod
+    private void display( String msg, int value ) { }
+
+    @InfoMethod
+    private void display( String msg, Object value ) { }
+
     // Move the first startCount elements of the list to the end, so that
     // the list starts at the startCount'th element and continues
     // through all elements.  Each time we rotate, increment
     // startCount for load balancing.
+    @Transport
     private synchronized List<CorbaContactInfo> rotate( List<CorbaContactInfo> arg ) {
         if (skipRotate.get()) {
             skipRotate.set( false ) ;
@@ -124,39 +128,30 @@ public class CorbaContactInfoListImpl
         }
 
         if (usePerRequestLoadBalancing) {
-            if (orb.folbDebugFlag) {
-                dprint( ".rotate->: arg = " + arg + " startCount = " + startCount ) ;
-            }
-
+            display( "startCount", startCount ) ;
             LinkedList<CorbaContactInfo> tempList = null ; 
 
-            try {
-                // XXX  This may be the best way to support PRLB for now.
-                // The GIS will return types like "iiop-listener-1", but we also get
-                // IIOP_CLEAR_TEXT for some, for both SSL and non-SSL ports.  Invoking
-                // clear on an SSL port leads to bad failures that are not retryable.
-                tempList = new LinkedList<CorbaContactInfo>( filter( arg, testPred ) ) ;
+            // XXX  This may be the best way to support PRLB for now.
+            // The GIS will return types like "iiop-listener-1", but we also get
+            // IIOP_CLEAR_TEXT for some, for both SSL and non-SSL ports.  Invoking
+            // clear on an SSL port leads to bad failures that are not retryable.
+            tempList = new LinkedList<CorbaContactInfo>( filter( arg, testPred ) ) ;
 
-                // XXX Really should just be this:
-                // tempList = new LinkedList<CorbaContactInfo>( arg ) ;
+            // XXX Really should just be this:
+            // tempList = new LinkedList<CorbaContactInfo>( arg ) ;
 
-                if (startCount >= tempList.size()) {
-                    startCount = 0 ;
-                }
-
-                for (int ctr=0; ctr<startCount; ctr++) {
-                    CorbaContactInfo element = tempList.removeLast() ;
-                    tempList.addFirst( element ) ;
-                }
-
-                startCount++ ;
-            
-                return tempList ;
-            } finally {
-                if (orb.folbDebugFlag) {
-                    dprint( ".rotate<-: result = " + tempList ) ;
-                }
+            if (startCount >= tempList.size()) {
+                startCount = 0 ;
             }
+
+            for (int ctr=0; ctr<startCount; ctr++) {
+                CorbaContactInfo element = tempList.removeLast() ;
+                tempList.addFirst( element ) ;
+            }
+
+            startCount++ ;
+
+            return tempList ;
         } else {
             return arg ;
         }
@@ -216,6 +211,7 @@ public class CorbaContactInfoListImpl
 	return targetIOR;
     }
 
+    @Transport
     public synchronized void setEffectiveTargetIOR(IOR effectiveTargetIOR)
     {
 	this.effectiveTargetIOR = effectiveTargetIOR;
@@ -264,9 +260,26 @@ public class CorbaContactInfoListImpl
     // java.lang.Object
     //
 
+    @Override
     public synchronized int hashCode()
     {
 	return targetIOR.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CorbaContactInfoListImpl other = (CorbaContactInfoListImpl) obj;
+        if (this.targetIOR != other.targetIOR &&
+            (this.targetIOR == null || !this.targetIOR.equals(other.targetIOR))) {
+            return false;
+        }
+        return true;
     }
 
     ////////////////////////////////////////////////////
@@ -274,8 +287,8 @@ public class CorbaContactInfoListImpl
     // Implementation
     //
 
-    private void createContactInfoList()
-    {
+    @Transport
+    private void createContactInfoList() {
 	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
 
 	if (effectiveTargetIORContactInfoList == null) {
@@ -307,37 +320,27 @@ public class CorbaContactInfoListImpl
 		addRemoteContactInfos(effectiveTargetIOR,
 				      effectiveTargetIORContactInfoList);
 	    }
-	    if (orb.transportDebugFlag) {
-		dprint(".createContactInfoList: first time for: "
-		       + iiopProfile
-		       + " list: "
-		       + effectiveTargetIORContactInfoList);
-	    }
+            display( "First time for iiopProfile", iiopProfile ) ;
 	} else {
 	    if (! iiopProfile.isLocal()) {
+                display( "Subsequent time for iiopProfile", iiopProfile ) ;
 		// 6152681 - this is so SSL can change its selection on each
 		// invocation
 		addRemoteContactInfos(effectiveTargetIOR,
 				      effectiveTargetIORContactInfoList);
 	    } else {
-		if (orb.transportDebugFlag) {
-		    dprint(".createContactInfoList: subsequent for: "
-			   + iiopProfile
-			   + " colocated so no change");
-		}
+                display( "Subsequent time for (colocated) iiopProfile",
+                    iiopProfile ) ;
 	    }
 	}
 
-        if (orb.folbDebugFlag) {
-            dprint( ".createContactInfoList: effectiveTargetIORContactInfoList = " +
-                effectiveTargetIORContactInfoList ) ;
-        }
+        display( "effective list", effectiveTargetIORContactInfoList ) ;
     }
 
-    private void addRemoteContactInfos(
-        IOR  effectiveTargetIOR,
-	List<CorbaContactInfo> effectiveTargetIORContactInfoList)
-    {
+    @Transport
+    private void addRemoteContactInfos( IOR  effectiveTargetIOR,
+	List<CorbaContactInfo> effectiveTargetIORContactInfoList) {
+
 	CorbaContactInfo contactInfo;
 	List<? extends SocketInfo> socketInfos = orb.getORBData()
 	    .getIORToSocketInfo().getSocketInfo(
@@ -346,9 +349,7 @@ public class CorbaContactInfoListImpl
 		effectiveTargetIORContactInfoList);
 
 	if (socketInfos == effectiveTargetIORContactInfoList) {
-	    if (orb.transportDebugFlag) {
-		dprint(".addRemoteContactInfos: no change: " + socketInfos);
-	    }
+            display( "socketInfos", socketInfos ) ;
 	    return;
 	}
 
@@ -361,9 +362,9 @@ public class CorbaContactInfoListImpl
 	}
     }
 
-    protected CorbaContactInfo createContactInfo(String type, 
-					    String hostname, int port)
-    {
+    protected CorbaContactInfo createContactInfo(String type, String hostname, 
+        int port) {
+
 	return new SocketOrChannelContactInfoImpl(
 	    orb, this, 
 	    // XREVISIT - See Base Line 62
@@ -380,8 +381,7 @@ public class CorbaContactInfoListImpl
      * allows local optimization, because ServantManagers in the POA
      * ALWAYS use local optimization ONLY (they do not have a remote case).
      */
-    protected void setLocalSubcontract()
-    {
+    protected void setLocalSubcontract() {
 	if (!effectiveTargetIOR.getProfile().isLocal()) {
 	    localClientRequestDispatcher = new NotLocalLocalCRDImpl();
 	    return;
@@ -403,14 +403,8 @@ public class CorbaContactInfoListImpl
     }
 
     // For timing test.
-    public CorbaContactInfo getPrimaryContactInfo()
-    {
+    public CorbaContactInfo getPrimaryContactInfo() {
 	return primaryContactInfo;
-    }
-
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaContactInfoListImpl", msg);
     }
 }
 

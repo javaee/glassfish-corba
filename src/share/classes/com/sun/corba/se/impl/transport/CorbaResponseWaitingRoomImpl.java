@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1996-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1996-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -58,10 +58,13 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 /**
  * @author Harold Carr
  */
+@Transport
 public class CorbaResponseWaitingRoomImpl
     implements
 	CorbaResponseWaitingRoom
@@ -94,11 +97,13 @@ public class CorbaResponseWaitingRoomImpl
                Collections.synchronizedMap(new HashMap<Integer, OutCallDesc>());
     }
 
+    @Transport
     public void registerWaiter(CorbaMessageMediator messageMediator)
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".registerWaiter: " + opAndId(messageMediator));
-	}
+        display( "messageMediator request ID",
+            messageMediator.getRequestId() ) ;
+        display( "messageMediator operation name",
+            messageMediator.getOperationName() ) ;
 
 	Integer requestId = messageMediator.getRequestIdInteger();
         
@@ -107,44 +112,43 @@ public class CorbaResponseWaitingRoomImpl
 	OutCallDesc exists = out_calls.put(requestId, call);
         if (exists != null) {
             wrapper.duplicateRequestIdsInResponseWaitingRoom(
-                       opAndId((CorbaMessageMediator)exists.messageMediator),
-                       opAndId(messageMediator));
+                       ORBUtility.operationNameAndRequestId(
+                           (CorbaMessageMediator)exists.messageMediator),
+                       ORBUtility.operationNameAndRequestId(messageMediator));
         }
     }
 
+    @Transport
     public void unregisterWaiter(CorbaMessageMediator mediator)
     {
 	CorbaMessageMediator messageMediator = (CorbaMessageMediator) mediator;
-
-	if (orb.transportDebugFlag) {
-	    dprint(".unregisterWaiter: " + opAndId(messageMediator));
-	}
+        display( "messageMediator request ID",
+            messageMediator.getRequestId() ) ;
+        display( "messageMediator operation name",
+            messageMediator.getOperationName() ) ;
 
 	Integer requestId = messageMediator.getRequestIdInteger();
 
         out_calls.remove(requestId);
     }
 
+    @Transport
     public CDRInputObject waitForResponse(CorbaMessageMediator messageMediator) {
         try {
             tp.enter_waitForResponse() ;
             CDRInputObject returnStream = null;
             
-            if (orb.transportDebugFlag) {
-                dprint(".waitForResponse->: " + opAndId(messageMediator));
-            }
+            display( "messageMediator request ID",
+                messageMediator.getRequestId() ) ;
+            display( "messageMediator operation name",
+                messageMediator.getOperationName() ) ;
             
             Integer requestId = messageMediator.getRequestIdInteger();
             
             if (messageMediator.isOneWay()) {
                 // The waiter is removed in releaseReply in the same
                 // way as a normal request.
-                
-                if (orb.transportDebugFlag) {
-                    dprint(".waitForResponse: one way - not waiting: "
-                            + opAndId(messageMediator));
-                }
-                
+                display( "Oneway request: not waiting") ;
                 return null;
             }
             
@@ -165,10 +169,7 @@ public class CorbaResponseWaitingRoomImpl
                     // The ReaderThread reads in the reply IIOP message
                     // and signals us.
                     try {
-                        if (orb.transportDebugFlag) {
-                            dprint(".waitForResponse: waiting: "
-                                    + opAndId(messageMediator));
-                        }
+                        display( "Waiting for response..." ) ;
                         
                         waitForResponseTimeout =
                                 call.condition.awaitNanos(waitForResponseTimeout);
@@ -176,12 +177,8 @@ public class CorbaResponseWaitingRoomImpl
                             if (waitForResponseTimeout > 0) {
                                 // it's a "spurious wait wakeup", need to
                                 // continue to wait for a response
-                                if (orb.transportDebugFlag) {
-                                    dprint(".waitForResponse: a 'spurious wait' " +
-                                            "detected: " + opAndId(messageMediator) +
-                                            ", will continue to wait another " +
-                                            waitForResponseTimeout/1000000 + " ms.");
-                                }
+                                display( "Spurious wakeup, continuing to wait for ",
+                                    waitForResponseTimeout/1000000 );
                             } else {
                                 // timed out waiting for data
                                 call.exception =
@@ -200,11 +197,7 @@ public class CorbaResponseWaitingRoomImpl
                     } catch (InterruptedException ie) {};
                 }
                 if (call.exception != null) {
-                    if (orb.transportDebugFlag) {
-                        dprint(".waitForResponse: exception: " +
-                                opAndId(messageMediator) +
-                                " " + call.exception);
-                    }
+                    display( "Exception from call", call.exception ) ;
                     throw call.exception;
                 }
                 
@@ -229,22 +222,27 @@ public class CorbaResponseWaitingRoomImpl
             
         } finally {
             tp.exit_waitForResponse() ;
-            if (orb.transportDebugFlag) {
-                dprint(".waitForResponse<-: " + opAndId(messageMediator));
-            }
         }
     }
 
+    @InfoMethod
+    private void display( String msg ) { }
+
+    @InfoMethod
+    private void display( String msg, int value ) { }
+
+    @InfoMethod
+    private void display( String msg, Object value ) { }
+
+    @Transport
     public void responseReceived(CDRInputObject is)
     {
 	CDRInputObject inputObject = (CDRInputObject) is;
 	LocateReplyOrReplyMessage header = (LocateReplyOrReplyMessage)
 	    inputObject.getMessageHeader();
-	if (orb.transportDebugFlag) {
-	    dprint(".responseReceived: id/"
-		   + header.getRequestId() + ": "
-		   + header);
-	}
+        display( "requestId", header.getRequestId()) ;
+        display( "header", header ) ;
+
         OutCallDesc call = out_calls.get(header.getRequestId());
 
         // This is an interesting case.  It could mean that someone sent us a
@@ -256,12 +254,7 @@ public class CorbaResponseWaitingRoomImpl
         // the ReaderThread gives it the last fragment and gets to the
         // out_calls.get line, then it will also be null, so just return;
         if (call == null) {
-	    if (orb.transportDebugFlag) {
-		dprint(".responseReceived: id/" 
-		       + header.getRequestId()
-		       + ": no waiter: "
-		       + header);
-	    }
+            display( "No waiter" ) ;
             return;
 	}
 
@@ -276,11 +269,11 @@ public class CorbaResponseWaitingRoomImpl
             CorbaMessageMediator messageMediator = 
                            (CorbaMessageMediator)call.messageMediator;
 
-	    if (orb.transportDebugFlag) {
-		dprint(".responseReceived: "
-		       + opAndId(messageMediator)
-		       + ": notifying waiters");
-	    }
+            display( "Notifying waiters") ;
+            display( "messageMediator request ID",
+                messageMediator.getRequestId() ) ;
+            display( "messageMediator operation name",
+                messageMediator.getOperationName() ) ;
 
 	    messageMediator.setReplyHeader(header);
 	    messageMediator.setInputObject(is);
@@ -302,13 +295,8 @@ public class CorbaResponseWaitingRoomImpl
     // CorbaResponseWaitingRoom
     //
 
-    public void signalExceptionToAllWaiters(SystemException systemException)
-    {
-
-	if (orb.transportDebugFlag) {
-	    dprint(".signalExceptionToAllWaiters: " + systemException);
-	}
-
+    @Transport
+    public void signalExceptionToAllWaiters(SystemException systemException) {
         OutCallDesc call;
         synchronized (out_calls) {
             Iterator<OutCallDesc> itr = out_calls.values().iterator();
@@ -336,21 +324,6 @@ public class CorbaResponseWaitingRoomImpl
 	    return null;
 	}
 	return call.messageMediator;
-    }
-
-    ////////////////////////////////////////////////////
-    //
-    // Implementation.
-    //
-
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaResponseWaitingRoomImpl", msg);
-    }
-
-    protected String opAndId(CorbaMessageMediator mediator)
-    {
-	return ORBUtility.operationNameAndRequestId(mediator);
     }
 }
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2001-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,7 +44,7 @@ import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.trace.Transport;
 
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.AMXMetadata ;
@@ -53,6 +53,7 @@ import org.glassfish.gmbal.Description ;
 /**
  * @author Harold Carr
  */
+@Transport
 @ManagedObject
 @Description( "Cache of connections accepted by the ORB" ) 
 @AMXMetadata( type="corba-inbound-connection-cache-mon", group="monitoring" )
@@ -78,11 +79,9 @@ public class CorbaInboundConnectionCacheImpl
 	throw wrapper.methodShouldNotBeCalled();
     }
     
+    @Transport
     public void put(CorbaAcceptor acceptor, CorbaConnection connection)
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".put: " + acceptor + " " + connection);
-	}
 	synchronized (backingStore()) {
 	    connectionCache.add(connection);
 	    connection.setConnectionCache(this);
@@ -91,11 +90,9 @@ public class CorbaInboundConnectionCacheImpl
 	}
     }
 
+    @Transport
     public void remove(CorbaConnection connection)
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".remove: " +  connection);
-	}
 	synchronized (backingStore()) {
 	    connectionCache.remove(connection);
 	    dprintStatistics();
@@ -116,11 +113,6 @@ public class CorbaInboundConnectionCacheImpl
     protected Object backingStore()
     {
 	return connectionCache;
-    }
-
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaInboundConnectionCacheImpl", msg);
     }
 }
 

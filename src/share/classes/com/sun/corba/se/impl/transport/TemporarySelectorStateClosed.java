@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2006-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2006-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,7 +43,7 @@ import java.nio.channels.Selector;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.TemporarySelectorState;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.trace.Transport;
 
 /**
  *
@@ -54,18 +54,15 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
  *
  * An class which models a temporary Selector in a closed state.
  */
+@Transport
 public class TemporarySelectorStateClosed implements TemporarySelectorState {
-    final private boolean debug;
 
     private TemporarySelectorStateClosed() {
-        // must be initialized to rid of compiler complaint
-        debug = true;
     }
 
     /** Creates a new instance of TemporarySelectorStateOpen */
     public TemporarySelectorStateClosed(ORB theOrb) {
         ORB itsOrb = theOrb;
-        debug = itsOrb.transportDebugFlag;
     }
 
     public int select(Selector theSelector, long theTimeout) throws IOException {
@@ -92,16 +89,11 @@ public class TemporarySelectorStateClosed implements TemporarySelectorState {
                                                    " closed");
     }
 
+    @Transport
     public TemporarySelectorState close(Selector theSelector) throws IOException {
         String selectorToString = getSelectorToString(theSelector);
-        if (debug) {
-            dprint("close()->: selector: " + selectorToString);
-        }
         if (theSelector != null && theSelector.isOpen()) {
             theSelector.close();
-        }
-        if (debug) {
-            dprint("close()<-: selector: " + selectorToString);
         }
         return this;
     }
@@ -120,9 +112,5 @@ public class TemporarySelectorStateClosed implements TemporarySelectorState {
             selectorToString = theSelector.toString();
         }
         return selectorToString;
-    }
-
-    private void dprint(String theMsg) {
-	ORBUtility.dprint("TemporarySelectorStateClosed", theMsg);
     }
 }

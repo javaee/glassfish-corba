@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1996-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1996-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,8 +44,10 @@ import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
+@Transport
 public abstract class EventHandlerBase
     implements
 	EventHandler
@@ -81,25 +83,27 @@ public abstract class EventHandlerBase
 	return selectionKey;
     }
 
+    @InfoMethod
+    private void display( String msg ) { }
+
+    @InfoMethod
+    private void display( String msg, Object value ) { }
+
     /*
      * NOTE:
      * This is not thread-safe by design.
      * Only one thread should call it - a reader/listener/select thread.
      * Not stateless: interest ops, registration.
      */
+    @Transport
     public void handleEvent()
     {
-	if (orb.transportDebugFlag) {
-	    dprint(".handleEvent->: " + this);
-	}
 	getSelectionKey().interestOps(getSelectionKey().interestOps() &
 				      (~ getInterestOps()));
 	if (shouldUseWorkerThreadForEvent()) {
 	    Throwable throwable = null;
 	    try {
-		if (orb.transportDebugFlag) {
-		    dprint(".handleEvent: addWork to pool: " + 0);
-		}
+                display( "add work to pool 0") ;
 		orb.getThreadPoolManager().getThreadPool(0)
 		    .getWorkQueue(0).addWork(getWork());
 	    } catch (NoSuchThreadPoolException e) {
@@ -109,20 +113,13 @@ public abstract class EventHandlerBase
 	    }
 	    // REVISIT: need to close connection.
 	    if (throwable != null) {
-		if (orb.transportDebugFlag) {
-		    dprint(".handleEvent: " + throwable);
-		}
+                display( "unexpected exception", throwable ) ;
 		throw orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil()
                          .noSuchThreadpoolOrQueue(throwable);
 	    }
 	} else {
-	    if (orb.transportDebugFlag) {
-		dprint(".handleEvent: doWork");
-	    }
+            display( "doWork" ) ;
 	    getWork().doWork();
-	}
-	if (orb.transportDebugFlag) {
-	    dprint(".handleEvent<-: " + this);
 	}
     }
 
@@ -144,11 +141,6 @@ public abstract class EventHandlerBase
     public Work getWork()
     {
 	return work;
-    }
-
-    private void dprint(String msg)
-    {
-	ORBUtility.dprint("EventHandlerBase", msg);
     }
 }
 

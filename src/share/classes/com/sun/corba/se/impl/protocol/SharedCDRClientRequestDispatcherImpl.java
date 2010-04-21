@@ -68,6 +68,10 @@ public class SharedCDRClientRequestDispatcherImpl
     extends
 	CorbaClientRequestDispatcherImpl
 {
+
+    @InfoMethod
+    private void operationAndId( String msg, int rid ) { }
+
     // REVISIT:
     // Rather than have separate CDR subcontract,
     // use same CorbaClientRequestDispatcherImpl but have
@@ -90,6 +94,8 @@ public class SharedCDRClientRequestDispatcherImpl
         operationAndId( messageMediator.getOperationName(),
             messageMediator.getRequestId() ) ;
 	orb = (ORB) messageMediator.getBroker();
+        operationAndId(messageMediator.getOperationName(), 
+            messageMediator.getRequestId());
 
 	CDROutputObject cdrOutputObject = (CDROutputObject) outputObject;
 
@@ -98,7 +104,8 @@ public class SharedCDRClientRequestDispatcherImpl
 	//
 
 	ByteBufferWithInfo bbwi = cdrOutputObject.getByteBufferWithInfo();
-	cdrOutputObject.getMessageHeader().setSize(bbwi.getByteBuffer(), bbwi.getSize());
+	cdrOutputObject.getMessageHeader().setSize(bbwi.getByteBuffer(),
+            bbwi.getSize());
 
 	CDRInputObject cdrInputObject =
 	    new CDRInputObject(orb, null, bbwi.getByteBuffer(),

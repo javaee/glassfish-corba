@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2003-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -60,7 +60,6 @@ import com.sun.corba.se.spi.transport.MessageTraceManager;
 
 // REVISIT - impl/poa specific:
 import com.sun.corba.se.impl.oa.poa.Policies;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.BufferManagerRead;
@@ -69,6 +68,8 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message_1_2;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
@@ -82,14 +83,15 @@ import org.glassfish.external.probe.provider.PluginPoint ;
  */
 // Note that no ObjectKeyName attribute is needed, because there is only
 // one CorbaTransportManager per ORB.
+@Transport
 public class CorbaTransportManagerImpl 
     implements
 	CorbaTransportManager
 {
     protected ORB orb;
     protected List<CorbaAcceptor> acceptors;
-    protected Map<String,CorbaOutboundConnectionCache> outboundConnectionCaches;
-    protected Map<String,CorbaInboundConnectionCache> inboundConnectionCaches;
+    protected final Map<String,CorbaOutboundConnectionCache> outboundConnectionCaches;
+    protected final Map<String,CorbaInboundConnectionCache> inboundConnectionCaches;
     protected Selector selector;
     
     public CorbaTransportManagerImpl(ORB orb) 
@@ -189,42 +191,28 @@ public class CorbaTransportManagerImpl
 	return selector;
     }
 
-    public synchronized void registerAcceptor(CorbaAcceptor acceptor)
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".registerAcceptor->: " + acceptor);
-	}
+    @Transport
+    public synchronized void registerAcceptor(CorbaAcceptor acceptor) {
 	acceptors.add(acceptor);
-	if (orb.transportDebugFlag) {
-	    dprint(".registerAcceptor<-: " + acceptor);
-	}
     }
 
-    public synchronized void unregisterAcceptor(CorbaAcceptor acceptor)
-    {
+    @Transport
+    public synchronized void unregisterAcceptor(CorbaAcceptor acceptor) {
 	acceptors.remove(acceptor);
     }
 
+    @Transport
     public void close()
     {
-	try {
-	    if (orb.transportDebugFlag) {
-		dprint(".close->");
-	    }
-            for (CorbaOutboundConnectionCache cc : outboundConnectionCaches.values()) {
-                StatsProviderManager.unregister( cc ) ;
-                cc.close() ;
-            }
-            for (CorbaInboundConnectionCache cc : inboundConnectionCaches.values()) {
-                StatsProviderManager.unregister( cc ) ;
-                cc.close() ;
-            }
-	    getSelector(0).close();
-	} finally {
-	    if (orb.transportDebugFlag) {
-		dprint(".close<-");
-	    }
-	}
+        for (CorbaOutboundConnectionCache cc : outboundConnectionCaches.values()) {
+            StatsProviderManager.unregister( cc ) ;
+            cc.close() ;
+        }
+        for (CorbaInboundConnectionCache cc : inboundConnectionCaches.values()) {
+            StatsProviderManager.unregister( cc ) ;
+            cc.close() ;
+        }
+        getSelector(0).close();
     }
 
     ////////////////////////////////////////////////////
@@ -236,6 +224,10 @@ public class CorbaTransportManagerImpl
         return getAcceptors( null, null ) ;
     }
 
+    @InfoMethod
+    private void display( String msg ) { }
+
+    @Transport
     public Collection<CorbaAcceptor> getAcceptors(String objectAdapterManagerId,
 				   ObjectAdapterId objectAdapterId)
     {
@@ -245,6 +237,7 @@ public class CorbaTransportManagerImpl
 	// Lazy initialization of acceptors.
         for (CorbaAcceptor acc : acceptors) {
 	    if (acc.initialize()) {
+                display( "initializing acceptors" ) ;
 		if (acc.shouldRegisterAcceptEvent()) {
 		    orb.getTransportManager().getSelector(0)
 			.registerForEvent(acc.getEventHandler());
@@ -255,6 +248,7 @@ public class CorbaTransportManagerImpl
     }
 
     // REVISIT - POA specific policies
+    @Transport
     public void addToIORTemplate(IORTemplate iorTemplate, 
 				 Policies policies,
 				 String codebase,
@@ -355,16 +349,6 @@ public class CorbaTransportManagerImpl
     public MessageTraceManager getMessageTraceManager() 
     {
 	return (MessageTraceManager)(currentMessageTraceManager.get()) ;
-    }
-
-    ////////////////////////////////////////////////////
-    //
-    // implemenation
-    //
-
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaTransportManagerImpl", msg);
     }
 }
 

@@ -52,14 +52,13 @@ import com.sun.corba.se.spi.transport.Selector;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 /**
  * @author Harold Carr
  */
-public class SocketOrChannelAcceptorImpl
-    extends
-        CorbaAcceptorBase
-{
+@Transport public class SocketOrChannelAcceptorImpl extends CorbaAcceptorBase {
     protected ServerSocketChannel serverSocketChannel;
     protected ServerSocket serverSocket;
     
@@ -71,13 +70,10 @@ public class SocketOrChannelAcceptorImpl
         super( orb, port, name, type ) ;
     }
 
-    public synchronized boolean initialize()
-    {
+    @Transport
+    public synchronized boolean initialize() {
 	if (initialized) {
 	    return false;
-	}
-	if (orb.transportDebugFlag) {
-	    dprint(".initialize: " + this);
 	}
 	InetSocketAddress inetSocketAddress = null;
 	String host = "all interfaces";
@@ -132,6 +128,13 @@ public class SocketOrChannelAcceptorImpl
 
     }
 
+    @InfoMethod
+    private void usingServerSocket( ServerSocket ss ) { }
+
+    @InfoMethod
+    private void usingServerSocketChannel( ServerSocketChannel ssc ) { }
+
+    @Transport
     public Socket getAcceptedSocket() {
 	SocketChannel socketChannel = null;
 	Socket socket = null;
@@ -139,9 +142,11 @@ public class SocketOrChannelAcceptorImpl
 	try {
 	    if (serverSocketChannel == null) {
 		socket = serverSocket.accept();
+                usingServerSocket( serverSocket ) ;
 	    } else {
 		socketChannel = serverSocketChannel.accept();
 		socket = socketChannel.socket();
+                usingServerSocketChannel(serverSocketChannel);
 	    }
 
 	    orb.getORBData().getSocketFactory()
@@ -173,23 +178,15 @@ public class SocketOrChannelAcceptorImpl
 	    // a growing log file to alert admin of problem.
 	}
 
-	if (orb.transportDebugFlag) {
-	    dprint(".accept: " + 
-		   (serverSocketChannel == null 
-		    ? serverSocket.toString()
-		    : serverSocketChannel.toString()));
-	}
-
         return socket ;
     }
 
+    @InfoMethod
+    private void closeException( IOException exc ) { }
 
-    public void close ()
-    {
+    @Transport
+    public void close () {
 	try {
-	    if (orb.transportDebugFlag) {
-		dprint(".close->:");
-	    }
 	    Selector selector = orb.getTransportManager().getSelector(0);
 	    selector.unregisterForEvent(this);
 	    if (serverSocketChannel != null) {
@@ -199,21 +196,15 @@ public class SocketOrChannelAcceptorImpl
 		serverSocket.close();
 	    }
 	} catch (IOException e) {
-	    if (orb.transportDebugFlag) {
-		dprint(".close:", e);
-	    }
+            closeException(e);
 	} finally {
-	    if (orb.transportDebugFlag) {
-		dprint(".close<-:");
-	    }
 	}
     }
 
     // EventHandler methods
     //
 
-    public SelectableChannel getChannel()
-    {
+    public SelectableChannel getChannel() {
 	return serverSocketChannel;
     }
 
@@ -226,12 +217,9 @@ public class SocketOrChannelAcceptorImpl
         processSocket( getAcceptedSocket() ) ;
     }
 
-    public void doWork()
-    {
+    @Transport
+    public void doWork() {
 	try {
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork->: " + this);
-	    }
 	    if (selectionKey.isAcceptable()) {
                 AccessController.doPrivileged(
 		    new PrivilegedAction<Object>() {
@@ -242,31 +230,17 @@ public class SocketOrChannelAcceptorImpl
 		    }
 		);
 	    } else {
-		if (orb.transportDebugFlag) {
-		    dprint(".doWork: ! selectionKey.isAcceptable: " + this);
-		}
+                selectionKeyNotAcceptable() ;
 	    }
 	} catch (SecurityException se) {
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork: ignoring SecurityException: "
-		       + se 
-		       + " " + this);
-	    }
+            securityException( se ) ;
 	    String permissionStr = ORBUtility.getClassSecurityInfo(getClass());
             wrapper.securityExceptionInAccept(se, permissionStr);
 	} catch (Exception ex) {
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork: ignoring Exception: "
-		       + ex 
-		       + " " + this);
-	    }
+            otherException( ex ) ;
             wrapper.exceptionInAccept(ex);
 	} catch (Throwable t) {
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork: ignoring Throwable: "
-		       + t
-		       + " " + this);
-	    }
+            otherException( t ) ;
 	} finally {
 
             // IMPORTANT: To avoid bug (4953599), we force the
@@ -286,10 +260,6 @@ public class SocketOrChannelAcceptorImpl
 
             Selector selector = orb.getTransportManager().getSelector(0);
             selector.registerInterestOps(this);
-
-	    if (orb.transportDebugFlag) {
-		dprint(".doWork<-:" + this);
-	    }
 	}
     }
 
@@ -302,6 +272,15 @@ public class SocketOrChannelAcceptorImpl
     {
 	return serverSocket;
     }
+
+    @InfoMethod
+    private void selectionKeyNotAcceptable() { }
+
+    @InfoMethod
+    private void securityException(SecurityException se) { }
+
+    @InfoMethod
+    private void otherException(Throwable t) { }
     // END Legacy support
 }
 

@@ -96,7 +96,10 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.POASystemException;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Subcontract;
 
+@Subcontract
 public class CorbaServerRequestDispatcherImpl
     implements CorbaServerRequestDispatcher 
 {
@@ -138,331 +141,239 @@ public class CorbaServerRequestDispatcherImpl
      * @exception OBJECT_NOT_EXIST is thrown if we know the object does not 
      * exist here, and we are not forwarding.
      */
-    public IOR locate(ObjectKey okey) 
-    {
-	try {
-	    if (orb.subcontractDebugFlag)
-		dprint(".locate->");
+    @Subcontract
+    public IOR locate(ObjectKey okey) {
+        ObjectKeyTemplate oktemp = okey.getTemplate() ;
 
-	    ObjectKeyTemplate oktemp = okey.getTemplate() ;
+        try {
+            checkServerId(okey);
+        } catch (ForwardException fex) {
+            return fex.getIOR() ;
+        }
 
-	    try {
-		checkServerId(okey);
-	    } catch (ForwardException fex) {
-		return fex.getIOR() ;
-	    }
+        // Called only for its side-effect of throwing appropriate exceptions
+        findObjectAdapter(oktemp);
 
-	    // Called only for its side-effect of throwing appropriate exceptions
-	    findObjectAdapter(oktemp);
-
-	    return null ;
-	} finally {
-	    if (orb.subcontractDebugFlag)
-		dprint(".locate<-");
-	} 
+        return null ;
     }		
 
-    public void dispatch(CorbaMessageMediator request)
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".dispatch->: " + opAndId(request));
-	    }
+    @InfoMethod
+    private void generalMessage( String msg ) { }
 
-	    // to set the codebase information, if any transmitted; and also
-	    // appropriate ORB Version.
-	    consumeServiceContexts(request);
+    @InfoMethod
+    private void exceptionMessage( String msg, Throwable thr ) { }
 
-	    // Now that we have the service contexts processed and the
-	    // correct ORBVersion set, we must finish initializing the
-	    // stream.
-	    ((MarshalInputStream)request.getInputObject())
-		.performORBVersionSpecificInit();
+    @Subcontract
+    public void dispatch(CorbaMessageMediator request) {
+        // to set the codebase information, if any transmitted; and also
+        // appropriate ORB Version.
+        consumeServiceContexts(request);
 
-	    ObjectKeyCacheEntry entry = request.getObjectKeyCacheEntry() ;
-	    ObjectKey okey = entry.getObjectKey();
+        // Now that we have the service contexts processed and the
+        // correct ORBVersion set, we must finish initializing the
+        // stream.
+        ((MarshalInputStream)request.getInputObject())
+            .performORBVersionSpecificInit();
 
-	    // Check that this server is the right server
-	    try {
-		checkServerId(okey);
-	    } catch (ForwardException fex) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatch: " + opAndId(request) 
-			   + ": bad server id");
-		}
+        ObjectKeyCacheEntry entry = request.getObjectKeyCacheEntry() ;
+        ObjectKey okey = entry.getObjectKey();
 
-		request.getProtocolHandler()
-		    .createLocationForward(request, fex.getIOR(), null);
-		return;
-	    }
+        // Check that this server is the right server
+        try {
+            checkServerId(okey);
+        } catch (ForwardException fex) {
+            operationAndId(request.getOperationName(),
+                request.getRequestId());
 
-	    String operation = request.getOperationName();
-	    ObjectAdapter objectAdapter = entry.getObjectAdapter() ;
+            request.getProtocolHandler()
+                .createLocationForward(request, fex.getIOR(), null);
+            return;
+        }
 
-	    try {
-		byte[] objectId = okey.getId().getId() ;
-		ObjectKeyTemplate oktemp = okey.getTemplate() ;
-		
-		if (objectAdapter == null) {
-		    // This call is expensive enough to cache, hence the creation
-		    // of the ObjectKeyCacheEntry mechanism.
-		    objectAdapter = findObjectAdapter(oktemp);
-		    entry.setObjectAdapter( objectAdapter ) ;
-		}
+        String operation = request.getOperationName();
+        ObjectAdapter objectAdapter = entry.getObjectAdapter() ;
 
-		java.lang.Object servant = getServantWithPI(request, objectAdapter, 
-		    objectId, oktemp, operation);
+        try {
+            byte[] objectId = okey.getId().getId() ;
+            ObjectKeyTemplate oktemp = okey.getTemplate() ;
 
-		dispatchToServant(servant, request, objectId, objectAdapter);
-	    } catch (ForwardException ex) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatch: " + opAndId(request)
-			   + ": ForwardException caught");
-		}
+            if (objectAdapter == null) {
+                // This call is expensive enough to cache, hence the creation
+                // of the ObjectKeyCacheEntry mechanism.
+                objectAdapter = findObjectAdapter(oktemp);
+                entry.setObjectAdapter( objectAdapter ) ;
+            }
 
-		// Thrown by Portable Interceptors from InterceptorInvoker,
-		// through Response constructor.
-		request.getProtocolHandler()
-		    .createLocationForward(request, ex.getIOR(), null);
-	    } catch (OADestroyed ex) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatch: " + opAndId(request)
-			   + ": OADestroyed exception caught");
-		}
+            java.lang.Object servant = getServantWithPI(request, objectAdapter,
+                objectId, oktemp, operation);
 
-		// Clear any cached ObjectAdapter in the ObjectKeyCacheEntry, because
-		// it is no longer valid.
-		entry.clearObjectAdapter() ;
+            dispatchToServant(servant, request, objectId, objectAdapter);
+        } catch (ForwardException ex) {
+            generalMessage( "Caught ForwardException") ;
+            // Thrown by Portable Interceptors from InterceptorInvoker,
+            // through Response constructor.
+            request.getProtocolHandler()
+                .createLocationForward(request, ex.getIOR(), null);
+        } catch (OADestroyed ex) {
+            generalMessage( "Caught OADestroyed" ) ;
 
-		// DO NOT CALL releaseServant here! 
-		// The problem is that OADestroyed is only thrown by oa.enter, in
-		// which case oa.exit should NOT be called, and neither should
-		// the invocationInfo stack be popped.
+            // Clear any cached ObjectAdapter in the ObjectKeyCacheEntry, because
+            // it is no longer valid.
+            entry.clearObjectAdapter() ;
 
-		// Destroyed POAs can be recreated by normal adapter activation.
-		// So just restart the dispatch.
-		dispatch(request);
-	    } catch (RequestCanceledException ex) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatch: " + opAndId(request)
-			   + ": RequestCanceledException caught");
-		}
+            // DO NOT CALL releaseServant here!
+            // The problem is that OADestroyed is only thrown by oa.enter, in
+            // which case oa.exit should NOT be called, and neither should
+            // the invocationInfo stack be popped.
 
-		// IDLJ generated non-tie based skeletons do not catch the
-		// RequestCanceledException. Rethrow the exception, which will
-		// cause the worker thread to unwind the dispatch and wait for
-		// other requests.
-		throw ex;
-	    } catch (UnknownException ex) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatch: " + opAndId(request)
-			   + ": UnknownException caught " + ex);
-		}
+            // Destroyed POAs can be recreated by normal adapter activation.
+            // So just restart the dispatch.
+            dispatch(request);
+        } catch (RequestCanceledException ex) {
+            generalMessage( "Caught RequestCanceledException") ;
 
-		// RMIC generated tie skeletons convert all Throwable exception
-		// types (including RequestCanceledException, ThreadDeath)
-		// thrown during reading fragments into UnknownException.
-		// If RequestCanceledException was indeed raised,
-		// then rethrow it, which will eventually cause the worker
-		// thread to unstack the dispatch and wait for other requests.
-		if (ex.originalEx instanceof RequestCanceledException) {
-		    throw (RequestCanceledException) ex.originalEx;
-		}
+            // IDLJ generated non-tie based skeletons do not catch the
+            // RequestCanceledException. Rethrow the exception, which will
+            // cause the worker thread to unwind the dispatch and wait for
+            // other requests.
+            throw ex;
+        } catch (UnknownException ex) {
+            generalMessage( "Caught UnknownException" ) ;
 
-		ServiceContexts contexts = 
-		    ServiceContextDefaults.makeServiceContexts(orb);
-		UEInfoServiceContext usc = 
-		    ServiceContextDefaults.makeUEInfoServiceContext(ex.originalEx);
+            // RMIC generated tie skeletons convert all Throwable exception
+            // types (including RequestCanceledException, ThreadDeath)
+            // thrown during reading fragments into UnknownException.
+            // If RequestCanceledException was indeed raised,
+            // then rethrow it, which will eventually cause the worker
+            // thread to unstack the dispatch and wait for other requests.
+            if (ex.originalEx instanceof RequestCanceledException) {
+                throw (RequestCanceledException) ex.originalEx;
+            }
 
-		contexts.put( usc ) ;
+            ServiceContexts contexts =
+                ServiceContextDefaults.makeServiceContexts(orb);
+            UEInfoServiceContext usc =
+                ServiceContextDefaults.makeUEInfoServiceContext(ex.originalEx);
 
-		SystemException sysex = wrapper.unknownExceptionInDispatch( 
-			CompletionStatus.COMPLETED_MAYBE, ex ) ;
-		request.getProtocolHandler()
-		    .createSystemExceptionResponse(request, sysex, 
-			contexts);
-	    } catch (Throwable ex) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatch: " + opAndId(request)
-			   + ": other exception " + ex);
-		}
-		request.getProtocolHandler()
-		    .handleThrowableDuringServerDispatch(
-                        request, ex, CompletionStatus.COMPLETED_MAYBE);
-	    }
-	    return;
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".dispatch<-: " + opAndId(request));
-	    }
-	}
+            contexts.put( usc ) ;
+
+            SystemException sysex = wrapper.unknownExceptionInDispatch(
+                    CompletionStatus.COMPLETED_MAYBE, ex ) ;
+            request.getProtocolHandler()
+                .createSystemExceptionResponse(request, sysex,
+                    contexts);
+        } catch (Throwable ex) {
+            generalMessage( "Caught other exception" ) ;
+            request.getProtocolHandler()
+                .handleThrowableDuringServerDispatch(
+                    request, ex, CompletionStatus.COMPLETED_MAYBE);
+        }
+
+        return;
     }
 
-    private void releaseServant(ObjectAdapter objectAdapter) 
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".releaseServant->");
-	    }
+    @Subcontract
+    private void releaseServant(ObjectAdapter objectAdapter) {
+        if (objectAdapter == null) {
+            generalMessage( "Null object adapter" ) ;
+            return ;
+        }
 
-	    if (objectAdapter == null) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".releaseServant: null object adapter");
-		}
-		return ;
-	    }
-
-	    try {
-		objectAdapter.returnServant();
-	    } finally {
-		objectAdapter.exit();
-		orb.popInvocationInfo() ;
-	    }
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".releaseServant<-");
-	    }
-	}
+        try {
+            objectAdapter.returnServant();
+        } finally {
+            objectAdapter.exit();
+            orb.popInvocationInfo() ;
+        }
     }
 
     // Note that objectAdapter.enter() must be called before getServant.
-    private java.lang.Object getServant(ObjectAdapter objectAdapter, byte[] objectId,
-	String operation) 
-	throws OADestroyed
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".getServant->");
-	    }
+    @Subcontract
+    private java.lang.Object getServant(ObjectAdapter objectAdapter, 
+        byte[] objectId, String operation) throws OADestroyed {
 
-	    OAInvocationInfo info = objectAdapter.makeInvocationInfo(objectId);
-	    info.setOperation(operation);
-	    orb.pushInvocationInfo(info);
-	    objectAdapter.getInvocationServant(info);
-	    return info.getServantContainer() ;
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".getServant<-");
-	    }
-	}
+        OAInvocationInfo info = objectAdapter.makeInvocationInfo(objectId);
+        info.setOperation(operation);
+        orb.pushInvocationInfo(info);
+        objectAdapter.getInvocationServant(info);
+        return info.getServantContainer() ;
     }
 
-    protected java.lang.Object getServantWithPI(CorbaMessageMediator request,
-						 ObjectAdapter objectAdapter,
-	byte[] objectId, ObjectKeyTemplate oktemp, String operation) 
-	throws OADestroyed 
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".getServantWithPI->");
-	    }
+    @Subcontract
+    protected java.lang.Object getServantWithPI(CorbaMessageMediator request, 
+        ObjectAdapter objectAdapter, byte[] objectId, ObjectKeyTemplate oktemp,
+        String operation) throws OADestroyed {
 
-	    // Prepare Portable Interceptors for a new server request
-	    // and invoke receive_request_service_contexts.  The starting
-	    // point may throw a SystemException or ForwardException.
-	    orb.getPIHandler().initializeServerPIInfo(request, objectAdapter,
-		objectId, oktemp);
-	    orb.getPIHandler().invokeServerPIStartingPoint();
+        // Prepare Portable Interceptors for a new server request
+        // and invoke receive_request_service_contexts.  The starting
+        // point may throw a SystemException or ForwardException.
+        orb.getPIHandler().initializeServerPIInfo(request, objectAdapter,
+            objectId, oktemp);
+        orb.getPIHandler().invokeServerPIStartingPoint();
 
-	    objectAdapter.enter() ;
+        objectAdapter.enter() ;
 
-	    // This must be set just after the enter so that exceptions thrown by 
-	    // enter do not cause 
-	    // the exception reply to pop the thread stack and do an extra oa.exit.
-	    if (request != null)
-		request.setExecuteReturnServantInResponseConstructor(true);
+        // This must be set just after the enter so that exceptions thrown by
+        // enter do not cause
+        // the exception reply to pop the thread stack and do an extra oa.exit.
+        if (request != null)
+            request.setExecuteReturnServantInResponseConstructor(true);
 
-	    java.lang.Object servant = getServant(objectAdapter, objectId, 
-		operation);
+        java.lang.Object servant = getServant(objectAdapter, objectId,
+            operation);
 
-	    // Note: we do not know the MDI on a null servant.
-	    // We only end up in that situation if _non_existent called,
-	    // so that the following handleNullServant call does not throw an 
-	    // exception.
-	    String mdi = "unknown" ;
+        // Note: we do not know the MDI on a null servant.
+        // We only end up in that situation if _non_existent called,
+        // so that the following handleNullServant call does not throw an
+        // exception.
+        String mdi = "unknown" ;
 
-	    if (servant instanceof NullServant) 
-		handleNullServant(operation, (NullServant)servant);
-	    else 
-		mdi = objectAdapter.getInterfaces(servant, objectId)[0] ;
+        if (servant instanceof NullServant)
+            handleNullServant(operation, (NullServant)servant);
+        else
+            mdi = objectAdapter.getInterfaces(servant, objectId)[0] ;
 
-	    orb.getPIHandler().setServerPIInfo(servant, mdi);
+        orb.getPIHandler().setServerPIInfo(servant, mdi);
 
-	    if (((servant != null) &&
-		!(servant instanceof org.omg.CORBA.DynamicImplementation) &&
-		!(servant instanceof org.omg.PortableServer.DynamicImplementation)) ||
-		(SpecialMethod.getSpecialMethod(operation) != null)) {
-		orb.getPIHandler().invokeServerPIIntermediatePoint();
-	    }
+        if (((servant != null) &&
+            !(servant instanceof org.omg.CORBA.DynamicImplementation) &&
+            !(servant instanceof org.omg.PortableServer.DynamicImplementation)) ||
+            (SpecialMethod.getSpecialMethod(operation) != null)) {
+            orb.getPIHandler().invokeServerPIIntermediatePoint();
+        }
 
-	    return servant ;
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".getServantWithPI<-");
-	    }
-	}
+        return servant ;
     }
 
-    protected void checkServerId(ObjectKey okey) 
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".checkServerId->");
-	    }
+    @Subcontract
+    protected void checkServerId(ObjectKey okey) {
+        ObjectKeyTemplate oktemp = okey.getTemplate() ;
+        int sId = oktemp.getServerId() ;
+        int scid = oktemp.getSubcontractId() ;
 
-	    ObjectKeyTemplate oktemp = okey.getTemplate() ;
-	    int sId = oktemp.getServerId() ;
-	    int scid = oktemp.getSubcontractId() ;
-
-	    if (!orb.isLocalServerId(scid, sId)) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".checkServerId: bad server id");
-		}
-
-		orb.handleBadServerId(okey);
-	    }
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".checkServerId<-");
-	    }
-	}
+        if (!orb.isLocalServerId(scid, sId)) {
+            generalMessage("bad server ID");
+            orb.handleBadServerId(okey);
+        }
     }
 
-    private ObjectAdapter findObjectAdapter(ObjectKeyTemplate oktemp)
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".findObjectAdapter->");
-	    }
+    @Subcontract
+    private ObjectAdapter findObjectAdapter(ObjectKeyTemplate oktemp) {
+        RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
+        int scid = oktemp.getSubcontractId() ;
+        ObjectAdapterFactory oaf = scr.getObjectAdapterFactory(scid);
+        if (oaf == null) {
+            throw wrapper.noObjectAdapterFactory() ;
+        }
 
-	    RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
-	    int scid = oktemp.getSubcontractId() ;
-	    ObjectAdapterFactory oaf = scr.getObjectAdapterFactory(scid);
-	    if (oaf == null) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".findObjectAdapter: failed to find ObjectAdapterFactory");
-		}
+        ObjectAdapterId oaid = oktemp.getObjectAdapterId() ;
+        ObjectAdapter oa = oaf.find(oaid);
 
-		throw wrapper.noObjectAdapterFactory() ;
-	    }
+        if (oa == null) {
+            throw wrapper.badAdapterId() ;
+        }
 
-	    ObjectAdapterId oaid = oktemp.getObjectAdapterId() ;
-	    ObjectAdapter oa = oaf.find(oaid);
-
-	    if (oa == null) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".findObjectAdapter: failed to find ObjectAdaptor");
-		}
-
-		throw wrapper.badAdapterId() ;
-	    }
-
-	    return oa ;
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".findObjectAdapter<-");
-	    }
-	}
+        return oa ;
     }
 
     /** Always throws OBJECT_NOT_EXIST if operation is not a special method.
@@ -471,43 +382,25 @@ public class CorbaServerRequestDispatcherImpl
     * false.  Always throws OBJECT_NOT_EXIST for any other special method.
     * Update for issue 4385.
     */
-    protected void handleNullServant(String operation, NullServant nserv ) 
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".handleNullServant->: " + operation);
-	    }
+    @Subcontract
+    protected void handleNullServant(String operation, NullServant nserv ) {
+        SpecialMethod specialMethod = SpecialMethod.getSpecialMethod(operation);
 
-	    SpecialMethod specialMethod = 
-		SpecialMethod.getSpecialMethod(operation);
-
-	    if ((specialMethod == null) || 
-		!specialMethod.isNonExistentMethod()) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".handleNullServant: " + operation 
-			   + ": throwing OBJECT_NOT_EXIST");
-		}
-
-		throw nserv.getException() ;
-	    }
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".handleNullServant<-: " + operation);
-	    }
-	}
+        if ((specialMethod == null) ||
+            !specialMethod.isNonExistentMethod()) {
+            throw nserv.getException() ;
+        }
     }
 
-    protected void consumeServiceContexts(CorbaMessageMediator request) 
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".consumeServiceContexts->: " 
-		       + opAndId(request));
-	    }
+    @InfoMethod
+    private void objectInfo( String msg, Object obj ) { }
+
+    @Subcontract
+    protected void consumeServiceContexts(CorbaMessageMediator request) {
+        operationAndId(request.getOperationName(), request.getRequestId());
 
 	    ServiceContexts ctxts = request.getRequestServiceContexts();
 	    ServiceContext sc ;
-
 	    GIOPVersion giopVersion = request.getGIOPVersion();
 
 	    // we cannot depend on this since for our local case, we do not send
@@ -516,12 +409,8 @@ public class CorbaServerRequestDispatcherImpl
 
 	    boolean hasCodeSetContext = processCodeSetContext(request, ctxts);
 
-	    if (orb.subcontractDebugFlag) {
-		dprint(".consumeServiceContexts: " + opAndId(request)
-		       + ": GIOP version: " + giopVersion);
-		dprint(".consumeServiceContexts: " + opAndId(request)
-		       + ": as code set context? " + hasCodeSetContext);
-	    }
+            objectInfo( "GIOP version", giopVersion ) ;
+            objectInfo( "Has code set context?" , hasCodeSetContext ) ;
 
 	    sc = ctxts.get(
 		SendingContextServiceContext.SERVICE_CONTEXT_ID ) ;
@@ -560,11 +449,7 @@ public class CorbaServerRequestDispatcherImpl
 	    boolean isForeignORB = false;
 
 	    if (giopVersion.equals(GIOPVersion.V1_0) && hasCodeSetContext) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".consumeServiceCOntexts: " + opAndId(request)
-			   + ": Determined to be an old Sun ORB");
-		}
-		    
+                generalMessage("Old Sun ORB");
 		orb.setORBVersion(ORBVersionFactory.getOLD()) ;
 		// System.out.println("setting legacy ORB version");
 	    } else {
@@ -587,36 +472,26 @@ public class CorbaServerRequestDispatcherImpl
 	    }
 
 	    if (isForeignORB) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".consumeServiceContexts: " + opAndId(request)
-			   + ": Determined to be a foreign ORB");
-		}
-
+                generalMessage("Foreign ORB" ) ;
 		orb.setORBVersion(ORBVersionFactory.getFOREIGN());
 	    }
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".consumeServiceContexts<-: " + opAndId(request));
-	    }
-	}
     }
     
+    @Subcontract
     protected CorbaMessageMediator dispatchToServant(
         java.lang.Object servant, 
 	CorbaMessageMediator req, 
 	byte[] objectId, ObjectAdapter objectAdapter) 
     {
-	try {
+        try {
             if (orb.operationTraceDebugFlag) {
                 OperationTracer.enable() ;
             }
 
             OperationTracer.begin( "Dispatch to servant" ) ;
 
-	    if (orb.subcontractDebugFlag) {
-		dprint(".dispatchToServant->: " + opAndId(req) 
-		       + ": " + servantInfo(servant));
-	    }
+            operationAndId( req.getOperationName(), req.getRequestId());
+            objectInfo( "Servant info", servant ) ;
 
 	    CorbaMessageMediator response = null ;
 
@@ -624,12 +499,7 @@ public class CorbaServerRequestDispatcherImpl
 
 	    SpecialMethod method = SpecialMethod.getSpecialMethod(operation) ;
 	    if (method != null) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatchToServant: " + opAndId(req)
-			   + ": Handling special method: "
-			   + method.getName()
-			   + ": " + servantInfo(servant));
-		}
+                objectInfo( "Handling special method", method.getName() ) ;
 
 		response = method.invoke(servant, req, objectId, objectAdapter);
 		return response ;
@@ -637,11 +507,7 @@ public class CorbaServerRequestDispatcherImpl
 	    
 	    // Invoke on the servant using the portable DSI skeleton
 	    if (servant instanceof org.omg.CORBA.DynamicImplementation) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatchToServant: " + opAndId(req)
-			   + ": Handling old style DSI type servant: "
-			   + servantInfo(servant));
-		}
+                generalMessage( "Handling old style DSI type servant") ;
 
 		org.omg.CORBA.DynamicImplementation dynimpl = 
 		    (org.omg.CORBA.DynamicImplementation)servant;
@@ -653,12 +519,7 @@ public class CorbaServerRequestDispatcherImpl
 		
 		response = handleDynamicResult(sreq, req);
 	    } else if (servant instanceof org.omg.PortableServer.DynamicImplementation) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatchToServant: " + opAndId(req)
-			   + ": Handling POA DSI type servant: "
-			   + servantInfo(servant));
-		}
-
+                generalMessage( "Handling POA DSI type servant" ) ;
 		org.omg.PortableServer.DynamicImplementation dynimpl = 
 		    (org.omg.PortableServer.DynamicImplementation)servant;
 		ServerRequestImpl sreq = new ServerRequestImpl(req, orb);
@@ -669,12 +530,7 @@ public class CorbaServerRequestDispatcherImpl
 		
 		response = handleDynamicResult(sreq, req);
 	    } else {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".dispatchToServant: " + opAndId(req)
-			   + ": Handling invoke handler type servant: "
-			   + servantInfo(servant));
-		}
-
+                generalMessage( "Handling invoke handler type servant" ) ;
 		InvokeHandler invhandle = (InvokeHandler)servant ;
 
 		OutputStream stream = null;
@@ -691,234 +547,161 @@ public class CorbaServerRequestDispatcherImpl
 
 	    return response ;
 	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".dispatchToServant<-: " + opAndId(req)
-		       + ": " + servantInfo(servant));
-	    }
-
             OperationTracer.disable() ;
             OperationTracer.finish( ) ;
 	}
     }
 
-    protected CorbaMessageMediator handleDynamicResult(
-        ServerRequestImpl sreq,
-	CorbaMessageMediator req) 
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".handleDynamicResult->: " + opAndId(req));
-	    }
+    @Subcontract
+    protected CorbaMessageMediator handleDynamicResult( ServerRequestImpl sreq,
+        CorbaMessageMediator req) {
 
-	    CorbaMessageMediator response = null ;
+        CorbaMessageMediator response = null ;
 
-	    // Check if ServerRequestImpl.result() has been called
-	    Any excany = sreq.checkResultCalled();
+        // Check if ServerRequestImpl.result() has been called
+        Any excany = sreq.checkResultCalled();
 
-	    if (excany == null) { // normal return
-		if (orb.subcontractDebugFlag) {
-		    dprint(".handleDynamicResult: " + opAndId(req)
-			   + ": handling normal result");
-		}
+        if (excany == null) { // normal return
+            generalMessage( "Handling normal result" ) ;
 
-		// Marshal out/inout/return parameters into the ReplyMessage
-		response = sendingReply(req);
-		OutputStream os = (OutputStream) response.getOutputObject();
-		sreq.marshalReplyParams(os);
-	    }  else {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".handleDynamicResult: " + opAndId(req) 
-			   + ": handling error");
-		}
+            // Marshal out/inout/return parameters into the ReplyMessage
+            response = sendingReply(req);
+            OutputStream os = (OutputStream) response.getOutputObject();
+            sreq.marshalReplyParams(os);
+        }  else {
+            generalMessage( "Handling error" ) ;
 
-		response = sendingReply(req, excany);
-	    }
+            response = sendingReply(req, excany);
+        }
 
-	    return response ;
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".handleDynamicResult<-: " + opAndId(req));
-	    }
-	}
+        return response ;
     }
 
-    protected CorbaMessageMediator sendingReply(CorbaMessageMediator req)
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".sendingReply->: " + opAndId(req));
-	    }
-
-	    ServiceContexts scs = ServiceContextDefaults.makeServiceContexts(orb);
-	    return req.getProtocolHandler().createResponse(req, scs);
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".sendingReply<-: " + opAndId(req));
-	    }
-	}
+    @Subcontract
+    protected CorbaMessageMediator sendingReply(CorbaMessageMediator req) {
+        ServiceContexts scs = ServiceContextDefaults.makeServiceContexts(orb);
+        return req.getProtocolHandler().createResponse(req, scs);
     }
 
     /** Must always be called, just after the servant's method returns.
      *  Creates the ReplyMessage header and puts in the transaction context
      *  if necessary.
      */
-    protected CorbaMessageMediator sendingReply(CorbaMessageMediator req, Any excany)
-    { 
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".sendingReply/Any->: " + opAndId(req));
-	    }
+    @Subcontract
+    protected CorbaMessageMediator sendingReply(CorbaMessageMediator req, 
+        Any excany) {
 
-	    ServiceContexts scs = ServiceContextDefaults.makeServiceContexts(orb);
+        ServiceContexts scs = ServiceContextDefaults.makeServiceContexts(orb);
+        operationAndId( req.getOperationName(), req.getRequestId() ) ;
 
-	    // Check if the servant set a SystemException or
-	    // UserException
-	    CorbaMessageMediator resp;
-	    String repId=null;
-	    try {
-		repId = excany.type().id();
-	    } catch (org.omg.CORBA.TypeCodePackage.BadKind e) {
-		throw wrapper.problemWithExceptionTypecode( e ) ;
-	    }
+        // Check if the servant set a SystemException or
+        // UserException
+        CorbaMessageMediator resp;
+        String repId=null;
+        try {
+            repId = excany.type().id();
+        } catch (org.omg.CORBA.TypeCodePackage.BadKind e) {
+            throw wrapper.problemWithExceptionTypecode( e ) ;
+        }
 
-	    if (ORBUtility.isSystemException(repId)) {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".sendingReply/Any: " + opAndId(req)
-			   + ": handling system exception");
-		}
+        if (ORBUtility.isSystemException(repId)) {
+            generalMessage( "Handling system exception" ) ;
 
-		// Get the exception object from the Any
-		InputStream in = excany.create_input_stream();
-		SystemException ex = ORBUtility.readSystemException(in);
-		// Marshal the exception back
-		resp = req.getProtocolHandler()
-		    .createSystemExceptionResponse(req, ex, scs);
-	    } else {
-		if (orb.subcontractDebugFlag) {
-		    dprint(".sendingReply/Any: " + opAndId(req)
-			   + ": handling user exception");
-		}
+            // Get the exception object from the Any
+            InputStream in = excany.create_input_stream();
+            SystemException ex = ORBUtility.readSystemException(in);
+            // Marshal the exception back
+            resp = req.getProtocolHandler()
+                .createSystemExceptionResponse(req, ex, scs);
+        } else {
+            generalMessage( "Handling user exception" ) ;
 
-		resp = req.getProtocolHandler()
-		    .createUserExceptionResponse(req, scs);
-		OutputStream os = (OutputStream)resp.getOutputObject();
-		excany.write_value(os);
-	    }
+            resp = req.getProtocolHandler()
+                .createUserExceptionResponse(req, scs);
+            OutputStream os = (OutputStream)resp.getOutputObject();
+            excany.write_value(os);
+        }
 
-	    return resp;
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".sendingReply/Any<-: " + opAndId(req));
-	    }
-	}
+        return resp;
     }
+
+    @InfoMethod
+    private void codeSetServiceContextInfo( CodeSetServiceContext csctx ) { }
 
     /**
      * Handles setting the connection's code sets if required.
      * Returns true if the CodeSetContext was in the request, false
      * otherwise.
      */
+    @Subcontract
     protected boolean processCodeSetContext(
-	CorbaMessageMediator request, ServiceContexts contexts) 
-    {
-	try {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".processCodeSetContext->: " + opAndId(request));
-	    }
+	CorbaMessageMediator request, ServiceContexts contexts) {
 
-	    ServiceContext sc = contexts.get( 
-		CodeSetServiceContext.SERVICE_CONTEXT_ID);
-	    if (sc != null) {
-		// Somehow a code set service context showed up in the local case.
-		if (request.getConnection() == null) {
-		    return true;
-		}
+        ServiceContext sc = contexts.get(
+            CodeSetServiceContext.SERVICE_CONTEXT_ID);
 
-		// If it's GIOP 1.0, it shouldn't have this context at all.  Our legacy
-		// ORBs sent it and we need to know if it's here to make ORB versioning
-		// decisions, but we don't use the contents.
-		if (request.getGIOPVersion().equals(GIOPVersion.V1_0)) {
-		    return true;
-		}
+        if (sc != null) {
+            // Somehow a code set service context showed up in the local case.
+            if (request.getConnection() == null) {
+                return true;
+            }
 
-		CodeSetServiceContext cssc = (CodeSetServiceContext)sc ;
-		CodeSetComponentInfo.CodeSetContext csctx = cssc.getCodeSetContext();
+            // If it's GIOP 1.0, it shouldn't have this context at all.  Our legacy
+            // ORBs sent it and we need to know if it's here to make ORB versioning
+            // decisions, but we don't use the contents.
+            if (request.getGIOPVersion().equals(GIOPVersion.V1_0)) {
+                return true;
+            }
 
-		// The connection's codeSetContext is null until we've received a
-		// request with a code set context with the negotiated code sets.
-                CorbaConnection connection = 
-                    (CorbaConnection)request.getConnection() ;
+            CodeSetServiceContext cssc = (CodeSetServiceContext)sc ;
+            CodeSetComponentInfo.CodeSetContext csctx = cssc.getCodeSetContext();
 
-                synchronized (connection) {
-                    if (connection.getCodeSetContext() == null) {
+            // The connection's codeSetContext is null until we've received a
+            // request with a code set context with the negotiated code sets.
+            CorbaConnection connection =
+                (CorbaConnection)request.getConnection() ;
 
-                        // Use these code sets on this connection
-                        if (orb.subcontractDebugFlag) {
-                            dprint(".processCodeSetContext: " + opAndId(request)
-                                   + ": Setting code sets to: " + csctx);
-                        }
+            synchronized (connection) {
+                if (connection.getCodeSetContext() == null) {
+                    operationAndId(request.getOperationName(), 
+                        request.getRequestId() );
+                    codeSetServiceContextInfo(cssc);
 
-                        connection.setCodeSetContext(csctx);
+                    connection.setCodeSetContext(csctx);
 
-                        // We had to read the method name using ISO 8859-1
-                        // (which is the default in the CDRInputStream for
-                        // char data), but now we may have a new char
-                        // code set.  If it isn't ISO8859-1, we must tell
-                        // the CDR stream to null any converter references
-                        // it has created so that it will reacquire
-                        // the code sets again using the new info.
-                        //
-                        // This should probably compare with the stream's
-                        // char code set rather than assuming it's ISO8859-1.
-                        // (However, the operation name is almost certainly
-                        // ISO8859-1 or ASCII.)
-                        if (csctx.getCharCodeSet() != 
-                            OSFCodeSetRegistry.ISO_8859_1.getNumber()) {
-                            ((MarshalInputStream)request.getInputObject())
-                                .resetCodeSetConverters();
-                        }
+                    // We had to read the method name using ISO 8859-1
+                    // (which is the default in the CDRInputStream for
+                    // char data), but now we may have a new char
+                    // code set.  If it isn't ISO8859-1, we must tell
+                    // the CDR stream to null any converter references
+                    // it has created so that it will reacquire
+                    // the code sets again using the new info.
+                    //
+                    // This should probably compare with the stream's
+                    // char code set rather than assuming it's ISO8859-1.
+                    // (However, the operation name is almost certainly
+                    // ISO8859-1 or ASCII.)
+                    if (csctx.getCharCodeSet() !=
+                        OSFCodeSetRegistry.ISO_8859_1.getNumber()) {
+                        ((MarshalInputStream)request.getInputObject())
+                            .resetCodeSetConverters();
                     }
                 }
-	    }
+            }
+        }
 
-	    // If no code set information is ever sent from the client,
-	    // the server will use ISO8859-1 for char and throw an
-	    // exception for any wchar transmissions.
-	    //
-	    // In the local case, we use ORB provided streams for
-	    // marshaling and unmarshaling.  Currently, they use
-	    // ISO8859-1 for char/string and UTF16 for wchar/wstring.
-	    return sc != null ;
-	} finally {
-	    if (orb.subcontractDebugFlag) {
-		dprint(".processCodeSetContext<-: " + opAndId(request));
-	    }
-	}
+        // If no code set information is ever sent from the client,
+        // the server will use ISO8859-1 for char and throw an
+        // exception for any wchar transmissions.
+        //
+        // In the local case, we use ORB provided streams for
+        // marshaling and unmarshaling.  Currently, they use
+        // ISO8859-1 for char/string and UTF16 for wchar/wstring.
+        return sc != null ;
     }
 
-    protected String servantInfo(Object servant)
-    {
-	String result = servant.toString();
-	if (servant instanceof Servant) {
-	    Servant s = (Servant) servant;
-	    result += " " + s._all_interfaces(null, null)[0];
-	}
-	if (servant instanceof Tie) {
-	    Tie t = (Tie) servant;
-	    result += " " + t.getTarget();
-	}
-	return result;
-    }
-
-    protected void dprint(String msg)
-    {
-        ORBUtility.dprint("CorbaServerRequestDispatcherImpl", msg);
-    }
-
-    protected String opAndId(CorbaMessageMediator mediator)
-    {
-	return ORBUtility.operationNameAndRequestId(mediator);
-    }
+    @InfoMethod
+    private void operationAndId( String operation, int rid ) { }
 }
 
 // End of file.

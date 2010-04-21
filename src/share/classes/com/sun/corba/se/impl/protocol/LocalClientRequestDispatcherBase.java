@@ -60,8 +60,10 @@ import com.sun.corba.se.spi.ior.ObjectId;
 import com.sun.corba.se.impl.logging.POASystemException;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Subcontract;
 
+@Subcontract
 public abstract class LocalClientRequestDispatcherBase implements LocalClientRequestDispatcher
 {
     // XXX May want to make some of this configuratble as in the remote case
@@ -81,7 +83,6 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     protected ObjectAdapterFactory oaf ;
     protected ObjectAdapterId oaid ;
     protected byte[] objectId ;
-    protected boolean debug ;
     protected POASystemException poaWrapper ;
     protected ORBUtilSystemException wrapper ;
 
@@ -97,7 +98,6 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     protected LocalClientRequestDispatcherBase(ORB orb, int scid, IOR ior)
     {
 	this.orb = orb ;
-	debug = orb.subcontractDebugFlag ;
 	wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 	poaWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_POA() ;
 
@@ -191,114 +191,100 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
 	// Default is NO-OP
     }
 
+    @InfoMethod
+    private void display( String msg ) { }
+
+    @InfoMethod
+    private void display( String msg, int value ) { }
+
+    @InfoMethod
+    private void display( String msg, Object value ) { }
+
+
     // servant_preinvoke is here to contain the exception handling
     // logic that is common to all POA based servant_preinvoke implementations.
+    @Subcontract
     public ServantObject servant_preinvoke( org.omg.CORBA.Object self,
-	String operation, Class expectedType )
-    {
-	if (debug)
-	    dprint( ".servant_preinvoke->:" ) ;
+	String operation, Class expectedType ) {
 
-	try {
-	    // XXX Should we consider an implementation here that is
-	    // event driven instead of polled?  We could take advantage
-	    // of the ORT OAManager state change notification to drive
-	    // this.  This would require registering an IORInterceptor_3_0
-	    // implementation that signals a condition on which thread 
-	    // wait in colocated invocations.  But this is probably not
-	    // justified.
-	    long startTime = -1 ;
-	    long backoff = INITIAL_BACKOFF ;
-	    long maxWait = MAX_WAIT_TIME ;
+        // XXX Should we consider an implementation here that is
+        // event driven instead of polled?  We could take advantage
+        // of the ORT OAManager state change notification to drive
+        // this.  This would require registering an IORInterceptor_3_0
+        // implementation that signals a condition on which thread
+        // wait in colocated invocations.  But this is probably not
+        // justified.
+        long startTime = -1 ;
+        long backoff = INITIAL_BACKOFF ;
+        long maxWait = MAX_WAIT_TIME ;
 
-	    while (true) {
-		try {
-		    if (debug)
-			dprint( ".servant_preinvoke: calling internalPreinvoke" ) ;
-		    return internalPreinvoke( self, operation, expectedType ) ;
-		} catch (OADestroyed pdes) {
-		    cleanupAfterOADestroyed() ;
+        while (true) {
+            try {
+                display( "Calling internalPreinvoke") ;
+                return internalPreinvoke( self, operation, expectedType ) ;
+            } catch (OADestroyed pdes) {
+                display( "Caught OADestroyed: will retry") ;
+                cleanupAfterOADestroyed() ;
+            } catch (TRANSIENT exc) {
+                display( "Caught transient") ;
+                // Local calls are very fast, so don't waste time setting
+                // up to track the time UNLESS the first attempt fails
+                // with a TRANSIENT exception.
+                long currentTime = System.currentTimeMillis() ;
 
-		    if (debug)
-			dprint( ".internalPreinvoke: retrying after OADestroyed" ) ;
-		} catch (TRANSIENT exc) {
-		    // Local calls are very fast, so don't waste time setting
-		    // up to track the time UNLESS the first attempt fails
-		    // with a TRANSIENT exception.
-		    long currentTime = System.currentTimeMillis() ;
+                // Delay if not too much time passed, otherwise re-throw
+                // the TRANSIENT exception.
+                if (startTime == -1) {
+                    display( "backoff (first retry)", backoff ) ;
+                    startTime = currentTime ;
+                } else if ((currentTime-startTime) > MAX_WAIT_TIME) {
+                    display( "Total time exceeded", MAX_WAIT_TIME ) ;
+                    throw exc ;
+                } else {
+                    backoff *= 2 ;
+                    if (backoff > MAX_BACKOFF) {
+                        backoff = MAX_BACKOFF ;
+                    }
 
-		    // Delay if not too much time passed, otherwise re-throw
-		    // the TRANSIENT exception.
-		    if (startTime == -1) {
-			if (debug)
-			    dprint( ".servant_preinvoke: first retry on TRANSIENT, backoff = " + backoff ) ;
+                    display( "increasing backoff (will retry)", backoff ) ;
+                }
 
-			startTime = currentTime ;
-		    } else if ((currentTime-startTime) > MAX_WAIT_TIME) {
-			if (debug)
-			    dprint( ".servant_preinvoke: total time exceeded " + MAX_WAIT_TIME ) ;
+                try {
+                    Thread.sleep( backoff ) ;
+                } catch (InterruptedException iexc) {
+                    // As usual, ignore the possible InterruptedException
+                }
 
-			throw exc ;
-		    } else {
-			backoff *= 2 ;
-			if (backoff > MAX_BACKOFF) {
-			    backoff = MAX_BACKOFF ;
-			}
+                display( "retry" ) ;
+            } catch ( ForwardException ex ) {
+                /* REVISIT
+                ClientRequestDispatcher csub = (ClientRequestDispatcher)
+                    StubAdapter.getDelegate( ex.forward_reference ) ;
+                IOR ior = csub.getIOR() ;
+                setLocatedIOR( ior ) ;
+                */
+                display( "Unsupported ForwardException" ) ;
+                RuntimeException runexc = new RuntimeException("deal with this.");
+                runexc.initCause( ex ) ;
+                throw runexc ;
+            } catch ( ThreadDeath ex ) {
+                // ThreadDeath on the server side should not cause a client
+                // side thread death in the local case.  We want to preserve
+                // this behavior for location transparency, so that a ThreadDeath
+                // has the same affect in either the local or remote case.
+                // The non-colocated case is handled in iiop.ORB.process, which
+                // throws the same exception.
+                display( "Caught ThreadDeath") ;
+                throw wrapper.runtimeexception( ex, ex.getClass().getName(), ex.getMessage() ) ;
+            } catch ( Throwable t ) {
+                display( "Caught Throwable") ;
 
-			if (debug)
-			    dprint( ".servant_preinvoke: increasing backoff to " + backoff ) ;
-		    }
+                if (t instanceof SystemException)
+                    throw (SystemException)t ;
 
-		    try {
-			Thread.sleep( backoff ) ;
-		    } catch (InterruptedException iexc) {
-			// As usual, ignore the possible InterruptedException
-		    }
-
-		    if (debug)
-			dprint( ".servant_preinvoke: retry after backoff for TRANSIENT exception" ) ;
-		} catch ( ForwardException ex ) {
-		    /* REVISIT
-		    ClientRequestDispatcher csub = (ClientRequestDispatcher)
-			StubAdapter.getDelegate( ex.forward_reference ) ;
-		    IOR ior = csub.getIOR() ;
-		    setLocatedIOR( ior ) ;
-		    */
-		    if (debug)
-			dprint( ".internalPreinvoke: caught unsupported ForwardException" ) ;
-
-		    RuntimeException runexc = new RuntimeException("deal with this.");
-		    runexc.initCause( ex ) ;
-		    throw runexc ;
-		} catch ( ThreadDeath ex ) {
-		    // ThreadDeath on the server side should not cause a client
-		    // side thread death in the local case.  We want to preserve
-		    // this behavior for location transparency, so that a ThreadDeath
-		    // has the same affect in either the local or remote case.
-		    // The non-colocated case is handled in iiop.ORB.process, which
-		    // throws the same exception.
-		    if (debug)
-			dprint( ".internalPreinvoke: caught ThreadDeath" ) ;
-
-		    throw wrapper.runtimeexception( ex, ex.getClass().getName(), ex.getMessage() ) ;
-		} catch ( Throwable t ) {
-		    if (debug)
-			dprint( ".internalPreinvoke: caught Throwable " + t ) ;
-
-		    if (t instanceof SystemException)
-			throw (SystemException)t ;
-
-		    throw poaWrapper.localServantLookup( t ) ;
-		} 
-	    }
-	} finally { 
-	    if (debug)
-		dprint( ".servant_preinvoke<-:" ) ;
-	}
-    }
-
-    protected void dprint( String msg ) {
-	ORBUtility.dprint( this, msg ) ;
+                throw poaWrapper.localServantLookup( t ) ;
+            }
+        }
     }
 }
 

@@ -37,6 +37,7 @@
 package com.sun.corba.se.impl.transport;
 
 import com.sun.corba.se.spi.orb.ORB;
+import com.sun.corba.se.spi.trace.Transport;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.SelectableChannel;
@@ -47,6 +48,7 @@ import java.nio.channels.SelectableChannel;
  *
  * @author ken
  */
+@Transport
 public class CorbaAcceptorLazyImpl extends CorbaAcceptorBase {
 
     public CorbaAcceptorLazyImpl( ORB orb, int port, String name, String type ) {
@@ -66,14 +68,11 @@ public class CorbaAcceptorLazyImpl extends CorbaAcceptorBase {
         throw wrapper.notSupportedOnLazyAcceptor() ;
     }
 
+    @Transport
     public synchronized boolean initialize() {
 	if (initialized) {
 	    return false;
         }
-
-	if (orb.transportDebugFlag) {
-	    dprint(".initialize: " + this);
-	}
 
 	orb.getCorbaTransportManager().getInboundConnectionCache(this);
 

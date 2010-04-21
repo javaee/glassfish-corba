@@ -45,6 +45,8 @@ import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 
 import java.util.Map ;
+import java.util.concurrent.ConcurrentMap ;
+import java.util.concurrent.ConcurrentHashMap ;
 import java.util.WeakHashMap ;
 
 import org.omg.CORBA.UserException ;
@@ -212,6 +214,33 @@ public class ClassInfoCache {
 	public boolean isInterface() { return isInterface ; }
 	public boolean isProxyClass() { return isProxyClass ; }
     }
+
+    // XXX This shows up as a locking hotspot in heavy marshaling tests.
+    // Ideally we need a WeakConccurrentMap, which is not available in
+    // the JDK (Google's MapMaker can easily construct such a class).
+
+    /* Version using ConcurrentMap for testing ONLY
+     * (This would pin Classes (and thus ClassLoaders), leading to
+     * App server deployment memory leaks.
+    
+    private static ConcurrentMap<Class,ClassInfo> classData = 
+        new ConcurrentHashMap<Class,ClassInfo>() ;
+
+    public static ClassInfo get( Class cls ) {
+	ClassInfo result = classData.get( cls ) ;
+	if (result == null) {
+	    final ClassInfo cinfo = new ClassInfo( cls ) ;
+	    final ClassInfo putResult = classData.putIfAbsent( cls, cinfo ) ;
+            if (putResult == null) {
+                result = cinfo ;
+            } else {
+                result = putResult ;
+            }
+	}
+
+	return result ;
+    }
+    */
 
     private static Map<Class,ClassInfo> classData = new WeakHashMap<Class,ClassInfo>() ;
 

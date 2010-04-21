@@ -284,7 +284,7 @@
                 <package-root>experimental/test/src/share/classes</package-root>
                 <package-root>build/rename/ee</package-root>
                 <package-root>build/rename/ee/src/share/classes</package-root>
-                <classpath mode="compile">build/classes:orblib/build/classes:lib/felix.jar:test/build/classes:lib/junit.jar:lib/testng.jar:lib/ejb-2_1-api.jar:lib/management-api.jar:build/libcache/gmbal.jar:build/libcache/management-api.jar:build/libcache/org.osgi.core.jar</classpath>
+                <classpath mode="compile">build/classes:orblib/build/classes:lib/felix.jar:test/build/classes:lib/junit.jar:lib/testng.jar:lib/ejb-2_1-api.jar:lib/management-api.jar:build/libcache/gmbal.jar:build/libcache/management-api.jar:build/libcache/org.osgi.core.jar:lib/japex.jar</classpath>
                 <built-to>build/classes</built-to>
                 <built-to>orblib/build/classes</built-to>
                 <built-to>test/build/classes</built-to>

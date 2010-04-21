@@ -313,7 +313,7 @@
     <target name="increment-build-version" depends="init">
         <propertyfile file="${root.dir}/make/build.properties">
             <entry key="corba.major.version" value="3"/>
-            <entry key="corba.minor.version" value="0"/>
+            <entry key="corba.minor.version" value="1"/>
             <entry key="corba.update.version" value="0"/>
             <entry key="build.int" type="int" value="1" pattern="000" operation="+"/>
         </propertyfile>

@@ -244,7 +244,7 @@ public class ReferenceFactoryManagerImpl
     public ReferenceFactory create( final String name, 
 				    final String repositoryId,
 				    final List<Policy> policies,
-				    final ServantLocator manager ) 
+				    final ServantLocator locator ) 
     {
 	lock.lock() ;
 	try {
@@ -261,7 +261,7 @@ public class ReferenceFactoryManagerImpl
 	    // Store an entry for the appropriate POA in the POA table,
 	    // which is used by the AdapterActivator on the root.
 	    synchronized (poatable) {
-		poatable.put( name, new Pair( manager, newPolicies ) ) ;
+		poatable.put( name, new Pair( locator, newPolicies ) ) ;
 	    }
 
 	    ReferenceFactory factory = new ReferenceFactoryImpl( this, name, repositoryId ) ;

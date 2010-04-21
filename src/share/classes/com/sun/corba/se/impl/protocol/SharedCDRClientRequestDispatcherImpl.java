@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -47,11 +47,7 @@ package com.sun.corba.se.impl.protocol;
 
 import java.io.IOException;
 
-
 import org.omg.CORBA.portable.ApplicationException;
-
-
-import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
@@ -59,13 +55,15 @@ import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Subcontract;
 
 /**
  * ClientDelegate is the RMI client-side subcontract or representation
  * It implements RMI delegate as well as our internal ClientRequestDispatcher
  * interface.
  */
+@Subcontract
 public class SharedCDRClientRequestDispatcherImpl
     extends
 	CorbaClientRequestDispatcherImpl
@@ -78,23 +76,20 @@ public class SharedCDRClientRequestDispatcherImpl
     // Benefit: then in ContactInfo no need to do a direct new
     // of subcontract - does not complicate subcontract registry.
 
+    @Override
     public CDRInputObject marshalingComplete(java.lang.Object self,
 					  CDROutputObject outputObject)
 	throws 
 	    ApplicationException, 
 	    org.omg.CORBA.portable.RemarshalException
     {
-      ORB orb = null;
-      CorbaMessageMediator messageMediator = null;
-      try {
+        ORB orb = null;
+        CorbaMessageMediator messageMediator = null;
 	messageMediator = (CorbaMessageMediator)
 	    outputObject.getMessageMediator();
-
+        operationAndId( messageMediator.getOperationName(),
+            messageMediator.getRequestId() ) ;
 	orb = (ORB) messageMediator.getBroker();
-
-	if (orb.subcontractDebugFlag) {
-	    dprint(".marshalingComplete->: " + opAndId(messageMediator));
-	}
 
 	CDROutputObject cdrOutputObject = (CDROutputObject) outputObject;
 
@@ -122,15 +117,13 @@ public class SharedCDRClientRequestDispatcherImpl
         // InputStream must be closed on the InputObject so that its
         // ByteBuffer can be released to the ByteBufferPool. We must do
         // this before we re-assign the cdrInputObject reference below.
-        try { cdrInputObject.close(); }
-        catch (IOException ex) {
+        try {
+            cdrInputObject.close();
+        } catch (IOException ex) {
             // No need to do anything since we're done with the input stream
             // and cdrInputObject will be re-assigned a new client-side input
             // object, (i.e. won't result in a corba error).
-           
-            if (orb.transportDebugFlag) {
-               dprint(".marshalingComplete: ignoring IOException - " + ex.toString());
-            }
+            // XXX log this
         }
 
 	//
@@ -151,18 +144,10 @@ public class SharedCDRClientRequestDispatcherImpl
 	CDRInputObject inputObject = cdrInputObject;
 
 	return processResponse(orb, messageMediator, inputObject);
-
-      } finally {
-        if (orb.subcontractDebugFlag) {
-	    dprint(".marshalingComplete<-: " + opAndId(messageMediator));
-	}
-      }
     }
 
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("SharedCDRClientRequestDispatcherImpl", msg);
-    }
+    @InfoMethod
+    private void operationAndId(String operationName, int requestId) { }
 }
 
 // End of file.

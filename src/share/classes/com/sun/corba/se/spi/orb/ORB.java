@@ -294,7 +294,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
             Annotation[] annots = fld.getAnnotations() ;
 	    for (Annotation anno : annots) {
-		Class<? extends Annotation> annoClass = anno.getClass() ;
+		Class<? extends Annotation> annoClass = anno.annotationType() ;
 
 		if (annoClass.isAnnotationPresent(
 		    MethodMonitorGroup.class )) {

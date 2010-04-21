@@ -81,6 +81,7 @@ public class SharedCDRClientRequestDispatcherImpl
     // of subcontract - does not complicate subcontract registry.
 
     @Override
+    @Subcontract
     public CDRInputObject marshalingComplete(java.lang.Object self,
 					  CDROutputObject outputObject)
 	throws 
@@ -152,9 +153,6 @@ public class SharedCDRClientRequestDispatcherImpl
 
 	return processResponse(orb, messageMediator, inputObject);
     }
-
-    @InfoMethod
-    private void operationAndId(String operationName, int requestId) { }
 }
 
 // End of file.

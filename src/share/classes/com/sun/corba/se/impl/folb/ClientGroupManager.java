@@ -485,6 +485,7 @@ public class ClientGroupManager
                 iiopFailoverTo(result);
 
 		if (orb.folbDebugFlag) {
+                    // Only compute if debugging here.
                     mappedResultWithUpdate(result, contactInfos.indexOf(previous),
                         contactInfos.size() );
                 }
@@ -642,19 +643,15 @@ public class ClientGroupManager
 		    ((com.sun.corba.se.spi.ior.TaggedComponent)iterator.next())
 		        .getIOPComponent(orb);
 		byte[] data = membershipLabelTaggedComponent.component_data;
-		if (orb.folbDebugFlag) {
-		    sentMemberShipLabel = true; // For test
-                    sendRequestMembershipLabel( new String(data) );
-		}
+                sentMemberShipLabel = true; // For test
+                sendRequestMembershipLabel( new String(data) );
 		ServiceContext sc = new ServiceContext(
 		    ORBConstants.FOLB_MEMBERSHIP_LABEL_SERVICE_CONTEXT_ID,
 		    data);
 		ri.add_request_service_context(sc, false);
 	    } else {
-		if (orb.folbDebugFlag) {
-		    sentMemberShipLabel = false; // For test
-                    sendRequestNoMembershipLabel() ;
-		}
+                sentMemberShipLabel = false; // For test
+                sendRequestNoMembershipLabel() ;
 	    }
 	} catch (RuntimeException e) {
 	    throw e;
@@ -687,7 +684,7 @@ public class ClientGroupManager
     private void noIORUpdate() { }
 
     @InfoMethod
-    private void receivedIORUpdate() { }
+    private void receivedIORUpdateInfo() { }
 
     private void receive_star(String point, ClientRequestInfo ri)
     {
@@ -703,14 +700,13 @@ public class ClientGroupManager
         }
 
         if (iorServiceContext == null) {
-            if (orb.folbDebugFlag) {
-                noIORUpdate();
-                receivedIORUpdate = false; // For testing.
-            }
+            noIORUpdate();
+            receivedIORUpdate = false; // For testing.
             return;
         }
 
-        receivedIORUpdate() ;
+        receivedIORUpdateInfo() ;
+        receivedIORUpdate = true ;
 
         byte[] data = iorServiceContext.context_data;
         Any any = null;

@@ -119,10 +119,8 @@ public class BufferManagerReadStream
         synchronized (fragmentQueue) {
 
             if (receivedCancel) {
-		if (orb.transportDebugFlag) {
-                    underflowMessage( "underflow() - Cancel request id:",
-                        cancelReqId);
-		}
+                underflowMessage( "underflow() - Cancel request id:", 
+                    cancelReqId);
                 throw new RequestCanceledException(cancelReqId);
             }
 
@@ -146,11 +144,8 @@ public class BufferManagerReadStream
 		    throw wrapper.bufferReadManagerTimeout() ;
 
                 if (receivedCancel) {
-		    if (orb.transportDebugFlag) {
-                        underflowMessage(
-                            "underflow() - Cancel request id after wait:",
-                            cancelReqId);
-		    }
+                    underflowMessage( "underflow() - Cancel request id after wait:", 
+                        cancelReqId);
                     throw new RequestCanceledException(cancelReqId);
                 }
             }

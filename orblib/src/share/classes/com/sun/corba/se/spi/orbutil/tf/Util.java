@@ -96,6 +96,7 @@ public class Util {
         info( 2, "Initializing variable " + var ) ;
         Type type = Type.getType( var.desc ) ;
         switch (type.getSort()) {
+            case Type.BYTE :
             case Type.BOOLEAN :
             case Type.CHAR :
             case Type.SHORT :

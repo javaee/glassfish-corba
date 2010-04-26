@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2001-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2001-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,7 +44,8 @@ import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Transport;
 
 import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
@@ -53,9 +54,15 @@ import org.glassfish.gmbal.NameValue ;
 import org.glassfish.external.statistics.CountStatistic ;
 import org.glassfish.external.statistics.impl.CountStatisticImpl ;
 
+
+    ////////////////////////////////////////////////////
+    //
+    // spi.transport.ConnectionCache
+    //
 /**
  * @author Harold Carr
  */
+@Transport
 public abstract class CorbaConnectionCacheBase
     implements
 	CorbaConnectionCache
@@ -203,80 +210,60 @@ public abstract class CorbaConnectionCacheBase
      * it for SocketChannels and WorkerThreads for Sockets by updating the
      * ParserTable.
      */
-    synchronized public boolean reclaim()
-    {
-	try {
-	    long numberOfConnections = numberOfConnections() ;
+    @Transport
+    synchronized public boolean reclaim() {
+        long numberOfConnections = numberOfConnections() ;
 
-	    if (orb.transportDebugFlag) {
-		dprint(".reclaim->: " + numberOfConnections
-			+ " ("
-			+ orb.getORBData().getHighWaterMark()
-			+ "/"
-			+ orb.getORBData().getNumberToReclaim()
-			+ ")");
-	    }
+        reclaimInfo( numberOfConnections,
+            orb.getORBData().getHighWaterMark(),
+            orb.getORBData().getNumberToReclaim() ) ;
 
-	    if (numberOfConnections <= orb.getORBData().getHighWaterMark()) {
-		return false;
-	    }
-	    
-	    Object backingStore = backingStore();
-	    synchronized (backingStore) {
+        if (numberOfConnections <= orb.getORBData().getHighWaterMark()) {
+            return false;
+        }
 
-	         // REVISIT - A less expensive alternative connection reclaiming 
-	         //           algorithm could be investigated.
+        Object backingStore = backingStore();
+        synchronized (backingStore) {
 
-		for (int i=0; i < orb.getORBData().getNumberToReclaim(); i++) {
-		    CorbaConnection toClose = null;
-		    long lru = java.lang.Long.MAX_VALUE;
-		    Iterator iterator = values().iterator();
-		    
-		    // Find least recently used and not busy connection in cache
-		    while ( iterator.hasNext() ) {
-			CorbaConnection c = (CorbaConnection) iterator.next();
-			if ( !c.isBusy() && c.getTimeStamp() < lru ) {
-			    toClose = c; 
-			    lru = c.getTimeStamp();
-			}
-		    }
-		    
-		    if ( toClose == null ) {
-			return false;
-		    }
-		    
-		    try {
-			if (orb.transportDebugFlag) {
-			    dprint(".reclaim: closing: " + toClose);
-			}
-			toClose.close();
-		    } catch (Exception ex) {
-			// REVISIT - log
-		    }
-		}
+                // REVISIT - A less expensive alternative connection reclaiming
+                //           algorithm could be investigated.
 
-		if (orb.transportDebugFlag) {
-		    dprint(".reclaim: connections reclaimed (" 
-			    + (numberOfConnections - numberOfConnections()) + ")");
-		}
-	    }
+            for (int i=0; i < orb.getORBData().getNumberToReclaim(); i++) {
+                CorbaConnection toClose = null;
+                long lru = java.lang.Long.MAX_VALUE;
+                Iterator iterator = values().iterator();
 
-	    // XXX is necessary to do a GC to reclaim
-	    // closed network connections ??
-	    // java.lang.System.gc();
+                // Find least recently used and not busy connection in cache
+                while ( iterator.hasNext() ) {
+                    CorbaConnection c = (CorbaConnection) iterator.next();
+                    if ( !c.isBusy() && c.getTimeStamp() < lru ) {
+                        toClose = c;
+                        lru = c.getTimeStamp();
+                    }
+                }
 
-	    return true;
-	} finally {
-	    if (orb.transportDebugFlag) {
-		dprint(".reclaim<-: " + numberOfConnections());
-	    }
-	}
+                if ( toClose == null ) {
+                    return false;
+                }
+
+                try {
+                    closingInfo( toClose ) ;
+                    toClose.close();
+                } catch (Exception ex) {
+                    // REVISIT - log
+                }
+            }
+
+            connectionsReclaimedInfo(
+                numberOfConnections - numberOfConnections() );
+        }
+
+        // XXX is necessary to do a GC to reclaim
+        // closed network connections ??
+        // java.lang.System.gc();
+
+        return true;
     }
-
-    ////////////////////////////////////////////////////
-    //
-    // spi.transport.ConnectionCache
-    //
 
     public String getMonitoringName()
     {
@@ -293,32 +280,35 @@ public abstract class CorbaConnectionCacheBase
 
     protected abstract Object backingStore();
 
-    protected void dprintCreation()
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".constructor: cacheType: " + getCacheType()
-		   + " monitoringName: " + getMonitoringName());
-	}
+    @InfoMethod
+    private void creationInfo(String cacheType, String monitoringName) { }
+
+    @Transport
+    protected void dprintCreation() {
+        creationInfo( getCacheType(), getMonitoringName() ) ;
     }
 
-    protected void dprintStatistics()
-    {
-	if (orb.transportDebugFlag) {
-	    dprint(".stats: "
-		   + numberOfConnections() + "/total "
-		   + numberOfBusyConnections() + "/busy "
-		   + numberOfIdleConnections() + "/idle"
-		   + " (" 
-		   + orb.getORBData().getHighWaterMark() + "/"
-		   + orb.getORBData().getNumberToReclaim() 
-		   + ")");
-	}
+    @InfoMethod
+    private void cacheStatsInfo( long numberOfConnections,
+        long numberOfBusyConnections, long numberOfIdleConnections,
+        int highWaterMark, int numberToReclaim) { }
+
+    @Transport
+    protected void cacheStatisticsInfo() {
+        cacheStatsInfo( numberOfConnections(), numberOfBusyConnections(),
+            numberOfIdleConnections(), orb.getORBData().getHighWaterMark(),
+            orb.getORBData().getNumberToReclaim() ) ;
     }
 
-    protected void dprint(String msg)
-    {
-	ORBUtility.dprint("CorbaConnectionCacheBase", msg);
-    }
+    @InfoMethod
+    private void reclaimInfo(long numberOfConnections, int highWaterMark,
+        int numberToReclaim) { }
+
+    @InfoMethod
+    private void closingInfo(CorbaConnection toClose) { }
+
+    @InfoMethod
+    private void connectionsReclaimedInfo(long l) { }
 }
 
 // End of file.

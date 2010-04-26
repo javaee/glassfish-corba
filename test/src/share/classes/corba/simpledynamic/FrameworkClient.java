@@ -239,9 +239,9 @@ public class FrameworkClient extends Framework {
 	    InterceptorTester.theTester.setExceptionExpected() ;
 
 	    msg( "******* Start Test with disconnected connection *******" ) ; 
-	    // ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).transportDebugFlag = true;
+	    // getClientORB().setDebugFlag( "transport" ) ;
 	    sref.echo( arg ) ;
-	    // ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).transportDebugFlag = false;
+	    // getClientORB().clearDebugFlag( "transport" ) ;
 	    msg( "******* End test with disconnected connection *******" ) ; 
 	} catch (MarshalException exc) {
 	    msg( "Caught expected MarshalException" ) ;
@@ -300,12 +300,12 @@ public class FrameworkClient extends Framework {
 	    RCTest rct = new RCTest( thr ) ;
 	    Echo sref = findStub( Echo.class, TEST_REF_NAME ) ;
 
-	    // ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).giopDebugFlag = true;
+	    // getClientORB().setDebugFlag( "giop" ) ;
 	    for (ctr=0; ctr<4096; ctr+=256) {
 		rct.setPrefixSize( ctr ) ;
 		sref.echo( rct ) ;
 	    }
-	    // ((com.sun.corba.se.spi.orb.ORB)(getClientORB())).giopDebugFlag = false;
+	    // getClientORB().clearDebugFlag( "giop" ) ;
 
 	} catch (Exception exc) {
 	    exc.printStackTrace() ;
@@ -323,8 +323,8 @@ public class FrameworkClient extends Framework {
 	    Echo serv = makeServant( "purple" ) ;
 	    connectServant( serv, getClientORB() ) ;
 	    Echo stub = toStub( serv, Echo.class ) ;
-	    ((com.sun.corba.se.org.omg.CORBA.ORB)getClientORB())
-		.register_initial_reference( name, (org.omg.CORBA.Object)stub ) ;
+	    getClientORB().register_initial_reference( name, 
+                (org.omg.CORBA.Object)stub ) ;
 
 	    Echo echo = narrow( orb.string_to_object( url ), Echo.class ) ;
 	    Assert.assertFalse( echo == null ) ;

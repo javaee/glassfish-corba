@@ -50,8 +50,6 @@ import com.sun.corba.se.spi.trace.Cdr;
  * only non-negative values should be stored here (and storing -1 will cause
  * failures).  Also note that the same key (Object) may be stored with multiple
  * values (int offsets) due to the way readResolve works (see also GlassFish issue 1605).
- * <P>
- * Note that this class cannot be generified, as any arbitrary object can be a key.
  *
  * @since 1.1
  *

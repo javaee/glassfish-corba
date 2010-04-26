@@ -641,8 +641,6 @@
              132 FINE "Exception occurred in reader thread")
             (EXCEPTION_IN_LISTENER_THREAD
              133 FINE "Exception occurred in listener thread")
-            (ORB_LIFECYCLE_TRACE
-             134 INFO "ORB Lifecycle for ORB {0}: {1}" )
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 

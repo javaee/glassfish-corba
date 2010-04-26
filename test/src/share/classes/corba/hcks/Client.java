@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -168,17 +168,13 @@ public class Client
 	com.sun.corba.se.spi.orb.ORB spiOrb = 
 	    com.sun.corba.se.spi.orb.ORB.class.cast( orb ) ;
 	System.out.println( "DEBUGGING ON: " + msg ) ;
-	spiOrb.serviceContextDebugFlag = true ;
-	spiOrb.interceptorDebugFlag = true ;
-	spiOrb.subcontractDebugFlag = true ;
+        spiOrb.setDebugFlags( "serviceContext", "interceptor", "subcontract" ) ;
     }
 
     private static void debugOff() {
 	com.sun.corba.se.spi.orb.ORB spiOrb = 
 	    com.sun.corba.se.spi.orb.ORB.class.cast( orb ) ;
-	spiOrb.serviceContextDebugFlag = false ;
-	spiOrb.interceptorDebugFlag = false ;
-	spiOrb.subcontractDebugFlag = false ;
+        spiOrb.clearDebugFlags( "serviceContext", "interceptor", "subcontract" ) ;
 	System.out.println( "DEBUGGING OFF" ) ;
     }
 

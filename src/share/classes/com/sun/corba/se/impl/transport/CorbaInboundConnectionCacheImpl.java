@@ -85,7 +85,7 @@ public class CorbaInboundConnectionCacheImpl
 	synchronized (backingStore()) {
 	    connectionCache.add(connection);
 	    connection.setConnectionCache(this);
-	    dprintStatistics();
+	    cacheStatisticsInfo();
             pp.connectionOpenedEvent( acceptor.toString(), connection.toString() ) ;
 	}
     }
@@ -95,7 +95,7 @@ public class CorbaInboundConnectionCacheImpl
     {
 	synchronized (backingStore()) {
 	    connectionCache.remove(connection);
-	    dprintStatistics();
+	    cacheStatisticsInfo();
             pp.connectionClosedEvent( connection.toString() ) ;
 	}
     }

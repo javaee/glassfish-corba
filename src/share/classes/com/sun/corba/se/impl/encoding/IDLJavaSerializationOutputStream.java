@@ -112,7 +112,6 @@ public class IDLJavaSerializationOutputStream extends CDROutputStreamBase {
     // [GIOPHeader(12) + requestID(4)] bytes
     static final int DIRECT_RW_LENGTH = Message.GIOPMessageHeaderLength + 4;
 
-    private boolean debug;
     protected ORBUtilSystemException wrapper;
 
     private static final List<IDLByteArrayOutputStream> outputStreamPool = 
@@ -329,10 +328,6 @@ public class IDLJavaSerializationOutputStream extends CDROutputStreamBase {
 	    initObjectOutputStream();
 	}
 	this.useDirectByteBuffer = useDirectByteBuffer;
-    	debug = ((ORB)orb).transportDebugFlag;
-	if (debug) {
-	    ORBUtility.dprint(this, "IDLJavaSerializationOutputStream init");
-	}
     }
 
     /**

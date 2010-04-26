@@ -203,9 +203,7 @@ public class CDROutputObject
      * Message onto the Message list.
      */
     public void writeTo(CorbaConnection connection)
-	throws java.io.IOException 
-    {
-
+	throws java.io.IOException {
         //
         // Update the GIOP MessageHeader size field.
         //
@@ -216,9 +214,6 @@ public class CDROutputObject
 
 	ORB lorb = (ORB)orb() ;
         if (lorb != null) {
-	    if (lorb.transportDebugFlag) {
-		dprint(".writeTo: " + connection);
-	    }
 	    if (lorb.giopDebugFlag) {
 		ORBUtility.printBuffer( "CDROutputObject Buffer", 
                                 bbwi.getByteBuffer(), System.out ) ;

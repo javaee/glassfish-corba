@@ -261,9 +261,12 @@ public class MethodMonitorRegistry {
         Set<Class<? extends Annotation>> images = subgroupsTC.get( src ) ;
         images.add( dest ) ;
 
-        for (Class<? extends Annotation> anno : subgroups.get(dest)) {
-            if (!images.contains( anno )) {
-                dfs( src, anno ) ;
+        Set<Class<? extends Annotation>> temp = subgroups.get(dest) ;
+        if (temp != null) {
+            for (Class<? extends Annotation> anno : temp) {
+                if (!images.contains( anno )) {
+                    dfs( src, anno ) ;
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2000-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2000-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -166,8 +166,8 @@ abstract public class ClientCommon
         // Should result in send_request being called for all, 
         // receive_exception called for 3, and 2, and receive_other for
         // 1.
-        orb.interceptorDebugFlag = true ;
-        orb.subcontractDebugFlag = true ;
+        orb.setDebugFlag( "interceptor" ) ;
+        orb.setDebugFlag( "subcontract" ) ;
         try {
             out.println(
                 "- Testing standard invocation where interceptor #2 " +
@@ -177,8 +177,8 @@ abstract public class ClientCommon
                 "sr1sr2sr3re3re2ro1sr1sr2sr3re3re2re1", "sayException", 
                 true, true, true );
         } finally {
-            orb.interceptorDebugFlag = false ;
-            orb.subcontractDebugFlag = false ;
+            orb.clearDebugFlag( "interceptor" ) ;
+            orb.clearDebugFlag( "subcontract" ) ;
         }
 
         // Check that call counter is zero (balanced starting points with

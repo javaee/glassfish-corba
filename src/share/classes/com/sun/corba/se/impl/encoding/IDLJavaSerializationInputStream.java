@@ -161,7 +161,6 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
     private int peekIndex, peekCount;
     private LinkedList<Object> markedItemQ = new LinkedList<Object>();
 
-    private boolean debug;
     protected ORBUtilSystemException wrapper;
 
     private static final List<IDLByteArrayInputStream> inputStreamPool = 
@@ -328,10 +327,6 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	wrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 	if (!directRead) {
 	    initObjectInputStream();
-	}
-	debug = ((ORB)orb).transportDebugFlag;
-	if (debug) {
-	    ORBUtility.dprint(this, "IDLJavaSerializationInputStream init");
 	}
     }
 
@@ -653,16 +648,10 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
 	try {
 	    int off = offset;
 	    int len = length;
-	    if (debug) {
-		ORBUtility.dprint(this, "off: " + off + ", len: " + len);
-	    }
 	    while (len > 0) {
 		int n = is.read(value, off, len);
 		off += n;
 		len -= n;
-		if (debug) {
-		    ORBUtility.dprint(this, "off: " + off + ", len: " + len);
-		}
 	    }
 	    if (markOn) { // enqueue
 		byte[] b = new byte[length];

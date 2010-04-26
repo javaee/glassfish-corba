@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -429,7 +429,7 @@ public class Client extends TestCase
 	    mtm.enable( true ) ;
 
 	    // if (debug)
-		// clientORB.giopDebugFlag = true ;
+		// clientORB.setDebugFlag( "giop" ) ;
 
 	    tester.setAttribute( won, attr ) ;
 
@@ -439,7 +439,7 @@ public class Client extends TestCase
 	    if (debug) {
 		displayData( "dataSent", dataSent ) ;
 		displayData( "dataReceived", dataSent ) ;
-		// clientORB.giopDebugFlag = false ;
+		// clientORB.clearDebugFlag( "giop" ) ;
 	    }
 		
 	    mtm.clear() ;

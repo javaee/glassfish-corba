@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2000-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2000-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -67,6 +67,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.AddressingDispositionException;
 import com.sun.corba.se.impl.protocol.CorbaRequestIdImpl;
 import com.sun.corba.se.impl.transport.MessageTraceManagerImpl;
+import com.sun.corba.se.spi.trace.Giop;
 
 /**
  * This class acts as the base class for the various GIOP message types. This
@@ -77,6 +78,7 @@ import com.sun.corba.se.impl.transport.MessageTraceManagerImpl;
  * @version 1.0
  */
 
+@Giop
 public abstract class MessageBase implements Message{
 
     // This is only used when the giopDebug flag is
@@ -87,7 +89,7 @@ public abstract class MessageBase implements Message{
 
     // (encodingVersion == 0x00) implies CDR encoding, 
     // (encodingVersion >  0x00) implies Java serialization encoding version.
-    private byte encodingVersion = (byte) ORBConstants.CDR_ENC_VERSION;
+    private byte encodingVersion = ORBConstants.CDR_ENC_VERSION;
 
     private static ORBUtilSystemException wrapper = 
 	ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
@@ -146,8 +148,7 @@ public abstract class MessageBase implements Message{
                                               ByteBuffer buf,
                                               int startPosition) {
         
-        CorbaTransportManager ctm = 
-	    (CorbaTransportManager)orb.getTransportManager() ;
+        CorbaTransportManager ctm = orb.getTransportManager() ;
 	MessageTraceManagerImpl mtm = 
 	    (MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
 	if (mtm.isEnabled()) {

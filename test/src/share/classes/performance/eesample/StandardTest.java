@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -988,10 +988,10 @@ public class StandardTest extends JapexDriverBase {
 
     private void setDebugFlags( ORB orb ) {
 	if (argData.getSize()) {
-            orb.giopSizeDebugFlag = true;
+            orb.setDebugFlag( "giopSize" ) ;
         }
 	if (argData.getRead()) {
-            orb.giopReadDebugFlag = true;
+            orb.setDebugFlag( "giopRead" ) ;
         }
     }
 
@@ -1008,7 +1008,7 @@ public class StandardTest extends JapexDriverBase {
 	    clientORB = (ORB)ORB.init( myArgs, clientProps ) ;
         	    setDebugFlags( clientORB ) ;
 	    if (argData.getSize()) {
-                clientORB.giopSizeDebugFlag = true;
+                clientORB.setDebugFlag( "giopSize" ) ;
             }
 	    clientNamingRoot = NamingContextExtHelper.narrow(
 		clientORB.resolve_initial_references( "NameService" )) ;
@@ -1043,7 +1043,7 @@ public class StandardTest extends JapexDriverBase {
 	serverORB = (ORB)ORB.init( myArgs, serverProps ) ;
     	setDebugFlags( serverORB ) ;
 	if (argData.getSize()) {
-            serverORB.giopSizeDebugFlag = true;
+            serverORB.setDebugFlag( "giopSize" ) ;
         }
 	new TransientNameService( serverORB ) ;
 	

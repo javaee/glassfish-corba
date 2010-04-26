@@ -123,6 +123,7 @@ import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryDefaults;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 
 import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
@@ -158,6 +159,7 @@ import org.glassfish.gmbal.AMXMetadata ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.NameValue ;
 
+@OrbLifeCycle
 @ManagedObject
 @Description( "The Main ORB Implementation object" ) 
 @AMXMetadata( type="ORB-Root" )
@@ -273,7 +275,16 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         return result ;
     }
 
+    @InfoMethod
+    private void mbeanRegistrationSuspended(String oRBId) { }
+
     public enum DebugFlagResult { OK, BAD_NAME }
+
+    @ManagedOperation
+    @Description( "Enable debugging for several ORB debug flags")
+    public DebugFlagResult setDebugFlags( String... names ) {
+        return setDebugFlags( true, names ) ;
+    }
 
     @ManagedOperation
     @Description( "Enable debugging for a particular ORB debug flag")
@@ -282,11 +293,28 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     }
 
     @ManagedOperation
+    @Description( "Disable debugging for several ORB debug flags")
+    public DebugFlagResult clearDebugFlags( String... names ) {
+        return setDebugFlags( true, names ) ;
+    }
+
+    @ManagedOperation
     @Description( "Disable debugging for a particular ORB debug flag")
     public DebugFlagResult clearDebugFlag( String name ) {
         return setDebugFlag( name, false ) ;
     }
    
+    private DebugFlagResult setDebugFlags( boolean flag, String... names ) {
+        DebugFlagResult res = DebugFlagResult.OK ;
+        for (String name : names) {
+            DebugFlagResult lres = setDebugFlag( name, flag ) ;
+            if (lres == DebugFlagResult.BAD_NAME) {
+                res = DebugFlagResult.BAD_NAME ;
+            }
+        }
+        return res ;
+    }
+
     private DebugFlagResult setDebugFlag( String name, boolean value ) {
         try {
             Field fld = this.getClass().getField( name + "DebugFlag" ) ;
@@ -760,6 +788,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         rootParentObjectName = oname ;
     }
 
+    @OrbLifeCycle
     public void createORBManagedObjectManager() {
         // XXX createStandalone should be replaced by createFederated if running
         // as part of GlassFish v3 or later.  An extension to the SPI is needed for
@@ -790,10 +819,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
         mom.suspendJMXRegistration() ;
 
-        if (orbLifecycleDebugFlag) {
-            wrapper.orbLifecycleTrace( getORBData().getORBId(), 
-                "MBean registration suspended" ) ;
-        }     
+        mbeanRegistrationSuspended( getORBData().getORBId() ) ;
 
         mom.createRoot( this, getUniqueOrbId() ) ;
     }

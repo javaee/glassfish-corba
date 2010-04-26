@@ -54,14 +54,9 @@ public class BufferManagerWriteCollect extends BufferManagerWrite
     private BufferQueue queue = new BufferQueue();
 
     private boolean sentFragment = false;
-    private boolean debug = false;
 
-
-    BufferManagerWriteCollect(ORB orb)
-    {
+    BufferManagerWriteCollect(ORB orb) {
         super(orb);
-         if (orb != null)
-            debug = orb.transportDebugFlag;
     }
 
     public boolean sentFragment() {
@@ -143,16 +138,6 @@ public class BufferManagerWriteCollect extends BufferManagerWrite
 
                 // Release ByteBufferWithInfo's ByteBuffer back to the pool
                 // of ByteBuffers.
-                if (debug)
-                {
-                    // print address of ByteBuffer being released
-                    int bbAddress = System.identityHashCode(bbwi.getByteBuffer());
-                    StringBuffer sb = new StringBuffer(80);
-                    sb.append("sendMessage() - releasing ByteBuffer id (");
-                    sb.append(bbAddress).append(") to ByteBufferPool.");
-                    String msg = sb.toString();
-                    dprint(msg);
-                }
                 byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
                 bbwi.setByteBuffer(null);
                 bbwi = null;
@@ -185,18 +170,7 @@ public class BufferManagerWriteCollect extends BufferManagerWrite
         while (bufs.hasNext())
         {
             ByteBufferWithInfo bbwi = (ByteBufferWithInfo)bufs.next();
-            if (bbwi != null && bbwi.getByteBuffer() != null)
-            {
-                if (debug)
-                {
-                    // print address of ByteBuffer being released
-                    int bbAddress = System.identityHashCode(bbwi.getByteBuffer());
-                    StringBuffer sb = new StringBuffer(80);
-                    sb.append("close() - releasing ByteBuffer id (");
-                    sb.append(bbAddress).append(") to ByteBufferPool.");
-                    String msg = sb.toString();
-                    dprint(msg);
-                }
+            if (bbwi != null && bbwi.getByteBuffer() != null) {
                  byteBufferPool.releaseByteBuffer(bbwi.getByteBuffer());
                  bbwi.setByteBuffer(null);
                  bbwi = null;

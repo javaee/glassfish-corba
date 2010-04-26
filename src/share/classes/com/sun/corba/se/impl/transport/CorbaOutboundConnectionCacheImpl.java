@@ -79,7 +79,7 @@ public class CorbaOutboundConnectionCacheImpl
     public CorbaConnection get(CorbaContactInfo contactInfo)
     {
 	synchronized (backingStore()) {
-	    dprintStatistics();
+	    cacheStatisticsInfo();
 	    return connectionCache.get(contactInfo);
 	}
     }
@@ -91,7 +91,7 @@ public class CorbaOutboundConnectionCacheImpl
 	    connectionCache.put(contactInfo, connection);
 	    connection.setConnectionCache(this);
             pp.connectionOpenedEvent( contactInfo.toString(), connection.toString() ) ;
-	    dprintStatistics();
+	    cacheStatisticsInfo();
 	}
     }
 
@@ -103,7 +103,7 @@ public class CorbaOutboundConnectionCacheImpl
 		CorbaConnection connection = connectionCache.remove(contactInfo);
                 pp.connectionClosedEvent( contactInfo.toString(), connection.toString() ) ;
 	    }
-	    dprintStatistics();
+	    cacheStatisticsInfo();
 	}
     }
 

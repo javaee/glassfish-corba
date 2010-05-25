@@ -313,21 +313,33 @@ public abstract class ClientBase {
     protected void checkMarshalException(String msg, Exception got, 
         SystemException expected) {
 
-	if (got.getCause().getClass().isInstance(expected)
-	    && ((SystemException)got.getCause()).minor == expected.minor 
-	    && ((SystemException)got.getCause()).completed == expected.completed) {
+        Throwable thr = got ;
+        while (thr != null) {
+            if (thr.getClass().equals(expected.getClass())) {
+                break ;
+            }
 
+            thr = thr.getCause() ;
+        }
+
+        SystemException sysex = null;
+        if (thr != null) {
+            sysex = (SystemException)thr ;
+        }
+
+	if ((sysex != null) && (sysex.minor == expected.minor) 
+            && (sysex.completed == expected.completed)) {
 	    dprint("--------------------------------------------------");
 	    dprint(msg + ": SUCCEEDED");
 	    dprint("--------------------------------------------------");
 	} else {
 	    got.printStackTrace(System.out);
 	    dprint( msg + "ERROR: Expected MarshalException " + expected
-	        + "Got   : " + got
-	        + "detail: " + got.getCause() ) ;
+	        + " Got   : " + got
+	        + " detail: " + got.getCause() ) ;
 	    Assert.fail( msg + " FAILED: Expected MarshalException " + expected
-	        + "Got   : " + got
-	        + "detail: " + got.getCause() ) ;
+	        + " Got   : " + got
+	        + " detail: " + got.getCause() ) ;
 	}
     }
 

@@ -76,6 +76,9 @@ import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import java.io.ObjectInputStream;
 
+import com.sun.corba.se.spi.orbutil.copyobject.Copy ;
+import com.sun.corba.se.spi.orbutil.copyobject.CopyType ;
+
 // subclasses must provide a matching helper class
 public class AnyImpl extends Any
 {
@@ -111,8 +114,14 @@ public class AnyImpl extends Any
     // Always valid.
     //
     private TypeCodeImpl typeCode;
+
+    @Copy( CopyType.IDENTITY ) 
     protected transient ORB orb;
+
+    @Copy( CopyType.IDENTITY ) 
     private transient TimingPoints tp ;
+    
+    @Copy( CopyType.IDENTITY ) 
     private transient ORBUtilSystemException wrapper ;
 
     //
@@ -123,7 +132,9 @@ public class AnyImpl extends Any
     // stream type is an Any extension of CDR stream that is used to
     // detect an optimization in read_value().
     //
+    @Copy( CopyType.IDENTITY ) 
     private transient CDRInputObject stream;
+
     private long value;
     private java.lang.Object object;
 

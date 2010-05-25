@@ -1893,6 +1893,9 @@ public abstract class Client extends TestCase
 
     public  void testExternalizableNonStaticContext()
     {
+        Object foo = new FooImpl() ;
+        doStandardTest( foo ) ;
+        /*
         try {
             FooImpl foo = new FooImpl();
             Object result = copyObject(foo.bar);
@@ -1901,6 +1904,7 @@ public abstract class Client extends TestCase
         } catch (Exception e) {
             assertTrue(true);
         }
+        */
     }
 
     public  void testRemoteStub() throws Exception {

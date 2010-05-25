@@ -46,14 +46,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.spi.folb.ClusterInstanceInfoHelper;
 import com.sun.corba.se.spi.folb.GroupInfoService;
 import com.sun.corba.se.spi.folb.GroupInfoServiceBase;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 import com.sun.corba.se.spi.folb.SocketInfo;
 
-import com.sun.corba.se.impl.folb.ServerGroupManager;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 /**

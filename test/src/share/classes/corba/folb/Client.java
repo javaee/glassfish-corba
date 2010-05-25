@@ -40,6 +40,8 @@
 
 package corba.folb;
 
+import org.testng.Assert ;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test ;
 import org.testng.annotations.BeforeSuite ;
 
@@ -59,7 +61,7 @@ public class Client extends ClientBase {
     }
 
     @Test
-    public void testBootstrap() throws Exception {
+    public void testBootstrap() {
         dprint("--------------------------------------------------");
         dprint("testBootstrap (missing label, therefore IORUpdate)");
         dprint("--------------------------------------------------");
@@ -76,7 +78,7 @@ public class Client extends ClientBase {
                  NO_MEMBERSHIP_LABEL, RECEIVE_IOR_UPDATE);
     }
 
-    @Test
+    @Test( dependsOnMethods={ "testBootstrap" } )
     public void testNormalOperation() {
         dprint("--------------------------------------------------");
         dprint("testNormalOperation (send label, no IORUpdate)");
@@ -94,102 +96,103 @@ public class Client extends ClientBase {
                  SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
     }
 
-    @Test
-    public void testIORUpdate() throws Exception {
-        dprint("--------------------------------------------------");
-        dprint("testIORUpdate only (send label, receive IORUpdate)");
-        dprint("setup: remove instance");
-        dprint("--------------------------------------------------");
-        doRemoveInstance(gisPoaWithAddressesWithLabels,
-                         corba.folb_8_1.Common.Z);
+    @Test( dependsOnMethods={ "testNormalOperation" } )
+    public void testIORUpdate() {
+        try {
+            dprint("--------------------------------------------------");
+            dprint("testIORUpdate only (send label, receive IORUpdate)");
+            dprint("setup: remove instance");
+            dprint("--------------------------------------------------");
+            doRemoveInstance(gisPoaWithAddressesWithLabels, corba.folb_8_1.Common.Z);
+            makeCall(testRfmWithAddressesWithLabel,
+                Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                "IORUpdate only1 (send label, receive IORUpdate)",
+                corba.folb_8_1.Common.W, SEND_MEMBERSHIP_LABEL,
+                RECEIVE_IOR_UPDATE);
+            makeCall(testRfmWithAddressesWithLabel,
+                Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                "IORUpdate only2 (send label, no IORUpdate)",
+                corba.folb_8_1.Common.W, SEND_MEMBERSHIP_LABEL,
+                NO_IOR_UPDATE);
 
-        makeCall(testRfmWithAddressesWithLabel,
-                 Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-                 "IORUpdate only1 (send label, receive IORUpdate)",
-                 corba.folb_8_1.Common.W,
-                 SEND_MEMBERSHIP_LABEL, RECEIVE_IOR_UPDATE);
-        makeCall(testRfmWithAddressesWithLabel,
-                 Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-                 "IORUpdate only2 (send label, no IORUpdate)",
-                 corba.folb_8_1.Common.W,
-                 SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
-        doAddInstance(gisPoaWithAddressesWithLabels,
-                      corba.folb_8_1.Common.Z);
-        makeCall(testRfmWithAddressesWithLabel,
-                 Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-                 "IORUpdate only3 (send label, receive IORUpdate)",
-                 corba.folb_8_1.Common.W,
-                 SEND_MEMBERSHIP_LABEL, RECEIVE_IOR_UPDATE);
-        makeCall(testRfmWithAddressesWithLabel,
-                 Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-                 "IORUpdate only4 (send label, no IORUpdate)",
-                 corba.folb_8_1.Common.W,
-                 SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
+            doAddInstance(gisPoaWithAddressesWithLabels, corba.folb_8_1.Common.Z);
+            makeCall(testRfmWithAddressesWithLabel,
+                Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                "IORUpdate only3 (send label, receive IORUpdate)",
+                corba.folb_8_1.Common.W, SEND_MEMBERSHIP_LABEL,
+                RECEIVE_IOR_UPDATE);
+            makeCall(testRfmWithAddressesWithLabel,
+                Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                "IORUpdate only4 (send label, no IORUpdate)",
+                corba.folb_8_1.Common.W, SEND_MEMBERSHIP_LABEL,
+                NO_IOR_UPDATE);
+        } catch (Exception ex) {
+            Assert.fail( "Caught exception in testIORUpdate", ex ) ;
+        }
     }
 
-    @Test
-    public void testFailoverWithoutUpdate() throws Exception {
-        dprint("--------------------------------------------------");
-        dprint("testFailoverWithoutUpdate (send label, no IORUpdate)");
-        dprint("Setup: remove W listener");
-        dprint("--------------------------------------------------");
-        gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
-            corba.folb_8_1.Common.W);
-        Thread.sleep(2000);
+    @Test( dependsOnMethods={ "testIORUpdate" } )
+    public void testFailoverWithoutUpdate() {
+        try {
+            dprint("--------------------------------------------------");
+            dprint("testFailoverWithoutUpdate (send label, no IORUpdate)");
+            dprint("Setup: remove W listener");
+            dprint("--------------------------------------------------");
+            gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(corba.folb_8_1.Common.W);
+            Thread.sleep(2000);
+            makeCall(testRfmWithAddressesWithLabel,
+                Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                "Failover without update (send label, no IORUpdate)",
+                corba.folb_8_1.Common.X, SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
 
-        makeCall(testRfmWithAddressesWithLabel,
-                 Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-                 "Failover without update (send label, no IORUpdate)",
-                 corba.folb_8_1.Common.X,
-                 SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
-
-        dprint("--------------------------------------------------");
-        dprint("Check stuck to new instance (send label, no IORUpdate)");
-        dprint("--------------------------------------------------");
-
-        makeCall(testRfmWithAddressesWithLabel,
-                 Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-                 "Check stuck to new instance (send label, no IORUpdate)",
-                 corba.folb_8_1.Common.X,
-                 SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
+            dprint("--------------------------------------------------");
+            dprint("Check stuck to new instance (send label, no IORUpdate)");
+            dprint("--------------------------------------------------");
+            makeCall(testRfmWithAddressesWithLabel,
+                Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                "Check stuck to new instance (send label, no IORUpdate)",
+                corba.folb_8_1.Common.X, SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
+        } catch (Exception ex) {
+            Assert.fail( "Caught exception in testFailoverWithoutUpdate", ex ) ;
+        }
     }
 
-    @Test
-    public void testFailoverWithUpdate() throws Exception {
-        dprint("--------------------------------------------------");
-        dprint("testFailoverWithUpdate (send label, IORUpdate)");
-        dprint("Setup: remove instances W, X");
-        dprint("Setup: remove X listener");
-        dprint("--------------------------------------------------");
-        doRemoveInstance(gisPoaWithAddressesWithLabels, 
-                         corba.folb_8_1.Common.W);
-        doRemoveInstance(gisPoaWithAddressesWithLabels, 
-                         corba.folb_8_1.Common.X);
-        gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
-            corba.folb_8_1.Common.X);
-        Thread.sleep(2000);
+    @Test( dependsOnMethods={ "testFailoverWithoutUpdate" } )
+    public void testFailoverWithUpdate() {
+        try {
+            dprint("--------------------------------------------------");
+            dprint("testFailoverWithUpdate (send label, IORUpdate)");
+            dprint("Setup: remove instances W, X");
+            dprint("Setup: remove X listener");
+            dprint("--------------------------------------------------");
+            doRemoveInstance(gisPoaWithAddressesWithLabels, corba.folb_8_1.Common.W);
+            doRemoveInstance(gisPoaWithAddressesWithLabels, corba.folb_8_1.Common.X);
+            gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(corba.folb_8_1.Common.X);
+            Thread.sleep(2000);
+            makeCall(testRfmWithAddressesWithLabel,
+                Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                "Failover with update (send label, IORUpdate)",
+                corba.folb_8_1.Common.Y, SEND_MEMBERSHIP_LABEL,
+                RECEIVE_IOR_UPDATE);
 
-        makeCall(testRfmWithAddressesWithLabel,
-                 Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-                 "Failover with update (send label, IORUpdate)",
-                 corba.folb_8_1.Common.Y,
-                 SEND_MEMBERSHIP_LABEL, RECEIVE_IOR_UPDATE);
-
-        dprint("--------------------------------------------------");
-        dprint("Check stuck to new instance (send label, no IORUpdate)");
-        dprint("--------------------------------------------------");
-
-        makeCall(testRfmWithAddressesWithLabel,
-                 Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
-                 "Check stuck to new instance (send label, no IORUpdate)",
-                 corba.folb_8_1.Common.Y,
-                 SEND_MEMBERSHIP_LABEL, NO_IOR_UPDATE);
+            dprint("--------------------------------------------------");
+            dprint("Check stuck to new instance (send label, no IORUpdate)");
+            dprint("--------------------------------------------------");
+            makeCall(testRfmWithAddressesWithLabel,
+                Common.TEST_RFM_WITH_ADDRESSES_WITH_LABEL,
+                "Check stuck to new instance (send label, no IORUpdate)",
+                corba.folb_8_1.Common.Y, SEND_MEMBERSHIP_LABEL,
+                NO_IOR_UPDATE);
+        } catch (Exception ex) {
+            Assert.fail("Caught exception in testFailoverWithUpdate", ex);
+        }
     }
 
     private void doAddInstance( 
 	GroupInfoServiceTest gist,
 	String arg ) throws Exception {
 
+        dprint( "Adding instance " + arg ) ;
 	gist.addInstance(arg);
 
 	// Add a delay here to avoid race condition in test:
@@ -205,6 +208,7 @@ public class Client extends ClientBase {
 	GroupInfoServiceTest gist,
 	String arg ) throws Exception {
 
+        dprint( "Removing instance " + arg ) ;
 	gist.removeInstance(arg);
 
 	// Add a delay here to avoid race condition in test:
@@ -219,6 +223,31 @@ public class Client extends ClientBase {
     public static void main(String[] av) {
         doMain( Client.class ) ;
     }
+
+    // Order of test (current):
+    // 1076 testBootstrap           WXYZ
+
+    // 1577 testFailoverWithUpdate  WXYZ
+    // 1581 Removing instance W
+    // 1840 Removing instance X
+    // 2272 ERROR: expected Y got W
+
+    // 2274 testFailoverWithoutUpdate   YZ
+    // 2836 ERROR: expected X got Y
+
+    // 2838 testIORUpdate               YZ
+    // 2841 Removing instance Z (should add Z too?)
+    // 3057 ERROR: expected W got Y
+
+    // 3059 testNormalOperation         Y
+    // 3250 ERROR: expected W got Y
+
+    // Expected order:
+    //  testBootstrap
+    //  testNormalOperation
+    //  testIORUpdate
+    //  testFailoverWithoutUpdate
+    //  testFailoverWithUpdate
 }
 
 // End of file.

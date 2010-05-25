@@ -40,21 +40,11 @@
 
 package corba.folb;
 
-import java.util.Hashtable;
 import java.util.Properties;
-import javax.naming.InitialContext;
 
-import org.omg.CORBA.COMM_FAILURE;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
-import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-
-import corba.framework.Controller;
-import corba.hcks.U;
 
 import org.testng.annotations.BeforeSuite ;
 import org.testng.annotations.Test ;
@@ -65,8 +55,6 @@ import org.testng.Assert ;
  * @author Harold Carr
  */
 public class ClientCircular extends ClientBase {
-
-    public ORBUtilSystemException wrapper = ORB.getStaticLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 
     @BeforeSuite
     public void clientSetup() throws Exception {

@@ -61,7 +61,7 @@ public class Client extends ClientBase {
     @Test
     public void testBootstrap() throws Exception {
         dprint("--------------------------------------------------");
-        dprint("BOOTSTRAP Test (missing label, therefore IORUpdate)");
+        dprint("testBootstrap (missing label, therefore IORUpdate)");
         dprint("--------------------------------------------------");
 
         makeCall(testRfmWithAddressesWithoutLabel, 
@@ -79,7 +79,7 @@ public class Client extends ClientBase {
     @Test
     public void testNormalOperation() {
         dprint("--------------------------------------------------");
-        dprint("Normal operation (send label, no IORUpdate)");
+        dprint("testNormalOperation (send label, no IORUpdate)");
         dprint("--------------------------------------------------");
 
         makeCall(testRfmWithAddressesWithLabel,
@@ -97,7 +97,7 @@ public class Client extends ClientBase {
     @Test
     public void testIORUpdate() throws Exception {
         dprint("--------------------------------------------------");
-        dprint("IORUpdate only (send label, receive IORUpdate)");
+        dprint("testIORUpdate only (send label, receive IORUpdate)");
         dprint("setup: remove instance");
         dprint("--------------------------------------------------");
         doRemoveInstance(gisPoaWithAddressesWithLabels,
@@ -130,7 +130,7 @@ public class Client extends ClientBase {
     @Test
     public void testFailoverWithoutUpdate() throws Exception {
         dprint("--------------------------------------------------");
-        dprint("Failover without update (send label, no IORUpdate)");
+        dprint("testFailoverWithoutUpdate (send label, no IORUpdate)");
         dprint("Setup: remove W listener");
         dprint("--------------------------------------------------");
         gisPoaWithAddressesWithLabels.removeAcceptorAndConnections(
@@ -157,7 +157,7 @@ public class Client extends ClientBase {
     @Test
     public void testFailoverWithUpdate() throws Exception {
         dprint("--------------------------------------------------");
-        dprint("Failover with update (send label, IORUpdate)");
+        dprint("testFailoverWithUpdate (send label, IORUpdate)");
         dprint("Setup: remove instances W, X");
         dprint("Setup: remove X listener");
         dprint("--------------------------------------------------");

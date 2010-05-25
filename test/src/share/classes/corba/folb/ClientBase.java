@@ -86,7 +86,7 @@ public abstract class ClientBase {
         Properties props = new Properties();
 	props.setProperty(ORBConstants.DEBUG_PROPERTY,
             //"giop,transport,subcontract,poa"
-            "transport" );
+            "transport,folb,protocol" );
 
 	props.setProperty(ORBConstants.SOCKET_FACTORY_CLASS_PROPERTY,
             SocketFactoryImpl.class.getName());
@@ -268,6 +268,8 @@ public abstract class ClientBase {
             if (socketType.equals(corba.folb_8_1.Client.lastSocketTypeUsed)) {
                 dprint("    Correct socket type: " + socketType);
             } else {
+                dprint( "ERROR: incorrect socket type: expected: " + socketType
+                    + " got: " + corba.folb_8_1.Client.lastSocketTypeUsed ) ;
                 Assert.fail( "incorrect socket type: expected: " + socketType
                     + " got: " + corba.folb_8_1.Client.lastSocketTypeUsed ) ;
             }
@@ -276,6 +278,9 @@ public abstract class ClientBase {
                 dprint("    Correctly handled membership label: " 
                        + sentOrNotSent(sendMembershipLabel));
             } else {
+                dprint( "ERROR: incorrectly handled membership label:"
+                       + " expected: " + sentOrNotSent(sendMembershipLabel)
+                       + " got: " + sentOrNotSent(ClientGroupManager.sentMemberShipLabel) ) ;
                 Assert.fail( "incorrectly handled membership label:"
                        + " expected: " + sentOrNotSent(sendMembershipLabel)
                        + " got: " + sentOrNotSent(ClientGroupManager.sentMemberShipLabel) ) ;
@@ -285,6 +290,9 @@ public abstract class ClientBase {
                 dprint("    Correctly handled IOR update: " 
                        + receivedOrNotReceived(receiveIORUpdate));
             } else {
+                dprint( "ERROR: incorrectly handled IOR update:"
+                       + " expected: " + receivedOrNotReceived(receiveIORUpdate)
+                       + " got: " + receivedOrNotReceived(ClientGroupManager.receivedIORUpdate));
                 Assert.fail( "incorrectly handled IOR update:"
                        + " expected: " + receivedOrNotReceived(receiveIORUpdate)
                        + " got: " + receivedOrNotReceived(ClientGroupManager.receivedIORUpdate));
@@ -314,6 +322,9 @@ public abstract class ClientBase {
 	    dprint("--------------------------------------------------");
 	} else {
 	    got.printStackTrace(System.out);
+	    dprint( msg + "ERROR: Expected MarshalException " + expected
+	        + "Got   : " + got
+	        + "detail: " + got.getCause() ) ;
 	    Assert.fail( msg + " FAILED: Expected MarshalException " + expected
 	        + "Got   : " + got
 	        + "detail: " + got.getCause() ) ;

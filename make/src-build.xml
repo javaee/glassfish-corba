@@ -94,7 +94,7 @@
         classpathref="maven-ant-tasks.classpath">
     </typedef>
 
-    <target name="build" depends="init, prepare-dirs, compile, orb-jar"/>
+    <target name="build" depends="init, prepare-dirs, compile, enhance-orb, orb-jar, make-bundles"/>
 
     <target name="enhance-orb" depends="init">
         <!-- Run the tracing enhancer on the class files for corba.tf -->

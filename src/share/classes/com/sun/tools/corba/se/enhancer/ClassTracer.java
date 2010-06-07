@@ -264,8 +264,12 @@ public class ClassTracer extends TFEnhanceAdapter {
             info( 2, "visitCode" ) ;
 
             // visit try-catch block BEFORE visiting start label!
-            lmv.visitTryCatchBlock( start, end, excHandler, null );
-            lmv.visitTryCatchBlock( excHandler, afterExcStore, excHandler, null );
+            // But that "requirement" (violated in Kuleshov's AOSD 07 paper)
+            // makes it very hard to generate finally handlers in the correct order.
+            // Moving the visitTryCatchBlock calls to visitMaxs.
+            //
+            // lmv.visitTryCatchBlock( start, end, excHandler, null );
+            // lmv.visitTryCatchBlock( excHandler, afterExcStore, excHandler, null );
 
 /*            final Object rt = getTypeForStackMap( Type.getReturnType( desc ) )  ;
             final Object[] locals = (rt == null)
@@ -441,6 +445,11 @@ public class ClassTracer extends TFEnhanceAdapter {
             lmv.visitLabel( end  ) ;
             lmv.visitLabel( excHandler  ) ;
 
+            // Here these finally blocks will be generated AFTER any 
+            // finally blocks in the wrapper code.
+            lmv.visitTryCatchBlock( start, end, excHandler, null );
+            lmv.visitTryCatchBlock( excHandler, afterExcStore, excHandler, null );
+            
             // Store the exception
             lmv.visitVarInsn( Opcodes.ASTORE, __exc.index ) ;
 

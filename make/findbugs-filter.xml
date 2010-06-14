@@ -1,5 +1,11 @@
 <FindBugsFilter>
     <Match>
+        <Package name="~org.glassfish.*"/>
+    </Match>
+    <Match>
+        <Package name="~org.osgi.*"/>
+    </Match>
+    <Match>
         <Package name="~com.sun.corba.se.impl.activation"/>
     </Match>
     <Match>
@@ -15,7 +21,7 @@
 	<Package name="~org.objectweb.*"/>
     </Match>
     <Match>
-	<Package name="~com.sun.corba.se.org.objectweb.*"/>
+	<Package name="~com.sun.corba.se.org.objectweb.asm.*"/>
     </Match>
     <Match>
 	<Package name="~com.sun.corba.se.org.omg.*"/>

@@ -48,7 +48,6 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.OMGSystemException;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.transport.MessageTraceManagerImpl;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
 import java.io.IOException ;
 import java.io.ObjectInputStream;
@@ -59,6 +58,7 @@ import org.omg.CORBA.TypeCode;
 /**
  * @author Harold Carr
  */
+@CdrWrite
 public class CDROutputObject 
     extends org.omg.CORBA_2_3.portable.OutputStream
     implements com.sun.corba.se.impl.encoding.MarshalOutputStream,
@@ -69,7 +69,6 @@ public class CDROutputObject
     private transient ORB orb;
     protected transient ORBUtilSystemException wrapper;
     private transient OMGSystemException omgWrapper;
-    private transient TimingPoints tp ;
     private transient CDROutputStreamBase impl;
 
     private Message header;
@@ -83,11 +82,22 @@ public class CDROutputObject
         orb = null ;
         wrapper = null ;
         omgWrapper = null ;
-        tp = null ;
         impl = null ;
         corbaMessageMediator = null ;
         connection = null ;
         throw new IllegalStateException( "Should not be called" ) ;
+    }
+
+    @CdrWrite
+    private void createCDROutputStream(ORB orb, GIOPVersion version, byte encodingVersion, 
+        boolean littleEndian, BufferManagerWrite bufferManager, 
+        byte streamFormatVersion, boolean usePooledByteBuffers, boolean directWrite)
+        impl = OutputStreamFactory.newOutputStream(orb, 
+            version, encodingVersion, directWrite);
+        impl.init(orb, littleEndian, bufferManager, streamFormatVersion, 
+            usePooledByteBuffers);
+
+        impl.setParent(this);
     }
 
     public CDROutputObject(ORB orb, GIOPVersion version, byte encodingVersion, 
@@ -96,19 +106,9 @@ public class CDROutputObject
     {
 	this.wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 	this.omgWrapper = orb.getLogWrapperTable().get_RPC_ENCODING_OMG() ;
-	this.tp = orb.getTimerManager().points() ;
 
-	tp.enter_createCDROutputStream() ;
-	try {
-	    impl = OutputStreamFactory.newOutputStream(orb, 
-                version, encodingVersion, directWrite);
-	    impl.init(orb, littleEndian, bufferManager, streamFormatVersion, 
-                usePooledByteBuffers);
-
-	    impl.setParent(this);
-	} finally {
-	    tp.exit_createCDROutputStream() ;
-	}
+        createCDROutputStream( orb, version, encodingVersion, littleEndian,
+            bufferManager, streamFormatVersion,usePooledByteBuffers, directWrite ) ;
 
         this.header = null ;
         this.corbaMessageMediator = null ;
@@ -404,278 +404,113 @@ public class CDROutputObject
     // org.omg.CORBA.portable.OutputStream
 
     public final void write_boolean(boolean value) {
-	tp.enter_writeBooleanToCDRStream() ;
-	try {
-	    impl.write_boolean(value);
-	} finally {
-	    tp.exit_writeBooleanToCDRStream() ;
-	}
+        impl.write_boolean(value);
     }
     public final void write_char(char value) {
-	tp.enter_writeCharToCDRStream() ;
-	try {
-	    impl.write_char(value);
-	} finally {
-	    tp.exit_writeCharToCDRStream() ;
-	}
+        impl.write_char(value);
     }
     public final void write_wchar(char value) {
-	tp.enter_writeWideCharToCDRStream() ;
-	try {
-	    impl.write_wchar(value);
-	} finally {
-	    tp.exit_writeWideCharToCDRStream() ;
-	}
+        impl.write_wchar(value);
     }
     public final void write_octet(byte value) {
-	tp.enter_writeOctetToCDRStream() ;
-	try {
-	    impl.write_octet(value);
-	} finally {
-	    tp.exit_writeOctetToCDRStream() ;
-	}
+        impl.write_octet(value);
     }
     public final void write_short(short value) {
-	tp.enter_writeShortToCDRStream() ;
-	try {
-	    impl.write_short(value);
-	} finally {
-	    tp.exit_writeShortToCDRStream() ;
-	}
+        impl.write_short(value);
     }
     public final void write_ushort(short value) {
-	tp.enter_writeUnsignedShortToCDRStream() ;
-	try {
-	    impl.write_ushort(value);
-	} finally {
-	    tp.exit_writeUnsignedShortToCDRStream() ;
-	}
+        impl.write_ushort(value);
     }
     public final void write_long(int value) {
-	tp.enter_writeLongToCDRStream() ;
-	try {
-	    impl.write_long(value);
-	} finally {
-	    tp.exit_writeLongToCDRStream() ;
-	}
+        impl.write_long(value);
     }
     public final void write_ulong(int value) {
-	tp.enter_writeUnsignedLongToCDRStream() ;
-	try {
-	    impl.write_ulong(value);
-	} finally {
-	    tp.exit_writeUnsignedLongToCDRStream() ;
-	}
+        impl.write_ulong(value);
     }
     public final void write_longlong(long value) {
-	tp.enter_writeLongLongToCDRStream() ;
-	try {
-	    impl.write_longlong(value);
-	} finally {
-	    tp.exit_writeLongLongToCDRStream() ;
-	}
+        impl.write_longlong(value);
     }
     public final void write_ulonglong(long value) {
-	tp.enter_writeUnsignedLongLongToCDRStream() ;
-	try {
-	    impl.write_ulonglong(value);
-	} finally {
-	    tp.exit_writeUnsignedLongLongToCDRStream() ;
-	}
+        impl.write_ulonglong(value);
     }
     public final void write_float(float value) {
-	tp.enter_writeFloatToCDRStream() ;
-	try {
-	    impl.write_float(value);
-	} finally {
-	    tp.exit_writeFloatToCDRStream() ;
-	}
+        impl.write_float(value);
     }
     public final void write_double(double value) {
-	tp.enter_writeDoubleToCDRStream() ;
-	try {
-	    impl.write_double(value);
-	} finally {
-	    tp.exit_writeDoubleToCDRStream() ;
-	}
+        impl.write_double(value);
     }
     public final void write_string(String value) {
-	tp.enter_writeStringToCDRStream() ;
-	try {
-	    impl.write_string(value);
-	} finally {
-	    tp.exit_writeStringToCDRStream() ;
-	}
+        impl.write_string(value);
     }
     public final void write_wstring(String value) {
-	tp.enter_writeWideStringToCDRStream() ;
-	try {
-	    impl.write_wstring(value);
-	} finally {
-	    tp.exit_writeWideStringToCDRStream() ;
-	}
+        impl.write_wstring(value);
     }
 
     public final void write_boolean_array(boolean[] value, int offset, int length) {
-	tp.enter_writeBooleanArrayToCDRStream() ;
-	try {
-	    impl.write_boolean_array(value, offset, length);
-	} finally {
-	    tp.exit_writeBooleanArrayToCDRStream() ;
-	}
+        impl.write_boolean_array(value, offset, length);
     }
     public final void write_char_array(char[] value, int offset, int length) {
-	tp.enter_writeCharArrayToCDRStream() ;
-	try {
-	    impl.write_char_array(value, offset, length);
-	} finally {
-	    tp.exit_writeCharArrayToCDRStream() ;
-	}
+        impl.write_char_array(value, offset, length);
     }
     public final void write_wchar_array(char[] value, int offset, int length) {
-	tp.enter_writeWideCharArrayToCDRStream() ;
-	try {
-	    impl.write_wchar_array(value, offset, length);
-	} finally {
-	    tp.exit_writeWideCharArrayToCDRStream() ;
-	}
+        impl.write_wchar_array(value, offset, length);
     }
     public final void write_octet_array(byte[] value, int offset, int length) {
-	tp.enter_writeOctetArrayToCDRStream() ;
-	try {
-	    impl.write_octet_array(value, offset, length);
-	} finally {
-	    tp.exit_writeOctetArrayToCDRStream() ;
-	}
+        impl.write_octet_array(value, offset, length);
     }
     public final void write_short_array(short[] value, int offset, int length) {
-	tp.enter_writeShortArrayToCDRStream() ;
-	try {
-	    impl.write_short_array(value, offset, length);
-	} finally {
-	    tp.exit_writeShortArrayToCDRStream() ;
-	}
+        impl.write_short_array(value, offset, length);
     }
     public final void write_ushort_array(short[] value, int offset, int length){
-	tp.enter_writeUnsignedShortArrayToCDRStream() ;
-	try {
-	    impl.write_ushort_array(value, offset, length);
-	} finally {
-	    tp.exit_writeUnsignedShortArrayToCDRStream() ;
-	}
+        impl.write_ushort_array(value, offset, length);
     }
     public final void write_long_array(int[] value, int offset, int length) {
-	tp.enter_writeLongArrayToCDRStream() ;
-	try {
-	    impl.write_long_array(value, offset, length);
-	} finally {
-	    tp.exit_writeLongArrayToCDRStream() ;
-	}
+        impl.write_long_array(value, offset, length);
     }
     public final void write_ulong_array(int[] value, int offset, int length) {
-	tp.enter_writeUnsignedLongArrayToCDRStream() ;
-	try {
-	    impl.write_ulong_array(value, offset, length);
-	} finally {
-	    tp.exit_writeUnsignedLongArrayToCDRStream() ;
-	}
+        impl.write_ulong_array(value, offset, length);
     }
     public final void write_longlong_array(long[] value, int offset, int length) {
-	tp.enter_writeLongLongArrayToCDRStream() ;
-	try {
-	    impl.write_longlong_array(value, offset, length);
-	} finally {
-	    tp.exit_writeLongLongArrayToCDRStream() ;
-	}
+        impl.write_longlong_array(value, offset, length);
     }
     public final void write_ulonglong_array(long[] value, int offset,int length) {
-	tp.enter_writeUnsignedLongLongArrayToCDRStream() ;
-	try {
-	    impl.write_ulonglong_array(value, offset, length);
-	} finally {
-	    tp.exit_writeUnsignedLongLongArrayToCDRStream() ;
-	}
+        impl.write_ulonglong_array(value, offset, length);
     }
     public final void write_float_array(float[] value, int offset, int length) {
-	tp.enter_writeFloatArrayToCDRStream() ;
-	try {
-	    impl.write_float_array(value, offset, length);
-	} finally {
-	    tp.exit_writeFloatArrayToCDRStream() ;
-	}
+        impl.write_float_array(value, offset, length);
     }
     public final void write_double_array(double[] value, int offset, int length) {
-	tp.enter_writeDoubleArrayToCDRStream() ;
-	try {
-	    impl.write_double_array(value, offset, length);
-	} finally {
-	    tp.exit_writeDoubleArrayToCDRStream() ;
-	}
+        impl.write_double_array(value, offset, length);
     }
     public final void write_Object(org.omg.CORBA.Object value) {
-	tp.enter_writeObjectToCDRStream() ;
-	try {
-	    impl.write_Object(value);
-	} finally {
-	    tp.exit_writeObjectToCDRStream() ;
-	}
+        impl.write_Object(value);
     }
     public final void write_TypeCode(TypeCode value) {
-	tp.enter_writeTypeCodeToCDRStream() ;
-	try {
-	    impl.write_TypeCode(value);
-	} finally {
-	    tp.exit_writeTypeCodeToCDRStream() ;
-	}
+        impl.write_TypeCode(value);
     }
     public final void write_any(Any value) {
-	tp.enter_writeAnyToCDRStream() ;
-	try {
-	    impl.write_any(value);
-	} finally {
-	    tp.exit_writeAnyToCDRStream() ;
-	}
+        impl.write_any(value);
     }
 
     @SuppressWarnings({"deprecation"})
     public final void write_Principal(org.omg.CORBA.Principal value) {
-	tp.enter_writePrincipalToCDRStream() ;
-	try {
-	    impl.write_Principal(value);
-	} finally {
-	    tp.exit_writePrincipalToCDRStream() ;
-	}
+        impl.write_Principal(value);
     }
 
     @Override
     public final void write(int b) throws java.io.IOException {
-	tp.enter_writeIntToCDRStream() ;
-	try {
-	    impl.write(b);
-	} finally {
-	    tp.exit_writeIntToCDRStream() ;
-	}
+        impl.write(b);
     }
     
     @Override
     public final void write_fixed(java.math.BigDecimal value) {
-	tp.enter_writeFixedToCDRStream() ;
-	try {
-	    impl.write_fixed(value);
-	} finally {
-	    tp.exit_writeFixedToCDRStream() ;
-	}
+        impl.write_fixed(value);
     }
 
     @Override
     public final void write_Context(org.omg.CORBA.Context ctx,
 			      org.omg.CORBA.ContextList contexts) {
-	tp.enter_writeContextToCDRStream() ;
-	try {
-	    impl.write_Context(ctx, contexts);
-	} finally {
-	    tp.exit_writeContextToCDRStream() ;
-	}
+        impl.write_Context(ctx, contexts);
     }
 
     @Override
@@ -686,136 +521,71 @@ public class CDROutputObject
     // org.omg.CORBA_2_3.portable.OutputStream
     @Override
     public final void write_value(java.io.Serializable value) {
-	tp.enter_writeValueToCDRStream() ;
-	try {
-	    impl.write_value(value);
-	} finally {
-	    tp.exit_writeValueToCDRStream() ;
-	}
+        impl.write_value(value);
     }
 
     @Override
     public final void write_value(java.io.Serializable value,
             java.lang.Class clz) {
-	tp.enter_writeValueWithClassToCDRStream() ;
-	try {
-	    impl.write_value(value, clz);
-	} finally {
-	    tp.exit_writeValueWithClassToCDRStream() ;
-	}
+        impl.write_value(value, clz);
     }
 
     @Override
     public final void write_value(java.io.Serializable value,
         String repository_id) {
 
-	tp.enter_writeValueWithRepidToCDRStream() ;
-	try {
-	    impl.write_value(value, repository_id);
-	} finally {
-	    tp.exit_writeValueWithRepidToCDRStream() ;
-	}
+        impl.write_value(value, repository_id);
     }
 
     @Override
     public final void write_value(java.io.Serializable value, 
                             org.omg.CORBA.portable.BoxedValueHelper factory) {
-	tp.enter_writeValueWithFactoryToCDRStream() ;
-	try {
-	    impl.write_value(value, factory);
-	} finally {
-	    tp.exit_writeValueWithFactoryToCDRStream() ;
-	}
+        impl.write_value(value, factory);
     }
 
     @Override
     public final void write_abstract_interface(java.lang.Object obj) {
-	tp.enter_writeAbstractInterfaceToCDRStream() ;
-	try {
-	    impl.write_abstract_interface(obj);
-	} finally {
-	    tp.exit_writeAbstractInterfaceToCDRStream() ;
-	}
+        impl.write_abstract_interface(obj);
     }
 
     // java.io.OutputStream
     @Override
     public final void write(byte b[]) throws IOException {
-	tp.enter_writeByteArrayToCDRStream() ;
-	try {
-	    impl.write(b);
-	} finally {
-	    tp.exit_writeByteArrayToCDRStream() ;
-	}
+        impl.write(b);
     }
 
     @Override
     public final void write(byte b[], int off, int len) throws IOException {
-	tp.enter_writeByteArrayWithOffsetToCDRStream() ;
-	try {
-	    impl.write(b, off, len);
-	} finally {
-	    tp.exit_writeByteArrayWithOffsetToCDRStream() ;
-	}
+        impl.write(b, off, len);
     }
 
     @Override
     public final void flush() throws IOException {
-	tp.enter_flushCDRStream() ;
-	try {
-	    impl.flush();
-	} finally {
-	    tp.exit_flushCDRStream() ;
-	}
+        impl.flush();
     }
 
     @Override
     public final void close() throws IOException {
-	tp.enter_closeCDRStream() ;
-	try {
-	    impl.close();
-	} finally {
-	    tp.exit_closeCDRStream() ;
-	}
+        impl.close();
     }
 
     // com.sun.corba.se.impl.encoding.MarshalOutputStream
     public final void start_block() {
-	tp.enter_startBlockCDRStream() ;
-	try {
-	    impl.start_block();
-	} finally {
-	    tp.exit_startBlockCDRStream() ;
-	}
+        impl.start_block();
     }
 
     public final void end_block() {
-	tp.enter_endBlockCDRStream() ;
-	try {
-	    impl.end_block();
-	} finally {
-	    tp.exit_endBlockCDRStream() ;
-	}
+        impl.end_block();
     }
 
     public final void putEndian() {
-	tp.enter_putEndianCDRStream() ;
-	try {
-	    impl.putEndian();
-	} finally {
-	    tp.exit_putEndianCDRStream() ;
-	}
+        impl.putEndian();
     }
 
     public void writeTo(java.io.OutputStream s)
 	throws IOException 
     {
-	tp.enter_writeToCDRStream() ;
-	try {
-	    impl.writeTo(s);
-	} finally {
-	    tp.exit_writeToCDRStream() ;
-	}
+        impl.writeTo(s);
     }
 
     public final byte[] toByteArray() {
@@ -824,30 +594,15 @@ public class CDROutputObject
 
     // org.omg.CORBA.DataOutputStream
     public final void write_Abstract (java.lang.Object value) {
-	tp.enter_writeAbstractToCDRStream() ;
-	try {
-	    impl.write_Abstract(value);
-	} finally {
-	    tp.exit_writeAbstractToCDRStream() ;
-	}
+        impl.write_Abstract(value);
     }
 
     public final void write_Value (java.io.Serializable value) {
-	tp.enter_writeValue2ToCDRStream() ;
-	try {
-	    impl.write_Value(value);
-	} finally {
-	    tp.exit_writeValue2ToCDRStream() ;
-	}
+        impl.write_Value(value);
     }
 
     public final void write_any_array(org.omg.CORBA.Any[] seq, int offset, int length) {
-	tp.enter_writeAnyArrayToCDRStream() ;
-	try {
-	    impl.write_any_array(seq, offset, length);
-	} finally {
-	    tp.exit_writeAnyArrayToCDRStream() ;
-	}
+        impl.write_any_array(seq, offset, length);
     }
 
     // org.omg.CORBA.portable.ValueBase
@@ -891,21 +646,11 @@ public class CDROutputObject
     }
 
     public final void write_fixed(java.math.BigDecimal bigDecimal, short digits, short scale) {
-	tp.enter_writeFixed2ToCDRStream() ;
-	try {
-	    impl.write_fixed(bigDecimal, digits, scale);
-	} finally {
-	    tp.exit_writeFixed2ToCDRStream() ;
-	}
+        impl.write_fixed(bigDecimal, digits, scale);
     }
 
     public final void writeOctetSequenceTo(org.omg.CORBA.portable.OutputStream s) {
-	tp.enter_writeOctetSequenceToCDRStream() ;
-	try {
-	    impl.writeOctetSequenceTo(s);
-	} finally {
-	    tp.exit_writeOctetSequenceToCDRStream() ;
-	}
+        impl.writeOctetSequenceTo(s);
     }
 
     public final GIOPVersion getGIOPVersion() {
@@ -932,21 +677,11 @@ public class CDROutputObject
     // ValueOutputStream -----------------------------
 
     public void start_value(String rep_id) {
-	tp.enter_startValueCDRStream() ;
-	try {
-	    impl.start_value(rep_id);
-	} finally {
-	    tp.exit_startValueCDRStream() ;
-	}
+        impl.start_value(rep_id);
     }
 
     public void end_value() {
-	tp.enter_endValueCDRStream() ;
-	try {
-	    impl.end_value();
-	} finally {
-	    tp.exit_endValueCDRStream() ;
-	}
+        impl.end_value();
     }
 }
 

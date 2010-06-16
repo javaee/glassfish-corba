@@ -51,8 +51,6 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
-
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
 import com.sun.corba.se.spi.servicecontext.ServiceContext ;
 import com.sun.corba.se.spi.servicecontext.ServiceContexts ;
@@ -88,7 +86,6 @@ public class ServiceContextsImpl implements ServiceContexts
 
     private CodeBase codeBase;
     private GIOPVersion giopVersion;
-    private TimingPoints tp ;
     private final ORBUtilSystemException wrapper ; 
 
     private String getValidSCIds() {
@@ -127,32 +124,24 @@ public class ServiceContextsImpl implements ServiceContexts
      * get(int).
      */
     @TraceServiceContext
-    private void createMapFromInputStream(InputStream is)
-    {
-	tp.enter_serviceContextsCreateMap() ;
+    private void createMapFromInputStream(InputStream is) {
+        int numValid = is.read_long() ;
+        numberValid( numValid ) ;
 
-	try {
-	    int numValid = is.read_long() ;
-            numberValid( numValid ) ;
+        for (int ctr = 0; ctr < numValid; ctr++) {
+            int scId = is.read_long();
+            readingServiceContextId(scId);
 
-	    for (int ctr = 0; ctr < numValid; ctr++) {
-		int scId = is.read_long();
-                readingServiceContextId(scId);
+            byte[] data = OctetSeqHelper.read(is);
+            serviceContextLength(data.length);
 
-		byte[] data = OctetSeqHelper.read(is);
-                serviceContextLength(data.length);
-
-		scMap.put(scId, data);
-	    }
-	} finally {
-	    tp.exit_serviceContextsCreateMap() ;
-	}
+            scMap.put(scId, data);
+        }
     }
 
     public ServiceContextsImpl( ORB orb ) {
 	this.orb = orb ;
 
-	tp = orb.getTimerManager().points() ;
 	wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
         scMap = new HashMap<Integer,Object>();
@@ -167,8 +156,7 @@ public class ServiceContextsImpl implements ServiceContexts
     /** 
      * Read the Service contexts from the input stream.
      */
-    public ServiceContextsImpl(InputStream s)
-    {
+    public ServiceContextsImpl(InputStream s) {
 	this( (ORB)(s.orb()) ) ;
 
         // We need to store this so that we can have access
@@ -195,63 +183,56 @@ public class ServiceContextsImpl implements ServiceContexts
      * the bytes.
      */
     @TraceServiceContext
-    private ServiceContext unmarshal(int scId, byte[] data) 
-    {
-	tp.enter_serviceContextsUnmarshal() ;
+    private ServiceContext unmarshal(int scId, byte[] data) {
+        ServiceContextFactoryRegistry scr = 
+            orb.getServiceContextFactoryRegistry();
 
-	try {
-	    ServiceContextFactoryRegistry scr = 
-		orb.getServiceContextFactoryRegistry();
+        ServiceContext.Factory factory = scr.find(scId);
+        ServiceContext sc = null;
 
-	    ServiceContext.Factory factory = scr.find(scId);
-	    ServiceContext sc = null;
+        if (factory == null) {
+            couldNotFindServiceContextFactory(scId);
+            sc = ServiceContextDefaults.makeUnknownServiceContext(scId, data);
+        } else {
+            foundServiceContextFactory(scId);
 
-	    if (factory == null) {
-                couldNotFindServiceContextFactory(scId);
-		sc = ServiceContextDefaults.makeUnknownServiceContext(scId, data);
-	    } else {
-                foundServiceContextFactory(scId);
+            // REVISIT.  GIOP version should be specified as
+            // part of a service context's definition, so should
+            // be accessible from ServiceContextData via
+            // its ServiceContext implementation class.
+            //
+            // Since we don't have that, yet, I'm using the GIOP
+            // version of the input stream, presuming that someone
+            // can't send a service context of a later GIOP
+            // version than its stream version.
+            //
+            // Note:  As of Jan 2001, no standard OMG or Sun service contexts
+            // ship wchar data or are defined as using anything but GIOP 1.0 CDR.
+            EncapsInputStream eis = new EncapsInputStream(orb, data, data.length, 
+                giopVersion, codeBase);
 
-		// REVISIT.  GIOP version should be specified as
-		// part of a service context's definition, so should
-		// be accessible from ServiceContextData via
-		// its ServiceContext implementation class.
-		//
-		// Since we don't have that, yet, I'm using the GIOP
-		// version of the input stream, presuming that someone
-		// can't send a service context of a later GIOP
-		// version than its stream version.
-		//
-		// Note:  As of Jan 2001, no standard OMG or Sun service contexts
-		// ship wchar data or are defined as using anything but GIOP 1.0 CDR.
-		EncapsInputStream eis = new EncapsInputStream(orb, data, data.length, 
-		    giopVersion, codeBase);
+            try {
+                eis.consumeEndian();
+                // Now the input stream passed to a ServiceContext
+                // constructor is already the encapsulation input
+                // stream with the endianness read off, so the
+                // service context should just unmarshal its own
+                // data.
+                sc =factory.create(eis, giopVersion);
+            } finally {
+                try {
+                    eis.close();
+                } catch (java.io.IOException e) {
+                    wrapper.ioexceptionDuringStreamClose(e);
+                }
+            }
 
-		try {
-		    eis.consumeEndian();
-		    // Now the input stream passed to a ServiceContext
-		    // constructor is already the encapsulation input
-		    // stream with the endianness read off, so the
-		    // service context should just unmarshal its own
-		    // data.
-		    sc =factory.create(eis, giopVersion);
-		} finally {
-		    try {
-			eis.close();
-		    } catch (java.io.IOException e) {
-			wrapper.ioexceptionDuringStreamClose(e);
-		    }
-		}
+            if (sc == null)
+                throw wrapper.svcctxUnmarshalError( 
+                    CompletionStatus.COMPLETED_MAYBE);
+        }
 
-		if (sc == null)
-		    throw wrapper.svcctxUnmarshalError( 
-			CompletionStatus.COMPLETED_MAYBE);
-	    }
-
-	    return sc;
-	} finally {
-	    tp.exit_serviceContextsUnmarshal() ;
-	}
+        return sc;
     }
 
     /** 
@@ -261,17 +242,11 @@ public class ServiceContextsImpl implements ServiceContexts
      * unmarshal them.
      */
     @TraceServiceContext
-    public void write(OutputStream os, GIOPVersion gv)
-    {
-	tp.enter_serviceContextsWrite() ;
-	try {
-	    int numsc = scMap.size();
-	    os.write_long( numsc ) ;
+    public void write(OutputStream os, GIOPVersion gv) {
+        int numsc = scMap.size();
+        os.write_long( numsc ) ;
 
-	    writeServiceContextsInOrder(os, gv);
-	} finally {
-	    tp.exit_serviceContextsWrite() ;
-	}
+        writeServiceContextsInOrder(os, gv);
     }
 
     /**
@@ -280,25 +255,19 @@ public class ServiceContextsImpl implements ServiceContexts
      * so I'm merely writing it last if present.
      */
     @TraceServiceContext
-    private void writeServiceContextsInOrder(OutputStream os, GIOPVersion gv) 
-    {
-	tp.enter_serviceContextsWriteInOrder() ;
-	try {
-	    int ueid = UEInfoServiceContext.SERVICE_CONTEXT_ID ;
+    private void writeServiceContextsInOrder(OutputStream os, GIOPVersion gv) {
+        int ueid = UEInfoServiceContext.SERVICE_CONTEXT_ID ;
 
-	    for (int i : scMap.keySet() ) {
-		if (i != ueid)
-		    writeMapEntry( os, i, scMap.get(i), gv ) ;
-	    }
+        for (int i : scMap.keySet() ) {
+            if (i != ueid)
+                writeMapEntry( os, i, scMap.get(i), gv ) ;
+        }
 
-	    // Write the UnknownExceptionInfo service context last
-	    // (so it will be after the CodeBase) 
-	    Object uesc = scMap.get(ueid) ;
-	    if (uesc != null)
-		writeMapEntry( os, ueid, uesc, gv ) ; 
-	} finally {
-	    tp.exit_serviceContextsWriteInOrder() ;
-	}
+        // Write the UnknownExceptionInfo service context last
+        // (so it will be after the CodeBase) 
+        Object uesc = scMap.get(ueid) ;
+        if (uesc != null)
+            writeMapEntry( os, ueid, uesc, gv ) ; 
     }
 
     @InfoMethod
@@ -314,32 +283,25 @@ public class ServiceContextsImpl implements ServiceContexts
      */
     @TraceServiceContext
     private void writeMapEntry(OutputStream os, int id, Object scObj, 
-	GIOPVersion gv) 
-    {
-	tp.enter_serviceContextsWriteMapEntry() ;
+	GIOPVersion gv) {
+        if (scObj instanceof byte[]) {
+            // If it's still in byte[] form, we don't need to
+            // unmarshal it here, just copy the bytes into
+            // the new stream.
+            byte[] sc = (byte[])scObj ;
 
-	try {
-	    if (scObj instanceof byte[]) {
-		// If it's still in byte[] form, we don't need to
-		// unmarshal it here, just copy the bytes into
-		// the new stream.
-		byte[] sc = (byte[])scObj ;
+            writingServiceContextBytesFor(id);
+            OctetSeqHelper.write(os, sc);
+        } else if (scObj instanceof ServiceContext) {
+            // We actually unmarshaled it into a ServiceContext
+            // at some point.
+            ServiceContext sc = (ServiceContext)scObj;
 
-                writingServiceContextBytesFor(id);
-		OctetSeqHelper.write(os, sc);
-	    } else if (scObj instanceof ServiceContext) {
-		// We actually unmarshaled it into a ServiceContext
-		// at some point.
-		ServiceContext sc = (ServiceContext)scObj;
-
-                writingServiceContext(sc);
-		sc.write(os, gv);
-	    } else {
-		wrapper.errorInServiceContextMap() ;
-	    }
-	} finally {
-	    tp.exit_serviceContextsWriteMapEntry() ;
-	}
+            writingServiceContext(sc);
+            sc.write(os, gv);
+        } else {
+            wrapper.errorInServiceContextMap() ;
+        }
     }
 
     @TraceServiceContext
@@ -364,33 +326,27 @@ public class ServiceContextsImpl implements ServiceContexts
     private void unmarshallingServiceContext( int id ) {  }
 
     @TraceServiceContext
-    public ServiceContext get(int id) 
-    {
-	tp.enter_serviceContextsGet() ;
-	try {
-	    Object result = scMap.get(id);
-	    if (result == null) {
-                serviceContextIdNotFound(id);
-		return null ;
-	    }
+    public ServiceContext get(int id) {
+        Object result = scMap.get(id);
+        if (result == null) {
+            serviceContextIdNotFound(id);
+            return null ;
+        }
 
-            serviceContextIdFound(id);
-	    
-	    // Lazy unmarshaling on first use.
-	    if (result instanceof byte[]) {
-		unmarshallingServiceContext(id) ;
+        serviceContextIdFound(id);
+        
+        // Lazy unmarshaling on first use.
+        if (result instanceof byte[]) {
+            unmarshallingServiceContext(id) ;
 
-		ServiceContext sc = unmarshal(id, (byte[])result);
+            ServiceContext sc = unmarshal(id, (byte[])result);
 
-		scMap.put(id, sc);
+            scMap.put(id, sc);
 
-		return sc;
-	    } else {
-		return (ServiceContext)result;
-	    }
-	} finally {
-	    tp.exit_serviceContextsGet() ;
-	}
+            return sc;
+        } else {
+            return (ServiceContext)result;
+        }
     }
 
     private ServiceContextsImpl(  ServiceContextsImpl scimpl ) {

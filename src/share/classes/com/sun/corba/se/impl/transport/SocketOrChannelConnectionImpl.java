@@ -85,7 +85,6 @@ import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
@@ -194,13 +193,10 @@ public class SocketOrChannelConnectionImpl
     // via one of its handleInput methods.
     protected ConcurrentHashMap<CorbaRequestId, Queue> fragmentMap;
 
-    private TimingPoints tp ;
-
     // Used in genericRPCMSGFramework test.
     protected SocketOrChannelConnectionImpl(ORB orb)
     {
 	this.orb = orb;
-	tp = orb.getTimerManager().points() ;
 	wrapper =  orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 
 	setWork(this);
@@ -355,11 +351,8 @@ public class SocketOrChannelConnectionImpl
     }
 
     @Transport
-    protected CorbaMessageMediator readBits()
-    {
+    protected CorbaMessageMediator readBits() {
 	try {
-	    tp.enter_connectionReadBits() ;
-
 	    CorbaMessageMediator messageMediator;
 	    // REVISIT - use common factory base class.
 	    if (contactInfo != null) {
@@ -408,9 +401,7 @@ public class SocketOrChannelConnectionImpl
 	    // causes IBM (screen scraping) tests to fail.
 	    //close();
 	    throw wrapper.throwableInReadBits(ex);
-	} finally {
-	    tp.exit_connectionReadBits() ;
-	}
+	} 
     }
 
     public boolean shouldUseDirectByteBuffers()
@@ -420,10 +411,8 @@ public class SocketOrChannelConnectionImpl
 
     // NOTE: This method can throw a connection rebind SystemException.
     public ByteBuffer read(int size, int offset, int length )
-	throws IOException
-    {
+	throws IOException {
 	try {
-	    tp.enter_connectionRead1() ;
 	    if (shouldUseDirectByteBuffers()) {
 	        ByteBuffer lbb = orb.getByteBufferPool().getByteBuffer(size);
 
@@ -449,7 +438,6 @@ public class SocketOrChannelConnectionImpl
 	    nbb.limit(size);
 	    return nbb;
 	} catch (IOException ioe) {
-	    tp.exit_connectionRead1() ;
 	    if (state == CLOSE_RECVD) {
 		throw wrapper.connectionRebind(ioe);
 	    } else {
@@ -465,7 +453,6 @@ public class SocketOrChannelConnectionImpl
 	throws IOException
     {
 	try {
-	    tp.enter_connectionRead2() ;
 	    int size = offset + length;
 	    if (shouldUseDirectByteBuffers()) {
 	        if (size > byteBuffer.capacity()) {
@@ -501,9 +488,7 @@ public class SocketOrChannelConnectionImpl
 	    } else {
 		throw ioe;
 	    }
-	} finally {
-	    tp.exit_connectionRead2() ;
-        }
+	} 
     }
 
     // REVISIT - Logic in this method that utilizes TCP timeouts can be removed
@@ -641,10 +626,7 @@ public class SocketOrChannelConnectionImpl
     }    
 
     // NOTE: This method can throw a connection rebind SystemException.
-    public void write(ByteBuffer byteBuffer)
-	throws IOException
-    {
-	tp.enter_connectionWrite() ;
+    public void write(ByteBuffer byteBuffer) throws IOException {
         try {
             if (shouldUseDirectByteBuffers()) {
 
@@ -730,19 +712,15 @@ public class SocketOrChannelConnectionImpl
 	    } else {
 		throw ioe;
 	    }
-	} finally {
-	    tp.exit_connectionWrite() ;
-	}
+	} 
     }
 
     /**
      * Note:it is possible for this to be called more than once
      */
     @Transport
-    public synchronized void close() 
-    {
+    public synchronized void close() {
 	try {
-	    tp.enter_connectionClose() ;
 	    writeLock();
 
 	    // REVISIT It will be good to have a read lock on the reader thread
@@ -782,10 +760,7 @@ public class SocketOrChannelConnectionImpl
 	    }
 
             closeConnectionResources();
-
-	} finally {
-	    tp.exit_connectionClose() ;
-	}
+	} 
     }
 
     @Transport
@@ -913,86 +888,80 @@ public class SocketOrChannelConnectionImpl
      */
     @Transport
     public void writeLock() {
-	try {
-	    tp.enter_connectionWriteLock() ;
+        // Keep looping till we can set the writeLock.
+        while ( true ) {
+            int localState;
+            synchronized (stateEvent) {
+                localState = state;
+            }
 
-	    // Keep looping till we can set the writeLock.
-	    while ( true ) {
-		int localState;
-		synchronized (stateEvent) {
-		    localState = state;
-		}
+            localStateInfo( localState ) ;
 
-                localStateInfo( localState ) ;
-
-		switch (localState) {
-		     
-		case OPENING:
-		    synchronized (stateEvent) {
-			if (state != OPENING) {
-			    // somebody has changed 'state' so be careful
-			    break;
-			}
-			try {
-			    stateEvent.wait();
-			} catch (InterruptedException ie) {
-                            // XXX log this
-			}
-		    }
-		    // Loop back
-		    break;
-		
-		case ESTABLISHED:
-		    synchronized (writeEvent) {
-			if (!writeLocked) {
-			    writeLocked = true;
-			    return;
-			}
-		    
-			try {
-			    // do not stay here too long if state != ESTABLISHED
-			    // Bug 4752117
-			    while (state == ESTABLISHED && writeLocked) {
-				writeEvent.wait(100);
-			    }
-			} catch (InterruptedException ie) {
-                            // XXX log this
-			}
-		    }
-		    // Loop back
-		    break;
-		
-		    //
-		    // XXX
-		    // Need to distinguish between client and server roles
-		    // here probably.
-		    //
-		case ABORT:
-		    synchronized ( stateEvent ){
-			if (state != ABORT) {
-			    break;
-			}
-			throw wrapper.writeErrorSend() ;
-		    }
-		     
-		case CLOSE_RECVD:
-		    // the connection has been closed or closing
-		    // ==> throw rebind exception
-		    synchronized ( stateEvent ){
-			if (state != CLOSE_RECVD) {
-			    break;
-			}
-			throw wrapper.connectionRebind() ;
-		    }
-		
-		default:
-		    // REVISIT
-		    throw new RuntimeException(".writeLock: bad state");
-		}
-	    }
-	} finally {
-	    tp.exit_connectionWriteLock() ;
-	}
+            switch (localState) {
+                 
+            case OPENING:
+                synchronized (stateEvent) {
+                    if (state != OPENING) {
+                        // somebody has changed 'state' so be careful
+                        break;
+                    }
+                    try {
+                        stateEvent.wait();
+                    } catch (InterruptedException ie) {
+                        // XXX log this
+                    }
+                }
+                // Loop back
+                break;
+            
+            case ESTABLISHED:
+                synchronized (writeEvent) {
+                    if (!writeLocked) {
+                        writeLocked = true;
+                        return;
+                    }
+                
+                    try {
+                        // do not stay here too long if state != ESTABLISHED
+                        // Bug 4752117
+                        while (state == ESTABLISHED && writeLocked) {
+                            writeEvent.wait(100);
+                        }
+                    } catch (InterruptedException ie) {
+                        // XXX log this
+                    }
+                }
+                // Loop back
+                break;
+            
+                //
+                // XXX
+                // Need to distinguish between client and server roles
+                // here probably.
+                //
+            case ABORT:
+                synchronized ( stateEvent ){
+                    if (state != ABORT) {
+                        break;
+                    }
+                    throw wrapper.writeErrorSend() ;
+                }
+                 
+            case CLOSE_RECVD:
+                // the connection has been closed or closing
+                // ==> throw rebind exception
+                synchronized ( stateEvent ){
+                    if (state != CLOSE_RECVD) {
+                        break;
+                    }
+                    throw wrapper.connectionRebind() ;
+                }
+            
+            default:
+                // REVISIT
+                throw new RuntimeException(".writeLock: bad state");
+            }
+        }
     }
 
     @Transport
@@ -1107,8 +1076,6 @@ public class SocketOrChannelConnectionImpl
     @Transport
     public void doWork() {
 	try {
-	    tp.enter_connectionEventHandler() ;
-
 	    // IMPORTANT: Sanity checks on SelectionKeys such as
 	    //            SelectorKey.isValid() should not be done
 	    //            here.
@@ -1122,9 +1089,7 @@ public class SocketOrChannelConnectionImpl
             }
 	} catch (Throwable t) {
             exceptionInfo(t);
-	} finally {
-	    tp.exit_connectionEventHandler() ;
-	}
+	} 
     }
 
     public void setEnqueueTime(long timeInMillis)

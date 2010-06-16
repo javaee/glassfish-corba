@@ -97,7 +97,6 @@ import com.sun.corba.se.impl.orbutil.DprintUtil ;
 import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
 import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
 import com.sun.corba.se.impl.orbutil.RepositoryIdFactory;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
@@ -119,7 +118,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     ByteBufferWithInfo bbwi;
 
     protected ORB orb;
-    protected TimingPoints tp;
     protected ORBUtilSystemException wrapper ;
 
     // XXX These appear to always contain the same value: remove one
@@ -189,7 +187,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     {
         // ORB must not be null.  See CDROutputStream constructor.
         this.orb = (ORB)orb;
-	tp = this.orb.getTimerManager().points() ;
 	this.wrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 
         this.littleEndian = littleEndian;
@@ -622,20 +619,13 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @CdrWrite
-    public void write_any(Any any) 
-    {
-        tp.enter_writeAny() ;
-
-        try {
-            if ( any == null ) {
-                throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
-            }
-
-            write_TypeCode(any.type());
-            any.write_value(parent);
-        } finally {
-            tp.exit_writeAny() ;
+    public void write_any(Any any) {
+        if ( any == null ) {
+            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
         }
+
+        write_TypeCode(any.type());
+        any.write_value(parent);
     }
 
     @CdrWrite
@@ -811,12 +801,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
         // Allow the ValueHandler to call writeReplace on
         // the Serializable (if the method is present)
-        tp.enter_callValueHandlerWriteReplaceFromCDRStream() ;
-        try {
-            object = valueHandler.writeReplace(key);
-        } finally {
-            tp.exit_callValueHandlerWriteReplaceFromCDRStream() ;
-        }
+        object = valueHandler.writeReplace(key);
 		
         if (object != key) {
 	    if (object == null) {
@@ -833,12 +818,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             clazz = object.getClass();
         }
 
-        tp.enter_callValueHandlerIsCustomMarshaledFromCDRStream() ;
-        try {
-            mustChunk = valueHandler.isCustomMarshaled(clazz) ;
-        } finally {
-            tp.exit_callValueHandlerIsCustomMarshaledFromCDRStream() ;
-        }
+        mustChunk = valueHandler.isCustomMarshaled(clazz) ;
 				
         // Write value_tag
         int indirection = writeValueTag(mustChunk, true, getCodebase(clazz));
@@ -865,16 +845,11 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	boolean currentMustChunk = mustChunk ;
 	startValueChunk(currentMustChunk) ;
 
-        tp.enter_callValueHandlerWriteValueFromCDRStream() ;
-        try {
-            if (valueHandler instanceof ValueHandlerMultiFormat) {
-                ValueHandlerMultiFormat vh = (ValueHandlerMultiFormat)valueHandler;
-                vh.writeValue(parent, object, streamFormatVersion);
-            } else {
-                valueHandler.writeValue(parent, object);
-            }
-        } finally {
-            tp.exit_callValueHandlerWriteValueFromCDRStream() ;
+        if (valueHandler instanceof ValueHandlerMultiFormat) {
+            ValueHandlerMultiFormat vh = (ValueHandlerMultiFormat)valueHandler;
+            vh.writeValue(parent, object, streamFormatVersion);
+        } else {
+            valueHandler.writeValue(parent, object);
         }
 
 	endValueChunk(currentMustChunk) ;
@@ -1155,6 +1130,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     // ------------ End RMI related methods --------------------------
     
+    @CdrWrite
     public final void write_boolean_array(boolean[]value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1171,6 +1147,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         handleSpecialChunkEnd();
     }
 
+    @CdrWrite
     public final void write_char_array(char[]value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1187,6 +1164,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         handleSpecialChunkEnd();
     }
 
+    @CdrWrite
     public void write_wchar_array(char[]value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1203,6 +1181,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         handleSpecialChunkEnd();
     }
 
+    @CdrWrite
     public final void write_short_array(short[]value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1223,6 +1202,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     	write_short_array(value, offset, length);
     }
 
+    @CdrWrite
     public final void write_long_array(int[]value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1243,6 +1223,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     	write_long_array(value, offset, length);
     }
 
+    @CdrWrite
     public final void write_longlong_array(long[]value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1263,6 +1244,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     	write_longlong_array(value, offset, length);
     }
 
+    @CdrWrite
     public final void write_float_array(float[]value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1279,6 +1261,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         handleSpecialChunkEnd();
     }
 
+    @CdrWrite
     public final void write_double_array(double[]value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1295,6 +1278,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         handleSpecialChunkEnd();
     }
 
+    @CdrWrite
     public void write_string_array(String[] value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1305,6 +1289,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
     }
     
+    @CdrWrite
     public void write_wstring_array(String[] value, int offset, int length) {
         if ( value == null ) {
             throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
@@ -1315,6 +1300,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         }
     }
 
+    @CdrWrite
     public final void write_any_array(org.omg.CORBA.Any value[], int offset, int length)
     {
     	for(int i = 0; i < length; i++) {

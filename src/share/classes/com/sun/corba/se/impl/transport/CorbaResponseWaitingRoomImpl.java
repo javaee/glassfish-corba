@@ -56,7 +56,6 @@ import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
@@ -78,8 +77,6 @@ public class CorbaResponseWaitingRoomImpl
         Condition condition = lock.newCondition();
     }
 
-    private TimingPoints tp ;
-
     // Maps requestId to an OutCallDesc.
     final private Map<Integer, OutCallDesc> out_calls;
     final private ORB orb;
@@ -90,7 +87,6 @@ public class CorbaResponseWaitingRoomImpl
     public CorbaResponseWaitingRoomImpl(ORB orb, CorbaConnection connection)
     {
 	this.orb = orb;
-	tp = orb.getTimerManager().points() ;
 	this.wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 	this.connection = connection;
         this.out_calls = 
@@ -134,95 +130,89 @@ public class CorbaResponseWaitingRoomImpl
 
     @Transport
     public CDRInputObject waitForResponse(CorbaMessageMediator messageMediator) {
-        try {
-            tp.enter_waitForResponse() ;
-            CDRInputObject returnStream = null;
-            
-            display( "messageMediator request ID",
-                messageMediator.getRequestId() ) ;
-            display( "messageMediator operation name",
-                messageMediator.getOperationName() ) ;
-            
-            Integer requestId = messageMediator.getRequestIdInteger();
-            
-            if (messageMediator.isOneWay()) {
-                // The waiter is removed in releaseReply in the same
-                // way as a normal request.
-                display( "Oneway request: not waiting") ;
-                return null;
-            }
-            
-            OutCallDesc call = out_calls.get(requestId);
-            if (call == null) {
-                throw wrapper.nullOutCall(CompletionStatus.COMPLETED_MAYBE);
-            }
-
-            // Value from ORBData is in milliseconds, will convert it nanoseconds
-            // to use it with Condition.awaitNanos()
-            long waitForResponseTimeout =
-                    orb.getORBData().getWaitForResponseTimeout() * 1000 * 1000;
-            
-            try {
-                call.lock.lock();
-                while (call.inputObject == null && call.exception == null) {
-                    // Wait for the reply from the server.
-                    // The ReaderThread reads in the reply IIOP message
-                    // and signals us.
-                    try {
-                        display( "Waiting for response..." ) ;
-                        
-                        waitForResponseTimeout =
-                                call.condition.awaitNanos(waitForResponseTimeout);
-                        if (call.inputObject == null && call.exception == null) {
-                            if (waitForResponseTimeout > 0) {
-                                // it's a "spurious wait wakeup", need to
-                                // continue to wait for a response
-                                display( "Spurious wakeup, continuing to wait for ",
-                                    waitForResponseTimeout/1000000 );
-                            } else {
-                                // timed out waiting for data
-                                call.exception =
-                                        wrapper.communicationsTimeoutWaitingForResponse(
-                                        CompletionStatus.COMPLETED_MAYBE,
-                                        orb.getORBData().getWaitForResponseTimeout());
-                                // REVISIT:
-                                // Normally the inputObject or exception is
-                                // created from the response stream.
-                                // Need to fake encoding version since
-                                // it is expected to be popped in endRequest.
-                                ORBUtility.pushEncVersionToThreadLocalState(
-                                        ORBConstants.JAVA_ENC_VERSION);
-                            }
-                        }
-                    } catch (InterruptedException ie) {};
-                }
-                if (call.exception != null) {
-                    display( "Exception from call", call.exception ) ;
-                    throw call.exception;
-                }
-                
-                returnStream = call.inputObject;
-            } finally {
-                call.lock.unlock();
-            }
-            
-            // REVISIT -- exceptions from unmarshaling code will
-            // go up through this client thread!
-            
-            if (returnStream != null) {
-                // On fragmented streams the header MUST be unmarshaled here
-                // (in the client thread) in case it blocks.
-                // If the header was already unmarshaled, this won't
-                // do anything
-                // REVISIT: cast - need interface method.
-                ((CDRInputObject)returnStream).unmarshalHeader();
-            }
-            
-            return returnStream;
-            
-        } finally {
-            tp.exit_waitForResponse() ;
+        CDRInputObject returnStream = null;
+        
+        display( "messageMediator request ID",
+            messageMediator.getRequestId() ) ;
+        display( "messageMediator operation name",
+            messageMediator.getOperationName() ) ;
+        
+        Integer requestId = messageMediator.getRequestIdInteger();
+        
+        if (messageMediator.isOneWay()) {
+            // The waiter is removed in releaseReply in the same
+            // way as a normal request.
+            display( "Oneway request: not waiting") ;
+            return null;
         }
+        
+        OutCallDesc call = out_calls.get(requestId);
+        if (call == null) {
+            throw wrapper.nullOutCall(CompletionStatus.COMPLETED_MAYBE);
+        }
+
+        // Value from ORBData is in milliseconds, will convert it nanoseconds
+        // to use it with Condition.awaitNanos()
+        long waitForResponseTimeout =
+                orb.getORBData().getWaitForResponseTimeout() * 1000 * 1000;
+        
+        try {
+            call.lock.lock();
+            while (call.inputObject == null && call.exception == null) {
+                // Wait for the reply from the server.
+                // The ReaderThread reads in the reply IIOP message
+                // and signals us.
+                try {
+                    display( "Waiting for response..." ) ;
+                    
+                    waitForResponseTimeout =
+                            call.condition.awaitNanos(waitForResponseTimeout);
+                    if (call.inputObject == null && call.exception == null) {
+                        if (waitForResponseTimeout > 0) {
+                            // it's a "spurious wait wakeup", need to
+                            // continue to wait for a response
+                            display( "Spurious wakeup, continuing to wait for ",
+                                waitForResponseTimeout/1000000 );
+                        } else {
+                            // timed out waiting for data
+                            call.exception =
+                                    wrapper.communicationsTimeoutWaitingForResponse(
+                                    CompletionStatus.COMPLETED_MAYBE,
+                                    orb.getORBData().getWaitForResponseTimeout());
+                            // REVISIT:
+                            // Normally the inputObject or exception is
+                            // created from the response stream.
+                            // Need to fake encoding version since
+                            // it is expected to be popped in endRequest.
+                            ORBUtility.pushEncVersionToThreadLocalState(
+                                    ORBConstants.JAVA_ENC_VERSION);
+                        }
+                    }
+                } catch (InterruptedException ie) {};
+            }
+            if (call.exception != null) {
+                display( "Exception from call", call.exception ) ;
+                throw call.exception;
+            }
+            
+            returnStream = call.inputObject;
+        } finally {
+            call.lock.unlock();
+        }
+        
+        // REVISIT -- exceptions from unmarshaling code will
+        // go up through this client thread!
+        
+        if (returnStream != null) {
+            // On fragmented streams the header MUST be unmarshaled here
+            // (in the client thread) in case it blocks.
+            // If the header was already unmarshaled, this won't
+            // do anything
+            // REVISIT: cast - need interface method.
+            ((CDRInputObject)returnStream).unmarshalHeader();
+        }
+        
+        return returnStream;
     }
 
     @InfoMethod

@@ -134,6 +134,7 @@ import com.sun.corba.se.spi.trace.Giop;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
 import com.sun.corba.se.spi.trace.Naming;
 import com.sun.corba.se.spi.trace.OrbLifeCycle;
+import com.sun.corba.se.spi.trace.DynamicType ;
 import com.sun.corba.se.spi.trace.Orbd;
 import com.sun.corba.se.spi.trace.Poa;
 import com.sun.corba.se.spi.trace.PoaFSM;
@@ -256,6 +257,9 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public boolean orbLifecycleDebugFlag = false ;
 
     public boolean operationTraceDebugFlag = false ;
+
+    @DynamicType
+    public boolean dynamicTypeDebugFlag = false ;
 
     @ManagedAttribute
     @Description( "The current settings of the ORB debug flags" )

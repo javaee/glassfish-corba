@@ -57,7 +57,6 @@ import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
 
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 
@@ -72,7 +71,6 @@ public class CorbaContactInfoListIteratorImpl
     protected CorbaContactInfoList contactInfoList;
     protected RuntimeException failureException;
     protected ORBUtilSystemException wrapper;
-    private TimingPoints tp ;
     private boolean usePRLB ;
     protected TcpTimeouts tcpTimeouts ;
 
@@ -98,7 +96,6 @@ public class CorbaContactInfoListIteratorImpl
         boolean usePerRequestLoadBalancing )
     {
 	this.orb = orb;
-	this.tp = orb.getTimerManager().points() ;
 	this.wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 	this.tcpTimeouts = orb.getORBData().getTransportTcpConnectTimeouts() ;
 	this.contactInfoList = corbaContactInfoList;
@@ -148,104 +145,91 @@ public class CorbaContactInfoListIteratorImpl
     @Transport
     public boolean hasNext() {
 	boolean result = false;
-	try {
-	    tp.enter_contactInfoListIteratorHasNext() ;
+        if (retryWithPreviousContactInfo) {
+            display("backoff before retry previous");
 
-	    if (retryWithPreviousContactInfo) {
-                display("backoff before retry previous");
+            if (waiter.isExpired()) {
+                display("time to wait for connection exceeded " ,
+                   tcpTimeouts.get_max_time_to_wait());
+                
+                // NOTE: Need to indicate the timeout.
+                // And it needs to break the loop in the delegate.
+                failureException = wrapper.communicationsRetryTimeout(
+                    failureException,
+                        Long.toString(tcpTimeouts.get_max_time_to_wait()));
+                return false;
+            }
 
-		if (waiter.isExpired()) {
-                    display("time to wait for connection exceeded " ,
-                       tcpTimeouts.get_max_time_to_wait());
-		    
-		    // NOTE: Need to indicate the timeout.
-		    // And it needs to break the loop in the delegate.
-		    failureException = wrapper.communicationsRetryTimeout(
-                        failureException,
-			    Long.toString(tcpTimeouts.get_max_time_to_wait()));
-		    return false;
-		}
+            waiter.sleepTime() ;
+            waiter.advance() ;
+            return true;
+        }
 
-		waiter.sleepTime() ;
-		waiter.advance() ;
-		return true;
-	    }
+        if (isAddrDispositionRetry) {
+            return true;
+        }
 
-	    if (isAddrDispositionRetry) {
-		return true;
-	    }
+        if (primaryToContactInfo != null) {
+            result = primaryToContactInfo.hasNext( primaryContactInfo, 
+                previousContactInfo, listOfContactInfos);
+        } else {
+            result = effectiveTargetIORIterator.hasNext();
+        }
 
-	    if (primaryToContactInfo != null) {
-		result = primaryToContactInfo.hasNext( primaryContactInfo, 
-		    previousContactInfo, listOfContactInfos);
-	    } else {
-		result = effectiveTargetIORIterator.hasNext();
-	    }
+        if (!result && !waiter.isExpired()) {
+            display("Reached end of ContactInfoList list. Starting at beginning");
 
-	    if (!result && !waiter.isExpired()) {
-                display("Reached end of ContactInfoList list. Starting at beginning");
+            previousContactInfo = null;
+            if (primaryToContactInfo != null) {
+                primaryToContactInfo.reset(primaryContactInfo);
+            } else {
+                // Argela:
+                effectiveTargetIORIterator = listOfContactInfos.iterator() ;
+            }
 
-		previousContactInfo = null;
-		if (primaryToContactInfo != null) {
-		    primaryToContactInfo.reset(primaryContactInfo);
-		} else {
-                    // Argela:
-		    effectiveTargetIORIterator = listOfContactInfos.iterator() ;
-		}
+            result = hasNext();
+            return result;
+        }
 
-		result = hasNext();
-		return result;
-	    }
-
-	    return result;
-	} finally {
-	    tp.exit_contactInfoListIteratorHasNext() ;
-	}
+        return result;
     }
 
     @Transport
-    public CorbaContactInfo next()
-    {
-	try {
-	    tp.enter_contactInfoListIteratorNext() ;
+    public CorbaContactInfo next() {
+        if (retryWithPreviousContactInfo) {
+            retryWithPreviousContactInfo = false;
+            return previousContactInfo;
+        }
 
-	    if (retryWithPreviousContactInfo) {
-		retryWithPreviousContactInfo = false;
-		return previousContactInfo;
-	    }
+        if (isAddrDispositionRetry) {
+            isAddrDispositionRetry = false;
+            return previousContactInfo;
+        }
 
-	    if (isAddrDispositionRetry) {
-		isAddrDispositionRetry = false;
-		return previousContactInfo;
-	    }
+        // We hold onto the last in case we get an addressing
+        // disposition retry.  Then we use it again.
 
-	    // We hold onto the last in case we get an addressing
-	    // disposition retry.  Then we use it again.
+        // We also hold onto it for the sticky manager.
 
-	    // We also hold onto it for the sticky manager.
+        if (primaryToContactInfo != null) {
+            previousContactInfo = (CorbaContactInfo)
+                primaryToContactInfo.next(primaryContactInfo,
+                                          previousContactInfo,
+                                          listOfContactInfos);
+        } else {
+            previousContactInfo = effectiveTargetIORIterator.next();
+        }
 
-	    if (primaryToContactInfo != null) {
-		previousContactInfo = (CorbaContactInfo)
-		    primaryToContactInfo.next(primaryContactInfo,
-					      previousContactInfo,
-					      listOfContactInfos);
-	    } else {
-		previousContactInfo = effectiveTargetIORIterator.next();
-	    }
+        // We must use waiter here regardless of whether or not
+        // there is a IIOPPrimaryToContactInfo or not.
+        // Failure to do this resulted in bug 6568174.
+        if (failedEndpoints.contains(previousContactInfo)) {
+            failedEndpoints.clear() ;
+            waiter.sleepTime() ;
+            waiter.advance() ;
+        }
 
-	    // We must use waiter here regardless of whether or not
-	    // there is a IIOPPrimaryToContactInfo or not.
-	    // Failure to do this resulted in bug 6568174.
-	    if (failedEndpoints.contains(previousContactInfo)) {
-		failedEndpoints.clear() ;
-		waiter.sleepTime() ;
-		waiter.advance() ;
-	    }
-
-	    return previousContactInfo;
-	} finally {
-	    tp.exit_contactInfoListIteratorNext() ;
-	}
+        return previousContactInfo;
     }
 
     public void remove()
@@ -270,54 +254,49 @@ public class CorbaContactInfoListIteratorImpl
     public boolean reportException(CorbaContactInfo contactInfo,
 				   RuntimeException ex) {
 	boolean result = false;
-	try {
-            display( "contactInfo", contactInfo) ;
-	    tp.enter_contactInfoListIteratorReportException() ;
+        display( "contactInfo", contactInfo) ;
 
-	    failedEndpoints.add( contactInfo ) ;
-	    this.failureException = ex;
-	    if (ex instanceof COMM_FAILURE) {
-		SystemException se = (SystemException) ex;
-		if (se.minor == ORBUtilSystemException.CONNECTION_REBIND) {
-                    display( "COMM_FAILURE(connection rebind): " 
-                        + "retry with previous contact info", ex ) ;
+        failedEndpoints.add( contactInfo ) ;
+        this.failureException = ex;
+        if (ex instanceof COMM_FAILURE) {
+            SystemException se = (SystemException) ex;
+            if (se.minor == ORBUtilSystemException.CONNECTION_REBIND) {
+                display( "COMM_FAILURE(connection rebind): " 
+                    + "retry with previous contact info", ex ) ;
 
-		    retryWithPreviousContactInfo = true;
-		    result = true;
-		    return result;
-		} else {
-		    if (se.completed == CompletionStatus.COMPLETED_NO) {
-			if (hasNext()) {
-                            display( "COMM_FAILURE(COMPLETED_NO, hasNext true): "
-                                + "retry with next contact info", ex ) ;
-			    result = true;
-			    return result;
-			}
-			if (contactInfoList.getEffectiveTargetIOR() !=
-			    contactInfoList.getTargetIOR()) {
-                            display( "COMM_FAILURE(COMPLETED_NO, hasNext false, " +
-                                "effective != target): "
-                                + "retry with target", ex ) ;
+                retryWithPreviousContactInfo = true;
+                result = true;
+                return result;
+            } else {
+                if (se.completed == CompletionStatus.COMPLETED_NO) {
+                    if (hasNext()) {
+                        display( "COMM_FAILURE(COMPLETED_NO, hasNext true): "
+                            + "retry with next contact info", ex ) ;
+                        result = true;
+                        return result;
+                    }
+                    if (contactInfoList.getEffectiveTargetIOR() !=
+                        contactInfoList.getTargetIOR()) {
+                        display( "COMM_FAILURE(COMPLETED_NO, hasNext false, " +
+                            "effective != target): "
+                            + "retry with target", ex ) ;
 
-			    // retry from root ior
-			    updateEffectiveTargetIOR(contactInfoList.getTargetIOR());
-			    result = true;
-			    return result;
-			}
-		    }
-		}
-	    } else if (ex instanceof TRANSIENT) {
-                display( "TRANSIENT: retry with previous contact info", ex ) ;
-		retryWithPreviousContactInfo = true;
-		result = true;
-		return result;
-	    }
-	    result = false;
-	    waiter.reset() ; // not strictly necessary.
-	    return result;
-	} finally {
-	    tp.exit_contactInfoListIteratorReportException() ;
-	}
+                        // retry from root ior
+                        updateEffectiveTargetIOR(contactInfoList.getTargetIOR());
+                        result = true;
+                        return result;
+                    }
+                }
+            }
+        } else if (ex instanceof TRANSIENT) {
+            display( "TRANSIENT: retry with previous contact info", ex ) ;
+            retryWithPreviousContactInfo = true;
+            result = true;
+            return result;
+        }
+        result = false;
+        waiter.reset() ; // not strictly necessary.
+        return result;
     }
 
     public RuntimeException getFailureException()

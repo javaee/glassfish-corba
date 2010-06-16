@@ -127,8 +127,6 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.DprintUtil;
 import com.sun.corba.se.impl.orbutil.CacheTable;
 
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
-
 import com.sun.org.omg.SendingContext.CodeBase;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
@@ -151,7 +149,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     protected boolean littleEndian;
     protected ORB orb;
-    protected TimingPoints tp ;
     protected ORBUtilSystemException wrapper ;
     protected OMGSystemException omgWrapper ;
     protected ValueHandler valueHandler = null;
@@ -247,7 +244,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                      BufferManagerRead bufferManager) 
     {
         this.orb = (ORB)orb;
-	this.tp = this.orb.getTimerManager().points() ;
 	this.wrapper = ((ORB)orb).getLogWrapperTable()
 	    .get_RPC_ENCODING_ORBUtil() ;
 	this.omgWrapper = ((ORB)orb).getLogWrapperTable()
@@ -1019,13 +1015,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 valueHandler = ORBUtility.createValueHandler(orb);
             }
 
-            tp.enter_callValueHandlerReadValueFromCDRStream() ;
-            try {
-                return valueHandler.readValue(parent, indirection, valueClass, 
-                    repositoryIDString, getCodeBase());
-            } finally {
-                tp.exit_callValueHandlerReadValueFromCDRStream() ;
-            }
+            return valueHandler.readValue(parent, indirection, valueClass, 
+                repositoryIDString, getCodeBase());
 	} catch(SystemException sysEx) {
 	    // Just rethrow any CORBA system exceptions
 	    // that come out of the ValueHandler

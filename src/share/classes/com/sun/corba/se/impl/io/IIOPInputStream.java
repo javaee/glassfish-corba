@@ -1310,7 +1310,7 @@ public class IIOPInputStream
         return descs;
     }
 
-    // XXX Do we want to replace this with something integrsated with the 
+    // XXX Do we want to replace this with something integrated with the 
     // tracing facility?
     private String displayFVD( FullValueDescription fvd ) {
         StringBuilder sb = new StringBuilder() ;

@@ -58,7 +58,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
+import com.sun.corba.se.spi.trace.Transport ;
 
 /**
  * This implements the GIOP 1.2 Reply header.
@@ -67,13 +67,13 @@ import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
  * @version 1.0
  */
 
+@Transport
 public final class ReplyMessage_1_2 extends Message_1_2
         implements ReplyMessage {
 
     // Instance variables
 
     private ORB orb = null;
-    private TimingPoints tp = null ;
     private ORBUtilSystemException wrapper = null ;
     private int reply_status = (int) 0;
     private ServiceContexts service_contexts = null ;
@@ -88,7 +88,6 @@ public final class ReplyMessage_1_2 extends Message_1_2
     ReplyMessage_1_2(ORB orb) {
 	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
         this.orb = orb;
-	this.tp = orb.getTimerManager().points() ;
 	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
     }
 
@@ -97,7 +96,6 @@ public final class ReplyMessage_1_2 extends Message_1_2
         super(Message.GIOPBigMagic, GIOPVersion.V1_2, FLAG_NO_FRAG_BIG_ENDIAN,
             Message.GIOPReply, 0);
         this.orb = orb;
-	this.tp = orb.getTimerManager().points() ;
 	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
         request_id = _request_id;
         reply_status = _reply_status;
@@ -139,87 +137,79 @@ public final class ReplyMessage_1_2 extends Message_1_2
     }
 
     // IO methods
+    @Transport
     public void read(org.omg.CORBA.portable.InputStream istream) {
-	tp.enter_giopHeaderReadReply() ;
-	try {
-	    super.read(istream);
-	    this.request_id = istream.read_ulong();
-	    this.reply_status = istream.read_long();
-	    isValidReplyStatus(this.reply_status); // raises exception on error
-	    this.service_contexts = ServiceContextDefaults.makeServiceContexts(
-		(org.omg.CORBA_2_3.portable.InputStream)istream ) ;
+        super.read(istream);
+        this.request_id = istream.read_ulong();
+        this.reply_status = istream.read_long();
+        isValidReplyStatus(this.reply_status); // raises exception on error
+        this.service_contexts = ServiceContextDefaults.makeServiceContexts(
+            (org.omg.CORBA_2_3.portable.InputStream)istream ) ;
 
-	    // CORBA formal 00-11-0 15.4.2.2 GIOP 1.2 body must be
-	    // aligned on an 8 octet boundary.
-	    // Ensures that the first read operation called from the stub code,
-	    // during body deconstruction, would skip the header padding, that was
-	    // inserted to ensure that the body was aligned on an 8-octet boundary.
-	    ((CDRInputObject)istream).setHeaderPadding(true);
+        // CORBA formal 00-11-0 15.4.2.2 GIOP 1.2 body must be
+        // aligned on an 8 octet boundary.
+        // Ensures that the first read operation called from the stub code,
+        // during body deconstruction, would skip the header padding, that was
+        // inserted to ensure that the body was aligned on an 8-octet boundary.
+        ((CDRInputObject)istream).setHeaderPadding(true);
 
-	    // The code below reads the reply body in some cases
-	    // SYSTEM_EXCEPTION & LOCATION_FORWARD & LOCATION_FORWARD_PERM &
-	    // NEEDS_ADDRESSING_MODE
-	    if (this.reply_status == SYSTEM_EXCEPTION) {
+        // The code below reads the reply body in some cases
+        // SYSTEM_EXCEPTION & LOCATION_FORWARD & LOCATION_FORWARD_PERM &
+        // NEEDS_ADDRESSING_MODE
+        if (this.reply_status == SYSTEM_EXCEPTION) {
 
-		String reposId = istream.read_string();
-		this.exClassName = ORBUtility.classNameOf(reposId);
-		this.minorCode = istream.read_long();
-		int status = istream.read_long();
+            String reposId = istream.read_string();
+            this.exClassName = ORBUtility.classNameOf(reposId);
+            this.minorCode = istream.read_long();
+            int status = istream.read_long();
 
-		switch (status) {
-		case CompletionStatus._COMPLETED_YES:
-		    this.completionStatus = CompletionStatus.COMPLETED_YES;
-		    break;
-		case CompletionStatus._COMPLETED_NO:
-		    this.completionStatus = CompletionStatus.COMPLETED_NO;
-		    break;
-		case CompletionStatus._COMPLETED_MAYBE:
-		    this.completionStatus = CompletionStatus.COMPLETED_MAYBE;
-		    break;
-		default:
-		    throw wrapper.badCompletionStatusInReply( 
-			CompletionStatus.COMPLETED_MAYBE, status );
-		}
+            switch (status) {
+            case CompletionStatus._COMPLETED_YES:
+                this.completionStatus = CompletionStatus.COMPLETED_YES;
+                break;
+            case CompletionStatus._COMPLETED_NO:
+                this.completionStatus = CompletionStatus.COMPLETED_NO;
+                break;
+            case CompletionStatus._COMPLETED_MAYBE:
+                this.completionStatus = CompletionStatus.COMPLETED_MAYBE;
+                break;
+            default:
+                throw wrapper.badCompletionStatusInReply( 
+                    CompletionStatus.COMPLETED_MAYBE, status );
+            }
 
-	    } else if (this.reply_status == USER_EXCEPTION) {
-		// do nothing. The client stub will read the exception from body.
-	    } else if ( (this.reply_status == LOCATION_FORWARD) ||
-		    (this.reply_status == LOCATION_FORWARD_PERM) ){
-		CDRInputObject cdr = (CDRInputObject) istream;
-		this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
-	    }  else if (this.reply_status == NEEDS_ADDRESSING_MODE) {
-		// read GIOP::AddressingDisposition from body and resend the
-		// original request using the requested addressing mode. The
-		// resending is transparent to the client program.
-		this.addrDisposition = AddressingDispositionHelper.read(istream);            
-	    }
-	} finally {
-	    tp.exit_giopHeaderReadReply() ;
-	}
+        } else if (this.reply_status == USER_EXCEPTION) {
+            // do nothing. The client stub will read the exception from body.
+        } else if ( (this.reply_status == LOCATION_FORWARD) ||
+                (this.reply_status == LOCATION_FORWARD_PERM) ){
+            CDRInputObject cdr = (CDRInputObject) istream;
+            this.ior = IORFactories.makeIOR( orb, (InputStream)cdr ) ;
+        }  else if (this.reply_status == NEEDS_ADDRESSING_MODE) {
+            // read GIOP::AddressingDisposition from body and resend the
+            // original request using the requested addressing mode. The
+            // resending is transparent to the client program.
+            this.addrDisposition = AddressingDispositionHelper.read(istream);            
+        }
     }
 
     // Note, this writes only the header information. SystemException or
     // IOR or GIOP::AddressingDisposition may be written afterwards into the
     // reply mesg body.
+    @Transport
     public void write(org.omg.CORBA.portable.OutputStream ostream) {
-	tp.enter_giopHeaderReadReply() ;
-	try {
-	    super.write(ostream);
-	    ostream.write_ulong(this.request_id);
-	    ostream.write_long(this.reply_status);
-	    service_contexts.write(
-		(org.omg.CORBA_2_3.portable.OutputStream) ostream,
-		GIOPVersion.V1_2);
+        super.write(ostream);
+        ostream.write_ulong(this.request_id);
+        ostream.write_long(this.reply_status);
+        service_contexts.write(
+            (org.omg.CORBA_2_3.portable.OutputStream) ostream,
+            GIOPVersion.V1_2);
 
-	    // CORBA formal 00-11-0 15.4.2.2 GIOP 1.2 body must be
-	    // aligned on an 8 octet boundary.
-	    // Ensures that the first write operation called from the stub code,
-	    // during body construction, would insert a header padding, such that
-	    // the body is aligned on an 8-octet boundary.
-	    ((CDROutputObject)ostream).setHeaderPadding(true);
-	} finally {
-	    tp.exit_giopHeaderReadReply() ;
-	}
+        // CORBA formal 00-11-0 15.4.2.2 GIOP 1.2 body must be
+        // aligned on an 8 octet boundary.
+        // Ensures that the first write operation called from the stub code,
+        // during body construction, would insert a header padding, such that
+        // the body is aligned on an 8-octet boundary.
+        ((CDROutputObject)ostream).setHeaderPadding(true);
     }
 
     // Static methods

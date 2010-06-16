@@ -87,7 +87,6 @@ public class MethodMonitorFactoryDefaults {
         return name ;
     }
 
-    // XXX define me
     private static MethodMonitorFactory operationTracerImpl =
         new MethodMonitorFactory() {
             public MethodMonitor create( final Class<?> cls) {

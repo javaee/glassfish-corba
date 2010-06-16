@@ -52,7 +52,6 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.logging.OMGSystemException;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.trace.Transport;
@@ -75,7 +74,6 @@ public class CDRInputObject
     private static final long serialVersionUID = 3654171034620991056L;
 
     private transient ORB orb ;
-    private transient TimingPoints tp ;
     private transient ORBUtilSystemException wrapper ;
     private transient OMGSystemException omgWrapper ;
     private transient CDRInputStreamBase impl;
@@ -88,7 +86,6 @@ public class CDRInputObject
         ClassNotFoundException {
 
         orb = null ;
-        tp = null ;
         wrapper = null ;
         omgWrapper = null ;
         impl = null ;
@@ -138,7 +135,6 @@ public class CDRInputObject
      public CDRInputObject(CDRInputObject is) {
         impl = is.impl.dup();
         impl.setParent(this);
-	tp = is.tp ;
     }
 
     // Called from EncapsInputStream
@@ -147,7 +143,6 @@ public class CDRInputObject
         BufferManagerRead bufMgr, boolean directRead)
     {
         this.orb = (ORB)orb ;
-	this.tp = this.orb.getTimerManager().points() ;
 	this.wrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 	this.omgWrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_OMG() ;
 

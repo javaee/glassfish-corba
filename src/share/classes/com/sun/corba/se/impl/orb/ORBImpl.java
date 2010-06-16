@@ -162,11 +162,6 @@ import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.OrbLifeCycle;
 import com.sun.corba.se.spi.trace.Subcontract;
          
-
-
-////////////////////////////////////////////////////////////////////////
-/// Helper class for a Synchronization Variable
-////////////////////////////////////////////////////////////////////////
 /**
  * The JavaIDL ORB implementation.
  */
@@ -2128,6 +2123,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 	return entry ;
     }
+
     @Override
     public synchronized boolean orbIsShutdown() {
         return ((status == STATUS_DESTROYED) || 
@@ -2135,32 +2131,31 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     }
 } // Class ORBImpl
 
-class SynchVariable 
-{
+////////////////////////////////////////////////////////////////////////
+/// Helper class for a Synchronization Variable
+////////////////////////////////////////////////////////////////////////
+
+class SynchVariable {
     // Synchronization Variable
     public boolean _flag;
 
     // Constructor
-    SynchVariable() 
-    {
+    SynchVariable() {
         _flag = false;
     }
 
     // set Flag to true
-    public void set() 
-    {
+    public void set() {
         _flag = true;
     }
 
         // get value
-    public boolean value() 
-    {
+    public boolean value() {
         return _flag;
     }
 
     // reset Flag to true
-    public void reset() 
-    {
+    public void reset() {
         _flag = false;
     }
 }

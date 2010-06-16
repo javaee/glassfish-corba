@@ -128,7 +128,7 @@ public final class IORInfoImpl
      * @param type The CORBA::PolicyType specifying the type of policy to 
      *   return.
      * @return The effective CORBA::Policy object of the requested type.
-     *   If the given policy type is known, but no policy of that tpye is 
+     *   If the given policy type is known, but no policy of that type is 
      *   in effect, then this operation will return a nil object reference.
      */
     public Policy get_effective_policy (int type) {

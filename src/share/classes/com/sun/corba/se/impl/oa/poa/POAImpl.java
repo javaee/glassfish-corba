@@ -232,7 +232,6 @@ public class POAImpl extends ObjectAdapterBase implements POA
     private int invocationCount ; // pending invocations on this POA.
 
     // Data used to control POA concurrency
-    // XXX revisit for JSR 166
 
     // Master lock for all POA synchronization.  See lock and unlock.
     // package private for access by AOMEntry.
@@ -349,13 +348,15 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	return mediator.getPolicies() ;
     }
 
+    @Poa
+    private void newPOACreated( String name, String parentName ) { }
+
     // Note that the parent POA must be locked when this constructor is called.
     private POAImpl( String name, POAImpl parent, ORB orb, int initialState ) 
     {
 	super( orb ) ;
 
-	// XXX nice to have creating POA name= parent= here, but TF does not
-	// support instrumenting constructors.
+        newPOACreated( name, parent.name ) ;
 
 	this.state     = initialState ;
 	this.name      = name ;

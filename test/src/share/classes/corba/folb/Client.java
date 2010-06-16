@@ -223,31 +223,6 @@ public class Client extends ClientBase {
     public static void main(String[] av) {
         doMain( Client.class ) ;
     }
-
-    // Order of test (current):
-    // 1076 testBootstrap           WXYZ
-
-    // 1577 testFailoverWithUpdate  WXYZ
-    // 1581 Removing instance W
-    // 1840 Removing instance X
-    // 2272 ERROR: expected Y got W
-
-    // 2274 testFailoverWithoutUpdate   YZ
-    // 2836 ERROR: expected X got Y
-
-    // 2838 testIORUpdate               YZ
-    // 2841 Removing instance Z (should add Z too?)
-    // 3057 ERROR: expected W got Y
-
-    // 3059 testNormalOperation         Y
-    // 3250 ERROR: expected W got Y
-
-    // Expected order:
-    //  testBootstrap
-    //  testNormalOperation
-    //  testIORUpdate
-    //  testFailoverWithoutUpdate
-    //  testFailoverWithUpdate
 }
 
 // End of file.

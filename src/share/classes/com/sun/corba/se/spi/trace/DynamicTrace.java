@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,17 +33,20 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.corba.se.spi.trace ;
 
-package com.sun.corba.se.spi.orbutil.tf.annotation;
+import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
+import java.lang.annotation.Target ;
+import java.lang.annotation.ElementType ;
+import java.lang.annotation.Retention ;
+import java.lang.annotation.RetentionPolicy ;
 
-/** Annotation representing the level of tracing enhancement present
- * on a class file.
- *
- * @author ken
+/** This annotation is applied to a class or interface to indicate
+ * that its methods are classified as part of the CDR implementation in the ORB.
  */
-public enum TraceEnhanceLevel { 
-    NONE,
-    PHASE1,
-    PHASE2
+@Target({ElementType.METHOD,ElementType.TYPE,ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@MethodMonitorGroup
+public @interface DynamicTrace {
 }
 

@@ -49,14 +49,7 @@
     <timer name="clientTransportAndWait" description="Client side transport and wait for response in CorbaClientRequestDispatcherImpl"/>
     <timer name="clientDecoding" description="Client side response unmarshalling in CorbaClientRequestDispatcherImpl"/>
 
-    <timerGroup name="contactInfoListIterator" description="Key ContactInfoListIterator methods">
-	<contains name="contactInfoListIteratorHasNext"/>
-	<contains name="contactInfoListIteratorNext"/>
-	<contains name="contactInfoListIteratorReportException"/>
-    </timerGroup>
-
     <timerGroup name="transportClient" description="Major events in client side request cycle">
-	<contains name="contactInfoListIterator"/>
 	<contains name="hasNextNext"/>
 	<contains name="connectionSetup"/>
 	<contains name="clientEncoding"/>

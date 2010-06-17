@@ -42,11 +42,12 @@ import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
 /** This annotation is applied to a class or interface to indicate
- * that its methods are classified as part of the CDR implementation in the ORB.
+ * that its traced methods are classified as part of the 
+ * TypeCode/Any implementation in the ORB.
  */
 @Target({ElementType.METHOD,ElementType.TYPE,ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @MethodMonitorGroup
-public @interface DynamicTrace {
+public @interface DynamicType {
 }
 

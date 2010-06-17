@@ -168,6 +168,22 @@ public class Client
 
             return arg1 ;
         }
+         
+        @InfoMethod
+        private void inSync() {
+        }
+
+        @A
+        int call4( int arg1 ) {
+            int result ;
+
+            synchronized (this) {
+                inSync() ;
+                result = 2*arg1 ;
+            }
+
+            return result ;
+        }
 
         @A
         void methodA() { methodB() ; }
@@ -186,9 +202,11 @@ public class Client
     private static final int SINGLE4 ;
     private static final int CALL2 ;
     private static final int CALL3 ;
+    private static final int CALL4 ;
     private static final int METHODA ;
     private static final int METHODB ;
     private static final int METHODC ;
+    private static final int INSYNC ;
 
     private static final MethodMonitor expected =
         new MethodMonitorTracingImpl( TestCombination.class ) ;
@@ -205,9 +223,11 @@ public class Client
         SINGLE4 = MethodMonitorRegistry.getMethodIdentifier( cls, "single4" ) ;
         CALL2 = MethodMonitorRegistry.getMethodIdentifier( cls, "call2" ) ;
         CALL3 = MethodMonitorRegistry.getMethodIdentifier( cls, "call3" ) ;
+        CALL4 = MethodMonitorRegistry.getMethodIdentifier( cls, "call4" ) ;
         METHODA = MethodMonitorRegistry.getMethodIdentifier( cls, "methodA" ) ;
         METHODB = MethodMonitorRegistry.getMethodIdentifier( cls, "methodB" ) ;
         METHODC = MethodMonitorRegistry.getMethodIdentifier( cls, "methodC" ) ;
+        INSYNC = MethodMonitorRegistry.getMethodIdentifier( cls, "inSync" ) ;
     }
 
     @Test
@@ -336,6 +356,25 @@ public class Client
         } catch (Exception exc) {
             Assert.fail( "Unexpected exception " + exc ) ;
         }
+    }
+
+    @Test
+    public void testSync() {
+        int arg = 23 ;
+        expected.clear() ;
+        expected.enter( CALL4, arg ) ;
+        // expected.info( new Object[0], CALL4, SOMEINFO);
+        expected.info( null, CALL4, SOMEINFO);
+        expected.exit( CALL4, 2*arg ) ;
+
+        MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;
+
+        tc.call4( arg ) ;
+
+        MethodMonitor actual = MethodMonitorRegistry.getMethodMonitorForClass(
+            TestCombination.class, A.class ) ;
+
+        Assert.assertEquals( actual, expected );
     }
 
     @Test

@@ -55,6 +55,8 @@ import java.nio.ByteBuffer;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 
+import com.sun.corba.se.spi.trace.CdrWrite ;
+
 /**
  * @author Harold Carr
  */
@@ -91,7 +93,7 @@ public class CDROutputObject
     @CdrWrite
     private void createCDROutputStream(ORB orb, GIOPVersion version, byte encodingVersion, 
         boolean littleEndian, BufferManagerWrite bufferManager, 
-        byte streamFormatVersion, boolean usePooledByteBuffers, boolean directWrite)
+        byte streamFormatVersion, boolean usePooledByteBuffers, boolean directWrite) {
         impl = OutputStreamFactory.newOutputStream(orb, 
             version, encodingVersion, directWrite);
         impl.init(orb, littleEndian, bufferManager, streamFormatVersion, 

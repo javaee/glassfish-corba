@@ -60,13 +60,13 @@ import com.sun.corba.se.impl.encoding.WrapperInputStream;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
-
 import com.sun.corba.se.spi.orbutil.copyobject.Copy;
 import com.sun.corba.se.spi.orbutil.copyobject.CopyType;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+
+import com.sun.corba.se.spi.trace.DynamicType ;
 
 // no chance of subclasses, so no problems with runtime helper lookup
 public final class TypeCodeImpl extends TypeCode {
@@ -327,7 +327,7 @@ public final class TypeCodeImpl extends TypeCode {
     public TypeCodeImpl(ORB orb, int creationKind) {
 	this(orb);
 
-        createPrimitiveTypeCode( ORB orb, int creationKind ) ;
+        createPrimitiveTypeCode( orb, creationKind ) ;
     }
 
     @DynamicType
@@ -543,7 +543,7 @@ public final class TypeCodeImpl extends TypeCode {
 
     public TypeCodeImpl(ORB orb, int creationKind, int bound, TypeCode element_type) {
 	this(orb) ;
-        createArrayTypeCOde( orb, creationKind, bound, element_type ) ;
+        createArrayTypeCode( orb, creationKind, bound, element_type ) ;
     }
       
     @DynamicType
@@ -575,7 +575,7 @@ public final class TypeCodeImpl extends TypeCode {
     public TypeCodeImpl(ORB orb, String id) {
 	this(orb) ;
 
-        createRecursizeTypeCode( orb, id ) ;
+        createRecursiveTypeCode( orb, id ) ;
     }
 
     @DynamicType
@@ -709,7 +709,7 @@ public final class TypeCodeImpl extends TypeCode {
     ///////////////////////////////////////////////////////////////////////////
     // TypeCode operations
 
-    @DynmicType
+    @DynamicType
     public final boolean equal(TypeCode tc) {
         if (tc == this) {
             return true;
@@ -1424,7 +1424,7 @@ public final class TypeCodeImpl extends TypeCode {
     }
 
     @DynamicType
-    private void readValueBodyComplexObjref( InputStream is ) {
+    private void readValueBodyComplexObjref( TypeCodeInputStream _encap ) {
         // get the repository id
         setId(_encap.read_string());
         // get the name
@@ -1432,7 +1432,9 @@ public final class TypeCodeImpl extends TypeCode {
     }
 
     @DynamicType
-    private void readValueBodyComplexUnion( InputStream is ) {
+    private void readValueBodyComplexUnion( InputStream is, 
+        TypeCodeInputStream _encap ) {
+
         setId(_encap.read_string());
         _name = _encap.read_string();
         _discriminator = new TypeCodeImpl((ORB)is.orb());
@@ -1502,7 +1504,7 @@ public final class TypeCodeImpl extends TypeCode {
     }
 
     @DynamicType
-    private void readValueBodyComplexEnum( InputStream is ) {
+    private void readValueBodyComplexEnum( TypeCodeInputStream _encap ) {
         setId(_encap.read_string());
         _name = _encap.read_string();
         _memberCount = _encap.read_long();
@@ -1514,21 +1516,25 @@ public final class TypeCodeImpl extends TypeCode {
     }
 
     @DynamicType
-    private void readValueBodyComplexSequence( InputStream is ) {
+    private void readValueBodyComplexSequence( InputStream is, 
+        TypeCodeInputStream _encap ) {
+
         _contentType = new TypeCodeImpl((ORB)is.orb());
         _contentType.read_value_recursive(_encap);
         _length = _encap.read_long();
     }
 
     @DynamicType
-    private private void readValueBodyComplexArray( InputStream is ) {
+    private void readValueBodyComplexArray( InputStream is,
+        TypeCodeInputStream _encap ) {
         _contentType = new TypeCodeImpl((ORB)is.orb());
         _contentType.read_value_recursive(_encap);
         _length = _encap.read_long();
     }
 
     @DynamicType
-    private void readValueBodyComplexAlias( InputStream is ) {
+    private void readValueBodyComplexAlias( InputStream is,
+        TypeCodeInputStream _encap ) {
         setId(_encap.read_string());
         _name = _encap.read_string();
         _contentType = new TypeCodeImpl((ORB)is.orb());
@@ -1536,7 +1542,9 @@ public final class TypeCodeImpl extends TypeCode {
     }
 
     @DynamicType
-    private void readValueBodyComplexStruct( InputStream is ) {
+    private void readValueBodyComplexStruct( InputStream is, 
+        TypeCodeInputStream _encap ) {
+
         setId(_encap.read_string());
         _name = _encap.read_string();
         _memberCount = _encap.read_long();
@@ -1552,7 +1560,9 @@ public final class TypeCodeImpl extends TypeCode {
     }
 
     @DynamicType
-    private void readValueBodyComplexValue( InputStream is ) {
+    private void readValueBodyComplexValue( InputStream is,
+        TypeCodeInputStream _encap ) {
+
         setId(_encap.read_string());
         _name = _encap.read_string();
         _type_modifier = _encap.read_short();
@@ -1594,37 +1604,37 @@ public final class TypeCodeImpl extends TypeCode {
                 switch(_kind) {
                     case TCKind._tk_objref:
                     case TCKind._tk_abstract_interface:
-                        readValueBodyComplexObjref( is ) ;
+                        readValueBodyComplexObjref( _encap ) ;
                         break;
 
                     case TCKind._tk_union:
-                        readValueBodyComplexUnion( is ) ;
+                        readValueBodyComplexUnion( is, _encap ) ;
                         break;
 
                     case TCKind._tk_enum:
-                        readValueBodyComplexEnum( is ) ;
+                        readValueBodyComplexEnum( _encap ) ;
                         break;
 
                     case TCKind._tk_sequence:
-                        readValueBodyComplexSequence( is ) ;
+                        readValueBodyComplexSequence( is, _encap ) ;
                         break;
 
                     case TCKind._tk_array:
-                        readValueBodyComplexArray( is ) ;
+                        readValueBodyComplexArray( is, _encap ) ;
                         break;
 
                     case TCKind._tk_alias:
                     case TCKind._tk_value_box:
-                        readValueBodyComplexAlias( is ) ;
+                        readValueBodyComplexAlias( is, _encap ) ;
                         break;
 
                     case TCKind._tk_except:
                     case TCKind._tk_struct:
-                        readValueBodyComplexStruct( is ) ;
+                        readValueBodyComplexStruct( is, _encap ) ;
                         break;
 
                     case TCKind._tk_value:
-                        readValueBodyComplexValue( is ) ;
+                        readValueBodyComplexValue( is, _encap ) ;
                         break;
 
                     default:
@@ -1908,7 +1918,7 @@ public final class TypeCodeImpl extends TypeCode {
             dst.write_octet(src.read_octet());
             break;
 
-        case TCKind._tk_string:
+        case TCKind._tk_string: {
             String s;
             s = src.read_string();
             // make sure length bound in typecode is not violated
@@ -1917,8 +1927,9 @@ public final class TypeCodeImpl extends TypeCode {
             }
             dst.write_string(s);
             break;
+        }
 
-        case TCKind._tk_wstring:
+        case TCKind._tk_wstring: {
             String s;
             s = src.read_wstring();
             // make sure length bound in typecode is not violated
@@ -1927,6 +1938,7 @@ public final class TypeCodeImpl extends TypeCode {
             }
             dst.write_wstring(s);
             break;
+        }
 
         case TCKind._tk_fixed:
             dst.write_ushort(src.read_ushort());
@@ -1972,78 +1984,91 @@ public final class TypeCodeImpl extends TypeCode {
             Any tagValue = new AnyImpl( (ORB)src.orb());
 
             switch  (realType(_discriminator).kind().value()) {
-                case TCKind._tk_short:
+                case TCKind._tk_short: {
                     short value = src.read_short();
                     tagValue.insert_short(value);
                     dst.write_short(value);
                     break;
+                }
 
-                case TCKind._tk_long:
+                case TCKind._tk_long: {
                     int value = src.read_long();
                     tagValue.insert_long(value);
                     dst.write_long(value);
                     break;
+                }
 
-                case TCKind._tk_ushort:
+                case TCKind._tk_ushort: {
                     short value = src.read_short();
                     tagValue.insert_ushort(value);
                     dst.write_short(value);
                     break;
+                }
 
-                case TCKind._tk_ulong:
+                case TCKind._tk_ulong: {
                     int value = src.read_long();
                     tagValue.insert_ulong(value);
                     dst.write_long(value);
                     break;
+                }
 
-                case TCKind._tk_float:
+                case TCKind._tk_float: {
                     float value = src.read_float();
                     tagValue.insert_float(value);
                     dst.write_float(value);
                     break;
+                }
 
-                case TCKind._tk_double:
+                case TCKind._tk_double: {
                     double value = src.read_double();
                     tagValue.insert_double(value);
                     dst.write_double(value);
                     break;
+                }
 
-                case TCKind._tk_boolean:
+                case TCKind._tk_boolean: {
                     boolean value = src.read_boolean();
                     tagValue.insert_boolean(value);
                     dst.write_boolean(value);
                     break;
+                }
 
-                case TCKind._tk_char:
+                case TCKind._tk_char: {
                     char value = src.read_char();
                     tagValue.insert_char(value);
                     dst.write_char(value);
                     break;
+                }
 
-                case TCKind._tk_enum:
+                case TCKind._tk_enum: {
                     int value = src.read_long();
                     tagValue.type(_discriminator);
                     tagValue.insert_long(value);
                     dst.write_long(value);
                     break;
+                }
 
-                case TCKind._tk_longlong:
+                case TCKind._tk_longlong: {
                     long value = src.read_longlong();
                     tagValue.insert_longlong(value);
                     dst.write_longlong(value);
                     break;
+                }
                     
-                case TCKind._tk_ulonglong:
+                case TCKind._tk_ulonglong: {
                     long value = src.read_longlong();
                     tagValue.insert_ulonglong(value);
                     dst.write_longlong(value);
                     break ;
+                }
 
-                case TCKind._tk_wchar:
+                case TCKind._tk_wchar: {
                     char value = src.read_wchar();
                     tagValue.insert_wchar(value);
                     dst.write_wchar(value);
                     break;
+                }
+
                 default:
                     throw wrapper.illegalUnionDiscriminatorType() ;
             }

@@ -720,47 +720,45 @@ public class SocketOrChannelConnectionImpl
      */
     @Transport
     public synchronized void close() {
-	try {
-	    writeLock();
+        writeLock();
 
-	    // REVISIT It will be good to have a read lock on the reader thread
-	    // before we proceed further, to avoid the reader thread (server side)
-	    // from processing requests. This avoids the risk that a new request
-	    // will be accepted by ReaderThread while the ListenerThread is 
-	    // attempting to close this connection.
+        // REVISIT It will be good to have a read lock on the reader thread
+        // before we proceed further, to avoid the reader thread (server side)
+        // from processing requests. This avoids the risk that a new request
+        // will be accepted by ReaderThread while the ListenerThread is
+        // attempting to close this connection.
 
-	    if (isBusy()) { // we are busy!
-		writeUnlock();
-                doNotCloseBusyConnection() ;
-		return;
-	    }
+        if (isBusy()) { // we are busy!
+            writeUnlock();
+            doNotCloseBusyConnection() ;
+            return;
+        }
 
-	    try {
-		try {
-		    sendCloseConnection(GIOPVersion.V1_0);
-		} catch (Throwable t) {
-		    wrapper.exceptionWhenSendingCloseConnection(t);
-		}
+        try {
+            try {
+                sendCloseConnection(GIOPVersion.V1_0);
+            } catch (Throwable t) {
+                wrapper.exceptionWhenSendingCloseConnection(t);
+            }
 
-		synchronized ( stateEvent ){
-		    state = CLOSE_SENT;
-		    stateEvent.notifyAll();
-		}
+            synchronized ( stateEvent ){
+                state = CLOSE_SENT;
+                stateEvent.notifyAll();
+            }
 
-		// stop the reader without causing it to do purgeCalls
-		//Exception ex = new Exception();
-		//reader.stop(ex); // REVISIT
+            // stop the reader without causing it to do purgeCalls
+            //Exception ex = new Exception();
+            //reader.stop(ex); // REVISIT
 
-		// NOTE: !!!!!!
-		// This does writeUnlock().
-		purgeCalls(wrapper.connectionRebind(), false, true);
+            // NOTE: !!!!!!
+            // This does writeUnlock().
+            purgeCalls(wrapper.connectionRebind(), false, true);
 
-	    } catch (Exception ex) {
-                // XXX log this
-	    }
+        } catch (Exception ex) {
+            // XXX log this
+        }
 
-            closeConnectionResources();
-	} 
+        closeConnectionResources();
     }
 
     @Transport

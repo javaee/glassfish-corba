@@ -47,12 +47,15 @@ import java.lang.annotation.RetentionPolicy ;
  * Any arguments are passed into the
  * MethodMonitor.info call in the instrumented code.
  *
- * @param tpType Indicates whether this info method represents an ENTER, EXIT, or no timing point.
+ * @Param tpName The name of the TimingPoint (if any) corresponding to this method.  Default means 
+ * use the method name.  Note: in the case of overloaded methods, each overloaded method must have a tpName
+ * that is unique within the class.
+ *
  * @author ken
  */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface InfoMethod {
-    TimingPointType tpType() default TimingPointType.NONE ;
+public @interface TimingPointName {
+    String tpName() default "" ;
 }

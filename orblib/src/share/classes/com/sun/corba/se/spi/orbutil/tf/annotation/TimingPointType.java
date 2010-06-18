@@ -42,17 +42,6 @@ import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
-/** Used to indicate that a method is used for invoking MethodMonitor.info.
- * The method must be private and have a void return type.
- * Any arguments are passed into the
- * MethodMonitor.info call in the instrumented code.
- *
- * @param tpType Indicates whether this info method represents an ENTER, EXIT, or no timing point.
- * @author ken
+/** Used to indicate what kind of TimingPoint a InfoMethod represents.
  */
-@Documented
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface InfoMethod {
-    TimingPointType tpType() default TimingPointType.NONE ;
-}
+public enum TimingPointType { NONE, ENTER, EXIT }

@@ -79,7 +79,18 @@ public class MethodMonitorRegistry {
 	    System.out.println( "Exception: " + exc ) ;
 	}
     }
-
+    
+    // XXX Add maps for timing point data:
+    //
+    //  Class -> InfoMethodName -> TimingPointType
+    //      No entry = not a timing point 
+    //  Class -> InfoMethodName -> TimingPointName
+    //      No entry = TimingPoint name same as InfoMethodName name.
+    //  Class -> MMName -> TimingPointName
+    //      No entry = TimingPoint name same as MMName name.
+    //
+    //  XXX Problem: this doesn't work for overloaded methods!
+    
     // Maps traceable classes to the list of method names (which is in the order
     // used in the generated code, so the index of a method name is the number
     // used in the generated code).

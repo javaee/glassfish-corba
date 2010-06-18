@@ -59,7 +59,8 @@ public interface MethodMonitor {
     /** Invoked anywhere in the method after enter and before exit, to indicate
      * some useful tracing information in the method.
      * 
-     * @param ident The method identifier.
+     * @param callerIdent The identifier of the method calling the InfoMethod.
+     * @param selfIdent The identifier of the InfoMethod itself.
      * @param args Any information needed in the info call.
      */
     void info( Object[] args, int callerIdent, int selfIdent ) ;

@@ -38,6 +38,7 @@ package com.sun.corba.se.spi.orbutil.tf;
 
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -79,18 +80,14 @@ public class MethodMonitorRegistry {
 	    System.out.println( "Exception: " + exc ) ;
 	}
     }
-    
-    // XXX Add maps for timing point data:
-    //
-    //  Class -> InfoMethodName -> TimingPointType
-    //      No entry = not a timing point 
-    //  Class -> InfoMethodName -> TimingPointName
-    //      No entry = TimingPoint name same as InfoMethodName name.
-    //  Class -> MMName -> TimingPointName
-    //      No entry = TimingPoint name same as MMName name.
-    //
-    //  XXX Problem: this doesn't work for overloaded methods!
-    
+
+    // Maps traceables class to the list of TimingPointTypes corresponding to
+    // the method name (as in classToMNames).  The type for all MM names is
+    // NONE, while the type for info maethods InfoMethods is taken from the 
+    // @InfoMethod annotation.
+    private static final Map<Class<?>,List<TimingPointType>> classToTimerTypes =
+        new HashMap<Class<?>,List<TimingPointType>>() ;
+
     // Maps traceable classes to the list of method names (which is in the order
     // used in the generated code, so the index of a method name is the number
     // used in the generated code).
@@ -282,6 +279,24 @@ public class MethodMonitorRegistry {
         }
     }
 
+    private static String getExternalName( String name ) {
+	return name.replace( '/', '.' ) ;
+    }
+
+    private static final MethodMonitorGroup checkAnnotation(
+        Class<? extends Annotation> annoClass ) {
+
+        final MethodMonitorGroup mmg =
+            annoClass.getAnnotation( MethodMonitorGroup.class ) ;
+
+        if (mmg == null) {
+            throw new RuntimeException( "Annotation " + annoClass
+                + " does not have the MethodMonitorGroup annotation" ) ;
+        } else {
+            return mmg ;
+        }
+    }
+
     /** Register a class with the tracing facility.  The class must be an
      * instrumented class that is annotated with an annotation with a
      * meta-annotation of @MethodMonitorGroup.  Note that this method should
@@ -309,10 +324,6 @@ public class MethodMonitorRegistry {
         }
     }
 
-    private static String getExternalName( String name ) {
-	return name.replace( '/', '.' ) ;
-    }
-
     /** Register a class with the tracing facility.  This form assumes that
      * all of the computation for method names and the mapping from annotation
      * name to MM holder is done at registration time, rather than in the 
@@ -327,7 +338,8 @@ public class MethodMonitorRegistry {
 
         final boolean fullUpdate = scanClassAnnotations( cls ) ;
 
-	classToMNames.put( cls, ecd.getMethodNames() ) ;
+	classToMNames.put( cls, ecd.getMethodTracingNames() ) ;
+        classToTimerTypes.put( cls, ecd.getTimingPointTypes() ) ;
 
         final Map<Class<? extends Annotation>,
             SynchronizedHolder<MethodMonitor>> annoMM =
@@ -342,19 +354,18 @@ public class MethodMonitorRegistry {
 		final String fname = entry.getValue() ;	// field name
 
 		final Field fld = cls.getDeclaredField( fname ) ;
+
+                // XXX needs doPrivileged if non-null SecurityManager
 		fld.setAccessible(true) ;
+
 		final SynchronizedHolder<MethodMonitor> sh =
 		    new SynchronizedHolder<MethodMonitor>() ;
+
 	        fld.set( null, sh) ;
 
-		Class<? extends Annotation> aclass =
-		    ecd.getAnnoNameMap().get( aname ) ; 
-
-		if (aclass == null) {
-		    final String axname = getExternalName( aname ) ;
-		    aclass = (Class<? extends Annotation>)Class.forName(
-			axname ) ;
-		}
+                final String axname = getExternalName( aname ) ;
+                Class<? extends Annotation> aclass =
+                    (Class<? extends Annotation>)Class.forName( axname ) ;
 
 		annoMM.put( aclass, sh ) ;
 	    } catch (Exception exc) {
@@ -369,6 +380,10 @@ public class MethodMonitorRegistry {
         } else {
             updateTracedClass( cls ) ;
         }
+    }
+
+    public static List<String> getMethodNames( Class<?> cls ) {
+        return classToMNames.get( cls ) ;    
     }
 
     /** Provided so that implementation of the MethodMonitor interface can
@@ -407,20 +422,6 @@ public class MethodMonitorRegistry {
         }
 
         return -1 ;
-    }
-
-    private static final MethodMonitorGroup checkAnnotation(
-        Class<? extends Annotation> annoClass ) {
-
-        final MethodMonitorGroup mmg =
-            annoClass.getAnnotation( MethodMonitorGroup.class ) ;
-
-        if (mmg == null) {
-            throw new RuntimeException( "Annotation " + annoClass
-                + " does not have the MethodMonitorGroup annotation" ) ;
-        } else {
-            return mmg ;
-        }
     }
 
     /** Register a particular MethodMonitorFactory against an annotation.
@@ -511,5 +512,14 @@ public class MethodMonitorRegistry {
         }
 
         return holder.content() ;
+    }
+
+    /** Return a list of all timer types defined for cls.  This is in the same
+     * order as classToMNames.get(cls).
+     * @param cls The monitored class to use.
+     * @return A list of timer types in the same order as the method names.
+     */
+    public static List<TimingPointType> getTimerTypes( final Class<?> cls ) {
+        return classToTimerTypes.get( cls ) ;
     }
 }

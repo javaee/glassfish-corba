@@ -83,6 +83,7 @@ import java.util.Hashtable;
  */
 
 
+@Naming
 public class NamingContextImpl extends NamingContextExtPOA
     implements NamingContextDataStore, Serializable {
 

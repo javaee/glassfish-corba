@@ -34,28 +34,14 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.tf.annotation;
+package com.sun.corba.se.spi.orbutil.newtimer;
 
-import java.lang.annotation.Target ;
-import java.lang.annotation.Documented ;
-import java.lang.annotation.ElementType ;
-import java.lang.annotation.Retention ;
-import java.lang.annotation.RetentionPolicy ;
-
-/** Used to indicate that a method is used for invoking MethodMonitor.info.
- * The method must be private and have a void return type.
- * Any arguments are passed into the
- * MethodMonitor.info call in the instrumented code.
- *
- * @Param tpName The name of the TimingPoint (if any) corresponding to this method.  Default means 
- * use the method name.  Note: in the case of overloaded methods, each overloaded method must have a tpName
- * that is unique within the class.
- *
- * @author ken
+/** Used to indicate what kind of TimingPoint a InfoMethod represents.
+ * For convience, BOTH is the type of a Monitored Method, since the
+ * enter and exit to the method give the corresponding timer events.
  */
-@Documented
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TimingPointName {
-    String tpName() default "" ;
-}
+public enum TimingPointType { 
+    NONE, 
+    BOTH,
+    ENTER, 
+    EXIT }

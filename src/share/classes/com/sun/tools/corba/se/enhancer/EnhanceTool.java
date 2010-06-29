@@ -36,16 +36,19 @@
 
 package com.sun.tools.corba.se.enhancer ;
 
+import com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator;
 import com.sun.corba.se.spi.orbutil.argparser.DefaultValue ;
 import com.sun.corba.se.spi.orbutil.argparser.Help ;
 import com.sun.corba.se.spi.orbutil.argparser.ArgParser ;
 import com.sun.corba.se.spi.orbutil.file.ActionFactory;
-
 import com.sun.corba.se.spi.orbutil.file.Scanner ;
 import com.sun.corba.se.spi.orbutil.file.Recognizer ;
 import com.sun.corba.se.spi.orbutil.file.FileWrapper ;
+import com.sun.corba.se.spi.orbutil.generic.Pair;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory;
 import com.sun.corba.se.spi.orbutil.tf.Util;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -71,6 +74,25 @@ import java.util.Set;
 public class EnhanceTool {
     private static int errorCount = 0 ;
     private Util util ;
+
+    public enum ProcessingMode {
+        /** Only generate the timing points file: no changes to monitored class
+         * bytecode.
+         */
+        TimingPoints,
+
+        /** Update the class schemas for monitored classes, but don't insert
+         * the tracing code.  Generate the TimingPoints file if the
+         * timingPointDir and timingPointClass options are set.
+         */
+        UpdateSchemas,
+
+        /** Update the class schema and insert tracing code.  Generate the
+         * TimingPoints file if the timingPointDir and timingPointClass
+         * options are set.
+         */
+        TraceEnhance
+    }
 
     private interface Arguments {
         @DefaultValue( "tfannotations.properties" )
@@ -99,12 +121,22 @@ public class EnhanceTool {
         @Help( "If true, write output to a .class.new file")
         boolean newout() ;
 
-        @DefaultValue( "true" )
-        @Help( "If true, do second phase (add tracing code) processing")
-        boolean tracegen() ;
+        @DefaultValue( "TimingPoints" )
+        @Help( "Control the mode of operation: TimingPoints, UpdateSchema, or TraceEnhance")
+        ProcessingMode mode() ;
+
+        @DefaultValue( "" ) 
+        @Help( "The timing point class name")
+        String timingPointClass() ;
+
+        @DefaultValue( "" ) 
+        @Help( "The directory in which to write the TimingPoint file")
+        String timingPointDir() ;
     }
 
     private Arguments args ;
+
+    private TimerPointSourceGenerator.TimingInfoProcessor tip ;
 
     private class EnhancerFileAction implements Scanner.Action {
         private UnaryFunction<byte[],byte[]> ea ;
@@ -206,10 +238,23 @@ public class EnhanceTool {
             args = ap.parse( strs ) ;
             util = new Util( args.debug(), args.verbose() ) ;
 
+            String fullTimingPointName = args.timingPointClass() ;
+            String pkg = "" ;
+            String cname = fullTimingPointName ;
+            int index = fullTimingPointName.lastIndexOf('.') ;
+            if (index > 0) {
+                cname = fullTimingPointName.substring( index + 1 ) ;
+                pkg = fullTimingPointName.substring( 0, index ) ;
+            }
+
+            tip = new TimerPointSourceGenerator.TimingInfoProcessor( 
+                cname, pkg ) ;
+
             final ActionFactory af = new ActionFactory( 0, args.dryrun() ) ;
             final Scanner scanner = new Scanner( 0, args.dir() ) ;
 
-            AnnotationScannerAction annoAct = new AnnotationScannerAction( util ) ;
+            AnnotationScannerAction annoAct = new AnnotationScannerAction( util,
+                tip ) ;
 
             doScan( args, af, scanner, annoAct ) ;
 
@@ -221,12 +266,19 @@ public class EnhanceTool {
 
             generatePropertiesFile( args, anames ) ;
 
-            Transformer ea = new Transformer( util, args.tracegen() ) ;
-            ea.setMMGAnnotations( anames );
+            Transformer ea = new Transformer( util, 
+                args.mode(), tip, anames ) ;
 
             final Scanner.Action act = new EnhancerFileAction( ea ) ;
 
             doScan( args, af, scanner, act ) ;
+
+            Pair<String,TimerFactory> res = tip.getResult() ;
+
+            if (!args.timingPointDir().equals( "" ) ) {
+                TimerPointSourceGenerator.generateSingleFile(
+                    args.timingPointDir(), res );
+            }
         } catch (Exception exc) {
             if (util == null) {
                 util = new Util( true, 1 ) ;

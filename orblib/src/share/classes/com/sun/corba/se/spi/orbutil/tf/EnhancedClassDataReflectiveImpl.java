@@ -37,12 +37,18 @@
 package com.sun.corba.se.spi.orbutil.tf ;
 
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.orbutil.tf.annotation.TracingName;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.glassfish.gmbal.Description;
 import org.objectweb.asm.Type;
 
 public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
@@ -62,7 +68,6 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
                 final String aname = Type.getInternalName( an.annotationType() ) ;
 		if (isMMAnnotation(an)) {
                     annoNamesForClass.add( aname ) ;
-		    annoNameMap.put( aname, an.annotationType() ) ;
 		}
 	    }
 
@@ -86,17 +91,40 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
     // Scan methods:
     //    - Build List<String> to map names of MM annotated methods to ints
     //      validate: such methods must have exactly 1 MM annotation that
-    //          is in annoNamesForClass.
+    //          is in annoNamesForClass, or must be @InfoMethod annotated.
+    //      Note: this must check for a @TracingName annotation.
+    //    - In parallel with names of methods, construct descriptions and
+    //      TimingPointTypes arrays.
     //    - Build Set<String> of all InfoMethod annotated methods.
     //      validate: such methods must be private, return void, and have
     //          an empty body.  May NOT have MM annotation.
     private void scanMethods() {
         final Method[] methods = currentClass.getDeclaredMethods() ;
+        Map<String,String> mmnToDescriptions =
+            new HashMap<String,String>() ;
+
+        Map<String,TimingPointType> mmnToTPT =
+            new HashMap<String,TimingPointType>() ;
+
+        Map<String,String> mmnToAnnotationName = 
+            new HashMap<String,String>() ;
+
         for (Method mn : methods) {
             final String mname = mn.getName() ;
             final String mdesc = util.getFullMethodDescriptor( mn ) ;
 
-            String annoForMethod = null ;
+            String monitoredMethodMMAnno = null ;
+            String shortClassName = className ;
+            int index = shortClassName.lastIndexOf( '/' ) ;
+            if (index >= 0) {
+                shortClassName = className.substring( index + 1 ) ;
+            }
+
+            String description = "Timer for method " + mname 
+                + " in class " + shortClassName ; // default
+            String mmName = mname ; // default
+            TimingPointType tpt = TimingPointType.BOTH ; // default for non InfoMethod
+
             boolean hasMethodInfoAnno = false ;
 
             final Annotation[] annotations = mn.getDeclaredAnnotations() ;
@@ -105,7 +133,17 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
 		    final String aname = Type.getInternalName(
 			an.annotationType() ) ;
 
-                    if (aname.equals( INFO_METHOD_NAME)) {
+                    if (aname.equals( TRACING_NAME )) {
+                        TracingName tname = (TracingName)an ;
+                        if (tname.value().length() > 0) {
+                            mmName = tname.value() ;
+                        }
+                    } else if (aname.equals( DESCRIPTION_NAME )) {
+                        Description desc = (Description)an ;
+                        if (desc.value().length() > 0) {
+                            description = desc.value() ;
+                        }
+                    } else if (aname.equals( INFO_METHOD_NAME)) {
                         // Check for private method!
                         if (!util.hasAccess( mn.getModifiers(),
 		            Modifier.PRIVATE )) {
@@ -115,10 +153,13 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
                                 + " is a non-private @InfoMethod,"
                                 + " which is not allowed" ) ;
                         }
+
                         hasMethodInfoAnno = true ;
+                        InfoMethod im = (InfoMethod)an ;
+                        tpt = im.tpType() ;
                     } else if (annoNamesForClass.contains( aname)) {
-                        if (annoForMethod == null) {
-                            annoForMethod = aname ;
+                        if (monitoredMethodMMAnno == null) {
+                            monitoredMethodMMAnno = aname ;
                         } else {
                             util.error( "Method " + mdesc
                                 + " for Class " + currentClass.getName()
@@ -132,7 +173,7 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
                     }
                 }
 
-                if (hasMethodInfoAnno && annoForMethod != null) {
+                if (hasMethodInfoAnno && monitoredMethodMMAnno != null) {
                     util.error( "Method " + mdesc
                         + " for Class " + currentClass.getName()
                         + " has both @InfoMethod annotation and"
@@ -157,30 +198,43 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
                     if (hasMethodInfoAnno) {
                         util.error( "Constructors must not have an "
                             + "@InfoMethod annotations") ;
-                    } else if (annoForMethod != null) {
+                    } else if (monitoredMethodMMAnno != null) {
                         util.error( "Constructors must not have an "
                             + "MM annotation") ;
                     }
                 }
 
+                // This will be a null value for InfoMethods, which is what
+                // we want.
+                mmnToAnnotationName.put(mmName, monitoredMethodMMAnno ) ;
+
                 // We could have a method at this point that is annotated with
                 // something OTHER than tracing annotations.  Do not add
                 // such methods to the ECD.
-                if (hasMethodInfoAnno || (annoForMethod != null)) {
-                    // Both infoMethods and MM annotated methods go into methodNames
-                    methodNames.add( mname ) ;
+                if (hasMethodInfoAnno || (monitoredMethodMMAnno != null)) {
+                    // Both infoMethods and MM annotated methods go into 
+                    // methodNames
+                    methodNames.add( mmName ) ;
 
-                    // annoForMethod will not be null here
+                    mmnToDescriptions.put( mmName, description ) ;
+                    mmnToTPT.put( mmName, tpt ) ;
+
                     if (hasMethodInfoAnno) {
                         infoMethodDescs.add( mdesc ) ;
                     } else {
                         mmMethodDescs.add( mdesc ) ;
-                        methodToAnno.put( mdesc, annoForMethod ) ;
+                        methodToAnno.put( mdesc, monitoredMethodMMAnno ) ;
                     }
                 }
             }
+        }
 
-	    Collections.sort( methodNames ) ;
+        Collections.sort( methodNames ) ;
+
+        for (String str : methodNames ) {
+            methodDescriptions.add( mmnToDescriptions.get( str ) ) ;
+            methodTPTs.add( mmnToTPT.get( str ) ) ;
+            methodAnnoList.add( mmnToAnnotationName.get( str ) ) ;
         }
 
         if (util.getDebug()) {
@@ -188,6 +242,8 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
             util.msg( "\tmmMethodSignature = " + mmMethodDescs ) ;
             util.msg( "\tmethodNames = " + methodNames ) ;
             util.msg( "\tmethodToAnno = " + methodToAnno ) ;
+            util.msg( "\tmethodDescriptions = " + methodDescriptions ) ;
+            util.msg( "\tmethodTPTs = " + methodTPTs ) ;
         }
     }
 
@@ -205,4 +261,5 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
         processClassAnnotations() ;
         scanMethods();
     }
+
 }

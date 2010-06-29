@@ -72,8 +72,8 @@ public class StaticInitVisitor extends LocalVariablesSorter {
         util.info( 2, "StaticInitVisitor created" ) ;
     }
 
-    private LocalVariableNode defineLocal( MethodVisitor mv, String name, Class<?> cls,
-        Label start, Label end ) {
+    private LocalVariableNode defineLocal( MethodVisitor mv, String name, 
+        Class<?> cls, Label start, Label end ) {
 
         Type type = Type.getType( cls ) ;
         int index = newLocal( type ) ;
@@ -145,8 +145,9 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 	    util.newWithSimpleConstructor( mv, ArrayList.class ) ;
 	    mv.visitVarInsn( Opcodes.ASTORE, mnameList.index ) ;
 
-	    for (String str : ecd.getMethodNames()) {
-		util.info( 2, "Generating code to add " + str + " to methodNames" ) ;
+	    for (String str : ecd.getMethodTracingNames()) {
+		util.info( 2, "Generating code to add " + str
+                    + " to methodNames" ) ;
 		mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
 		mv.visitLdcInsn( str );
 		mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
@@ -155,7 +156,8 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 	    }
 
 	    generateTraceMsg( mv,
-		"create map from MM annotation class to Holder and init", line++ ) ;
+		"create map from MM annotation class to Holder and init",
+                line++ ) ;
 	    util.newWithSimpleConstructor( mv, HashMap.class ) ;
 	    mv.visitVarInsn( Opcodes.ASTORE, holderMap.index ) ;
 
@@ -176,19 +178,22 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 
 		mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
 		    "java/util/Map", "put",
-		    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;" );
+		    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
 		mv.visitInsn( Opcodes.POP ) ;
 	    }
 
-	    generateTraceMsg( mv, "register with MethodMonitorRegistry", line++ ) ;
-	    util.info( 2, "Generating code call MethodMonitorRegistry.registerClass" ) ;
+	    generateTraceMsg( mv, "register with MethodMonitorRegistry",
+                line++ ) ;
+	    util.info( 2,
+                "Generating code call MethodMonitorRegistry.registerClass" ) ;
 	    mv.visitVarInsn( Opcodes.ALOAD, thisClass.index ) ;
 	    mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
 	    mv.visitVarInsn( Opcodes.ALOAD, holderMap.index ) ;
 
 	    Type mmrType = Type.getType( MethodMonitorRegistry.class ) ;
-	    String mdesc = "(Ljava/lang/Class;Ljava/util/List;Ljava/util/Map;)V" ;
+	    String mdesc =
+                "(Ljava/lang/Class;Ljava/util/List;Ljava/util/Map;)V" ;
 	    mv.visitMethodInsn( Opcodes.INVOKESTATIC,
 		mmrType.getInternalName(), "registerClass", mdesc ) ;
 

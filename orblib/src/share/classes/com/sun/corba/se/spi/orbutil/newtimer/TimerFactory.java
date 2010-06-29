@@ -165,5 +165,9 @@ public interface TimerFactory extends TimerGroup {
     @ManagedAttribute
     @Description( "All activated Timers" ) 
     Set<Timer> activeSet() ;
+
+    /** Return true iff a timer with the given name already exists.
+     */
+    boolean timerAlreadyExists( String name ) ;
 }
 

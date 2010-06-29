@@ -69,6 +69,9 @@ import com.sun.corba.se.impl.orbutil.codegen.ASMUtil ;
 import com.sun.corba.se.spi.orbutil.codegen.Expression;
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
+import com.sun.corba.se.spi.orbutil.newtimer.Named;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static java.lang.reflect.Modifier.* ;
 
@@ -84,7 +87,13 @@ import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
  * checked into SCCS.
  */
 public class TimerPointSourceGenerator {
-    private static class TimingInfoProcessor {
+    private static final Comparator<Named> COMP = new Comparator<Named>() {
+        public int compare(Named o1, Named o2) {
+            return o1.name().compareTo( o2.name() ) ;
+        }
+    } ;
+
+    public static class TimingInfoProcessor {
 	private boolean done = false ;
 	private String pkg ;
 	private TimerFactory tf ;
@@ -92,24 +101,24 @@ public class TimerPointSourceGenerator {
 	private TimerGroup currentTimerGroup ;
 
 	private void checkForValidIdentifier( String name ) {
-	    if (!Identifier.isValidIdentifier( name )) 
-		throw new IllegalArgumentException(
-		    "name " + name + " is not a valid Java identifier" ) ;
+	    if (!Identifier.isValidIdentifier( name )) {
+                throw new IllegalArgumentException("name " + name + " is not a valid Java identifier");
+            }
 	}
 
 	private void checkDone() {
-	    if (done)
-		throw new IllegalStateException(
-		    "past getResult: no other methods may be called" ) ;
+	    if (done) {
+                throw new IllegalStateException("past getResult: no other methods may be called");
+            }
 	}
 
 	public TimingInfoProcessor( String name, String pkg ) {
 	    this.done = false ;
 	    this.pkg = pkg ;
 	    checkForValidIdentifier( name ) ;
-	    if (!Identifier.isValidFullIdentifier( pkg ))
-		throw new IllegalArgumentException(
-		    pkg + " is not a valid package name" ) ;
+	    if (!Identifier.isValidFullIdentifier( pkg )) {
+                throw new IllegalArgumentException(pkg + " is not a valid package name");
+            }
 	    this.tf = TimerFactoryBuilder.make( name, name ) ;
 	    this.contents = new LinkedHashMap<String,List<String>>() ;
 	    this.currentTimerGroup = null ;
@@ -118,7 +127,9 @@ public class TimerPointSourceGenerator {
 	public void addTimer( String name, String desc ) {
 	    checkDone() ;
 	    checkForValidIdentifier( name ) ;
-	    tf.makeTimer( name, desc ) ;
+            if (!tf.timerAlreadyExists( name )) {
+                tf.makeTimer( name, desc ) ;
+            }
 	    currentTimerGroup = null ;
 	}
 
@@ -128,6 +139,20 @@ public class TimerPointSourceGenerator {
 	    currentTimerGroup = tf.makeTimerGroup( name, desc ) ;
 	}
 
+        private void addContained( String timerName, String timerGroupName ) {
+            List<String> list = contents.get( timerGroupName ) ;
+            if (list == null) {
+                list = new ArrayList<String>() ;
+                contents.put( timerGroupName, list ) ;
+            }
+
+            list.add( timerName ) ;
+        }
+
+        public void containedIn( String timerName, String timerGroupName ) {
+            addContained( timerName, timerGroupName ) ;
+        }
+
 	public void contains( String name ) {
 	    checkDone() ;
 	    if (currentTimerGroup == null) {
@@ -135,25 +160,20 @@ public class TimerPointSourceGenerator {
 		    "contains must be called after an addTimerGroup call" ) ;
 	    } else {
 		String cname = currentTimerGroup.name() ;
-		List<String> list = contents.get( cname ) ;
-		if (list == null) {
-		    list = new ArrayList<String>() ;
-		    contents.put( cname, list ) ;
-		}
-
-		list.add( name ) ;
+                addContained( cname, name ) ;
 	    }
 	}
 
-	private static Controllable getControllable( TimerFactory tf, 
-	    String name ) {
+	private Controllable getControllable( String name ) {
 
 	    Controllable result = tf.timers().get( name ) ;
-	    if (result == null)
-		result = tf.timerGroups().get( name ) ;
-	    if (result == null)
-		throw new IllegalArgumentException( 
-		    name + " is not a valid Timer or TimerGroup name" ) ;
+	    if (result == null) {
+                result = tf.timerGroups().get(name);
+            }
+	    if (result == null) {
+                throw new IllegalArgumentException(name +
+                    " is not a valid Timer or TimerGroup name");
+            }
 	    return result ;
 	}
 
@@ -164,7 +184,7 @@ public class TimerPointSourceGenerator {
 		List<String> list = contents.get(str) ;
 		TimerGroup tg = tf.timerGroups().get( str ) ;
 		for (String content : list) {
-		    tg.add( getControllable( tf, content ) ) ;
+		    tg.add( getControllable( content ) ) ;
 		}
 	    }
 	}
@@ -219,8 +239,9 @@ public class TimerPointSourceGenerator {
 	private void setPad() {
 	    int length = WIDTH * level ;
 	    pad = new char[length] ;
-	    for (int ctr=0; ctr<length; ctr++)
-		pad[ctr] = ' ' ;
+	    for (int ctr=0; ctr<length; ctr++) {
+                pad[ctr] = ' ';
+            }
 	}
 
 	private void dprint( String msg ) {
@@ -321,8 +342,6 @@ public class TimerPointSourceGenerator {
 	return handler.getResult() ;
     }
 
-    private static Type Controllable ;
-    private static Type TimerManager ;
     private static Type TimerFactory ; 
     private static Type Timer ; 
     private static Type TimerEventController ;
@@ -336,10 +355,6 @@ public class TimerPointSourceGenerator {
 	_clear() ;
 	_package() ;
 
-	Controllable = _import( 
-	    "com.sun.corba.se.spi.orbutil.newtimer.Controllable" ) ;
-	TimerManager = _import( 
-	    "com.sun.corba.se.spi.orbutil.newtimer.TimerManager" ) ;
 	TimerFactory = _import( 
 	    "com.sun.corba.se.spi.orbutil.newtimer.TimerFactory" ) ;
 	Timer = _import( 
@@ -350,6 +365,42 @@ public class TimerPointSourceGenerator {
 	    "com.sun.corba.se.spi.orbutil.newtimer.TimerGroup" ) ;
 
 	standardImports = _import() ;
+    }
+
+    /** Generate a single class which contains:
+     * <ul>
+     * <li>private fields for Timers and TimerGroups
+     * <li>public accessor methods for Timers and TimerGroups
+     * <li>A public constructor <init>(TimerFactory) that initializes the
+     * Timer and TimerGroup fields, and the TimerGroup containment.
+     * </ul>
+     * @param dirName
+     * @param description
+     * @throws IOException
+     */
+    public static void generateSingleFile( String dirName,
+        Pair<String,TimerFactory> description ) throws IOException {
+    
+	String packageName = description.first() ;
+	TimerFactory tf = description.second() ;
+        generateSingleClass( dirName, packageName, tf ) ;
+    }
+
+    private static void generateSingleClass( String dirName,
+        String packageName, TimerFactory tf ) throws IOException {
+
+	startFile( packageName ) ;
+	_class( PUBLIC, tf.name(), _Object() ) ;
+
+        generateFields( tf, false, true ) ;
+	generateConstructor( tf, false ) ;
+	generateAccessorMethods( tf, true ) ;
+
+	_end() ;
+
+	Type type = Type._classGenerator( _classGenerator() ) ;
+
+	writeFile( dirName, type ) ;
     }
 
     /** Generate the source files for the Timers in the TimerFactory from the 
@@ -408,8 +459,8 @@ public class TimerPointSourceGenerator {
 
 	_class( PUBLIC|ABSTRACT, baseClassName, _Object(), generatedInterfaceType ) ; 
 
-	generateFields( tf ) ;
-	generateConstructor( tf ) ;
+	generateFields( tf, true, false ) ;
+	generateConstructor( tf, true ) ;
 	generateAccessorMethods( tf, true ) ;
 
 	_end() ;
@@ -453,10 +504,14 @@ public class TimerPointSourceGenerator {
 	writeFile( dirName, thisClass ) ;
     }
     
-    private static void generateAccessorMethods( TimerFactory tf, boolean isImpl ) {
+    private static void generateAccessorMethods( TimerFactory tf,
+        boolean isImpl ) {
+
 	int modifiers = isImpl ? (PUBLIC|FINAL) : (PUBLIC|ABSTRACT) ;
 
-	for (Timer t : tf.timers().values()) {
+        List<Timer> timers = new ArrayList<Timer>( tf.timers().values() ) ;
+        Collections.sort( timers, COMP );
+	for (Timer t : timers) {
 	    _method( modifiers, Timer, t.name()) ;
 	    if (isImpl) {
 		_body() ;
@@ -465,7 +520,10 @@ public class TimerPointSourceGenerator {
 	    _end() ;
 	}
 
-	for (TimerGroup tg : tf.timerGroups().values()) {
+        List<TimerGroup> timerGroups = new ArrayList<TimerGroup>(
+            tf.timerGroups().values() ) ;
+        Collections.sort( timerGroups, COMP );
+	for (TimerGroup tg : timerGroups) {
 	    _method( modifiers, TimerGroup, tg.name()) ;
 	    if (isImpl) {
 		_body() ;
@@ -496,27 +554,46 @@ public class TimerPointSourceGenerator {
 	}
     }
 
-    private static void generateFields( TimerFactory tf ) {
-	_data( PROTECTED|FINAL, TimerEventController, "controller" ) ;
+    private static void generateFields( TimerFactory tf, 
+        boolean generateController, boolean privateTimers ) {
 
-	for (Timer t : tf.timers().values()) {
-	    _data( PROTECTED|FINAL, Timer, t.name() ) ;
+        if (generateController) {
+            _data( PROTECTED|FINAL, TimerEventController, "controller" ) ;
+        }
+
+        final int mod = FINAL | (privateTimers ? PRIVATE : PROTECTED) ;
+
+        final List<Timer> timers = 
+            new ArrayList<Timer>( tf.timers().values() ) ;
+        Collections.sort( timers, COMP );
+	for (Timer t : timers) {
+	    _data( mod, Timer, t.name() ) ;
 	}
 
+        final List<TimerGroup> timerGroups = 
+            new ArrayList<TimerGroup>( tf.timerGroups().values() ) ;
+        Collections.sort( timerGroups, COMP ) ;
 	for (TimerGroup tg : tf.timerGroups().values()) {
 	    _data( PRIVATE|FINAL, TimerGroup, tg.name() ) ;
 	}
     }
 
-    private static void generateConstructor( TimerFactory tf ) {
+    private static void generateConstructor( TimerFactory tf, 
+        boolean generateController ) {
+
+        Expression controller = null ;
+
 	_constructor( PUBLIC ) ;
 	    Expression tfe = _arg( TimerFactory, "tf" ) ;
-	    Expression controller = _arg( TimerEventController,
-		"controller" ) ;
+            if (generateController) {
+                controller = _arg( TimerEventController,
+                    "controller" ) ;
+            }
 	_body() ;
 
-	// set up orb and tm
-	_assign( _field( _this(), "controller" ), controller ) ;
+        if (generateController) {
+            _assign( _field( _this(), "controller" ), controller ) ;
+        }
 
 	// create all timers
 	for (Timer t : tf.timers().values() ) {

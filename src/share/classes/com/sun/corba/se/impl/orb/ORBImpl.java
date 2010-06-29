@@ -125,7 +125,7 @@ import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility;
 import com.sun.corba.se.spi.orbutil.misc.StackImpl;
 
-import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
+// import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
@@ -157,7 +157,6 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.copyobject.CopierManagerImpl;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.OrbLifeCycle;
 import com.sun.corba.se.spi.trace.Subcontract;
@@ -228,8 +227,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private RequestDispatcherRegistry requestDispatcherRegistry ;
 
     private CopierManager copierManager ;
-
-    private TimerManager<TimingPoints> timerManager ;
 
     private int transientServerId ;
 
@@ -553,7 +550,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	// case we want to time interceptor setup.  Obviously we
 	// want to initialize the timerManager as early as possible
 	// so we can time parts of initialization if desired.
-	timerManager = makeTimerManager( mom ) ;
+	// timerManager = makeTimerManager( mom ) ;
 
 	// This requires a valid TimerManager.
 	initializePrimitiveTypeCodeConstants() ;
@@ -1450,8 +1447,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             if (status < STATUS_DESTROYED) {
                 getCorbaTransportManager().close();
                 getPIHandler().destroyInterceptors() ;
-                timerManager.destroy() ;
-                timerManager = null ;
+                // timerManager.destroy() ;
+                // timerManager = null ;
                 status = STATUS_DESTROYED;
             } else {
                 // Already destroyed: don't want to throw null pointer exceptions.
@@ -2062,10 +2059,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     public CopierManager getCopierManager() {
 	return copierManager ;
-    }
-
-    public TimerManager<TimingPoints> getTimerManager() {
-	return timerManager ;
     }
 
     @Override

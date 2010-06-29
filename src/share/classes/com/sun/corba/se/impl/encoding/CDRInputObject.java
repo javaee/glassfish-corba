@@ -128,8 +128,8 @@ public class CDRInputObject
     // 
     // REVISIT.
     public CDRInputObject() {
-	((com.sun.corba.se.spi.orb.ORB)org.omg.CORBA.ORB.init())
-	    .getTimerManager().points() ;
+	// ((com.sun.corba.se.spi.orb.ORB)org.omg.CORBA.ORB.init())
+	    // .getTimerManager().points() ;
     }
 
      public CDRInputObject(CDRInputObject is) {

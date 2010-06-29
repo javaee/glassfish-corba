@@ -36,10 +36,14 @@
 
 package com.sun.corba.se.spi.orbutil.tf ;
 
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import com.sun.corba.se.spi.orbutil.tf.annotation.TFEnhanced;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -81,6 +85,25 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
         }
     }
 
+    private Object getAttribute( AnnotationNode an, String name ) {
+        if (an.values != null) {
+            Iterator iter = an.values.iterator() ;
+            while (iter.hasNext()) {
+                Object key = iter.next() ;
+                Object value = iter.next() ;
+                if (!(key instanceof String)) {
+                    return null ;
+                }
+
+                if (key.equals(name)) {
+                    return value ;
+                }
+            }
+        }
+
+        return null ;
+    }
+
     // Scan methods:
     //    - Build List<String> to map names of MM annotated methods to ints
     //      validate: such methods must have exactly 1 MM annotation that
@@ -90,11 +113,31 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
     //          an empty body.  May NOT have MM annotation.
     private void scanMethods() {
         final List<MethodNode> methods = currentClass.methods ;
+        Map<String,String> mmnToDescriptions =
+            new HashMap<String,String>() ;
+
+        Map<String,TimingPointType> mmnToTPT =
+            new HashMap<String,TimingPointType>() ;
+
+        Map<String,String> mmnToAnnotationName = 
+            new HashMap<String,String>() ;
+
         for (MethodNode mn : methods) {
             final String mname = mn.name ;
             final String mdesc = util.getFullMethodDescriptor( mn ) ;
 
-            String annoForMethod = null ;
+            String monitoredMethodMMAnno = null ;
+            String shortClassName = className ;
+            int index = shortClassName.lastIndexOf( '/' ) ;
+            if (index >= 0) {
+                shortClassName = className.substring( index + 1 ) ;
+            }
+
+            String description = "Timer for method " + mname
+                + " in class " + shortClassName ; // default
+            String mmName = mname ; // default
+            TimingPointType tpt = TimingPointType.BOTH ; // default for non InfoMethod
+
             boolean hasMethodInfoAnno = false ;
 
             final List<AnnotationNode> annotations = mn.visibleAnnotations ;
@@ -103,18 +146,40 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                     final String aname =
                         Type.getType( an.desc ).getInternalName() ;
 
-                    if (aname.equals( INFO_METHOD_NAME)) {
+                    if (aname.equals( TRACING_NAME )) {
+                        Object value = getAttribute( an, "value" ) ;
+                        if (value != null && value instanceof String) {
+                            mmName = (String)value ;
+                        }
+                    } else if (aname.equals( DESCRIPTION_NAME )) {
+                        Object value = getAttribute( an, "value" ) ;
+                        if (value != null && value instanceof String) {
+                            description = (String)value ;
+                        }
+                    } else if (aname.equals( INFO_METHOD_NAME)) {
                         // Check for private method!
-                        if (!util.hasAccess( mn.access, Opcodes.ACC_PRIVATE )) {
+                        if (!util.hasAccess( mn.access, 
+                            Opcodes.ACC_PRIVATE )) {
+
                             util.error( "Method " + mdesc
                                 + " for Class " + currentClass.name
                                 + " is a non-private @InfoMethod,"
                                 + " which is not allowed" ) ;
                         }
+
                         hasMethodInfoAnno = true ;
+
+                        Object value = getAttribute( an, "tpType" ) ;
+                        if (value != null && value instanceof String[]) {
+                            String[] enumData = (String[])value ;
+                            if (enumData.length == 2) {
+                                // [0] is desc, [1] is value
+                                tpt = TimingPointType.valueOf( enumData[1] ) ;
+                            }
+                        }
                     } else if (annoNamesForClass.contains( aname)) {
-                        if (annoForMethod == null) {
-                            annoForMethod = aname ;
+                        if (monitoredMethodMMAnno == null) {
+                            monitoredMethodMMAnno = aname ;
                         } else {
                             util.error( "Method " + mdesc
                                 + " for Class " + currentClass.name
@@ -128,7 +193,7 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                     }
                 }
 
-                if (hasMethodInfoAnno && annoForMethod != null) {
+                if (hasMethodInfoAnno && monitoredMethodMMAnno != null) {
                     util.error( "Method " + mdesc
                         + " for Class " + currentClass.name
                         + " has both @InfoMethod annotation and"
@@ -153,37 +218,52 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                     if (hasMethodInfoAnno) {
                         util.error( "Constructors must not have an "
                             + "@InfoMethod annotations") ;
-                    } else if (annoForMethod != null) {
+                    } else if (monitoredMethodMMAnno != null) {
                         util.error( "Constructors must not have an "
                             + "MM annotation") ;
                     }
                 }
 
+                // This will be a null value for InfoMethods, which is what
+                // we want.
+                mmnToAnnotationName.put(mmName, monitoredMethodMMAnno ) ;
+
                 // We could have a method at this point that is annotated with
                 // something OTHER than tracing annotations.  Do not add
                 // such methods to the ECD.
-                if (hasMethodInfoAnno || (annoForMethod != null)) {
-                    // Both infoMethods and MM annotated methods go into methodNames
+                if (hasMethodInfoAnno || (monitoredMethodMMAnno != null)) {
+                    // Both infoMethods and MM annotated methods go into 
+                    // methodNames
                     methodNames.add( mname ) ;
 
-                    // annoForMethod will not be null here
+                    mmnToDescriptions.put( mmName, description ) ;
+                    mmnToTPT.put( mmName, tpt ) ;
+
                     if (hasMethodInfoAnno) {
                         infoMethodDescs.add( mdesc ) ;
                     } else {
                         mmMethodDescs.add( mdesc ) ;
-                        methodToAnno.put( mdesc, annoForMethod ) ;
+                        methodToAnno.put( mdesc, monitoredMethodMMAnno ) ;
                     }
                 }
             }
+        }
 
-	    Collections.sort( methodNames ) ;
+        Collections.sort( methodNames ) ;
+
+        for (String str : methodNames ) {
+            methodDescriptions.add( mmnToDescriptions.get( str ) ) ;
+            methodTPTs.add( mmnToTPT.get( str ) ) ;
+            methodAnnoList.add( mmnToAnnotationName.get( str ) ) ;
         }
 
         if (util.getDebug()) {
-            util.msg( "\tinfoMethodSignature = " + infoMethodDescs ) ;
-            util.msg( "\tmmMethodSignature = " + mmMethodDescs ) ;
+            util.msg( "\tinfoMethodDescs = " + infoMethodDescs ) ;
+            util.msg( "\tmmMethodDescs = " + mmMethodDescs ) ;
             util.msg( "\tmethodNames = " + methodNames ) ;
             util.msg( "\tmethodToAnno = " + methodToAnno ) ;
+            util.msg( "\tmethodDescriptions = " + methodDescriptions ) ;
+            util.msg( "\tmethodTPTs = " + methodTPTs ) ;
         }
     }
 

@@ -72,8 +72,6 @@ import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.util.JDKBridge;
 
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
-
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
@@ -85,11 +83,11 @@ import com.sun.corba.se.spi.trace.Subcontract;
 /**
  * @author Harold Carr
  */
+@Subcontract
 public class CorbaClientDelegateImpl extends CorbaClientDelegate 
 {
     private ORB orb;
     private ORBUtilSystemException wrapper ;
-    private TimingPoints tp ;
 
     private CorbaContactInfoList contactInfoList;
 
@@ -97,7 +95,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 				   CorbaContactInfoList contactInfoList)
     {
 	this.orb = orb;
-	this.tp = orb.getTimerManager().points() ;
+	// this.tp = orb.getTimerManager().points() ;
 	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 	this.contactInfoList = contactInfoList;
     }
@@ -133,7 +131,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 				String operation, 
 				boolean responseExpected) 
     {
-	tp.enter_totalInvocation() ;
+	// tp.enter_totalInvocation() ;
 	try {
 	    OutputStream result = null;
 	    boolean retry;
@@ -154,7 +152,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 		    }
 
 		    try {
-			tp.enter_hasNextNext() ;
+			// tp.enter_hasNextNext() ;
 
 			if (! contactInfoListIterator.hasNext()) {
 			    // REVISIT: When we unwind the retry stack
@@ -169,7 +167,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 			    contactInfoListIterator.next();
                         requestInfo( operation, contactInfo ) ;
 		    } finally {
-			tp.exit_hasNextNext() ;
+			// tp.exit_hasNextNext() ;
 		    }
 
 		    CorbaClientRequestDispatcher subcontract =
@@ -245,7 +243,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    }
 	    orb.releaseOrDecrementInvocationInfo();
 	} finally {
-	    tp.exit_totalInvocation() ;
+	    // tp.exit_totalInvocation() ;
         
             // Disable operation tracing for result unmarshaling
             OperationTracer.disable() ;

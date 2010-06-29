@@ -81,8 +81,8 @@ import com.sun.corba.se.spi.orbutil.copyobject.CopyType ;
 import com.sun.corba.se.spi.trace.DynamicType ;
 
 // subclasses must provide a matching helper class
-public class AnyImpl extends Any
-{
+@DynamicType
+public class AnyImpl extends Any {
     private static final long serialVersionUID = -8646067979785949029L;
 
     private static final class AnyInputStream extends EncapsInputStream 

@@ -108,6 +108,7 @@ public class ReferenceFactoryManagerImpl
     private POAManager manager ; 
     private AdapterActivator activator ; 
 	
+    @Poa
     private class AdapterActivatorImpl 
 	extends LocalObject 
 	implements AdapterActivator 

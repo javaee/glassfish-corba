@@ -128,6 +128,8 @@ import com.sun.corba.se.spi.trace.Transport;
 /**
  * @author Harold Carr
  */
+@Subcontract
+@Transport
 public class CorbaMessageMediatorImpl
     implements 
 	CorbaMessageMediator,

@@ -99,6 +99,7 @@ import com.sun.corba.se.spi.trace.Transport;
  * The changes are in the 1.106 version, which is saved as
  * SocketOrChannelConnectionImpl.1.106.sjava.
  */
+@Transport
 public class SocketOrChannelConnectionImpl
     extends
 	EventHandlerBase
@@ -410,6 +411,7 @@ public class SocketOrChannelConnectionImpl
     }
 
     // NOTE: This method can throw a connection rebind SystemException.
+    @Transport
     public ByteBuffer read(int size, int offset, int length )
 	throws IOException {
 	try {
@@ -449,6 +451,7 @@ public class SocketOrChannelConnectionImpl
     // NOTE: This method is used only when the ORB is configured with
     //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels.
     // NOTE: This method can throw a connection rebind SystemException.
+    @Transport
     public ByteBuffer read(ByteBuffer byteBuffer, int offset, int length)
 	throws IOException
     {
@@ -626,6 +629,7 @@ public class SocketOrChannelConnectionImpl
     }    
 
     // NOTE: This method can throw a connection rebind SystemException.
+    @Transport
     public void write(ByteBuffer byteBuffer) throws IOException {
         try {
             if (shouldUseDirectByteBuffers()) {
@@ -1459,6 +1463,7 @@ public class SocketOrChannelConnectionImpl
 	this.tcpTimeouts = tcpTimeouts;
     }
 
+    @Transport
     protected void doOptimizedReadStrategy() {
         MessageParser messageParser;
         try {

@@ -63,6 +63,7 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceServiceContext;
 
+@TraceServiceContext
 public class ServiceContextsImpl implements ServiceContexts 
 {
     private final ORB orb ;

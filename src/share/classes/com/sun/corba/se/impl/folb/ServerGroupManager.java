@@ -89,6 +89,7 @@ import com.sun.corba.se.spi.trace.Folb;
 /**
  * @author Harold Carr
  */
+@Folb
 public class ServerGroupManager
     extends
         org.omg.CORBA.LocalObject

@@ -61,6 +61,7 @@ import com.sun.corba.se.spi.trace.Transport;
 /**
  * @author Harold Carr
  */
+@Transport
 public abstract class CorbaContactInfoBase
     implements
 	CorbaContactInfo
@@ -103,6 +104,7 @@ public abstract class CorbaContactInfoBase
     }
 
     // Called when client making an invocation.    
+    @Transport
     public CorbaMessageMediator createMessageMediator(ORB broker,
 						 CorbaContactInfo contactInfo,
 						 CorbaConnection connection,
@@ -148,6 +150,7 @@ public abstract class CorbaContactInfoBase
 	return messageMediator;
     }
 
+    @Transport
     public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator)
     {
 	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
@@ -162,6 +165,7 @@ public abstract class CorbaContactInfoBase
 	return outputObject;
     }
 
+    @Transport
     public CDRInputObject createInputObject(ORB broker, 
         CorbaMessageMediator messageMediator) {
 

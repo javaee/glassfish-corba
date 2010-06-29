@@ -90,7 +90,6 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
@@ -147,8 +146,7 @@ public class CorbaClientRequestDispatcherImpl
         final CorbaContactInfo corbaContactInfo = contactInfo;
         final ORB orb = contactInfo.getBroker();
 
-	final TimingPoints tp = orb.getTimerManager().points() ;
-        tp.enter_totalRequest() ;
+        // tp.enter_totalRequest() ;
 
         // Portable Interceptor initialization.
         orb.getPIHandler().initiateClientPIRequest( false );
@@ -162,7 +160,7 @@ public class CorbaClientRequestDispatcherImpl
         synchronized (lock) {
             if (contactInfo.isConnectionBased()) {
                 try {
-                    tp.enter_connectionSetup();
+                    // tp.enter_connectionSetup();
 
                     if (contactInfo.shouldCacheConnection()) {
                         connection = (CorbaConnection) orb.getTransportManager()
@@ -196,7 +194,7 @@ public class CorbaClientRequestDispatcherImpl
                         }
                     }
                 } finally {
-                    tp.exit_connectionSetup();
+                    // tp.exit_connectionSetup();
                 }
             }
         }
@@ -219,11 +217,11 @@ public class CorbaClientRequestDispatcherImpl
 
         performCodeSetNegotiation(messageMediator);
 
-        tp.enter_requestAddServiceContexts() ;
+        // tp.enter_requestAddServiceContexts() ;
         try {
             addServiceContexts(messageMediator);
         } finally {
-            tp.exit_requestAddServiceContexts() ;
+            // tp.exit_requestAddServiceContexts() ;
         }
 
         CDROutputObject outputObject = contactInfo.createOutputObject(messageMediator);
@@ -291,7 +289,7 @@ public class CorbaClientRequestDispatcherImpl
         messageMediator.initializeMessage();
         generalMessage( "initialized message");
 
-        tp.enter_clientEncoding();
+        // tp.enter_clientEncoding();
 
         return outputObject;
     }
@@ -309,27 +307,26 @@ public class CorbaClientRequestDispatcherImpl
         CorbaMessageMediator messageMediator = (CorbaMessageMediator)
             outputObject.getMessageMediator();
         ORB orb = (ORB) messageMediator.getBroker();
-        TimingPoints tp = orb.getTimerManager().points() ;
         operationAndId(messageMediator.getOperationName(), 
             messageMediator.getRequestId() );
 
 	try {
-	    tp.exit_clientEncoding();
+	    // tp.exit_clientEncoding();
 
-	    tp.enter_clientTransportAndWait();
+	    // tp.enter_clientTransportAndWait();
 
 	    CDRInputObject inputObject = null ;
 	    try {
 		inputObject = marshalingComplete1(orb, messageMediator);
 	    } finally {
-		tp.exit_clientTransportAndWait();
+		// tp.exit_clientTransportAndWait();
 	    }
 
 	    return processResponse(orb, messageMediator, inputObject);
 	} finally {
 	    // We must ALWAYS call enter_ClientDecoding, so that the
 	    // corresponding exit_clientDecoding gets called in endRequest().
-	    tp.enter_clientDecoding() ;
+	    // tp.enter_clientDecoding() ;
 	}
     }
 
@@ -413,14 +410,13 @@ public class CorbaClientRequestDispatcherImpl
         CorbaMessageMediator messageMediator, CDRInputObject inputObject)
 	throws ApplicationException, org.omg.CORBA.portable.RemarshalException {
 
-	TimingPoints tp = orb.getTimerManager().points() ;
 	ORBUtilSystemException wrapper = 
 	    orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
         operationAndId(messageMediator.getOperationName(),
             messageMediator.getRequestId() );
 
-	tp.enter_processResponse() ;
+	// tp.enter_processResponse() ;
 	try {
 	    // We know for sure now that we've sent a message.
 	    // So OK to not send initial again.
@@ -644,7 +640,7 @@ public class CorbaClientRequestDispatcherImpl
 		return inputObject;
 	    }
         } finally {
-	    tp.exit_processResponse() ;
+	    // tp.exit_processResponse() ;
 	}
     }
 
@@ -847,16 +843,8 @@ public class CorbaClientRequestDispatcherImpl
     {
 	ORB orb = (ORB)broker ;
 
-        TimerManager<TimingPoints> tm = orb.getTimerManager() ;
-        if (tm == null) {
-            // ORB was shutdown: no action possible
-            return ;
-        }
-
-	TimingPoints tp = tm.points() ;
-
 	try {
-	    tp.exit_clientDecoding();
+	    // tp.exit_clientDecoding();
 
 	    // Note: the inputObject may be null if an error occurs
 	    //       in request or before _invoke returns.
@@ -910,7 +898,7 @@ public class CorbaClientRequestDispatcherImpl
             // This won't result in a Corba error if an IOException happens.
             reportException("ignoring IOException", ex );
 	} finally {
-	    tp.exit_totalRequest() ;
+	    // tp.exit_totalRequest() ;
 	}
     }
 

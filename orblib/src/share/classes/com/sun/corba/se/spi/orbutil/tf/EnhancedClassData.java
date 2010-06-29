@@ -37,11 +37,12 @@
 package com.sun.corba.se.spi.orbutil.tf ;
 
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
-import com.sun.corba.se.spi.orbutil.tf.MethodMonitor;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
-import java.lang.annotation.Annotation;
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
+import com.sun.corba.se.spi.orbutil.tf.annotation.TracingName;
 import java.util.List;
 import java.util.Map;
+import org.glassfish.gmbal.Description;
 import org.objectweb.asm.Type;
 
 /**
@@ -60,57 +61,109 @@ public interface EnhancedClassData {
 
     String INFO_METHOD_NAME = Type.getInternalName( InfoMethod.class ) ;
 
+    String TRACING_NAME = Type.getInternalName( TracingName.class ) ;
+
+    String DESCRIPTION_NAME = Type.getInternalName( Description.class ) ;
+
     /** Return the internal name of the class.
+     * @return The class name.
      */
     String getClassName() ;
 
+    /** Returns true iff this class is monitored.
+     *
+     * @return true iff this class has one or more MM annotations.
+     */
+    boolean isTracedClass() ;
+
     /** Map from MM annotation name to the name of the holder 
      * field that contains the SynchronizedHolder for the
-     * corresponding MethodMonitor.
+     * corresponding MethodMonitor.  The domain of this map is the set of
+     * MM annotations on this class.
+     *
+     * @return Map from MM annotations defined on this class to the names of
+     * the holder fields.
      */
     Map<String,String> getAnnotationToHolderName() ;
 
-    /** Some implementations of this interface may choose to reveal this
-     * information.  It is convenient to get in the reflective case (where
-     * it is needed for the MethodMonitorRegistry.registerClass( Class<?> ) 
-     * method), but not so convenient in the ASM case (where it is not 
-     * needed in any case).
-     * 
-     * @return A map from annotation name to corresponding annotations
-     * class.  May be empty even for classes that have MM annotations.
+    public enum MethodType {
+        STATIC_INITIALIZER,
+        INFO_METHOD,
+        NORMAL_METHOD,
+        MONITORED_METHOD
+    }
+
+    /** Classify the method.
+     * @param fullMethodDescriptor The full method descriptor of the method.
+     * @return The kind of the corresponding method.
      */
-    Map<String,Class<? extends Annotation>> getAnnoNameMap() ;
+    MethodType classifyMethod( String fullMethodDescriptor ) ;
+
+    /** Name of the holder fields corresponding to a particular
+     * method.  Note that the full descriptor (name + arg/return
+     * descriptor) is used to unambiguously identify the method in the class.
+     *
+     * @param fullMethodDescriptor The full method descriptor of the method.
+     * @return The name of the holder field used for this method.
+     */
+    String getHolderName( String fullMethodDescriptor ) ;
+
+    /** Given the method descriptor, return the tracing name of the method.
+     * For non-overloaded methods, this is the method name, otherwise it is
+     * the name given in the @TracingName annotation.  The resulting String is
+     * used in getMethodTracingNames and getMethodIndex.
+     *
+     * @param fullMethodDescriptor The full method descriptor of the method.
+     * @return The corresponding method tracing name
+     */
+    String getMethodTracingName( String fullMethodDescriptor ) ;
 
     /** List of method names for all MM methods and info methods 
      * in the class.  Order is significant, as the index of the
      * method in the list is the ordinal used to represent it.
+     * This list is in sorted order.
+     *
+     * @return List of all method tracing names in sorted order.
      */
-    List<String> getMethodNames() ;
-    
-    /** Index of method name in the list of method names.
-     */
-    int getMethodIndex( String methodName ) ;
-    
-    /** Name of the holder fields corresponding to a particular
-     * method.  Note that the full descriptor (name + arg/return
-     * descriptor) to unambiguously identify the method in the class.
-     */
-    String getHolderName( String fullMethodDescriptor ) ;
-    
-    public enum MethodType {
-        STATIC_INITIALIZER,
-        INFO_METHOD, 
-        NORMAL_METHOD, 
-        MONITORED_METHOD 
-    }
+    List<String> getMethodTracingNames() ;
 
-    /** Classify the method.
+    /** List of descriptions of monitored methods and info methods.
+     * If no description was given in the annotations, the value is "".
+     * 
+     * @return List of descriptions in the same order as in 
+     * getMethodTracingNames.
      */
-    MethodType classifyMethod( String fullMethodDescriptor ) ;
-    
-    /** Returns true iff this class is monitored.
+    List<String> getDescriptions() ;
+
+    /** List of timing point types of monitored methods and info methods.
+     * The list contains BOTH for a monitored method.  An info method that
+     * does not represent a timing point is represented by NONE.
+     * 
+     * @return List of TimingPointTypes in the same order as in
+     * getMethodTracingNames.
      */
-    boolean isTracedClass() ;
+    List<TimingPointType> getTimingPointTypes() ;
+
+    /** List of annotation names for each info method and monitored method.
+     * It is interpreted as follows:
+     * <ul>
+     * <li>If the entry in the list is not null, it is the only annotation
+     * applicable to this method.  This is the case for monitored methods.
+     * <li>If the entry in the list is null, all annotations on the
+     * enclosing class apply to this method.  This is the case for an
+     * InfoMethod, which can be called from any monitored method regardless of
+     * the annotation on the monitored method.
+     * </ul>
+     * @return
+     */
+    List<String> getMethodMMAnnotationName() ;
+
+    /** Index of method name in the list of method names.
+     *
+     * @param methodTracingName The method name as defined for tracing.
+     * @return the method index
+     */
+    int getMethodIndex( String methodTracingName ) ;
 
     /** Enhance all of the descriptors for infoMethods.
      */

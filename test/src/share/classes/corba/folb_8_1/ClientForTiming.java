@@ -378,8 +378,8 @@ public class ClientForTiming
 	// Create the extra timers for this test
 	totalTestTime = tf.makeTimer( "totalTestTime", "Total Test Execution Time" ) ;
 	clientInvoke = tf.makeTimer( "clientInvoke", "Execution Time of Client Invoke" ) ;
-	tp.transport().add( totalTestTime ) ;
-	tp.transport().add( clientInvoke ) ;
+	// Not available: tp.transport().add( totalTestTime ) ;
+	// Not available: tp.transport().add( clientInvoke ) ;
 
 	dprint();
 	dprint("ending setup");
@@ -465,10 +465,12 @@ public class ClientForTiming
 
     public static void setTimerPoints(boolean x)
     {
+        /* tp.transport not available.
 	if (x)
 	    tp.transport().enable() ;
 	else
 	    tp.transport().disable() ;
+        */
     }
 
     public static void dprint()

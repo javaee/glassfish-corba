@@ -36,13 +36,18 @@
 
 package com.sun.tools.corba.se.enhancer;
 
+import com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator.TimingInfoProcessor;
 import java.util.Set;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder;
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import com.sun.corba.se.spi.orbutil.tf.EnhancedClassData;
 import com.sun.corba.se.spi.orbutil.tf.EnhancedClassDataASMImpl;
 import com.sun.corba.se.spi.orbutil.tf.TraceEnhancementException;
 import com.sun.corba.se.spi.orbutil.tf.Util;
+import java.util.Iterator;
+import java.util.List;
 
 import org.objectweb.asm.ClassAdapter;
 
@@ -50,6 +55,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import sun.security.krb5.internal.EncAPRepPart;
 
 /** ClassFile enhancer for the tracing facility.  This modifies the bytecode
  * for an applicable class, then returns the updated bytecode.
@@ -91,25 +97,71 @@ import org.objectweb.asm.tree.ClassNode;
  * @author ken
  */
 public class Transformer implements UnaryFunction<byte[],byte[]> {
-    private final boolean tracegen ;
-
-    private Set<String> annotationNames = null ;
     private final Util util  ;
+    private final EnhanceTool.ProcessingMode mode ;
+    private final TimingInfoProcessor tip ;
+    private final Set<String> annotationNames ;
 
     // Initialized in the evaluate method.
     private EnhancedClassData ecd = null ;
 
-    public Transformer( Util util, boolean tracegen ) {
-        this.util = util ;
-        this.tracegen = tracegen ;
-    }
+    Transformer(Util util, EnhanceTool.ProcessingMode mode,
+        TimingInfoProcessor tip, Set<String> anames ) {
 
-    public void setMMGAnnotations(Set<String> mmgAnnotations) {
-        annotationNames = mmgAnnotations ;
+        this.util = util ;
+        this.mode = mode ;
+        this.tip = tip ;
+        this.annotationNames = anames ;
     }
 
     private boolean hasAccess( int access, int flag ) {
         return (access & flag) == flag ;
+    }
+
+    private String getSuffix( String str ) {
+        String result = str ;
+        final int index = str.lastIndexOf('/') ;
+        if (index >=0) {
+            result = result.substring(index + 1);
+        }
+        return result ;
+    }
+
+    private void processTimers() {
+        final Iterator<String> descriptions =
+            ecd.getDescriptions().iterator() ;
+        final Iterator<String> names =
+            ecd.getMethodTracingNames().iterator() ;
+        final Iterator<TimingPointType> tpts =
+            ecd.getTimingPointTypes().iterator() ;
+        final Iterator<String> groups =
+            ecd.getMethodMMAnnotationName().iterator() ;
+
+        final Set<String> classAnnoNames =
+            ecd.getAnnotationToHolderName().keySet() ;
+
+        while (descriptions.hasNext()) {
+            final String desc = descriptions.next() ;
+            final String name = names.next() ;
+            final TimingPointType tpt = tpts.next() ;
+            final String group = groups.next() ;
+
+            if (tpt != TimingPointType.NONE) {
+                final String cname = getSuffix( ecd.getClassName() ) ;
+                final String timerName = TimerFactoryBuilder.getTimerName( cname,
+                    name) ;
+
+                tip.addTimer( timerName, desc ) ;
+
+                if (group == null) {
+                    for (String str : classAnnoNames) {
+                        tip.containedIn( timerName, getSuffix( str ) ) ;
+                    }
+                } else {
+                    tip.containedIn( timerName, getSuffix( group ) ) ;
+                }
+            }
+        }
     }
 
     public byte[] evaluate( final byte[] arg) {
@@ -124,12 +176,6 @@ public class Transformer implements UnaryFunction<byte[],byte[]> {
         }
 
         try {
-            // We need EnhancedClassData to hold the results of scanning the class
-            // for various details about annotations.  This makes it easy to write
-            // a one-pass visitor in part 2 to actually add the tracing code.
-            // Note that the ECD can easily be computed either at build time
-            // from the classfile byte[] (using ASM), or at runtime, directly
-            // from a Class object using reflection.
             ecd = new EnhancedClassDataASMImpl( util, annotationNames, cn ) ;
 
             // If this class is not annotated as a traced class, ignore it.
@@ -137,13 +183,19 @@ public class Transformer implements UnaryFunction<byte[],byte[]> {
                 return null ;
             }
 
-            final byte[] phase1 = util.transform( false, arg,
-                new UnaryFunction<ClassVisitor, ClassAdapter>() {
-                    public ClassAdapter evaluate(ClassVisitor arg) {
-                        return new ClassEnhancer( util, ecd, arg ) ;
+            processTimers() ;
+
+            byte[] phase1 = null ;
+            if ((mode == EnhanceTool.ProcessingMode.UpdateSchemas) ||
+               (mode == EnhanceTool.ProcessingMode.TraceEnhance)) {
+                phase1 = util.transform( false, arg,
+                    new UnaryFunction<ClassVisitor, ClassAdapter>() {
+                        public ClassAdapter evaluate(ClassVisitor arg) {
+                            return new ClassEnhancer( util, ecd, arg ) ;
+                        }
                     }
-                }
-            ) ;
+                ) ;
+            }
 
             // Only communication from part 1 to part2 is a byte[] and
             // the EnhancedClassData.  A runtime version can be regenerated
@@ -159,7 +211,7 @@ public class Transformer implements UnaryFunction<byte[],byte[]> {
             //     It must NOT modify its input visitor (or you get an
             //     infinite series of calls to onMethodExit...)
 
-            if (tracegen) {
+            if (mode == EnhanceTool.ProcessingMode.TraceEnhance) {
                 final byte[] phase2 = util.transform( util.getDebug(), phase1,
                     new UnaryFunction<ClassVisitor, ClassAdapter>() {
 

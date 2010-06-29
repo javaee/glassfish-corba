@@ -238,6 +238,7 @@ public class VirtualAddressAgentImpl
     // This is exactly like IIOPProfileImpl, except for isLocal.
     // Here isLocal is true iff the profile's primary address
     // is the address of the LB.
+    @Subcontract
     private class SpecialIIOPProfileImpl extends
 	IIOPProfileImpl {
 

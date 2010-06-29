@@ -107,8 +107,12 @@
             <arg value="1"/>
 	    <arg value="-rf"/>
 	    <arg value="com/sun/corba/se/spi/tfannotations.properties"/>
-            <arg value="-tracegen"/>
-            <arg value="true"/>
+            <arg value="-mode"/>
+            <arg value="TraceEnhance"/>
+            <arg value="-timingPointClass"/>
+            <arg value="com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints"/>
+            <arg value="-timingPointDir"/>
+            <arg value="${gensrc.dir}"/>
         </java>
     </target>
 
@@ -214,7 +218,7 @@
 
     <!-- ========================= COMPILE ========================= -->
 
-    <target name="compile" depends="init, prepare-dirs, get-dependencies, build-jscheme, orb-library, compile-enhancer, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, generate-timing-points, delete-java-sources, copy-resources">
+    <target name="compile" depends="init, prepare-dirs, get-dependencies, build-jscheme, orb-library, compile-enhancer, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"

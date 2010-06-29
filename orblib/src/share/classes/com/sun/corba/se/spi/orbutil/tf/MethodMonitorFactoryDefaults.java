@@ -38,6 +38,10 @@ package com.sun.corba.se.spi.orbutil.tf;
 
 import com.sun.corba.se.spi.orbutil.generic.Algorithms;
 import com.sun.corba.se.spi.orbutil.generic.Pair;
+import com.sun.corba.se.spi.orbutil.newtimer.Timer;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Formatter;
@@ -102,7 +106,8 @@ public class MethodMonitorFactoryDefaults {
                         OperationTracer.enter( mname, args ) ;
                     }
 
-                    public void info(Object[] args, int callerIdent, int selfIdent) {
+                    public void info(Object[] args, int callerIdent, 
+                        int selfIdent ) {
                         // Should we do something here?
                     }
 
@@ -318,6 +323,60 @@ public class MethodMonitorFactoryDefaults {
                 } ;
             }
         } ;
+
+    public static <T> MethodMonitorFactory makeTimingImpl(
+        final TimerManager<T> tm ) {
+
+        return new MethodMonitorFactory() {
+            public MethodMonitor create(final Class<?> cls) {
+                return new MethodMonitorBase( cls ) {
+                    private TimerEventController tec = tm.controller() ;
+
+                    private final List<Timer> timers =
+                        tm.getTimers( cls ) ;
+
+                    private final List<TimingPointType> timerTypes =
+                        MethodMonitorRegistry.getTimerTypes( cls ) ;
+
+                    public void enter(int ident, Object... args) { 
+                        Timer tp = timers.get( ident ) ;
+                        tec.enter( tp ) ;
+                    }
+
+                    public void info(Object[] args, int callerId,
+                        int selfId ) { 
+                        
+                        Timer tp = timers.get( selfId ) ;
+                        if (tp != null) {
+                            TimingPointType tpt = timerTypes.get( selfId ) ;
+                            if (tpt == TimingPointType.ENTER) {
+                                tec.enter( tp ) ;
+                            } else if (tpt == TimingPointType.EXIT) {
+                                tec.exit( tp ) ;
+                            }
+                        }
+                    }
+
+                    public void exit(int ident) { 
+                        Timer tp = timers.get( ident ) ;
+                        tec.exit( tp ) ;
+                    }
+
+                    public void exit(int ident, Object result) { 
+                        Timer tp = timers.get( ident ) ;
+                        tec.exit( tp ) ;
+                    }
+
+                    public void exception(int ident, Throwable thr) { 
+                        Timer tp = timers.get( ident ) ;
+                        tec.exit( tp ) ;
+                    }
+
+                    public void clear() { }
+                } ;
+            }
+        } ;
+    }
 
     public static MethodMonitorFactory operationTracer() {
         return operationTracerImpl ;

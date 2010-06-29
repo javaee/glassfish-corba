@@ -36,10 +36,11 @@
 
 package com.sun.corba.se.spi.orbutil.newtimer ;
 
-import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
-
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.glassfish.gmbal.ManagedObjectManager ;
 
 /** Provides access to timer facilities.
@@ -52,10 +53,17 @@ import org.glassfish.gmbal.ManagedObjectManager ;
  * methods.
  */
 public class TimerManager<T> {
-    private TimerFactory tf ;
-    private T tp ;
-    private volatile TimerEventController controller ;
-    private boolean isInitialized = false ;
+    private final TimerFactory tf ;
+    private final TimerEventController controller ;
+
+    private volatile T tp ;
+    private volatile boolean isInitialized = false ;
+
+    private final Map<Class<?>,List<Timer>> classToTimers =
+        new HashMap<Class<?>,List<Timer>>() ;
+
+    private final Map<Class<?>,List<TimingPointType>> classToTPTs =
+        new HashMap<Class<?>,List<TimingPointType>>() ;
 
     /** Create a new TimerManager, with a TimerFactory registered under the given name
      * in the TimerFactoryBuilder, and a TimerEventController with the same name.
@@ -123,5 +131,26 @@ public class TimerManager<T> {
      */
     public TimerEventController controller() {
 	return controller ;
+    }
+
+    public synchronized List<Timer> getTimers( Class<?> cls ) {
+        checkInitialized();
+
+        List<Timer> result = classToTimers.get( cls ) ;
+        if (result == null) {
+            result = new ArrayList<Timer>() ;
+
+            List<String> names = MethodMonitorRegistry.getMethodNames(cls) ;
+            for (String name : names) {
+                String tname = TimerFactoryBuilder.getTimerName(
+                    cls.getSimpleName(), name) ;
+                Timer timer = tf.timers().get( tname ) ;
+                result.add( timer ) ;
+            }
+
+            classToTimers.put( cls, result ) ;
+        }
+
+        return result ;
     }
 }

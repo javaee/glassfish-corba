@@ -64,4 +64,6 @@ public @interface MethodMonitorGroup {
      * this one.
      */
     Class<? extends Annotation>[] value() default {} ;
+
+    String description() default "" ;
 }

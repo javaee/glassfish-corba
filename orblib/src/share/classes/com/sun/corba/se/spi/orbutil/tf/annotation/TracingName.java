@@ -42,6 +42,21 @@ import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
-/** Used to indicate what kind of TimingPoint a InfoMethod represents.
+/** Used to indicate that a method is used for invoking MethodMonitor.info.
+ * The method must be private and have a void return type.
+ * Any arguments are passed into the
+ * MethodMonitor.info call in the instrumented code.
+ *
+ * @Param value The tracing name of this method.  Default means 
+ * use the method name.  Note: in the case of overloaded methods, 
+ * each overloaded method must have a tracing name
+ * that is unique within the class.
+ *
+ * @author ken
  */
-public enum TimingPointType { NONE, ENTER, EXIT }
+@Documented
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TracingName {
+    String value() default "" ;
+}

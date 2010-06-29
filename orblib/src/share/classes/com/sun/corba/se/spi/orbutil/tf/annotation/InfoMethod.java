@@ -36,6 +36,7 @@
 
 package com.sun.corba.se.spi.orbutil.tf.annotation;
 
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import java.lang.annotation.Target ;
 import java.lang.annotation.Documented ;
 import java.lang.annotation.ElementType ;
@@ -43,6 +44,11 @@ import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
 /** Used to indicate that a method is used for invoking MethodMonitor.info.
+ * Note that the tracing name is the method name unless overridden by a
+ * @TracingName annotation (which is required if the method is overloaded).
+ * Also note that either all overloaded methods of the same name are InfoMethods,
+ * or none of them are.
+ * The name of this method as a TimingPoint is the same as the tracing name.
  * The method must be private and have a void return type.
  * Any arguments are passed into the
  * MethodMonitor.info call in the instrumented code.

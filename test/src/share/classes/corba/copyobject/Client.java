@@ -1805,6 +1805,7 @@ public abstract class Client extends TestCase
 	    copyObject( data ) ;
     }
 
+    /* Not using this; re-writing timing points.
     public  void testTimedNonFinalComplexClassTreeCDRTiming()
     {
 	Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
@@ -1845,6 +1846,7 @@ public abstract class Client extends TestCase
 	    // "Timing Data for making " + REP_COUNT
 	    // + " copies of Tree(4, 3, 2, 3) using ORBStream copier" ) ;
     }
+    */
 
     // Use reflection to get the typecodes so we don't need to generate the
     // classes at compile time.

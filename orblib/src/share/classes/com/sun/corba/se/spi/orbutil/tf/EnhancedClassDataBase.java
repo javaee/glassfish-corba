@@ -36,6 +36,7 @@
 
 package com.sun.corba.se.spi.orbutil.tf ;
 
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,9 +63,6 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
     protected final Set<String> annoNamesForClass =
         new HashSet<String>() ;
 
-    protected final Map<String,Class<? extends Annotation>> annoNameMap =
-	new HashMap<String,Class<? extends Annotation>>() ;
-
     // Map from MM annotation internal name to
     // SynchronizedHolder<MethodMonitor> field
     // name.  Use something like __$mm$__nnn that is unlikely to collide with
@@ -72,9 +70,27 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
     protected final Map<String,String> annoToHolderName =
         new HashMap<String,String>() ;
 
-    // List of simple names of MM methods.  Index of method is identifier in
+    // List of tracing names of MM methods.  Index of method is identifier in
     // MethodMonitor calls.  Sorted to guarantee consistent order.
     protected final List<String> methodNames =
+        new ArrayList<String>() ;
+
+    // List of descriptions of methods.  This is in the same order as
+    // methodNames.
+    protected final List<String> methodDescriptions = 
+        new ArrayList<String>() ;
+
+    // List of timing point types of methods.  This is in the same order as
+    // methodNames.  All names of monitored methods have type BOTH;
+    // names of info methods may be ENTER, EXIT, or NONE.
+    protected final List<TimingPointType> methodTPTs =
+        new ArrayList<TimingPointType>() ;
+
+    // List of annotations of methods.  This is in the same order as
+    // methodNames.  If the method is a monitored method, this is the
+    // annotation on the method; if the method is an info method, this is
+    // null.
+    protected final List<String> methodAnnoList = 
         new ArrayList<String>() ;
 
     // List of descriptors of @InfoMethod-annotated methods.
@@ -97,11 +113,7 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
         return annoToHolderName ;
     }
 
-    public Map<String,Class<? extends Annotation>> getAnnoNameMap() {
-        return annoNameMap ;
-    }
-
-    public List<String> getMethodNames() {
+    public List<String> getMethodTracingNames() {
         return methodNames ;
     }
     
@@ -152,5 +164,42 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
             String fd = util.augmentInfoMethodDescriptor(d) ;
             infoMethodDescs.add( name + fd ) ;
         }
+    }
+
+    /** Given the method descriptor, return the tracing name of the method.
+     * For non-overloaded methods, this is the method name, otherwise it is
+     * the name given in the @TracingName annotation.  The resulting String is
+     * used in getMethodTracingNames and getMethodIndex.
+     *
+     * @param fullMethodDescriptor The full method descriptor of the method.
+     * @return The corresponding method tracing name
+     */
+    public String getMethodTracingName( String fullMethodDescriptor ) {
+        return null ;
+    }
+
+    /** List of descriptions of monitored methods and info methods.
+     * If no description was given in the annotations, the value is "".
+     *
+     * @return List of descriptions in the same order as in
+     * getMethodTracingNames.
+     */
+    public List<String> getDescriptions() {
+        return methodDescriptions ;
+    }
+
+    /** List of timing point types of monitored methods and info methods.
+     * The list contains BOTH for a monitored method.  An info method that
+     * does not represent a timing point is represented by NONE.
+     *
+     * @return List of TimingPointTypes in the same order as in
+     * getMethodTracingNames.
+     */
+    public List<TimingPointType> getTimingPointTypes() {
+        return methodTPTs ;
+    }
+
+    public List<String> getMethodMMAnnotationName() {
+        return methodAnnoList ;
     }
 }

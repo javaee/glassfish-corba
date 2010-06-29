@@ -110,6 +110,7 @@ import javax.rmi.PortableRemoteObject ;
 /**
  * @author Harold Carr
  */
+@Folb
 public class ClientGroupManager
     extends
         org.omg.CORBA.LocalObject
@@ -686,6 +687,7 @@ public class ClientGroupManager
     @InfoMethod
     private void receivedIORUpdateInfo() { }
 
+    @Folb
     private void receive_star(String point, ClientRequestInfo ri)
     {
         operation( ri.operation() ) ;

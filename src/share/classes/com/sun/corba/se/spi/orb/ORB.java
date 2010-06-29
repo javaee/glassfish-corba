@@ -36,9 +36,11 @@
 
 package com.sun.corba.se.spi.orb;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map ;
 import java.util.HashMap ;
 import java.util.Properties ;
+import java.util.logging.Level;
 
 import java.util.logging.Logger ;
 
@@ -95,10 +97,10 @@ import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
 
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 
-import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsDisabledImpl ;
-import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsEnabledImpl ;
+// import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
+// import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
+// import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsDisabledImpl ;
+// import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsEnabledImpl ;
 
 // XXX needs an SPI or else it does not belong here
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;
@@ -121,6 +123,8 @@ import com.sun.corba.se.impl.logging.LogWrapperTableImpl ;
 import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory;
+import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryDefaults;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
@@ -146,6 +150,7 @@ import com.sun.corba.se.spi.trace.TraceValueHandler;
 import com.sun.corba.se.spi.trace.TransientObjectManager;
 import com.sun.corba.se.spi.trace.Transport;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 
 import java.lang.reflect.Field;
 import org.glassfish.gmbal.ManagedObjectManager ;
@@ -461,28 +466,30 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	wireObjectKeyTemplate = new WireObjectKeyTemplate(this);
     }
 
-    protected TimerManager<TimingPoints> makeTimerManager( 
-        ManagedObjectManager mom ) {
+    private <T> T makeInstance( Class<T> cls, TimerFactory tf ) {
+        try {
+            Constructor<T> cons = cls.getConstructor( cls, TimerFactory.class);
+            return cons.newInstance(tf);
+        } catch (Exception ex) {
+            // XXX log?
+        }
+        return null ;
+    }
 
+    public <T> TimerManager<T> makeTimerManager( Class<T> tpClass ) {
         String orbId = getUniqueOrbId() ;
 
-        final boolean timingsPointsEnabled = getORBData() != null 
+        final boolean enabled = getORBData() != null
             && getORBData().timingPointsEnabled() ;
 
-	TimerManager<TimingPoints> timerManager = 
-	    new TimerManager<TimingPoints>( mom, orbId, timingsPointsEnabled ) ;
+	TimerManager<T> timerManager = 
+	    new TimerManager<T>( mom(), orbId, enabled ) ;
 
-	TimingPoints tp = null ;
-        if (timingsPointsEnabled) {
-	    tp = new TimingPointsEnabledImpl( timerManager.factory(), 
-		timerManager.controller() ) ;
-	} else {
-	    tp = new TimingPointsDisabledImpl( timerManager.factory(), 
-		timerManager.controller() ) ;
-	}
+        T tp = makeInstance( tpClass, timerManager.factory() ) ;
 
-	timerManager.initialize( tp ) ;
-	return timerManager ;
+        timerManager.initialize( tp ) ;
+
+        return timerManager ;
     }
 
     protected void initializePrimitiveTypeCodeConstants() {
@@ -830,7 +837,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     /** Return the ORB's TimerManager.
      */
-    public abstract TimerManager<TimingPoints> getTimerManager() ;
+    // public abstract TimerManager<TimingPoints> getTimerManager() ;
     
     // This method obtains an IOR from a CORBA object reference.
     // The result is never null.

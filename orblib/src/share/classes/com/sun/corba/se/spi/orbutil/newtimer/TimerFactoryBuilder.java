@@ -54,6 +54,17 @@ public class TimerFactoryBuilder {
     private static Map<String,TimerFactory> fmap = 
 	new HashMap<String,TimerFactory>() ;
 
+    /** Construct the standard name for a Timer derived from a method
+     * in the tracing facility.
+     * @param cls The monitored clas
+     * @param name The name of a monitored method or info method
+     * @return
+     */
+    public static String getTimerName( final String cname, final String name ) {
+        return cname + "__" + name ;
+    }
+
+
     public synchronized static TimerFactory make( 
         String name, String description ) {
 

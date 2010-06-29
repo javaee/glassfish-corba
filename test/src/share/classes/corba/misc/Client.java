@@ -782,7 +782,8 @@ public class Client extends TestCase
 	TimerManager<TimingPoints> tm = orb.getTimerManager() ;
 	LogEventHandler leh = tm.factory().makeLogEventHandler( "ContactInfoListIterator" ) ;
 	tm.controller().register( leh ) ;
-	TimerGroup cili = tm.points().contactInfoListIterator() ;
+        TimingPoints tp = tm.points() ;
+	TimerGroup cili = tp.contactInfoListIterator() ;
 
 	try {
 	    cili.enable() ;

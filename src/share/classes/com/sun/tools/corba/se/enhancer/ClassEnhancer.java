@@ -50,8 +50,8 @@ import com.sun.corba.se.spi.orbutil.tf.Util;
 import com.sun.corba.se.spi.orbutil.tf.annotation.TraceEnhanceLevel;
 
 public class ClassEnhancer extends TFEnhanceAdapter {
-    private Util util ;
-    private EnhancedClassData ecd ;
+    private final Util util ;
+    private final EnhancedClassData ecd ;
     private boolean hasStaticInitializer = false ;
     private boolean hasTFAnnotation = false ;
 

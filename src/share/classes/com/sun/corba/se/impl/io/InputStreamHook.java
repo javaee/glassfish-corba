@@ -61,6 +61,7 @@ import com.sun.corba.se.impl.logging.OMGSystemException;
 import com.sun.corba.se.impl.orbutil.DprintUtil ;
 import com.sun.corba.se.spi.trace.StreamFormatVersion;
 
+@StreamFormatVersion
 public abstract class InputStreamHook extends ObjectInputStream
 {
     // These should be visible in all the nested classes

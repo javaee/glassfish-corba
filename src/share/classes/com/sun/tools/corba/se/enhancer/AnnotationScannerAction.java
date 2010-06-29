@@ -36,6 +36,7 @@
 
 package com.sun.tools.corba.se.enhancer;
 
+import com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator.TimingInfoProcessor;
 import com.sun.corba.se.spi.orbutil.file.FileWrapper;
 import com.sun.corba.se.spi.orbutil.file.Scanner;
 import com.sun.corba.se.spi.orbutil.tf.Util;
@@ -67,13 +68,15 @@ public class AnnotationScannerAction implements Scanner.Action {
         Type.getType(MMG_CLASS).getDescriptor() ;
 
     private final Util util ;
+    private final TimingInfoProcessor tip ;
 
     // NOTE: this is a set of annotation class names in INTERNAL format.
     private Set<String> annotationNames = new HashSet<String>() ;
     private String currentClass ;
 
-    public AnnotationScannerAction( final Util util ) {
+    AnnotationScannerAction(Util util, TimingInfoProcessor tip) {
         this.util = util ;
+        this.tip = tip ;
     }
 
     public Set<String> getAnnotationNames() {
@@ -81,6 +84,10 @@ public class AnnotationScannerAction implements Scanner.Action {
     }
 
     private class AnnoScanner extends EmptyVisitor {
+        private boolean visitingAnnotation = false ;
+        private String timerGroupDescription ;
+        private String timerGroupName ;
+        private String[] timerGroupMembers ;
 
         @Override
         public void visit( int version, int access, String name, String signature,
@@ -94,16 +101,67 @@ public class AnnotationScannerAction implements Scanner.Action {
             }
         }
 
+        private String getGroupName( String desc ) {
+            String result = desc ;
+            final int index = desc.lastIndexOf('/') ;
+
+            if (index >= 0) {
+                result = desc.substring( index + 1 ) ;
+            }
+
+            return result ;
+        }
+
         @Override
-        public AnnotationVisitor visitAnnotation( String desc, boolean visible ) {
+        public AnnotationVisitor visitAnnotation( String desc,
+            boolean visible ) {
+
             util.info( 3, "\tVisiting annotation " + desc ) ;
 
             if (desc.equals( MMG_DESCRIPTOR )) {
                 // Leave name in internal form.
                 annotationNames.add( currentClass  );
+                visitingAnnotation = true ;
+                timerGroupName = getGroupName( currentClass ) ;
+                timerGroupDescription = "TimerGroup for Annotation "
+                    + timerGroupName ;
+                timerGroupMembers = new String[0] ;
+
+                return this ;
             }
 
             return null ;
+        }
+
+        @Override 
+        // visit an Annotation member
+        public void visit( String name, Object value ) {
+            if (name == null) {
+                return  ;
+            }
+
+            if (name.equals( "description" )) {
+                if (value instanceof String) { 
+                    timerGroupDescription = (String)value ;
+                }
+            } else if (name.equals( "value")) {
+                if (value instanceof String[]) {
+                    timerGroupMembers = (String[]) value ;
+                }
+            }
+        }
+
+        @Override
+        // Only interested in the visitEnd on an Annotation!
+        public void visitEnd() {
+            if (visitingAnnotation) {
+                visitingAnnotation = false ;
+
+                tip.addTimerGroup( timerGroupName, timerGroupDescription ) ;
+                for (String str : timerGroupMembers) {
+                    tip.contains( str ) ;
+                }
+            }
         }
 
         // Don't visit fields or methods: we don't need to look at their 

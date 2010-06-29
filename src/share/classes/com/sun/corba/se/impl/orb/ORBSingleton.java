@@ -133,10 +133,10 @@ public class ORBSingleton extends ORB
     private static ORB fullORB;
     private static PresentationManager.StubFactoryFactory staticStubFactoryFactory =
 	PresentationDefaults.getStaticStubFactoryFactory() ;
-    private TimerManager timerManager ;
+    // private TimerManager timerManager ;
 
     public ORBSingleton() {
-	timerManager = makeTimerManager( null ) ;
+	// timerManager = makeTimerManager( null ) ;
 	initializePrimitiveTypeCodeConstants() ;
     }
 
@@ -804,9 +804,11 @@ public class ORBSingleton extends ORB
 	return null ;
     }
 
+    /*
     public TimerManager getTimerManager() {
 	return timerManager ;
     }
+    */
 }
 
 // End of file.

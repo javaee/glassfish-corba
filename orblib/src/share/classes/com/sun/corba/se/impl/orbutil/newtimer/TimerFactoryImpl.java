@@ -361,5 +361,9 @@ public class TimerFactoryImpl extends TimerGroupImpl implements TimerFactory {
 	    }
 	}
     }
+
+    public synchronized boolean timerAlreadyExists( String name ) {
+        return timers.keySet().contains( name ) ;
+    }
 }
 

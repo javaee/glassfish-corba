@@ -49,6 +49,7 @@ import com.sun.corba.se.spi.trace.Transport;
 /**
  * @author Harold Carr
  */
+@Transport
 public class SocketFactoryAcceptorImpl
     extends
 	SocketOrChannelAcceptorImpl

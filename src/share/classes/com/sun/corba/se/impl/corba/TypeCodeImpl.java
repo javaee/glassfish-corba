@@ -69,6 +69,7 @@ import java.io.ObjectInputStream;
 import com.sun.corba.se.spi.trace.DynamicType ;
 
 // no chance of subclasses, so no problems with runtime helper lookup
+@DynamicType
 public final class TypeCodeImpl extends TypeCode {
     private static final long serialVersionUID = -5320808494290154449L;
 

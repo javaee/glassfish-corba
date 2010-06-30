@@ -131,7 +131,7 @@ public class Transformer implements UnaryFunction<byte[],byte[]> {
         final Iterator<String> descriptions =
             ecd.getDescriptions().iterator() ;
         final Iterator<String> names =
-            ecd.getMethodTracingNames().iterator() ;
+            ecd.getMethodNames().iterator() ;
         final Iterator<TimingPointType> tpts =
             ecd.getTimingPointTypes().iterator() ;
         final Iterator<String> groups =

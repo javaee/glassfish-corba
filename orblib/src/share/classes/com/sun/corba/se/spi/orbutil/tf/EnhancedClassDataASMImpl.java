@@ -135,8 +135,8 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
 
             String description = "Timer for method " + mname
                 + " in class " + shortClassName ; // default
-            String mmName = mname ; // default
-            TimingPointType tpt = TimingPointType.BOTH ; // default for non InfoMethod
+            TimingPointType tpt = TimingPointType.BOTH ; // default for non-InfoMethod
+            String tpName = mname ; // default for non-InfoMethod
 
             boolean hasMethodInfoAnno = false ;
 
@@ -146,12 +146,7 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                     final String aname =
                         Type.getType( an.desc ).getInternalName() ;
 
-                    if (aname.equals( TRACING_NAME )) {
-                        Object value = getAttribute( an, "value" ) ;
-                        if (value != null && value instanceof String) {
-                            mmName = (String)value ;
-                        }
-                    } else if (aname.equals( DESCRIPTION_NAME )) {
+                    if (aname.equals( DESCRIPTION_NAME )) {
                         Object value = getAttribute( an, "value" ) ;
                         if (value != null && value instanceof String) {
                             description = (String)value ;
@@ -175,6 +170,23 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                             if (enumData.length == 2) {
                                 // [0] is desc, [1] is value
                                 tpt = TimingPointType.valueOf( enumData[1] ) ;
+                            }
+                        }
+
+                        Object value2 = getAttribute( an, "tpName ") ;
+                        String tpn = "" ;
+                        if ((value2 != null ) && value2 instanceof String) {
+                            tpn = (String)value ;
+                        }
+
+                        if (tpt != TimingPointType.NONE) {
+                            if (tpn.length() == 0) {
+                                util.error( "Method " + mdesc
+                                    + " for Class " + currentClass.name
+                                    + " is an info method with timing point type "
+                                    + tpt + " but no tpName was specified" )  ;
+                            } else {
+                                tpName = tpn ;
                             }
                         }
                     } else if (annoNamesForClass.contains( aname)) {
@@ -226,7 +238,7 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
 
                 // This will be a null value for InfoMethods, which is what
                 // we want.
-                mmnToAnnotationName.put(mmName, monitoredMethodMMAnno ) ;
+                mmnToAnnotationName.put(mname, monitoredMethodMMAnno ) ;
 
                 // We could have a method at this point that is annotated with
                 // something OTHER than tracing annotations.  Do not add
@@ -236,8 +248,8 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                     // methodNames
                     methodNames.add( mname ) ;
 
-                    mmnToDescriptions.put( mmName, description ) ;
-                    mmnToTPT.put( mmName, tpt ) ;
+                    mmnToDescriptions.put( mname, description ) ;
+                    mmnToTPT.put( mname, tpt ) ;
 
                     if (hasMethodInfoAnno) {
                         infoMethodDescs.add( mdesc ) ;

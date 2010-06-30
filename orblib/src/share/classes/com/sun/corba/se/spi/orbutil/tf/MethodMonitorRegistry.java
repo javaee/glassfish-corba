@@ -338,7 +338,7 @@ public class MethodMonitorRegistry {
 
         final boolean fullUpdate = scanClassAnnotations( cls ) ;
 
-	classToMNames.put( cls, ecd.getMethodTracingNames() ) ;
+	classToMNames.put( cls, ecd.getMethodNames() ) ;
         classToTimerTypes.put( cls, ecd.getTimingPointTypes() ) ;
 
         final Map<Class<? extends Annotation>,

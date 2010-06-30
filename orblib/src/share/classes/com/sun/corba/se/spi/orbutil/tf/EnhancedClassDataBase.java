@@ -113,7 +113,7 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
         return annoToHolderName ;
     }
 
-    public List<String> getMethodTracingNames() {
+    public List<String> getMethodNames() {
         return methodNames ;
     }
     
@@ -164,18 +164,6 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
             String fd = util.augmentInfoMethodDescriptor(d) ;
             infoMethodDescs.add( name + fd ) ;
         }
-    }
-
-    /** Given the method descriptor, return the tracing name of the method.
-     * For non-overloaded methods, this is the method name, otherwise it is
-     * the name given in the @TracingName annotation.  The resulting String is
-     * used in getMethodTracingNames and getMethodIndex.
-     *
-     * @param fullMethodDescriptor The full method descriptor of the method.
-     * @return The corresponding method tracing name
-     */
-    public String getMethodTracingName( String fullMethodDescriptor ) {
-        return null ;
     }
 
     /** List of descriptions of monitored methods and info methods.

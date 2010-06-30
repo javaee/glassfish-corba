@@ -39,7 +39,6 @@ package com.sun.corba.se.spi.orbutil.tf ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
-import com.sun.corba.se.spi.orbutil.tf.annotation.TracingName;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -122,8 +121,8 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
 
             String description = "Timer for method " + mname 
                 + " in class " + shortClassName ; // default
-            String mmName = mname ; // default
-            TimingPointType tpt = TimingPointType.BOTH ; // default for non InfoMethod
+            TimingPointType tpt = TimingPointType.BOTH ; // default for non-InfoMethod
+            String tpName = mname ; // default for non-InfoMethod
 
             boolean hasMethodInfoAnno = false ;
 
@@ -133,12 +132,7 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
 		    final String aname = Type.getInternalName(
 			an.annotationType() ) ;
 
-                    if (aname.equals( TRACING_NAME )) {
-                        TracingName tname = (TracingName)an ;
-                        if (tname.value().length() > 0) {
-                            mmName = tname.value() ;
-                        }
-                    } else if (aname.equals( DESCRIPTION_NAME )) {
+                    if (aname.equals( DESCRIPTION_NAME )) {
                         Description desc = (Description)an ;
                         if (desc.value().length() > 0) {
                             description = desc.value() ;
@@ -157,6 +151,17 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
                         hasMethodInfoAnno = true ;
                         InfoMethod im = (InfoMethod)an ;
                         tpt = im.tpType() ;
+                        if (tpt != TimingPointType.NONE) {
+                            String tpn = im.tpName() ;
+                            if (tpn.length() == 0) {
+                                util.error( "Method " + mdesc
+                                    + " for Class " + currentClass.getName()
+                                    + " is an info method with timing point type "
+                                    + tpt + " but no tpName was specified" )  ;
+                            } else {
+                                tpName = tpn ;
+                            }
+                        }
                     } else if (annoNamesForClass.contains( aname)) {
                         if (monitoredMethodMMAnno == null) {
                             monitoredMethodMMAnno = aname ;
@@ -206,7 +211,7 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
 
                 // This will be a null value for InfoMethods, which is what
                 // we want.
-                mmnToAnnotationName.put(mmName, monitoredMethodMMAnno ) ;
+                mmnToAnnotationName.put(mname, monitoredMethodMMAnno ) ;
 
                 // We could have a method at this point that is annotated with
                 // something OTHER than tracing annotations.  Do not add
@@ -214,10 +219,10 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
                 if (hasMethodInfoAnno || (monitoredMethodMMAnno != null)) {
                     // Both infoMethods and MM annotated methods go into 
                     // methodNames
-                    methodNames.add( mmName ) ;
+                    methodNames.add( mname ) ;
 
-                    mmnToDescriptions.put( mmName, description ) ;
-                    mmnToTPT.put( mmName, tpt ) ;
+                    mmnToDescriptions.put( mname, description ) ;
+                    mmnToTPT.put( mname, tpt ) ;
 
                     if (hasMethodInfoAnno) {
                         infoMethodDescs.add( mdesc ) ;

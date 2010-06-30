@@ -39,7 +39,6 @@ package com.sun.corba.se.spi.orbutil.tf ;
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
-import com.sun.corba.se.spi.orbutil.tf.annotation.TracingName;
 import java.util.List;
 import java.util.Map;
 import org.glassfish.gmbal.Description;
@@ -60,8 +59,6 @@ public interface EnhancedClassData {
     String MM_NAME = MM_TYPE.getInternalName() ;
 
     String INFO_METHOD_NAME = Type.getInternalName( InfoMethod.class ) ;
-
-    String TRACING_NAME = Type.getInternalName( TracingName.class ) ;
 
     String DESCRIPTION_NAME = Type.getInternalName( Description.class ) ;
 
@@ -108,16 +105,6 @@ public interface EnhancedClassData {
      */
     String getHolderName( String fullMethodDescriptor ) ;
 
-    /** Given the method descriptor, return the tracing name of the method.
-     * For non-overloaded methods, this is the method name, otherwise it is
-     * the name given in the @TracingName annotation.  The resulting String is
-     * used in getMethodTracingNames and getMethodIndex.
-     *
-     * @param fullMethodDescriptor The full method descriptor of the method.
-     * @return The corresponding method tracing name
-     */
-    String getMethodTracingName( String fullMethodDescriptor ) ;
-
     /** List of method names for all MM methods and info methods 
      * in the class.  Order is significant, as the index of the
      * method in the list is the ordinal used to represent it.
@@ -125,7 +112,15 @@ public interface EnhancedClassData {
      *
      * @return List of all method tracing names in sorted order.
      */
-    List<String> getMethodTracingNames() ;
+    List<String> getMethodNames() ;
+
+    /** List of timing point names corresponding to method names.
+     * For monitored methods, this is just the method name.
+     * For info methods whose tpType is not NONE, this is specified
+     * in tpName.
+     * @return
+     */
+    List<String> getMethodTimingPointNames() ;
 
     /** List of descriptions of monitored methods and info methods.
      * If no description was given in the annotations, the value is "".
@@ -160,10 +155,10 @@ public interface EnhancedClassData {
 
     /** Index of method name in the list of method names.
      *
-     * @param methodTracingName The method name as defined for tracing.
+     * @param methodName The method name as defined for tracing.
      * @return the method index
      */
-    int getMethodIndex( String methodTracingName ) ;
+    int getMethodIndex( String methodName ) ;
 
     /** Enhance all of the descriptors for infoMethods.
      */

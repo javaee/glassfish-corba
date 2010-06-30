@@ -145,7 +145,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 	    util.newWithSimpleConstructor( mv, ArrayList.class ) ;
 	    mv.visitVarInsn( Opcodes.ASTORE, mnameList.index ) ;
 
-	    for (String str : ecd.getMethodTracingNames()) {
+	    for (String str : ecd.getMethodNames()) {
 		util.info( 2, "Generating code to add " + str
                     + " to methodNames" ) ;
 		mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;

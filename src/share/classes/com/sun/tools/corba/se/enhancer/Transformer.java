@@ -47,7 +47,6 @@ import com.sun.corba.se.spi.orbutil.tf.EnhancedClassDataASMImpl;
 import com.sun.corba.se.spi.orbutil.tf.TraceEnhancementException;
 import com.sun.corba.se.spi.orbutil.tf.Util;
 import java.util.Iterator;
-import java.util.List;
 
 import org.objectweb.asm.ClassAdapter;
 
@@ -55,7 +54,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
-import sun.security.krb5.internal.EncAPRepPart;
 
 /** ClassFile enhancer for the tracing facility.  This modifies the bytecode
  * for an applicable class, then returns the updated bytecode.
@@ -131,7 +129,7 @@ public class Transformer implements UnaryFunction<byte[],byte[]> {
         final Iterator<String> descriptions =
             ecd.getDescriptions().iterator() ;
         final Iterator<String> names =
-            ecd.getMethodNames().iterator() ;
+            ecd.getTimingPointNames().iterator() ;
         final Iterator<TimingPointType> tpts =
             ecd.getTimingPointTypes().iterator() ;
         final Iterator<String> groups =

@@ -119,6 +119,9 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
         Map<String,TimingPointType> mmnToTPT =
             new HashMap<String,TimingPointType>() ;
 
+        Map<String,String> mmnToTPN =
+            new HashMap<String,String>() ;
+
         Map<String,String> mmnToAnnotationName = 
             new HashMap<String,String>() ;
 
@@ -250,6 +253,7 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
 
                     mmnToDescriptions.put( mname, description ) ;
                     mmnToTPT.put( mname, tpt ) ;
+                    mmnToTPN.put( mname, tpName ) ;
 
                     if (hasMethodInfoAnno) {
                         infoMethodDescs.add( mdesc ) ;
@@ -267,6 +271,7 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
             methodDescriptions.add( mmnToDescriptions.get( str ) ) ;
             methodTPTs.add( mmnToTPT.get( str ) ) ;
             methodAnnoList.add( mmnToAnnotationName.get( str ) ) ;
+            methodTPNames.add( mmnToTPN.get(  str ) ) ;
         }
 
         if (util.getDebug()) {
@@ -276,6 +281,7 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
             util.msg( "\tmethodToAnno = " + methodToAnno ) ;
             util.msg( "\tmethodDescriptions = " + methodDescriptions ) ;
             util.msg( "\tmethodTPTs = " + methodTPTs ) ;
+            util.msg( "\tmethodTPNs = " + methodTPNames ) ;
         }
     }
 

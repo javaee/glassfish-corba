@@ -47,7 +47,7 @@ import org.glassfish.gmbal.ManagedObjectManager ;
  * This is intended to make it easy to set up timing,
  * either for performance tests, or for adaptive policy management.
  * Note that the constructor and the initialize method must be called
- * from the same thread in order to safely complete the initilization 
+ * from the same thread in order to safely complete the initialization
  * of an instance of this class.  After that, multiple threads may
  * access this class for the factory(), points(), and controller() 
  * methods.
@@ -61,9 +61,6 @@ public class TimerManager<T> {
 
     private final Map<Class<?>,List<Timer>> classToTimers =
         new HashMap<Class<?>,List<Timer>>() ;
-
-    private final Map<Class<?>,List<TimingPointType>> classToTPTs =
-        new HashMap<Class<?>,List<TimingPointType>>() ;
 
     /** Create a new TimerManager, with a TimerFactory registered under the given name
      * in the TimerFactoryBuilder, and a TimerEventController with the same name.
@@ -94,8 +91,10 @@ public class TimerManager<T> {
     // is simply to make controller() read only, since there is seldom a reason
     // to change the default controller.
     private void checkInitialized() {
-	if (!isInitialized)
-	    throw new IllegalStateException( "TimerManager is not initialized" ) ;
+	if (!isInitialized) {
+            throw new IllegalStateException(
+                "TimerManager is not initialized");
+        }
     }
 
     // Originally, initialize was synchronized, and this forced the other methods
@@ -105,8 +104,10 @@ public class TimerManager<T> {
     // method results in a very bad lock hot spot which severly hampers ORB throughput
     // (Scott measured 15% in GF v2 build 49).
     public void initialize( T tp ) {
-	if (isInitialized)
-	    throw new IllegalStateException( "TimerManager is already initialized" ) ;
+	if (isInitialized) {
+            throw new IllegalStateException(
+                "TimerManager is already initialized");
+        }
 
 	this.tp = tp ;
 	isInitialized = true ;
@@ -140,7 +141,7 @@ public class TimerManager<T> {
         if (result == null) {
             result = new ArrayList<Timer>() ;
 
-            List<String> names = MethodMonitorRegistry.getMethodNames(cls) ;
+            List<String> names = MethodMonitorRegistry.getTimerNames(cls) ;
             for (String name : names) {
                 String tname = TimerFactoryBuilder.getTimerName(
                     cls.getSimpleName(), name) ;

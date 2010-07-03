@@ -86,6 +86,9 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
     protected final List<TimingPointType> methodTPTs =
         new ArrayList<TimingPointType>() ;
 
+    protected final List<String> methodTPNames =
+        new ArrayList<String>() ;
+
     // List of annotations of methods.  This is in the same order as
     // methodNames.  If the method is a monitored method, this is the
     // annotation on the method; if the method is an info method, this is
@@ -185,6 +188,10 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
      */
     public List<TimingPointType> getTimingPointTypes() {
         return methodTPTs ;
+    }
+
+    public List<String> getTimingPointNames() {
+        return methodTPNames ;
     }
 
     public List<String> getMethodMMAnnotationName() {

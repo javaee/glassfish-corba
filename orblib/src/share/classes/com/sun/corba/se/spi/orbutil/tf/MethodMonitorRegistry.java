@@ -88,6 +88,9 @@ public class MethodMonitorRegistry {
     private static final Map<Class<?>,List<TimingPointType>> classToTimerTypes =
         new HashMap<Class<?>,List<TimingPointType>>() ;
 
+    private static final Map<Class<?>,List<String>> classToTimerNames =
+        new HashMap<Class<?>,List<String>>() ;
+
     // Maps traceable classes to the list of method names (which is in the order
     // used in the generated code, so the index of a method name is the number
     // used in the generated code).
@@ -340,6 +343,7 @@ public class MethodMonitorRegistry {
 
 	classToMNames.put( cls, ecd.getMethodNames() ) ;
         classToTimerTypes.put( cls, ecd.getTimingPointTypes() ) ;
+        classToTimerNames.put( cls, ecd.getTimingPointNames() ) ;
 
         final Map<Class<? extends Annotation>,
             SynchronizedHolder<MethodMonitor>> annoMM =
@@ -521,5 +525,9 @@ public class MethodMonitorRegistry {
      */
     public static List<TimingPointType> getTimerTypes( final Class<?> cls ) {
         return classToTimerTypes.get( cls ) ;
+    }
+
+    public static List<String> getTimerNames( final Class<?> cls ) {
+        return classToTimerNames.get( cls ) ;
     }
 }

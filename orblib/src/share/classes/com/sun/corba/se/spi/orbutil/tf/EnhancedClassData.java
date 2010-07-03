@@ -120,7 +120,7 @@ public interface EnhancedClassData {
      * in tpName.
      * @return
      */
-    List<String> getMethodTimingPointNames() ;
+    List<String> getTimingPointNames() ;
 
     /** List of descriptions of monitored methods and info methods.
      * If no description was given in the annotations, the value is "".

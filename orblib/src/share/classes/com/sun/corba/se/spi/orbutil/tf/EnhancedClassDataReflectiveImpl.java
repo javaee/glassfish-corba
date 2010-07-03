@@ -105,6 +105,9 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
         Map<String,TimingPointType> mmnToTPT =
             new HashMap<String,TimingPointType>() ;
 
+        Map<String,String> mmnToTPN =
+            new HashMap<String,String>() ;
+
         Map<String,String> mmnToAnnotationName = 
             new HashMap<String,String>() ;
 
@@ -223,6 +226,7 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
 
                     mmnToDescriptions.put( mname, description ) ;
                     mmnToTPT.put( mname, tpt ) ;
+                    mmnToTPN.put( mname, tpName ) ;
 
                     if (hasMethodInfoAnno) {
                         infoMethodDescs.add( mdesc ) ;
@@ -239,6 +243,7 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
         for (String str : methodNames ) {
             methodDescriptions.add( mmnToDescriptions.get( str ) ) ;
             methodTPTs.add( mmnToTPT.get( str ) ) ;
+            methodTPNames.add( mmnToTPN.get( str ) ) ;
             methodAnnoList.add( mmnToAnnotationName.get( str ) ) ;
         }
 
@@ -249,6 +254,7 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
             util.msg( "\tmethodToAnno = " + methodToAnno ) ;
             util.msg( "\tmethodDescriptions = " + methodDescriptions ) ;
             util.msg( "\tmethodTPTs = " + methodTPTs ) ;
+            util.msg( "\tmethodTPTs = " + methodTPNames ) ;
         }
     }
 

@@ -94,7 +94,7 @@ public class EnhanceTool {
         TraceEnhance
     }
 
-    private interface Arguments {
+    public interface Arguments {
         @DefaultValue( "tfannotations.properties" )
         @Help( "Name of resource file containing information "
            + "about tf annotations")
@@ -162,7 +162,7 @@ public class EnhanceTool {
                     }
                 }
             } catch (Exception exc) {
-                util.info( 2, "Exception " + exc + " while processing class "
+                util.info( 1, "Exception " + exc + " while processing class "
                     + fw.getName() ) ;
                 errorCount++ ;
             }

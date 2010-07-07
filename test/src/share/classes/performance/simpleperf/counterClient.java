@@ -36,7 +36,6 @@
 package performance.simpleperf;
 
 import java.io.PrintStream ;
-import java.lang.reflect.Method ;
 import javax.rmi.PortableRemoteObject ;
 import java.rmi.RemoteException ;
 import java.util.Hashtable ;
@@ -70,12 +69,9 @@ import com.sun.corba.se.spi.orbutil.newtimer.Statistics ;
 import com.sun.corba.se.spi.orbutil.newtimer.StatsEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
@@ -250,7 +246,8 @@ public class counterClient implements InternalProcess
 
     private DataBlock startTiming( ORB orb ) {
 	DataBlock db = new DataBlock() ;
-	TimerManager<TimingPoints> tm = orb.getTimerManager() ;
+	TimerManager<TimingPoints> tm = orb.makeTimerManager(
+            TimingPoints.class ) ;
 	db.tp = tm.points() ;
 	TimerFactory tf = tm.factory() ;
 	db.controller = tm.controller() ;
@@ -266,7 +263,15 @@ public class counterClient implements InternalProcess
 	}
 
 	db.top.enable() ;
-	db.tp.invocation().enable() ;
+
+        // Enabled everything in the invocation path.
+        // XXX Should we add an annotation just to include all of these?
+	db.tp.DynamicType().enable() ;
+	db.tp.Transport().enable() ;
+	db.tp.Giop().enable() ;
+	db.tp.TraceServiceContext().enable() ;
+	db.tp.Cdr().enable() ;
+
 	db.seh.clear() ;
 
 	db.controller.enter( db.top ) ;
@@ -277,8 +282,8 @@ public class counterClient implements InternalProcess
 	db.controller.exit( db.top ) ;
 
 	db.top.disable() ;
-	db.tp.CDR().disable() ;
-	db.tp.Dynamic().disable() ;
+	db.tp.Cdr().disable() ;
+	db.tp.DynamicType().disable() ;
 	
 	// Dump out timing results.
 	Map<Timer,Statistics> result = db.seh.stats() ;	
@@ -370,10 +375,11 @@ public class counterClient implements InternalProcess
     {
 	if (StubAdapter.isLocal( counter ) != expectedResult) {
 	    String msg ;
-	    if (expectedResult)
-		msg = "Error: expected local object, but is_local returned false" ;
-	    else
-		msg = "Error: expected remote object, but is_local returned true" ;
+	    if (expectedResult) {
+                msg = "Error: expected local object, but is_local returned false";
+            } else {
+                msg = "Error: expected remote object, but is_local returned true";
+            }
 	    throw new Exception( msg ) ;
 	}
     }

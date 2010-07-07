@@ -160,7 +160,7 @@ public class TimerPointSourceGenerator {
 		    "contains must be called after an addTimerGroup call" ) ;
 	    } else {
 		String cname = currentTimerGroup.name() ;
-                addContained( cname, name ) ;
+                addContained( name, cname ) ;
 	    }
 	}
 
@@ -573,7 +573,7 @@ public class TimerPointSourceGenerator {
         final List<TimerGroup> timerGroups = 
             new ArrayList<TimerGroup>( tf.timerGroups().values() ) ;
         Collections.sort( timerGroups, COMP ) ;
-	for (TimerGroup tg : tf.timerGroups().values()) {
+	for (TimerGroup tg : timerGroups) {
 	    _data( PRIVATE|FINAL, TimerGroup, tg.name() ) ;
 	}
     }

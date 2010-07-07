@@ -110,8 +110,9 @@ public class Client {
 	long version = tset.version() ;
 
 	// test add
-	for (String str : data)
-	    tset.add( str ) ;
+	for (String str : data) {
+            tset.add(str);
+        }
 	Assert.assertTrue( version != tset.version() ) ;
 	version = tset.version() ;
 
@@ -130,8 +131,9 @@ public class Client {
 
 	// test iterator without remove
 	String rainbow = "" ;
-	for (String str : tset)
-	    rainbow += " " + str ;
+	for (String str : tset) {
+            rainbow += " " + str;
+        }
 
 	Assert.assertEquals( version, tset.version() ) ;
 
@@ -139,8 +141,9 @@ public class Client {
 	Iterator<String> iter = tset.iterator() ;
 	while (iter.hasNext()) {
 	    String str = iter.next() ;
-	    if (str.equals( toRemove2 )) 
-		iter.remove() ;
+	    if (str.equals( toRemove2 )) {
+                iter.remove();
+            }
 	}
 
 	Assert.assertTrue( version != tset.version() ) ;
@@ -159,25 +162,25 @@ public class Client {
 	
 	controller.enter( top ) ;
 
-	tp.enter_hasNextNext() ;
+	controller.enter( tp.CorbaClientDelegateImpl__hasNextNext() );
 	sleep( 1 ) ;
-	tp.exit_hasNextNext() ;
+	controller.exit( tp.CorbaClientDelegateImpl__hasNextNext() );
 
-	tp.enter_connectionSetup() ;
+        controller.enter( tp.CorbaClientRequestDispatcherImpl__connectionSetup() ) ;
 	sleep( 4 ) ;
-	tp.exit_connectionSetup() ;
+        controller.exit( tp.CorbaClientRequestDispatcherImpl__connectionSetup() ) ;
 
-	tp.enter_clientEncoding() ;
+        controller.enter( tp.CorbaClientRequestDispatcherImpl__clientEncoding() ) ;
 	sleep( 100 ) ;
-	tp.exit_clientEncoding() ;
+        controller.exit( tp.CorbaClientRequestDispatcherImpl__clientEncoding() ) ;
 
-	tp.enter_clientTransportAndWait() ;
+        controller.enter( tp.CorbaClientRequestDispatcherImpl__clientTransportAndWait() ) ;
 	sleep( transportDelay ) ;
-	tp.exit_clientTransportAndWait() ;
+        controller.exit( tp.CorbaClientRequestDispatcherImpl__clientTransportAndWait() ) ;
 
-	tp.enter_clientDecoding() ;
+        controller.enter( tp.CorbaClientRequestDispatcherImpl__clientDecoding() ) ;
 	sleep( 40 ) ;
-	tp.exit_clientDecoding() ;
+        controller.exit( tp.CorbaClientRequestDispatcherImpl__clientDecoding() ) ;
 
 	controller.exit( top ) ;
     }
@@ -191,7 +194,8 @@ public class Client {
 	    "com.sun.corba.se.impl.orb.ORBImpl" ) ;
 	ORB orb = (ORB)ORB.init( new String[0], props ) ;
 	try {
-	    TimerManager<TimingPoints> tm = orb.getTimerManager() ;
+	    TimerManager<TimingPoints> tm = orb.makeTimerManager(
+                TimingPoints.class ) ;
 	    TimingPoints tp = tm.points() ;
 	    TimerFactory tf = tm.factory() ;
 	    TimerEventController controller = tm.controller() ;
@@ -201,7 +205,7 @@ public class Client {
 	    controller.register( handler ) ;
 	    handler.clear() ;
 
-	    tp.transport().enable() ;
+	    tp.Transport().enable() ;
 	    top.enable() ;
 
 	    // Simulate the actions of the ORB client transport 

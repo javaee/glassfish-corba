@@ -141,6 +141,9 @@ public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {
                             description = desc.value() ;
                         }
                     } else if (aname.equals( INFO_METHOD_NAME)) {
+                        // set the correct default for InfoMethod!
+                        tpt = TimingPointType.NONE ;
+
                         // Check for private method!
                         if (!util.hasAccess( mn.getModifiers(),
 		            Modifier.PRIVATE )) {

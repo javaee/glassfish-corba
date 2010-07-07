@@ -74,6 +74,7 @@ import com.sun.corba.se.impl.util.JDKBridge;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
 
@@ -124,6 +125,18 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     @InfoMethod
     private void retryingRequest( Exception exc ) { }
 
+    @InfoMethod( tpName="totalInvocation", tpType=TimingPointType.ENTER )
+    private void enter_totalInvocation() { }
+
+    @InfoMethod( tpName="totalInvocation", tpType=TimingPointType.EXIT )
+    private void exit_totalInvocation() { }
+
+    @InfoMethod( tpName="hasNextNext", tpType=TimingPointType.ENTER )
+    private void enter_hasNextNext() { }
+
+    @InfoMethod( tpName="hasNextNext", tpType=TimingPointType.EXIT )
+    private void exit_hasNextNext() { }
+
 
     @Subcontract
     @Override
@@ -131,7 +144,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 				String operation, 
 				boolean responseExpected) 
     {
-	// tp.enter_totalInvocation() ;
+	enter_totalInvocation() ;
 	try {
 	    OutputStream result = null;
 	    boolean retry;
@@ -152,7 +165,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 		    }
 
 		    try {
-			// tp.enter_hasNextNext() ;
+			enter_hasNextNext() ;
 
 			if (! contactInfoListIterator.hasNext()) {
 			    // REVISIT: When we unwind the retry stack
@@ -167,7 +180,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 			    contactInfoListIterator.next();
                         requestInfo( operation, contactInfo ) ;
 		    } finally {
-			// tp.exit_hasNextNext() ;
+			exit_hasNextNext() ;
 		    }
 
 		    CorbaClientRequestDispatcher subcontract =
@@ -243,7 +256,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    }
 	    orb.releaseOrDecrementInvocationInfo();
 	} finally {
-	    // tp.exit_totalInvocation() ;
+	    exit_totalInvocation() ;
         
             // Disable operation tracing for result unmarshaling
             OperationTracer.disable() ;

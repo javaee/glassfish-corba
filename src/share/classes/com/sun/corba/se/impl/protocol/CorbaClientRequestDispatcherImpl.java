@@ -89,9 +89,9 @@ import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
+import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
 
@@ -139,6 +139,48 @@ public class CorbaClientRequestDispatcherImpl
     @InfoMethod
     private void remarshalWithHasNextTrue( CorbaContactInfo info ) { }
 
+    @InfoMethod( tpName="totalRequest", tpType=TimingPointType.ENTER )
+    private void enter_totalRequest() { }
+
+    @InfoMethod( tpName="totalRequest", tpType=TimingPointType.EXIT )
+    private void exit_totalRequest() { }
+
+    @InfoMethod( tpName="connectionSetup", tpType=TimingPointType.ENTER )
+    private void enter_connectionSetup() { }
+
+    @InfoMethod( tpName="connectionSetup", tpType=TimingPointType.EXIT )
+    private void exit_connectionSetup() { }
+
+    @InfoMethod( tpName="clientDecoding", tpType=TimingPointType.ENTER )
+    private void enter_clientDecoding() { }
+
+    @InfoMethod( tpName="clientDecoding", tpType=TimingPointType.EXIT )
+    private void exit_clientDecoding() { }
+
+    @InfoMethod( tpName="clientEncoding", tpType=TimingPointType.ENTER )
+    private void enter_clientEncoding() { }
+
+    @InfoMethod( tpName="clientEncoding", tpType=TimingPointType.EXIT )
+    private void exit_clientEncoding() { }
+
+    @InfoMethod( tpName="clientTransportAndWait", tpType=TimingPointType.ENTER )
+    private void enter_clientTransportAndWait() { }
+
+    @InfoMethod( tpName="clientTransportAndWait", tpType=TimingPointType.EXIT )
+    private void exit_clientTransportAndWait() { }
+
+    @InfoMethod( tpName="processResponse", tpType=TimingPointType.ENTER )
+    private void enter_processResponse() { }
+
+    @InfoMethod( tpName="processResponse", tpType=TimingPointType.EXIT )
+    private void exit_processResponse() { }
+
+    @InfoMethod( tpName="requestAddServiceContexts", tpType=TimingPointType.ENTER )
+    private void enter_requestAddServiceContexts() { }
+
+    @InfoMethod( tpName="requestAddServiceContexts", tpType=TimingPointType.EXIT )
+    private void exit_requestAddServiceContexts() { }
+
     @Subcontract
     public CDROutputObject beginRequest(Object self, String opName,
 	boolean isOneWay, CorbaContactInfo contactInfo) {
@@ -146,7 +188,7 @@ public class CorbaClientRequestDispatcherImpl
         final CorbaContactInfo corbaContactInfo = contactInfo;
         final ORB orb = contactInfo.getBroker();
 
-        // tp.enter_totalRequest() ;
+        enter_totalRequest() ;
 
         // Portable Interceptor initialization.
         orb.getPIHandler().initiateClientPIRequest( false );
@@ -160,18 +202,19 @@ public class CorbaClientRequestDispatcherImpl
         synchronized (lock) {
             if (contactInfo.isConnectionBased()) {
                 try {
-                    // tp.enter_connectionSetup();
+                    enter_connectionSetup();
 
                     if (contactInfo.shouldCacheConnection()) {
-                        connection = (CorbaConnection) orb.getTransportManager()
-                            .getOutboundConnectionCache(contactInfo).get(contactInfo);
+                        connection = orb.getTransportManager()
+                            .getOutboundConnectionCache(contactInfo)
+                            .get(contactInfo);
                     }
 
                     if (connection != null) {
                         usingCachedConnection( connection ) ;
                     } else {
                         connection =
-                            (CorbaConnection)contactInfo.createConnection();
+                            contactInfo.createConnection();
                         usingCreatedConnection( connection ) ;
 
                         if (connection.shouldRegisterReadEvent()) {
@@ -181,9 +224,10 @@ public class CorbaClientRequestDispatcherImpl
                             connectionRegistered( connection ) ;
                         }
 
-                        // Do not do connection reclaim here since the connections
-                        // are marked in use by registerWaiter() call and since this
-                        // call happens later do it after that.
+                        // Do not do connection reclaim here since the 
+                        // connections are marked in use by registerWaiter()
+                        // call and since this call happens later do it after
+                        // that.
                         if (contactInfo.shouldCacheConnection()) {
                             CorbaOutboundConnectionCache connectionCache =
                                 orb.getTransportManager()
@@ -194,14 +238,14 @@ public class CorbaClientRequestDispatcherImpl
                         }
                     }
                 } finally {
-                    // tp.exit_connectionSetup();
+                    exit_connectionSetup();
                 }
             }
         }
 
-        CorbaMessageMediator messageMediator =
-            (CorbaMessageMediator)contactInfo.createMessageMediator(
-                orb, contactInfo, connection, opName, isOneWay);
+        CorbaMessageMediator messageMediator = 
+            contactInfo.createMessageMediator(orb, contactInfo, connection,
+                opName, isOneWay);
         createdMessageMediator(messageMediator);
 
         // NOTE: Thread data so we can get the mediator in release reply
@@ -217,11 +261,11 @@ public class CorbaClientRequestDispatcherImpl
 
         performCodeSetNegotiation(messageMediator);
 
-        // tp.enter_requestAddServiceContexts() ;
+        enter_requestAddServiceContexts() ;
         try {
             addServiceContexts(messageMediator);
         } finally {
-            // tp.exit_requestAddServiceContexts() ;
+            exit_requestAddServiceContexts() ;
         }
 
         CDROutputObject outputObject = contactInfo.createOutputObject(messageMediator);
@@ -268,7 +312,7 @@ public class CorbaClientRequestDispatcherImpl
             // ContactInfoList outside of subcontract.
             // Want to move that update to here.
             if (getContactInfoListIterator(orb).hasNext()) {
-                contactInfo = (CorbaContactInfo)getContactInfoListIterator(orb).next();
+                contactInfo = getContactInfoListIterator(orb).next();
                 remarshalWithHasNextTrue(contactInfo);
 
                 // Fix for 6763340: Complete the first attempt before starting another.
@@ -289,7 +333,7 @@ public class CorbaClientRequestDispatcherImpl
         messageMediator.initializeMessage();
         generalMessage( "initialized message");
 
-        // tp.enter_clientEncoding();
+        enter_clientEncoding();
 
         return outputObject;
     }
@@ -304,29 +348,28 @@ public class CorbaClientRequestDispatcherImpl
 	    ApplicationException, 
 	    org.omg.CORBA.portable.RemarshalException
     {
-        CorbaMessageMediator messageMediator = (CorbaMessageMediator)
-            outputObject.getMessageMediator();
-        ORB orb = (ORB) messageMediator.getBroker();
+        CorbaMessageMediator messageMediator = outputObject.getMessageMediator();
+        ORB orb = messageMediator.getBroker();
         operationAndId(messageMediator.getOperationName(), 
             messageMediator.getRequestId() );
 
 	try {
-	    // tp.exit_clientEncoding();
+	    exit_clientEncoding();
 
-	    // tp.enter_clientTransportAndWait();
+	    enter_clientTransportAndWait();
 
 	    CDRInputObject inputObject = null ;
 	    try {
 		inputObject = marshalingComplete1(orb, messageMediator);
 	    } finally {
-		// tp.exit_clientTransportAndWait();
+		exit_clientTransportAndWait();
 	    }
 
 	    return processResponse(orb, messageMediator, inputObject);
 	} finally {
 	    // We must ALWAYS call enter_ClientDecoding, so that the
 	    // corresponding exit_clientDecoding gets called in endRequest().
-	    // tp.enter_clientDecoding() ;
+	    enter_clientDecoding() ;
 	}
     }
 
@@ -416,14 +459,13 @@ public class CorbaClientRequestDispatcherImpl
         operationAndId(messageMediator.getOperationName(),
             messageMediator.getRequestId() );
 
-	// tp.enter_processResponse() ;
+	enter_processResponse() ;
 	try {
 	    // We know for sure now that we've sent a message.
 	    // So OK to not send initial again.
 	    if (messageMediator.getConnection() != null) {
                 generalMessage( "Non-null connection" ) ;
-		((CorbaConnection)messageMediator.getConnection())
-		    .setPostInitialContexts();
+		messageMediator.getConnection().setPostInitialContexts();
 	    }
 
 	    // NOTE: not necessary to set MessageMediator for PI.
@@ -450,7 +492,7 @@ public class CorbaClientRequestDispatcherImpl
 	    // Now that we have the service contexts processed and the
 	    // correct ORBVersion set, we must finish initializing the stream.
 	    // REVISIT - need interface for this operation.
-	    ((CDRInputObject)inputObject).performORBVersionSpecificInit();
+	    inputObject.performORBVersionSpecificInit();
 
 	    if (messageMediator.isSystemExceptionReply()) {
 		SystemException se = messageMediator.getSystemExceptionReply();
@@ -575,8 +617,8 @@ public class CorbaClientRequestDispatcherImpl
 		
 		// NOTE: Expects iterator to update target IOR
 		getContactInfoListIterator(orb).reportRedirect(
-		    (CorbaContactInfo)messageMediator.getContactInfo(),
-		    messageMediator.getForwardedIOR());
+		    messageMediator.getContactInfo(),
+                    messageMediator.getForwardedIOR());
 
 		// Invoke Portable Interceptors with receive_other:
 		Exception newException = orb.getPIHandler().invokeClientPIEndingPoint(
@@ -601,8 +643,8 @@ public class CorbaClientRequestDispatcherImpl
 
 		// Set the desired target addressing disposition.
 		getContactInfoListIterator(orb).reportAddrDispositionRetry(
-		    (CorbaContactInfo)messageMediator.getContactInfo(),
-		    messageMediator.getAddrDispositionReply());
+		    messageMediator.getContactInfo(),
+                    messageMediator.getAddrDispositionReply());
 
 		// Invoke Portable Interceptors with receive_other:
 		Exception newException = orb.getPIHandler().invokeClientPIEndingPoint(
@@ -640,7 +682,7 @@ public class CorbaClientRequestDispatcherImpl
 		return inputObject;
 	    }
         } finally {
-	    // tp.exit_processResponse() ;
+	    exit_processResponse() ;
 	}
     }
 
@@ -656,7 +698,7 @@ public class CorbaClientRequestDispatcherImpl
         throws 
 	    SystemException, RemarshalException
     {
-        final ORB orb = (ORB) messageMediator.getBroker();
+        final ORB orb = messageMediator.getBroker();
 
         if ( exception == null ) {
             // do nothing.
@@ -702,8 +744,8 @@ public class CorbaClientRequestDispatcherImpl
 
     @Subcontract
     protected void addServiceContexts(CorbaMessageMediator messageMediator) {
-	ORB orb = (ORB)messageMediator.getBroker();
-	CorbaConnection c = (CorbaConnection) messageMediator.getConnection();
+	ORB orb = messageMediator.getBroker();
+	CorbaConnection c = messageMediator.getConnection();
 	GIOPVersion giopVersion = messageMediator.getGIOPVersion();
 
 	ServiceContexts contexts = null;
@@ -721,15 +763,15 @@ public class CorbaClientRequestDispatcherImpl
 	    giopVersion.equals(GIOPVersion.V1_2) && 
 	    c.getBroker().getORBData().alwaysSendCodeSetServiceContext()) {
 	    if (!c.isPostInitialContexts()) {	       
-	        contexts = ((ORB)messageMediator.getBroker()).
+	        contexts = (messageMediator.getBroker()).
 		                                getServiceContextsCache().get(
 						ServiceContextsCache.CASE.CLIENT_INITIAL);
-
 	    } else {
-	        contexts = ((ORB)messageMediator.getBroker()).
-		                                getServiceContextsCache().get(
-						ServiceContextsCache.CASE.CLIENT_SUBSEQUENT);
+	        contexts = messageMediator.getBroker()
+                    .getServiceContextsCache().get(
+                        ServiceContextsCache.CASE.CLIENT_SUBSEQUENT);
 	    }
+
 	    addCodeSetServiceContext(c, contexts, giopVersion);
 
 	    messageMediator.setRequestServiceContexts(contexts);
@@ -787,7 +829,7 @@ public class CorbaClientRequestDispatcherImpl
 	    try {
 		// set the codebase returned by the server
 		if (messageMediator.getConnection() != null) {
-		    ((CorbaConnection)messageMediator.getConnection()).setCodeBaseIOR(ior);
+		    messageMediator.getConnection().setCodeBaseIOR(ior);
 		}
 	    } catch (ThreadDeath td) {
 		throw td ;
@@ -818,16 +860,17 @@ public class CorbaClientRequestDispatcherImpl
     {
 	ServiceContext sc = messageMediator.getReplyServiceContexts()
 	    .get(ExceptionDetailMessage.value);
-	if (sc == null)
-	    return ;
+	if (sc == null) {
+            return;
+        }
 
 	if (! (sc instanceof UnknownServiceContext)) {
 	    throw wrapper.badExceptionDetailMessageServiceContextType();
 	}
 	byte[] data = ((UnknownServiceContext)sc).getData();
 	EncapsInputStream in = 
-	    new EncapsInputStream((ORB)messageMediator.getBroker(),
-				  data, data.length);
+	    new EncapsInputStream(messageMediator.getBroker(),
+                data, data.length);
 	in.consumeEndian();
 
 	String msg =
@@ -839,12 +882,10 @@ public class CorbaClientRequestDispatcherImpl
     }
 
     @Subcontract
-    public void endRequest(ORB broker, Object self, CDRInputObject inputObject)
+    public void endRequest(ORB orb, Object self, CDRInputObject inputObject)
     {
-	ORB orb = (ORB)broker ;
-
 	try {
-	    // tp.exit_clientDecoding();
+	    exit_clientDecoding();
 
 	    // Note: the inputObject may be null if an error occurs
 	    //       in request or before _invoke returns.
@@ -856,8 +897,7 @@ public class CorbaClientRequestDispatcherImpl
 		ORBUtility.popEncVersionFromThreadLocalState();
 
                 if (messageMediator.getConnection() != null) {
-                    ((CorbaMessageMediator)messageMediator)
-                              .sendCancelRequestIfFinalFragmentNotSent();
+                    messageMediator.sendCancelRequestIfFinalFragmentNotSent();
                 }
 
                 // Release any outstanding NIO ByteBuffers to the ByteBufferPool
@@ -898,26 +938,28 @@ public class CorbaClientRequestDispatcherImpl
             // This won't result in a Corba error if an IOException happens.
             reportException("ignoring IOException", ex );
 	} finally {
-	    // tp.exit_totalRequest() ;
+	    exit_totalRequest() ;
 	}
     }
 
     @Subcontract
     protected void performCodeSetNegotiation(CorbaMessageMediator messageMediator) {
-	CorbaConnection conn = (CorbaConnection) messageMediator.getConnection();
-        if (conn == null)
-            return ;
+	CorbaConnection conn = messageMediator.getConnection();
+        if (conn == null) {
+            return;
+        }
 
 	GIOPVersion giopVersion = messageMediator.getGIOPVersion();
-        if (giopVersion.equals(GIOPVersion.V1_0))
-            return ;
+        if (giopVersion.equals(GIOPVersion.V1_0)) {
+            return;
+        }
 
-	IOR ior = ((CorbaContactInfo)messageMediator.getContactInfo())
-	    .getEffectiveTargetIOR();
+	IOR ior = (messageMediator.getContactInfo()).getEffectiveTargetIOR();
 
         synchronized( conn ) {
-            if (conn.getCodeSetContext() != null)
+            if (conn.getCodeSetContext() != null) {
                 return;
+            }
             
             // This only looks at the first code set component.  If
             // there can be multiple locations with multiple code sets,
@@ -969,8 +1011,9 @@ public class CorbaClientRequestDispatcherImpl
         // in GIOP 1.0.  ISO8859-1 is used for char/string, and
         // wchar/wstring are illegal.
         //
-        if (giopVersion.equals(GIOPVersion.V1_0) || conn == null)
+        if (giopVersion.equals(GIOPVersion.V1_0) || conn == null) {
             return;
+        }
         
         CodeSetComponentInfo.CodeSetContext codeSetCtx = null;
 
@@ -985,8 +1028,9 @@ public class CorbaClientRequestDispatcherImpl
         // for some reason, the connection doesn't have its code sets.
         // Perhaps the server didn't include them in the IOR.  Uses
         // ISO8859-1 for char and makes wchar/wstring illegal.
-        if (codeSetCtx == null)
+        if (codeSetCtx == null) {
             return;
+        }
 
         CodeSetServiceContext cssc = 
 	    ServiceContextDefaults.makeCodeSetServiceContext(codeSetCtx);
@@ -995,7 +1039,7 @@ public class CorbaClientRequestDispatcherImpl
 
     @Subcontract
     protected String peekUserExceptionId(CDRInputObject inputObject) {
-	CDRInputObject cdrInputObject = (CDRInputObject) inputObject;
+	CDRInputObject cdrInputObject = inputObject;
 	// REVISIT - need interface for mark/reset
         cdrInputObject.mark(Integer.MAX_VALUE);
         String result = cdrInputObject.read_string();

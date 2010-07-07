@@ -38,7 +38,6 @@ package corba.misc ;
 
 import java.util.Properties ;
 import java.util.Random ;
-import java.util.Stack ;
 import java.util.Date ;
 
 import java.nio.ByteBuffer ;
@@ -695,9 +694,10 @@ public class Client extends TestCase
     void validateLogEvents( final ORB orb, final LogEventHandler leh, 
 	final int initialTimeout, final int maxWait, final int backoff ) {
 
-	final TimerManager<TimingPoints> tm = orb.getTimerManager() ;
+	final TimerManager<TimingPoints> tm = orb.makeTimerManager(
+            TimingPoints.class ) ;
 	final TimingPoints tp = tm.points() ;
-	final Timer nextTime = tp.contactInfoListIteratorNext() ;
+	final Timer nextTime = tp.CorbaContactInfoListIteratorImpl__next() ;
 
 	// per-event data (all events)
 	boolean firstEvent = true ;
@@ -779,11 +779,19 @@ public class Client extends TestCase
 	assertEquals( timeouts.get_max_time_to_wait(),     expectedMaxWait ) ;
 	assertEquals( timeouts.get_backoff_factor(),       expectedBackoff + 100 ) ;
 	
-	TimerManager<TimingPoints> tm = orb.getTimerManager() ;
+	TimerManager<TimingPoints> tm = orb.makeTimerManager(
+            TimingPoints.class ) ;
 	LogEventHandler leh = tm.factory().makeLogEventHandler( "ContactInfoListIterator" ) ;
 	tm.controller().register( leh ) ;
         TimingPoints tp = tm.points() ;
-	TimerGroup cili = tp.contactInfoListIterator() ;
+	TimerGroup cili = tm.factory().makeTimerGroup( "cili", 
+            "TimerGroup for CorbaContactInfoListIteratorImpl" ) ;
+        cili.add( tp.CorbaContactInfoListIteratorImpl__hasNext() ) ;
+        cili.add( tp.CorbaContactInfoListIteratorImpl__next() ) ;
+        cili.add( tp.CorbaContactInfoListIteratorImpl__reportException() ) ;
+        cili.add( tp.CorbaContactInfoListIteratorImpl__reportAddrDispositionRetry() ) ;
+        cili.add( tp.CorbaContactInfoListIteratorImpl__reportRedirect() ) ;
+        cili.add( tp.CorbaContactInfoListIteratorImpl__reportSuccess() ) ;
 
 	try {
 	    cili.enable() ;

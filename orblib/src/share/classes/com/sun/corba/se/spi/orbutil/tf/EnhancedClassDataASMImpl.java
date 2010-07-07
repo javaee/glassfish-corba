@@ -68,7 +68,7 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
 		}
 	    }
 
-	    List<String> acnames = new ArrayList( annoNamesForClass ) ;
+	    List<String> acnames = new ArrayList<String>( annoNamesForClass ) ;
 	    Collections.sort( acnames ) ;
 
 	    int ctr=0 ;
@@ -155,6 +155,9 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                             description = (String)value ;
                         }
                     } else if (aname.equals( INFO_METHOD_NAME)) {
+                        // set the correct default for InfoMethod!
+                        tpt = TimingPointType.NONE ;
+
                         // Check for private method!
                         if (!util.hasAccess( mn.access, 
                             Opcodes.ACC_PRIVATE )) {
@@ -176,10 +179,10 @@ public class EnhancedClassDataASMImpl extends EnhancedClassDataBase {
                             }
                         }
 
-                        Object value2 = getAttribute( an, "tpName ") ;
+                        Object value2 = getAttribute( an, "tpName") ;
                         String tpn = "" ;
                         if ((value2 != null ) && value2 instanceof String) {
-                            tpn = (String)value ;
+                            tpn = (String)value2 ;
                         }
 
                         if (tpt != TimingPointType.NONE) {

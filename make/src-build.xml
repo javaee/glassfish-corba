@@ -94,11 +94,12 @@
         classpathref="maven-ant-tasks.classpath">
     </typedef>
 
-    <target name="build" depends="init, prepare-dirs, compile, enhance-orb, orb-jar, make-bundles"/>
+    <target name="build" depends="init, prepare-dirs, compile, enhance-orb, compile-timing-points, orb-jar, make-bundles"/>
 
     <target name="enhance-orb" depends="init">
         <!-- Run the tracing enhancer on the class files for corba.tf -->
 	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool" classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
+            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar:${classes.dir}:${gmbal-jar}"/>
             <arg value="-dir"/>
             <arg value="com/sun/corba/se/"/>
             <arg value="-debug"/>
@@ -217,6 +218,23 @@
     </target>
 
     <!-- ========================= COMPILE ========================= -->
+
+    <target name="compile-timing-points" depends="init">
+	<echo message="Compiling TimingPoints class"/>
+	<javac destdir="${classes.dir}" 
+		classpathref="classpath.master"
+		deprecation="${deprecation}"
+		debug="${javac.debug}" 
+		optimize="${javac.optimize}"
+	       	failonerror="true"
+		fork="true"
+		memoryMaximumSize="512m"> 
+	    <src path="${gensrc.dir}"/>
+            <include name="com/sun/corba/se/impl/orbutil/newtimer/generated/*"/>
+	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+	</javac>
+    </target>
 
     <target name="compile" depends="init, prepare-dirs, get-dependencies, build-jscheme, orb-library, compile-enhancer, compile-logutils, compile-idl-compiler, run-all-idl, run-all-jscheme, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>

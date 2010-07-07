@@ -341,15 +341,17 @@ public class FrameworkClient extends Framework {
         private TimerGroup serverCDR ;
 
         public CDRTimerContext( ORB clientORB, ORB serverORB ) {
-            final TimerManager<TimingPoints> clientTM = clientORB.getTimerManager() ;
+            final TimerManager<TimingPoints> clientTM = 
+                clientORB.makeTimerManager( TimingPoints.class) ;
             clientLEH = clientTM.factory().makeLogEventHandler( "Client_CDR_LEH" ) ;
             clientTM.controller().register( clientLEH ) ;
-            clientCDR = clientTM.points().CDR() ;
+            clientCDR = clientTM.points().Cdr() ;
 
-            final TimerManager<TimingPoints> serverTM = serverORB.getTimerManager() ;
+            final TimerManager<TimingPoints> serverTM = 
+                serverORB.makeTimerManager( TimingPoints.class ) ;
             serverLEH = serverTM.factory().makeLogEventHandler( "Server_CDR_LEH" ) ;
             serverTM.controller().register( serverLEH ) ;
-            serverCDR = serverTM.points().CDR() ;
+            serverCDR = serverTM.points().Cdr() ;
         }
 
         public void enable() {

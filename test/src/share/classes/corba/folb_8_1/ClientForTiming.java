@@ -41,31 +41,26 @@
 package corba.folb_8_1;
 
 import java.io.File;
-import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
-import org.omg.CORBA.portable.ObjectImpl;
 
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.orbutil.newtimer.Timer;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent;
-import com.sun.corba.se.spi.orbutil.newtimer.Controllable;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController;
 import com.sun.corba.se.spi.orbutil.newtimer.LogEventHandler;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
+
 import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
+import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
+import org.omg.CORBA_2_3.portable.ObjectImpl;
 
 // import corba.framework.TimerUtils ;
 
@@ -230,11 +225,11 @@ public class ClientForTiming
 	dprint("--------- Calling i2Ref to prime pump.");
 	i2Ref.foo(1);
 
-	serverPrimaryContactInfo = 
-	    ((CorbaContactInfoListImpl)
-	     ((CorbaClientDelegate) 
-	      ((ObjectImpl)i2Ref)._get_delegate())
-	     .getContactInfoList()).getPrimaryContactInfo();
+	serverPrimaryContactInfo =
+            ((CorbaContactInfoListImpl)
+	     ((CorbaClientDelegate)
+              ((ObjectImpl)i2Ref)._get_delegate())
+              .getContactInfoList()).getPrimaryContactInfo();
 	
 	dprint("--------- i2Ref primaryContactInfo: " 
 	       + serverPrimaryContactInfo);
@@ -366,7 +361,7 @@ public class ClientForTiming
 
 	Client.setProperties(props);
 	orb = (ORB) ORB.init(av, props);
-	tm = orb.getTimerManager() ;
+	tm = orb.makeTimerManager( TimingPoints.class ) ;
 	tf = tm.factory() ;
 	tp = tm.points() ;
 

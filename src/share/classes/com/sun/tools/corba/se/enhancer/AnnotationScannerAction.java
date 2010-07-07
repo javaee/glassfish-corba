@@ -43,7 +43,10 @@ import com.sun.corba.se.spi.orbutil.tf.Util;
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.objectweb.asm.AnnotationVisitor;
 
@@ -85,9 +88,10 @@ public class AnnotationScannerAction implements Scanner.Action {
 
     private class AnnoScanner extends EmptyVisitor {
         private boolean visitingAnnotation = false ;
+        private String annotationValueName = null ;
         private String timerGroupDescription ;
         private String timerGroupName ;
-        private String[] timerGroupMembers ;
+        private List<Type> timerGroupMembers ;
 
         @Override
         public void visit( int version, int access, String name, String signature,
@@ -125,7 +129,7 @@ public class AnnotationScannerAction implements Scanner.Action {
                 timerGroupName = getGroupName( currentClass ) ;
                 timerGroupDescription = "TimerGroup for Annotation "
                     + timerGroupName ;
-                timerGroupMembers = new String[0] ;
+                timerGroupMembers = new ArrayList<Type>() ;
 
                 return this ;
             }
@@ -137,18 +141,27 @@ public class AnnotationScannerAction implements Scanner.Action {
         // visit an Annotation member
         public void visit( String name, Object value ) {
             if (name == null) {
-                return  ;
-            }
-
-            if (name.equals( "description" )) {
+                // This is called after visitArray
+                if (annotationValueName.equals( "value" )) {
+                    timerGroupMembers.add( (Type)value ) ;
+                }
+            } else if(name.equals("description")) {
                 if (value instanceof String) { 
                     timerGroupDescription = (String)value ;
                 }
             } else if (name.equals( "value")) {
-                if (value instanceof String[]) {
-                    timerGroupMembers = (String[]) value ;
+                if (value instanceof Type[]) {
+                    // This normally doesn't happen: it seems that ASM
+                    // always visits the array elements.
+                    timerGroupMembers = Arrays.asList( (Type[])value ) ;
                 }
             }
+        }
+
+        @Override
+        public AnnotationVisitor visitArray( String name ) {
+            annotationValueName = name ;
+            return this ;
         }
 
         @Override
@@ -158,8 +171,13 @@ public class AnnotationScannerAction implements Scanner.Action {
                 visitingAnnotation = false ;
 
                 tip.addTimerGroup( timerGroupName, timerGroupDescription ) ;
-                for (String str : timerGroupMembers) {
-                    tip.contains( str ) ;
+                for (Type type : timerGroupMembers) {
+                    String name = type.getClassName() ;
+                    final int index = name.lastIndexOf('.') ;
+                    if (index >= 0) {
+                        name = name.substring(index + 1) ;
+                    }
+                    tip.contains( name ) ;
                 }
             }
         }

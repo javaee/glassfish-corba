@@ -98,9 +98,10 @@ public class WorkspaceRename {
     private static final String[][] patterns = {
 	{ "com.sun.corba.se", "com.sun.corba.VERSION" },
 	{ "com/sun/corba/se", "com/sun/corba/VERSION" }, 
-	{ "org.apache.bcel",  "com.sun.corba.VERSION.org.apache.bcel" },
-	{ "org.apache.regexp", "com.sun.corba.VERSION.org.apache.regexp" },
-	{ "org.objectweb.asm", "com.sun.corba.VERSION.org.objectweb.asm" } } ;
+	{ "com.sun.tools.corba.se", "com.sun.tools.corba.VERSION" },
+	{ "com/sun/tools/corba/se", "com/sun/tools/corba/VERSION" }, 
+	{ "org.objectweb.asm", "com.sun.corba.VERSION.org.objectweb.asm" }, 
+	{ "org/objectweb/asm", "com/sun/corba/VERSION/org/objectweb/asm" } } ;
 
     public static void main(String[] strs) {
 	(new WorkspaceRename( strs )).run() ;
@@ -167,15 +168,17 @@ public class WorkspaceRename {
 	}
 
 	if (sourceName.startsWith( rootName)) {
-            final String targetName ;
+            String targetName = sourceName.substring( 
+                rootName.length() ) ;
 
-            // Special handling for ASM!
-            if (sourceName.indexOf( "org/objectweb" ) >= 0) {
-                targetName = sourceName.substring( rootName.length() ).replace( "org/objectweb/asm",
-                    "com/sun/corba/" + version + "/org/objectweb/asm" ) ;
-            } else {
-                targetName = sourceName.substring( rootName.length() ).replace( "com/sun/corba/se",
-                    "com/sun/corba/" + version ) ;
+            for (String[] astr : patterns) {
+                final String key = astr[0] ;
+                final String replacement = astr[1] ;
+
+                if (sourceName.indexOf( key ) >= 0) {
+                    targetName = targetName.replace( key, replacement )
+                        .replace( "VERSION", version ) ;
+                }
             }
 
 	    File result = new File( destination, targetName ) ;
@@ -236,8 +239,8 @@ public class WorkspaceRename {
 			}
 			return true ;
 		    } catch (IOException exc ) {
-			System.out.println( "Exception while processing file " + fw 
-			    + ": " + exc ) ;
+			System.out.println( "Exception while processing file " 
+                            + fw + ": " + exc ) ;
 			exc.printStackTrace() ;
 			return false ;
 		    } 
@@ -250,7 +253,8 @@ public class WorkspaceRename {
 	    for (String[] pstrs : patterns) {
 		String pattern = pstrs[0] ;
 		String replacement = pstrs[1].replace( "VERSION", version ) ;
-		Pair<String,String> pair = new Pair<String,String>( pattern, replacement ) ;
+		Pair<String,String> pair = new Pair<String,String>( pattern, 
+                    replacement ) ;
 		substitutions.add( pair ) ;
 	    }
 
@@ -270,7 +274,9 @@ public class WorkspaceRename {
 			    }
 
 			    Block sourceBlock = BlockParser.getBlock( fw ) ;
-			    Block targetBlock = sourceBlock.substitute( substitutions ) ;
+			    Block targetBlock = sourceBlock.substitute( 
+                                substitutions ) ;
+
                             if (expandtabs) {
                                 targetBlock = targetBlock.expandTabs() ;
                             }

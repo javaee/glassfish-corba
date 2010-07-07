@@ -356,7 +356,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
     {
 	super( orb ) ;
 
-        newPOACreated( name, parent.name ) ;
+        if (parent == null) {
+            newPOACreated( name, "null parent for root POA" ) ;
+        } else {
+            newPOACreated( name, parent.name ) ;
+        }
 
 	this.state     = initialState ;
 	this.name      = name ;

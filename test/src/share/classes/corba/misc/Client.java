@@ -56,10 +56,8 @@ import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CosNaming.NamingContextExt ;
 import org.omg.CosNaming.NamingContextExtHelper ;
 
-import org.omg.CORBA.BAD_PARAM ;
 import org.omg.CORBA.Policy ;
 
-import org.omg.IOP.TaggedComponent ;
 import org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS ;
 
 import org.omg.PortableServer.POA ;
@@ -77,10 +75,7 @@ import junit.framework.TestCase ;
 import junit.framework.Test ;
 import junit.framework.TestResult ;
 import junit.framework.TestSuite ;
-import junit.framework.TestListener ;
-import junit.extensions.RepeatedTest ;
 import junit.extensions.TestSetup ;
-import junit.textui.TestRunner ;
 
 import corba.framework.TestCaseTools ;
 
@@ -92,7 +87,6 @@ import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
 import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent ;
  
-import com.sun.corba.se.spi.oa.OADestroyed ;
 
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
@@ -108,8 +102,6 @@ import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.impl.logging.OMGSystemException ;
-import com.sun.corba.se.impl.oa.poa.POAImpl ;
 
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
@@ -138,13 +130,15 @@ public class Client extends TestCase
 	    super( test ) ;
 	}
 
+        @Override
 	public void setUp()
 	{
 	    orbs = new ORB[idInfo.length] ;
 	    for (int ctr=0; ctr<idInfo.length; ctr++) {
 		orbs[ctr] = makeORB( idInfo[ctr][0] ) ;
-		if (ctr==0)
-		    orb = orbs[ctr] ;
+		if (ctr==0) {
+                    orb = orbs[ctr];
+                }
 	    }
 	}
 
@@ -157,10 +151,12 @@ public class Client extends TestCase
 	    return (ORB)ORB.init( new String[0], props ) ;
 	}
 
+        @Override
 	public void tearDown()
 	{
-	    for (int ctr=0; ctr<orbs.length; ctr++) 
-		orbs[ctr].destroy() ;
+	    for (int ctr=0; ctr<orbs.length; ctr++) {
+                orbs[ctr].destroy();
+            }
 	    // System.out.println( "TimerFactories after ORB destruction:" ) ;
 	    // displayTimerFactories() ;
 	}
@@ -178,8 +174,9 @@ public class Client extends TestCase
 	if (result.errorCount() + result.failureCount() > 0) {
 	    System.out.println( "Error: failures or errrors in JUnit test" ) ;
 	    System.exit( 1 ) ;
-	} else
-	    System.exit( 0 ) ;
+	} else {
+            System.exit(0);
+        }
     }
 
     public Client()
@@ -287,8 +284,9 @@ public class Client extends TestCase
     private static synchronized int getCounter()
     {
 	int result = counter++ ;
-	if (counter > Byte.MAX_VALUE)
-	    counter = 1 ;
+	if (counter > Byte.MAX_VALUE) {
+            counter = 1;
+        }
 	return result ;
     }
 
@@ -301,8 +299,9 @@ public class Client extends TestCase
     private ByteBuffer getBuffer( int val, int len ) 
     {
 	byte[] buff = new byte[len] ;
-	for (int ctr=0; ctr<len; ctr++)
-	    buff[ctr] = (byte)val ;
+	for (int ctr=0; ctr<len; ctr++) {
+            buff[ctr] = (byte) val;
+        }
 	ByteBuffer result = ByteBuffer.wrap( buff ) ;
 	result.position( len ) ;
 	return result ;
@@ -324,6 +323,7 @@ public class Client extends TestCase
 	    return 10 + gen.nextInt( 100 ) ;
 	}
 
+        @Override
 	public void run() 
 	{
 	    for (int ctr=0; ctr<REP_COUNT; ctr++) {
@@ -415,8 +415,9 @@ public class Client extends TestCase
 	    } catch (Exception exc) {
 		fail( "Unexpected exception on id_to_servant: " + exc ) ;
 	    }
-	    if (!expectedException)
-		fail( "id_to_servant did not throw excepted exception" ) ;
+	    if (!expectedException) {
+                fail("id_to_servant did not throw excepted exception");
+            }
 
 	    // Try to Activate again: Failure?
 	    myPOA.activate_object_with_id( oid, servant ) ;
@@ -584,8 +585,9 @@ public class Client extends TestCase
 		    shouldBeColors[ctr], colors[ctr] ) ;
 	    }
 	} finally {
-	    if (orb != null)
-		orb.destroy() ;
+	    if (orb != null) {
+                orb.destroy();
+            }
 	}
     }
 
@@ -603,9 +605,11 @@ public class Client extends TestCase
 	    return value ;
 	}
 
+        @Override
 	public boolean equals( Object obj ) {
-	    if (obj == this)
-		return true ;
+	    if (obj == this) {
+                return true;
+            }
 
 	    if (obj instanceof RRTest) {
 		RRTest other = (RRTest)obj ;
@@ -620,12 +624,13 @@ public class Client extends TestCase
 	}
 
 	private Object readResolve() {
-	    if (value == 1) 
-		return rr1 ;
-	    else if (value == 2)
-		return rr2 ;
-	    else
-		return this ;
+	    if (value == 1) {
+                return rr1;
+            } else if (value == 2) {
+                return rr2;
+            } else {
+                return this;
+            }
 	}
     }
 
@@ -833,8 +838,9 @@ public class Client extends TestCase
 
     private static TimerFactory findTimerFactoryForORB( String orbId ) {
 	for (TimerFactory tf : TimerFactoryBuilder.contents()) {
-	    if (tf.name().contains( orbId )) 
-		return tf ;
+	    if (tf.name().contains( orbId )) {
+                return tf;
+            }
 	}
 
 	return null ;
@@ -850,11 +856,17 @@ public class Client extends TestCase
 	
 	for (int ctr=0; ctr<2; ctr++) {
 	    lorb = (ORB)ORB.init( new String[0], props ) ;
+            // If we don't create a TimerManager, there won't be a 
+            // TimerFactory.
+            TimerManager<TimingPoints> tm =
+                lorb.makeTimerManager( TimingPoints.class ) ;
+
 	    // displayTimerFactories() ;
 	    assertTrue( findTimerFactoryForORB(orbId) != null ) ;
 
 	    lorb.destroy() ;
 	    // displayTimerFactories() ;
+            tm.destroy() ; // ORB.destroy won't clean this up!
 	    assertTrue( findTimerFactoryForORB(orbId) == null ) ;
 	}
     }

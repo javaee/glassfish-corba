@@ -238,13 +238,19 @@ public class EnhanceTool {
             args = ap.parse( strs ) ;
             util = new Util( args.debug(), args.verbose() ) ;
 
-            String fullTimingPointName = args.timingPointClass() ;
+            final String tpname = args.timingPointClass() ;
             String pkg = "" ;
-            String cname = fullTimingPointName ;
-            int index = fullTimingPointName.lastIndexOf('.') ;
-            if (index > 0) {
-                cname = fullTimingPointName.substring( index + 1 ) ;
-                pkg = fullTimingPointName.substring( 0, index ) ;
+            String cname = tpname ;
+
+            if (tpname.length() > 0) {
+                int index = tpname.lastIndexOf('.') ;
+                if (index > 0) {
+                    cname = tpname.substring( index + 1 ) ;
+                    pkg = tpname.substring( 0, index ) ;
+                }
+            } else {
+                cname = "NotUsed" ;
+                pkg = "no.package" ;
             }
 
             tip = new TimerPointSourceGenerator.TimingInfoProcessor( 

@@ -363,8 +363,8 @@ public class Client
         int arg = 23 ;
         expected.clear() ;
         expected.enter( CALL4, arg ) ;
-        // expected.info( new Object[0], CALL4, SOMEINFO);
-        expected.info( null, CALL4, SOMEINFO);
+        expected.info( new Object[0], CALL4, INSYNC);
+        // expected.info( null, CALL4, INSYNC);
         expected.exit( CALL4, 2*arg ) ;
 
         MethodMonitorRegistry.register( A.class, tracingMonitorFactory ) ;

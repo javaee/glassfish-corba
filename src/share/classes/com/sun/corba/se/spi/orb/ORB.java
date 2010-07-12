@@ -439,8 +439,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     }
 
     /** Obtain the InvocationInterceptor for this ORB instance.
-     * By default this does nothing.  XXX this would be a good 
-     * place for the ORB timing system to gather data.
+     * By default this does nothing.  
      * @return The InvocationInterceptor.
      */
     public abstract InvocationInterceptor getInvocationInterceptor() ;
@@ -468,12 +467,11 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     private <T> T makeInstance( Class<T> cls, TimerFactory tf ) {
         try {
-            Constructor<T> cons = cls.getConstructor( cls, TimerFactory.class);
+            Constructor<T> cons = cls.getConstructor( TimerFactory.class);
             return cons.newInstance(tf);
         } catch (Exception ex) {
-            // XXX log?
+            throw wrapper.couldNotMakeInstance( ex, cls ) ;
         }
-        return null ;
     }
 
     public <T> TimerManager<T> makeTimerManager( Class<T> tpClass ) {
@@ -801,9 +799,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     @OrbLifeCycle
     public void createORBManagedObjectManager() {
-        // XXX createStandalone should be replaced by createFederated if running
-        // as part of GlassFish v3 or later.  An extension to the SPI is needed for
-        // this.
         if (rootParentObjectName == null) {
             mom = ManagedObjectManagerFactory.createStandalone( "com.sun.corba" ) ;
         } else {

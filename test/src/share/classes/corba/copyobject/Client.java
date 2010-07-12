@@ -39,8 +39,6 @@ package corba.copyobject  ;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Method;
 
-import java.util.*;
-import java.io.PrintStream ;
 import java.io.Serializable ;
 import java.math.BigInteger;
 import java.math.BigDecimal;
@@ -52,7 +50,6 @@ import java.rmi.RemoteException;
 
 import javax.rmi.CORBA.Util;
 import javax.rmi.PortableRemoteObject;
-import javax.rmi.CORBA.Tie;
 
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.BAD_PARAM;
@@ -60,27 +57,21 @@ import org.omg.CORBA.BAD_INV_ORDER;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TypeCode;
 
-import junit.framework.AssertionFailedError ;
 import junit.framework.TestCase ;
 import junit.framework.Test ;
 import junit.framework.TestResult ;
 import junit.framework.TestSuite ;
-import junit.framework.TestListener ;
-import junit.textui.TestRunner ;
 
 import corba.framework.TimedTest ;
 import corba.framework.TestCaseTools ;
-// import corba.framework.TimerUtils ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
-import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 import com.sun.corba.se.spi.orbutil.generic.Holder ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
@@ -89,15 +80,33 @@ import com.sun.corba.se.spi.orbutil.newtimer.Statistics ;
 import com.sun.corba.se.spi.orbutil.newtimer.StatsEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.Timer ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEvent ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerEventHandler ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Stack;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
 
 public abstract class Client extends TestCase
 {
@@ -105,7 +114,7 @@ public abstract class Client extends TestCase
     private static final boolean DEBUG = false ;
     private static final int REP_COUNT = 200 ;
     private static ORB orb ;
-    private List timedTests ;
+    private List<TimedTest> timedTests ;
 
     static {
 	try {
@@ -126,30 +135,32 @@ public abstract class Client extends TestCase
 	return false ;
     }
 
+    @Override
     protected void runTest() throws Throwable
     {
-	if (isTestExcluded())
-	    // Excluded tests always pass.  Be careful with this.
-	    assertTrue( true ) ;
-	else
-	    try {
-		super.runTest() ;
-		if (shouldThrowReflectiveCopyException())
-		    fail( "Test did not throw expected ReflectiveCopyException" ) ;
-	    } catch (RuntimeException rce) {
-		Throwable cause = rce.getCause() ;
-		if (!shouldThrowReflectiveCopyException()) {
-		    System.out.println( "Printing stack trace:" ) ;
-		    rce.printStackTrace() ;
-		    fail( "Test should not have thrown Exception " + cause ) ;
-		}
-		if (!(rce.getCause() instanceof ReflectiveCopyException)) {
-		    System.out.println( "Printing stack trace:" ) ;
-		    rce.printStackTrace() ;
-		    fail( "Cause of RuntimeException was " + cause 
-			+ " instead of expected ReflectiveCopyException" ) ;
-		}
-	    } ;
+	if (isTestExcluded()) {
+            assertTrue(true);
+        } else {
+            try {
+                super.runTest();
+                if (shouldThrowReflectiveCopyException()) {
+                    fail("Test did not throw expected ReflectiveCopyException");
+                }
+            } catch (RuntimeException rce) {
+                Throwable cause = rce.getCause();
+                if (!shouldThrowReflectiveCopyException()) {
+                    System.out.println("Printing stack trace:");
+                    rce.printStackTrace();
+                    fail("Test should not have thrown Exception " + cause);
+                }
+                if (!(rce.getCause() instanceof ReflectiveCopyException)) {
+                    System.out.println("Printing stack trace:");
+                    rce.printStackTrace();
+                    fail("Cause of RuntimeException was " + cause
+                        + " instead of expected ReflectiveCopyException");
+                }
+            }
+        }
     }
     
     public  Object copyObject( Object obj )
@@ -171,9 +182,11 @@ public abstract class Client extends TestCase
 
     protected boolean findInArray( String name, String[] args ) 
     {
-	for( String str : args ) 
-	    if (name.equals( str ))
-		return true ;
+	for( String str : args ) {
+            if (name.equals(str)) {
+                return true;
+            }
+        }
 
 	return false ;
     }
@@ -211,8 +224,9 @@ public abstract class Client extends TestCase
 	if (result.errorCount() + result.failureCount() > 0) {
 	    System.out.println( "Error: failures or errrors in JUnit test" ) ;
 	    System.exit( 1 ) ;
-	} else
-	    System.exit( 0 ) ;
+	} else {
+            System.exit(0);
+        }
     }
 
     public Client()
@@ -439,9 +453,9 @@ public abstract class Client extends TestCase
 
     private void doImmutableTest( Object data )
     {
-	if (DEBUG)
-	    System.out.println( "doImmutableTest called with data type " + 
-		data.getClass().getName() ) ;
+	if (DEBUG) {
+            System.out.println("doImmutableTest called with data type " + data.getClass().getName());
+        }
 
 	Object result = copyObject( data ) ;
 
@@ -452,9 +466,9 @@ public abstract class Client extends TestCase
 
     private void doStandardTest( Object data )
     {
-	if (DEBUG)
-	    System.out.println( "doStandardTest called with data type " + 
-		data.getClass().getName() ) ;
+	if (DEBUG) {
+            System.out.println("doStandardTest called with data type " + data.getClass().getName());
+        }
 
 	Object result = copyObject( data ) ;
 
@@ -464,9 +478,9 @@ public abstract class Client extends TestCase
 
     private void doCopyObjectsTest( Object[] data )
     {
-	if (DEBUG)
-	    System.out.println( "doCopyObjectsTest called with data type " + 
-		data.getClass().getName() ) ;
+	if (DEBUG) {
+            System.out.println("doCopyObjectsTest called with data type " + data.getClass().getName());
+        }
 
 	Object[] result = copyObjects( data ) ;
 
@@ -476,8 +490,9 @@ public abstract class Client extends TestCase
 
     private boolean hasDelegateSet( Object obj )
     {
-	if (!StubAdapter.isStub( obj )) 
-	    return false ;
+	if (!StubAdapter.isStub( obj )) {
+            return false;
+        }
 
 	try {
 	    StubAdapter.getDelegate(obj) ;
@@ -490,9 +505,9 @@ public abstract class Client extends TestCase
     private void doRemoteTest(Object data)
         throws RemoteException 
     {
-	if (DEBUG)
-	    System.out.println( "doRemoteTest called with data type " + 
-		data.getClass().getName() ) ;
+	if (DEBUG) {
+            System.out.println("doRemoteTest called with data type " + data.getClass().getName());
+        }
 
         try {
 	    assertFalse( hasDelegateSet( data ) ) ;
@@ -509,13 +524,13 @@ public abstract class Client extends TestCase
 
     public void testImmutableClass()
     {
-	Class arg = Client.class ;
+	Class<?> arg = Client.class ;
 	Object result = copyObject( arg ) ;
 	String argName = arg.getName() ;
-	String resultName = ((Class)result).getName() ;
-	if (!argName.equals( resultName ))
-	    fail( "Class test failed: argName = " + argName +
-		" resultName = " + resultName ) ;
+	String resultName = ((Class<?>)result).getName() ;
+	if (!argName.equals( resultName )) {
+            fail("Class test failed: argName = " + argName + " resultName = " + resultName);
+        }
     }
 
     public void testImmutableString()
@@ -624,7 +639,7 @@ public abstract class Client extends TestCase
 
         double[] doubleArray = new double[100];
         for (int i = 0; i < doubleArray.length; i++) {
-            doubleArray[i] = (double) 10.35 + (double) i;
+            doubleArray[i] = 10.35 + (double) i;
         }
 
         doStandardTest(doubleArray);
@@ -643,7 +658,7 @@ public abstract class Client extends TestCase
 
         char[] unicodeCharArray = new char[100];
         for (int i = 0; i < unicodeCharArray.length; i++) {
-            unicodeCharArray[i] = (char) ((char) '\u6D77' + (char) i);
+            unicodeCharArray[i] = (char) ('\u6D77' + (char) i);
         }
         doStandardTest(unicodeCharArray);
     }
@@ -689,10 +704,11 @@ public abstract class Client extends TestCase
     public  void testImmutableBooleanArray() {
         Boolean[] boolArray = new Boolean[10];
         for (int i = 0; i < boolArray.length; i++) {
-            if ((i % 2) == 0)
+            if ((i % 2) == 0) {
                 boolArray[i] = Boolean.TRUE;
-            else
+            } else {
                 boolArray[i] = Boolean.FALSE;
+            }
         }
         doStandardTest(boolArray);
     }
@@ -764,7 +780,7 @@ public abstract class Client extends TestCase
 
         Character[] unicodeCharArray = new Character[100];
         for (int i = 0; i < unicodeCharArray.length; i++) {
-            unicodeCharArray[i] = (char) ((char) '\u6D77' + (char) i);
+            unicodeCharArray[i] = (char) ('\u6D77' + (char) i);
         }
         doStandardTest(unicodeCharArray);
     }
@@ -773,7 +789,7 @@ public abstract class Client extends TestCase
 
         String[] stringArray = new String[25];
         for (int i = 0; i < stringArray.length; i++) {
-            stringArray[i] = new String("String " + i);
+            stringArray[i] = "String " + i ;
         }
         doStandardTest(stringArray);
     }
@@ -782,7 +798,7 @@ public abstract class Client extends TestCase
 
         String[] unicodeStrArray = new String[25];
         for (int i = 0; i < unicodeStrArray.length; i++) {
-            unicodeStrArray[i] = new String("Unicode " + '\u6D77' + " #" + i);
+            unicodeStrArray[i] = "Unicode " + '\u6D77' + " #" + i;
         }
         doStandardTest(unicodeStrArray);
     }
@@ -865,9 +881,9 @@ public abstract class Client extends TestCase
     public  void testImmutableStringArrayAlias() {
 
         String s1 = "";
-        String s2 = new String("");
+        String s2 = "" + "" ;
         String s3 = "test";
-        String s4 = new String("test");
+        String s4 = "test" + "" ;
 
         String[] stringArray = new String[] { s1, s2, s3, s4, s1, s2, s3, s4};
 
@@ -887,28 +903,26 @@ public abstract class Client extends TestCase
 
     public  void testImmutable2dStringArrayAlias() {
         String[] array =
-        { new String("one"), new String("two"), "", new String("") };
+        { "one", "two", "", "" + "" };
 
         String[][] stringArray = new String[3][4];
         for (int i = 0; i < 3; i++){
-            for (int j = 0; j < 4; j++) {
-                stringArray[i][j] = array[j];
-            }
+            System.arraycopy(array, 0, stringArray[i], 0, 4);
         }
         doStandardTest(stringArray);
     }
 
     public  void testImmutable2dStringArrayComplex() {
-        String s1 = new String("one");
-        String s2 = new String("two");
+        String s1 = "one";
+        String s2 = "two";
         String s3 = "";
-        String s4 = new String("");
+        String s4 = "" + "" ;
 
         String[] array1 = new String[] { s1, s2, s3 };
 
         String[][] stringArray = new String[5][];
         stringArray[0] = array1;
-        stringArray[1] = new String[] { s1, "", new String("") };
+        stringArray[1] = new String[] { s1, "", "" + "" };
         stringArray[2] = new String[] { "test1", s4 };
         stringArray[3] = new String[] { s1, s2, s3 };
         stringArray[4] = array1;
@@ -918,18 +932,18 @@ public abstract class Client extends TestCase
 
     public  void testImmutableClassArray() {
 
-        Class[] classArray = new Class[]
-        { new String("str").getClass(), new Integer(1).getClass() };
+        Class<?>[] classArray = new Class<?>[]
+        { "str".getClass(), Integer.class};
 
         doStandardTest(classArray);
     }
 
     public  void testImmutableClassArrayAlias() {
 
-        Class c1 = new String("test").getClass();
-        Class c2 = new Integer(1).getClass();
+        Class<?> c1 = String.class;
+        Class<?> c2 = Integer.class;
 
-        Class[] classArray = { c1, c2, c1, c2 };
+        Class<?>[] classArray = { c1, c2, c1, c2 };
 
         doStandardTest(classArray);
     }
@@ -1766,52 +1780,58 @@ public abstract class Client extends TestCase
     // the code.
     public void conditionTimingTests() {
 	Object data = NonFinalComplexClass.makeNonFinalComplexClass( "FOO" ) ;
-	for (int ctr=0; ctr<2000; ctr++)
-	    copyObject( data ) ;
+	for (int ctr=0; ctr<2000; ctr++) {
+            copyObject(data);
+        }
     }
 
     public void testTimedObject() {
 	Object obj = new Object() ;
-	for (int ctr=0; ctr<REP_COUNT; ctr++)
-	    copyObject( obj ) ;
+	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+            copyObject(obj);
+        }
     }
 
     public  void testTimedNonFinalComplexClassArray()
     {
 	Object data = NonFinalComplexClass.makeNonFinalComplexClass( "FOO" ) ;
-	for (int ctr=0; ctr<REP_COUNT; ctr++)
-	    copyObject( data ) ;
+	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+            copyObject(data);
+        }
     }
 
     public  void testTimedNonFinalComplexClassAliasedArray()
     {
 	Object data = NonFinalComplexClass.makeNonFinalComplexClassAliasedArray( "BAR" ) ;
-	for (int ctr=0; ctr<REP_COUNT; ctr++)
-	    copyObject( data ) ;
+	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+            copyObject(data);
+        }
     }
 
     public  void testTimedNonFinalComplexClassGraph()
     {
 	Object data = NonFinalComplexClass.makeNonFinalComplexClassGraph( ) ;
-	for (int ctr=0; ctr<REP_COUNT; ctr++)
-	    copyObject( data ) ;
+	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+            copyObject(data);
+        }
     }
 
     public  void testTimedNonFinalComplexClassTree()
     {
 	Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
 
-	for (int ctr=0; ctr<REP_COUNT; ctr++)
-	    copyObject( data ) ;
+	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+            copyObject(data);
+        }
     }
 
-    /* Not using this; re-writing timing points.
     public  void testTimedNonFinalComplexClassTreeCDRTiming()
     {
 	Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
 
 	// Set up timing for CDR.
-	TimerManager<TimingPoints> tm = orb.getTimerManager() ;
+	TimerManager<TimingPoints> tm = orb.makeTimerManager(
+            TimingPoints.class ) ;
 	TimingPoints tp = tm.points() ;
 	TimerFactory tf = tm.factory() ;
 	TimerEventController controller = tm.controller() ;
@@ -1824,21 +1844,22 @@ public abstract class Client extends TestCase
 	controller.register( handler ) ;
 
 	top.enable() ;
-	tp.CDR().enable() ;
-	tp.Dynamic().enable() ;
+	tp.Cdr().enable() ;
+	tp.DynamicType().enable() ;
 	handler.clear() ;
 
 	controller.enter( top ) ;
 
 	// Run the actual timed test
-	for (int ctr=0; ctr<REP_COUNT; ctr++)
-	    copyObject( data ) ;
+	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+            copyObject(data);
+        }
 
 	controller.exit( top ) ;
 
 	top.disable() ;
-	tp.CDR().disable() ;
-	tp.Dynamic().disable() ;
+	tp.Cdr().disable() ;
+	tp.DynamicType().disable() ;
 	
 	// Dump out timing results.
 	Map<Timer,Statistics> result = handler.stats() ;	
@@ -1846,7 +1867,6 @@ public abstract class Client extends TestCase
 	    // "Timing Data for making " + REP_COUNT
 	    // + " copies of Tree(4, 3, 2, 3) using ORBStream copier" ) ;
     }
-    */
 
     // Use reflection to get the typecodes so we don't need to generate the
     // classes at compile time.

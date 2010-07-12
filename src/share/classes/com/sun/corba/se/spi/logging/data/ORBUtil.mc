@@ -177,6 +177,8 @@
              79 FINE "Inserting exported package {0} from bundle {1} into packageNameMap")
             (REMOVE_BUNDLE_PACKAGE
              80 FINE "Removing exported package {0} from bundle {1} from packageNameMap") 
+            (COULD_NOT_MAKE_INSTANCE
+             81 WARNING "Could not make an instance of Class {0}")
 	    )
 	(BAD_PARAM
 	    (NULL_PARAM 

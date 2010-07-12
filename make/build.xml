@@ -190,7 +190,7 @@
             <arg value="-debug"/>
             <arg value="true"/>
             <arg value="-verbose"/>
-            <arg value="3"/>
+            <arg value="1"/>
             <arg value="-rf"/>
             <arg value="corba/tf/tfannotations.properties"/>
             <arg value="-mode"/>
@@ -1642,7 +1642,7 @@
 	    <jvmarg value="-Djavax.rmi.CORBA.UtilClass=com.sun.corba.se.impl.javax.rmi.CORBA.Util"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.StubClass=com.sun.corba.se.impl.javax.rmi.CORBA.StubDelegateImpl"/>
 	    <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
-	    <jvmarg value="-Dcorba.test.orb.classpath=${emma.classes.dir}:${test-classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${emma-jar}:${gmbal-jar}:${management-api-jar}:${testng-jar}"/>
+            <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${gmbal-jar}:${management-api-jar}"/>
             <!-- add this to debug use of JUnitReportHelper:
             <jvmarg value="-Dcorba.test.junit.helper.debug=true"/>
             -->
@@ -1665,7 +1665,7 @@
 	    <jvmarg value="-Demma.coverage.out.file=../../${emma.dir}/orb_coverage.ec"/>
 	    <jvmarg value="-Demma.coverage.out.merge=true"/>
 	    <jvmarg value="-Demma.rt.control=false"/>
-	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${test-classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${tools-jar}:${emma-jar}:${gmbal-jar}:${management-api-jar}:${testng-jar}"/>
+            <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${tools-jar}:${emma-jar}:${gmbal-jar}:${management-api-jar}"/>
 	    <jvmarg line="${debug.args}"/>
             <jvmarg value="-Xmx200m"/>
 	    <!-- was:

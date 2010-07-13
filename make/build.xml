@@ -188,7 +188,7 @@
             <arg value="-dir"/>
             <arg value="corba/tf"/>
             <arg value="-debug"/>
-            <arg value="true"/>
+            <arg value="false"/>
             <arg value="-verbose"/>
             <arg value="1"/>
             <arg value="-rf"/>

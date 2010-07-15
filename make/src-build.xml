@@ -566,7 +566,7 @@
 	    <src path="${orblib.src.dir}"/>
 	    <include name="**"/>
 	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${orblib.classes.dir}"/>
 	</javac>
     </target>
 

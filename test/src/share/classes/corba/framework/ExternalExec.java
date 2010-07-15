@@ -68,7 +68,7 @@ public class ExternalExec extends ControllerAdapter
     }
     
     public ExternalExec() {
-	this( true ) ;
+	this( false ) ;
     }
 
     /**

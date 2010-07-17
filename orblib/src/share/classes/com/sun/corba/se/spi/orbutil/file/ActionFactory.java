@@ -64,7 +64,7 @@ public class ActionFactory {
 	    }
 
 	    public boolean evaluate( final FileWrapper fw ) {
-		if (verbose > 0) {
+		if (verbose > 1) {
                     System.out.println("SkipAction called on " + fw);
                 }
 		
@@ -85,7 +85,7 @@ public class ActionFactory {
 	    }
 
 	    public boolean evaluate( final FileWrapper fw ) {
-		if (verbose > 0) {
+		if (verbose > 1) {
                     System.out.println("StopAction called on " + fw);
                 }
 

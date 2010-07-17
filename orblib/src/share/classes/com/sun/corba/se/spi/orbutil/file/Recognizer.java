@@ -163,7 +163,7 @@ public class Recognizer implements Scanner.Action {
             action = defaultAction;
         }
 
-	if (verbose > 0) {
+	if (verbose > 1) {
 	    System.out.println( 
 		"Recognizer: calling action " + action 
 		+ " on file " + file ) ;

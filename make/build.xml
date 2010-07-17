@@ -1727,11 +1727,9 @@
 	    <sysproperty key="emma.coverage.out.file" value="../../${emma.dir}/orb_coverage.ec"/>
 	    <sysproperty key="emma.coverage.out.merge" value="true"/>
 	    <sysproperty key="emma.rt.control" value="false"/>
-            <!--
 	    <classpath>
 		<path refid="test-classpath.master"/>
 	    </classpath> 
-            -->
             <!--
 	    <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${boot.dir}/lib/tools.jar:${emma-jar}:${gmbal-jar}:${management-api-jar}"/> 
 	    <jvmarg value="-Xbootclasspath/p:${toString:test-classpath.master}"/> 
@@ -1783,6 +1781,7 @@
     <echo message="use.java.serialization=${use.java.serialization}"/>
     <echo message="use.codegen.copyobject=${use.codegen.copyobject}"/>
     <echo message="http.server.port=${http.server.port}"/>
+    <echo message="classpath=${toString:test-classpath.master}"/>
 </target>
 
 <target name="run-test-target" depends="test-init">

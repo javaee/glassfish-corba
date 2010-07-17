@@ -208,7 +208,7 @@ public class WorkspaceRename {
 	copyonly = args.copyonly() ;
         expandtabs = args.expandtabs() ;
 
-	if (verbose > 0) {
+	if (verbose > 1) {
 	    trace( "Main: args:\n" + args ) ;
 	}
     }
@@ -226,7 +226,7 @@ public class WorkspaceRename {
 		    try {
 			FileWrapper target = makeTargetFileWrapper( fw ) ;
 			if (target.isYoungerThan( fw )) {
-			    if (verbose > 1) {
+			    if (verbose > 0) {
 				trace( "copyAction: copying " + fw
 				    + " to " + target ) ;
 			    }
@@ -268,7 +268,7 @@ public class WorkspaceRename {
 
 		    try {
 			if (target.isYoungerThan( fw )) {
-			    if (verbose > 1) {
+			    if (verbose > 0) {
 				trace( "renameAction: renaming " + fw
 				    + " to " + target ) ;
 			    }
@@ -348,7 +348,7 @@ public class WorkspaceRename {
 		recognizer.addKnownName( str, skipAction ) ;
 	    }
 
-	    if (verbose > 0) {
+	    if (verbose > 1) {
 		trace( "Main: contents of recognizer:" ) ;
 		recognizer.dump() ;
 	    }

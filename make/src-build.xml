@@ -756,7 +756,7 @@
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
 	    </classpath>
 	    <arg value="-verbose"/>
-	    <arg value="0"/>
+	    <arg value="1"/>
 	    <arg value="-dryrun"/>
 	    <arg value="false"/>
 	    <arg value="-source"/>

@@ -131,14 +131,14 @@ public class Scanner {
 	for (String pattern : patternsToSkip) {
 	    String absPath = file.getAbsolutePath() ;
 	    if (match( pattern, absPath)) {
-		if (verbose > 0) {
+		if (verbose > 1) {
                     System.out.println("Scanner: Skipping directory " + absPath + "(pattern " + pattern + ")");
                 }
 		return true ;
 	    }
 	}
 
-	if (verbose > 0) {
+	if (verbose > 1) {
             System.out.println("Scanner: Not skipping directory " + file);
         }
 	return false ;
@@ -154,7 +154,7 @@ public class Scanner {
 	while (st.hasMoreTokens()) {
 	    final String token = st.nextToken() ;
 	    if (pattern.equals( token )) {
-		if (verbose > 0) {
+		if (verbose > 1) {
                     System.out.println("fname " + fname + " matched on pattern " + pattern);
                 }
 		return true ;

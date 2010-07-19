@@ -67,7 +67,6 @@ public class FolbTest
         orbd.start();
 
         ////////////////////////////////////////////////////
-
         server = createServer(thisPackage + "." + "Server", "Server");
         client = createClient(thisPackage + "." + "Client", "Client");
         server.start();

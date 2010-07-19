@@ -145,7 +145,7 @@ public abstract class CorbaContactInfoBase
 	ByteBuffer byteBuffer = msg.getByteBuffer();
 	msg.setByteBuffer(null);
 	CorbaMessageMediator messageMediator =
-	    new CorbaMessageMediatorImpl(orb, connection, msg, byteBuffer);
+	    new CorbaMessageMediatorImpl(lorb, connection, msg, byteBuffer);
 
 	return messageMediator;
     }

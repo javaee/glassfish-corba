@@ -228,7 +228,7 @@ public class ClientForTiming
 	serverPrimaryContactInfo =
             ((CorbaContactInfoListImpl)
 	     ((CorbaClientDelegate)
-              ((ObjectImpl)i2Ref)._get_delegate())
+              ((_I2Stub)i2Ref)._get_delegate())
               .getContactInfoList()).getPrimaryContactInfo();
 	
 	dprint("--------- i2Ref primaryContactInfo: " 

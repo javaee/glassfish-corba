@@ -368,12 +368,18 @@ public class MethodMonitorRegistry {
 	        fld.set( null, sh) ;
 
                 final String axname = getExternalName( aname ) ;
+
+                // This assumes that the class and its annotations are all available in
+                // the same ClassLoader.  In OSGi, this means that the class and its
+                // annotations are in the same OSGi bundle, which is a reasonable
+                // restriction.
                 Class<? extends Annotation> aclass =
-                    (Class<? extends Annotation>)Class.forName( axname ) ;
+                    (Class<? extends Annotation>)Class.forName( axname, true,
+                        cls.getClassLoader() ) ;
 
 		annoMM.put( aclass, sh ) ;
 	    } catch (Exception exc) {
-		System.out.println( "Exception: " + exc ) ;
+		System.out.println( "Exceptionn MethodMonitorRegistry.registerClass: " + exc ) ;
 	    }
 	}
 

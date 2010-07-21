@@ -1,0 +1,10 @@
+Some packages are exported in the glassfish-corba-orb bundle because they are
+needed at runtime for various reflective operations.  This includes:
+
+com.sun.corba.se.impl.orb: so that ORBSingleton is available
+com.sun.corba.se.impl.presentation.rmi: so that CodegenStubBase is available
+com.sun.corba.se.spi.trace: while these are internal only, they are
+    needed in order for the trace facility code in glassfish-corba-orbgeneric
+    to be able to load these classes reflectively from 
+    glassfish-corba-orb
+

@@ -41,8 +41,6 @@ import org.omg.CORBA_2_3.portable.OutputStream ;
 
 import org.omg.CORBA.OctetSeqHolder ;
 
-import com.sun.corba.se.spi.activation.POANameHelper ;
-
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBVersion ;
 import com.sun.corba.se.spi.orb.ORBVersionFactory ;
@@ -56,12 +54,24 @@ import com.sun.corba.se.impl.ior.ObjectKeyFactoryImpl ;
  */
 public final class POAObjectKeyTemplate extends NewObjectKeyTemplateBase 
 {
+    public static String[] readPOAName(
+        org.omg.CORBA.portable.InputStream istream)
+    {
+        String value[] = null;
+        int _len0 = istream.read_long();
+        value = new String[_len0];
+        for (int _o1 = 0;_o1 < value.length; ++_o1) {
+            value[_o1] = istream.read_string();
+        }
+        return value;
+    }
+
     /** This constructor reads the template ONLY from the stream.
     */
     public POAObjectKeyTemplate( ORB orb, int magic, int scid, InputStream is ) 
     {
 	super( orb, magic, scid, is.read_long(), is.read_string(),
-	    new ObjectAdapterIdArray( POANameHelper.read( is ) ) ) ;
+	    new ObjectAdapterIdArray( readPOAName( is ) ) ) ;
 
 	setORBVersion( is ) ;
     }
@@ -73,7 +83,7 @@ public final class POAObjectKeyTemplate extends NewObjectKeyTemplateBase
 	OctetSeqHolder osh ) 
     {
 	super( orb, magic, scid, is.read_long(), is.read_string(),
-	    new ObjectAdapterIdArray( POANameHelper.read( is ) ) ) ;
+	    new ObjectAdapterIdArray( readPOAName( is ) ) ) ;
 	
 	osh.value = readObjectKey( is ) ;
 

@@ -470,6 +470,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             if (disableORBD) {
                 configurator = ORBConfiguratorImpl.class ;            
             } else {
+                // Note: this class is NOT included in the GF bundles!
                 String cname = 
                     "com.sun.corba.se.impl.activation.ORBConfiguratorPersistentImpl" ;
                 try {
@@ -570,12 +571,18 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	parser.init( dataCollector ) ;
 
 	ORBConfigurator configurator =  null ;
-	try {
-	    configurator = 
-		(ORBConfigurator)(parser.configurator.newInstance()) ;
-	} catch (Exception iexc) {
-	    throw wrapper.badOrbConfigurator( iexc, parser.configurator.getName() ) ;
-	}
+        String name = "NO NAME AVAILABLE" ;
+        if (parser.configurator == null) {
+            throw wrapper.badOrbConfigurator( name ) ;
+        } else {
+            try {
+                configurator = 
+                    (ORBConfigurator)(parser.configurator.newInstance()) ;
+            } catch (Exception iexc) {
+                name = parser.configurator.getName() ;
+                throw wrapper.badOrbConfigurator( iexc, name ) ;
+            }
+        }
 
 	// Finally, run the configurator.  Note that the default implementation allows
 	// other configurators with their own parsers to run,

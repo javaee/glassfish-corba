@@ -463,6 +463,14 @@ public class ORBSingleton extends ORB
 	    // root monitoring agent name "orb" 
 	    props.setProperty( ORBConstants.ORB_ID_PROPERTY,
 		"_$$$_INTERNAL_FULL_ORB_ID_$$$_" ) ;
+
+            // We do not want to initialize the activation code here, because it is
+            // not included in the GF ORB bundles.  There is no need for 
+            // activation code, because this internal "full" ORB is only used
+            // to create typecodes that require a full ORB.
+            props.setProperty( ORBConstants.DISABLE_ORBD_INIT_PROPERTY,
+                "true" ) ;
+
 	    fullORB = new ORBImpl() ;
 	    fullORB.set_parameters( props ) ;
 	}

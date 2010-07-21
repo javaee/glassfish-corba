@@ -1925,6 +1925,7 @@
 	    <filter excludes="com.sun.corba.se.impl.orbutil.copyobject.FastCache*"/>
 	    <filter excludes="com.sun.corba.se.spi.orbutil.proxy.*"/>
 	    <filter excludes="com.sun.corba.se.impl.dynamicany.*"/>
+	    <filter excludes="com.sun.corba.se.impl.encoding.fast.*"/>
 	    <filter excludes="com.sun.corba.se.impl.naming.pcosnaming.*"/>
 	    <filter excludes="com.sun.corba.se.internal.*.*"/>
 	    <filter excludes="com.sun.corba.se.org.omg"/>

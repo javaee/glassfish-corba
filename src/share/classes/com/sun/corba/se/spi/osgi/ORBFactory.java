@@ -57,9 +57,9 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 public class ORBFactory {   
     private ORBFactory() {} 
 
-    public static ORB create( String[] args, Properties props, boolean isGFv3 ) {
+    public static ORB create( String[] args, Properties props, boolean useOSGi ) {
         ORB result = create() ;
-        initialize( result, args, props, isGFv3 ) ;
+        initialize( result, args, props, useOSGi ) ;
         return result ;
     }
 
@@ -72,19 +72,22 @@ public class ORBFactory {
     }
 
     /** Complete the initialization of the ORB.  
-     * isGFv3 if true will cause an ORB initialization
+     * useOSGi if true will cause an ORB initialization
      * suitable for use in GlassFish v3.
      * @param orb The orb to initialize.
      * @param args Usual args passed to an ORB.init() call.
      * @param props Usual props passed to an ORB.init() call.
-     * @param isGFv3 true if the ORB is running in GFv3 or later (generally means an OSGI environment).
+     * @param useOSGi true if the ORB is running in GFv3 or later (generally means an OSGI environment).
      */
     @SuppressWarnings("static-access")
-    public static void initialize( ORB orb, String[] args, Properties props, boolean isGFv3 ) {
-        if (isGFv3) {
-            props.setProperty( ORBConstants.DISABLE_ORBD_INIT_PROPERTY,
-                "true" ) ;
+    public static void initialize( ORB orb, String[] args, Properties props, boolean useOSGi ) {
+        // Always disable ORBD if coming through the ORBFactory.
+        // Anyone that wants ORBD must use ORB.init as usual.
+        // Actually we assume that we are running in GFv3 if this method is called,
+        // regardless of whether OSGi is used or not.
+        props.setProperty( ORBConstants.DISABLE_ORBD_INIT_PROPERTY, "true" ) ;
 
+        if (useOSGi) {
             orb.classNameResolver(
                 orb.makeCompositeClassNameResolver(
                     OSGIListener.classNameResolver(),
@@ -93,9 +96,9 @@ public class ORBFactory {
 
             ClassCodeBaseHandler ccbh = OSGIListener.classCodeBaseHandler() ;
             orb.classCodeBaseHandler( ccbh ) ;
-            orb.setRootParentObjectName( 
-                AMXGlassfish.DEFAULT.serverMonForDAS() ) ;
         }
+
+        orb.setRootParentObjectName( AMXGlassfish.DEFAULT.serverMonForDAS() ) ;
 
         orb.setParameters( args, props ) ;
     }

@@ -322,16 +322,24 @@ public class CorbaMessageMediatorImpl
     
     public GIOPVersion getGIOPVersion() {
 	if (messageHeader != null) {
-	    return GIOPVersion.V1_2 ;
+	    return messageHeader.getGIOPVersion() ;
 	}
+
+        if (getRequestHeader() == null) {
+            return GIOPVersion.V1_2 ;
+        }
 
 	return getRequestHeader().getGIOPVersion();
     }
 
     public byte getEncodingVersion() {
-	if (messageHeader != null) {
-	    return 0 ; 
+	if (messageHeader == null) {
+	    return messageHeader.getEncodingVersion() ; 
 	}
+
+        if (getRequestHeader() == null) {
+            return 0 ;
+        }
 
 	return getRequestHeader().getEncodingVersion();
     }

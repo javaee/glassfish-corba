@@ -333,7 +333,7 @@ public class CorbaMessageMediatorImpl
     }
 
     public byte getEncodingVersion() {
-	if (messageHeader == null) {
+	if (messageHeader != null) {
 	    return messageHeader.getEncodingVersion() ; 
 	}
 

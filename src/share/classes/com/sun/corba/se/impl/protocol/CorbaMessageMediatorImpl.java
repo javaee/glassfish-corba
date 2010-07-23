@@ -322,30 +322,37 @@ public class CorbaMessageMediatorImpl
     
     public GIOPVersion getGIOPVersion() {
 	if (messageHeader != null) {
-	    return messageHeader.getGIOPVersion();
+	    return GIOPVersion.V1_2 ;
 	}
+
 	return getRequestHeader().getGIOPVersion();
     }
 
     public byte getEncodingVersion() {
 	if (messageHeader != null) {
-	    return messageHeader.getEncodingVersion();
+	    return 0 ; 
 	}
+
 	return getRequestHeader().getEncodingVersion();
     }
 
     public int getRequestId() {
+        if (getRequestHeader() == null) {
+            return -1 ;
+        }
+
 	return getRequestHeader().getRequestId();
     }
 
     public Integer getRequestIdInteger() {
-	if (requestIdInteger == null) {
-	    requestIdInteger = Integer.valueOf(getRequestHeader().getRequestId());
-	}
-	return requestIdInteger;
+        return Integer.valueOf( getRequestId() ) ;
     }
 
     public boolean isOneWay() {
+        if (getRequestHeader() == null) {
+            return false ;
+        }
+
 	return ! getRequestHeader().isResponseExpected();
     }
 
@@ -354,10 +361,18 @@ public class CorbaMessageMediatorImpl
     }
 
     public String getOperationName() {
+        if (getRequestHeader() == null) {
+            return "UNKNOWN" ;
+        }
+
 	return getRequestHeader().getOperation();
     }
 
     public ServiceContexts getRequestServiceContexts() {
+        if (getRequestHeader() == null) {
+            return null ;
+        }
+
 	return getRequestHeader().getServiceContexts();
     }
 
@@ -1477,6 +1492,7 @@ public class CorbaMessageMediatorImpl
 	    }
 	    sendResponse(messageMediator);
         } catch (Throwable t) {
+            wrapper.exceptionInHandleRequestForRequest( t ) ;
 	    dispatchError(messageMediator, "RequestMessage", t);
 	} finally {
 	    endRequest(messageMediator);
@@ -1496,6 +1512,7 @@ public class CorbaMessageMediatorImpl
 	    }
 	    sendResponse(messageMediator);
         } catch (Throwable t) {
+            wrapper.exceptionInHandleRequestForLocateRequest( t ) ;
 	    dispatchError(messageMediator, "LocateRequestMessage", t);
 	} finally {
 	    endRequest(messageMediator);

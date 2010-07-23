@@ -643,6 +643,10 @@
              132 FINE "Exception occurred in reader thread")
             (EXCEPTION_IN_LISTENER_THREAD
              133 FINE "Exception occurred in listener thread")
+            (EXCEPTION_IN_HANDLE_REQUEST_FOR_REQUEST
+             134 WARNING "Exception occured in handleRequest for a Request message")
+            (EXCEPTION_IN_HANDLE_REQUEST_FOR_LOCATE_REQUEST
+             135 WARNING "Exception occured in handleRequest for a LocateRequest message")
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 

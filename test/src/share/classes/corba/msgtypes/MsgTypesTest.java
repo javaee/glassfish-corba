@@ -72,7 +72,7 @@ public class MsgTypesTest extends CORBATest {
         System.out.print(output.toString());
     }
 
-    private String testName(
+    private String testName( boolean isServer,
         int clientVersion, int clientStrategy, int serverVersion, int serverStrategy)
     {
         StringBuffer output = new StringBuffer(80);
@@ -80,10 +80,15 @@ public class MsgTypesTest extends CORBATest {
         output.append(GIOP_version[clientVersion]);
         output.append("_");
         output.append(GIOP_strategy[clientStrategy]);
-        output.append("_client_to_");
+        output.append("_to_");
         output.append(GIOP_version[serverVersion]);
         output.append("_");
         output.append(GIOP_strategy[serverStrategy]);
+        if (isServer) {
+            output.append( "_server" ) ;
+        } else {
+            output.append( "_client" ) ;
+        }
 
         return output.toString() ;
     }
@@ -144,19 +149,22 @@ public class MsgTypesTest extends CORBATest {
             clientProps.put(ORBConstants.GIOP_VERSION, GIOP_version[i]);
             clientProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + client_strategy);
             clientProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + client_strategy);
+            // clientProps.put(ORBConstants.DEBUG_PROPERTY, "transport,subcontract" ) ;
 
             for (int server_strategy = GROW, j = 0; j < GIOP_version.length; j++) {
 
                 printBeginTest(i, client_strategy, j, server_strategy);
-                String name = testName(i, client_strategy, j, server_strategy);
 
                 Properties serverProps = Options.getServerProperties();
                 serverProps.put(ORBConstants.GIOP_VERSION, GIOP_version[i]);
                 serverProps.put(ORBConstants.GIOP_11_BUFFMGR, "" + server_strategy);
                 serverProps.put(ORBConstants.GIOP_12_BUFFMGR, "" + server_strategy);
+                // serverProps.put(ORBConstants.DEBUG_PROPERTY, "transport,subcontract" ) ;
 
-                Controller server = createServer("corba.msgtypes.Server", name );
-                Controller client = createClient("corba.msgtypes.Client", name );
+                Controller server = createServer("corba.msgtypes.Server",
+                    testName( true, i, client_strategy, j, server_strategy));
+                Controller client = createClient("corba.msgtypes.Client",
+                    testName( false, i, client_strategy, j, server_strategy));
 
                 server.start();
                 client.start();

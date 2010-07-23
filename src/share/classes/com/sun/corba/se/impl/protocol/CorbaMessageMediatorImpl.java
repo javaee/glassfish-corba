@@ -190,14 +190,18 @@ public class CorbaMessageMediatorImpl
 	this.contactInfo = contactInfo;
 	this.addrDisposition = addrDisposition;
 
+        streamFormatVersion = getStreamFormatVersionForThisRequest(
+            this.contactInfo.getEffectiveTargetIOR(), giopVersion);
+
+        /* Assuming streamFormatVersion can be set to 2 here
+         * here breaks interoperability
+         * with SAP, who has an ORB that does not support SFV 2 in
+         * GIOP 1.2.  So we can't optimize this here.
 	if (orb.getORBData().isAppServerMode() == true) {
 	    streamFormatVersion = localMaxVersion;
-	} else {
-	    streamFormatVersion =
-	        getStreamFormatVersionForThisRequest(
-		    this.contactInfo.getEffectiveTargetIOR(),
-		    giopVersion);
-	}
+	} 
+        */
+
 	streamFormatVersionSet = true;
 
 	byte encodingVersion =

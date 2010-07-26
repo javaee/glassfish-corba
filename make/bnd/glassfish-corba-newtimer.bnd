@@ -1,2 +1,2 @@
 -include bnd.properties
-Export-Package: com.sun.corba.se.spi.orbutil.newtimer, com.sun.corba.se.impl.orbutil.newtimer
+Export-Package: com.sun.corba.se.spi.orbutil.newtimer, com.sun.corba.se.impl.orbutil.newtimer, com.sun.corba.se.spi.orbutil.tf.*

@@ -47,7 +47,7 @@ import java.util.List;
 
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
 import com.sun.corba.se.spi.folb.GroupInfoService;
-import com.sun.corba.se.spi.folb.GroupInfoServiceBase;
+import com.sun.corba.se.impl.folb.GroupInfoServiceBase;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 import com.sun.corba.se.spi.folb.SocketInfo;
 

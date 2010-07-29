@@ -38,7 +38,7 @@
 // Last Modified : 2005 Aug 09 (Tue) 16:31:38 by Harold Carr.
 //
 
-package com.sun.corba.se.spi.folb;
+package com.sun.corba.se.impl.folb;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +48,8 @@ import com.sun.corba.se.spi.folb.GroupInfoService;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.folb.GroupInfoService;
+import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 
 /**
  * @author Harold Carr

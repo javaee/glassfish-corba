@@ -64,9 +64,13 @@ public class GroupInfoServiceImpl
     private GIS gis;
     private boolean debug = true; // REVISIT - get from ORB
 
-    private class GIS
-	extends GroupInfoServiceBase
+    private class GIS extends GroupInfoServiceBase
     {
+	public List<ClusterInstanceInfo> internalClusterInstanceInfo() { 
+            throw new RuntimeException( "Should not be called" ) ;
+        }
+
+        @Override
 	public List<ClusterInstanceInfo> getClusterInstanceInfo(
             String[] adapterName)
 	{
@@ -158,6 +162,7 @@ public class GroupInfoServiceImpl
 	    }
 	}
 
+        @Override
 	public boolean shouldAddAddressesToNonReferenceFactory(
 	    String[] adapterName)
 	{
@@ -165,6 +170,7 @@ public class GroupInfoServiceImpl
 	        adapterName[adapterName.length-1]);
 	}
 
+        @Override
 	public boolean shouldAddMembershipLabel (String[] adapterName)
 	{
 	    return ! isNoLabelName(adapterName);

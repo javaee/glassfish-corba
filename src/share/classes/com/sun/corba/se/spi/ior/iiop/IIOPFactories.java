@@ -50,6 +50,8 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
+import com.sun.corba.se.spi.folb.ClusterInstanceInfo ;
+
 import com.sun.corba.se.impl.encoding.MarshalInputStream ;
 
 import com.sun.corba.se.impl.ior.iiop.IIOPAddressImpl ;
@@ -63,6 +65,7 @@ import com.sun.corba.se.impl.ior.iiop.IIOPProfileImpl ;
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileTemplateImpl ;
 import com.sun.corba.se.impl.ior.iiop.RequestPartitioningComponentImpl ;
 import com.sun.corba.se.impl.ior.iiop.LoadBalancingComponentImpl ;
+import com.sun.corba.se.impl.ior.iiop.ClusterInstanceInfoComponentImpl ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
@@ -117,6 +120,25 @@ public abstract class IIOPFactories {
 	    int loadBalancingValue)
     {
 	return new LoadBalancingComponentImpl(loadBalancingValue);
+    }
+
+    public static IdentifiableFactory makeClusterInstanceInfoComponentFactory()
+    {
+        return new EncapsulationFactoryBase(ORBConstants.TAG_LOAD_BALANCING_ID) {
+            public Identifiable readContents(InputStream in)
+	    {
+                final ClusterInstanceInfo cinfo = new ClusterInstanceInfo( in ) ;
+		Identifiable comp = 
+		    new ClusterInstanceInfoComponentImpl(cinfo);
+		return comp;
+	    }
+        };
+    } 
+
+    public static ClusterInstanceInfoComponent makeClusterInstanceInfoComponent(
+        ClusterInstanceInfo loadBalancingValue)
+    {
+	return new ClusterInstanceInfoComponentImpl(loadBalancingValue);
     }
 
     public static IdentifiableFactory makeAlternateIIOPAddressComponentFactory()

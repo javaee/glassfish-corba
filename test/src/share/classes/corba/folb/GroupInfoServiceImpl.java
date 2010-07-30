@@ -52,6 +52,7 @@ import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 import com.sun.corba.se.spi.folb.SocketInfo;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import java.util.ArrayList;
 
 /**
  * @author Harold Carr
@@ -129,8 +130,9 @@ public class GroupInfoServiceImpl
 		    //
 		    // One fake instance.
 		    //
-		    SocketInfo[] socketInfos = 
-		        { siBad, si }; // Note order: bad/good
+		    List<SocketInfo> socketInfos = new ArrayList<SocketInfo>() ;
+                    socketInfos.add( siBad ) ;
+                    socketInfos.add( si ) ;
 		    instanceInfo = 
 			new ClusterInstanceInfo("instance-" + i, i + 1,
 						socketInfos);

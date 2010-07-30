@@ -60,9 +60,7 @@ import org.omg.PortableInterceptor.ForwardRequestHelper;
 import org.omg.PortableInterceptor.ORBInitializer;
 import org.omg.PortableInterceptor.ORBInitInfo;
 
-import com.sun.corba.se.spi.folb.CSIv2SSLTaggedComponentHandler;
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.spi.folb.ClusterInstanceInfoHelper;
 import com.sun.corba.se.spi.folb.GroupInfoService;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 
@@ -78,7 +76,6 @@ import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.impl.interceptors.ClientRequestInfoImpl;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 // BEGIN imports for IIOPPrimaryToContactInfo
 import java.util.HashMap;
@@ -91,6 +88,7 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 // BEGIN import for IORToSocketInfo
 import java.util.ArrayList;
 import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent;
+import com.sun.corba.se.spi.ior.iiop.ClusterInstanceInfoComponent;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Folb;
@@ -234,22 +232,21 @@ public class ClientGroupManager
 	    // List alternate cluster addresses
 	    //
 
-	    Iterator iterator = iiopProfileTemplate.iteratorById(
-	        ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID);
+	    final Iterator<ClusterInstanceInfoComponent> iterator =
+                iiopProfileTemplate.iteratorById(
+                    ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID,
+                    ClusterInstanceInfoComponent.class );
 
 	    while (iterator.hasNext()) {
 		ClusterInstanceInfo clusterInstanceInfo = 
-		    extractClusterInstanceInfo(
-		        (com.sun.corba.se.spi.ior.TaggedComponent) 
-			iterator.next());
-		com.sun.corba.se.spi.folb.SocketInfo[] endpoints = 
-		  clusterInstanceInfo.endpoints;
-		for (int i = 0; i < endpoints.length; ++i) {
-		    com.sun.corba.se.spi.folb.SocketInfo socketInfo = 
-			endpoints[i];
-		    result.add(createSocketInfo(
+                    iterator.next().getClusterInstanceInfo() ;
+		List<com.sun.corba.se.spi.folb.SocketInfo> endpoints =
+		  clusterInstanceInfo.endpoints();
+                for (com.sun.corba.se.spi.folb.SocketInfo socketInfo : endpoints) {
+		    result.add( createSocketInfo(
 		        "ClusterInstanceInfo.endpoint",
-			socketInfo.type, socketInfo.host, socketInfo.port));
+			socketInfo.type(), socketInfo.host(),
+                        socketInfo.port()));
 		}
 	    }
 
@@ -257,13 +254,14 @@ public class ClientGroupManager
 	    // List alternate TAG_ALTERNATE_IIOP_ADDRESS (for corbaloc)
 	    //
 
-	    iterator = iiopProfileTemplate.iteratorById(
-	        org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS.value
-		);
+	    final Iterator<AlternateIIOPAddressComponent> aiterator = 
+                iiopProfileTemplate.iteratorById(
+                    org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS.value,
+                    AlternateIIOPAddressComponent.class );
 
-	    while (iterator.hasNext()) {
-		AlternateIIOPAddressComponent alternate =
-		    (AlternateIIOPAddressComponent) iterator.next();
+	    while (aiterator.hasNext()) {
+		AlternateIIOPAddressComponent alternate = 
+                    aiterator.next();
 		
 		host = alternate.getAddress().getHost().toLowerCase();
 		port = alternate.getAddress().getPort();
@@ -282,24 +280,6 @@ public class ClientGroupManager
 	    rte.initCause(e);
             throw rte;
 	}
-    }
-
-    @Folb
-    private ClusterInstanceInfo extractClusterInstanceInfo(
-        com.sun.corba.se.spi.ior.TaggedComponent sunTC)
-    {
-	ClusterInstanceInfo clusterInstanceInfo = null;
-	try {
-	    org.omg.IOP.TaggedComponent tc = sunTC.getIOPComponent(orb);
-	    Any any = codec.decode_value(tc.component_data,
-					 ClusterInstanceInfoHelper.type());
-	    clusterInstanceInfo = ClusterInstanceInfoHelper.extract(any);
-	} catch (FormatMismatch e) {
-            reportException(e);
-	} catch (TypeMismatch e) {
-            reportException(e);
-	}
-	return clusterInstanceInfo;
     }
 
     @Folb
@@ -538,10 +518,8 @@ public class ClientGroupManager
 
     private class GIS extends GroupInfoServiceBase
     {
-	public List<ClusterInstanceInfo> getClusterInstanceInfo(
-            String[] adapterName)
+	public List<ClusterInstanceInfo> internalClusterInstanceInfo()
 	{
-
 	    if (lastIOR == null) {	     
 		return getInitialClusterInstanceInfo(orb);
 	    }
@@ -551,19 +529,20 @@ public class ClientGroupManager
 		iiopProfileTemplate = (IIOPProfileTemplate)
 		    lastIOR.getProfile().getTaggedProfileTemplate();
 	    }
-	    Iterator iterator = iiopProfileTemplate.iteratorById(
-	        ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID);
+	    Iterator<ClusterInstanceInfoComponent> iterator =
+                iiopProfileTemplate.iteratorById(
+                    ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID,
+                    ClusterInstanceInfoComponent.class );
 
 	    LinkedList<ClusterInstanceInfo> results = 
 		new LinkedList<ClusterInstanceInfo>();
 
 	    while (iterator.hasNext()) {
 		ClusterInstanceInfo clusterInstanceInfo = 
-		    extractClusterInstanceInfo(
-		        (com.sun.corba.se.spi.ior.TaggedComponent) 
-			iterator.next());
+                    iterator.next().getClusterInstanceInfo() ;
 		results.add(clusterInstanceInfo);
 	    }
+
 	    return results;
 	}
 

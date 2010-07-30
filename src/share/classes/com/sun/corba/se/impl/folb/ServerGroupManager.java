@@ -68,12 +68,13 @@ import org.omg.PortableInterceptor.ORBInitInfo;
 import org.omg.PortableInterceptor.ServerRequestInterceptor;
 import org.omg.PortableInterceptor.ServerRequestInfo;
 
-import com.sun.corba.se.spi.folb.CSIv2SSLTaggedComponentHandler;
 import com.sun.corba.se.spi.folb.GroupInfoService;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.spi.folb.ClusterInstanceInfoHelper;
 import com.sun.corba.se.spi.folb.SocketInfo;
+
+import com.sun.corba.se.spi.ior.iiop.ClusterInstanceInfoComponent ;
+import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactory;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager;
@@ -202,6 +203,15 @@ public class ServerGroupManager
     @InfoMethod
     private void notAddingMembershipLabel( ) { }
 
+    @InfoMethod
+    private void skippingEndpoint( SocketInfo si ) {}
+
+    @InfoMethod
+    private void includingEndpoint( SocketInfo si ) {}
+
+    @InfoMethod
+    private void addingInstanceInfoFor( String name, int weight ) {}
+
     @Folb
     public void establish_components(IORInfo iorInfo) {
 	try {
@@ -241,57 +251,32 @@ public class ServerGroupManager
 
 	    // Handle CLEAR_TEXT addresses.
 	    for (ClusterInstanceInfo clusterInstanceInfo : info) {
-		if (orb.folbDebugFlag) {
-		    dprint(".establish_components: adding instance info for: " 
-			   + clusterInstanceInfo.name 
-			   + "; " + clusterInstanceInfo.weight 
-			   + "; with addresses:");
-		}
+                addingInstanceInfoFor( clusterInstanceInfo.name(),
+                    clusterInstanceInfo.weight() ) ;
 
 		List<SocketInfo> listOfSocketInfo = 
 		    new LinkedList<SocketInfo>();
 
-		for (int i = 0; i < clusterInstanceInfo.endpoints.length; ++i){
-		    if (clusterInstanceInfo.endpoints[i].type.startsWith(SSL)){
-			// NOTE: The standalone ORB test depends on accepting
-			// types such as "t0", "W", etc.
-			if (orb.folbDebugFlag) {
-			    dprint(".establish_components: skipping: "
-				   +       clusterInstanceInfo.endpoints[i].type
-				   + "/" + clusterInstanceInfo.endpoints[i].host
-				   + "/" + clusterInstanceInfo.endpoints[i].port);
-			}
-			continue;
-		    }
-		    if (orb.folbDebugFlag) {
-			dprint(".establish_components: "
-			       +       clusterInstanceInfo.endpoints[i].type
-			       + "/" + clusterInstanceInfo.endpoints[i].host
-			       + "/" + clusterInstanceInfo.endpoints[i].port);
-		    }
-		    listOfSocketInfo.add(clusterInstanceInfo.endpoints[i]);
-		}
-		// REVISIT - make orbutil utility and use in
-		// FailoverIORInterceptor, IiopFolbGmsClient and here.
-		SocketInfo[] arrayOfSocketInfo =
-		    new SocketInfo[listOfSocketInfo.size()];
-		int x = 0;
-		for (SocketInfo si : listOfSocketInfo) {
-		    arrayOfSocketInfo[x++] = si;
-		}
-		clusterInstanceInfo.endpoints = arrayOfSocketInfo;
-		Any any = orb.create_any();
-		ClusterInstanceInfoHelper.insert(any, clusterInstanceInfo);
-		byte[] data = null;
-		try {
-		    data = codec.encode_value(any);
-		} catch (InvalidTypeForEncoding e) {
-                    // XXX log
-		}
-		TaggedComponent tc = new TaggedComponent(
-	            ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID,
-		    data);
-		iorInfo.add_ior_component(tc);
+                for (SocketInfo sinfo : clusterInstanceInfo.endpoints()) {
+                    if (sinfo.type().startsWith( SSL )) {
+                        skippingEndpoint(sinfo);
+                        continue ;
+                    }
+
+                    includingEndpoint(sinfo);
+                    listOfSocketInfo.add( sinfo ) ;
+                }
+
+                final ClusterInstanceInfo ninfo = new ClusterInstanceInfo(
+                    clusterInstanceInfo.name(),
+                    clusterInstanceInfo.weight(),
+                    listOfSocketInfo ) ;
+
+                ClusterInstanceInfoComponent comp = 
+                    IIOPFactories.makeClusterInstanceInfoComponent( 
+                        clusterInstanceInfo ) ;
+
+                iorInfo.add_ior_component( comp.getIOPComponent(orb) ) ;
 	    }
 
 	    // Handle membership label.
@@ -645,21 +630,6 @@ public class ServerGroupManager
 
 	// Setup for IOR and ServerRequest Interceptors
 	orb.getORBData().addORBInitializer(this);
-    }
-
-    ////////////////////////////////////////////////////
-    //
-    // Implementation
-    //
-
-    private void dprint(String msg)
-    {
-	ORBUtility.dprint("ServerGroupManager", msg);
-    }
-
-    private void dprint(String msg, String[] x)
-    {
-        dprint(msg + " " + ORBUtility.formatStringArray(x));
     }
 }
 

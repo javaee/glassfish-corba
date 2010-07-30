@@ -78,6 +78,9 @@ public interface TaggedProfileTemplate extends List<TaggedComponent>,
     */
     public Iterator<TaggedComponent> iteratorById( int id ) ;
 
+    public <T extends TaggedComponent> Iterator<T> iteratorById( int id, 
+        Class<T> cls )  ;
+
     /** Create a TaggedProfile from this template.
     */
     TaggedProfile create( ObjectKeyTemplate oktemp, ObjectId id ) ;

@@ -343,13 +343,9 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 			    // is not ours - so ignore it.
 			    ;
 			} catch (IllegalAccessException e) {
-			    RuntimeException rte = new RuntimeException();
-			    rte.initCause(e);
-			    throw rte;
+			    throw new RuntimeException(e);
 			} catch (InvocationTargetException e) {
-			    RuntimeException rte = new RuntimeException();
-			    rte.initCause(e);
-			    throw rte;
+			    throw new RuntimeException(e);
 			}
 			return null;
 		    }
@@ -460,6 +456,8 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    IIOPFactories.makeJavaSerializationComponentFactory());
 	compFinder.registerFactory(
 	    IIOPFactories.makeLoadBalancingComponentFactory());
+	compFinder.registerFactory(
+	    IIOPFactories.makeClusterInstanceInfoComponentFactory());
 
 	// Register the ValueFactory instances for ORT
 	IORFactories.registerValueFactories( orb ) ;

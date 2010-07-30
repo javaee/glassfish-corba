@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <data xmlns="http://www.netbeans.org/ns/profiler/1" version="0.4"/>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/space/ws/mercurial/CORBA/corba-master/test/src/share/classes/corba/folb/Client.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/test/src/share/classes/corba/folb/ClientBase.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/test/src/share/classes/corba/folb/GroupInfoServiceImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/test/src/share/classes/corba/folb/GroupInfoServiceTest.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/test/src/share/classes/corba/folb/ClientCircular.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/transport/SocketOrChannelConnectionImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/presentation/rmi/StubInvocationHandlerImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/javax/rmi/CORBA/Util.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/test/src/share/classes/corba/folb/FolbTest.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/encoding/CDRInputStream_1_0.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/encoding/CDRInputObject.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/encoding/CDROutputStream_1_0.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/encoding/CDROutputObject.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/encoding/CDROutputStreamBase.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/transport/CorbaContactInfoBase.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/protocol/CorbaMessageMediatorImpl.java</file>
+    </open-files>
+</project-private>

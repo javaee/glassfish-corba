@@ -47,7 +47,7 @@ import org.omg.IOP.TaggedComponent;
 import org.omg.PortableInterceptor.IORInfo;
 
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.spi.folb.CSIv2SSLTaggedComponentHandler;
+import com.sun.corba.se.impl.folb.CSIv2SSLTaggedComponentHandler;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.orb.DataCollector;
 import com.sun.corba.se.spi.orb.ORB;

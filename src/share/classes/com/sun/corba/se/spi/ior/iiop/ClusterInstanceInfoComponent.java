@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -33,51 +33,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.corba.se.spi.ior.iiop;
 
-package com.sun.corba.se.spi.ior;
+import com.sun.corba.se.spi.ior.TaggedComponent;
+import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
 
-import java.util.Iterator ;
-
-import org.omg.CORBA_2_3.portable.OutputStream ;
-
-import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.impl.ior.EncapsulationUtility ;
-
-public abstract class TaggedProfileTemplateBase 
-    extends IdentifiableContainerBase<TaggedComponent> 
-    implements TaggedProfileTemplate
-{   
-    public void write( OutputStream os )
-    {
-	EncapsulationUtility.writeEncapsulation( this, os ) ;
-    }
-
-    public org.omg.IOP.TaggedComponent[] getIOPComponents( ORB orb, int id )
-    {
-	int count = 0 ;
-	Iterator<TaggedComponent> iter = iteratorById( id ) ;
-	while (iter.hasNext()) {
-	    iter.next() ;
-	    count++ ;
-	}
-
-	org.omg.IOP.TaggedComponent[] result = new
-	    org.omg.IOP.TaggedComponent[count] ;
-
-	int index = 0 ;
-	iter = iteratorById( id ) ;
-	while (iter.hasNext()) {
-	    TaggedComponent comp = iter.next() ;
-	    result[index++] = comp.getIOPComponent( orb ) ;
-	}
-
-	return result ;
-    }
-
-    public <T extends TaggedComponent> Iterator<T> iteratorById( int id,
-        Class<T> cls ) {
-
-        return (Iterator<T>)iteratorById( id ) ;
-    }
+public interface ClusterInstanceInfoComponent extends TaggedComponent
+{
+    public ClusterInstanceInfo getClusterInstanceInfo();
 }
+

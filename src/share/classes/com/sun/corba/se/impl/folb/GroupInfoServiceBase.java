@@ -40,51 +40,66 @@
 
 package com.sun.corba.se.impl.folb;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
-import com.sun.corba.se.spi.folb.GroupInfoService;
-import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod ;
+
+import com.sun.corba.se.spi.trace.Folb ;
+
 import com.sun.corba.se.spi.folb.GroupInfoService;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 
 /**
  * @author Harold Carr
  */
+@Folb
 public abstract class GroupInfoServiceBase
+    extends org.omg.CORBA.LocalObject
     implements GroupInfoService
 {
     private List<GroupInfoServiceObserver> observers =
 	new LinkedList<GroupInfoServiceObserver>();
 
-    private boolean debug = false;
-
-    public boolean addObserver(GroupInfoServiceObserver x) 
-    {
-	if (debug) dprint(".addObserver->: " + x);
-	boolean result = observers.add(x);
-	if (debug) dprint(".addObserver<-: " + x + " " + result);
-	return result;
+    @Folb
+    public boolean addObserver(GroupInfoServiceObserver x) {
+	return observers.add(x);
     }
 
-    public void notifyObservers()
-    {
-	if (debug) dprint(".notifyObservers->:");
+    @InfoMethod
+    private void observerInfo( GroupInfoServiceObserver obs ) { }
+
+    @Folb
+    public void notifyObservers() {
 	for (GroupInfoServiceObserver observer : observers) {
-	    if (debug) dprint(".notifyObservers: " + observer);
+            observerInfo( observer ) ;
 	    observer.membershipChange();
 	}
-	if (debug) dprint(".notifyObservers<-:");
-
     }
 
-    private static void dprint(String msg)
-    {
-	ORBUtility.dprint("GroupInfoServiceBase", msg);
+    @Folb
+    public List<ClusterInstanceInfo> getClusterInstanceInfo(
+        String[] adapterName) {
+
+        // Make a copy of the internal data
+        return new ArrayList( internalClusterInstanceInfo() ) ;
     }
+
+    @Folb
+    public boolean shouldAddAddressesToNonReferenceFactory(
+        String[] adapterName) {
+        return false ;
+    }
+
+    @Folb
+    public boolean shouldAddMembershipLabel (String[] adapterName) {
+        return true ;
+    }
+
+    public abstract List<ClusterInstanceInfo> internalClusterInstanceInfo() ;
 }
 
 // End of file.

@@ -467,16 +467,19 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	public Class<?> configurator ;
 
         public ConfigParser( boolean disableORBD ) {
-            if (disableORBD) {
-                configurator = ORBConfiguratorImpl.class ;            
-            } else {
+            // Default configurator
+            configurator = ORBConfiguratorImpl.class ;            
+
+            if (!disableORBD) {
                 // Note: this class is NOT included in the GF bundles!
+                // Try to load it if present.
                 String cname = 
                     "com.sun.corba.se.impl.activation.ORBConfiguratorPersistentImpl" ;
+
                 try {
                     configurator = Class.forName(cname);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(ORBImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ORBImpl.class.getName()).log(Level.FINE, null, ex);
                 }
             }
         }

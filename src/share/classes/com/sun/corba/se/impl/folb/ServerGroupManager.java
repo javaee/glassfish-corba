@@ -274,7 +274,7 @@ public class ServerGroupManager
 
                 ClusterInstanceInfoComponent comp = 
                     IIOPFactories.makeClusterInstanceInfoComponent( 
-                        clusterInstanceInfo ) ;
+                        ninfo ) ;
 
                 iorInfo.add_ior_component( comp.getIOPComponent(orb) ) ;
 	    }

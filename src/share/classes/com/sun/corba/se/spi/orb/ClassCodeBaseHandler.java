@@ -42,8 +42,10 @@ public interface ClassCodeBaseHandler {
      * then loadClass( str, cls.getClassName() ) will return cls.
      * <return>A codebase to use with this handler, or null if this handler
      * does not apply to this class.
+     * @param cls Class for which we need a codebase
+     * @return Codebase string
      */
-    String getCodeBase( Class cls ) ;
+    String getCodeBase( Class<?> cls ) ;
 
     /** load a class given the classname and a codebase.
      * The className will always satisfy cls.getClassName().equals( className ) 
@@ -53,6 +55,9 @@ public interface ClassCodeBaseHandler {
      * or something more specialized, such as a description of an OSGi bundles and version.
      * <param>className The name of the class to load.
      * <return>The loaded class, or null if the class could not be loaded.
+     * @param codebase The codebase to use for finding the ClassLoader
+     * @param className The name of the class to load
+     * @return The loaded class
      */
-    Class loadClass( String codebase, String className ) ;
+    Class<?> loadClass( String codebase, String className ) ;
 }

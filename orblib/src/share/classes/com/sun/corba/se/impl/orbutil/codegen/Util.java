@@ -146,7 +146,7 @@ public final class Util {
     // Display all attributes of node.  If the value of an attribute is itself
     // a node, display its attributes as well (recursively).  At the end,
     // leave the Printer indented one level.
-    private static void displayAttributes( final Node node, final Printer pr ) {
+    private static void displayAttributes( final Node node, final CodegenPrinter pr ) {
 	Set<Attribute<?>> attrs = Attribute.getAttributes( node ) ;
 	for (Attribute<?> attr : attrs) {
 	    String typeName = attr.type().getName() ;
@@ -175,7 +175,7 @@ public final class Util {
 	TreeWalkerContext context = new TreeWalkerContext() ;
 	Visitor visitor = new TreeWalker( context ) {
 
-	    final Printer pr = new Printer( pw, 2, '.' ) ;
+	    final CodegenPrinter pr = new CodegenPrinter( pw, 2, '.' ) ;
 
 	    private boolean done( Node node ) {
 		displayAttributes( node, pr ) ;

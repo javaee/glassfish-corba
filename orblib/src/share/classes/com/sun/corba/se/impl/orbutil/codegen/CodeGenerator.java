@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.orbutil.codegen.Type ;
 import com.sun.corba.se.spi.orbutil.codegen.ImportList ;
 
 import com.sun.corba.se.impl.orbutil.codegen.Visitor ;
-import com.sun.corba.se.impl.orbutil.codegen.Printer ;
+import com.sun.corba.se.impl.orbutil.codegen.CodegenPrinter ;
 import com.sun.corba.se.impl.orbutil.codegen.StatementBase ;
 import com.sun.corba.se.impl.orbutil.codegen.SourceStatementVisitor ;
 import com.sun.corba.se.impl.orbutil.codegen.ASMUtil ;

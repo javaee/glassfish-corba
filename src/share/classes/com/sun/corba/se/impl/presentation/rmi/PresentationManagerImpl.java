@@ -45,7 +45,6 @@ import java.util.Set ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.ArrayList ;
-import java.util.Iterator ;
 
 import java.lang.reflect.Method ;
 
@@ -80,8 +79,8 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 public final class PresentationManagerImpl implements PresentationManager
 {
-    private Map classToClassData ;
-    private Map methodToDMM ;
+    private Map<Class<?>,ClassData> classToClassData ;
+    private Map<Method,DynamicMethodMarshaller> methodToDMM ;
     private PresentationManager.StubFactoryFactory staticStubFactoryFactory ;
     private PresentationManager.StubFactoryFactory dynamicStubFactoryFactory ;
     private ORBUtilSystemException wrapper = null ;
@@ -94,8 +93,8 @@ public final class PresentationManagerImpl implements PresentationManager
 	this.useDynamicStubs = useDynamicStubs ;
 	wrapper = ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
 
-	classToClassData = new WeakHashMap() ;
-	methodToDMM = new WeakHashMap() ;
+	classToClassData = new WeakHashMap<Class<?>,ClassData>() ;
+	methodToDMM = new WeakHashMap<Method,DynamicMethodMarshaller>() ;
     }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,11 +104,11 @@ public final class PresentationManagerImpl implements PresentationManager
     public synchronized DynamicMethodMarshaller getDynamicMethodMarshaller( 
 	Method method ) 
     {
-	if (method == null)
-	    return null ;
+	if (method == null) {
+            return null;
+        }
 
-	DynamicMethodMarshaller result = 
-	    (DynamicMethodMarshaller)methodToDMM.get( method ) ;
+	DynamicMethodMarshaller result = methodToDMM.get(method) ;
 	if (result == null) {
 	    result = new DynamicMethodMarshallerImpl( method ) ;
 	    methodToDMM.put( method, result ) ;
@@ -118,9 +117,9 @@ public final class PresentationManagerImpl implements PresentationManager
 	return result ;
     }
 
-    public synchronized ClassData getClassData( Class cls ) 
+    public synchronized ClassData getClassData( Class<?> cls )
     {
-	ClassData result = (ClassData)classToClassData.get( cls ) ;
+	ClassData result = classToClassData.get(cls) ;
 	if (result == null) {
 	    result = new ClassDataImpl( cls ) ;
 	    classToClassData.put( cls, result ) ;
@@ -131,33 +130,32 @@ public final class PresentationManagerImpl implements PresentationManager
 
     private class ClassDataImpl implements PresentationManager.ClassData 
     {
-	private Class cls ;
+	private Class<?> cls ;
 	private IDLNameTranslator nameTranslator ;
 	private String[] typeIds ;
 	private PresentationManager.StubFactory sfactory ;
 	private InvocationHandlerFactory ihfactory ;
-	private Map dictionary ;
+	private Map<String,Object> dictionary ;
 
-	public ClassDataImpl( Class cls ) 
-	{
+	ClassDataImpl( Class<?> cls ) {
 	    this.cls = cls ;
-	    Graph gr = new GraphImpl() ;
+	    Graph<NodeImpl> gr = new GraphImpl<NodeImpl>() ;
 	    NodeImpl root = new NodeImpl( cls ) ;
-	    Set rootSet = getRootSet( cls, root, gr ) ;
+	    Set<NodeImpl> rootSet = getRootSet( cls, root, gr ) ;
 
 	    // At this point, rootSet contains those remote interfaces
 	    // that are not related by inheritance, and gr contains
 	    // all reachable remote interfaces.
 
-	    Class[] interfaces = getInterfaces( rootSet ) ;
+	    Class<?>[] interfaces = getInterfaces( rootSet ) ;
 	    nameTranslator = IDLNameTranslatorImpl.get( interfaces ) ;
 	    typeIds = makeTypeIds( root, gr, rootSet ) ;
 	    ihfactory = new InvocationHandlerFactoryImpl( 
 		PresentationManagerImpl.this, this ) ;
-	    dictionary = new HashMap() ;
+	    dictionary = new HashMap<String,Object>() ;
 	}
 
-	public Class getMyClass()
+	public Class<?> getMyClass()
 	{
 	    return cls ;
 	}
@@ -169,7 +167,7 @@ public final class PresentationManagerImpl implements PresentationManager
 
 	public String[] getTypeIds()
 	{
-	    return typeIds ;
+	    return typeIds.clone() ;
 	}
 
 	public InvocationHandlerFactory getInvocationHandlerFactory() 
@@ -177,7 +175,7 @@ public final class PresentationManagerImpl implements PresentationManager
 	    return ihfactory ;
 	}
 
-	public Map getDictionary()
+	public Map<String,Object> getDictionary()
 	{
 	    return dictionary ;
 	}
@@ -186,19 +184,21 @@ public final class PresentationManagerImpl implements PresentationManager
     public PresentationManager.StubFactoryFactory getStubFactoryFactory( 
 	boolean isDynamic ) 
     {
-	if (isDynamic)
-	    return dynamicStubFactoryFactory ;
-	else
-	    return staticStubFactoryFactory ;
+	if (isDynamic) {
+            return dynamicStubFactoryFactory;
+        } else {
+            return staticStubFactoryFactory;
+        }
     }
 
     public void setStubFactoryFactory( boolean isDynamic, 
 	PresentationManager.StubFactoryFactory sff ) 
     {
-	if (isDynamic)
-	    dynamicStubFactoryFactory = sff ;
-	else
-	    staticStubFactoryFactory = sff ;
+	if (isDynamic) {
+            dynamicStubFactoryFactory = sff;
+        } else {
+            staticStubFactoryFactory = sff;
+        }
     }
 
     public Tie getTie()
@@ -224,12 +224,12 @@ public final class PresentationManagerImpl implements PresentationManager
 	return useDynamicStubs ;
     }
 
-    public void flushClass( final Class cls ) 
+    public void flushClass( final Class<?> cls )
     {
 	classToClassData.remove( cls ) ;
 
 	Method[] methods = (Method[])AccessController.doPrivileged(
-	    new PrivilegedAction() {
+	    new PrivilegedAction<Object>() {
 		public Object run() {
 		    return cls.getMethods() ;
 		}
@@ -245,19 +245,20 @@ public final class PresentationManagerImpl implements PresentationManager
 // Graph computations
 ////////////////////////////////////////////////////////////////////////////////
 
-    private Set getRootSet( Class target, NodeImpl root, Graph gr ) 
+    private Set<NodeImpl> getRootSet( Class<?> target, NodeImpl root,
+        Graph<NodeImpl> gr )
     {
-	Set rootSet = null ;
+	Set<NodeImpl> rootSet = null ;
 
 	if (ClassInfoCache.get(target).isInterface()) {
 	    gr.add( root ) ;
 	    rootSet = gr.getRoots() ; // rootSet just contains root here
 	} else {
 	    // Use this class and its superclasses (not Object) as initial roots
-	    Class superclass = target ;
-	    Set initialRootSet = new HashSet() ;
+	    Class<?> superclass = target ;
+	    Set<NodeImpl> initialRootSet = new HashSet<NodeImpl>() ;
 	    while ((superclass != null) && !superclass.equals( Object.class )) {
-		Node node = new NodeImpl( superclass ) ;
+		NodeImpl node = new NodeImpl( superclass ) ;
 		gr.add( node ) ;
 		initialRootSet.add( node ) ;
 		superclass = superclass.getSuperclass() ;
@@ -274,31 +275,32 @@ public final class PresentationManagerImpl implements PresentationManager
 	return rootSet ;
     }
 
-    private Class[] getInterfaces( Set roots )
+    private Class<?>[] getInterfaces( Set<NodeImpl> roots )
     {
-	Class[] classes = new Class[ roots.size() ] ;
-	Iterator iter = roots.iterator() ;
 	int ctr = 0 ;
-	while (iter.hasNext()) {
-	    NodeImpl node = (NodeImpl)iter.next() ;
-	    classes[ctr++] = node.getInterface() ;
-	}
+	Class<?>[] classes = new Class<?>[ roots.size() ] ;
+        for (NodeImpl node : roots) {
+	    classes[ctr] = node.getInterface() ;
+            ctr++ ;
+        }
 
 	return classes ;
     }
 
-    private String[] makeTypeIds( NodeImpl root, Graph gr, Set rootSet ) 
+    private String[] makeTypeIds( NodeImpl root, Graph<NodeImpl> gr,
+        Set<NodeImpl> rootSet )
     {
-	Set nonRootSet = new HashSet( gr ) ;
+	Set<NodeImpl> nonRootSet = new HashSet<NodeImpl>( gr ) ;
 	nonRootSet.removeAll( rootSet ) ;
 
 	// Handle the case of a remote reference that only implements
 	// java.rmi.Remote.
-	if (rootSet.size() == 0)
-	    return new String[] { "" } ;
+	if (rootSet.isEmpty()) {
+            return new String[]{""};
+        }
 
 	// List<String> for the typeids
-	List result = new ArrayList() ;
+	List<String> result = new ArrayList<String>() ;
 
 	if (rootSet.size() > 1) {
 	    // If the rootSet has more than one element, we must
@@ -310,29 +312,27 @@ public final class PresentationManagerImpl implements PresentationManager
 	addNodes( result, rootSet ) ;
 	addNodes( result, nonRootSet ) ;
 
-	return (String[])result.toArray( new String[result.size()] ) ;
+	return result.toArray(new String[result.size()]) ;
     }
 
-    private void addNodes( List resultList, Set nodeSet )
+    private void addNodes( List<String> resultList, Set<NodeImpl> nodeSet )
     {
-	Iterator iter = nodeSet.iterator() ;
-	while (iter.hasNext()) {
-	    NodeImpl node = (NodeImpl)iter.next() ;
+        for (NodeImpl node : nodeSet) {
 	    String typeId = node.getTypeId() ;
 	    resultList.add( typeId ) ;
-	}
+        }
     }
 
-    private static class NodeImpl implements Node
+    private static class NodeImpl implements Node<NodeImpl>
     {
-	private Class interf ;
+	private Class<?> interf ;
 
-	public Class getInterface()
+	public Class<?> getInterface()
 	{
 	    return interf ;
 	}
 
-	public NodeImpl( Class interf )
+	NodeImpl( Class<?> interf )
 	{
 	    this.interf = interf ;
 	}
@@ -343,43 +343,49 @@ public final class PresentationManagerImpl implements PresentationManager
 	    // return "RMI:" + interf.getName() + ":0000000000000000" ;
 	}
 
-	public Set getChildren()
+	public Set<NodeImpl> getChildren()
 	{
-	    Set result = new HashSet() ;
-	    Class[] interfaces = interf.getInterfaces() ;
+	    Set<NodeImpl> result = new HashSet<NodeImpl>() ;
+	    Class<?>[] interfaces = interf.getInterfaces() ;
 	    for (int ctr=0; ctr<interfaces.length; ctr++) {
-		Class cls = interfaces[ctr] ;
+		Class<?> cls = interfaces[ctr] ;
 		ClassInfoCache.ClassInfo cinfo = 
 		    ClassInfoCache.get( cls ) ;
 		if (cinfo.isARemote(cls) &&
-		    !Remote.class.equals(cls))
-		    result.add( new NodeImpl( cls ) ) ;
+		    !Remote.class.equals(cls)) {
+                    result.add(new NodeImpl(cls));
+                }
 	    }
 
 	    return result ;
 	}
 
+        @Override
 	public String toString() 
 	{
 	    return "NodeImpl[" + interf + "]" ;
 	}
 
+        @Override
 	public int hashCode()
 	{
 	    return interf.hashCode() ;
 	}
 
+        @Override
 	public boolean equals( Object obj )
 	{
-	    if (this == obj)
-		return true ;
+	    if (this == obj) {
+                return true;
+            }
 
-	    if (!(obj instanceof NodeImpl))
-		return false ;
+	    if (!(obj instanceof NodeImpl)) {
+                return false;
+            }
 
 	    NodeImpl other = (NodeImpl)obj ;
 
-	    return other.interf.equals( interf ) ;
+	    return other.getInterface().equals( interf ) ;
 	}
     }
 

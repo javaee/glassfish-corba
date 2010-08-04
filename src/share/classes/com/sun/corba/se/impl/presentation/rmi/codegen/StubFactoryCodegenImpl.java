@@ -37,12 +37,6 @@
 package com.sun.corba.se.impl.presentation.rmi.codegen ;
 
 import java.util.Map ;
-import java.util.List ;
-import java.util.ArrayList ;
-
-import java.io.IOException ;
-import java.io.OutputStream ;
-import java.io.ByteArrayOutputStream ;
 
 import java.security.ProtectionDomain ;
 import java.security.PrivilegedAction;
@@ -54,10 +48,6 @@ import java.lang.reflect.Method ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.ClassInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
-
 import com.sun.corba.se.impl.util.Utility ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
@@ -66,7 +56,6 @@ import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.impl.presentation.rmi.StubFactoryDynamicBase ;
 import com.sun.corba.se.impl.presentation.rmi.StubInvocationHandlerImpl ;
 
-import com.sun.corba.se.impl.presentation.rmi.codegen.CodegenProxyCreator ;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
@@ -85,24 +74,24 @@ public class StubFactoryCodegenImpl extends StubFactoryDynamicBase
 	this.pm = pm ;
     }
 
-    private Class getStubClass()
+    private Class<?> getStubClass()
     {
-	Class stubClass = null;
+	Class<?> stubClass = null;
 
 	// IMPORTANT: A get & put to classData's dictionary can occur
 	//            by two or more threads in this method at the same
 	//            time. Therefore, classData must be synchronized here.
 
 	synchronized (classData) {
-            final Map dictionary = classData.getDictionary() ;
-            stubClass = (Class)dictionary.get( CODEGEN_KEY ) ;
+            final Map<String,Object> dictionary = classData.getDictionary() ;
+            stubClass = (Class<?>)dictionary.get( CODEGEN_KEY ) ;
             if (stubClass == null) {
 		final IDLNameTranslator nt = classData.getIDLNameTranslator() ;
-                final Class theClass = classData.getMyClass() ;
+                final Class<?> theClass = classData.getMyClass() ;
                 final String stubClassName = Utility.dynamicStubName(
 			theClass.getName() ) ; 
-                final Class baseClass = CodegenStubBase.class ;
-                final Class[] interfaces = nt.getInterfaces() ;
+                final Class<?> baseClass = CodegenStubBase.class ;
+                final Class<?>[] interfaces = nt.getInterfaces() ;
                 final Method[] methods = nt.getMethods() ;
 
                 final ProtectionDomain pd = 
@@ -125,8 +114,8 @@ public class StubFactoryCodegenImpl extends StubFactoryDynamicBase
 			pm.getPrintStream() ) ;
 		} else {
 		    stubClass = AccessController.doPrivileged(
-			new PrivilegedAction<Class>() {
-			    public Class run() {
+			new PrivilegedAction<Class<?>>() {
+			    public Class<?> run() {
 				return creator.create( pd, loader, pm.getDebug(),
 				    pm.getPrintStream() ) ;
 			    }
@@ -143,7 +132,7 @@ public class StubFactoryCodegenImpl extends StubFactoryDynamicBase
 
     public org.omg.CORBA.Object makeStub()
     {
-	final Class stubClass = getStubClass( ) ;
+	final Class<?> stubClass = getStubClass( ) ;
 
 	CodegenStubBase stub = null ;
 

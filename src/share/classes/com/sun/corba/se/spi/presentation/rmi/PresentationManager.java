@@ -41,11 +41,9 @@ import java.io.PrintStream ;
 import java.util.Map ;
 
 import java.lang.reflect.Method ;
-import java.lang.reflect.InvocationHandler ;
 
 import javax.rmi.CORBA.Tie ;
 
-import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orbutil.proxy.InvocationHandlerFactory ;
 
 
@@ -70,7 +68,10 @@ public interface PresentationManager
 	/** Return the standard name of a stub (according to the RMI-IIOP specification
 	 * and rmic).  This is needed so that the name of a stub is known for
 	 * standalone clients of the app server.
-	 */
+         *
+         * @param className name of the class
+         * @return the stub name
+         */
 	String getStubName( String className ) ;
 
 	/** Create a stub factory for stubs for the interface whose type is given by
@@ -81,21 +82,27 @@ public interface PresentationManager
 	 * @param remoteCodeBase The CodeBase to use for loading Stub classes, if
 	 * necessary (may be null or unused).
 	 * @param expectedClass The expected stub type (may be null or unused).
-	 * @param classLoader The classLoader to use (may be null).
+         * @param classLoader The classLoader to use (may be null).
+         * @return The stub factory
 	 */
 	PresentationManager.StubFactory createStubFactory( String className, 
-	    boolean isIDLStub, String remoteCodeBase, Class expectedClass, 
+	    boolean isIDLStub, String remoteCodeBase, Class<?> expectedClass,
 	    ClassLoader classLoader);
 
 	/** Return a Tie for the given class.
-	 */
-	Tie getTie( Class cls ) ;
+         *
+         * @param cls class
+         * @return The tie corresponding to cls
+         */
+	Tie getTie( Class<?> cls ) ;
 
 	/** Return whether or not this StubFactoryFactory creates StubFactory
 	 * instances that create dynamic stubs and ties.  At the top level, 
 	 * true indicates that rmic -iiop is not needed for generating stubs
 	 * or ties.
-	 */
+         *
+         * @return true iff we are using dynamic stubs
+         */
 	boolean createsDynamicStubs() ;
     }
 
@@ -106,43 +113,57 @@ public interface PresentationManager
     {
 	/** Create a new dynamic stub.  It has the type that was
 	 * used to create this factory.
-	 */
+         *
+         * @return The dynamic stub
+         */
 	org.omg.CORBA.Object makeStub() ;
 
 	/** Return the repository ID information for all Stubs
 	 * created by this stub factory.
-	 */
+         *
+         * @return Array of type ids, most derived type first.
+         */
 	String[] getTypeIds() ;
     }
 
     public interface ClassData 
     {
 	/** Get the class used to create this ClassData instance
-	 */
-	Class getMyClass() ;
+         *
+         * @return Class of this ClassData.
+         */
+	Class<?> getMyClass() ;
 
 	/** Get the IDLNameTranslator for the class used to create
 	 * this ClassData instance.
-	 */
+         *
+         * @return IDLNameTranslator for the class of this ClassData
+         */
 	IDLNameTranslator getIDLNameTranslator() ;
 
 	/** Return the array of repository IDs for all of the remote
 	 * interfaces implemented by this class.
-	 */
+         *
+         * @return The typeids, most derived first.
+         */
 	String[] getTypeIds() ;
 
 	/** Get the InvocationHandlerFactory that is used to create
 	 * an InvocationHandler for dynamic stubs of the type of the
 	 * ClassData.  
-	 */
+         *
+         * @return InvocationHandlerFactory.
+         */
 	InvocationHandlerFactory getInvocationHandlerFactory() ;
 
 	/** Get the dictionary for this ClassData instance.
 	 * This is used to hold class-specific information for a Class
 	 * in the class data.  This avoids the need to create other
 	 * caches for accessing the information.
-	 */
-	Map getDictionary() ;
+         *
+         * @return the dictionary.
+         */
+	Map<String,Object> getDictionary() ;
     }
 
     /** Get the ClassData for a particular class.
@@ -151,21 +172,29 @@ public interface PresentationManager
      * the class.  If the class implements more than one remote interface, and not 
      * all of the remote interfaces are related by inheritance, then the type 
      * IDs have the implementation class as element 0.  
+     * @param cls iClass fro which we need ClassData.
+     * @return The ClassData.
      */
-    ClassData getClassData( Class cls ) ;
+    ClassData getClassData( Class<?> cls ) ;
 
     /** Given a particular method, return a DynamicMethodMarshaller 
      * for that method.  This is used for dynamic stubs and ties.
+     * @param method Method for which we need a DynamicMethodMarshaller.
+     * @return The DynamicMethodMarshaller.
      */
     DynamicMethodMarshaller getDynamicMethodMarshaller( Method method ) ;
 
     /** Return the registered StubFactoryFactory.
+     * @param isDynamic true iff we want the dynamic stub factory
+     * @return static or dynamic stub factory.
      */
     StubFactoryFactory getStubFactoryFactory( boolean isDynamic ) ;
 
     /** Register the StubFactoryFactory.  Note that
      * a static StubFactoryFactory is always required for IDL.  The
      * dynamic stubFactoryFactory is optional.
+     * @param isDynamic
+     * @param sff
      */
     void setStubFactoryFactory( boolean isDynamic, StubFactoryFactory sff ) ;
 
@@ -173,27 +202,33 @@ public interface PresentationManager
      * Provided for compatibility with earlier versions of PresentationManager
      * as used in the app server.  The class argument is ignored in
      * the dynamic case, so this is safe.
+     * @return
      */
     Tie getTie() ;
 
     /** Get the correct repository ID for the given implementation
      * instance.  This is useful when using dynamic RMI with the POA.
+     * @param impl implementation
+     * @return repository ID string
      */
     String getRepositoryId( java.rmi.Remote impl ) ;
 
     /** Returns the value of the com.sun.corba.se.ORBUseDynamicStub
      * property.
+     * @return whether to use dynamic stubs.
      */
     boolean useDynamicStubs() ;
 
     /** Remove all internal references to Class cls from the 
      *  PresentationManager. This allows ClassLoaders to
      *  be garbage collected when they are no longer needed.
+     * @param cls Class to flush
      */
-    void flushClass( Class cls ) ;
+    void flushClass( Class<?> cls ) ;
 
     /** Turn on internal debugging flags, which dump information
      * about stub code generation to the PrintStream.
+     * @param ps Output stream.
      */
     void enableDebug( PrintStream ps ) ;
 

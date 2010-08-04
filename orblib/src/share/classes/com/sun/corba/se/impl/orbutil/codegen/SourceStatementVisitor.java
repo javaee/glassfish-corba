@@ -49,7 +49,7 @@ import com.sun.corba.se.spi.orbutil.codegen.FieldInfo ;
 
 public class SourceStatementVisitor extends TreeWalker {
     private ImportList imports ;
-    Printer pr ;
+    CodegenPrinter pr ;
     private String className ;
 
     private String typeName( Type type ) {
@@ -60,7 +60,7 @@ public class SourceStatementVisitor extends TreeWalker {
     }
 
     public SourceStatementVisitor( TreeWalkerContext context, 
-	ImportList imports, Printer pr ) {
+	ImportList imports, CodegenPrinter pr ) {
 	super( context ) ;
 	context.push( this ) ;
 

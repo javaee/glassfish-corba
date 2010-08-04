@@ -41,17 +41,17 @@ import java.io.PrintStream ;
 /** Extends the file utility Printer with line numbers that are
  * also optionally stored as Attributes in Nodes for annotating the AST.
  */
-public class Printer extends com.sun.corba.se.spi.orbutil.misc.Printer {
+public class CodegenPrinter extends com.sun.corba.se.spi.orbutil.misc.Printer {
     static Attribute<Integer> lineNumberAttribute = new Attribute<Integer>( 
 	Integer.class, "lineNumber", -1 ) ;
 
     private int lineNumber ;
 
-    public Printer( PrintStream ps ) {
+    public CodegenPrinter( PrintStream ps ) {
 	this( ps, DEFAULT_INCREMENT, ' ' ) ;
     }
 
-    public Printer( PrintStream ps, int increment, char padChar ) {
+    public CodegenPrinter( PrintStream ps, int increment, char padChar ) {
 	super( ps, increment, padChar ) ;
 	this.lineNumber = 1 ;
     }
@@ -61,36 +61,36 @@ public class Printer extends com.sun.corba.se.spi.orbutil.misc.Printer {
     }
 
     @Override
-    public Printer p( String str ) {
+    public CodegenPrinter p( String str ) {
 	super.p( str ) ;
 	return this ;
     }
 
     @Override
-    public Printer p( Object obj ) {
+    public CodegenPrinter p( Object obj ) {
 	super.p( obj ) ;
 	return this ;
     }
 
     @Override
-    public Printer in() {
+    public CodegenPrinter in() {
 	super.in() ;
 	return this ;
     }
 
     @Override
-    public Printer out() {
+    public CodegenPrinter out() {
 	super.out() ;
 	return this ;
     }
 
     @Override
-    public Printer nl() {
+    public CodegenPrinter nl() {
 	super.nl() ;
 	return this ;
     }
 
-    public Printer nl( Node node ) {
+    public CodegenPrinter nl( Node node ) {
 	lineNumber++ ;
 	if (node != null)
 	    lineNumberAttribute.set( node, lineNumber ) ;

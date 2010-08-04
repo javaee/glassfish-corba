@@ -1534,7 +1534,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
         try {
             mom.close() ;
-        } catch (IOException exc) {
+        } catch (Exception exc) {
             // ignore: stupid close exception
         }
     }

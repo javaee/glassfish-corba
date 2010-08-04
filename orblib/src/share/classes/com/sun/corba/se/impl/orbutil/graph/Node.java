@@ -40,9 +40,10 @@ import java.util.Set ;
 
 /** Node in a graph.
 */
-public interface Node 
+public interface Node <T extends Node>
 {
     /** Get all the children of this node. 
+     * @return The set of all children of this node.
      */
-    Set /* Set<Node> */ getChildren() ;
+    Set<T> getChildren() ;
 }

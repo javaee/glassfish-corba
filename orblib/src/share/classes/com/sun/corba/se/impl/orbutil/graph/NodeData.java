@@ -48,7 +48,7 @@ public class NodeData
 	clear() ;
     }
 
-    public void clear()
+    public final void clear()
     {
 	this.visited = false ;
 	this.root = true ;

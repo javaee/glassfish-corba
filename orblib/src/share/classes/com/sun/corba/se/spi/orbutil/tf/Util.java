@@ -143,7 +143,7 @@ public class Util {
 	return method.getName() + desc ;
     }
 
-    public void newWithSimpleConstructor( MethodVisitor mv, Class cls ) {
+    public void newWithSimpleConstructor( MethodVisitor mv, Class<?> cls ) {
         info( 2, "generating new for class " + cls ) ;
         Type type = Type.getType( cls ) ;
         mv.visitTypeInsn( Opcodes.NEW, type.getInternalName() );
@@ -160,9 +160,7 @@ public class Util {
 
         int oldlen = oldArgTypes.length ;
         Type[] argTypes = new Type[ oldlen + 2 ] ;
-        for (int ctr=0; ctr<oldlen; ctr++) {
-            argTypes[ctr] = oldArgTypes[ctr] ;
-        }
+        System.arraycopy(oldArgTypes, 0, argTypes, 0, oldlen);
 
         argTypes[oldlen] = Type.getType( MethodMonitor.class ) ;
         argTypes[oldlen+1] = Type.INT_TYPE ;
@@ -261,7 +259,7 @@ public class Util {
                 break ;
         }
 
-        return argIndex += atype.getSize() ;
+        return argIndex + atype.getSize() ;
     }
 
     // Emit code to wrap all of the argumnts as Object[],

@@ -385,7 +385,7 @@ public final class ByteCodeUtility {
 		    TraceMethodVisitor.class.cast( mv ).getText().add( 
 			"    Already emitted label " + label ) ;
 	    } else {
-		int lineNumber = Printer.lineNumberAttribute.get( node ) ;
+		int lineNumber = CodegenPrinter.lineNumberAttribute.get( node ) ;
 		if (lineNumber > 0) {
 		    MethodGenerator mg = node.getAncestor( MethodGenerator.class ) ;
 		    ASMUtil.LineNumberTable lnt = ASMUtil.lineNumberTable.get( mg ) ;

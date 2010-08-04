@@ -106,28 +106,29 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     }
 
     private static String getBundleEventType( int type ) {
-        if (type == BundleEvent.INSTALLED) 
-            return "INSTALLED" ;
-        else if (type == BundleEvent.LAZY_ACTIVATION)
-            return "LAZY_ACTIVATION" ;
-        else if (type == BundleEvent.RESOLVED)
+        if (type == BundleEvent.INSTALLED) {
+            return "INSTALLED";
+        } else if (type == BundleEvent.LAZY_ACTIVATION) {
+            return "LAZY_ACTIVATION";
+        } else if (type == BundleEvent.RESOLVED) {
             return "RESOLVED" ;
-        else if (type == BundleEvent.STARTED)
+        } else if (type == BundleEvent.STARTED) {
             return "STARTED" ;
-        else if (type == BundleEvent.STARTING)
+        } else if (type == BundleEvent.STARTING) {
             return "STARTING" ;
-        else if (type == BundleEvent.STOPPED)
+        } else if (type == BundleEvent.STOPPED) {
             return "STOPPED" ;
-        else if (type == BundleEvent.STOPPING)
+        } else if (type == BundleEvent.STOPPING) {
             return "STOPPING" ;
-        else if (type == BundleEvent.UNINSTALLED)
+        } else if (type == BundleEvent.UNINSTALLED) {
             return "UNINSTALLED" ;
-        else if (type == BundleEvent.UNRESOLVED)
+        } else if (type == BundleEvent.UNRESOLVED) {
             return "UNRESOLVED" ;
-        else if (type == BundleEvent.UPDATED)
+        } else if (type == BundleEvent.UPDATED) {
             return "UPDATED" ;
-        else 
+        } else {
             return "ILLEGAL-EVENT-TYPE" ;
+        }
     }
 
     private static class ClassNameResolverImpl implements
@@ -149,6 +150,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             }
         }
 
+        @Override
         public String toString() {
             return "OSGiClassNameResolver" ;
         }
@@ -164,7 +166,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     private static class ClassCodeBaseHandlerImpl implements ClassCodeBaseHandler {
         private static final String PREFIX = "osgi://" ;
 
-        public String getCodeBase( Class cls ) {
+        public String getCodeBase( Class<?> cls ) {
             if (cls == null) {
                 return null ;
             }
@@ -185,8 +187,9 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             String version = "0.0.0" ;
             if (headers != null) {
                 String hver = (String)headers.get( "Bundle-Version" ) ;
-                if (hver != null)
-                    version = hver ;
+                if (hver != null) {
+                    version = hver;
+                }
             }
 
             wrapper.foundClassInBundleVersion( cls, name, version ) ;
@@ -194,7 +197,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             return PREFIX + name + "/" + version ;
         }
 
-        public Class loadClass( String codebase, String className ) {
+        public Class<?> loadClass( String codebase, String className ) {
             if (codebase == null) {
                 Bundle bundle = getBundleForClass( className ) ;
                 if (bundle != null) {
@@ -212,7 +215,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
             if (codebase.startsWith( PREFIX )) {
                 String rest = codebase.substring( PREFIX.length() ) ;
-                int index = rest.indexOf( "/" ) ;
+                int index = rest.indexOf( '/') ;
                 if (index > 0) {
                     String name = rest.substring( 0, index ) ;
                     String version = rest.substring( index+1 ) ;
@@ -243,7 +246,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         return ccbHandler ;
     }
 
-    private static synchronized void insertClasses( Bundle bundle ) {
+    private synchronized void insertClasses( Bundle bundle ) {
         final Dictionary dict = bundle.getHeaders() ;
         final String name = bundle.getSymbolicName() ;
         if (dict != null) {
@@ -269,7 +272,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
     }
 
-    private static synchronized void removeClasses( Bundle bundle ) {
+    private synchronized void removeClasses( Bundle bundle ) {
         final Dictionary dict = bundle.getHeaders() ;
         final String name = bundle.getSymbolicName() ;
         if (dict != null) {
@@ -299,7 +302,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         if (result == null) {
             wrapper.classNotFoundInClassNameMap( className ) ;
             // Get package prefix
-            final int index = className.lastIndexOf( "." ) ;
+            final int index = className.lastIndexOf( '.') ;
             if (index > 0) {
                 final String packageName = className.substring( 0, index ) ;
                 result = packageNameMap.get( packageName ) ;

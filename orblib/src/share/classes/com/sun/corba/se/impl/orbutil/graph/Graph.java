@@ -38,9 +38,9 @@ package com.sun.corba.se.impl.orbutil.graph ;
 
 import java.util.Set ;
 
-public interface Graph extends Set // Set<Node>
+public interface Graph<T extends Node> extends Set<T> // Set<Node>
 {
-    NodeData getNodeData( Node node ) ;
+    NodeData getNodeData( T node ) ;
 
-    Set /* Set<Node> */ getRoots() ;
+    Set<T> getRoots() ;
 }

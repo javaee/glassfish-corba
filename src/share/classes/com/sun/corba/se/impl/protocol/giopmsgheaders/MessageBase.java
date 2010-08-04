@@ -375,6 +375,10 @@ public abstract class MessageBase implements Message{
             //msg = new FragmentMessage(orb.giopDebugFlag);
             if ( (it[4] == 0x01) && (it[5] == 0x00) ) { // 1.0
                 // not possible (error checking done already)
+                // Throw exception just for completeness, and
+                // for proper dataflow analysis in FindBugs
+		throw wrapper.giopVersionError(
+		    CompletionStatus.COMPLETED_MAYBE);
             } else if ( (it[4] == 0x01) && (it[5] == 0x01) ) { // 1.1
                 msg = new FragmentMessage_1_1();
             } else if ( (it[4] == 0x01) && (it[5] == 0x02) ) { // 1.2

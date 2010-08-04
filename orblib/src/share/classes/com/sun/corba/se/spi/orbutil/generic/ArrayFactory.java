@@ -66,13 +66,15 @@ public abstract class ArrayFactory{
     public static <T,S extends T> T[] make( Collection<S> collection, 
 	Class<T> cls ) 
     {
-	if (collection == null)
-	    return null ;
+	if (collection == null) {
+            return null;
+        }
 
 	T[] result = (T[])Array.newInstance( cls, collection.size() ) ;
 	int index = 0 ;
 	for (S elem : collection) {
-	    result[index++] = elem ;
+	    result[index] = elem ;
+            index++ ;
 	}
 	return result ;
     }
@@ -98,21 +100,20 @@ public abstract class ArrayFactory{
 
 	System.out.println( "ArrayFactory: Testing ArrayFactory" ) ;
 
-	// Test null
-	check( make( null, String.class ), null, "null" ) ;
-
 	// Test empty String[]
 	List<String> arg1 = new ArrayList<String>() ;
-	for (String s : empty) 
-	    arg1.add( s ) ;
+	for (String s : empty) {
+            arg1.add(s);
+        }
 
 	String[] res1 = make( arg1, String.class ) ;
 	check( res1, empty, "empty" ) ;
 
 	// Test non-empty String[]
 	List<String> arg2 = new ArrayList<String>() ;
-	for (String s : colors) 
-	    arg2.add( s ) ;
+	for (String s : colors) {
+            arg2.add(s);
+        }
 
 	String[] res2 = make( arg2, String.class ) ;
 	check( res2, colors, "colors" ) ;
@@ -124,19 +125,22 @@ public abstract class ArrayFactory{
 	int index = 0 ;
 	for (int x : numbers) {
 	    arg4.add( x ) ;
-	    nres[index++] = x ;
+	    nres[index] = x ;
+            index++ ;
 	}
 
 	for (BigInteger bi : bigNumbers) {
 	    arg4.add( bi ) ;
-	    nres[index++] = bi ;
+	    nres[index] = bi ;
+            index++ ;
 	}
 
 	Number[] res4 = make( arg4, Number.class ) ;
 	check( res4, nres, "int+numbers" ) ;
 
-	if (!error)
-	    System.out.println( "ArrayFactory: test passed" ) ;
+	if (!error) {
+            System.out.println("ArrayFactory: test passed");
+        }
 
 	System.exit( error ? 1 : 0 ) ;
     }

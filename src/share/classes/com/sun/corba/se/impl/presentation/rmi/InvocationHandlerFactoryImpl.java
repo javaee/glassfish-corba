@@ -67,11 +67,11 @@ public class InvocationHandlerFactoryImpl implements InvocationHandlerFactory
 	this.classData = classData ;
 	this.pm = pm ;
 
-    	Class[] remoteInterfaces = 
+    	Class<?>[] remoteInterfaces =
 	    classData.getIDLNameTranslator().getInterfaces() ;
-	proxyInterfaces = new Class[ remoteInterfaces.length + 1 ] ;
-	for (int ctr=0; ctr<remoteInterfaces.length; ctr++)
-	    proxyInterfaces[ctr] = remoteInterfaces[ctr] ;
+	proxyInterfaces = new Class<?>[ remoteInterfaces.length + 1 ] ;
+        System.arraycopy(remoteInterfaces, 0, proxyInterfaces, 0,
+            remoteInterfaces.length);
 
 	proxyInterfaces[remoteInterfaces.length] = DynamicStub.class ;
     }
@@ -84,7 +84,12 @@ public class InvocationHandlerFactoryImpl implements InvocationHandlerFactory
 
 	public void setProxy( Proxy proxy ) 
 	{
-	    ((DynamicStubImpl)stub).setSelf( (DynamicStub)proxy ) ;
+            if (proxy instanceof DynamicStub) {
+                ((DynamicStubImpl)stub).setSelf( (DynamicStub)proxy ) ;
+            } else {
+                throw new RuntimeException(
+                    "Proxy not instance of DynamicStub" ) ;
+            }
 	}
 
 	public Proxy getProxy()

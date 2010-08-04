@@ -1101,7 +1101,7 @@ public class IDLJavaSerializationInputStream extends CDRInputStreamBase {
     }
 
     public void orb(org.omg.CORBA.ORB orb) {
-	orb = (ORB) orb;
+	this.orb = (ORB) orb;
     }
 
     public BufferManagerRead getBufferManager() {

@@ -93,7 +93,7 @@ public class ASMUtil {
 
 	TreeWalkerContext context = new TreeWalkerContext() ;
 	Visitor visitor = new SourceStatementVisitor( context, 
-	    imports, new Printer( ps ) ) ;
+	    imports, new CodegenPrinter( ps ) ) ;
 	cg.accept( visitor ) ;
     }
 

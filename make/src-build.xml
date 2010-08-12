@@ -94,7 +94,7 @@
         classpathref="maven-ant-tasks.classpath">
     </typedef>
 
-    <target name="build" depends="init, prepare-dirs, compile, enhance-orb, compile-timing-points, orb-jar, make-bundles"/>
+    <target name="build" depends="init, prepare-dirs, compile, enhance-orb, compile-timing-points, orb-jar, make-bundles, archive-bundles"/>
 
     <target name="enhance-orb" depends="init">
         <!-- Run the tracing enhancer on the class files for corba.tf -->
@@ -519,6 +519,27 @@
         <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
         <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
         <make-bundle classpath="${classes.dir}" file="osgi-test"/>
+    </target>
+
+    <target name="archive-bundles" depends="init">
+        <mkdir dir="${releaselib.dir}/glassfish/modules"/>
+        <copy todir="${releaselib.dir}/glassfish/modules">
+            <fileset dir="${releaselib.dir}/bundles">
+                <include name="glassfish-corba-*.jar"/>
+                <exclude name="glassfish-corba-source.jar"/>
+                <exclude name="glassfish-corba-osgi-test.jar"/> 
+            </fileset>
+        </copy>
+        <zip destfile="${releaselib.dir}/bundles-archive.zip" compress="false" basedir="${releaselib.dir}"
+         includes="glassfish/modules/*"/>
+        <delete dir="${releaselib.dir}/glassfish/modules"/>
+    </target>
+
+    <target name="archive-workspace" depends="init">
+        <delete file="${releaselib.dir}/ws.zip"/>
+        <zip destfile="${root.dir}/ws.zip" basedir="${root.dir}" level="9"
+         includes="build/**,jscheme/**,lib/**,make/**,orblib/**,src/**,test/**"/>
+        <move file="${root.dir}/ws.zip" todir="${releaselib.dir}"/>
     </target>
 
     <!-- ========================= Build the ORB library ====================  

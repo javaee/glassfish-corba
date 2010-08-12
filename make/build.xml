@@ -381,7 +381,6 @@
         />
     </target>
 
-
 <!-- Run all idl invocations for the tests that use idl and generate
      sources for them -->
 <target name="run-all-test-idl">

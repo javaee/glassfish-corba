@@ -789,6 +789,27 @@
 	</java>
     </target>
 
+    <target name="rename-quiet" depends="init">
+	<mkdir dir="build/rename/ee"/>
+	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
+	    dir="${root.dir}" failonerror="true">
+            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
+	    <classpath>
+		<pathelement location="${releaselib.dir}/orblib.jar"/>
+	    </classpath>
+	    <arg value="-verbose"/>
+	    <arg value="0"/>
+	    <arg value="-dryrun"/>
+	    <arg value="false"/>
+	    <arg value="-source"/>
+	    <arg value="."/>
+	    <arg value="-destination"/>
+	    <arg value="build/rename/ee"/>
+	    <arg value="-version"/>
+	    <arg value="ee"/>
+	</java>
+    </target>
+
     <target name="generate-bnd-properties" depends="init">
         <propertyfile file="${bnd.properties.file}">
             <entry key="Bundle-Version" value="${release.version}-${build.version}"/>

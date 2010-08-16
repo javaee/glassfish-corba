@@ -198,8 +198,13 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 		} catch (RuntimeException e) {
 		    // REVISIT: 
 		    // this part similar to BufferManagerWriteStream.overflow()
-		    retry = ((CorbaContactInfoListIterator) 
+                    if (contactInfoListIterator == null) {
+                        retry = false ;
+                    } else {
+                        retry = ((CorbaContactInfoListIterator) 
 			     contactInfoListIterator).reportException(contactInfo, e);
+                    }
+
 		    if (retry) {
                         retryingRequest(e);
 			invocationInfo.setIsRetryInvocation(true);

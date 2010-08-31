@@ -1867,10 +1867,17 @@ public class SocketOrChannelConnectionImpl
     public String toString()
     {
         synchronized ( stateEvent ){
-            return 
-		"SocketOrChannelConnectionImpl[" + " "
-		+ (socketChannel == null ?
-		   socket.toString() : socketChannel.toString()) + " "
+            String str ;
+            if (socketChannel != null) {
+                str = socketChannel.toString() ;
+            } else if (socket != null) {
+                str = socket.toString() ;
+            } else {
+                str = "<no connection!>" ;
+            }
+
+            return "SocketOrChannelConnectionImpl[ "
+		+ str + " " 
 		+ getStateString( state ) + " "
 		+ shouldUseSelectThreadToWait() + " "
 		+ shouldUseWorkerThreadForEvent()

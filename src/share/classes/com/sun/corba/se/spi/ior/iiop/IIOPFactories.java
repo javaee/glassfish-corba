@@ -128,7 +128,9 @@ public abstract class IIOPFactories {
 
     public static IdentifiableFactory makeClusterInstanceInfoComponentFactory()
     {
-        return new EncapsulationFactoryBase(ORBConstants.TAG_LOAD_BALANCING_ID) {
+        return new EncapsulationFactoryBase(
+            ORBConstants.FOLB_MEMBER_ADDRESSES_TAGGED_COMPONENT_ID) {
+
             public Identifiable readContents(InputStream in)
 	    {
                 final ClusterInstanceInfo cinfo = new ClusterInstanceInfo( in ) ;
@@ -140,9 +142,9 @@ public abstract class IIOPFactories {
     } 
 
     public static ClusterInstanceInfoComponent makeClusterInstanceInfoComponent(
-        ClusterInstanceInfo loadBalancingValue)
+        ClusterInstanceInfo cinfo)
     {
-	return new ClusterInstanceInfoComponentImpl(loadBalancingValue);
+	return new ClusterInstanceInfoComponentImpl(cinfo);
     }
 
     public static IdentifiableFactory makeAlternateIIOPAddressComponentFactory()

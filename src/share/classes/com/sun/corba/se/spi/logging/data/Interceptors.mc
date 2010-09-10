@@ -68,8 +68,17 @@
 	    (SERVER_INFO_STACK_NULL  18 WARNING "Assertion failed: Server request info stack is null")
 	    (MARK_AND_RESET_FAILED   19 WARNING "Mark and reset failed")
 	    (SLOT_TABLE_INVARIANT    20 WARNING "currentIndex > tableContainer.size(): {0} > {1}")
-	    (INTERCEPTOR_LIST_LOCKED  21 WARNING "InterceptorList is locked")
-	    (SORT_SIZE_MISMATCH      22 WARNING "Invariant: sorted size + unsorted size == total size was violated"))
+	    (INTERCEPTOR_LIST_LOCKED 21 WARNING "InterceptorList is locked")
+	    (SORT_SIZE_MISMATCH      22 WARNING "Invariant: sorted size + unsorted size == total size was violated")
+            (IGNORED_EXCEPTION_IN_ESTABLISH_COMPONENTS
+             23 FINE "Ignored exception in establish_components method for ObjectAdapter {0} (as per specification)")
+            (EXCEPTION_IN_COMPONENTS_ESTABLISHED
+             24 FINE "Exception in components_established method for ObjectAdapter {0}")
+            (IGNORED_EXCEPTION_IN_ADAPTER_MANAGER_STATE_CHANGED
+             25 FINE "Ignored exception in adapter_manager_state_changed method for managerId {0} and newState {1} (as per specification)")
+            (IGNORED_EXCEPTION_IN_ADAPTER_STATE_CHANGED
+             26 FINE "Ignored exception in adapter_state_changed method for templates {0} and newState {1} (as per specification)")
+            )
 	(NO_IMPLEMENT 
 	    (PI_ORB_NOT_POLICY_BASED 1 WARNING "Policies not implemented"))
 	(OBJECT_NOT_EXIST

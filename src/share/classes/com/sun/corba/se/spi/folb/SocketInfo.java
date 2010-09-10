@@ -40,6 +40,8 @@
 
 package com.sun.corba.se.spi.folb;
 
+import java.io.Serializable ;
+
 import org.omg.CORBA_2_3.portable.InputStream;
 import org.omg.CORBA_2_3.portable.OutputStream;
 
@@ -47,7 +49,7 @@ import org.omg.CORBA_2_3.portable.OutputStream;
  *
  * @author ken
  */
-public class SocketInfo {
+public class SocketInfo implements Serializable {
     private final String type ;
     private final String host ;
     private final int port ;
@@ -84,6 +86,7 @@ public class SocketInfo {
         sb.append( host ) ;
         sb.append( " port=" ) ;
         sb.append( port ) ;
+        sb.append( ']' ) ;
         return sb.toString() ;
     }
 

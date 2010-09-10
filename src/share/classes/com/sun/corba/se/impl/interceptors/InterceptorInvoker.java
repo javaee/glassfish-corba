@@ -55,6 +55,10 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
         
+import com.sun.corba.se.impl.logging.InterceptorsSystemException;
+import java.util.Arrays;
+import java.util.List;
+
 /** 
  * Handles invocation of interceptors.  Has specific knowledge of how to
  * invoke IOR, ClientRequest, and ServerRequest interceptors.  
@@ -65,6 +69,8 @@ import com.sun.corba.se.spi.trace.TraceInterceptor;
 @TraceInterceptor
 public class InterceptorInvoker {
     private ORB orb;
+
+    private InterceptorsSystemException wrapper ;
 
     // The list of interceptors to be invoked
     private InterceptorList interceptorList;
@@ -90,6 +96,8 @@ public class InterceptorInvoker {
                         PICurrent piCurrent ) 
     {
         this.orb = orb;
+	this.wrapper =
+	    orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
 	this.interceptorList = interceptorList;
 	this.enabled = false;
         this.current = piCurrent;
@@ -140,10 +148,11 @@ public class InterceptorInvoker {
 		IORInterceptor interceptor = iorInterceptors[i];
 		try {
 		    interceptor.establish_components( info );
-		}
-		catch( Exception e ) {
+		} catch( Exception e ) {
 		    // as per PI spec (orbos/99-12-02 sec 7.2.1), if
 		    // establish_components throws an exception, ignore it.
+		    // But do log something for debugging.
+	 	    wrapper.ignoredExceptionInEstablishComponents( e, oa ) ;
 		}
 	    }
 
@@ -156,7 +165,11 @@ public class InterceptorInvoker {
 		    IORInterceptor_3_0 interceptor30 = (IORInterceptor_3_0)interceptor ;
 		    // Note that exceptions here are NOT ignored, as per the
 		    // ORT spec (orbos/01-01-04)
-		    interceptor30.components_established( info );
+		    try {
+		        interceptor30.components_established( info );
+		    } catch (Exception exc) {
+			wrapper.exceptionInComponentsEstablished( exc, oa ) ;
+		    }
 		}
 	    }
 
@@ -186,6 +199,9 @@ public class InterceptorInvoker {
 		    }
 		} catch (Exception exc) {
 		    // No-op: ignore exception in this case
+		    // But do log something for debugging.
+		    wrapper.ignoredExceptionInAdapterManagerStateChanged(
+		        exc, managerId, newState ) ;
 		}
 	    }
 	}
@@ -210,6 +226,9 @@ public class InterceptorInvoker {
 		    }
 		} catch (Exception exc) {
 		    // No-op: ignore exception in this case
+		    // But do log something for debugging.
+		    wrapper.ignoredExceptionInAdapterStateChanged( exc,
+			Arrays.asList( templates ), newState ) ;
 		}
 	    }
 	}

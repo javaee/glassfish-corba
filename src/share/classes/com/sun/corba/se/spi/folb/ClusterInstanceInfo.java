@@ -43,6 +43,9 @@ package com.sun.corba.se.spi.folb;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import java.io.Serializable ;
+
 import org.omg.CORBA_2_3.portable.InputStream;
 import org.omg.CORBA_2_3.portable.OutputStream;
 
@@ -50,7 +53,7 @@ import org.omg.CORBA_2_3.portable.OutputStream;
  *
  * @author ken
  */
-public class ClusterInstanceInfo {
+public class ClusterInstanceInfo implements Serializable {
     private final String name ;
     private final int weight ;
     private final List<SocketInfo> endpoints ;

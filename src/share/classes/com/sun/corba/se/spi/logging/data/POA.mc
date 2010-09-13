@@ -111,7 +111,7 @@
 	    (RFM_POST_INIT_EXCEPTION 27
 		WARNING "Exception occurred in RMORBInitializer.post_init")
 	    (RFM_CONFIGURE_EXCEPTION 28
-		WARNING "Exception occured in ReferenceManagerConfigurator.configure")
+		WARNING "Exception occurred in ReferenceManagerConfigurator.configure")
 	    (RFM_MANAGER_INACTIVE 29
 		WARNING "RFM was inactive on state change")
 	    (RFM_SUSPEND_CONDITION_WAIT_INTERRUPTED 30
@@ -200,7 +200,7 @@
 	    (OTSHOOKEXCEPTION  1 WARNING "Error in OTS hook")
 	    (UNKNOWN_SERVER_EXCEPTION  2 WARNING "Unknown server exception")
 	    (UNKNOWN_SERVERAPP_EXCEPTION  3 WARNING "Unknown server application exception")
-	    (UNKNOWN_LOCALINVOCATION_ERROR  4 WARNING "Unknon local invocation error"))
+	    (UNKNOWN_LOCALINVOCATION_ERROR  4 WARNING "Unknown local invocation error"))
 	(OBJECT_NOT_EXIST 
 	    (ADAPTER_ACTIVATOR_NONEXISTENT  1 WARNING "AdapterActivator does not exist")
 	    (ADAPTER_ACTIVATOR_FAILED  2 WARNING "AdapterActivator failed")

@@ -107,7 +107,8 @@ public class ASMUtil {
 	Pair<String,String> names = Wrapper.splitClassName( className ) ;
 	String pkgName = names.first().replace( '.', File.separatorChar ) ;
 	File sdir = new File( genDir, pkgName ) ;
-	sdir.mkdirs() ; // make sure the directory exists; may fail if already exists
+	sdir.mkdirs() ; // make sure the directory exists; may return false if already exists.
+                        // Of course, it's not an error if the directory already exists.
 	
 	String sfname = names.second() + suffix ;
 

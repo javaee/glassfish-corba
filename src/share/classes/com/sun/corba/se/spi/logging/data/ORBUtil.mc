@@ -382,7 +382,7 @@
 	    (FRAGMENT_SIZE_MINIMUM 
 	     15 WARNING "Fragment size {0} is too small: it must be at least {1}")
 	    (FRAGMENT_SIZE_DIV 
-	     16 WARNING "Illegal valiue for fragment size ({0}): must be divisible by {1}")
+	     16 WARNING "Illegal value for fragment size ({0}): must be divisible by {1}")
 	    (ORB_INITIALIZER_FAILURE
 	     17 WARNING "Could not instantiate ORBInitializer {0}")
 	    (ORB_INITIALIZER_TYPE
@@ -425,7 +425,7 @@
 	    (PERSISTENT_SERVERID_NOT_SET  
 	     6 FINE "Persistent server ID is not set")
 	    (USER_CONFIGURATOR_EXCEPTION
-	     7 WARNING "Exception occured while running a user configurator")
+	     7 WARNING "Exception occurred while running a user configurator")
 	    )
 	(INTERNAL 
 	    (NON_EXISTENT_ORBID 
@@ -546,9 +546,9 @@
 	    (ERROR_INIT_BADSERVERIDHANDLER 
 	     62 WARNING "Error in constructing instance of bad server ID handler")
 	    (NO_TOA 
-	     63 WARNING "No TOAFactory is availble")
+	     63 WARNING "No TOAFactory is available")
 	    (NO_POA 
-	     64 WARNING "No POAFactory is availble")
+	     64 WARNING "No POAFactory is available")
 	    (INVOCATION_INFO_STACK_EMPTY 
 	     65 WARNING "Invocation info stack is unexpectedly empty")
 	    (BAD_CODE_SET_STRING 
@@ -556,7 +556,7 @@
 	    (UNKNOWN_NATIVE_CODESET 
 	     67 WARNING "Unknown native codeset: {0}")
 	    (UNKNOWN_CONVERSION_CODE_SET 
-	     68 WARNING "Unknown conversion codset: {0}")
+	     68 WARNING "Unknown conversion codeset: {0}")
 	    (INVALID_CODE_SET_NUMBER 
 	     69 WARNING "Invalid codeset number")
 	    (INVALID_CODE_SET_STRING 
@@ -634,7 +634,7 @@
 	    (GET_KEY_INVALID_IN_CACHE_TABLE
 	     120 WARNING "Illegal call to getKey in CacheTable: this instance has no reverse map")
 	    (TIMER_MANAGER_NOT_INITIALIZED
-	     121 WARNING "TimerManager not initialized: error in constructoring TypeCodeImpl")
+	     121 WARNING "TimerManager not initialized: error in constructing TypeCodeImpl")
 	    (TIMING_POINTS_ARE_NULL 
 	     122 WARNING "TimingPoints instance is null in TypeCodeImpl constructor")
 	    (LOST_CONNECTION_EVENT
@@ -648,9 +648,9 @@
             (EXCEPTION_IN_LISTENER_THREAD
              133 FINE "Exception occurred in listener thread")
             (EXCEPTION_IN_HANDLE_REQUEST_FOR_REQUEST
-             134 WARNING "Exception occured in handleRequest for a Request message")
+             134 WARNING "Exception occurred in handleRequest for a Request message")
             (EXCEPTION_IN_HANDLE_REQUEST_FOR_LOCATE_REQUEST
-             135 WARNING "Exception occured in handleRequest for a LocateRequest message")
+             135 WARNING "Exception occurred in handleRequest for a LocateRequest message")
 	    )
 	(MARSHAL 
 	    (CHUNK_OVERFLOW 
@@ -706,7 +706,7 @@
 	    (CUSTOM_WRAPPER_WITH_CODEBASE 
 	     27 WARNING "Codebase present in RMI-IIOP stream format version 1 optional data valuetype header")
 	    (CUSTOM_WRAPPER_INDIRECTION 
-	     28 WARNING "Indirection preseint in RMI-IIOP stream format version 2 optional data valuetype header")
+	     28 WARNING "Indirection present in RMI-IIOP stream format version 2 optional data valuetype header")
 	    (CUSTOM_WRAPPER_NOT_SINGLE_REPID 
 	     29 WARNING "0 or more than one repository ID found reading the optional data valuetype header")
 	    (BAD_VALUE_TAG 

@@ -116,6 +116,10 @@ public class GIOPVersion {
     // General methods
 
     public boolean equals(GIOPVersion gv){
+        if (gv == null) {
+            return false ;
+        } 
+
         return gv.major == this.major && gv.minor == this.minor ;
     }
 

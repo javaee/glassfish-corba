@@ -605,7 +605,12 @@ class Token
    **/
   boolean equals (String name)
   {
-    return (this.type == Identifier && this.name.equals (name));
+    if (this.type == Identifier) {
+      if ((this.name == null && name == null) || this.name.equals(name)) {
+        return true ;
+      }
+    }
+    return false ;
   } // equals
 
   // Although isEscaped is an independent attribute, it may be true only

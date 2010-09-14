@@ -63,7 +63,7 @@ public class TcpTimeoutsImpl implements TcpTimeouts
 	this.wrapper = ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
 	String[] data = args.split( ":" ) ;
 	if ((data.length < 3) || (data.length > 4))
-	    wrapper.badTimeoutDataLength() ;
+	    throw wrapper.badTimeoutDataLength() ;
 
 	initial_time_to_wait = parseArg( "initial_time_to_wait", data[0] ) ;
 	max_time_to_wait     = parseArg( "max_time_to_wait", data[1] ) ;

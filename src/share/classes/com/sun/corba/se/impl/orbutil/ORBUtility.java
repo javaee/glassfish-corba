@@ -109,6 +109,14 @@ public final class ORBUtility {
 	try {
 	    sc.connect( sa ) ;
 	    return sc ;
+	} catch (RuntimeException exc ) {
+            try {
+                sc.close() ;
+            } catch (IOException ioe) {
+		// Ignore this: close exceptions are useless.
+            }
+
+            throw exc ;
 	} catch (IOException exc ) {
 	    try {
 		sc.close() ;

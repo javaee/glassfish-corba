@@ -38,35 +38,36 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.logex;
+package com.sun.corba.se.spi.orbutil.logex.corba ;
 
-/**
+import org.omg.CORBA.CompletionStatus ;
+
+/** Enum corresponding to CompletionStatus that can be used in annotations.
  *
  * @author ken
  */
-import java.lang.annotation.Documented ;
-import java.lang.annotation.Target ;
-import java.lang.annotation.ElementType ;
-import java.lang.annotation.Retention ;
-import java.lang.annotation.RetentionPolicy ;
+public enum CSValue {
+    YES() {
+        @Override
+        public CompletionStatus getCompletionStatus() { 
+	    return CompletionStatus.COMPLETED_YES ;
+	}
+    },
 
-/** This annotation is applied to a method to define the log and exception
- * details for the method.
- */
-@Documented
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Log {
-    /** The logging Level (encoded as an enum) to use for the log record
-     * generated from the annotated method.
-     * 
-     * @return The log level.
-     */
-    LogLevel level() default LogLevel.WARNING ;
+    NO {
+        @Override
+        public CompletionStatus getCompletionStatus() { 
+	    return CompletionStatus.COMPLETED_NO ;
+	}
+    },
 
-    /** The exception ID to be used.  This is used to construct the message
-     * ID in the log message.
-     * @return The exception id (which must include the VMCID).
-     */
-    int id() default 0 ;
+    MAYBE {
+        @Override
+        public CompletionStatus getCompletionStatus() { 
+	    return CompletionStatus.COMPLETED_MAYBE ;
+	}
+    } ;
+
+    public abstract CompletionStatus getCompletionStatus() ;
 }
+

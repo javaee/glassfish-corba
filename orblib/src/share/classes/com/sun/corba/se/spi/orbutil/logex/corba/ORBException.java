@@ -37,8 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-package com.sun.corba.se.spi.orbutil.logex;
+package com.sun.corba.se.spi.orbutil.logex.corba ;
 
 /**
  *
@@ -50,23 +49,20 @@ import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
-/** This annotation is applied to a method to define the log and exception
- * details for the method.
+/** This annotation is applied to an interface or abstract class that is used
+ * to define logging and/or constructing CORBA exceptions.
  */
 @Documented
-@Target({ElementType.METHOD})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Log {
-    /** The logging Level (encoded as an enum) to use for the log record
-     * generated from the annotated method.
-     * 
-     * @return The log level.
+public @interface ORBException {
+    /** Return true if this is an OMG exception with the OMG VMCID, 
+     * false if it is using the old SUN VMCID.
      */
-    LogLevel level() default LogLevel.WARNING ;
+    boolean omgException() default false ;
 
-    /** The exception ID to be used.  This is used to construct the message
-     * ID in the log message.
-     * @return The exception id (which must include the VMCID).
+    /** Return the group ID to be used in computing the message ID.
      */
-    int id() default 0 ;
+    int group() ;
 }
+

@@ -90,6 +90,22 @@ import java.util.logging.Logger;
  * @author ken
  */
 public class WrapperGenerator {
+    public interface Extension {
+        String getLogId( Method method ) ;
+
+        /** Construct an exception from the message and the exception type.
+         * The method provides access to any additional annotations that may
+         * be needed.
+         */
+        Exception makeException( String msg, Method method ) ;
+    }
+
+    private static Extension extension = null ;
+
+    public static void setExtension( Extension ext ) {
+        extension = ext ;
+    }
+
     private WrapperGenerator() {}
 
     // Find the outer index in pannos for which the element array
@@ -124,8 +140,24 @@ public class WrapperGenerator {
         }
     }
 
+    // Extension: handle more complex CORBA log id.
+    // CORBA case needs: method return type, info from ORBException
+    private static String getLogId( Method method ) {
+        if (extension != null) {
+            return extension.getLogId( method ) ;
+        } else {
+	    Log log = method.getAnnotation( Log.class ) ;
+	    if (log == null) {
+		throw new RuntimeException(
+		    "No Log annotation present for " + method ) ;
+	    }
+
+            return Integer.toString(log.id()) ;
+        }
+    }
+
     private static String getMessage( Method method, int numParams, 
-        String idPrefix, int logId ) {
+        String idPrefix, String logId ) {
 
         final Message message = method.getAnnotation( Message.class ) ;
         final StringBuilder sb = new StringBuilder() ;
@@ -143,7 +175,7 @@ public class WrapperGenerator {
 
                 sb.append( "arg" ) ;
                 sb.append( ctr ) ;
-                sb.append( "={" + ctr + "}" ) ;
+		sb.append("={").append(ctr).append( "}") ;
             }
         } else {
             sb.append( message.value() ) ;
@@ -185,23 +217,35 @@ public class WrapperGenerator {
 	}
     }
 
-    private static Exception makeException( Class<?> rtype, String msg ) {
-        try {
-            Constructor cons = rtype.getConstructor(String.class);
-            return (Exception) cons.newInstance(msg);
-        } catch (InstantiationException ex) {
-            throw new RuntimeException( ex ) ;
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException( ex ) ;
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException( ex ) ;
-        } catch (InvocationTargetException ex) {
-            throw new RuntimeException( ex ) ;
-        } catch (NoSuchMethodException ex) {
-            throw new RuntimeException( ex ) ;
-        } catch (SecurityException ex) {
-            throw new RuntimeException( ex ) ;
+    // Extend: for making system exception based on data 
+    // used for minor code and completion status
+    private static Exception makeException( String msg, Method method ) {
+        Exception result = null ;
+        if (extension != null) {
+            result = extension.makeException( msg, method ) ;
         }
+
+        if (result == null) {
+	    Class<?> rtype = method.getReturnType() ;
+            try {
+                Constructor cons = rtype.getConstructor(String.class);
+                result = (Exception) cons.newInstance(msg);
+            } catch (InstantiationException ex) {
+                throw new RuntimeException( ex ) ;
+            } catch (IllegalAccessException ex) {
+                throw new RuntimeException( ex ) ;
+            } catch (IllegalArgumentException ex) {
+                throw new RuntimeException( ex ) ;
+            } catch (InvocationTargetException ex) {
+                throw new RuntimeException( ex ) ;
+            } catch (NoSuchMethodException ex) {
+                throw new RuntimeException( ex ) ;
+            } catch (SecurityException ex) {
+                throw new RuntimeException( ex ) ;
+            }
+        }
+        
+        return result ;
     }
 
     private static String handleMessageOnly( Method method, Logger logger,
@@ -285,14 +329,15 @@ public class WrapperGenerator {
         final Level level = log.level().getLevel() ;
         final ReturnType rtype = classifyReturnType( method ) ;
         final int len = messageParams == null ? 0 : messageParams.length ;
-        final String msgString = getMessage( method, len, idPrefix, log.id() ) ;
+        final String msgString = getMessage( method, len, idPrefix, 
+	    getLogId( method )) ;
         final LogRecord lrec = makeLogRecord( level, msgString,
             messageParams, logger ) ;
         final String message = formatter.format( lrec ) ;
 
         Exception exc = null ;
         if (rtype == ReturnType.EXCEPTION) {
-            exc = makeException( method.getReturnType(), message ) ;
+            exc = makeException( message, method ) ;
             if (cause != null) {
                 exc.initCause( cause ) ;
             }

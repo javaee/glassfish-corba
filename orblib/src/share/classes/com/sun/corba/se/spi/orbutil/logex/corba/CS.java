@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.logex;
+package com.sun.corba.se.spi.orbutil.logex.corba ;
 
 /**
  *
@@ -50,23 +50,17 @@ import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
-/** This annotation is applied to a method to define the log and exception
- * details for the method.
+/** This annotation is applied to a method to indicate what CompletionStatus to use
+ * for creating a CORBA exception.  It is an error to apply this annotation to a method
+ * that does not return a subclass of SystemException.
  */
 @Documented
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Log {
-    /** The logging Level (encoded as an enum) to use for the log record
-     * generated from the annotated method.
-     * 
-     * @return The log level.
+public @interface CS {
+    /** The CORBA CompletionStatus to be used for this method.
+     * Can only be used for a method that returns a subclass of SystemException.
      */
-    LogLevel level() default LogLevel.WARNING ;
-
-    /** The exception ID to be used.  This is used to construct the message
-     * ID in the log message.
-     * @return The exception id (which must include the VMCID).
-     */
-    int id() default 0 ;
+    CSValue value() default CSValue.NO ;
 }
+

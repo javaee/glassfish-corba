@@ -25,11 +25,11 @@ public class Listener extends Listener11swing implements java.awt.event.InputMet
     super(handler);
   }
  
-  public void caretPositionChanged(java.awt.event.InputMethodEvent e) {
+  public void inputMethodTextChanged(java.awt.event.InputMethodEvent e) {
         handler.apply(U.list(e));
       }
     
-  public void inputMethodTextChanged(java.awt.event.InputMethodEvent e) {
+  public void caretPositionChanged(java.awt.event.InputMethodEvent e) {
         handler.apply(U.list(e));
       }
     

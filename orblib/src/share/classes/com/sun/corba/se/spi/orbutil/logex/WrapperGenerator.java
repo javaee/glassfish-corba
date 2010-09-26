@@ -100,12 +100,6 @@ public class WrapperGenerator {
         Exception makeException( String msg, Method method ) ;
     }
 
-    private static Extension extension = null ;
-
-    public static void setExtension( Extension ext ) {
-        extension = ext ;
-    }
-
     private WrapperGenerator() {}
 
     // Find the outer index in pannos for which the element array
@@ -142,7 +136,7 @@ public class WrapperGenerator {
 
     // Extension: handle more complex CORBA log id.
     // CORBA case needs: method return type, info from ORBException
-    private static String getLogId( Method method ) {
+    private static String getLogId( Method method, Extension extension ) {
         if (extension != null) {
             return extension.getLogId( method ) ;
         } else {
@@ -219,7 +213,8 @@ public class WrapperGenerator {
 
     // Extend: for making system exception based on data 
     // used for minor code and completion status
-    private static Exception makeException( String msg, Method method ) {
+    private static Exception makeException( String msg, Method method,
+        Extension extension ) {
         Exception result = null ;
         if (extension != null) {
             result = extension.makeException( msg, method ) ;
@@ -324,20 +319,21 @@ public class WrapperGenerator {
     private final static ShortFormatter formatter = new ShortFormatter() ;
 
     private static Object handleFullLogging( Log log, Method method, Logger logger,
-        String idPrefix, Object[] messageParams, Throwable cause )  {
+        String idPrefix, Object[] messageParams, Throwable cause,
+        Extension extension )  {
 
         final Level level = log.level().getLevel() ;
         final ReturnType rtype = classifyReturnType( method ) ;
         final int len = messageParams == null ? 0 : messageParams.length ;
         final String msgString = getMessage( method, len, idPrefix, 
-	    getLogId( method )) ;
+	    getLogId( method, extension )) ;
         final LogRecord lrec = makeLogRecord( level, msgString,
             messageParams, logger ) ;
         final String message = formatter.format( lrec ) ;
 
         Exception exc = null ;
         if (rtype == ReturnType.EXCEPTION) {
-            exc = makeException( message, method ) ;
+            exc = makeException( message, method, extension ) ;
             if (cause != null) {
                 exc.initCause( cause ) ;
             }
@@ -365,6 +361,12 @@ public class WrapperGenerator {
     }
 
     public static <T> T makeWrapper( final Class<T> cls ) {
+        return makeWrapper(cls, null) ;
+    }
+
+    public static <T> T makeWrapper( final Class<T> cls,
+        final Extension extension ) {
+
         // Must have an interface to use a Proxy.
         if (!cls.isInterface()) {
             throw new IllegalArgumentException( "Class " + cls +
@@ -406,7 +408,7 @@ public class WrapperGenerator {
                     return handleMessageOnly( method, logger, messageParams ) ;
                 } else {
                     return handleFullLogging( log, method, logger, idPrefix,
-                        messageParams, cause ) ;
+                        messageParams, cause, extension ) ;
                 }
             }
         } ;

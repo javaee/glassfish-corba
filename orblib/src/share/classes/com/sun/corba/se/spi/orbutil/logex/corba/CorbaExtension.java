@@ -90,6 +90,11 @@ import org.omg.CORBA.TRANSIENT;
 import org.omg.CORBA.UNKNOWN;
 
 public class CorbaExtension implements WrapperGenerator.Extension {
+    public static final WrapperGenerator.Extension self =
+        new CorbaExtension() ;
+
+    private CorbaExtension() {}
+
     public static final int ORBUtilGroup = 0 ;
     public static final int ActivationGroup = 1 ;
     public static final int NamingGroup = 2 ;

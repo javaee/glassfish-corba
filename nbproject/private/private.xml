@@ -2,6 +2,11 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <data xmlns="http://www.netbeans.org/ns/profiler/1" version="0.4"/>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/net/minas/space/ws/mercurial/CORBA/improved-exceptions/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/logex/corba/CorbaExtension.java</file>
+        <file>file:/net/minas/space/ws/mercurial/CORBA/improved-exceptions/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/logex/ExceptionWrapper.java</file>
+        <file>file:/net/minas/space/ws/mercurial/CORBA/improved-exceptions/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/logex/WrapperGenerator.java</file>
+    </open-files>
 </project-private>
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.

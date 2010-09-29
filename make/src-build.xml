@@ -87,7 +87,6 @@
     </description>
 
     <property name="root.dir"			value="${basedir}"/>
-    <property name="jscheme-jar"                value="${root.dir}/jscheme/lib/jscheme.jar"/>
 
     <!-- ========================= set up for the maven ant tasks ============================ -->
 
@@ -195,7 +194,6 @@
 
 	    <pathelement location="${orblib.classes.dir}"/>
 	    <pathelement location="${classes.dir}"/>
-	    <pathelement location="${jscheme-jar}"/>        <!-- needed to build logutils -->
 	    <pathelement location="${tools-jar}"/>          <!-- needed to build rmic -->
 	</path>
     </target>
@@ -212,7 +210,6 @@
 
     <target name="prepare-dirs" depends="init">
 	<mkdir dir="${build.dir}"/>
-	<mkdir dir="${root.dir}/jscheme/lib"/>
 	<mkdir dir="${orblib.classes.dir}"/>
 	<mkdir dir="${lib.dir}"/>
 	<mkdir dir="${gensrc.dir}"/>
@@ -240,8 +237,7 @@
 	</javac>
     </target>
 
-    <!-- used to call run-all-jscheme here -->
-    <target name="compile" depends="init, prepare-dirs, get-dependencies, build-jscheme, orb-library, compile-enhancer, compile-logutils, compile-idl-compiler, run-all-idl, delete-java-sources, copy-resources">
+    <target name="compile" depends="init, prepare-dirs, get-dependencies, orb-library, compile-enhancer, compile-logutils, compile-idl-compiler, run-all-idl, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"
@@ -543,7 +539,7 @@
     <target name="archive-workspace" depends="init">
         <delete file="${releaselib.dir}/ws.zip"/>
         <zip destfile="${root.dir}/ws.zip" basedir="${root.dir}" level="9"
-         includes="build/**,jscheme/**,lib/**,make/**,orblib/**,src/**,test/**"/>
+         includes="build/**,lib/**,make/**,orblib/**,src/**,test/**"/>
         <move file="${root.dir}/ws.zip" todir="${releaselib.dir}"/>
     </target>
 
@@ -737,7 +733,7 @@
     
     <!-- ========================= CLEAN ========================= -->
 
-    <target name="clean" depends="init,clean-jscheme,clean-emma,clean-tests,clean-experimental">
+    <target name="clean" depends="init,clean-emma,clean-tests,clean-experimental">
         <delete file="${bnd.properties.file}"/>
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
@@ -1026,172 +1022,6 @@
             <param name="idl-gensrc-dir" value="${gensrc.dir}/com/sun/corba/se/spi/activation"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
-    </target>
-
-    <!-- Checks to see if the generated file for the jscheme script invocation exists
-         and if it does exist then has the jscheme script been changed in reference to 
-         the generated files  -->
-    <target name="check-minorcode-file-changed">
-        <basename property="only-file-name" suffix=".mc" file="${minorcode-file-name}"/>
-        <condition property="minorcode-file-changed">
-            <or>
-                <not>
-                    <available file="${output.dir}/${only-file-name}SystemException.java"/>
-                </not>
-                <not>
-                    <available file="${output.dir}/${only-file-name}SystemException.resource"/>
-                </not>
-                <uptodate property="minorcode-file-changed" targetfile="${minorcode-file-name}">
-                    <srcfiles dir="${output.dir}" includes="${only-file-name}SystemException.*"/>
-                </uptodate>
-            </or>
-        </condition>
-    </target>
-
-    <!-- Targets used to build Jscheme -->
-
-    <condition property="jscheme-not-available">
-        <not>
-            <available file="${jscheme-jar}"/>
-        </not>
-    </condition>
-
-    <macrodef name="run-jscheme">
-        <attribute name="command"/>
-        <sequential>
-            <java classname="jscheme.REPL" classpath="jscheme/src" fork="true" dir="${root.dir}/jscheme">
-                <arg value="bld/make.scm"/>
-                <arg value="-main"/>
-                <arg value="commandMain"/>
-                <arg value="@{command}"/>
-            </java>
-        </sequential>
-    </macrodef>
-
-    <target name="build-jscheme" depends="init" if="jscheme-not-available">
-        <javac sourcepath="" destdir="jscheme/src" srcdir="jscheme/src" classpath="jscheme/src">
-            <include name="jscheme/REPL.java"/>
-        </javac>
-        <run-jscheme command="-all"/>
-    </target>
-
-    <target name="clean-jscheme" depends="init">
-        <run-jscheme command="-clean"/>
-        <delete dir="${root.dir}/jscheme/lib"/>
-    </target>
-
-    <!-- Targets used to run Jscheme to generate minor code files -->
-
-   <macrodef name="jscheme-mc">
-        <attribute name="command"/>
-        <sequential>
-            <java classname="jscheme.REPL" classpathref="classpath.master" fork="true">
-	        <arg line="${jscheme-script-name}"/>
-		<arg line="-main main"/>
-	        <arg line="@{command}"/>
-	    </java>
-        </sequential>
-    </macrodef>
-
-    <!-- DON'T RUN THIS AGAIN: will overwrite modified Java source files!
-    <target name="gen-mc-interfaces" depends="init">
-        <property name="logging-spi-src.dir" value="${src.dir}/com/sun/corba/se/spi/logging"/>
-        <property name="jscheme.output.dir" value="${src.dir}/com/sun/corba/se/impl/logging"/>
-        <property name="jscheme-script-name" value="${src.dir}/com/sun/tools/corba/se/logutil/scripts/mc.scm"/>
-        <mkdir dir="${jscheme.output.dir}"/>
-	<jscheme-mc command="generate-logex-interface #f ${logging-spi-src.dir}/data/Activation.mc ${jscheme.output.dir}"/>
-	<jscheme-mc command="generate-logex-interface #f ${logging-spi-src.dir}/data/IOR.mc ${jscheme.output.dir}"/>
-	<jscheme-mc command="generate-logex-interface #f ${logging-spi-src.dir}/data/Interceptors.mc ${jscheme.output.dir}"/>
-	<jscheme-mc command="generate-logex-interface #f ${logging-spi-src.dir}/data/Naming.mc ${jscheme.output.dir}"/>
-	<jscheme-mc command="generate-logex-interface #f ${logging-spi-src.dir}/data/ORBUtil.mc ${jscheme.output.dir}"/>
-	<jscheme-mc command="generate-logex-interface #f ${logging-spi-src.dir}/data/POA.mc ${jscheme.output.dir}"/>
-	<jscheme-mc command="generate-logex-interface #f ${logging-spi-src.dir}/data/Util.mc ${jscheme.output.dir}"/>
-	<jscheme-mc command="generate-logex-interface #t ${logging-spi-src.dir}/data/OMG.mc ${jscheme.output.dir}"/>
-    </target>
-    -->
-
-    <!-- This target is called repeatedly for each jscheme invocation -->
-    <target name="call-jscheme" depends="check-minorcode-file-changed" if="minorcode-file-changed">
-        <echo message="Running jscheme on ${only-file-name}.mc"/>
-        <java classname="jscheme.REPL" classpathref="classpath.master" fork="true">
-            <classpath>
-                <pathelement location="${jscheme-jar}"/>
-                <pathelement location="${jschemelogutil-jar}"/>
-            </classpath>
-            <arg value="${jscheme-script-name}"/>
-            <arg line="-main main"/>
-            <arg value="make-class"/>
-            <arg value="${minorcode-file-name}"/>
-            <arg value="${output.dir}"/>
-        </java>
-        <java classname="jscheme.REPL" classpathref="classpath.master" fork="true">
-            <classpath>
-                <pathelement location="${jscheme-jar}"/>
-                <pathelement location="${jschemelogutil-jar}"/>
-            </classpath>
-            <arg value="${jscheme-script-name}"/>
-            <arg line="-main main"/>
-            <arg value="make-resource"/>
-            <arg value="${minorcode-file-name}"/>
-            <arg value="${output.dir}"/>
-        </java>
-    </target>
-
-    <!-- This target runs all the jscheme invocations -->
-    <target name="run-all-jscheme" depends="init">
-        <mkdir dir="${gensrc.dir}/com/sun/corba/se/impl/logging"/>
-        <property name="logging-spi-src.dir" value="${src.dir}/com/sun/corba/se/spi/logging"/>
-        <property name="jscheme.output.dir" value="${gensrc.dir}/com/sun/corba/se/impl/logging"/>
-        <property name="jscheme-script-name" value="${src.dir}/com/sun/tools/corba/se/logutil/scripts/mc.scm"/>
-        <java classname="jscheme.REPL" classpathref="classpath.master" fork="true">
-            <classpath>
-                <pathelement location="${jscheme-jar}"/>
-                <pathelement location="${jschemelogutil-jar}"/>
-            </classpath>
-            <arg value="${jscheme-script-name}"/>
-            <arg line="-main main"/>
-            <arg value="make-CORBALogDomains-classes"/>
-            <arg value="${logging-spi-src.dir}/data/LogDomains.mcd"/>
-            <arg value="${jscheme.output.dir}"/>
-        </java>
-        <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
-            <param name="minorcode-file-name" value="${logging-spi-src.dir}/data/Activation.mc"/>
-            <param name="output.dir" value="${jscheme.output.dir}"/>
-        </antcall>
-        <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
-            <param name="minorcode-file-name" value="${logging-spi-src.dir}/data/IOR.mc"/>
-            <param name="output.dir" value="${jscheme.output.dir}"/>
-        </antcall>
-        <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
-            <param name="minorcode-file-name" value="${logging-spi-src.dir}/data/Interceptors.mc"/>
-            <param name="output.dir" value="${jscheme.output.dir}"/>
-        </antcall>
-        <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
-            <param name="minorcode-file-name" value="${logging-spi-src.dir}/data/Naming.mc"/>
-            <param name="output.dir" value="${jscheme.output.dir}"/>
-        </antcall>
-        <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
-            <param name="minorcode-file-name" value="${logging-spi-src.dir}/data/OMG.mc"/>
-            <param name="output.dir" value="${jscheme.output.dir}"/>
-        </antcall>
-        <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
-            <param name="minorcode-file-name" value="${logging-spi-src.dir}/data/ORBUtil.mc"/>
-            <param name="output.dir" value="${jscheme.output.dir}"/>
-        </antcall>
-        <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
-            <param name="minorcode-file-name" value="${logging-spi-src.dir}/data/POA.mc"/>
-            <param name="output.dir" value="${jscheme.output.dir}"/>
-        </antcall>
-        <antcall target="call-jscheme" inheritAll="true" inheritRefs="true">
-            <param name="minorcode-file-name" value="${logging-spi-src.dir}/data/Util.mc"/>
-            <param name="output.dir" value="${jscheme.output.dir}"/>
-        </antcall>
-        <!-- Create the LogStrings.properties file from concatenating all
-             the *.resource files -->
-        <echo message="Concatenating resource files to create LogStrings.properties"/>
-        <concat destfile="${jscheme.output.dir}/LogStrings.properties">
-            <fileset dir="${jscheme.output.dir}" includes="*.resource"/>
-        </concat>
     </target>
 
     <target name="mavenize" depends="init" description="initialize maven ">

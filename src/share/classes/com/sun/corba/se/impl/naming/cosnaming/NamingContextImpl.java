@@ -91,6 +91,7 @@ import org.omg.CosNaming.NamingContextPackage.NotFoundReason;
  * to these methods are synchronized; these methods should
  * therefore not be synchronized.
  */
+@Naming
 public abstract class NamingContextImpl 
     extends NamingContextExtPOA
     implements NamingContextDataStore

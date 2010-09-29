@@ -69,6 +69,7 @@ import com.sun.corba.se.spi.trace.Naming;
  * @see TransientNamingContext
  * @see TransientBindingIterator
  */
+@Naming
 public class TransientNameService
 {
     private static final NamingSystemException wrapper =

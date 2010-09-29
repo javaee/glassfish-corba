@@ -66,6 +66,7 @@ import com.sun.corba.se.spi.trace.Naming;
  * @see TransientNameService
  * @see BootstrapServer
  */
+@Naming
 public class TransientNameServer
 {
     static private boolean debug = false ;

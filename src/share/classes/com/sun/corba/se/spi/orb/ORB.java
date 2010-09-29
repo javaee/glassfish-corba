@@ -77,15 +77,10 @@ import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.TaggedProfile ;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
-
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
-
-import com.sun.corba.se.spi.logging.LogWrapperFactory ;
-import com.sun.corba.se.spi.logging.LogWrapperBase ;
-import com.sun.corba.se.spi.logging.LogWrapperName ;
 
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 
@@ -118,11 +113,9 @@ import com.sun.corba.se.impl.ior.WireObjectKeyTemplate;
 
 import com.sun.corba.se.impl.transport.ByteBufferPoolImpl;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.logging.OMGSystemException ;
-import com.sun.corba.se.impl.logging.LogWrapperTable ;
-import com.sun.corba.se.impl.logging.LogWrapperTableImpl ;
-import com.sun.corba.se.impl.logging.LogWrapperTableStaticImpl ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
+
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory;
@@ -352,11 +345,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         }
     }
 
-    private LogWrapperTable logWrapperTable ;
-
-    private static LogWrapperTable staticLogWrapperTable = 
-	new LogWrapperTableStaticImpl() ;
-
     // mom MUST be initialized in a subclass by calling createManagedObjectManager.
     // In ORBSingleton, this happens in the constructor.  It ORBImpl, it cannot
     // happen in the constructor: instead, it must be called in post_init.
@@ -364,8 +352,10 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     
     // SystemException log wrappers.  Protected so that they can be used in
     // subclasses.
-    protected ORBUtilSystemException wrapper ; 
-    protected OMGSystemException omgWrapper ;
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+    protected static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
 
     // This map is needed for resolving recursive type code placeholders
     // based on the unique repository id.
@@ -409,9 +399,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     @Override
     public synchronized void destroy() {
-        logWrapperTable = null ;
-        wrapper = null ;
-        omgWrapper = null ;
         typeCodeMap = null ;
         primitiveTypeCodeConstants = null ;
         byteBufferPool = null ;
@@ -456,11 +443,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     
     protected ORB()
     {
-	logWrapperTable = new LogWrapperTableImpl( this ) ;
-
-	// Initialize logging first, since it is needed everywhere 
-	wrapper = logWrapperTable.get_RPC_PRESENTATION_ORBUtil() ;
-	omgWrapper = logWrapperTable.get_RPC_PRESENTATION_OMG() ;
 
 	typeCodeMap = new HashMap<String,TypeCodeImpl>();
 
@@ -536,7 +518,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	try {
 	    return primitiveTypeCodeConstants[kind] ;
 	} catch (Throwable t) {
-	    throw wrapper.invalidTypecodeKind( t, Integer.valueOf(kind) ) ;
+	    throw wrapper.invalidTypecodeKind( t, kind ) ;
 	}
     }
 
@@ -706,32 +688,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public static Logger getLogger( String name ) 
     {
 	return Logger.getLogger( name, ORBConstants.LOG_RESOURCE_FILE ) ;
-    }
-
-    /** get the log wrapper class (its type is dependent on the exceptionGroup)
-     * for the given log domain and exception group in this ORB instance.
-     */
-    public LogWrapperBase getLogWrapper( String logDomain, 
-        String exceptionGroup, LogWrapperFactory factory ) 
-    {
-	return factory.create( LogWrapperName.getLoggerName( this, logDomain )) ;
-    }
-
-    /** get the log wrapper class (its type is dependent on the exceptionGroup)
-     * for the given log domain and exception group in this ORB instance.
-     */
-    public static LogWrapperBase staticGetLogWrapper( String logDomain, 
-        String exceptionGroup, LogWrapperFactory factory ) 
-    {
-	return factory.create( LogWrapperName.getLoggerName( logDomain )) ;
-    }
-
-    public LogWrapperTable getLogWrapperTable() {
-	return logWrapperTable ;
-    }
-
-    public static LogWrapperTable getStaticLogWrapperTable() {
-	return staticLogWrapperTable ;
     }
 
     // get a reference to a ByteBufferPool, a pool of NIO ByteBuffers
@@ -925,6 +881,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
                 }
             }
 
+            @Override
             public String toString() {
                 return "ORBClassNameResolver" ;
             }
@@ -948,6 +905,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
                 }
             }
 
+            @Override
             public String toString() {
                 return "CompositeClassNameResolver[" + first + "," + second + "]" ;
             }

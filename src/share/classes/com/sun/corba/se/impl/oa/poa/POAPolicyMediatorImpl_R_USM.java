@@ -52,8 +52,6 @@ import org.omg.PortableServer.POAPackage.WrongPolicy ;
 import org.omg.PortableServer.POAPackage.ObjectNotActive ;
 import org.omg.PortableServer.POAPackage.NoServant ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
-
 import com.sun.corba.se.impl.oa.NullServantImpl ;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
@@ -74,8 +72,9 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
 	super( policies, poa ) ;
 	activator = null ;
 
-	if (!policies.useServantManager())
-	    throw poa.invocationWrapper().policyMediatorBadPolicyInFactory() ;
+	if (!policies.useServantManager()) {
+            throw wrapper.policyMediatorBadPolicyInFactory();
+        }
     }
    
     /* This handles a rather subtle bug (4939892).  The problem is that
@@ -134,7 +133,7 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
 
 	if (activator == null) {
 	    entry.incarnateFailure() ;
-	    throw poa.invocationWrapper().poaNoServantManager() ;
+	    throw wrapper.poaNoServantManager() ;
 	}
 
 	// Drop the POA lock during the incarnate call and
@@ -148,16 +147,16 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
 
 	    servant = activator.incarnate(id, poa);
 
-	    if (servant == null)
-		servant = new NullServantImpl(
-		    poa.omgInvocationWrapper().nullServantReturned() ) ;
+	    if (servant == null) {
+                servant =
+                    new NullServantImpl(omgWrapper.nullServantReturned());
+            }
 	} catch (ForwardRequest freq) {
 	    throw freq ;
 	} catch (SystemException exc) {
 	    throw exc ;
 	} catch (Throwable exc) {
-	    throw poa.invocationWrapper().poaServantActivatorLookupFailed(
-		exc ) ;
+	    throw wrapper.poaServantActivatorLookupFailed( exc ) ;
 	} finally {
 	    poa.lock() ;
 
@@ -187,7 +186,7 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
 		    if (activeObjectMap.contains((Servant)servant)) {
 			servantAlreadyAssignedToID() ;
 			entry.incarnateFailure() ;
-			throw poa.invocationWrapper().poaServantNotUnique() ;
+			throw wrapper.poaServantNotUnique() ;
 		    }
 		}
 
@@ -222,6 +221,7 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
 
 	    // Copy the elements in the set to an array to avoid
 	    // changes in the set due to concurrent modification
+            @SuppressWarnings("unchecked")
 	    ActiveObjectMap.Key[] keys = 
 		(ActiveObjectMap.Key[])keySet.toArray( 
 		    new ActiveObjectMap.Key[ keySet.size() ] ) ;
@@ -265,13 +265,15 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
     public void setServantManager( 
 	ServantManager servantManager ) throws WrongPolicy {
 
-	if (activator != null)
-	    throw poa.invocationWrapper().servantManagerAlreadySet() ;
+	if (activator != null) {
+            throw wrapper.servantManagerAlreadySet();
+        }
 
-	if (servantManager instanceof ServantActivator)
-	    activator = (ServantActivator)servantManager;
-	else
-	    throw poa.invocationWrapper().servantManagerBadType() ;
+	if (servantManager instanceof ServantActivator) {
+            activator = (ServantActivator) servantManager;
+        } else {
+            throw wrapper.servantManagerBadType();
+        }
     }
 
     public Servant getDefaultServant() throws NoServant, WrongPolicy 
@@ -304,6 +306,7 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
 	private void key( ActiveObjectMap.Key key ) { }
 
 	@Poa
+        @Override
 	public void run() {
 	    key( key ) ;
 
@@ -330,11 +333,13 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
     } 
 
     @Poa
+    @Override
     public void deactivateHelper( ActiveObjectMap.Key key, AOMEntry entry, 
 	Servant servant ) throws ObjectNotActive, WrongPolicy 
     {
-	if (activator == null)
-	    throw poa.invocationWrapper().poaNoServantManager() ;
+	if (activator == null) {
+            throw wrapper.poaNoServantManager();
+        }
 	    
 	Etherealizer eth = new Etherealizer( this, key, entry, servant ) ;
 	entry.startEtherealize( eth ) ;
@@ -348,9 +353,10 @@ public class POAPolicyMediatorImpl_R_USM extends POAPolicyMediatorBase_R {
 	AOMEntry entry = activeObjectMap.get(key);
 
 	Servant servant = activeObjectMap.getServant( entry ) ;
-	if (servant != null)
-	    return servant ;
-	else
-	    throw new ObjectNotActive() ;
+	if (servant != null) {
+            return servant;
+        } else {
+            throw new ObjectNotActive();
+        }
     }
 }

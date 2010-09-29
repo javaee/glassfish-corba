@@ -41,7 +41,6 @@
 package com.sun.corba.se.impl.presentation.rmi.codegen ;
 
 import java.io.ObjectInputStream ;
-import java.io.ObjectOutputStream ;
 import java.io.IOException ;
 import java.io.ObjectStreamException ;
 
@@ -53,15 +52,13 @@ import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
 import javax.rmi.CORBA.Stub ;
-import javax.rmi.PortableRemoteObject ;
 
-import sun.corba.Bridge ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.util.JDKBridge ;
 import com.sun.corba.se.impl.util.RepositoryId ;
 import com.sun.corba.se.impl.ior.StubIORImpl ;
@@ -75,8 +72,8 @@ public class CodegenStubBase extends Stub
     private transient PresentationManager.ClassData classData ;
     private transient InvocationHandler handler ;
 
-    private static ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private Object readResolve( ) throws ObjectStreamException
     {
@@ -107,8 +104,9 @@ public class CodegenStubBase extends Stub
 	final org.omg.CORBA.Object stub )
     {
 	StubDelegateImpl sdi = getStubDelegateImplField( stub ) ;
-	if (sdi == null)
-	    setDefaultDelegate( stub ) ;
+	if (sdi == null) {
+            setDefaultDelegate(stub);
+        }
 	sdi = getStubDelegateImplField( stub ) ;
 	return sdi ;
     }

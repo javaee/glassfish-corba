@@ -44,24 +44,24 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 import com.sun.corba.se.spi.ior.TaggedComponentBase;
 import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-
-import com.sun.corba.se.spi.orb.ORB ;
 
 public class LoadBalancingComponentImpl extends TaggedComponentBase 
     implements LoadBalancingComponent
 {
 
-    private static ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_OA_IOR_ORBUtil() ;
+    private static ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private int loadBalancingValue;
 
+    @Override
     public boolean equals(Object obj)
     {
-	if (!(obj instanceof LoadBalancingComponentImpl))
-	    return false ;
+	if (!(obj instanceof LoadBalancingComponentImpl)) {
+            return false;
+        }
 
 	LoadBalancingComponentImpl other = 
 	    (LoadBalancingComponentImpl)obj ;
@@ -69,11 +69,13 @@ public class LoadBalancingComponentImpl extends TaggedComponentBase
 	return loadBalancingValue == other.loadBalancingValue ;
     }
 
+    @Override
     public int hashCode()
     {
 	return loadBalancingValue;
     }
 
+    @Override
     public String toString()
     {
 	return "LoadBalancingComponentImpl[loadBalancingValue=" + loadBalancingValue + "]" ;
@@ -88,9 +90,9 @@ public class LoadBalancingComponentImpl extends TaggedComponentBase
 	if (theLoadBalancingValue < ORBConstants.FIRST_LOAD_BALANCING_VALUE ||
 	    theLoadBalancingValue > ORBConstants.LAST_LOAD_BALANCING_VALUE) {
 	    throw wrapper.invalidLoadBalancingComponentValue(
-		  new Integer(theLoadBalancingValue),
-		  new Integer(ORBConstants.FIRST_LOAD_BALANCING_VALUE),
-		  new Integer(ORBConstants.LAST_LOAD_BALANCING_VALUE));
+		  theLoadBalancingValue,
+		  ORBConstants.FIRST_LOAD_BALANCING_VALUE,
+		  ORBConstants.LAST_LOAD_BALANCING_VALUE );
 	}
         loadBalancingValue = theLoadBalancingValue;
     }

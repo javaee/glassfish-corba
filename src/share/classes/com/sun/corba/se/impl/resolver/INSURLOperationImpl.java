@@ -56,9 +56,7 @@ import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.sun.corba.se.spi.ior.IORFactories;
-import com.sun.corba.se.spi.ior.ObjectKeyFactory ;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
-import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
@@ -68,8 +66,8 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.resolver.Resolver;
 
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
 import com.sun.corba.se.impl.naming.namingutil.INSURLHandler;
 import com.sun.corba.se.impl.naming.namingutil.IIOPEndpointInfo;
 import com.sun.corba.se.impl.naming.namingutil.INSURL;
@@ -90,10 +88,12 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
  */
 public class INSURLOperationImpl implements Operation
 {
-    ORB orb;
-    ORBUtilSystemException wrapper ;
-    OMGSystemException omgWrapper ;
-    Resolver bootstrapResolver ;
+    private ORB orb;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
+    private Resolver bootstrapResolver ;
 
     // Root Naming Context for default resolution of names.
     private NamingContextExt rootNamingContextExt;
@@ -105,8 +105,6 @@ public class INSURLOperationImpl implements Operation
     public INSURLOperationImpl( ORB orb, Resolver bootstrapResolver )
     {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_ORB_RESOLVER_ORBUtil() ;
-	omgWrapper = orb.getLogWrapperTable().get_ORB_RESOLVER_OMG() ;
 	this.bootstrapResolver = bootstrapResolver ;
     }
 
@@ -119,8 +117,9 @@ public class INSURLOperationImpl implements Operation
     private org.omg.CORBA.Object getIORFromString( String str )
     {
 	// Length must be even for str to be valid
-	if ( (str.length() & 1) == 1 )
-	    throw wrapper.badStringifiedIorLen() ;
+	if ( (str.length() & 1) == 1 ) {
+            throw wrapper.badStringifiedIorLen();
+        }
 
 	byte[] buf = new byte[(str.length() - ORBConstants.STRINGIFY_PREFIX.length()) / NIBBLES_PER_BYTE];
 	for (int i=ORBConstants.STRINGIFY_PREFIX.length(), j=0; i < str.length(); i +=NIBBLES_PER_BYTE, j++) {
@@ -138,13 +137,13 @@ public class INSURLOperationImpl implements Operation
 	if (arg instanceof String) {
 	    String str = (String)arg ;
 
-	    if (str.startsWith( ORBConstants.STRINGIFY_PREFIX ))
-		// XXX handle this as just another URL scheme
-		return getIORFromString( str ) ;
-	    else {
+	    if (str.startsWith( ORBConstants.STRINGIFY_PREFIX )) {
+                return getIORFromString(str);
+            } else {
 		INSURL insURL = insURLHandler.parseURL( str ) ;
-		if (insURL == null)
-		    throw omgWrapper.soBadSchemeName( str ) ;
+		if (insURL == null) {
+                    throw omgWrapper.soBadSchemeName(str);
+                }
 		return resolveINSURL( insURL ) ;
 	    }
 	}
@@ -176,8 +175,9 @@ public class INSURLOperationImpl implements Operation
         if( theCorbaLocObject.getRIRFlag( ) )  {
             // result = bootstrapResolver.resolve(theCorbaLocObject.getKeyString());
 	    String keyString = theCorbaLocObject.getKeyString() ;
-	    if (keyString.equals( "" ))
-		keyString = "NameService" ;
+	    if (keyString.equals( "" )) {
+                keyString = "NameService";
+            }
 
 	    try {
 		result = orb.resolve_initial_references( keyString ) ;

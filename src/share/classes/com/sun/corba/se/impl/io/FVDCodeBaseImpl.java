@@ -49,11 +49,9 @@
 package com.sun.corba.se.impl.io;
 
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.CompletionStatus;
 
 import javax.rmi.CORBA.ValueHandler;
 
-import java.util.Properties;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Stack;
@@ -61,10 +59,8 @@ import java.util.Stack;
 import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
 
 import com.sun.org.omg.SendingContext._CodeBaseImplBase;
-import com.sun.org.omg.SendingContext.CodeBase;
-import com.sun.org.omg.SendingContext.CodeBaseHelper;
 
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
@@ -82,9 +78,8 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
     // having a delegate set.  
     private transient ORB orb = null;
 
-    private transient OMGSystemException wrapper = 
-	com.sun.corba.se.spi.orb.ORB
-	    .getStaticLogWrapperTable().get_RPC_ENCODING_OMG() ;
+    private static final OMGSystemException wrapper =
+        OMGSystemException.self ;
 
     // backward compatability so that appropriate rep-id calculations
     // can take place
@@ -107,22 +102,24 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
 	try{
             // Util.getCodebase may return null which would
             // cause a BAD_PARAM exception.
-	    String result = Util.getInstance().getCodebase(vhandler.getClassFromType(x));
-            if (result == null)
+	    String result = Util.getInstance().getCodebase(
+                vhandler.getClassFromType(x));
+            if (result == null) {
                 return "";
-            else
+            } else {
                 return result;
+            }
 	} catch(ClassNotFoundException cnfe){
-	    throw wrapper.missingLocalValueImpl( CompletionStatus.COMPLETED_MAYBE,
-		cnfe ) ;
+	    throw wrapper.missingLocalValueImpl( cnfe ) ;
 	}
     }
 
     public String[] implementations (String[] x){
 	String result[] = new String[x.length];
 
-	for (int i = 0; i < x.length; i++)
-	    result[i] = implementation(x[i]);
+	for (int i = 0; i < x.length; i++) {
+            result[i] = implementation(x[i]);
+        }
 
 	return result;
     }
@@ -137,8 +134,10 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
 		    result = ValueUtility.translate(_orb(), 
 			ObjectStreamClass.lookup(vhandler.getAnyClassFromType(x)), vhandler);
 		} catch(Throwable t){
-		    if (orb == null)
-			orb = ORB.init(); //d11638
+		    if (orb == null) {
+                        orb = ORB.init();
+                    }
+
 		    result = ValueUtility.translate(orb, 
 			ObjectStreamClass.lookup(vhandler.getAnyClassFromType(x)), vhandler);		
 		}
@@ -146,21 +145,22 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
 		if (result != null){
 		    fvds.put(x, result);
 		} else {
-		    throw wrapper.missingLocalValueImpl( CompletionStatus.COMPLETED_MAYBE);
+		    throw wrapper.missingLocalValueImpl();
 		}
 	    }
 				
 	    return result;
 	} catch(Throwable t){
-	    throw wrapper.incompatibleValueImpl(CompletionStatus.COMPLETED_MAYBE,t);
+	    throw wrapper.incompatibleValueImpl(t);
 	}
     }
 
     public FullValueDescription[] metas (String[] x){
 	FullValueDescription descriptions[] = new FullValueDescription[x.length];
 
-	for (int i = 0; i < x.length; i++)
-	    descriptions[i] = meta(x[i]);
+	for (int i = 0; i < x.length; i++) {
+            descriptions[i] = meta(x[i]);
+        }
 
 	return descriptions;
     }
@@ -169,7 +169,8 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
     public String[] bases (String x){
 	try {
 	    Stack<String> repIds = new Stack<String>();
-	    Class parent = ObjectStreamClass.lookup(vhandler.getClassFromType(x)).forClass().getSuperclass();
+	    Class parent = ObjectStreamClass.lookup(
+                vhandler.getClassFromType(x)).forClass().getSuperclass();
 
 	    while (!parent.equals(java.lang.Object.class)) {
 		repIds.push(vhandler.createForAnyType(parent));
@@ -177,12 +178,13 @@ public class FVDCodeBaseImpl extends _CodeBaseImplBase
 	    }
 
 	    String result[] = new String[repIds.size()];
-	    for (int i = result.length - 1; i >= 0; i++)
-		result[i] = repIds.pop();
+	    for (int i = result.length - 1; i >= 0; i++) {
+                result[i] = repIds.pop();
+            }
 
 	    return result;
 	} catch (Throwable t) {
-	    throw wrapper.missingLocalValueImpl( CompletionStatus.COMPLETED_MAYBE, t );
+	    throw wrapper.missingLocalValueImpl( t );
 	}
     }
 }

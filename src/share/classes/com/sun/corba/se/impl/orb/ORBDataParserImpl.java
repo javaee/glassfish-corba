@@ -43,8 +43,6 @@ package com.sun.corba.se.impl.orb ;
 import java.net.URL ;
 import java.net.InetAddress;
 
-import javax.management.ObjectName ;
-
 import org.omg.CORBA.CompletionStatus ;
 import org.omg.PortableInterceptor.ORBInitializer ;
 
@@ -61,14 +59,16 @@ import com.sun.corba.se.spi.transport.TcpTimeouts;
 
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 import com.sun.corba.se.impl.legacy.connection.USLPort;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 
 public class ORBDataParserImpl extends ParserImplTableBase implements ORBData 
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private ORB orb ;
-    private ORBUtilSystemException wrapper ;
     private String ORBInitialHost ; 
     private int ORBInitialPort ; 
     private String ORBServerHost ; 
@@ -101,7 +101,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private boolean persistentServerIdInitialized ; 
     private int persistentServerId ; 
     private boolean serverIsORBActivated ; 
-    private Class badServerIdHandlerClass ; 
+    private Class<?> badServerIdHandlerClass ;
     private CodeSetComponentInfo.CodeSetComponent charData ; 
     private CodeSetComponentInfo.CodeSetComponent wcharData ; 
     private ORBInitializer[] orbInitializers ; 
@@ -250,9 +250,15 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public int getGIOPBuffMgrStrategy(GIOPVersion gv) 
     {
         if(gv!=null){
-            if (gv.equals(GIOPVersion.V1_0)) return 0; //Always grow for 1.0
-            if (gv.equals(GIOPVersion.V1_1)) return giop11BuffMgr;
-            if (gv.equals(GIOPVersion.V1_2)) return giop12BuffMgr;
+            if (gv.equals(GIOPVersion.V1_0)) {
+                return 0;
+            } //Always grow for 1.0
+            if (gv.equals(GIOPVersion.V1_1)) {
+                return giop11BuffMgr;
+            }
+            if (gv.equals(GIOPVersion.V1_2)) {
+                return giop12BuffMgr;
+            }
         }
         //If a "faulty" GIOPVersion is passed, it's going to return 0;
         return 0;
@@ -295,11 +301,11 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 
     public int getPersistentServerPort()
     {
-	if ( persistentPortInitialized ) // this is a user-activated server
-	    return persistentServerPort;
+	if ( persistentPortInitialized ) {
+            return persistentServerPort;
+        }
 	else {
-	    throw wrapper.persistentServerportNotSet( 
-		CompletionStatus.COMPLETED_MAYBE );
+	    throw wrapper.persistentServerportNotSet( ) ;
 	}
     }
 
@@ -324,8 +330,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
         if ( persistentServerIdInitialized ) {
             return persistentServerId;
         } else {
-	    throw wrapper.persistentServeridNotSet( 
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.persistentServeridNotSet( ) ;
 	}
     }
 
@@ -492,7 +497,6 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 	super( ParserTable.get( 
             orb.defaultClassNameResolver() ).getParserData() ) ;
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
 	init( coll ) ;
     }
 

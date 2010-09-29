@@ -55,7 +55,7 @@ import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 
@@ -64,9 +64,8 @@ public class DefaultSocketFactory
 	ORBSocketFactory
 {
     private com.sun.corba.se.spi.orb.ORB orb;
-    private static ORBUtilSystemException wrapper = 
-	com.sun.corba.se.spi.orb.ORB.getStaticLogWrapperTable()
-	    .get_RPC_TRANSPORT_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     public DefaultSocketFactory()
     {

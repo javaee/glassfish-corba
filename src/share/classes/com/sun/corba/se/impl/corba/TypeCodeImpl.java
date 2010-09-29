@@ -62,7 +62,7 @@ import com.sun.corba.se.impl.encoding.TypeCodeOutputStream;
 import com.sun.corba.se.impl.encoding.TypeCodeReader;
 import com.sun.corba.se.impl.encoding.WrapperInputStream;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import com.sun.corba.se.spi.orbutil.copyobject.Copy;
 import com.sun.corba.se.spi.orbutil.copyobject.CopyType;
@@ -200,13 +200,13 @@ public final class TypeCodeImpl extends TypeCode {
     private transient ORB _orb; 		
 
     @Copy( CopyType.IDENTITY )
-    private transient ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     // Present only to suppress FindBugs warnings
     private void readObject( ObjectInputStream is ) throws IOException,
         ClassNotFoundException  {
         _orb = null ;
-        wrapper = null ;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -215,7 +215,6 @@ public final class TypeCodeImpl extends TypeCode {
     public TypeCodeImpl(ORB orb) {
 	// initialized to tk_null
 	_orb = orb;
-	wrapper = orb.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
     }
       
     public TypeCodeImpl(ORB orb, TypeCode tc)
@@ -1049,7 +1048,7 @@ public final class TypeCodeImpl extends TypeCode {
             throw wrapper.badkindCannotOccur() ;
         } catch (org.omg.CORBA.TypeCodePackage.Bounds e) {
             // impossible if we checked correctly above
-            throw wrapper.boundsCannotOccur() ;
+            throw wrapper.boundsCannotOccur( e ) ;
         }
 
         // Structural comparison succeeded!

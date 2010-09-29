@@ -52,8 +52,8 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
@@ -75,11 +75,13 @@ public class CDRInputObject
     implements com.sun.corba.se.impl.encoding.MarshalInputStream,
                org.omg.CORBA.DataInputStream, org.omg.CORBA.portable.ValueInputStream
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
     private static final long serialVersionUID = 3654171034620991056L;
 
     private transient ORB orb ;
-    private transient ORBUtilSystemException wrapper ;
-    private transient OMGSystemException omgWrapper ;
     private transient CDRInputStreamBase impl;
     private transient CorbaConnection corbaConnection;
     private transient Message header;
@@ -90,8 +92,6 @@ public class CDRInputObject
         ClassNotFoundException {
 
         orb = null ;
-        wrapper = null ;
-        omgWrapper = null ;
         impl = null ;
         corbaConnection = null ;
         header = null ;
@@ -110,14 +110,8 @@ public class CDRInputObject
                 case GIOPVersion.VERSION_1_1:
                     return new CDRInputStream_1_1();
                 case GIOPVersion.VERSION_1_2:
-		    if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
-			// Assumes JAVA_ENC_VERSION == 1
-			return new IDLJavaSerializationInputStream(directRead);
-		    }
                     return new CDRInputStream_1_2();
                 default:
-		    ORBUtilSystemException wrapper = 
-			orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 		    throw wrapper.unsupportedGiopVersion( version ) ;
             }
         }
@@ -147,8 +141,6 @@ public class CDRInputObject
         BufferManagerRead bufMgr, boolean directRead)
     {
         this.orb = (ORB)orb ;
-	this.wrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-	this.omgWrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_OMG() ;
 
         createCDRInputStream( version, encodingVersion, directRead,
             byteBuffer, size, littleEndian, bufMgr ) ;

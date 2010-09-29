@@ -43,9 +43,7 @@ package com.sun.corba.se.spi.extension ;
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.LocalObject ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 /** Policy used to support the request partitioning feature and to
@@ -53,8 +51,9 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 */
 public class LoadBalancingPolicy extends LocalObject implements Policy
 {
-    private static ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_OA_IOR_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private final int value;
 
     public LoadBalancingPolicy( int value ) 
@@ -62,11 +61,8 @@ public class LoadBalancingPolicy extends LocalObject implements Policy
 	if (value < ORBConstants.FIRST_LOAD_BALANCING_VALUE ||
 	    value > ORBConstants.LAST_LOAD_BALANCING_VALUE) {
 	    throw wrapper.invalidLoadBalancingPolicyValue(
-		  new Integer(value),
-	          new Integer(
-		      ORBConstants.FIRST_LOAD_BALANCING_VALUE),
-	          new Integer(
-		      ORBConstants.LAST_LOAD_BALANCING_VALUE));
+		  value, ORBConstants.FIRST_LOAD_BALANCING_VALUE,
+                  ORBConstants.LAST_LOAD_BALANCING_VALUE);
 	}
 	this.value = value;
     }
@@ -91,6 +87,7 @@ public class LoadBalancingPolicy extends LocalObject implements Policy
 	// NO-OP
     }
 
+    @Override
     public String toString() 
     {
 	return "LoadBalancingPolicy[" + value + "]" ;

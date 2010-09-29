@@ -41,9 +41,7 @@ package com.sun.corba.se.spi.orb ;
 
 import java.lang.reflect.Constructor ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /** Provides an extension to the OperationFactory for convertAction( Class ),
  * which takes a Class with a constructor that takes a String as an argument.
@@ -53,21 +51,22 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
  * version of OperationFactory that is in Java SE 5.0.
  */
 public class OperationFactoryExt {
-    private static final ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private OperationFactoryExt() {} 
 
     private static class ConvertAction implements Operation {
-	Class<?> cls ;
-	Constructor<?> cons ;
+	private Class<?> cls ;
+	private Constructor<?> cons ;
 
 	public ConvertAction( Class<?> cls ) {
 	    this.cls = cls ;
 	    try {
 		cons = cls.getConstructor( String.class ) ;
 	    } catch (Exception exc) {
-		throw wrapper.exceptionInConvertActionConstructor( exc, cls.getName() ) ;
+		throw wrapper.exceptionInConvertActionConstructor( exc,
+                    cls.getName() ) ;
 	    }
 	}
 
@@ -80,23 +79,28 @@ public class OperationFactoryExt {
 	    }
 	}
 
+        @Override
 	public String toString() {
 	    return "ConvertAction[" + cls.getName() + "]" ;
 	}
 
+        @Override
 	public boolean equals( Object obj ) 
 	{
-	    if (this==obj)
-		return true ;
+	    if (this==obj) {
+                return true;
+            }
 
-	    if (!(obj instanceof ConvertAction))
-		return false ;
+	    if (!(obj instanceof ConvertAction)) {
+                return false;
+            }
 
 	    ConvertAction other = (ConvertAction)obj ;
 
 	    return toString().equals( other.toString() ) ;
 	}
 
+        @Override
 	public int hashCode()
 	{
 	    return toString().hashCode() ;

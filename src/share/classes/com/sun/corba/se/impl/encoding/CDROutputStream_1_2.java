@@ -39,7 +39,6 @@
  */
 package com.sun.corba.se.impl.encoding;
 
-import org.omg.CORBA.CompletionStatus;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
@@ -408,7 +407,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     public void write_wchar_array(char[] value, int offset, int length)
     {
         if (value == null) {
-	    throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.nullParam();
         }   
 
         CodeSetConversion.CTBConverter converter = getWCharConverter();
@@ -454,7 +453,7 @@ public class CDROutputStream_1_2 extends CDROutputStream_1_1
     @Override
     public void write_wstring(String value) {
         if (value == null) {
-	    throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.nullParam();
         }
 
         // In GIOP 1.2, wstrings are not terminated by a null.  The

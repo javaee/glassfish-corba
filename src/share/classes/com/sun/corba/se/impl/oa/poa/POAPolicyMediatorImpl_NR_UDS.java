@@ -40,7 +40,6 @@
 
 package com.sun.corba.se.impl.oa.poa ;
 
-import java.util.Enumeration ;
 
 import org.omg.PortableServer.Servant ;
 import org.omg.PortableServer.ServantManager ;
@@ -52,8 +51,6 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.POAPackage.NoServant ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 /** Implementation of POAPolicyMediator that provides policy specific
  * operations on the POA.
@@ -66,11 +63,13 @@ public class POAPolicyMediatorImpl_NR_UDS extends POAPolicyMediatorBase {
 	super( policies, poa ) ;
 
 	// assert !policies.retainServants() && policies.useDefaultServant()
-	if (policies.retainServants())
-	    throw poa.invocationWrapper().policyMediatorBadPolicyInFactory() ;
+	if (policies.retainServants()) {
+            throw wrapper.policyMediatorBadPolicyInFactory();
+        }
 
-	if (!policies.useDefaultServant())
-	    throw poa.invocationWrapper().policyMediatorBadPolicyInFactory() ;
+	if (!policies.useDefaultServant()) {
+            throw wrapper.policyMediatorBadPolicyInFactory();
+        }
 
 	defaultServant = null ;
     }
@@ -78,8 +77,9 @@ public class POAPolicyMediatorImpl_NR_UDS extends POAPolicyMediatorBase {
     protected java.lang.Object internalGetServant( byte[] id, 
 	String operation ) throws ForwardRequest
     { 
-	if (defaultServant == null)
-	    throw poa.invocationWrapper().poaNoDefaultServant() ;
+	if (defaultServant == null) {
+            throw wrapper.poaNoDefaultServant();
+        }
 
 	return defaultServant;
     }
@@ -111,8 +111,9 @@ public class POAPolicyMediatorImpl_NR_UDS extends POAPolicyMediatorBase {
 
     public Servant getDefaultServant() throws NoServant, WrongPolicy 
     {
-	if (defaultServant == null)
-	    throw new NoServant();
+	if (defaultServant == null) {
+            throw new NoServant();
+        }
 	return defaultServant;
     }
 
@@ -141,8 +142,9 @@ public class POAPolicyMediatorImpl_NR_UDS extends POAPolicyMediatorBase {
     public Servant idToServant( byte[] id ) 
 	throws WrongPolicy, ObjectNotActive
     {
-	if (defaultServant != null)
-	    return defaultServant;
+	if (defaultServant != null) {
+            return defaultServant;
+        }
 
 	throw new ObjectNotActive() ;
     }

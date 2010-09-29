@@ -41,18 +41,13 @@
 package com.sun.corba.se.impl.naming.cosnaming;
 
 import java.util.Properties;
-import java.net.InetAddress;
 
 import org.omg.CORBA.ORB;
 
-import org.omg.CosNaming.NamingContext;
-
-import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
-
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
-import com.sun.corba.se.impl.logging.NamingSystemException;
-import java.util.Arrays;
+import com.sun.corba.se.spi.logging.NamingSystemException;
+import com.sun.corba.se.spi.trace.Naming;
 
 /**
  * Class TransientNameServer is a standalone application which
@@ -74,29 +69,10 @@ import java.util.Arrays;
 public class TransientNameServer
 {
     static private boolean debug = false ;
-    private static NamingSystemException wrapper = 
-	com.sun.corba.se.spi.orb.ORB.getStaticLogWrapperTable()
-	    .get_NAMING_Naming() ;
+    private static final NamingSystemException wrapper =
+        NamingSystemException.self ;
 
-    static public void trace( String msg ) {
-	if (debug)
-	    System.out.println( msg ) ;
-    }
-
-    static public void initDebug( String[] args ) {
-	// If debug was compiled to be true for testing purposes,
-	// don't change it.
-	if (debug)
-	    return ;
-	    
-	for (int ctr=0; ctr<args.length; ctr++)
-	    if (args[ctr].equalsIgnoreCase( "-debug" )) {
-		debug = true ;
-	    return ;
-        }
-	debug = false ;
-    }
-
+    @Naming
     private static org.omg.CORBA.Object initializeRootNamingContext( ORB orb ) {
         org.omg.CORBA.Object rootContext = null;
         try {
@@ -117,39 +93,36 @@ public class TransientNameServer
      * object and a BootstrapServer object, and then allows invocations to
      * happen.
      * @param args an array of strings representing the startup arguments.
-     */ 
+     */
+    @Naming
     public static void main(String args[]) {
-	initDebug( args ) ;
-
         boolean invalidHostOption = false;
         boolean orbInitialPort0 = false;
 
 	// Determine the initial bootstrap port to use
 	int initialPort = 0;
 	try {
-	    trace( "Transient name server started with args " + 
-                Arrays.asList( args ) ) ;
-
 	    // Create an ORB object
 	    Properties props = System.getProperties() ;
 
-	    props.put( ORBConstants.ORB_SERVER_ID_PROPERTY, ORBConstants.NAME_SERVICE_SERVER_ID ) ;
+	    props.put( ORBConstants.ORB_SERVER_ID_PROPERTY,
+                ORBConstants.NAME_SERVICE_SERVER_ID ) ;
             props.put( "org.omg.CORBA.ORBClass", 
                 "com.sun.corba.se.impl.orb.ORBImpl" );
 
 	    try {
-		// Try environment
 		String ips = System.getProperty( ORBConstants.INITIAL_PORT_PROPERTY ) ;
 		if (ips != null && ips.length() > 0 ) {
 		    initialPort = java.lang.Integer.parseInt(ips);
-                    // -Dorg.omg.CORBA.ORBInitialPort=0 is invalid
                     if( initialPort == 0 ) {
                         orbInitialPort0 = true;
 			throw wrapper.transientNameServerBadPort() ;
                     }
                 }
+
 		String hostName = 
                     System.getProperty( ORBConstants.INITIAL_HOST_PROPERTY ) ;
+
                 if( hostName != null ) {
                     invalidHostOption = true;
 		    throw wrapper.transientNameServerBadHost() ;
@@ -160,16 +133,16 @@ public class TransientNameServer
 
 	    // Let arguments override
 	    for (int i=0;i<args.length;i++) {
-		// Was the initial port specified?
 		if (args[i].equals("-ORBInitialPort") &&
 		    i < args.length-1) {
 		    initialPort = java.lang.Integer.parseInt(args[i+1]);
-                    // -ORBInitialPort 0 is invalid
+
                     if( initialPort == 0 ) {
                         orbInitialPort0 = true;
 			throw wrapper.transientNameServerBadPort() ;
                     }
 		}
+
                 if (args[i].equals("-ORBInitialHost" ) ) { 
                     invalidHostOption = true;
 		    throw wrapper.transientNameServerBadHost() ;
@@ -190,7 +163,6 @@ public class TransientNameServer
                java.lang.Integer.toString(initialPort) );
 
 	    org.omg.CORBA.ORB corb = ORB.init( args, props ) ;
-	    trace( "ORB object returned from init: " + corb ) ;
   
             org.omg.CORBA.Object ns = initializeRootNamingContext( corb ) ;
 	    ((com.sun.corba.se.org.omg.CORBA.ORB)corb).register_initial_reference( 
@@ -207,8 +179,6 @@ public class TransientNameServer
                      "tnameserv.usage"));
                 System.exit( 1 );
             }
-
-	    trace( "name service created" ) ;
 
 	    // This is used for handshaking by the IBM test framework!
 	    // Do not modify, unless another synchronization protocol is 
@@ -240,8 +210,6 @@ public class TransientNameServer
                 NamingUtils.errprint(CorbaResourceUtil.getText(
                     "tnameserv.usage"));
             }
-
-	    e.printStackTrace() ;
 	}
     }
 

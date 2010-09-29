@@ -41,7 +41,7 @@ package com.sun.corba.se.impl.orbutil;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import com.sun.corba.se.spi.trace.Cdr;
 
@@ -61,11 +61,14 @@ import com.sun.corba.se.spi.trace.Cdr;
  */
 @Cdr
 public class CacheTable<K> {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private class Entry<K> {
-        K key;
-        int val;
-        Entry next;  // this chains the collision list of table "map"
-        Entry rnext; // this chains the collision list of table "rmap" 
+        private K key;
+        private int val;
+        private Entry<K> next;  // this chains the collision list of table "map"
+        private Entry<K> rnext; // this chains the collision list of table "rmap"
         public Entry(K k, int v) {
             key = k;
             val = v;
@@ -88,12 +91,10 @@ public class CacheTable<K> {
     private Entry<K>[] rmap;
       
     private ORB orb;
-    private ORBUtilSystemException wrapper;
 
     public  CacheTable(String cacheType, ORB orb, boolean u) {
         this.orb = orb;
 	this.cacheType = cacheType ;
-	wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 	noReverseMap = u;
         size = INITIAL_SIZE;
 	threshhold = INITIAL_THRESHHOLD ;
@@ -103,17 +104,19 @@ public class CacheTable<K> {
 
     private void initTables() {
 	map = new Entry[size];
-	if (noReverseMap) 
-	    rmap = null ;
-	else
-	    rmap = new Entry[size] ;
+	if (noReverseMap) {
+            rmap = null;
+        } else {
+            rmap = new Entry[size];
+        }
     }
 
     private void grow() {
-	if (size == MAX_SIZE)
-	    return;	
+	if (size == MAX_SIZE) {
+            return;
+        }
 
-	Entry [] oldMap = map;
+	Entry<K>[] oldMap = map;
         int oldSize = size;
 	size <<= 1;
 	threshhold <<= 1 ;
@@ -121,8 +124,9 @@ public class CacheTable<K> {
 	initTables();
 	// now rehash the entries into the new table
 	for (int i = 0; i < oldSize; i++) {
-	    for (Entry<K> e = oldMap[i]; e != null; e = e.next)
-	        put_table(e.key, e.val);
+	    for (Entry<K> e = oldMap[i]; e != null; e = e.next) {
+                put_table(e.key, e.val);
+            }
 	}
     }
 
@@ -152,8 +156,9 @@ public class CacheTable<K> {
     public final void put(K key, int val) {
 	if (put_table(key, val)) {
 	    entryCount++;
-	    if (entryCount > threshhold)
-		grow();
+	    if (entryCount > threshhold) {
+                grow();
+            }
 	}
     }
 
@@ -161,7 +166,7 @@ public class CacheTable<K> {
     private boolean put_table(K key, int val) {
 	int index = hash(key);
 
-	for (Entry e = map[index]; e != null; e = e.next) {
+	for (Entry<K> e = map[index]; e != null; e = e.next) {
 	    if (e.key == key) {
 	        if (e.val != val) {
 		    // duplicateIndirectionOffset error here is not an error:
@@ -179,7 +184,7 @@ public class CacheTable<K> {
 	    }
         }
 	
-	Entry newEntry = new Entry(key, val);
+	Entry<K> newEntry = new Entry<K>(key, val);
 	newEntry.next = map[index];
 	map[index] = newEntry;
 	if (!noReverseMap) {
@@ -199,9 +204,10 @@ public class CacheTable<K> {
      */
     public final int getVal(K key) {
 	int index = hash(key);
-        for (Entry e = map[index]; e != null; e = e.next) {
-            if (e.key == key) 
+        for (Entry<K> e = map[index]; e != null; e = e.next) {
+            if (e.key == key) {
                 return e.val;
+            }
         }
 
         return -1;
@@ -214,13 +220,15 @@ public class CacheTable<K> {
     /** Return the key where (key,val) is present in the map.
      */
     public final K getKey(int val) {
-	if (noReverseMap)
-	    throw wrapper.getKeyInvalidInCacheTable() ;
+	if (noReverseMap) {
+            throw wrapper.getKeyInvalidInCacheTable();
+        }
 
 	int index = hash(val);
         for (Entry<K> e = rmap[index]; e != null; e = e.rnext) {
-            if (e.val == val)
+            if (e.val == val) {
                 return e.key;
+            }
         }
 
         return null;

@@ -66,14 +66,10 @@ import com.sun.org.omg.SendingContext.CodeBaseHelper;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
-
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
- 
 
-import com.sun.corba.se.impl.logging.OMGSystemException;
-import com.sun.corba.se.impl.logging.UtilSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.UtilSystemException;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
@@ -84,6 +80,11 @@ import com.sun.corba.se.spi.trace.ValueHandlerRead ;
 @ValueHandlerRead
 @ValueHandlerWrite
 public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat {
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
+    protected static final UtilSystemException utilWrapper =
+        UtilSystemException.self ;
+
     // Property to override our maximum stream format version
     public static final String FORMAT_VERSION_PROPERTY
         = "com.sun.corba.se.MaxStreamFormatVersion";
@@ -115,19 +116,20 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             });
 
             // The property wasn't set
-            if (propValue == null)
+            if (propValue == null) {
                 return MAX_SUPPORTED_FORMAT_VERSION;
+            }
 
             byte result = Byte.parseByte(propValue);
 
             // REVISIT.  Just set to MAX_SUPPORTED_FORMAT_VERSION
             // or really let the system shutdown with this Error?
-            if (result < 1 || result > MAX_SUPPORTED_FORMAT_VERSION)
-		// XXX I18N, logging needed.
-                throw new ExceptionInInitializerError("Invalid stream format version: "
-                                                      + result
-                                                      + ".  Valid range is 1 through "
-                                                      + MAX_SUPPORTED_FORMAT_VERSION);
+            if (result < 1 || result > MAX_SUPPORTED_FORMAT_VERSION) {
+                throw new ExceptionInInitializerError(
+                    "Invalid stream format version: " +
+                    result + ".  Valid range is 1 through " +
+                    MAX_SUPPORTED_FORMAT_VERSION);
+            }
 
             return result;
 
@@ -154,11 +156,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
     private IIOPOutputStream outputStreamBridge = null;
     private IIOPInputStream inputStreamBridge = null;
 
-    private OMGSystemException omgWrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_ENCODING_OMG() ;
-    protected UtilSystemException utilWrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_ENCODING_Util() ;
-
     // See javax.rmi.CORBA.ValueHandlerMultiFormat
     public byte getMaximumStreamFormatVersion() {
         return MAX_STREAM_FORMAT_VERSION;
@@ -177,7 +174,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             }
         } else if (streamFormatVersion != 1) {
 	    throw omgWrapper.invalidStreamFormatVersion( 
-		Integer.valueOf(streamFormatVersion) ) ;
+		streamFormatVersion ) ;
         }
 
         writeValueWithVersion( out, value, streamFormatVersion);
@@ -206,9 +203,12 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 
         IIOPOutputStream jdkToOrbOutputStreamBridge = null;
 
-        if (outputStreamPairs == null)
-            outputStreamPairs = Collections.synchronizedMap(
-                new HashMap<org.omg.CORBA.portable.OutputStream,IIOPOutputStream>());
+        if (outputStreamPairs == null) {
+            outputStreamPairs =
+                Collections.synchronizedMap(
+                    new HashMap<org.omg.CORBA.portable.OutputStream,
+                        IIOPOutputStream>());
+        }
 
         jdkToOrbOutputStreamBridge = outputStreamPairs.get(_out);
 
@@ -234,12 +234,13 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 	org.omg.CORBA_2_3.portable.OutputStream out, 
 	java.io.Serializable value, byte streamFormatVersion) {
 
-        Class clazz = value.getClass();
+        Class<?> clazz = value.getClass();
         ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-        if (cinfo.isArray())
+        if (cinfo.isArray()) {
             write_Array(out, value, clazz.getComponentType());
-        else
+        } else {
             bridge.simpleWriteObject(value, streamFormatVersion);
+        }
     }
 
     /**
@@ -263,14 +264,16 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             (org.omg.CORBA_2_3.portable.InputStream) _in;
 
         IIOPInputStream jdkToOrbInputStreamBridge = null;
-        if (inputStreamPairs == null)
-            inputStreamPairs = Collections.synchronizedMap(
-                new HashMap<org.omg.CORBA.portable.InputStream,IIOPInputStream>());
+        if (inputStreamPairs == null) {
+            inputStreamPairs =
+                Collections.synchronizedMap(
+                    new HashMap<org.omg.CORBA.portable.InputStream,
+                        IIOPInputStream>());
+        }
 
         jdkToOrbInputStreamBridge = inputStreamPairs.get(_in);
 
         if (jdkToOrbInputStreamBridge == null) {
-
             jdkToOrbInputStreamBridge = createInputStream();
             jdkToOrbInputStreamBridge.setOrbStream(in);
             jdkToOrbInputStreamBridge.setSender(sender);
@@ -281,8 +284,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 
         try {
             jdkToOrbInputStreamBridge.increaseRecursionDepth();
-            result = (java.io.Serializable) readValueInternal(
-                jdkToOrbInputStreamBridge, in, offset, clazz, repositoryID, sender);
+            result = readValueInternal(jdkToOrbInputStreamBridge, in, offset,
+                clazz, repositoryID, sender);
         } finally {
             if (jdkToOrbInputStreamBridge.decreaseRecursionDepth() == 0) {
                 inputStreamPairs.remove(_in);
@@ -583,16 +586,17 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             int i;
 
 	    if (sequence == null) {
-		for (i = 0; i < length; i++)
-		    in.read_value();
+		for (i = 0; i < length; i++) {
+                    in.read_value();
+                }
 
 		return null;
 	    }
 			
             OperationTracer.startReadArray( sequence.getName(), length ) ;
 
-	    Class componentType = sequence.getComponentType();
-	    Class actualType = componentType;
+	    Class<?> componentType = sequence.getComponentType();
+	    Class<?> actualType = componentType;
 	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( 
 		componentType ) ;
 
@@ -713,7 +717,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 				componentType);
                             String repID = RepositoryId.createForAnyType(
 				componentType);
-                            Class stubType = 
+                            Class<?> stubType =
 				Utility.loadStubClass(repID, codebase, 
 				    componentType); 
 			    actualType = stubType;
@@ -740,10 +744,9 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                             }
                             break;
                         case kAbstractType: 
-                            if (!narrow)
-                                array[i] = (Object)in.read_abstract_interface(
-				    actualType); 
-                            else {
+                            if (!narrow) {
+                                array[i] = in.read_abstract_interface(actualType);
+                            } else {
                                 array[i] = Utility.readAbstractAndNarrow(in, 
 				    actualType);
                             }

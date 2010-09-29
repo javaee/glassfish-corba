@@ -58,7 +58,7 @@ import org.osgi.service.packageadmin.ExportedPackage ;
 
 import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /** OSGi class that monitors which bundles provide classes that the ORB
  * needs to instantiate for initialization.  This class is part of the
@@ -75,8 +75,8 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
  * @author ken
  */
 public class OSGIListener implements BundleActivator, SynchronousBundleListener {
-    private static ORBUtilSystemException wrapper =
-        com.sun.corba.se.spi.orb.ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private static final String ORB_PROVIDER_KEY = "ORB-Class-Provider" ;
 
@@ -225,14 +225,17 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                     String version = rest.substring( index+1 ) ;
                     // version is a version range
                     if (pkgAdmin != null) {
-                        Bundle[] defBundles = pkgAdmin.getBundles( name, version ) ;
+                        Bundle[] defBundles = pkgAdmin.getBundles( name,
+                            version ) ;
                         if (defBundles != null) {
                             // I think this is the highest available version
                             try {
-                                wrapper.foundClassInBundleVersion( className, name, version ) ;
+                                wrapper.foundClassInBundleVersion( className,
+                                    name, version ) ;
                                 return defBundles[0].loadClass( className ) ;
                             } catch (ClassNotFoundException cnfe) {
-                                wrapper.classNotFoundInBundleVersion( className, name, version ) ;
+                                wrapper.classNotFoundInBundleVersion( className,
+                                    name, version ) ;
                                 // fall through to return null
                             }
                         }

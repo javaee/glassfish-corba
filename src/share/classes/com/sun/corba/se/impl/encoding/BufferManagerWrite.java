@@ -42,9 +42,7 @@ package com.sun.corba.se.impl.encoding;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 /**
  * Defines the contract between the BufferManager and
@@ -57,12 +55,12 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 public abstract class BufferManagerWrite
 {
     protected ORB orb ;
-    protected ORBUtilSystemException wrapper ; 
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     BufferManagerWrite( ORB orb ) 
     {
 	this.orb = orb ;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
     }
 
     /**

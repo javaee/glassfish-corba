@@ -52,33 +52,33 @@ import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.io.NotActiveException;
 import java.io.ObjectInputStream;
-import java.util.*;
 
 import org.omg.CORBA.portable.ValueInputStream;
 
-import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersion;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
-import com.sun.corba.se.impl.logging.UtilSystemException;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.UtilSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 
-import com.sun.corba.se.impl.orbutil.DprintUtil ;
 import com.sun.corba.se.spi.trace.StreamFormatVersion;
+import java.util.HashMap;
+import java.util.Map;
 
 @StreamFormatVersion
 public abstract class InputStreamHook extends ObjectInputStream
 {
     // These should be visible in all the nested classes
-    static final OMGSystemException omgWrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_ENCODING_OMG() ;
+    static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
 
-    static final UtilSystemException utilWrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_ENCODING_Util() ;
+    static final UtilSystemException utilWrapper =
+        UtilSystemException.self ;
+
 
     private class HookGetFields extends ObjectInputStream.GetField {
-	private Map fields = null;
+	private Map<String,Object> fields = null;
 
-	HookGetFields(Map fields){
+	HookGetFields(Map<String,Object> fields){
 	    this.fields = fields;
 	}
 
@@ -105,9 +105,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public boolean get(String name, boolean defvalue) 
 	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name))
-		return defvalue;
-	    else return ((Boolean)fields.get(name)).booleanValue();
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return ((Boolean) fields.get(name)).booleanValue();
+            }
 	}
 		
 	/**
@@ -115,9 +117,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public char get(String name, char defvalue) 
 	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name))
-		return defvalue;
-	    else return ((Character)fields.get(name)).charValue();
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return ((Character) fields.get(name)).charValue();
+            }
 
 	}
 		
@@ -126,9 +130,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public byte get(String name, byte defvalue) 
 	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name))
-		return defvalue;
-	    else return ((Byte)fields.get(name)).byteValue();
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return ((Byte) fields.get(name)).byteValue();
+            }
 
 	}
 		
@@ -137,9 +143,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public short get(String name, short defvalue) 
 	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name))
-		return defvalue;
-	    else return ((Short)fields.get(name)).shortValue();
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return ((Short) fields.get(name)).shortValue();
+            }
 
 	}
 		
@@ -148,10 +156,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public int get(String name, int defvalue) 
 	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name))
-		return defvalue;
-	    else return ((Integer)fields.get(name)).intValue();
-
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return ((Integer) fields.get(name)).intValue();
+            }
 	}
 		
 	/**
@@ -159,10 +168,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public long get(String name, long defvalue)
 	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name))
-		return defvalue;
-	    else return ((Long)fields.get(name)).longValue();
-
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return ((Long) fields.get(name)).longValue();
+            }
 	}
 		
 	/**
@@ -170,10 +180,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public float get(String name, float defvalue) 
 	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name))
-		return defvalue;
-	    else return ((Float)fields.get(name)).floatValue();
-
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return ((Float) fields.get(name)).floatValue();
+            }
 	}
 		
 	/**
@@ -181,10 +192,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public double get(String name, double defvalue) 
 	    throws IOException, IllegalArgumentException  {
-	    if (defaulted(name))
-		return defvalue;
-	    else return ((Double)fields.get(name)).doubleValue();
-
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return ((Double) fields.get(name)).doubleValue();
+            }
 	}
 		
 	/**
@@ -192,9 +204,11 @@ public abstract class InputStreamHook extends ObjectInputStream
 	 */
 	public Object get(String name, Object defvalue) 
 	    throws IOException, IllegalArgumentException {
-	    if (defaulted(name))
-		return defvalue;
-	    else return fields.get(name);
+	    if (defaulted(name)) {
+                return defvalue;
+            } else {
+                return fields.get(name);
+            }
 
 	}
 		
@@ -351,12 +365,14 @@ public abstract class InputStreamHook extends ObjectInputStream
             throws IOException {
 
             if (hasReadObject) {
-                if (calledDefaultWriteObject)
+                if (calledDefaultWriteObject) {
                     stream.setState(IN_READ_OBJECT_DEFAULTS_SENT);
-                else {
+                } else {
                     try {
-                        if (stream.getStreamFormatVersion() == 2)
-                            ((ValueInputStream)stream.getOrbStream()).start_value();
+                        if (stream.getStreamFormatVersion() == 2) {
+                            ((ValueInputStream) stream.getOrbStream())
+                                .start_value();
+                        }
                     } catch( Exception e ) {
                         // This will happen for Big Integer which uses 
                         // writeFields in it's writeObject. We should be past
@@ -369,11 +385,11 @@ public abstract class InputStreamHook extends ObjectInputStream
                     stream.setState(IN_READ_OBJECT_OPT_DATA);
                 }
             } else {
-                if (calledDefaultWriteObject)
+                if (calledDefaultWriteObject) {
                     stream.setState(NO_READ_OBJECT_DEFAULTS_SENT);
-                else
-		    // XXX I18N and logging needed.
+                } else {
                     throw new StreamCorruptedException("No default data sent");
+                }
             }
         }
     }
@@ -461,8 +477,9 @@ public abstract class InputStreamHook extends ObjectInputStream
         public void endDefaultReadObjectOverride(InputStreamHook stream) throws IOException {
 
             // Read the fake valuetype header in stream format version 2
-            if (stream.getStreamFormatVersion() == 2) 
-                ((ValueInputStream)stream.getOrbStream()).start_value();
+            if (stream.getStreamFormatVersion() == 2) {
+                ((ValueInputStream) stream.getOrbStream()).start_value();
+            }
 
             stream.setState(IN_READ_OBJECT_OPT_DATA);
         }

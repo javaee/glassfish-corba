@@ -71,8 +71,8 @@ import javax.rmi.CORBA.Tie;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
-import com.sun.corba.se.impl.logging.UtilSystemException ;
-import com.sun.corba.se.impl.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.UtilSystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
@@ -88,14 +88,14 @@ public final class Utility {
     public static final String DYNAMIC_STUB_SUFFIX = "_DynamicStub" ;
     public static final String IDL_STUB_SUFFIX = "Stub";
     public static final String TIE_SUFIX = "_Tie";
-    private static IdentityHashtable tieCache = new IdentityHashtable();
-    private static IdentityHashtable tieToStubCache = new IdentityHashtable();
-    private static IdentityHashtable stubToTieCache = new IdentityHashtable();
-    private static Object CACHE_MISS = new Object();
-    private static UtilSystemException wrapper = 
-	com.sun.corba.se.spi.orb.ORB.getStaticLogWrapperTable().get_UTIL_Util() ;
-    private static OMGSystemException omgWrapper =  
-	com.sun.corba.se.spi.orb.ORB.getStaticLogWrapperTable().get_UTIL_OMG() ;
+    private static final IdentityHashtable tieCache = new IdentityHashtable();
+    private static final IdentityHashtable tieToStubCache = new IdentityHashtable();
+    private static final IdentityHashtable stubToTieCache = new IdentityHashtable();
+    private static final Object CACHE_MISS = new Object();
+    private static final UtilSystemException wrapper =
+        UtilSystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
 
     /**
      * Ensure that stubs, ties, and implementation objects
@@ -182,7 +182,7 @@ public final class Utility {
      */
     public static Tie loadTie(Remote obj) {
     	Tie result = null;
-    	Class objClass = obj.getClass();
+    	Class<?> objClass = obj.getClass();
     	
     	// Have we tried to find this guy before?
     	
@@ -284,7 +284,7 @@ public final class Utility {
 	ClassLoader loader, Class expectedType, 
 	ClassLoader expectedTypeClassLoader) throws ClassNotFoundException 
     {
-	Class loadedClass = null;
+	Class<?> loadedClass = null;
 
 	try {
             //Sequence finding of the stubs according to spec
@@ -307,11 +307,13 @@ public final class Utility {
                 loadedClass = Util.getInstance().loadClass(className, remoteCodebase, 
                     loader);
             }
-            if (expectedType == null)
-	        return loadedClass;
+            if (expectedType == null) {
+                return loadedClass;
+            }
 	} catch (ClassNotFoundException cnfe) {
-	    if (expectedType == null)
-	        throw cnfe;
+	    if (expectedType == null) {
+                throw cnfe;
+            }
 	}
 	
         // If no class was loaded, or if the loaded class is not of the 
@@ -322,14 +324,14 @@ public final class Utility {
 	// Does the OMG standard algorithm need to be changed to include
 	// this step?
         if (loadedClass == null || !expectedType.isAssignableFrom(loadedClass)){
-            if (expectedType.getClassLoader() != expectedTypeClassLoader)
-                throw new IllegalArgumentException(
-                    "expectedTypeClassLoader not class loader of "  + 
+            if (expectedType.getClassLoader() != expectedTypeClassLoader) {
+                throw new IllegalArgumentException("expectedTypeClassLoader not class loader of " +
                     "expected Type.");
+            }
 
-            if (expectedTypeClassLoader != null)
-		loadedClass = expectedTypeClassLoader.loadClass(className);
-            else {
+            if (expectedTypeClassLoader != null) {
+                loadedClass = expectedTypeClassLoader.loadClass(className);
+            } else {
                 loadedClass = ORBClassLoader.loadClass(className);
             }
         }
@@ -352,15 +354,18 @@ public final class Utility {
                                            ClassLoader relatedTypeClassLoader)
         throws ClassNotFoundException 
     {
-        if (relatedType == null)
-	    return Util.getInstance().loadClass(className, remoteCodebase, loader);
+        if (relatedType == null) {
+            return Util.getInstance().loadClass(className, remoteCodebase,
+                loader);
+        }
 
-	Class loadedClass = null;
+	Class<?> loadedClass = null;
 	try {
 	    loadedClass = Util.getInstance().loadClass(className, remoteCodebase, loader);
 	} catch (ClassNotFoundException cnfe) {
-	    if (relatedType.getClassLoader() == null)
-        	throw cnfe;
+	    if (relatedType.getClassLoader() == null) {
+                throw cnfe;
+            }
 	}
 	
         // If no class was not loaded, or if the loaded class is not of the 
@@ -375,12 +380,13 @@ public final class Utility {
 	     loadedClass.getClassLoader().loadClass(relatedType.getName()) != 
                  relatedType))
         {
-            if (relatedType.getClassLoader() != relatedTypeClassLoader)
-                throw new IllegalArgumentException(
-                    "relatedTypeClassLoader not class loader of relatedType.");
+            if (relatedType.getClassLoader() != relatedTypeClassLoader) {
+                throw new IllegalArgumentException("relatedTypeClassLoader not class loader of relatedType.");
+            }
 
-            if (relatedTypeClassLoader != null)
-		loadedClass = relatedTypeClassLoader.loadClass(className);
+            if (relatedTypeClassLoader != null) {
+                loadedClass = relatedTypeClassLoader.loadClass(className);
+            }
         }
 	
 	return loadedClass;
@@ -397,14 +403,18 @@ public final class Utility {
 	String className = null;
         if (clazz != null) {
 	    className = clazz.getName();
-	    if (codebase == null)
-	        codebase = Util.getInstance().getCodebase(clazz);
+	    if (codebase == null) {
+                codebase =
+                    Util.getInstance().getCodebase(clazz);
+            }
 	} else {
-	    if (repId != null) 
-                className = RepositoryId.cache.getId(repId).getClassName();
-	    if (className == null) // no repId or unrecognized repId
-		throw wrapper.unableLocateValueHelper( 
-		    CompletionStatus.COMPLETED_MAYBE);
+	    if (repId != null) {
+                className =
+                    RepositoryId.cache.getId(repId).getClassName();
+            }
+	    if (className == null) {
+                throw wrapper.unableLocateValueHelper();
+            }
 	}
 
     	try {
@@ -416,17 +426,13 @@ public final class Utility {
 	    return (BoxedValueHelper)helperClass.newInstance();
 
     	} catch (ClassNotFoundException cnfe) {
-	    throw wrapper.unableLocateValueHelper( CompletionStatus.COMPLETED_MAYBE,
-		cnfe );
+	    throw wrapper.unableLocateValueHelper( cnfe );
         } catch (IllegalAccessException iae) {
-	    throw wrapper.unableLocateValueHelper( CompletionStatus.COMPLETED_MAYBE,
-		iae );
+	    throw wrapper.unableLocateValueHelper( iae );
         } catch (InstantiationException ie) {
-	    throw wrapper.unableLocateValueHelper( CompletionStatus.COMPLETED_MAYBE,
-		ie );
+	    throw wrapper.unableLocateValueHelper( ie );
         } catch (ClassCastException cce) {
-	    throw wrapper.unableLocateValueHelper( CompletionStatus.COMPLETED_MAYBE,
-		cce );
+	    throw wrapper.unableLocateValueHelper( cce );
         }    
     }
 
@@ -451,14 +457,18 @@ public final class Utility {
 	String className = null;
         if (clazz != null) {
 	    className = clazz.getName();
-	    if (codebase == null)
-	        codebase = Util.getInstance().getCodebase(clazz);
+	    if (codebase == null) {
+                codebase =
+                    Util.getInstance().getCodebase(clazz);
+            }
 	} else {
-	    if (repId != null) 
-                className = RepositoryId.cache.getId(repId).getClassName();
-	    if (className == null) // no repId or unrecognized repId
-		throw omgWrapper.unableLocateValueFactory( 
-		    CompletionStatus.COMPLETED_MAYBE);
+	    if (repId != null) {
+                className =
+                    RepositoryId.cache.getId(repId).getClassName();
+            }
+	    if (className == null) {
+                throw omgWrapper.unableLocateValueFactory();
+            }
 	}
 
 	// if earlier search found a non-default factory, or the same default
@@ -477,17 +487,13 @@ public final class Utility {
 	    return (ValueFactory)factoryClass.newInstance();
 
     	} catch (ClassNotFoundException cnfe) {
-	    throw omgWrapper.unableLocateValueFactory( 
-		CompletionStatus.COMPLETED_MAYBE, cnfe);
+	    throw omgWrapper.unableLocateValueFactory( cnfe);
         } catch (IllegalAccessException iae) {
-	    throw omgWrapper.unableLocateValueFactory( 
-		CompletionStatus.COMPLETED_MAYBE, iae);
+	    throw omgWrapper.unableLocateValueFactory( iae);
         } catch (InstantiationException ie) {
-	    throw omgWrapper.unableLocateValueFactory( 
-		CompletionStatus.COMPLETED_MAYBE, ie);
+	    throw omgWrapper.unableLocateValueFactory( ie);
         } catch (ClassCastException cce) {
-	    throw omgWrapper.unableLocateValueFactory( 
-		CompletionStatus.COMPLETED_MAYBE, cce);
+	    throw omgWrapper.unableLocateValueFactory( cce);
         }    
     }
 
@@ -655,8 +661,9 @@ public final class Utility {
 			errors.add( e ) ;
 		    }
 			    
-		    if (onlyMostDerived) 
-			break;
+		    if (onlyMostDerived) {
+                        break;
+                    }
 		}
 
 		// Report errors.  Errors are logged at FINE level if
@@ -755,8 +762,9 @@ public final class Utility {
     public static void purgeTieAndServant (Tie tie) {
 	synchronized (tieCache) {
 	    Object target = tie.getTarget();
-	    if (target != null)
-		tieCache.remove(target);
+	    if (target != null) {
+                tieCache.remove(target);
+            }
 	}
     }
 
@@ -897,8 +905,10 @@ public final class Utility {
 	boolean isDynamic ) 
     {
 	String name = stubNameForCompiler( className, isDynamic ) ;
-	if (PackagePrefixChecker.hasOffendingPrefix( name ))
-	    name = PackagePrefixChecker.packagePrefix() + name ;
+	if (PackagePrefixChecker.hasOffendingPrefix( name )) {
+            name =
+                PackagePrefixChecker.packagePrefix() + name;
+        }
 	return name ;
     }
 
@@ -959,8 +969,7 @@ public final class Utility {
      * Throws the CORBA equivalent of a java.io.NotSerializableException
      */
     public static void throwNotSerializableForCorba(String className) {
-	throw omgWrapper.notSerializable( CompletionStatus.COMPLETED_MAYBE, 
-	    className ) ;
+	throw omgWrapper.notSerializable( className ) ;
     }
 
     /**
@@ -1001,10 +1010,11 @@ public final class Utility {
 	throws ClassCastException 
     {
         Object result = in.read_Object();
-	if (result != null) 
+	if (result != null) {
             return PortableRemoteObject.narrow(result, narrowTo);
-	else
-	    return null;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1018,10 +1028,11 @@ public final class Utility {
 	throws ClassCastException 
     {
         Object result = in.read_abstract_interface();
-	if (result != null) 
+	if (result != null) {
             return PortableRemoteObject.narrow(result, narrowTo);
-	else
-	    return null;
+        } else {
+            return null;
+        }
     }
 
 
@@ -1032,16 +1043,19 @@ public final class Utility {
 	int val;
 
         val = x - '0';
-        if (val >=0 && val <= 9)
+        if (val >=0 && val <= 9) {
             return val;
+        }
 
         val = (x - 'a') + 10;
-        if (val >= 10 && val <= 15)
+        if (val >= 10 && val <= 15) {
             return val;
+        }
 
         val = (x - 'A') + 10;
-        if (val >= 10 && val <= 15)
+        if (val >= 10 && val <= 15) {
             return val;
+        }
 
 	throw wrapper.badHexDigit() ;
     }

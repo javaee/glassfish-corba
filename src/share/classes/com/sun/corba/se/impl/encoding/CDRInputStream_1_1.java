@@ -46,11 +46,13 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
     // See notes in CDROutputStream
     protected int fragmentOffset = 0;
 
+    @Override
     public GIOPVersion getGIOPVersion() {
         return GIOPVersion.V1_1;
     }
 
     // Template method
+    @Override
     public CDRInputStreamBase dup() {
         CDRInputStreamBase result = super.dup();
 
@@ -59,10 +61,12 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
         return result;
     }
 
+    @Override
     protected int get_offset() {
 	return bbwi.position() + fragmentOffset;
     }
 
+    @Override
     protected void alignAndCheck(int align, int n) {
 
 
@@ -97,6 +101,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
     //
     // This can be overridden....
     //
+    @Override
     protected void grow(int align, int n) {
                 
         bbwi.setNumberOfBytesNeeded(n);
@@ -136,10 +141,12 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
         }
     }
 
+    @Override
     public java.lang.Object createStreamMemento() {
         return new FragmentableStreamMemento();
     }
 
+    @Override
     public void restoreInternalState(java.lang.Object streamMemento) 
     {
         super.restoreInternalState(streamMemento);
@@ -150,6 +157,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
 
     // --------------------------------------------------
 
+    @Override
     public char read_wchar() {
         // In GIOP 1.1, interoperability with wchar is limited
         // to 2 byte fixed width encodings.  CORBA formal 99-10-07 15.3.1.6.
@@ -171,6 +179,7 @@ public class CDRInputStream_1_1 extends CDRInputStream_1_0
         return result[0];
     }
 
+    @Override
     public String read_wstring() {
         // In GIOP 1.1, interoperability with wchar is limited
         // to 2 byte fixed width encodings.  CORBA formal 99-10-07 15.3.1.6.

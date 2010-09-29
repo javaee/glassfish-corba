@@ -52,13 +52,16 @@ import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 
 import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 
-import com.sun.corba.se.impl.logging.IORSystemException;
+import com.sun.corba.se.spi.logging.IORSystemException;
 
 /**
  * @author  Ken Cavanaugh
  */
 public class ObjectKeyImpl implements ObjectKey 
 {
+    private static final IORSystemException wrapper =
+        IORSystemException.self ;
+
     private ObjectKeyTemplate oktemp;
     private ObjectId id;
     private byte[] array;
@@ -71,11 +74,13 @@ public class ObjectKeyImpl implements ObjectKey
     @Override
     public boolean equals( Object obj )
     {
-	if (obj == null)
-	    return false ;
+	if (obj == null) {
+            return false;
+        }
 
-	if (!(obj instanceof ObjectKeyImpl))
-	    return false ;
+	if (!(obj instanceof ObjectKeyImpl)) {
+            return false;
+        }
 
 	ObjectKeyImpl other = (ObjectKeyImpl)obj ;
 
@@ -115,13 +120,12 @@ public class ObjectKeyImpl implements ObjectKey
 	        try {
 		    os.close();
 		} catch (java.io.IOException e) {
-		    IORSystemException wrapper;
-		    wrapper = ((ORB)orb).getLogWrapperTable().get_OA_IOR_IOR() ;
 		    wrapper.ioexceptionDuringStreamClose(e);    
 		}
 	    }
-	} 
-	return (byte[])array.clone() ;
+	}
+
+	return array.clone() ;
     }
 
     public CorbaServerRequestDispatcher getServerRequestDispatcher() 

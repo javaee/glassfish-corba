@@ -306,8 +306,7 @@ public final class ClientRequestInfoImpl
 	// ClientRequestDispatcher.createRequest, v1.32
 
 	if (messageMediator != null && cachedEffectiveTargetObject == null) {
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
-		messageMediator.getContactInfo();
+	    CorbaContactInfo corbaContactInfo = messageMediator.getContactInfo();
 	    // REVISIT - get through chain like getLocatedIOR helper below.
 	    cachedEffectiveTargetObject =
 		iorToObject(corbaContactInfo.getEffectiveTargetIOR());
@@ -327,8 +326,7 @@ public final class ClientRequestInfoImpl
 	//checkAccess( MID_EFFECTIVE_PROFILE );
 
 	if(messageMediator != null && cachedEffectiveProfile == null ) {
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
-		messageMediator.getContactInfo();
+	    CorbaContactInfo corbaContactInfo = messageMediator.getContactInfo();
 	    cachedEffectiveProfile =
 		corbaContactInfo.getEffectiveProfile().getIOPProfile();
 	}
@@ -426,8 +424,7 @@ public final class ClientRequestInfoImpl
 	    !cachedEffectiveComponents.containsKey( id ) ) )
 	{
 	    // Not in cache.  Get it from the profile:
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
-		messageMediator.getContactInfo();
+	    CorbaContactInfo corbaContactInfo = messageMediator.getContactInfo();
 	    IIOPProfileTemplate ptemp =
 		(IIOPProfileTemplate)corbaContactInfo.getEffectiveProfile().
 		getTaggedProfileTemplate();
@@ -515,10 +512,11 @@ public final class ClientRequestInfoImpl
     public String operation(){
         // access is currently valid for all states:
         //checkAccess( MID_OPERATION );
-        if (messageMediator != null)
+        if (messageMediator != null) {
             return messageMediator.getOperationName();
-        else 
-            return "<special operation>" ;
+        } else {
+            return "<special operation>";
+        }
     }
 
     @Override
@@ -735,8 +733,8 @@ public final class ClientRequestInfoImpl
     @TraceInterceptor
     private IOR getLocatedIOR() {
 	IOR ior;
-	CorbaContactInfoList contactInfoList = (CorbaContactInfoList)
-	    messageMediator.getContactInfo().getContactInfoList();
+	CorbaContactInfoList contactInfoList = messageMediator.getContactInfo().
+            getContactInfoList();
 	ior = contactInfoList.getEffectiveTargetIOR();
 	return ior;
     }
@@ -744,7 +742,7 @@ public final class ClientRequestInfoImpl
     // Used to be protected. public for IIOPFailoverManagerImpl.
     @TraceInterceptor
     public void setLocatedIOR(IOR ior) {
-	ORB orb = (ORB) messageMediator.getBroker();
+	ORB orb = messageMediator.getBroker();
 
 	CorbaContactInfoListIterator iterator = (CorbaContactInfoListIterator)
 	    ((CorbaInvocationInfo)orb.getInvocationInfo())
@@ -752,9 +750,7 @@ public final class ClientRequestInfoImpl
 
 	// REVISIT - this most likely causes reportRedirect to happen twice.
 	// Once here and once inside the request dispatcher.
-	iterator.reportRedirect(
-	    (CorbaContactInfo)messageMediator.getContactInfo(),
-	    ior);
+	iterator.reportRedirect( messageMediator.getContactInfo(), ior);
     }
 
     /**
@@ -832,7 +828,7 @@ public final class ClientRequestInfoImpl
 
     protected void setInfo(CorbaMessageMediator messageMediator)
     {
-	this.messageMediator = (CorbaMessageMediator)messageMediator;
+	this.messageMediator = messageMediator;
 	// REVISIT - so mediator can handle DII in subcontract.
 	this.messageMediator.setDIIInfo(request);
     }

@@ -94,12 +94,13 @@ public final class OldJIDLObjectKeyTemplate extends OldObjectKeyTemplateBase
 
             patchVersion = is.read_octet();
 
-            if (patchVersion == ObjectKeyFactoryImpl.JDK1_3_1_01_PATCH_LEVEL)
+            if (patchVersion == ObjectKeyFactoryImpl.JDK1_3_1_01_PATCH_LEVEL) {
                 setORBVersion(ORBVersionFactory.getJDK1_3_1_01());
-            else if (patchVersion > ObjectKeyFactoryImpl.JDK1_3_1_01_PATCH_LEVEL)
+            } else if (patchVersion > ObjectKeyFactoryImpl.JDK1_3_1_01_PATCH_LEVEL) {
                 setORBVersion(ORBVersionFactory.getORBVersion());
-            else
-		throw wrapper.invalidJdk131PatchLevel( Integer.valueOf( patchVersion ) ) ;
+            } else {
+                throw wrapper.invalidJdk131PatchLevel(patchVersion);
+            }
         }
     }
     
@@ -121,11 +122,13 @@ public final class OldJIDLObjectKeyTemplate extends OldObjectKeyTemplateBase
 	os.write_long( getServerId() ) ;
     }
 
+    @Override
     public void write(ObjectId objectId, OutputStream os) 
     {
         super.write(objectId, os);
 
-        if (patchVersion != OldJIDLObjectKeyTemplate.NULL_PATCH_VERSION)
-           os.write_octet( patchVersion ) ;        
+        if (patchVersion != OldJIDLObjectKeyTemplate.NULL_PATCH_VERSION) {
+            os.write_octet(patchVersion);
+        }
     }
 }

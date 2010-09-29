@@ -47,7 +47,7 @@ import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.transport.SocketOrChannelContactInfoImpl;
 
 
@@ -58,7 +58,8 @@ public class SocketFactoryContactInfoImpl
     extends
 	SocketOrChannelContactInfoImpl
 {
-    protected ORBUtilSystemException wrapper;
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
     protected SocketInfo socketInfo;
 
     // XREVISIT 
@@ -80,8 +81,6 @@ public class SocketFactoryContactInfoImpl
 	this.effectiveTargetIOR = effectiveTargetIOR;
         this.addressingDisposition = addressingDisposition;
 
-	wrapper =  orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
-
 	socketInfo = 
 	    orb.getORBData().getLegacySocketFactory()
 	        .getEndPointInfo(orb, effectiveTargetIOR, cookie);
@@ -91,6 +90,7 @@ public class SocketFactoryContactInfoImpl
 	port = socketInfo.getPort();
     }
 
+    @Override
     public CorbaConnection createConnection()
     {
 	CorbaConnection connection =
@@ -106,6 +106,7 @@ public class SocketFactoryContactInfoImpl
     // java.lang.Object
     //
 
+    @Override
     public String toString()
     {
 	return

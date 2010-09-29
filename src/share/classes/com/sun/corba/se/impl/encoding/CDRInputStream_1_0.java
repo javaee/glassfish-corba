@@ -112,8 +112,8 @@ import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 
 import com.sun.corba.se.impl.corba.PrincipalImpl;
 import com.sun.corba.se.impl.corba.TypeCodeImpl;
@@ -143,6 +143,10 @@ import com.sun.corba.se.spi.trace.* ;
 public class CDRInputStream_1_0 extends CDRInputStreamBase 
     implements RestorableInputStream
 {
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
     private static final String kReadMethod = "read";
     private static final int maxBlockLength = 0x7fffff00;
 
@@ -153,8 +157,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     protected boolean littleEndian;
     protected ORB orb;
-    protected ORBUtilSystemException wrapper ;
-    protected OMGSystemException omgWrapper ;
     protected ValueHandler valueHandler = null;
 
     // Value cache
@@ -248,10 +250,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                      BufferManagerRead bufferManager) 
     {
         this.orb = (ORB)orb;
-	this.wrapper = ((ORB)orb).getLogWrapperTable()
-	    .get_RPC_ENCODING_ORBUtil() ;
-	this.omgWrapper = ((ORB)orb).getLogWrapperTable()
-	    .get_RPC_ENCODING_OMG() ;
         this.littleEndian = littleEndian;
         this.bufferManagerRead = bufferManager;
         this.bbwi = new ByteBufferWithInfo(orb,byteBuffer,0);
@@ -264,7 +262,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         createRepositoryIdHandlers();
     }
 
-    private final void createRepositoryIdHandlers()
+    private void createRepositoryIdHandlers()
     {
 	repIdUtil = RepositoryIdFactory.getRepIdUtility(orb);
 	repIdStrs = RepositoryIdFactory.getRepIdStringsFactory(orb);
@@ -415,7 +413,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     // No such type in java
     public final double read_longdouble() {
-	throw wrapper.longDoubleNotImplemented( CompletionStatus.COMPLETED_MAYBE);
+	throw wrapper.longDoubleNotImplemented();
     }
 
     public final boolean read_boolean() {
@@ -435,7 +433,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // Don't allow transmission of wchar/wstring data with
         // foreign ORBs since it's against the spec.
         if (ORBUtility.isForeignORB(orb)) {
-            throw wrapper.wcharDataInGiop10( CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.wcharDataInGiop10() ;
         }
 
         // If we're talking to one of our legacy ORBs, do what
@@ -452,7 +450,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             b2 = bbwi.getByteBuffer().get() & 0x00FF;
         }
 
-        result = (char)((b1 << 8) + (b2 << 0));
+        result = (char)((b1 << 8) + (b2));
         return result ;
     }
 
@@ -474,11 +472,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         alignAndCheck(2, 2);
 
         if (littleEndian) {
-            b2 = (bbwi.getByteBuffer().get() << 0) & 0x000000FF;
+            b2 = (bbwi.getByteBuffer().get()) & 0x000000FF;
             b1 = (bbwi.getByteBuffer().get() << 8) & 0x0000FF00;
         } else {
             b1 = (bbwi.getByteBuffer().get() << 8) & 0x0000FF00;
-            b2 = (bbwi.getByteBuffer().get() << 0) & 0x000000FF;
+            b2 = (bbwi.getByteBuffer().get()) & 0x000000FF;
         }
 
         result = (short)(b1 | b2);
@@ -548,7 +546,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
     protected final void checkForNegativeLength(int length) {
         if (length < 0) {
-            throw wrapper.negativeStringLength(CompletionStatus.COMPLETED_MAYBE, length);
+            throw wrapper.negativeStringLength(length);
         }
     }
 
@@ -582,7 +580,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     @CdrRead
-    private final String internalReadString(int len) {
+    private String internalReadString(int len) {
     	// Workaround for ORBs which send string lengths of
     	// zero to mean empty string.
         //
@@ -602,7 +600,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     @CdrRead
-    private final String legacyReadString(int len) {
+    private String legacyReadString(int len) {
 
     	//
     	// Workaround for ORBs which send string lengths of
@@ -660,7 +658,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         // Don't allow transmission of wchar/wstring data with
         // foreign ORBs since it's against the spec.
         if (ORBUtility.isForeignORB(orb)) {
-	    throw wrapper.wcharDataInGiop10( CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.wcharDataInGiop10();
         }
 
     	int len = read_long();
@@ -865,9 +863,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     public static org.omg.CORBA.Object internalIORToObject(
         IOR ior, PresentationManager.StubFactory stubFactory, ORB orb)
     {
-	ORBUtilSystemException wrapper = 
-	    orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-
 	java.lang.Object servant = ior.getProfile().getServant() ;
 	if (servant != null ) {
 	    if (servant instanceof Tie) {
@@ -995,8 +990,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                     } else if (factory != null) {
 			return factory.get_id();
 		    } else {
-			throw wrapper.expectedTypeNullAndNoRepId( 
-			    CompletionStatus.COMPLETED_MAYBE);
+			throw wrapper.expectedTypeNullAndNoRepId( ) ;
 		    }
                 }
                 return repIdStrs.createForAnyType(expectedType,cinfo);
@@ -1005,8 +999,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             case RepositoryIdUtility.PARTIAL_LIST_TYPE_INFO :
                 return read_repositoryIds();
             default:
-		throw wrapper.badValueTag( CompletionStatus.COMPLETED_MAYBE,
-		    Integer.toHexString(valueTag) ) ;
+		throw wrapper.badValueTag( Integer.toHexString(valueTag) ) ;
         }
     }
 
@@ -1026,11 +1019,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	    // that come out of the ValueHandler
 	    throw sysEx;
 	} catch(Exception ex) {
-	    throw wrapper.valuehandlerReadException( 
-		CompletionStatus.COMPLETED_MAYBE, ex ) ;
+	    throw wrapper.valuehandlerReadException( ex ) ;
 	} catch(Error e) {
-	    throw wrapper.valuehandlerReadError( 
-		CompletionStatus.COMPLETED_MAYBE, e ) ;
+	    throw wrapper.valuehandlerReadError( e ) ;
         }
     }
 
@@ -1116,7 +1107,6 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                         = repIdStrs.getFromString(repositoryIDString);
 
                     throw wrapper.couldNotFindClass(
-                        CompletionStatus.COMPLETED_MAYBE,
                         repositoryID.getClassName()) ;
                 }
 
@@ -1434,10 +1424,9 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
         try {
             cl = repositoryID.getClassFromType(codebases);
         } catch(ClassNotFoundException cnfe) {
-            throw wrapper.cnfeReadClass( CompletionStatus.COMPLETED_MAYBE,
-		cnfe, repositoryID.getClassName() ) ;
+            throw wrapper.cnfeReadClass( cnfe, repositoryID.getClassName() ) ;
         } catch(MalformedURLException me) {
-	    throw wrapper.malformedUrl( CompletionStatus.COMPLETED_MAYBE,
+	    throw wrapper.malformedUrl( 
 		me, repositoryID.getClassName(), codebases ) ;
         }
 
@@ -1626,8 +1615,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // handleEndOfValue should have assured that we were
             // at the end tag position!
             if (anEndTag >= 0) {
-		throw wrapper.positiveEndTag( CompletionStatus.COMPLETED_MAYBE,
-		                              anEndTag, get_offset() - 4 ) ;
+		throw wrapper.positiveEndTag( anEndTag, get_offset() - 4 ) ;
             }
 
             // If the ORB is null, or if we're sure we're talking to
@@ -1642,9 +1630,8 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 // then the sender must think it's sent more enclosing 
                 // chunked valuetypes than we have.  Throw an exception.
                 if (anEndTag < chunkedValueNestingLevel) {
-                    throw wrapper.unexpectedEnclosingValuetype(
-                        CompletionStatus.COMPLETED_MAYBE, anEndTag,
-                        chunkedValueNestingLevel);
+                    throw wrapper.unexpectedEnclosingValuetype( anEndTag,
+                        chunkedValueNestingLevel );
                 }
 
                 // If the end tag is bigger than what we expected, but
@@ -1780,8 +1767,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             // an error, and ended up setting blockLength to something
             // other than maxBlockLength even though we weren't
             // starting a new chunk.
-            throw wrapper.couldNotSkipBytes( CompletionStatus.COMPLETED_MAYBE,
-                                                     nextLong , get_offset() ) ;
+            throw wrapper.couldNotSkipBytes( nextLong , get_offset() ) ;
         }
     }
 
@@ -1929,7 +1915,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
     }
 
     @CdrRead
-    private final String read_repositoryId() {
+    private String read_repositoryId() {
         String result = readStringOrIndirection(true);
         if (result == null) { // Indirection
             int indirection = read_long() + get_offset() - 4;
@@ -1948,12 +1934,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             return result;
         }
 
-	throw wrapper.badRepIdIndirection( CompletionStatus.COMPLETED_MAYBE, 
-	    bbwi.position() ) ;
+	throw wrapper.badRepIdIndirection( bbwi.position() ) ;
     }
 
     @CdrRead
-    private final String read_codebase_URL() {
+    private String read_codebase_URL() {
         String result = readStringOrIndirection(true);
         if (result == null) { // Indirection
             int indirection = read_long() + get_offset() - 4;
@@ -1972,8 +1957,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             return result;
         }
 
-	throw wrapper.badCodebaseIndirection( CompletionStatus.COMPLETED_MAYBE, 
-	    bbwi.position() ) ;
+	throw wrapper.badCodebaseIndirection( bbwi.position() ) ;
     }
 
     /* DataInputStream methods */
@@ -2308,8 +2292,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             }
         } catch (MalformedURLException mue) {
             // Always report a bad URL
-	    throw wrapper.malformedUrl( CompletionStatus.COMPLETED_MAYBE,
-		mue, repositoryIDString, codebaseURL ) ;
+	    throw wrapper.malformedUrl( mue, repositoryIDString, codebaseURL ) ;
         }
     }
 
@@ -2407,19 +2390,16 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         if (vType == 0xffffffff) {
             // One should never indirect to a custom wrapper
-	    throw wrapper.customWrapperIndirection( 
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.customWrapperIndirection( );
         }
 
         if (repIdUtil.isCodeBasePresent(vType)) {
-	    throw wrapper.customWrapperWithCodebase(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.customWrapperWithCodebase();
         }
 			
         if (repIdUtil.getTypeInfo(vType) 
             != RepositoryIdUtility.SINGLE_REP_TYPE_INFO) {
-	    throw wrapper.customWrapperNotSingleRepid( 
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.customWrapperNotSingleRepid( );
         }
 
 

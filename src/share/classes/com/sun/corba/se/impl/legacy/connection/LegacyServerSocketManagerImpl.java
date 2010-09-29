@@ -52,19 +52,18 @@ import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 public class LegacyServerSocketManagerImpl 
     implements
 	LegacyServerSocketManager
 {
     protected ORB orb;
-    private ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
     
-    public LegacyServerSocketManagerImpl(ORB orb) 
-    {
+    public LegacyServerSocketManagerImpl(ORB orb) {
 	this.orb = orb;
-	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
 
     ////////////////////////////////////////////////////
@@ -88,8 +87,7 @@ public class LegacyServerSocketManagerImpl
 	    // this is a user-activated server
 	    return orb.getORBData().getPersistentServerPort();
 	} else {
-	    throw wrapper.persistentServerportNotSet( 
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.persistentServerportNotSet();
 	}
     }
 

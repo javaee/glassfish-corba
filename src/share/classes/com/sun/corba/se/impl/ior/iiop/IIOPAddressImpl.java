@@ -40,32 +40,31 @@
 
 package com.sun.corba.se.impl.ior.iiop;
 
-import org.omg.CORBA.BAD_PARAM ;
-
 import org.omg.CORBA_2_3.portable.InputStream ;
-import org.omg.CORBA_2_3.portable.OutputStream ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.logging.IORSystemException ;
+import com.sun.corba.se.spi.logging.IORSystemException ;
 
 /**
- * @author 
+ * @author Ken Cavanaugh
  */
 public final class IIOPAddressImpl extends IIOPAddressBase
 {
+    private static final IORSystemException wrapper =
+        IORSystemException.self ;
+
     private ORB orb ;
-    private IORSystemException wrapper ;
     private String host;
     private int port;
     
     public IIOPAddressImpl( ORB orb, String host, int port ) 
     {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_IOR_IOR() ;
 
-	if ((port < 0) || (port > 65535))
-	    throw wrapper.badIiopAddressPort( Integer.valueOf(port)) ;
+	if ((port < 0) || (port > 65535)) {
+            throw wrapper.badIiopAddressPort(port);
+        }
 
 	this.host = host ;
 	this.port = port ;

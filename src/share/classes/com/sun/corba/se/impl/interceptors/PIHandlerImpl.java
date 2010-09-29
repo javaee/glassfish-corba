@@ -44,7 +44,6 @@ import java.util.*;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.BAD_POLICY;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.UserException;
@@ -66,7 +65,6 @@ import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.omg.PortableInterceptor.PolicyFactory;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 
-
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
 import com.sun.corba.se.spi.oa.ObjectAdapter;
@@ -77,14 +75,13 @@ import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.protocol.PIHandler;
 import com.sun.corba.se.spi.protocol.RetryType ;
 
-import com.sun.corba.se.impl.logging.InterceptorsSystemException;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.InterceptorsSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 import com.sun.corba.se.impl.corba.RequestImpl;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
-import com.sun.corba.se.impl.orbutil.DprintUtil;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
@@ -97,9 +94,12 @@ public class PIHandlerImpl implements PIHandler
 {
     private ORB orb ;
 
-    InterceptorsSystemException wrapper ;
-    ORBUtilSystemException orbutilWrapper ;
-    OMGSystemException omgWrapper ;
+    static final InterceptorsSystemException wrapper =
+        InterceptorsSystemException.self ;
+    static final ORBUtilSystemException orbutilWrapper =
+        ORBUtilSystemException.self ;
+    static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
 
     // A unique id used in ServerRequestInfo.
     // This does not correspond to the GIOP request id.
@@ -180,9 +180,6 @@ public class PIHandlerImpl implements PIHandler
     @TraceInterceptor
     public void close() {
 	orb = null ;
-	wrapper = null ;
-	orbutilWrapper = null ;
-	omgWrapper = null ;
 	codecFactory = null ;
 	arguments = null ;
 	interceptorList = null ;
@@ -204,10 +201,12 @@ public class PIHandlerImpl implements PIHandler
         public int disableCount = 0;
 
         // Get FindBugs to shut up about not overridding equals.
+        @Override
         public boolean equals( Object o ) {
             return super.equals( o ) ;
         }
         
+        @Override
         public int hashCode() {
             return super.hashCode() ;
         }
@@ -215,9 +214,6 @@ public class PIHandlerImpl implements PIHandler
         
     public PIHandlerImpl( ORB orb, String[] args ) {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
-	orbutilWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	omgWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
 
 	if (args == null) {
 	    arguments = null ;
@@ -229,7 +225,7 @@ public class PIHandlerImpl implements PIHandler
 	codecFactory = new CodecFactoryImpl( orb );
 
 	// Create new interceptor list:
-	interceptorList = new InterceptorList( wrapper );
+	interceptorList = new InterceptorList();
 
 	// Create a new PICurrent.
 	current = new PICurrent( orb );
@@ -562,10 +558,9 @@ public class PIHandlerImpl implements PIHandler
 	    // to gracefully handle this in any of the calling code.
 	    // This is a rare corner case, so we will ignore this for now.
 	    short replyStatus = info.getReplyStatus();
-	    if (replyStatus == info.UNINITIALIZED ) {
+	    if (replyStatus == ClientRequestInfoImpl.UNINITIALIZED ) {
 		invokeClientPIEndingPoint( ReplyMessage.SYSTEM_EXCEPTION,
-		    wrapper.unknownRequestInvoke(
-			CompletionStatus.COMPLETED_MAYBE ) ) ;
+		    wrapper.unknownRequestInvoke() ) ;
 	    }
 	}
 
@@ -639,7 +634,8 @@ public class PIHandlerImpl implements PIHandler
 
 	// REVISIT: This was done inside of invokeServerInterceptorEndingPoint
 	// but needs to be here for now.  See comment in that method for why.
-	info.setCurrentExecutionPoint( info.EXECUTION_POINT_ENDING );
+	info.setCurrentExecutionPoint( 
+            ServerRequestInfoImpl.EXECUTION_POINT_ENDING );
 
 	// It is possible we might have entered this method more than
 	// once (e.g. if an ending point threw a SystemException, then
@@ -674,8 +670,7 @@ public class PIHandlerImpl implements PIHandler
 	    if( !info.isDynamic() &&
 		(piReplyStatus == USER_EXCEPTION.value) )
 	    {
-		info.setException( omgWrapper.unknownUserException(
-		    CompletionStatus.COMPLETED_MAYBE ) ) ;
+		info.setException( omgWrapper.unknownUserException() ) ;
 	    }
 
 	    // Invoke the ending interception points:
@@ -970,7 +965,7 @@ public class PIHandlerImpl implements PIHandler
 	// We will assume interceptor is not null, since it is called
 	// internally.
 	if( (type >= InterceptorList.NUM_INTERCEPTOR_TYPES) || (type < 0) ) {
-	    throw wrapper.typeOutOfRange( Integer.valueOf( type ) ) ;
+	    throw wrapper.typeOutOfRange( type ) ;
 	}
 
 	String interceptorName = interceptor.name();
@@ -1043,7 +1038,7 @@ public class PIHandlerImpl implements PIHandler
 	if (val == null) {
 	    policyFactoryTable.put( key, factory );
 	} else {
-	    throw omgWrapper.policyFactoryRegFailed( Integer.valueOf( type ) ) ;
+	    throw omgWrapper.policyFactoryRegFailed( type ) ;
 	}
     }
     

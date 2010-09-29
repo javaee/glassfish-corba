@@ -58,20 +58,20 @@ import org.omg.CORBA.ServerRequest;
 import org.omg.CORBA.Bounds;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
-import org.omg.CORBA.CompletionStatus;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 public class ServerRequestImpl extends ServerRequest {
+    private static final ORBUtilSystemException _wrapper =
+        ORBUtilSystemException.self ;
 
     ///////////////////////////////////////////////////////////////////////////
     // data members
 
     private ORB			 _orb		= null;
-    private ORBUtilSystemException _wrapper     = null;
     private String       	 _opName	= null;
     private NVList 		 _arguments 	= null;
     private Context		 _ctx		= null;
@@ -92,13 +92,14 @@ public class ServerRequestImpl extends ServerRequest {
 				// presumably also  be available on
 				// the server invocation
         _orb = orb;
-	_wrapper = orb.getLogWrapperTable().get_OA_INVOCATION_ORBUtil() ;
     }
 
+    @Override
     public String operation() {
         return _opName;
     }
 
+    @Override
     public void arguments(NVList args) 
     {
         if (_paramsCalled)
@@ -138,6 +139,7 @@ public class ServerRequestImpl extends ServerRequest {
 	_orb.getPIHandler().invokeServerPIIntermediatePoint();
     }
     
+    @Override
     public void set_result(Any res) {
         // check for invocation restrictions
         if (!_paramsCalled) 
@@ -160,6 +162,7 @@ public class ServerRequestImpl extends ServerRequest {
         // after the DSI returns control to the ORB.
     }
 
+    @Override
     public void set_exception(Any exc) 
     {
 	// except can be called by the DIR at any time (CORBA 2.2 section 6.3).
@@ -228,14 +231,12 @@ public class ServerRequestImpl extends ServerRequest {
 
 	        return null;
             } catch ( Exception ex ) {
-		throw _wrapper.dsiResultException( 
-		    CompletionStatus.COMPLETED_MAYBE, ex ) ;
+		throw _wrapper.dsiResultException( ex ) ;
             }
         } else if ( _exceptionSet )
             return _exception;
         else { 
-	    throw _wrapper.dsimethodNotcalled( 
-		CompletionStatus.COMPLETED_MAYBE ) ;
+	    throw _wrapper.dsimethodNotcalled( ) ;
         }
     }
 

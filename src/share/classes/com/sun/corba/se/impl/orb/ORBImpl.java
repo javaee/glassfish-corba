@@ -1434,8 +1434,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
                     waitForCompletionObj.notifyAll();
                 }
             } else if (numInvocations < 0) {
-		throw wrapper.numInvocationsAlreadyZero(
-		    CompletionStatus.COMPLETED_YES ) ;
+		throw wrapper.numInvocationsAlreadyZero() ;
             }
         }
     }

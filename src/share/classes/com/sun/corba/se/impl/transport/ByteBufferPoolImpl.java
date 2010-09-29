@@ -78,8 +78,7 @@ public class ByteBufferPoolImpl implements ByteBufferPool {
      * 1. ContactInfoBase.createMessageMediator()
      * 2. ByteBufferWithInfo.growBuffer()
      * 3. ByteBufferWithInfo(ORB, BufferManagerWrite) - constructor
-     * 4. IDLJavaSerializationOutputStream.getByteBufferWithInfo()
-     * 5. SocketOrChannelConnectionImpl.doMinimalReadStrategy()
+     * 4. SocketOrChannelConnectionImpl.doMinimalReadStrategy()
     */
 
     /** Return a ByteBuffer of the requested size. */
@@ -118,8 +117,6 @@ public class ByteBufferPoolImpl implements ByteBufferPool {
      * 6. BufferManagerWrite.close()
      * 7. BufferManagerRead.close()
      * 8. CorbaMessageMediatorImpl.releaseByteBufferToPool()
-     * 9. IDLJavaSerializationOutputStream.close()
-     * 10. IDLJavaSerializationInputStream.IDLByteBufferInputStream.close()
     */
     public void releaseByteBuffer(ByteBuffer buffer) {
         // nothing to do here other than help the garbage collector

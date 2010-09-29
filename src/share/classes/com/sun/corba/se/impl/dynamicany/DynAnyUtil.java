@@ -50,11 +50,14 @@ import java.math.BigDecimal;
 import com.sun.corba.se.impl.corba.AnyImpl;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import org.omg.DynamicAny.DynAny;
 
 public class DynAnyUtil
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     static boolean isConsistentType(TypeCode typeCode) {
         int kind = typeCode.kind().value();
         return (kind != TCKind._tk_Principal &&
@@ -143,9 +146,6 @@ public class DynAnyUtil
 
     // Creates a default Any of the given type.
     static Any createDefaultAnyOfType(TypeCode typeCode, ORB orb) {
-	ORBUtilSystemException wrapper =  
-	    orb.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
-
         Any returnValue = orb.create_any();
         // The spec for DynAny differs from Any on initialization via type code:
         // - false for boolean

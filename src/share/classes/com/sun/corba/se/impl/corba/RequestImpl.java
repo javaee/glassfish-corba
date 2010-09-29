@@ -71,7 +71,7 @@ import org.omg.CORBA.portable.OutputStream ;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 public class RequestImpl 
     extends Request
@@ -88,7 +88,8 @@ public class RequestImpl
     private Context		 _ctx;
     private ContextList		 _ctxList;
     protected ORB		 _orb;
-    private ORBUtilSystemException _wrapper;
+    private static final ORBUtilSystemException _wrapper =
+        ORBUtilSystemException.self ;
 
     // invocation-specific stuff
     protected boolean 		 _isOneWay	= false;
@@ -118,7 +119,6 @@ public class RequestImpl
 
         // initialize the orb
         _orb 	= orb;
-	_wrapper = orb.getLogWrapperTable().get_OA_INVOCATION_ORBUtil() ;
 
         // initialize target, context and operation name
         _target     = targetObject;

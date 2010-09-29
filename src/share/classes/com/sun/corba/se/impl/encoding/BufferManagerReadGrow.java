@@ -44,7 +44,7 @@ import java.nio.ByteBuffer;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 public class BufferManagerReadGrow
     implements BufferManagerRead, MarkAndResetHandler
@@ -55,12 +55,12 @@ public class BufferManagerReadGrow
     //           BufferManagerReadBase.
     private ORB orb ;
 
-    private ORBUtilSystemException wrapper ; 
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     BufferManagerReadGrow( ORB orb ) 
     {
 	this.orb = orb ;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
     }
 
     public void processFragment (ByteBuffer byteBuffer, FragmentMessage header)

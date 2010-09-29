@@ -63,15 +63,19 @@ import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext ;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceServiceContext;
 
 @TraceServiceContext
 public class ServiceContextsImpl implements ServiceContexts 
 {
-    private final ORB orb ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private static final AtomicInteger creationCount = new AtomicInteger(0) ;
+
+    private final ORB orb ;
 
     /** 
      * Map of all ServiceContext objects in this container.
@@ -91,17 +95,17 @@ public class ServiceContextsImpl implements ServiceContexts
 
     private CodeBase codeBase;
     private GIOPVersion giopVersion;
-    private final ORBUtilSystemException wrapper ; 
 
     private String getValidSCIds() {
 	StringBuilder sb = new StringBuilder() ;
 	sb.append( "(" ) ;
 	boolean first = true ;
 	for (int id : scMap.keySet()) {
-	    if (first)
-		first = false ;
-	    else
-		sb.append( "," ) ;
+	    if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
 
 	    sb.append( id ) ;
 	}
@@ -146,8 +150,6 @@ public class ServiceContextsImpl implements ServiceContexts
 
     public ServiceContextsImpl( ORB orb ) {
 	this.orb = orb ;
-
-	wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
         scMap = new HashMap<Integer,Object>();
 
@@ -232,9 +234,9 @@ public class ServiceContextsImpl implements ServiceContexts
                 }
             }
 
-            if (sc == null)
-                throw wrapper.svcctxUnmarshalError( 
-                    CompletionStatus.COMPLETED_MAYBE);
+            if (sc == null) {
+                throw wrapper.svcctxUnmarshalError();
+            }
         }
 
         return sc;
@@ -264,15 +266,17 @@ public class ServiceContextsImpl implements ServiceContexts
         int ueid = UEInfoServiceContext.SERVICE_CONTEXT_ID ;
 
         for (int i : scMap.keySet() ) {
-            if (i != ueid)
-                writeMapEntry( os, i, scMap.get(i), gv ) ;
+            if (i != ueid) {
+                writeMapEntry(os, i, scMap.get(i), gv);
+            }
         }
 
         // Write the UnknownExceptionInfo service context last
         // (so it will be after the CodeBase) 
         Object uesc = scMap.get(ueid) ;
-        if (uesc != null)
-            writeMapEntry( os, ueid, uesc, gv ) ; 
+        if (uesc != null) {
+            writeMapEntry(os, ueid, uesc, gv);
+        }
     }
 
     @InfoMethod

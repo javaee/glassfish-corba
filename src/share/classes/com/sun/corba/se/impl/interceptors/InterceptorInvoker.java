@@ -55,9 +55,8 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
         
-import com.sun.corba.se.impl.logging.InterceptorsSystemException;
+import com.sun.corba.se.spi.logging.InterceptorsSystemException;
 import java.util.Arrays;
-import java.util.List;
 
 /** 
  * Handles invocation of interceptors.  Has specific knowledge of how to
@@ -70,7 +69,8 @@ import java.util.List;
 public class InterceptorInvoker {
     private ORB orb;
 
-    private InterceptorsSystemException wrapper ;
+    private static final InterceptorsSystemException wrapper =
+        InterceptorsSystemException.self ;
 
     // The list of interceptors to be invoked
     private InterceptorList interceptorList;
@@ -96,8 +96,6 @@ public class InterceptorInvoker {
                         PICurrent piCurrent ) 
     {
         this.orb = orb;
-	this.wrapper =
-	    orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
 	this.interceptorList = interceptorList;
 	this.enabled = false;
         this.current = piCurrent;
@@ -266,7 +264,8 @@ public class InterceptorInvoker {
 		// Client's TSC is now RSC via RequestInfo.
 		current.pushSlotTable( );
 		info.setPICurrentPushed( true );
-		info.setCurrentExecutionPoint( info.EXECUTION_POINT_STARTING );
+		info.setCurrentExecutionPoint( 
+                    ClientRequestInfoImpl.EXECUTION_POINT_STARTING );
 
 		// Get all ClientRequestInterceptors:
 		ClientRequestInterceptor[] clientInterceptors =
@@ -375,7 +374,8 @@ public class InterceptorInvoker {
 		// NOTE: It is assumed someplace else prepared a
 		// fresh TSC slot table.
 
-		info.setCurrentExecutionPoint( info.EXECUTION_POINT_ENDING );
+		info.setCurrentExecutionPoint( 
+                    ClientRequestInfoImpl.EXECUTION_POINT_ENDING );
 
 		// Get all ClientRequestInterceptors:
 		ClientRequestInterceptor[] clientInterceptors =
@@ -490,7 +490,8 @@ public class InterceptorInvoker {
 		// interceptors need to make out calls.
 		current.pushSlotTable( );
 
-		info.setCurrentExecutionPoint( info.EXECUTION_POINT_STARTING );
+		info.setCurrentExecutionPoint( 
+                    ServerRequestInfoImpl.EXECUTION_POINT_STARTING );
 
 		// Get all ServerRequestInterceptors:
 		ServerRequestInterceptor[] serverInterceptors =
@@ -592,7 +593,8 @@ public class InterceptorInvoker {
 	    // NOTE: do not touch the slotStack.  The RSC and TSC are
 	    // equivalent at this point.
 
-	    info.setCurrentExecutionPoint( info.EXECUTION_POINT_INTERMEDIATE );
+	    info.setCurrentExecutionPoint( 
+                ServerRequestInfoImpl.EXECUTION_POINT_INTERMEDIATE );
 
 	    // Get all ServerRequestInterceptors:
 	    ServerRequestInterceptor[] serverInterceptors =

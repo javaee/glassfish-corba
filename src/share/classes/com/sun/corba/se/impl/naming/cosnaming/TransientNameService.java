@@ -41,27 +41,21 @@
 package com.sun.corba.se.impl.naming.cosnaming;
 
 // Get CORBA type
-import org.omg.CORBA.INITIALIZE;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.CompletionStatus;
 
 import org.omg.CORBA.Policy;
-import org.omg.CORBA.INTERNAL;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.LifespanPolicyValue;
-import org.omg.PortableServer.RequestProcessingPolicyValue;
 import org.omg.PortableServer.IdAssignmentPolicyValue;
 import org.omg.PortableServer.ServantRetentionPolicyValue;
 
 // Get org.omg.CosNaming types
-import org.omg.CosNaming.NamingContext;
 
 // Import transient naming context
-import com.sun.corba.se.impl.naming.cosnaming.TransientNamingContext;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 
-import com.sun.corba.se.impl.logging.NamingSystemException;
+import com.sun.corba.se.spi.logging.NamingSystemException;
+import com.sun.corba.se.spi.trace.Naming;
 
 /**
  * Class TransientNameService implements a transient name service
@@ -77,6 +71,9 @@ import com.sun.corba.se.impl.logging.NamingSystemException;
  */
 public class TransientNameService
 {
+    private static final NamingSystemException wrapper =
+        NamingSystemException.self ;
+
     /**
      * Constructs a new TransientNameService, and creates an initial
      * NamingContext, whose object
@@ -115,13 +112,12 @@ public class TransientNameService
     /** 
      * This method initializes Transient Name Service by associating Root 
      * context with POA and registering the root context with INS Object Keymap.
-     */ 
+     */
+    @Naming
     private void initialize( com.sun.corba.se.spi.orb.ORB orb,
         String nameServiceName )
         throws org.omg.CORBA.INITIALIZE
     {
-	NamingSystemException wrapper = orb.getLogWrapperTable().get_NAMING_Naming() ;
-
         try {
             POA rootPOA = (POA) orb.resolve_initial_references( 
 		ORBConstants.ROOT_POA_NAME );

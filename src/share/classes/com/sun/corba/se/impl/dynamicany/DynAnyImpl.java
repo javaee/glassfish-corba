@@ -52,10 +52,13 @@ import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
 {
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private static final long serialVersionUID = 7435214669604617358L;
 
     protected static final int NO_INDEX = -1;
@@ -71,7 +74,6 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
     //
 
     protected ORB orb = null;
-    protected ORBUtilSystemException wrapper ;
 
     // An Any is used internally to implement the basic DynAny.
     // It stores the DynAnys TypeCode.
@@ -87,12 +89,10 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
     //
 
     protected DynAnyImpl() {
-	wrapper = ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
     }
 
     protected DynAnyImpl(ORB orb, Any any, boolean copyValue) {
         this.orb = orb;
-	wrapper = orb.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
 
         if (copyValue) {
             this.any = DynAnyUtil.copy(any, orb);
@@ -105,7 +105,6 @@ abstract class DynAnyImpl extends org.omg.CORBA.LocalObject implements DynAny
 
     protected DynAnyImpl(ORB orb, TypeCode typeCode) {
         this.orb = orb;
-	wrapper = orb.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
 
         this.any = DynAnyUtil.createDefaultAnyOfType(typeCode, orb);
     }

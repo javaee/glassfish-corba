@@ -122,7 +122,7 @@ public class TOAImpl extends ObjectAdapterBase implements TOA
         id = currentId.getAndIncrement() ;
 
 	// Make the object key template
-	int serverid = ((ORB)getORB()).getTransientServerId();
+	int serverid = (getORB()).getTransientServerId();
 	int scid = ORBConstants.TOA_SCID ;
 
 	ObjectKeyTemplate oktemp = new JIDLObjectKeyTemplate( orb, scid, serverid ) ;
@@ -161,10 +161,10 @@ public class TOAImpl extends ObjectAdapterBase implements TOA
     public void getInvocationServant( OAInvocationInfo info ) 
     {
 	java.lang.Object servant = servants.lookupServant( info.id() ) ;
-	if (servant == null)
-	    // This is expected to result in an RMI-IIOP NoSuchObjectException.
-	    // See bug 4973160.
-	    servant = new NullServantImpl( lifecycleWrapper().nullServant() ) ;
+	if (servant == null) {
+            servant =
+                new NullServantImpl(wrapper.nullServant());
+        }
 	info.setServant( servant ) ;
     }
 
@@ -227,8 +227,7 @@ public class TOAImpl extends ObjectAdapterBase implements TOA
 
 	org.omg.CORBA.portable.Delegate delegate = StubAdapter.getDelegate( 
 	    obj ) ;
-	CorbaContactInfoList ccil = (CorbaContactInfoList)
-	    ((ClientDelegate)delegate).getContactInfoList() ;
+	CorbaContactInfoList ccil = ((ClientDelegate) delegate).getContactInfoList() ;
 	LocalClientRequestDispatcher lcs = 
 	    ccil.getLocalClientRequestDispatcher() ;
 
@@ -248,8 +247,7 @@ public class TOAImpl extends ObjectAdapterBase implements TOA
         // Get the delegate, then ior, then transientKey, then delete servant
         org.omg.CORBA.portable.Delegate del = StubAdapter.getDelegate( 
 	    objref ) ; 
-	CorbaContactInfoList ccil = (CorbaContactInfoList)
-	    ((ClientDelegate)del).getContactInfoList() ;
+	CorbaContactInfoList ccil = ((ClientDelegate) del).getContactInfoList() ;
 	LocalClientRequestDispatcher lcs = 
 	    ccil.getLocalClientRequestDispatcher() ;
 

@@ -40,8 +40,6 @@
 
 package com.sun.corba.se.impl.oa.poa;
 
-import java.util.*;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.PortableServer.CurrentPackage.NoContext;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
@@ -52,7 +50,8 @@ import com.sun.corba.se.spi.oa.ObjectAdapter ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.logging.POASystemException ;
+import com.sun.corba.se.spi.logging.POASystemException ;
+import java.util.EmptyStackException;
 
 // XXX Needs to be turned into LocalObjectImpl.
 
@@ -60,12 +59,12 @@ public class POACurrent extends org.omg.CORBA.portable.ObjectImpl
     implements org.omg.PortableServer.Current 
 {
     private ORB orb;
-    private POASystemException wrapper ;
+    private static final POASystemException wrapper =
+        POASystemException.self ;
 
     public POACurrent(ORB orb)
     {
 	this.orb = orb;
-	wrapper = orb.getLogWrapperTable().get_OA_INVOCATION_POA() ;
     }
 
     public String[] _ids()
@@ -188,7 +187,7 @@ public class POACurrent extends org.omg.CORBA.portable.ObjectImpl
     private void throwInternalIfNull(Object o)
     {
 	if ( o == null ) {
-	    throw wrapper.poacurrentNullField( CompletionStatus.COMPLETED_MAYBE ) ;
+	    throw wrapper.poacurrentNullField() ;
 	}
     }
 }

@@ -88,8 +88,8 @@ import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.corba.CORBAObjectImpl ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
 import com.sun.corba.se.impl.ior.iiop.JavaSerializationComponent;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.io.ValueHandlerImpl;
@@ -220,9 +220,9 @@ public final class ORBUtility {
     private ORBUtility() {}
 
     private static ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
-    private static OMGSystemException omgWrapper =  
-	ORB.getStaticLogWrapperTable().get_UTIL_OMG() ;
+        ORBUtilSystemException.self ;
+    private static OMGSystemException omgWrapper =
+        OMGSystemException.self ;
 
     private static StructMember[] members = null;
 
@@ -277,7 +277,7 @@ public final class ORBUtility {
         InputStream in = any.create_input_stream();
         ORB orb = (ORB)(in.orb());
         if ( ! isSystemExceptionTypeCode(any.type(), orb)) {
-	    throw wrapper.unknownDsiSysex(CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.unknownDsiSysex();
         }
         return ORBUtility.readSystemException(in);
     }
@@ -317,8 +317,9 @@ public final class ORBUtility {
      */
     public static boolean isForeignORB(ORB orb)
     {
-        if (orb == null)
+        if (orb == null) {
             return false;
+        }
 
         try {
             return orb.getORBVersion().equals(ORBVersionFactory.getFOREIGN());
@@ -368,16 +369,19 @@ public final class ORBUtility {
 	int val;
 
         val = x - '0';
-        if (val >=0 && val <= 9)
+        if (val >=0 && val <= 9) {
             return val;
+        }
 
         val = (x - 'a') + 10;
-        if (val >= 10 && val <= 15)
+        if (val >= 10 && val <= 15) {
             return val;
+        }
 
         val = (x - 'A') + 10;
-        if (val >= 10 && val <= 15)
+        if (val >= 10 && val <= 15) {
             return val;
+        }
 
 	throw wrapper.badHexDigit() ;
     }
@@ -412,7 +416,7 @@ public final class ORBUtility {
 	    ex.completed = CompletionStatus.from_int(strm.read_long());
 	    return ex;
 	} catch ( Exception ex ) {
-	    throw wrapper.unknownSysex( CompletionStatus.COMPLETED_MAYBE, ex );
+	    throw wrapper.unknownSysex( ex );
 	}
     }
 
@@ -428,8 +432,9 @@ public final class ORBUtility {
 	String className=null;
 
 	className = (String) exceptionClassNames.get(repositoryId);
-	if (className == null)
-	    className = "org.omg.CORBA.UNKNOWN";
+	if (className == null) {
+            className = "org.omg.CORBA.UNKNOWN";
+        }
 
 	return className;
     }
@@ -443,10 +448,7 @@ public final class ORBUtility {
 	String className=null;
 
 	className = (String) exceptionClassNames.get(repositoryId);
-	if (className == null)
-	    return false;
-	else
-	    return true;
+        return className != null ;
     }
     
     /**
@@ -460,8 +462,9 @@ public final class ORBUtility {
 	String id;
 
 	id = (String) exceptionRepositoryIds.get(name);
-	if (id == null)
-	    id = "IDL:omg.org/CORBA/UNKNOWN:1.0";
+	if (id == null) {
+            id = "IDL:omg.org/CORBA/UNKNOWN:1.0";
+        }
 
 	return id;
     }
@@ -587,30 +590,39 @@ public final class ORBUtility {
 	A string of "n." or "n..m" is equivalent to "n.0" or "n.0.m" respectively.
     */
     public static int[] parseVersion(String version) {
-	if (version == null)
-	    return new int[0];
+	if (version == null) {
+            return new int[0];
+        }
 	char[] s = version.toCharArray();
 	//find the maximum span of the string "n.n.n..." where n is an integer
 	int start = 0;
-	for (; start < s.length  && (s[start] < '0' || s[start] > '9'); ++start)
-	    if (start == s.length)	//no digit found
-		return new int[0];
+	for (; start < s.length  && (s[start] < '0' || s[start] > '9'); ++start) {
+            if (start == s.length) {
+                return new int[0];
+            }
+        }
 	int end = start + 1;
 	int size = 1;
-	for (; end < s.length; ++end)
-	    if (s[end] == '.')
-		++size;
-	    else if (s[end] < '0' || s[end] > '9')
-		break;
+	for (; end < s.length; ++end) {
+            if (s[end] == '.') {
+                ++size;
+            } else if (s[end] < '0' || s[end] > '9') {
+                break;
+            }
+        }
 	int[] val = new int[size];
 	for (int i = 0; i < size; ++i) {
 	    int dot = version.indexOf('.', start);
-	    if (dot == -1 || dot > end)
-		dot = end;
-	    if (start >= dot)	//cases like "n." or "n..m"
-		val[i] = 0;	//convert equivalent to "n.0" or "n.0.m"
-	    else
-		val[i] = Integer.parseInt(version.substring(start, dot));
+	    if (dot == -1 || dot > end) {
+                dot = end;
+            }
+	    if (start >= dot) {
+                val[i] = 0;
+            }	//convert equivalent to "n.0" or "n.0.m"
+	    else {
+                val[i] =
+                    Integer.parseInt(version.substring(start, dot));
+            }
 	    start = dot + 1;
 	}
 	return val;
@@ -620,15 +632,19 @@ public final class ORBUtility {
 	Return 1, 0 or -1 if v1 is greater than, equal to, or less than v2.
     */
     public static int compareVersion(int[] v1, int[] v2) {
-	if (v1 == null)
-	    v1 = new int[0];
-	if (v2 == null)
-	    v2 = new int[0];
+	if (v1 == null) {
+            v1 = new int[0];
+        }
+	if (v2 == null) {
+            v2 = new int[0];
+        }
 	for (int i = 0; i < v1.length; ++i) {
-	    if (i >= v2.length || v1[i] > v2[i])	//v1 is longer or greater than v2
-		return 1;
-	    if (v1[i] < v2[i])
-		return -1;
+	    if (i >= v2.length || v1[i] > v2[i]) {
+                return 1;
+            }
+	    if (v1[i] < v2[i]) {
+                return -1;
+            }
 	}
 	return v1.length == v2.length ? 0 : -1;
     }
@@ -646,8 +662,9 @@ public final class ORBUtility {
 	String prefix = "com.sun.corba.se." ;
 	if (name.startsWith( prefix ) ) {
 	    return "(ORB)." + name.substring( prefix.length() ) ;
-	} else
-	    return name ;
+	} else {
+            return name;
+        }
     }
 
     // Return a compressed representation of the thread name.  This is particularly
@@ -655,8 +672,9 @@ public final class ORBUtility {
     // we need a short unambiguous name for such threads.
     public static String getThreadName( Thread thr ) 
     {
-	if (thr == null)
-	    return "null" ;
+	if (thr == null) {
+            return "null";
+        }
 
 	// This depends on the formatting in SelectReaderThread and CorbaConnectionImpl.
 	// Pattern for SelectReaderThreads:
@@ -665,15 +683,18 @@ public final class ORBUtility {
 	String name = thr.getName() ;
 	StringTokenizer st = new StringTokenizer( name ) ;
 	int numTokens = st.countTokens() ;
-	if (numTokens != 5)
-	    return name ;
+	if (numTokens != 5) {
+            return name;
+        }
 
 	String[] tokens = new String[numTokens] ;
-	for (int ctr=0; ctr<numTokens; ctr++ ) 
-	    tokens[ctr] = st.nextToken() ;
+	for (int ctr=0; ctr<numTokens; ctr++ ) {
+            tokens[ctr] = st.nextToken();
+        }
 
-	if( !tokens[0].equals("SelectReaderThread"))
-	    return name ;
+	if( !tokens[0].equals("SelectReaderThread")) {
+            return name;
+        }
 
 	return "SelectReaderThread[" + tokens[2] + ":" + tokens[3] + "]" ;
     }
@@ -731,20 +752,17 @@ public final class ORBUtility {
 	    compressClassName( caller.getClass().getName() ) + 
 	    '(' + Thread.currentThread() + "): " + msg);
 
-        if (t != null)
-	    printStackTrace( t.getStackTrace() ) ;
+        if (t != null) {
+            printStackTrace(t.getStackTrace());
+        }
     }
 
     public static String[] concatenateStringArrays( String[] arr1, String[] arr2 ) 
     {
 	String[] result = new String[ 
 	    arr1.length + arr2.length ] ;
-
-	for (int ctr = 0; ctr<arr1.length; ctr++)
-	    result[ctr] = arr1[ctr] ;
-
-	for (int ctr = 0; ctr<arr2.length; ctr++)
-	    result[ctr + arr1.length] = arr2[ctr] ;
+        System.arraycopy(arr1, 0, result, 0, arr1.length);
+        System.arraycopy(arr2, 0, result, arr1.length, arr2.length);
 
 	return result ;
     }
@@ -762,8 +780,7 @@ public final class ORBUtility {
      * 2) We need to pick up the correct minor code from OMGSystemException.
      */
     public static void throwNotSerializableForCorba(String className) {
-	throw omgWrapper.notSerializable( CompletionStatus.COMPLETED_MAYBE,
-	    className ) ;
+	throw omgWrapper.notSerializable( className ) ;
     }
 
     /**
@@ -773,10 +790,11 @@ public final class ORBUtility {
     public static byte getMaxStreamFormatVersion() {
         ValueHandler vh = Util.getInstance().createValueHandler();
 
-        if (!(vh instanceof javax.rmi.CORBA.ValueHandlerMultiFormat))
+        if (!(vh instanceof javax.rmi.CORBA.ValueHandlerMultiFormat)) {
             return ORBConstants.STREAM_FORMAT_VERSION_1;
-        else
-            return ((ValueHandlerMultiFormat)vh).getMaximumStreamFormatVersion();
+        } else {
+            return ((ValueHandlerMultiFormat) vh).getMaximumStreamFormatVersion();
+        }
     }
 
     public static CorbaClientDelegate makeClientDelegate( IOR ior )
@@ -855,8 +873,9 @@ public final class ORBUtility {
     public static byte[] getBuffer( String[] data ) {
 	// Estimate size of result
 	int numChar = 0 ;
-	for (String str : data)
-	    numChar += str.length() ;
+	for (String str : data) {
+            numChar += str.length();
+        }
 	// Maximum result size is 1/2 the number of characters.
 	// Usually smaller due to comments and white space.
 	int maxSize = numChar/2 ;
@@ -870,9 +889,9 @@ public final class ORBUtility {
 	    for (int ctr = 0; ctr<str.length(); ctr++) {
 		char ch = str.charAt(ctr) ;
 		if (!Character.isWhitespace( ch )) {
-		    if (ch == '#') 
-			break ;
-		    else {
+		    if (ch == '#') {
+                        break;
+                    } else {
 			value = 16*value + hexOf( ch ) ;
 			if (!startByte) {
 			    result[index++] = (byte)value ;	
@@ -882,8 +901,9 @@ public final class ORBUtility {
 		    }
 		}
 
-		if (!startByte)
-		    throw new RuntimeException() ;
+		if (!startByte) {
+                    throw new RuntimeException();
+                }
 	    }
 	}
 
@@ -908,12 +928,14 @@ public final class ORBUtility {
             // by a space.
             while (j < 16 && (i + j) < length) {
                 int k = buffer.get(i + j);
-                if (k < 0)
+                if (k < 0) {
                     k = 256 + k;
+                }
                 String hex = Integer.toHexString(k);
-                if (hex.length() == 1)
+                if (hex.length() == 1) {
                     hex = "0" + hex;
-                sbuf.append(hex + " ");
+                }
+                sbuf.append(hex).append(" ");
                 j++;
             }
             
@@ -929,13 +951,14 @@ public final class ORBUtility {
             // characters are shown as periods.
             int x = 0;
             while (x < 16 && x + i < length) {
-                if (ORBUtility.isPrintable((char)buffer.get(i + x)))
-                    charBuf[x] = (char)buffer.get(i + x);
-                else
+                if (ORBUtility.isPrintable((char)buffer.get(i + x))) {
+                    charBuf[x] = (char) buffer.get(i + x);
+                } else {
                     charBuf[x] = '.';
+                }
                 x++;
             }
-            sbuf.append(new String(charBuf, 0, x) + "\n" );
+            sbuf.append(new String(charBuf, 0, x)).append("\n");
         }
     }
 
@@ -954,11 +977,11 @@ public final class ORBUtility {
 	StringBuffer sbuf = new StringBuffer() ;
 	int length = buffer.position() ;
 	sbuf.append( "--------------------------------------------------------\n\n" ) ;
-	sbuf.append( msg + "\n" ) ; 
+	sbuf.append(msg).append( "\n") ;
 	sbuf.append( "\n" ) ;
-        sbuf.append( "Total length (ByteBuffer position) : " + length + "\n" );
-        sbuf.append( "Byte Buffer capacity               : " + buffer.capacity() + 
-            "\n\n" );
+        sbuf.append("Total length (ByteBuffer position) : ").append(length).append( "\n");
+        sbuf.append("Byte Buffer capacity               : ").
+            append(buffer.capacity()).append( "\n\n");
 
         try {
             dumpBinary( sbuf, buffer ) ;

@@ -61,7 +61,7 @@ import com.sun.corba.se.spi.protocol.PIHandler ;
 
 import com.sun.corba.se.spi.orbutil.generic.MultiSet ;
 
-import com.sun.corba.se.impl.logging.POASystemException ;
+import com.sun.corba.se.spi.logging.POASystemException ;
 
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
@@ -84,6 +84,9 @@ import org.glassfish.gmbal.NameValue ;
 public class POAManagerImpl extends org.omg.CORBA.LocalObject implements 
     POAManager
 {
+    private static final POASystemException wrapper =
+        POASystemException.self ;
+
     private static final long serialVersionUID = -751471445699682659L;
 
     private final POAFactory factory ;	// factory which contains global state 
@@ -278,8 +281,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     {
 	// XXX This is probably not the correct error
 	if (state.value() == State._INACTIVE) {
-	    POASystemException wrapper = factory.getWrapper();
-	    throw wrapper.addPoaInactive( CompletionStatus.COMPLETED_NO ) ;
+	    throw wrapper.addPoaInactive() ;
 	}
 	    
         poas.add( (POAImpl)poa );

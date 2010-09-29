@@ -48,8 +48,8 @@ import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.transport.MessageTraceManagerImpl;
 
@@ -70,11 +70,13 @@ public class CDROutputObject
     implements com.sun.corba.se.impl.encoding.MarshalOutputStream,
                org.omg.CORBA.DataOutputStream, org.omg.CORBA.portable.ValueOutputStream
 {
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
     private static final long serialVersionUID = -3801946738338642735L;
 
     private transient ORB orb;
-    protected transient ORBUtilSystemException wrapper;
-    private transient OMGSystemException omgWrapper;
     private transient CDROutputStreamBase impl;
 
     private Message header;
@@ -86,8 +88,6 @@ public class CDROutputObject
     private void readObject( ObjectInputStream is ) throws IOException,
         ClassNotFoundException {
         orb = null ;
-        wrapper = null ;
-        omgWrapper = null ;
         impl = null ;
         corbaMessageMediator = null ;
         connection = null ;
@@ -110,9 +110,6 @@ public class CDROutputObject
         boolean littleEndian, BufferManagerWrite bufferManager, 
         byte streamFormatVersion, boolean usePooledByteBuffers, boolean directWrite)
     {
-	this.wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-	this.omgWrapper = orb.getLogWrapperTable().get_RPC_ENCODING_OMG() ;
-
         createCDROutputStream( orb, version, encodingVersion, littleEndian,
             bufferManager, streamFormatVersion,usePooledByteBuffers, directWrite ) ;
 
@@ -392,17 +389,11 @@ public class CDROutputObject
                 case GIOPVersion.VERSION_1_1:
                     return new CDROutputStream_1_1();
 	    case GIOPVersion.VERSION_1_2:
-		if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
-		    // Assumes JAVA_ENC_VERSION == 1
-		    return new IDLJavaSerializationOutputStream(directWrite);
-		}
 		return new CDROutputStream_1_2();
 	    default:
-		    ORBUtilSystemException wrapper = 
-			orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-                    // REVISIT - what is appropriate?  INTERNAL exceptions
-                    // are really hard to track later.
-		    throw wrapper.unsupportedGiopVersion( version ) ;
+                // REVISIT - what is appropriate?  INTERNAL exceptions
+                // are really hard to track later.
+                throw wrapper.unsupportedGiopVersion( version ) ;
             }
         }
     }

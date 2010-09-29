@@ -72,7 +72,7 @@ import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.orbutil.HexOutputStream;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
-import com.sun.corba.se.impl.logging.IORSystemException ;
+import com.sun.corba.se.spi.logging.IORSystemException ;
 
 // XXX remove this once getProfile is gone
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
@@ -89,7 +89,8 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
 {
     private String typeId;
     private ORB factory = null ;
-    IORSystemException wrapper ;
+    static final IORSystemException wrapper =
+        IORSystemException.self ;
     private boolean isCachedHashValue = false;
     private int cachedHashValue;
 
@@ -115,11 +116,13 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
     @Override
     public boolean equals( Object obj )
     {
-	if (obj == null)
-	    return false ;
+	if (obj == null) {
+            return false;
+        }
 
-	if (!(obj instanceof IOR))
-	    return false ;
+	if (!(obj instanceof IOR)) {
+            return false;
+        }
 
 	IOR other = (IOR)obj ;
 
@@ -146,7 +149,6 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
     public IORImpl( ORB orb, String typeid )
     {
 	factory = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_IOR_IOR() ;
 	this.typeId = typeid ;
     }
 
@@ -238,8 +240,9 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
     {
 	makeElementsImmutable() ;
 
-	if (iortemps != null)
-	    iortemps.makeImmutable() ;
+	if (iortemps != null) {
+            iortemps.makeImmutable();
+        }
 
 	super.makeImmutable() ;
     }
@@ -268,8 +271,9 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
 	while (myIterator.hasNext() && otherIterator.hasNext()) {
 	    TaggedProfile myProfile = myIterator.next() ;
 	    TaggedProfile otherProfile = otherIterator.next() ;
-	    if (!myProfile.isEquivalent( otherProfile ))
-		return false ;
+	    if (!myProfile.isEquivalent( otherProfile )) {
+                return false;
+            }
 	}
 
 	return myIterator.hasNext() == otherIterator.hasNext() ; 
@@ -291,10 +295,11 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
 
 	    // Check that all oids for all profiles are the same: if they are not,
 	    // throw exception.
-	    if (oid == null)
-		oid = prof.getObjectId() ;
-	    else if (!oid.equals( prof.getObjectId() ))
-		throw wrapper.badOidInIorTemplateList() ;
+	    if (oid == null) {
+                oid = prof.getObjectId();
+            } else if (!oid.equals( prof.getObjectId() )) {
+                throw wrapper.badOidInIorTemplateList();
+            }
 
 	    // Find or create the IORTemplate for oktemp.
 	    IORTemplate iortemp = oktempToIORTemplate.get( oktemp ) ;
@@ -318,8 +323,9 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
      */
     public synchronized IORTemplateList getIORTemplates() 
     {
-	if (iortemps == null) 
-	    initializeIORTemplateList() ;
+	if (iortemps == null) {
+            initializeIORTemplateList();
+        }
 
 	return iortemps ;
     }
@@ -335,11 +341,14 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
 	IIOPProfile iop = null ;
 	Iterator<TaggedProfile> iter = 
 	    iteratorById( TAG_INTERNET_IOP.value ) ;
-	if (iter.hasNext())
-	    iop = IIOPProfile.class.cast( iter.next() ) ;
+	if (iter.hasNext()) {
+            iop =
+                IIOPProfile.class.cast(iter.next());
+        }
  
-        if (iop != null)
-            return iop ;
+        if (iop != null) {
+            return iop;
+        }
  
         // if we come to this point then no IIOP Profile
         // is present.  Therefore, throw an exception.

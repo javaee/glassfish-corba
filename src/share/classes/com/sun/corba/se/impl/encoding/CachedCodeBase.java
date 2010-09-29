@@ -40,22 +40,20 @@
 
 package com.sun.corba.se.impl.encoding;
 
-import java.util.Hashtable;
-
 import com.sun.org.omg.CORBA.ValueDefPackage.FullValueDescription;
 
 import com.sun.org.omg.SendingContext.CodeBase;
 import com.sun.org.omg.SendingContext.CodeBaseHelper;
 import com.sun.org.omg.SendingContext._CodeBaseImplBase;
-import com.sun.org.omg.SendingContext._CodeBaseStub;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.ior.IOR ;
 
 import com.sun.corba.se.spi.orb.ORB ;
+import java.util.Hashtable;
 
 /**
  * Provides the reading side with a per connection cache of
@@ -77,7 +75,8 @@ import com.sun.corba.se.spi.orb.ORB ;
  */
 public class CachedCodeBase extends _CodeBaseImplBase
 {
-    private ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private Hashtable<String,String> implementations ;
     private Hashtable<String,FullValueDescription> fvds ;
@@ -197,10 +196,6 @@ public class CachedCodeBase extends _CodeBaseImplBase
             // service context processing didn't occur, or it
             // could be that we're talking to a foreign ORB which
             // doesn't include this optional service context.
-            if (wrapper == null) {
-                ORB orb = conn.getBroker() ;
-                wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-            }
 
             wrapper.codeBaseUnavailable( conn ) ;
 
@@ -224,7 +219,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
         return true;
     }
 
-    private final org.omg.CORBA.Object getObjectFromIOR() {
+    private org.omg.CORBA.Object getObjectFromIOR() {
         return CDRInputStream_1_0.internalIORToObject(
 	    conn.getCodeBaseIOR(), null /*stubFactory*/, conn.getBroker());
     }

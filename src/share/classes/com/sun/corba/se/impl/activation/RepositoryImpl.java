@@ -63,7 +63,7 @@ import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
-import com.sun.corba.se.impl.logging.ActivationSystemException;
+import com.sun.corba.se.spi.logging.ActivationSystemException;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 /**
@@ -83,7 +83,7 @@ public class RepositoryImpl extends _RepositoryImplBase
     {
 	this.debug = debug ;
 	this.orb = orb;
-	wrapper =  orb.getLogWrapperTable().get_ORBD_REPOSITORY_Activation() ;
+	wrapper =  ActivationSystemException.self ;
 
 	// if databse does not exist, create it otherwise read it in
 	File dbFile = new File(dbDir, "servers.db");
@@ -280,7 +280,7 @@ public class RepositoryImpl extends _RepositoryImplBase
 	    }
 
 	    if (debug) {
-		StringBuffer sb = new StringBuffer() ;
+		StringBuilder sb = new StringBuilder() ;
 		for (int ctr=0; ctr<servers.length; ctr++) {
 		    sb.append( ' ' ) ;
 		    sb.append( servers[ctr] ) ;
@@ -329,7 +329,7 @@ public class RepositoryImpl extends _RepositoryImplBase
 	    String[] apps = result.toArray( new String[result.size()] ) ;
 
 	    if (debug) {
-		StringBuffer sb = new StringBuffer() ;
+		StringBuilder sb = new StringBuilder() ;
 		for (int ctr=0; ctr<apps.length; ctr++) {
 		    sb.append( ' ' ) ;
 		    sb.append( apps[ctr] ) ;

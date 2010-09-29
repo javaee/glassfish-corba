@@ -52,34 +52,20 @@ import java.io.IOException;
 
 import java.rmi.RemoteException;
 
-import javax.rmi.CORBA.Tie;
-
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.SystemException;
-import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.BAD_INV_ORDER;
-
-import org.omg.CORBA.portable.Delegate;
-import org.omg.CORBA.portable.OutputStream;
-import org.omg.CORBA.portable.InputStream;
-
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
-
-import com.sun.corba.se.impl.util.Utility;
 
 import com.sun.corba.se.impl.ior.StubIORImpl ;
 import com.sun.corba.se.impl.presentation.rmi.StubConnectImpl ;
 
-import com.sun.corba.se.impl.logging.UtilSystemException ;
+import com.sun.corba.se.spi.logging.UtilSystemException ;
 
 /**
  * Base class from which all static RMI-IIOP stubs must inherit.
  */
 public class StubDelegateImpl implements javax.rmi.CORBA.StubDelegate 
 {
-    private static UtilSystemException wrapper = 
-	com.sun.corba.se.spi.orb.ORB
-	    .getStaticLogWrapperTable().get_RMIIIOP_Util() ;
+    private static final UtilSystemException wrapper =
+        UtilSystemException.self ;
 
     private StubIORImpl ior ;
 
@@ -105,8 +91,9 @@ public class StubDelegateImpl implements javax.rmi.CORBA.StubDelegate
     {
         // If the Stub is not connected to an ORB, BAD_OPERATION exception
         // will be raised by the code below.
-	if (ior == null)
-	    ior = new StubIORImpl( self ) ;
+	if (ior == null) {
+            ior = new StubIORImpl(self);
+        }
     }
         
     /**
@@ -152,27 +139,33 @@ public class StubDelegateImpl implements javax.rmi.CORBA.StubDelegate
 	return self.toString().equals( other.toString() ) ;
     }
 
+    @Override
     public synchronized boolean equals( Object obj )
     {
-	if (this == obj)
-	    return true ;
+	if (this == obj) {
+            return true;
+        }
 
-	if (!(obj instanceof StubDelegateImpl))
-	    return false ;
+	if (!(obj instanceof StubDelegateImpl)) {
+            return false;
+        }
 
 	StubDelegateImpl other = (StubDelegateImpl)obj ;
 
-	if (ior == null)
-	    return ior == other.ior ;
-	else 
-	    return ior.equals( other.ior ) ;
+	if (ior == null) {
+            return ior == other.ior;
+        } else {
+            return ior.equals(other.ior);
+        }
     }
 
+    @Override
     public synchronized int hashCode() {
-	if (ior == null)
-	    return 0 ;
-	else
-	    return ior.hashCode() ;
+	if (ior == null) {
+            return 0;
+        } else {
+            return ior.hashCode();
+        }
     }
 
     /**
@@ -182,10 +175,11 @@ public class StubDelegateImpl implements javax.rmi.CORBA.StubDelegate
      */
     public synchronized String toString(javax.rmi.CORBA.Stub self) 
     {
-	if (ior == null)
-	    return null ;
-	else
-	    return ior.toString() ;
+	if (ior == null) {
+            return null;
+        } else {
+            return ior.toString();
+        }
     }
     
     /**
@@ -211,8 +205,9 @@ public class StubDelegateImpl implements javax.rmi.CORBA.StubDelegate
     public synchronized void readObject(javax.rmi.CORBA.Stub self, 
 	java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException 
     {
-	if (ior == null)
-	    ior = new StubIORImpl() ;
+	if (ior == null) {
+            ior = new StubIORImpl();
+        }
 
 	ior.doRead( stream ) ;
     }

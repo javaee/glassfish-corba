@@ -47,7 +47,6 @@ import org.omg.CORBA.SystemException ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 import org.omg.CORBA_2_3.portable.InputStream ;
 
-import org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS ;
 import org.omg.IOP.TAG_INTERNET_IOP;
 import org.omg.IOP.TAG_JAVA_CODEBASE;
 
@@ -65,7 +64,6 @@ import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.ior.TaggedComponent ;
 import com.sun.corba.se.spi.ior.IdentifiableBase ;
 import com.sun.corba.se.spi.ior.IORFactories ;
-import com.sun.corba.se.spi.ior.ObjectKeyFactory ;
 
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
@@ -84,15 +82,17 @@ import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 
 import com.sun.corba.se.impl.util.JDKBridge;
 
-import com.sun.corba.se.impl.logging.IORSystemException;
+import com.sun.corba.se.spi.logging.IORSystemException;
 
 /**
  * @author
  */
 public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 {
+    private static final IORSystemException wrapper =
+        IORSystemException.self ;
+
     private ORB orb ;
-    private IORSystemException wrapper ;
     private ObjectId oid;
     private IIOPProfileTemplate proftemp;
     private ObjectKeyTemplate oktemp ;
@@ -111,20 +111,22 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 
 	static {
 	    String localCodebase = JDKBridge.getLocalCodebase() ;
-	    if (localCodebase == null)
-		comp = null ;
-	    else
-		comp = IIOPFactories.makeJavaCodebaseComponent( 
-		    localCodebase ) ;
+	    if (localCodebase == null) {
+                comp = null;
+            } else {
+                comp = IIOPFactories.makeJavaCodebaseComponent(localCodebase);
+            }
 	}
     }
 
     private GIOPVersion giopVersion = null;
 
+    @Override
     public boolean equals( Object obj )
     {
-	if (!(obj instanceof IIOPProfileImpl))
-	    return false ;
+	if (!(obj instanceof IIOPProfileImpl)) {
+            return false;
+        }
 
 	IIOPProfileImpl other = (IIOPProfileImpl)obj ;
 
@@ -132,6 +134,7 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 	    oktemp.equals( other.oktemp ) ;
     }
 
+    @Override
     public int hashCode()
     {
 	return oid.hashCode() ^ proftemp.hashCode() ^ oktemp.hashCode() ;
@@ -155,7 +158,6 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
     private IIOPProfileImpl( ORB orb ) 
     {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_IOR_IOR() ;
     }
 
     public IIOPProfileImpl( ORB orb, ObjectKeyTemplate oktemp, ObjectId oid, 
@@ -182,7 +184,7 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 	    throw wrapper.invalidTaggedProfile() ;
         }
 
-        EncapsInputStream istr = new EncapsInputStream((ORB)orb, profile.profile_data, 
+        EncapsInputStream istr = new EncapsInputStream(orb, profile.profile_data, 
 	    profile.profile_data.length);
 	istr.consumeEndian();
 	init( istr ) ;
@@ -204,9 +206,10 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 	    version, primary ) ;
 
 	// Handle any tagged components (if applicable)
-	if (version.getMinor() > 0) 
-	    EncapsulationUtility.readIdentifiableSequence( proftemp,
-		orb.getTaggedComponentFactoryFinder(), istr ) ;
+	if (version.getMinor() > 0) {
+            EncapsulationUtility.readIdentifiableSequence(proftemp,
+                orb.getTaggedComponentFactoryFinder(), istr);
+        }
 
 	// If there is no codebase in this IOR and there IS a
 	// java.rmi.server.codebase property set, we need to
@@ -217,8 +220,9 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 	    JavaCodebaseComponent jcc = LocalCodeBaseSingletonHolder.comp ;
 
 	    if (jcc != null) {
-		if (version.getMinor() > 0)
-		    proftemp.add( jcc ) ;
+		if (version.getMinor() > 0) {
+                    proftemp.add(jcc);
+                }
 
 		codebase = jcc.getURLs() ;
 	    }
@@ -241,8 +245,9 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 
     public boolean isEquivalent( TaggedProfile prof )
     {
-	if (!(prof instanceof IIOPProfile))
-	    return false ;
+	if (!(prof instanceof IIOPProfile)) {
+            return false;
+        }
 
 	IIOPProfile other = (IIOPProfile)prof ;
 
@@ -328,8 +333,9 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
      */
     public java.lang.Object getServant()
     {
-	if (!isLocal())
-	    return null ;
+	if (!isLocal()) {
+            return null;
+        }
 
 	RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
 	ObjectAdapterFactory oaf = scr.getObjectAdapterFactory( 
@@ -344,7 +350,7 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 	    // Could not find the OA, so just return null.
 	    // This usually happens when POAs are being deleted,
 	    // and the POA always return null for getLocalServant anyway.
-	    wrapper.getLocalServantFailure( exc, oaid.toString() ) ;
+	    wrapper.getLocalServantFailure( exc, oaid ) ;
 	    return null ;
 	}
 

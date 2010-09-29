@@ -8,8 +8,9 @@
  * Note: replace this header with the standard header.
  */
 
-package com.sun.corba.se.impl.logging ;
+package com.sun.corba.se.spi.logging ;
 
+import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
 import com.sun.corba.se.spi.orbutil.logex.Message ;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel ;
@@ -31,7 +32,7 @@ public interface ActivationSystemException {
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Cannot read repository datastore" )
-    INITIALIZE cannotReadRepositoryDb(  ) ;
+    INITIALIZE cannotReadRepositoryDb( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Cannot add initial naming" )
@@ -39,7 +40,7 @@ public interface ActivationSystemException {
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Cannot write repository datastore" )
-    INTERNAL cannotWriteRepositoryDb(  ) ;
+    INTERNAL cannotWriteRepositoryDb( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Server not expected to register" )
@@ -55,5 +56,5 @@ public interface ActivationSystemException {
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Error in BadServerIdHandler" )
-    OBJECT_NOT_EXIST errorInBadServerIdHandler(  ) ;
+    OBJECT_NOT_EXIST errorInBadServerIdHandler( @Chain Exception exc  ) ;
 }

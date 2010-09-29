@@ -54,20 +54,22 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBVersion ;
 
 
-import com.sun.corba.se.impl.logging.IORSystemException ;
+import com.sun.corba.se.spi.logging.IORSystemException ;
 
 /**
  * @author Ken Cavanaugh
  */
 public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate 
 {
+    protected static final IORSystemException wrapper =
+        IORSystemException.self ;
+
     // Fixed constants for Java IDL object key template forms
     public static final String JIDL_ORB_ID = "" ;
     private static final String[] JIDL_OAID_STRINGS = { "TransientObjectAdapter" } ;
     public static final ObjectAdapterId JIDL_OAID = new ObjectAdapterIdArray( JIDL_OAID_STRINGS ) ;
 
     private ORB orb ;
-    protected IORSystemException wrapper ;
     private ORBVersion version ;
     private int magic ;
     private int scid ;
@@ -82,7 +84,7 @@ public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate
         if (adapterId == null) {
 	    adapterId = computeAdapterId();
 	}
-	return (byte[])(adapterId.clone()) ;
+	return adapterId.clone() ;
     }
 
     private byte[] computeAdapterId()
@@ -107,7 +109,6 @@ public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate
 	String orbid, ObjectAdapterId oaid ) 
     {
 	this.orb = orb ;
-	this.wrapper = orb.getLogWrapperTable().get_OA_IOR_IOR() ;
 	this.magic = magic ;
 	this.scid = scid ;
 	this.serverid = serverid ;
@@ -117,10 +118,12 @@ public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate
 	adapterId = null;
     }
 
+    @Override
     public boolean equals( Object obj ) 
     {
-	if (!(obj instanceof ObjectKeyTemplateBase))
-	    return false ;
+	if (!(obj instanceof ObjectKeyTemplateBase)) {
+            return false;
+        }
 
 	ObjectKeyTemplateBase other = (ObjectKeyTemplateBase)obj ;
 

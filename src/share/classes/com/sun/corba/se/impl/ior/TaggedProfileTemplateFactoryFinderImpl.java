@@ -44,12 +44,10 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-
 import org.omg.CORBA_2_3.portable.InputStream ;
 
-
 /**
- * @author 
+ * @author Ken Cavanaugh
  */
 public class TaggedProfileTemplateFactoryFinderImpl extends
     IdentifiableFactoryFinderBase<TaggedProfileTemplate> 
@@ -61,6 +59,6 @@ public class TaggedProfileTemplateFactoryFinderImpl extends
 
     public TaggedProfileTemplate handleMissingFactory( int id, InputStream is) 
     {
-	throw wrapper.taggedProfileTemplateFactoryNotFound( Integer.valueOf(id) ) ;
+	throw wrapper.taggedProfileTemplateFactoryNotFound( id ) ;
     }
 }

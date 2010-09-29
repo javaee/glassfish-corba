@@ -48,7 +48,6 @@ import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.ObjectKey ;
-import com.sun.corba.se.spi.ior.ObjectKeyFactory ;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
@@ -58,16 +57,15 @@ import com.sun.corba.se.spi.resolver.Resolver ;
 
 import com.sun.corba.se.impl.ior.ObjectIdImpl;
 import com.sun.corba.se.impl.ior.ObjectKeyImpl;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 public class BootstrapResolverImpl implements Resolver {
     private org.omg.CORBA.portable.Delegate bootstrapDelegate ;
-    private ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     public BootstrapResolverImpl(ORB orb, String host, int port) {
-	wrapper = orb.getLogWrapperTable().get_ORB_RESOLVER_ORBUtil() ;
-
 	// Create a new IOR with the magic of INIT
 	byte[] initialKey = "INIT".getBytes();
 	ObjectKey okey = new ObjectKeyImpl(orb.getWireObjectKeyTemplate(),
@@ -80,8 +78,7 @@ public class BootstrapResolverImpl implements Resolver {
 	IORTemplate iortemp = IORFactories.makeIORTemplate( okey.getTemplate() ) ;
 	iortemp.add( ptemp ) ;
 
-	IOR initialIOR = iortemp.makeIOR( (com.sun.corba.se.spi.orb.ORB)orb, 
-	    "", okey.getId() ) ;
+	IOR initialIOR = iortemp.makeIOR( orb, "", okey.getId() ) ;
 
 	bootstrapDelegate = ORBUtility.makeClientDelegate( initialIOR ) ;	
     }
@@ -111,8 +108,8 @@ public class BootstrapResolverImpl implements Resolver {
 	    org.omg.CORBA.Object objref = null ;
 	    remarshal = false;
 
-	    OutputStream os = (OutputStream) bootstrapDelegate.request( objref, 
-		operationName, true);
+	    OutputStream os = bootstrapDelegate.request(objref, operationName,
+                true);
 
             if ( parameter != null ) {
                 os.write_string( parameter );
@@ -166,8 +163,9 @@ public class BootstrapResolverImpl implements Resolver {
 	    inStream = invoke( "list", null ) ;
 
 	    int count =	inStream.read_long();
-	    for (int i=0; i < count; i++) 
-		result.add( inStream.read_string() ) ;
+	    for (int i=0; i < count; i++) {
+                result.add(inStream.read_string());
+            }
 
 	    // NOTE: do note trap and ignore errors.
 	    // Let them flow out.

@@ -41,11 +41,6 @@
 package com.sun.corba.se.impl.interceptors;
 
 import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.NO_IMPLEMENT;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
-import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.PolicyError;
 import org.omg.IOP.CodecFactory;
@@ -60,11 +55,9 @@ import org.omg.PortableInterceptor.ORBInitInfoPackage.InvalidName;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.legacy.interceptor.ORBInitInfoExt ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-
-import com.sun.corba.se.impl.logging.InterceptorsSystemException;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.InterceptorsSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 
 /**
  * ORBInitInfoImpl is the implementation of the ORBInitInfo class to be
@@ -77,9 +70,12 @@ public final class ORBInitInfoImpl
     // The ORB we are initializing
     private transient ORB orb;
     
-    private transient InterceptorsSystemException wrapper ;
-    private transient ORBUtilSystemException orbutilWrapper ;
-    private transient OMGSystemException omgWrapper ;
+    private static final InterceptorsSystemException wrapper =
+        InterceptorsSystemException.self ;
+    private static final ORBUtilSystemException orbutilWrapper =
+        ORBUtilSystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
 
     // The arguments passed to ORB_init
     private String[] args;
@@ -115,11 +111,6 @@ public final class ORBInitInfoImpl
 	String orbId, CodecFactory codecFactory ) 
     {
 	this.orb = orb;
-
-	wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
-	orbutilWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	omgWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
-
 	this.args = args;
 	this.orbId = orbId;
 	this.codecFactory = codecFactory;

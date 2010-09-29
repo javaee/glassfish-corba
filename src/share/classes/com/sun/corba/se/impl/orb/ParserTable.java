@@ -88,7 +88,7 @@ import com.sun.corba.se.impl.oa.poa.Policies;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry ;
 import com.sun.corba.se.impl.legacy.connection.USLPort ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr ;
@@ -105,6 +105,9 @@ import com.sun.corba.se.spi.transport.CorbaInboundConnectionCache;
  * for ORBDataParserImpl.
  */
 public class ParserTable {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // There is a serious problem here with the DefaultSocketFactory.
     // It is NOT immutable: in particular is has a setORB method, so instances
     // of DefaultSocketFactoryImpl CANNOT be shared across ORBs.
@@ -113,8 +116,6 @@ public class ParserTable {
     private static String MY_CLASS_NAME = ParserTable.class.getName() ;
 
     // private static final ParserTable myInstance = new ParserTable() ;
-
-    private ORBUtilSystemException wrapper ;
 
     private Operation classAction ;
 
@@ -146,8 +147,6 @@ public class ParserTable {
 
     private ParserTable( UnaryFunction<String,Class<?>> cnr ) {
         classAction = OperationFactory.classAction( cnr ) ;
-
-	wrapper = ORB.getStaticLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
 
 	String codeSetTestString = 
 	    OSFCodeSetRegistry.ISO_8859_1_VALUE + "," +
@@ -718,7 +717,8 @@ public class ParserTable {
 			.isAssignableFrom(legacySocketFactoryClass)) {
 			return legacySocketFactoryClass.newInstance();
 		    } else {
-			throw wrapper.illegalSocketFactoryType( legacySocketFactoryClass.toString() ) ;
+			throw wrapper.illegalSocketFactoryType(
+                            legacySocketFactoryClass.toString() ) ;
 		    }
 		} catch (Exception ex) {
 		    // ClassNotFoundException, IllegalAccessException, 
@@ -899,13 +899,13 @@ public class ParserTable {
 	    {
 		int giopFragmentSize = ((Integer)value).intValue() ;
 		if (giopFragmentSize < ORBConstants.GIOP_FRAGMENT_MINIMUM_SIZE){
-		    throw wrapper.fragmentSizeMinimum( Integer.valueOf( giopFragmentSize ),
-			Integer.valueOf( ORBConstants.GIOP_FRAGMENT_MINIMUM_SIZE ) ) ;
+		    throw wrapper.fragmentSizeMinimum( giopFragmentSize,
+			ORBConstants.GIOP_FRAGMENT_MINIMUM_SIZE ) ;
 		}
 
                 if (giopFragmentSize % ORBConstants.GIOP_FRAGMENT_DIVISOR != 0)
-		    throw wrapper.fragmentSizeDiv( Integer.valueOf( giopFragmentSize ),
-			    Integer.valueOf( ORBConstants.GIOP_FRAGMENT_DIVISOR ) ) ;
+		    throw wrapper.fragmentSizeDiv( giopFragmentSize,
+			    ORBConstants.GIOP_FRAGMENT_DIVISOR ) ;
 
 		return value ;
 	    }

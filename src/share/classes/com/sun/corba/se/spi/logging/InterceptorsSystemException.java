@@ -8,16 +8,21 @@
  * Note: replace this header with the standard header.
  */
 
-package com.sun.corba.se.impl.logging ;
+package com.sun.corba.se.spi.logging ;
 
+import com.sun.corba.se.spi.oa.ObjectAdapter;
+import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
 import com.sun.corba.se.spi.orbutil.logex.Message ;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel ;
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper ;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
+import com.sun.corba.se.spi.orbutil.logex.corba.CS;
+import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
 
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
+import java.util.List;
 
 import org.omg.CORBA.BAD_INV_ORDER;
 import org.omg.CORBA.BAD_PARAM;
@@ -26,6 +31,7 @@ import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 import org.omg.CORBA.UNKNOWN;
+import org.omg.PortableInterceptor.ObjectReferenceTemplate;
 
 @ExceptionWrapper( idPrefix="IOP" )
 @ORBException( omgException=false, group=CorbaExtension.InterceptorsGroup )
@@ -35,7 +41,7 @@ public interface InterceptorsSystemException {
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Interceptor type {0} is out of range" )
-    BAD_PARAM typeOutOfRange( String arg0 ) ;
+    BAD_PARAM typeOutOfRange( int type ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Interceptor's name is null: use empty string for "
@@ -48,11 +54,11 @@ public interface InterceptorsSystemException {
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Expected state {0}, but current state is {1}" )
-    BAD_INV_ORDER badState1( String arg0, String arg1 ) ;
+    BAD_INV_ORDER badState1( int arg0, int arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Expected state {0} or {1}, but current state is {2}" )
-    BAD_INV_ORDER badState2( String arg0, String arg1, String arg2 ) ;
+    BAD_INV_ORDER badState2( int arg0, int arg1, int arg2 ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "IOException during cancel request" )
@@ -86,15 +92,15 @@ public interface InterceptorsSystemException {
     
     @Log( level=LogLevel.WARNING, id=7 )
     @Message( "Exception in arguments" )
-    INTERNAL exceptionInArguments(  ) ;
+    INTERNAL exceptionInArguments( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=8 )
     @Message( "Exception in exceptions" )
-    INTERNAL exceptionInExceptions(  ) ;
+    INTERNAL exceptionInExceptions( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=9 )
     @Message( "Exception in contexts" )
-    INTERNAL exceptionInContexts(  ) ;
+    INTERNAL exceptionInContexts( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=10 )
     @Message( "Another exception was null" )
@@ -134,11 +140,11 @@ public interface InterceptorsSystemException {
     
     @Log( level=LogLevel.WARNING, id=19 )
     @Message( "Mark and reset failed" )
-    INTERNAL markAndResetFailed(  ) ;
+    INTERNAL markAndResetFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=20 )
     @Message( "currentIndex > tableContainer.size(): {0} > {1}" )
-    INTERNAL slotTableInvariant( String arg0, String arg1 ) ;
+    INTERNAL slotTableInvariant( int arg0, int arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=21 )
     @Message( "InterceptorList is locked" )
@@ -151,21 +157,25 @@ public interface InterceptorsSystemException {
     @Log( level=LogLevel.FINE, id=23 )
     @Message( "Ignored exception in establish_components method for "
         + "ObjectAdapter {0} (as per specification)" )
-    INTERNAL ignoredExceptionInEstablishComponents( String arg0 ) ;
+    INTERNAL ignoredExceptionInEstablishComponents( @Chain Exception exc,
+        ObjectAdapter oa ) ;
     
     @Log( level=LogLevel.FINE, id=24 )
     @Message( "Exception in components_established method for ObjectAdapter {0}" )
-    INTERNAL exceptionInComponentsEstablished( String arg0 ) ;
+    INTERNAL exceptionInComponentsEstablished( @Chain Exception exc, 
+        ObjectAdapter oa ) ;
     
     @Log( level=LogLevel.FINE, id=25 )
     @Message( "Ignored exception in adapter_manager_state_changed method for "
         + "managerId {0} and newState {1} (as per specification)" )
-    INTERNAL ignoredExceptionInAdapterManagerStateChanged( String arg0, String arg1 ) ;
+    INTERNAL ignoredExceptionInAdapterManagerStateChanged( @Chain Exception exc,
+        int managerId, short newState ) ;
     
     @Log( level=LogLevel.FINE, id=26 )
     @Message( "Ignored exception in adapter_state_changed method for " +
         "templates {0} and newState {1} (as per specification)" )
-    INTERNAL ignoredExceptionInAdapterStateChanged( String arg0, String arg1 ) ;
+    INTERNAL ignoredExceptionInAdapterStateChanged( @Chain Exception exc,
+        List<ObjectReferenceTemplate> templates, short newState ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Policies not implemented" )
@@ -177,5 +187,6 @@ public interface InterceptorsSystemException {
     
     @Log( level=LogLevel.FINE, id=1 )
     @Message( "Unknown request invocation error" )
+    @CS( CSValue.MAYBE )
     UNKNOWN unknownRequestInvoke(  ) ;
 }

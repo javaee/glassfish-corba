@@ -50,8 +50,6 @@ import java.security.AccessController;
 import java.lang.reflect.InvocationHandler ;
 import java.lang.reflect.Method ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
 import com.sun.corba.se.impl.util.Utility ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
@@ -60,13 +58,12 @@ import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.impl.presentation.rmi.StubFactoryDynamicBase ;
 import com.sun.corba.se.impl.presentation.rmi.StubInvocationHandlerImpl ;
 
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 public class StubFactoryCodegenImpl extends StubFactoryDynamicBase  
 {
     private static final ORBUtilSystemException wrapper =
-	ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
+        ORBUtilSystemException.self ;
 
     private static final String CODEGEN_KEY = "CodegenStubClass" ;
     private final PresentationManager pm ;

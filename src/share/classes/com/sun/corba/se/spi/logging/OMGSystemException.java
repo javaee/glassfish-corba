@@ -8,13 +8,17 @@
  * Note: replace this header with the standard header.
  */
 
-package com.sun.corba.se.impl.logging ;
+package com.sun.corba.se.spi.logging ;
 
+import com.sun.corba.se.spi.ior.ObjectAdapterId;
+import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
 import com.sun.corba.se.spi.orbutil.logex.Message ;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel ;
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper ;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
+import com.sun.corba.se.spi.orbutil.logex.corba.CS;
+import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
 
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
@@ -135,12 +139,12 @@ public interface OMGSystemException {
     @Log( level=LogLevel.FINE, id=15 )
     @Message( "Service context add failed in portable interceptor because "
         + "a service context with id {0} already exists" )
-    BAD_INV_ORDER serviceContextAddFailed( String arg0 ) ;
+    BAD_INV_ORDER serviceContextAddFailed( int id ) ;
     
     @Log( level=LogLevel.WARNING, id=16 )
     @Message( "Registration of PolicyFactory failed because a factory already "
         + "exists for the given PolicyType {0}" )
-    BAD_INV_ORDER policyFactoryRegFailed( String arg0 ) ;
+    BAD_INV_ORDER policyFactoryRegFailed( int type ) ;
     
     @Log( level=LogLevel.WARNING, id=17 )
     @Message( "POA cannot create POAs while undergoing destruction" )
@@ -188,14 +192,22 @@ public interface OMGSystemException {
     
     @Log( level=LogLevel.WARNING, id=6 )
     @Message( "Class {0} is not Serializable" )
+    @CS( CSValue.MAYBE )
     BAD_PARAM notSerializable( String arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=7 )
     @Message( "string_to_object conversion failed due to bad scheme name {0}" )
     BAD_PARAM soBadSchemeName( String arg0 ) ;
     
+    String soBadAddress = "string_to_object conversion failed due to "
+        + "bad address in name {0}" ;
+
     @Log( level=LogLevel.FINE, id=8 )
-    @Message( "string_to_object conversion failed due to bad address in name {0}" )
+    @Message( soBadAddress )
+    BAD_PARAM soBadAddress( @Chain Throwable exc, String arg0 ) ;
+
+    @Log( level=LogLevel.FINE, id=8 )
+    @Message( soBadAddress )
     BAD_PARAM soBadAddress( String arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=9 )
@@ -242,7 +254,8 @@ public interface OMGSystemException {
     BAD_PARAM tcUnionDupLabel(  ) ;
     
     @Log( level=LogLevel.WARNING, id=19 )
-    @Message( "Incompatible TypeCode of label and discriminator in create_union_tc " )
+    @Message( "Incompatible TypeCode of label and discriminator in "
+        + "create_union_tc " )
     BAD_PARAM tcUnionIncompatible(  ) ;
     
     @Log( level=LogLevel.WARNING, id=20 )
@@ -250,7 +263,8 @@ public interface OMGSystemException {
     BAD_PARAM tcUnionBadDisc(  ) ;
     
     @Log( level=LogLevel.WARNING, id=21 )
-    @Message( "Any passed to ServerRequest::set_exception does not contain an exception " )
+    @Message( "Any passed to ServerRequest::set_exception does not contain "
+        + "an exception " )
     BAD_PARAM setExceptionBadAny(  ) ;
     
     @Log( level=LogLevel.WARNING, id=22 )
@@ -279,7 +293,7 @@ public interface OMGSystemException {
     
     @Log( level=LogLevel.FINE, id=28 )
     @Message( "Invalid component Id {0} in portable interceptor" )
-    BAD_PARAM invalidComponentId( String arg0 ) ;
+    BAD_PARAM invalidComponentId( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=29 )
     @Message( "Profile ID does not define a known profile or it is impossible "
@@ -288,7 +302,8 @@ public interface OMGSystemException {
     
     @Log( level=LogLevel.WARNING, id=30 )
     @Message( "Two or more Policy objects with the same PolicyType value "
-        + "supplied to Object::set_policy_overrides or PolicyManager::set_policy_overrides" )
+        + "supplied to Object::set_policy_overrides or "
+        + "PolicyManager::set_policy_overrides" )
     BAD_PARAM policyTypeDuplicate(  ) ;
     
     @Log( level=LogLevel.WARNING, id=31 )
@@ -305,7 +320,8 @@ public interface OMGSystemException {
     BAD_PARAM xaCallInval(  ) ;
     
     @Log( level=LogLevel.WARNING, id=34 )
-    @Message( "Union branch modifier method called with bad case label discriminator" )
+    @Message( "Union branch modifier method called with "
+        + "bad case label discriminator" )
     BAD_PARAM unionBadDiscriminator(  ) ;
     
     @Log( level=LogLevel.WARNING, id=35 )
@@ -326,10 +342,11 @@ public interface OMGSystemException {
     
     @Log( level=LogLevel.WARNING, id=39 )
     @Message( "Unsupported RMI/IDL custom value type stream format {0}" )
-    BAD_PARAM invalidStreamFormatVersion( String arg0 ) ;
+    BAD_PARAM invalidStreamFormatVersion( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=40 )
     @Message( "ORB output stream does not support ValueOutputStream interface" )
+    @CS( CSValue.MAYBE )
     BAD_PARAM notAValueoutputstream(  ) ;
     
     @Log( level=LogLevel.WARNING, id=41 )
@@ -350,7 +367,7 @@ public interface OMGSystemException {
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Character does not map to negotiated transmission code set" )
-    DATA_CONVERSION charNotInCodeset(  ) ;
+    DATA_CONVERSION charNotInCodeset( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Failure of PriorityMapping object" )
@@ -373,7 +390,8 @@ public interface OMGSystemException {
     INV_OBJREF codesetComponentRequired(  ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
-    @Message( "Unable to reconcile IOR specified policy with effective policy override" )
+    @Message( "Unable to reconcile IOR specified policy with "
+        + "effective policy override" )
     INV_POLICY iorPolicyReconcileError(  ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
@@ -400,9 +418,17 @@ public interface OMGSystemException {
     @Message( "No entry for requested interface in Interface Repository" )
     INTF_REPOS noInterfaceInIr(  ) ;
     
+    String unableLocateValueFactory = "Unable to locate value factory" ;
+
     @Log( level=LogLevel.FINE, id=1 )
-    @Message( "Unable to locate value factory" )
+    @Message( unableLocateValueFactory )
+    @CS( CSValue.MAYBE )
     MARSHAL unableLocateValueFactory(  ) ;
+
+    @Log( level=LogLevel.FINE, id=1 )
+    @Message( unableLocateValueFactory )
+    @CS( CSValue.MAYBE )
+    MARSHAL unableLocateValueFactory( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "ServerRequest::set_result called before ServerRequest::ctx "
@@ -416,7 +442,7 @@ public interface OMGSystemException {
     
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "Attempt to marshal Local object" )
-    MARSHAL notAnObjectImpl(  ) ;
+    MARSHAL notAnObjectImpl( @Chain BAD_PARAM exception ) ;
     
     @Log( level=LogLevel.WARNING, id=5 )
     @Message( "wchar or wstring data erroneously sent by client over GIOP 1.0 connection " )
@@ -428,6 +454,7 @@ public interface OMGSystemException {
     
     @Log( level=LogLevel.WARNING, id=7 )
     @Message( "Unsupported RMI/IDL custom value type stream format" )
+    @CS( CSValue.MAYBE )
     MARSHAL unsupportedFormatVersion(  ) ;
     
     @Log( level=LogLevel.FINE, id=8 )
@@ -441,14 +468,23 @@ public interface OMGSystemException {
     @Log( level=LogLevel.FINE, id=8 )
     @Message( "Not enough optional data available" )
     MARSHAL rmiiiopOptionalDataIncompatible3(  ) ;
-    
+
+    String missingLocalValueImpl = "Missing local value implementation" ;
+
     @Log( level=LogLevel.WARNING, id=1 )
-    @Message( "Missing local value implementation" )
-    NO_IMPLEMENT missingLocalValueImpl(  ) ;
+    @Message( missingLocalValueImpl )
+    @CS( CSValue.MAYBE )
+    NO_IMPLEMENT missingLocalValueImpl( @Chain Throwable exc ) ;
+
+    @Log( level=LogLevel.WARNING, id=1 )
+    @Message( missingLocalValueImpl )
+    @CS( CSValue.MAYBE )
+    NO_IMPLEMENT missingLocalValueImpl() ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Incompatible value implementation version" )
-    NO_IMPLEMENT incompatibleValueImpl(  ) ;
+    @CS( CSValue.MAYBE )
+    NO_IMPLEMENT incompatibleValueImpl( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Unable to use any profile in IOR" )
@@ -540,9 +576,15 @@ public interface OMGSystemException {
     @Message( "Attempt to pass an unactivated (unregistered) value as an object reference" )
     OBJECT_NOT_EXIST unregisteredValueAsObjref(  ) ;
     
+    String noObjectAdaptor = "Failed to create or locate Object Adaptor" ;
+
     @Log( level=LogLevel.FINE, id=2 )
-    @Message( "Failed to create or locate Object Adaptor" )
-    OBJECT_NOT_EXIST noObjectAdaptor(  ) ;
+    @Message( noObjectAdaptor )
+    OBJECT_NOT_EXIST noObjectAdaptor( @Chain Exception exc ) ;
+
+    @Log( level=LogLevel.FINE, id=2 )
+    @Message( noObjectAdaptor )
+    OBJECT_NOT_EXIST noObjectAdaptor() ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Biomolecular Sequence Analysis Service is no longer available" )
@@ -552,9 +594,17 @@ public interface OMGSystemException {
     @Message( "Object Adapter Inactive" )
     OBJECT_NOT_EXIST objectAdapterInactive(  ) ;
     
+    String adapterActivatorException = "System exception in "
+        + "POA::unknown_adapter for POA {0} with parent POA {1}" ;
+
     @Log( level=LogLevel.WARNING, id=1 )
-    @Message( "System exception in POA::unknown_adapter for POA {0} with parent POA {1}" )
-    OBJ_ADAPTER adapterActivatorException( String arg0, String arg1 ) ;
+    @Message( adapterActivatorException )
+    OBJ_ADAPTER adapterActivatorException( @Chain Exception exc, String arg0,
+        ObjectAdapterId arg1 ) ;
+
+    @Log( level=LogLevel.WARNING, id=1 )
+    @Message( adapterActivatorException )
+    OBJ_ADAPTER adapterActivatorException( String arg0, ObjectAdapterId arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Incorrect servant type returned by servant manager " )
@@ -573,16 +623,26 @@ public interface OMGSystemException {
     OBJ_ADAPTER badPolicyIncarnate(  ) ;
     
     @Log( level=LogLevel.WARNING, id=6 )
-    @Message( "Exception in PortableInterceptor::IORInterceptor.components_established" )
+    @Message( "Exception in "
+        + "PortableInterceptor::IORInterceptor.components_established" )
     OBJ_ADAPTER piExcCompEstablished(  ) ;
     
     @Log( level=LogLevel.FINE, id=7 )
     @Message( "Null servant returned by servant manager" )
     OBJ_ADAPTER nullServantReturned(  ) ;
     
+    String unknownUserException =
+        "Unlisted user exception received by client " ;
+
     @Log( level=LogLevel.FINE, id=1 )
-    @Message( "Unlisted user exception received by client " )
+    @Message( unknownUserException )
+    @CS( CSValue.MAYBE )
     UNKNOWN unknownUserException(  ) ;
+
+    @Log( level=LogLevel.FINE, id=1 )
+    @Message( unknownUserException )
+    @CS( CSValue.MAYBE )
+    UNKNOWN unknownUserException( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Non-standard System Exception not supported" )

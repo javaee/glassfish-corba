@@ -40,7 +40,6 @@
 
 package com.sun.corba.se.impl.oa.poa ;
 
-import java.util.Enumeration ;
 
 import org.omg.PortableServer.POA ;
 import org.omg.PortableServer.Servant ;
@@ -55,8 +54,6 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.impl.oa.NullServantImpl ;
@@ -72,11 +69,13 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
 	super( policies, poa ) ;
 
 	// assert !policies.retainServants() && policies.useServantManager()
-	if (policies.retainServants())
-	    throw poa.invocationWrapper().policyMediatorBadPolicyInFactory() ;
+	if (policies.retainServants()) {
+            throw wrapper.policyMediatorBadPolicyInFactory();
+        }
 
-	if (!policies.useServantManager())
-	    throw poa.invocationWrapper().policyMediatorBadPolicyInFactory() ;
+	if (!policies.useServantManager()) {
+            throw wrapper.policyMediatorBadPolicyInFactory();
+        }
 
 	locator = null ;
     }
@@ -84,8 +83,9 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
     protected java.lang.Object internalGetServant( byte[] id, 
 	String operation ) throws ForwardRequest
     { 
-	if (locator == null)
-	    throw poa.invocationWrapper().poaNoServantManager() ;
+	if (locator == null) {
+            throw wrapper.poaNoServantManager();
+        }
     
 	CookieHolder cookieHolder = orb.peekInvocationInfo().getCookieHolder() ;
 
@@ -95,10 +95,12 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
 	    poa.unlock() ;
 
 	    servant = locator.preinvoke(id, poa, operation, cookieHolder);
-	    if (servant == null)
-		servant = new NullServantImpl( poa.omgInvocationWrapper().nullServantReturned() ) ;
-	    else
-		setDelegate( (Servant)servant, id);
+	    if (servant == null) {
+                servant =
+                    new NullServantImpl(omgWrapper.nullServantReturned());
+            } else {
+                setDelegate((Servant) servant, id);
+            }
 	} finally {
 	    poa.lock() ;
 	}
@@ -110,8 +112,9 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
     {
 	OAInvocationInfo info = orb.peekInvocationInfo();
         // 6878245: added info == null check.
-	if (locator == null || info == null)
-	    return;
+	if (locator == null || info == null) {
+            return;
+        }
 
 	try {
 	    poa.unlock() ;
@@ -140,13 +143,15 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
 
     public void setServantManager( ServantManager servantManager ) throws WrongPolicy
     {
-	if (locator != null)
-	    throw poa.invocationWrapper().servantManagerAlreadySet() ;
+	if (locator != null) {
+            throw wrapper.servantManagerAlreadySet();
+        }
 
-	if (servantManager instanceof ServantLocator)
-	    locator = (ServantLocator)servantManager;
-	else
-	    throw poa.invocationWrapper().servantManagerBadType() ;
+	if (servantManager instanceof ServantLocator) {
+            locator = (ServantLocator) servantManager;
+        } else {
+            throw wrapper.servantManagerBadType();
+        }
     }
 
     public Servant getDefaultServant() throws NoServant, WrongPolicy 

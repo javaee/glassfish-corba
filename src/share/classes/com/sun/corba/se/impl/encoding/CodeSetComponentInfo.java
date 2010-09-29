@@ -53,14 +53,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.omg.CORBA.INITIALIZE;
-import org.omg.CORBA.CompletionStatus;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 public final class CodeSetComponentInfo {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     /**
      * CodeSetComponent is part of an IOR multi-component profile.  Two
@@ -71,6 +69,7 @@ public final class CodeSetComponentInfo {
         int nativeCodeSet;
 	int[] conversionCodeSets;
 
+        @Override
 	public boolean equals( Object obj )
 	{
 	    if (this == obj)
@@ -85,6 +84,7 @@ public final class CodeSetComponentInfo {
 		Arrays.equals( conversionCodeSets, other.conversionCodeSets ) ;
 	}
 
+        @Override
 	public int hashCode()
 	{
 	    int result = nativeCodeSet ;
@@ -117,8 +117,9 @@ public final class CodeSetComponentInfo {
 	    out.write_ulong_array(conversionCodeSets, 0, conversionCodeSets.length);
 	}
 
+        @Override
         public String toString() {
-            StringBuffer sbuf = new StringBuffer("CodeSetComponent(");
+            StringBuilder sbuf = new StringBuilder("CodeSetComponent(");
 
             sbuf.append("native:");
             sbuf.append(Integer.toHexString(nativeCodeSet));
@@ -140,6 +141,7 @@ public final class CodeSetComponentInfo {
     private CodeSetComponent forCharData;
     private CodeSetComponent forWCharData;
 
+    @Override
     public boolean equals( Object obj )
     {
 	if (this == obj)
@@ -153,13 +155,15 @@ public final class CodeSetComponentInfo {
 	    forWCharData.equals( other.forWCharData ) ;
     }
 
+    @Override
     public int hashCode()
     {
 	return forCharData.hashCode() ^ forWCharData.hashCode() ;
     }
 
+    @Override
     public String toString() {
-        StringBuffer sbuf = new StringBuffer("CodeSetComponentInfo(");
+        StringBuilder sbuf = new StringBuilder("CodeSetComponentInfo(");
 
         sbuf.append("char_data:");
         sbuf.append(forCharData.toString());
@@ -233,8 +237,9 @@ public final class CodeSetComponentInfo {
             return wchar_data;
         }
 
+        @Override
         public String toString() {
-            StringBuffer sbuf = new StringBuffer();
+            StringBuilder sbuf = new StringBuilder();
             sbuf.append("CodeSetContext char set: ");
             sbuf.append(Integer.toHexString(char_data));
             sbuf.append(" wchar set: ");
@@ -300,9 +305,6 @@ public final class CodeSetComponentInfo {
      * The numbers can either be decimal or hex.
      */
     public static CodeSetComponent createFromString(String str) {
-	ORBUtilSystemException wrapper = 
-	    ORB.getStaticLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-
         if (str == null || str.length() == 0)
 	    throw wrapper.badCodeSetString() ;
 
@@ -316,7 +318,7 @@ public final class CodeSetComponentInfo {
             nativeSet = Integer.decode(stok.nextToken()).intValue();
 
             if (OSFCodeSetRegistry.lookupEntry(nativeSet) == null)
-		throw wrapper.unknownNativeCodeset( Integer.valueOf(nativeSet) ) ;
+		throw wrapper.unknownNativeCodeset( nativeSet ) ;
 
             List<Integer> conversionList = new ArrayList<Integer>(10);
 

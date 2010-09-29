@@ -55,7 +55,7 @@ import com.sun.corba.se.spi.orb.ORBVersionFactory ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
-import com.sun.corba.se.impl.logging.IORSystemException ;
+import com.sun.corba.se.spi.logging.IORSystemException ;
 
 /**
  * @author Ken Cavanaugh
@@ -63,7 +63,8 @@ import com.sun.corba.se.impl.logging.IORSystemException ;
 public class WireObjectKeyTemplate implements ObjectKeyTemplate 
 {
     private ORB orb ;
-    private IORSystemException wrapper ;
+    private static final IORSystemException wrapper =
+        IORSystemException.self ;
     private static ObjectAdapterId NULL_OBJECT_ADAPTER_ID = 
         new ObjectAdapterIdArray( new String[0] ) ;
 
@@ -92,7 +93,6 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
     private void initORB( ORB orb ) 
     {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_IOR_IOR() ;
     }
 
     public void write( ObjectId id, OutputStream os ) 
@@ -148,6 +148,7 @@ public class WireObjectKeyTemplate implements ObjectKeyTemplate
     {
 	byte[] bid = id.getId() ;
 	String str = new String( bid ) ;
-	return orb.getRequestDispatcherRegistry().getServerRequestDispatcher( str ) ;
+	return orb.getRequestDispatcherRegistry().getServerRequestDispatcher(
+            str ) ;
     }
 }

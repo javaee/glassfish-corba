@@ -8,8 +8,10 @@
  * Note: replace this header with the standard header.
  */
 
-package com.sun.corba.se.impl.logging ;
+package com.sun.corba.se.spi.logging ;
 
+import com.sun.corba.se.spi.ior.ObjectAdapterId;
+import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
 import com.sun.corba.se.spi.orbutil.logex.Message ;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel ;
@@ -18,6 +20,7 @@ import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
 
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
+import java.io.IOException;
 
 import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.BAD_PARAM;
@@ -40,29 +43,30 @@ public interface IORSystemException {
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Bad magic number {0} in ObjectKeyTemplate" )
-    INTERNAL badMagic( String arg0 ) ;
+    INTERNAL badMagic( int magic ) ;
     
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "Error while stringifying an object reference" )
-    INTERNAL stringifyWriteError(  ) ;
+    INTERNAL stringifyWriteError( @Chain IOException exc ) ;
     
     @Log( level=LogLevel.WARNING, id=5 )
     @Message( "Could not find a TaggedProfileTemplateFactory for id {0}" )
-    INTERNAL taggedProfileTemplateFactoryNotFound( String arg0 ) ;
+    INTERNAL taggedProfileTemplateFactoryNotFound( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=6 )
     @Message( "Found a JDK 1.3.1 patch level indicator with value {0} "
         + "less than JDK 1.3.1_01 value of 1" )
-    INTERNAL invalidJdk131PatchLevel( String arg0 ) ;
+    INTERNAL invalidJdk131PatchLevel( int arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=7 )
     @Message( "Exception occurred while looking for ObjectAdapter {0} "
         + "in IIOPProfileImpl.getServant" )
-    INTERNAL getLocalServantFailure( String arg0 ) ;
-    
+    INTERNAL getLocalServantFailure( @Chain Exception exc, 
+        ObjectAdapterId oaid ) ;
+
     @Log( level=LogLevel.WARNING, id=8 )
     @Message( "Exception occurred while closing an IO stream object" )
-    INTERNAL ioexceptionDuringStreamClose(  ) ;
+    INTERNAL ioexceptionDuringStreamClose( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Adapter ID not available" )
@@ -91,7 +95,7 @@ public interface IORSystemException {
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Attempt to create IIOPAddress with port {0}, which is out of range" )
-    BAD_PARAM badIiopAddressPort( String arg0 ) ;
+    BAD_PARAM badIiopAddressPort( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "IOR must have at least one IIOP profile" )

@@ -8,16 +8,27 @@
  * Note: replace this header with the standard header.
  */
 
-package com.sun.corba.se.impl.logging ;
+package com.sun.corba.se.spi.logging ;
 
+import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
+import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
 import com.sun.corba.se.spi.orbutil.logex.Message ;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel ;
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper ;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
+import com.sun.corba.se.spi.orbutil.logex.corba.CS;
+import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
 
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
+import com.sun.corba.se.spi.transport.CorbaConnection;
+import java.net.MalformedURLException;
+import java.nio.charset.MalformedInputException;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.omg.CORBA.BAD_INV_ORDER;
 import org.omg.CORBA.BAD_OPERATION;
@@ -34,6 +45,8 @@ import org.omg.CORBA.OBJECT_NOT_EXIST;
 import org.omg.CORBA.OBJ_ADAPTER;
 import org.omg.CORBA.TIMEOUT;
 import org.omg.CORBA.TRANSIENT;
+import org.omg.CORBA.TypeCodePackage.BadKind;
+import org.omg.CORBA.Bounds;
 import org.omg.CORBA.UNKNOWN;
 
 @ExceptionWrapper( idPrefix="IOP" )
@@ -60,7 +73,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=5 )
     @Message( "Error connecting servant" )
-    BAD_OPERATION connectingServant(  ) ;
+    BAD_OPERATION connectingServant( @Chain RemoteException exc  ) ;
     
     @Log( level=LogLevel.FINE, id=6 )
     @Message( "Expected typecode kind {0} but got typecode kind {1}" )
@@ -68,11 +81,11 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=7 )
     @Message( "Expected typecode kind to be one of {0} but got typecode kind {1}" )
-    BAD_OPERATION extractWrongTypeList( String arg0, String arg1 ) ;
+    BAD_OPERATION extractWrongTypeList( List<String> opList, String tcName ) ;
     
     @Log( level=LogLevel.WARNING, id=8 )
     @Message( "String length of {0} exceeds bounded string length of {1}" )
-    BAD_OPERATION badStringBounds( String arg0, String arg1 ) ;
+    BAD_OPERATION badStringBounds( int len, int boundedLen ) ;
     
     @Log( level=LogLevel.WARNING, id=10 )
     @Message( "Tried to insert an object of an incompatible type into an Any "
@@ -81,7 +94,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=11 )
     @Message( "insert_Object call failed on an Any" )
-    BAD_OPERATION insertObjectFailed(  ) ;
+    BAD_OPERATION insertObjectFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=12 )
     @Message( "extract_Object call failed on an Any" )
@@ -93,7 +106,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=14 )
     @Message( "Tried to insert Fixed type for non-Fixed typecode" )
-    BAD_OPERATION fixedBadTypecode(  ) ;
+    BAD_OPERATION fixedBadTypecode( @Chain BadKind bk ) ;
     
     @Log( level=LogLevel.WARNING, id=23 )
     @Message( "set_exception(Any) called with null args for DSI ServerRequest" )
@@ -109,11 +122,15 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=26 )
     @Message( "ORB configurator class {0} could not be instantiated" )
-    BAD_OPERATION badOrbConfigurator( String arg0 ) ;
+    BAD_OPERATION badOrbConfigurator( @Chain Exception exc, String name ) ;
+
+    @Log( level=LogLevel.WARNING, id=26 )
+    @Message( "ORB configurator class {0} could not be instantiated" )
+    BAD_OPERATION badOrbConfigurator( String name ) ;
     
     @Log( level=LogLevel.WARNING, id=27 )
     @Message( "Error in running ORB configurator" )
-    BAD_OPERATION orbConfiguratorError(  ) ;
+    BAD_OPERATION orbConfiguratorError( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=28 )
     @Message( "This ORB instance has been destroyed, so no operations can be "
@@ -130,7 +147,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=31 )
     @Message( "extract_Object failed on an uninitialized Any" )
-    BAD_OPERATION extractObjectFailed(  ) ;
+    BAD_OPERATION extractObjectFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=32 )
     @Message( "Could not find method named {0} in class {1} in reflective Tie" )
@@ -153,12 +170,12 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=36 )
     @Message( "POA ServantNotActive exception while trying get an "
         + "org.omg.CORBA.Portable.Delegate for an org.omg.PortableServer.Servant" )
-    BAD_OPERATION getDelegateServantNotActive(  ) ;
+    BAD_OPERATION getDelegateServantNotActive( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=37 )
     @Message( "POA WrongPolicy exception while trying get an "
         + "org.omg.CORBA.Portable.Delegate for an org.omg.PortableServer.Servant" )
-    BAD_OPERATION getDelegateWrongPolicy(  ) ;
+    BAD_OPERATION getDelegateWrongPolicy( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=38 )
     @Message( "Call to StubAdapter.setDelegate did not pass a stub" )
@@ -207,7 +224,7 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=49 )
     @Message( "Could not activate POA from foreign ORB due to "
         + "AdapterInactive exception in StubAdapter" )
-    BAD_OPERATION adapterInactiveInActivateServant(  ) ;
+    BAD_OPERATION adapterInactiveInActivateServant( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=50 )
     @Message( "Could not instantiate stub class {0} for dynamic RMI-IIOP" )
@@ -227,31 +244,32 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=54 )
     @Message( "Error while attempting to load class {0}" )
-    BAD_OPERATION classActionException( String arg0 ) ;
+    BAD_OPERATION classActionException( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=55 )
     @Message( "Bad URL {0} in URLAction" )
-    BAD_OPERATION badUrlInAction( String arg0 ) ;
+    BAD_OPERATION badUrlInAction( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=56 )
     @Message( "Property value {0} is not in the range {1} to {2}" )
-    BAD_OPERATION valueNotInRange( String arg0, String arg1, String arg2 ) ;
+    BAD_OPERATION valueNotInRange( int arg0, int arg1, int arg2 ) ;
     
     @Log( level=LogLevel.WARNING, id=57 )
     @Message( "Number of token ({0}) and number of actions ({1}) don't match" )
-    BAD_OPERATION numTokensActionsDontMatch( String arg0, String arg1 ) ;
+    BAD_OPERATION numTokensActionsDontMatch( int arg0, int arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=58 )
     @Message( "Could not find constructor <init>(String) in class {0}" )
-    BAD_OPERATION exceptionInConvertActionConstructor( String arg0 ) ;
+    BAD_OPERATION exceptionInConvertActionConstructor( @Chain Exception exc,
+        String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=59 )
     @Message( "Exception in ConvertAction operation" )
-    BAD_OPERATION exceptionInConvertAction(  ) ;
+    BAD_OPERATION exceptionInConvertAction( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=60 )
     @Message( "Useless exception on call to Closeable.close()" )
-    BAD_OPERATION ioExceptionOnClose(  ) ;
+    BAD_OPERATION ioExceptionOnClose( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=61 )
     @Message( "Bundle not found for class {0}" )
@@ -335,15 +353,21 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=81 )
     @Message( "Could not make an instance of Class {0}" )
-    BAD_OPERATION couldNotMakeInstance( String arg0 ) ;
+    BAD_OPERATION couldNotMakeInstance( @Chain Exception ex, Class<?> arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Null parameter" )
+    @CS( CSValue.MAYBE )
     BAD_PARAM nullParam(  ) ;
+
+    @Log( level=LogLevel.WARNING, id=1 )
+    @Message( "Null parameter" )
+    @CS( CSValue.NO )
+    BAD_PARAM nullParamNoComplete(  ) ;
     
     @Log( level=LogLevel.FINE, id=2 )
     @Message( "Unable to find value factory" )
-    BAD_PARAM unableFindValueFactory(  ) ;
+    BAD_PARAM unableFindValueFactory( @Chain MARSHAL exc ) ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Abstract interface derived from non-abstract interface" )
@@ -373,32 +397,40 @@ public interface ORBUtilSystemException {
     @Message( "Malformed URL {0}" )
     BAD_PARAM badUrl( String arg0 ) ;
     
+    String fieldNotFound = "Field {0} not found in parser data object" ;
+
     @Log( level=LogLevel.WARNING, id=10 )
-    @Message( "Field {0} not found in parser data object" )
+    @Message( fieldNotFound )
     BAD_PARAM fieldNotFound( String arg0 ) ;
+
+    @Log( level=LogLevel.WARNING, id=10 )
+    @Message( fieldNotFound )
+    BAD_PARAM fieldNotFound( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=11 )
     @Message( "Error in setting field {0} to value {1} in parser data object" )
-    BAD_PARAM errorSettingField( String arg0, String arg1 ) ;
+    BAD_PARAM errorSettingField( @Chain Throwable exc, String arg0, Object arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=12 )
     @Message( "Bounds error occurred in DII request" )
-    BAD_PARAM boundsErrorInDiiRequest(  ) ;
+    BAD_PARAM boundsErrorInDiiRequest( @Chain Bounds b ) ;
     
     @Log( level=LogLevel.WARNING, id=13 )
     @Message( "Initialization error for persistent server" )
-    BAD_PARAM persistentServerInitError(  ) ;
+    @CS( CSValue.MAYBE)
+    BAD_PARAM persistentServerInitError( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=14 )
     @Message( "Could not create array for field {0} with "
         + "component type {1} and size {2}" )
-    BAD_PARAM couldNotCreateArray( String arg0, String arg1, String arg2 ) ;
+    BAD_PARAM couldNotCreateArray( @Chain Throwable exc, String arg0,
+        Class<?> arg1, int arg2 ) ;
     
     @Log( level=LogLevel.WARNING, id=15 )
     @Message( "Could not set array for field {0} at index {1} "
         + "with component type {2} and size {3} to value {4}" )
-    BAD_PARAM couldNotSetArray( String arg0, String arg1, String arg2,
-        String arg3, String arg4 ) ;
+    BAD_PARAM couldNotSetArray( @Chain Throwable thr, String arg0, int arg1,
+        Class<?> arg2, int arg3, Object arg4 ) ;
     
     @Log( level=LogLevel.WARNING, id=16 )
     @Message( "Illegal bootstrap operation {0}" )
@@ -418,7 +450,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=20 )
     @Message( "{0} does not represent a valid kind of typecode" )
-    BAD_PARAM invalidTypecodeKind( String arg0 ) ;
+    BAD_PARAM invalidTypecodeKind( @Chain Throwable t, int kind ) ;
     
     @Log( level=LogLevel.WARNING, id=21 )
     @Message( "cannot have a SocketFactory and a ContactInfoList at the same time" )
@@ -435,14 +467,14 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=24 )
     @Message( "Request partitioning value specified, {0}, "
         + "is outside supported range, {1} - {2}" )
-    BAD_PARAM invalidRequestPartitioningPolicyValue( String arg0, String arg1,
-        String arg2 ) ;
+    BAD_PARAM invalidRequestPartitioningPolicyValue( int arg0, int arg1,
+        int arg2 ) ;
     
     @Log( level=LogLevel.WARNING, id=25 )
     @Message( "Could not set request partitioning component value to {0}, "
         + "valid values are {1} - {2}" )
-    BAD_PARAM invalidRequestPartitioningComponentValue( String arg0,
-        String arg1, String arg2 ) ;
+    BAD_PARAM invalidRequestPartitioningComponentValue( int arg0,
+        int arg1, int arg2 ) ;
     
     @Log( level=LogLevel.WARNING, id=26 )
     @Message( "Invalid request partitioning id {0}, valid values are {1} - {2}" )
@@ -474,12 +506,12 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=32 )
     @Message( "Load balancing value specified, {0}, is outside "
         + "supported range, {1} - {2}" )
-    BAD_PARAM invalidLoadBalancingPolicyValue( String arg0, String arg1, String arg2 ) ;
+    BAD_PARAM invalidLoadBalancingPolicyValue( int arg0, int arg1, int arg2 ) ;
     
     @Log( level=LogLevel.WARNING, id=33 )
     @Message( "Could not set load balancing component value to {0}, "
         + "valid values are {1} - {2}" )
-    BAD_PARAM invalidLoadBalancingComponentValue( String arg0, String arg1, String arg2 ) ;
+    BAD_PARAM invalidLoadBalancingComponentValue( int arg0, int arg1, int arg2 ) ;
     
     @Log( level=LogLevel.WARNING, id=34 )
     @Message( "Invalid request partitioning id {0}, valid values are {1} - {2}" )
@@ -487,10 +519,11 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=35 )
     @Message( "CodeBase unavailable on connection {0}" )
-    BAD_PARAM codeBaseUnavailable( String arg0 ) ;
+    BAD_PARAM codeBaseUnavailable( CorbaConnection conn ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "DSI method not called" )
+    @CS( CSValue.MAYBE )
     BAD_INV_ORDER dsimethodNotcalled(  ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
@@ -720,7 +753,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=6 )
     @Message( "Invalid unicode pair detected during code set conversion" )
-    DATA_CONVERSION badUnicodePair(  ) ;
+    DATA_CONVERSION badUnicodePair( @Chain MalformedInputException exc  ) ;
     
     @Log( level=LogLevel.WARNING, id=7 )
     @Message( "Tried to convert bytes to a single java char, "
@@ -734,17 +767,19 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=9 )
     @Message( "Char to byte conversion for a CORBA char resulted in more than "
         + "one byte" )
+    @CS( CSValue.MAYBE )
     DATA_CONVERSION invalidSingleCharCtb(  ) ;
     
     @Log( level=LogLevel.WARNING, id=10 )
     @Message( "Character to byte conversion did not exactly double number of "
         + "chars (GIOP 1.1 only)" )
+    @CS( CSValue.MAYBE )
     DATA_CONVERSION badGiop11Ctb(  ) ;
     
     @Log( level=LogLevel.WARNING, id=12 )
     @Message( "Tried to insert a sequence of length {0} into a "
         + "bounded sequence of maximum length {1} in an Any" )
-    DATA_CONVERSION badSequenceBounds( String arg0, String arg1 ) ;
+    DATA_CONVERSION badSequenceBounds( int len, int maxLen ) ;
     
     @Log( level=LogLevel.WARNING, id=13 )
     @Message( "Class {0} is not a subtype of ORBSocketFactory" )
@@ -752,19 +787,19 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=14 )
     @Message( "{0} is not a valid custom socket factory" )
-    DATA_CONVERSION badCustomSocketFactory( String arg0 ) ;
+    DATA_CONVERSION badCustomSocketFactory( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=15 )
     @Message( "Fragment size {0} is too small: it must be at least {1}" )
-    DATA_CONVERSION fragmentSizeMinimum( String arg0, String arg1 ) ;
+    DATA_CONVERSION fragmentSizeMinimum( int arg0, int arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=16 )
     @Message( "Illegal value for fragment size ({0}): must be divisible by {1}" )
-    DATA_CONVERSION fragmentSizeDiv( String arg0, String arg1 ) ;
+    DATA_CONVERSION fragmentSizeDiv( int arg0, int arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=17 )
     @Message( "Could not instantiate ORBInitializer {0}" )
-    DATA_CONVERSION orbInitializerFailure( String arg0 ) ;
+    DATA_CONVERSION orbInitializerFailure( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=18 )
     @Message( "orb initializer class {0} is not a subtype of ORBInitializer" )
@@ -776,7 +811,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=20 )
     @Message( "Could not instantiate Acceptor {0}" )
-    DATA_CONVERSION acceptorInstantiationFailure( String arg0 ) ;
+    DATA_CONVERSION acceptorInstantiationFailure( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=21 )
     @Message( "Acceptor class {0} is not a subtype of Acceptor" )
@@ -788,7 +823,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=23 )
     @Message( "{0} is not a valid CorbaContactInfoListFactory" )
-    DATA_CONVERSION badContactInfoListFactory( String arg0 ) ;
+    DATA_CONVERSION badContactInfoListFactory( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=24 )
     @Message( "Class {0} is not a subtype of IORToSocketInfo" )
@@ -796,7 +831,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=25 )
     @Message( "{0} is not a valid custom IORToSocketInfo" )
-    DATA_CONVERSION badCustomIorToSocketInfo( String arg0 ) ;
+    DATA_CONVERSION badCustomIorToSocketInfo( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=26 )
     @Message( "Class {0} is not a subtype of IIOPPrimaryToContactInfo" )
@@ -804,7 +839,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=27 )
     @Message( "{0} is not a valid custom IIOPPrimaryToContactInfo" )
-    DATA_CONVERSION badCustomIiopPrimaryToContactInfo( String arg0 ) ;
+    DATA_CONVERSION badCustomIiopPrimaryToContactInfo( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Bad corbaloc: URL" )
@@ -832,15 +867,17 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=5 )
     @Message( "Persistent server port is not set" )
+    @CS( CSValue.MAYBE )
     INITIALIZE persistentServerportNotSet(  ) ;
     
     @Log( level=LogLevel.FINE, id=6 )
     @Message( "Persistent server ID is not set" )
+    @CS( CSValue.MAYBE )
     INITIALIZE persistentServeridNotSet(  ) ;
     
     @Log( level=LogLevel.WARNING, id=7 )
     @Message( "Exception occurred while running a user configurator" )
-    INITIALIZE userConfiguratorException(  ) ;
+    INITIALIZE userConfiguratorException( @Chain Exception exc  ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Non-existent ORB ID" )
@@ -873,7 +910,7 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=8 )
     @Message( "Unable to determine local hostname from "
         + "InetAddress.getLocalHost().getHostName()" )
-    INTERNAL getLocalHostFailed(  ) ;
+    INTERNAL getLocalHostFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=10 )
     @Message( "Bad locate request status in IIOP locate reply" )
@@ -937,11 +974,11 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=26 )
     @Message( "character to byte converter failure" )
-    INTERNAL ctbConverterFailure(  ) ;
+    INTERNAL ctbConverterFailure( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=27 )
     @Message( "byte to character converter failure" )
-    INTERNAL btcConverterFailure(  ) ;
+    INTERNAL btcConverterFailure( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=28 )
     @Message( "Unsupported wchar encoding: ORB only supports fixed width "
@@ -962,7 +999,8 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=32 )
     @Message( "Invalid isStreamed TCKind {0}" )
-    INTERNAL invalidIsstreamedTckind( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    INTERNAL invalidIsstreamedTckind( int kind ) ;
     
     @Log( level=LogLevel.WARNING, id=33 )
     @Message( "Found a JDK 1.3.1 patch level indicator with value less than "
@@ -971,6 +1009,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=34 )
     @Message( "Error unmarshalling service context data" )
+    @CS( CSValue.MAYBE )
     INTERNAL svcctxUnmarshalError(  ) ;
     
     @Log( level=LogLevel.WARNING, id=35 )
@@ -979,7 +1018,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=36 )
     @Message( "Unsupported GIOP version {0}" )
-    INTERNAL unsupportedGiopVersion( String arg0 ) ;
+    INTERNAL unsupportedGiopVersion( GIOPVersion arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=37 )
     @Message( "Application exception in special method: should not happen" )
@@ -1051,7 +1090,11 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=54 )
     @Message( "The BadKind exception should never occur here" )
-    INTERNAL badkindCannotOccur(  ) ;
+    INTERNAL badkindCannotOccur( @Chain BadKind bk ) ;
+
+    @Log( level=LogLevel.WARNING, id=54 )
+    @Message( "The BadKind exception should never occur here" )
+    INTERNAL badkindCannotOccur( ) ;
     
     @Log( level=LogLevel.WARNING, id=55 )
     @Message( "Could not resolve alias typecode" )
@@ -1065,18 +1108,26 @@ public interface ORBUtilSystemException {
     @Message( "Illegal typecode kind" )
     INTERNAL typecodeNotSupported(  ) ;
     
+    String boundsCannotOccur =
+        "Bounds exception cannot occur in this context" ;
+
     @Log( level=LogLevel.WARNING, id=59 )
-    @Message( "Bounds exception cannot occur in this context" )
-    INTERNAL boundsCannotOccur(  ) ;
+    @Message( boundsCannotOccur )
+    INTERNAL boundsCannotOccur( @Chain Bounds bd ) ;
+
+    @Log( level=LogLevel.WARNING, id=59 )
+    @Message( boundsCannotOccur )
+    INTERNAL boundsCannotOccur( @Chain org.omg.CORBA.TypeCodePackage.Bounds bd ) ;
     
     @Log( level=LogLevel.WARNING, id=61 )
     @Message( "Number of invocations is already zero, but another invocation "
         + "has completed" )
+    @CS( CSValue.YES )
     INTERNAL numInvocationsAlreadyZero(  ) ;
     
     @Log( level=LogLevel.WARNING, id=62 )
     @Message( "Error in constructing instance of bad server ID handler" )
-    INTERNAL errorInitBadserveridhandler(  ) ;
+    INTERNAL errorInitBadserveridhandler( @Chain Exception exc  ) ;
     
     @Log( level=LogLevel.WARNING, id=63 )
     @Message( "No TOAFactory is available" )
@@ -1096,31 +1147,32 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=67 )
     @Message( "Unknown native codeset: {0}" )
-    INTERNAL unknownNativeCodeset( String arg0 ) ;
+    INTERNAL unknownNativeCodeset( int codeset ) ;
     
     @Log( level=LogLevel.WARNING, id=68 )
     @Message( "Unknown conversion codeset: {0}" )
-    INTERNAL unknownConversionCodeSet( String arg0 ) ;
+    INTERNAL unknownConversionCodeSet( int codeset ) ;
     
     @Log( level=LogLevel.WARNING, id=69 )
     @Message( "Invalid codeset number" )
-    INTERNAL invalidCodeSetNumber(  ) ;
+    INTERNAL invalidCodeSetNumber( @Chain NumberFormatException exc  ) ;
     
     @Log( level=LogLevel.WARNING, id=70 )
     @Message( "Invalid codeset string {0}" )
-    INTERNAL invalidCodeSetString( String arg0 ) ;
+    INTERNAL invalidCodeSetString( @Chain NoSuchElementException exc,
+        String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=71 )
     @Message( "Invalid CTB converter {0}" )
-    INTERNAL invalidCtbConverterName( String arg0 ) ;
+    INTERNAL invalidCtbConverterName( Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=72 )
     @Message( "Invalid BTC converter {0}" )
-    INTERNAL invalidBtcConverterName( String arg0 ) ;
+    INTERNAL invalidBtcConverterName( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=73 )
     @Message( "Could not duplicate CDRInputStream" )
-    INTERNAL couldNotDuplicateCdrInputStream(  ) ;
+    INTERNAL couldNotDuplicateCdrInputStream( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=74 )
     @Message( "BootstrapResolver caught an unexpected ApplicationException" )
@@ -1191,7 +1243,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=91 )
     @Message( "Unable to setSocketFactoryORB" )
-    INTERNAL unableToSetSocketFactoryOrb(  ) ;
+    INTERNAL unableToSetSocketFactoryOrb( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=92 )
     @Message( "Unexpected exception occurred where no exception should occur" )
@@ -1227,7 +1279,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=100 )
     @Message( "Exception occurred while closing an IO stream object" )
-    INTERNAL ioexceptionDuringStreamClose(  ) ;
+    INTERNAL ioexceptionDuringStreamClose( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.SEVERE, id=101 )
     @Message( "Invalid Java serialization version {0}" )
@@ -1315,7 +1367,8 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=5 )
     @Message( "Exception thrown during result() on ServerRequest" )
-    MARSHAL dsiResultException(  ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL dsiResultException( Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=6 )
     @Message( "grow() called on IIOPInputStream" )
@@ -1327,52 +1380,73 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=8 )
     @Message( "Invalid ObjectKey in request header" )
-    MARSHAL invalidObjectKey(  ) ;
+    MARSHAL invalidObjectKey() ;
+
+    @Log( level=LogLevel.WARNING, id=8 )
+    @Message( "Invalid ObjectKey in request header" )
+    MARSHAL invalidObjectKey( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=9 )
     @Message( "Unable to locate value class for repository ID {0} "
         + "because codebase URL {1} is malformed" )
-    MARSHAL malformedUrl( String arg0, String arg1 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL malformedUrl( @Chain MalformedURLException exc,
+        String arg0, String arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=10 )
     @Message( "Error from readValue on ValueHandler in CDRInputStream" )
-    MARSHAL valuehandlerReadError(  ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL valuehandlerReadError( @Chain Error err ) ;
     
     @Log( level=LogLevel.WARNING, id=11 )
     @Message( "Exception from readValue on ValueHandler in CDRInputStream" )
-    MARSHAL valuehandlerReadException(  ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL valuehandlerReadException( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=12 )
     @Message( "Bad kind in isCustomType in CDRInputStream" )
-    MARSHAL badKind(  ) ;
+    MARSHAL badKind( BadKind bk ) ;
     
     @Log( level=LogLevel.WARNING, id=13 )
     @Message( "Could not find class {0} in CDRInputStream.readClass" )
-    MARSHAL cnfeReadClass( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL cnfeReadClass( @Chain ClassNotFoundException exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=14 )
     @Message( "Bad repository ID indirection at index {0}" )
-    MARSHAL badRepIdIndirection( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL badRepIdIndirection( int index ) ;
     
     @Log( level=LogLevel.WARNING, id=15 )
     @Message( "Bad codebase string indirection at index {0}" )
-    MARSHAL badCodebaseIndirection( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL badCodebaseIndirection( int index ) ;
     
+    String unknownCodeSet = "Unknown code set {0} specified by client ORB as a "
+        + "negotiated code set" ;
+
     @Log( level=LogLevel.WARNING, id=16 )
-    @Message( "Unknown code set {0} specified by client ORB as a negotiated code set" )
-    MARSHAL unknownCodeset( String arg0 ) ;
+    @Message( unknownCodeSet )
+    MARSHAL unknownCodeset( int arg0 ) ;
+
+    @Log( level=LogLevel.WARNING, id=16 )
+    @Message( unknownCodeSet )
+    MARSHAL unknownCodeset( OSFCodeSetRegistry.Entry arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=17 )
     @Message( "Attempt to marshal wide character or string data in GIOP 1.0" )
+    @CS( CSValue.MAYBE )
     MARSHAL wcharDataInGiop10(  ) ;
     
     @Log( level=LogLevel.WARNING, id=18 )
     @Message( "String or wstring with a negative length {0}" )
-    MARSHAL negativeStringLength( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL negativeStringLength( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=19 )
     @Message( "CDRInputStream.read_value(null) called, but no repository ID "
         + "information on the wire" )
+        @CS( CSValue.MAYBE )
     MARSHAL expectedTypeNullAndNoRepId(  ) ;
     
     @Log( level=LogLevel.WARNING, id=20 )
@@ -1382,12 +1456,14 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=22 )
     @Message( "Received end tag {0}, which is less than the expected value {1}" )
-    MARSHAL unexpectedEnclosingValuetype( String arg0, String arg1 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL unexpectedEnclosingValuetype( int endTag, int expected ) ;
     
     @Log( level=LogLevel.WARNING, id=23 )
     @Message( "Read non-negative end tag {0} at offset {1} (end tags should "
         + "always be negative)" )
-    MARSHAL positiveEndTag( String arg0, String arg1 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL positiveEndTag( int endTag, int offset ) ;
     
     @Log( level=LogLevel.WARNING, id=24 )
     @Message( "Out call descriptor is missing" )
@@ -1395,45 +1471,56 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=25 )
     @Message( "write_Object called with a local object" )
+    @CS( CSValue.MAYBE )
     MARSHAL writeLocalObject(  ) ;
     
     @Log( level=LogLevel.WARNING, id=26 )
     @Message( "Tried to insert non-ObjectImpl {0} into an Any via insert_Object" )
-    MARSHAL badInsertobjParam( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL badInsertobjParam( String name ) ;
     
     @Log( level=LogLevel.WARNING, id=27 )
     @Message( "Codebase present in RMI-IIOP stream format version 1 optional "
         + "data valuetype header" )
+    @CS( CSValue.MAYBE )
     MARSHAL customWrapperWithCodebase(  ) ;
     
     @Log( level=LogLevel.WARNING, id=28 )
     @Message( "Indirection present in RMI-IIOP stream format version 2 optional "
         + "data valuetype header" )
+    @CS( CSValue.MAYBE )
     MARSHAL customWrapperIndirection(  ) ;
     
     @Log( level=LogLevel.WARNING, id=29 )
     @Message( "0 or more than one repository ID found reading the optional data "
         + "valuetype header" )
+    @CS( CSValue.MAYBE )
     MARSHAL customWrapperNotSingleRepid(  ) ;
     
     @Log( level=LogLevel.WARNING, id=30 )
     @Message( "Bad valuetag {0} found while reading repository IDs" )
+    @CS( CSValue.MAYBE )
     MARSHAL badValueTag( String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=31 )
     @Message( "Bad typecode found for custom valuetype" )
-    MARSHAL badTypecodeForCustomValue(  ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL badTypecodeForCustomValue( @Chain BadKind bk ) ;
     
     @Log( level=LogLevel.WARNING, id=32 )
-    @Message( "An error occurred using reflection to invoke IDL Helper write method" )
-    MARSHAL errorInvokingHelperWrite(  ) ;
+    @Message( "An error occurred using reflection to invoke IDL Helper "
+        + "write method" )
+    @CS( CSValue.MAYBE )
+    MARSHAL errorInvokingHelperWrite( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=33 )
     @Message( "A bad digit was found while marshalling an IDL fixed type" )
+    @CS( CSValue.MAYBE )
     MARSHAL badDigitInFixed(  ) ;
     
     @Log( level=LogLevel.WARNING, id=34 )
     @Message( "Referenced type of indirect type not marshaled" )
+    @CS( CSValue.MAYBE )
     MARSHAL refTypeIndirType(  ) ;
     
     @Log( level=LogLevel.WARNING, id=35 )
@@ -1458,11 +1545,11 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=41 )
     @Message( "Invalid indirection value {0} (>-4): probable stream corruption" )
-    MARSHAL invalidIndirection( String arg0 ) ;
+    MARSHAL invalidIndirection( int arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=42 )
     @Message( "No type found at indirection {0}: probably stream corruption" )
-    MARSHAL indirectionNotFound( String arg0 ) ;
+    MARSHAL indirectionNotFound( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=43 )
     @Message( "Recursive TypeCode not supported by InputStream subtype" )
@@ -1490,19 +1577,20 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=49 )
     @Message( "Could not skip over {0} bytes at offset {1}" )
-    MARSHAL couldNotSkipBytes( String arg0, String arg1 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL couldNotSkipBytes( int len, int offset ) ;
     
     @Log( level=LogLevel.WARNING, id=50 )
     @Message( "Incorrect chunk length {0} at offset {1}" )
-    MARSHAL badChunkLength( String arg0, String arg1 ) ;
+    MARSHAL badChunkLength( int len, int offset ) ;
     
     @Log( level=LogLevel.WARNING, id=51 )
     @Message( "Unable to locate array of repository IDs from indirection {0}" )
-    MARSHAL unableToLocateRepIdArray( String arg0 ) ;
+    MARSHAL unableToLocateRepIdArray( int indir ) ;
     
     @Log( level=LogLevel.WARNING, id=52 )
     @Message( "Fixed of length {0} in buffer of length {1}" )
-    MARSHAL badFixed( String arg0, String arg1 ) ;
+    MARSHAL badFixed( short flen, int blen ) ;
     
     @Log( level=LogLevel.WARNING, id=53 )
     @Message( "Failed to load stub for {0} with class {1}" )
@@ -1510,7 +1598,8 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=54 )
     @Message( "Could not instantiate Helper class {0}" )
-    MARSHAL couldNotInstantiateHelper( String arg0 ) ;
+    MARSHAL couldNotInstantiateHelper( @Chain InstantiationException exc,
+        Class arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=55 )
     @Message( "Bad ObjectAdapterId for TOA" )
@@ -1518,19 +1607,21 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=56 )
     @Message( "Could not invoke helper read method for helper {0}" )
-    MARSHAL couldNotInvokeHelperReadMethod( String arg0 ) ;
+    MARSHAL couldNotInvokeHelperReadMethod( @Chain Exception exc,
+         Class arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=57 )
     @Message( "Could not load class {0}" )
-    MARSHAL couldNotFindClass( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL couldNotFindClass( String clasName ) ;
     
     @Log( level=LogLevel.FINE, id=58 )
     @Message( "Error in arguments(NVList) for DSI ServerRequest" )
-    MARSHAL badArgumentsNvlist(  ) ;
+    MARSHAL badArgumentsNvlist( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=59 )
     @Message( "Could not create stub" )
-    MARSHAL stubCreateError(  ) ;
+    MARSHAL stubCreateError( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=60 )
     @Message( "Java serialization exception during {0} operation" )
@@ -1538,30 +1629,42 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=61 )
     @Message( "Could not read exception from UEInfoServiceContext" )
-    MARSHAL couldNotReadInfo(  ) ;
+    @CS( CSValue.MAYBE )
+    MARSHAL couldNotReadInfo( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=62 )
     @Message( "Could not find enum class {0} while reading an enum" )
-    MARSHAL enumClassNotFound( String arg0 ) ;
+    MARSHAL enumClassNotFound( @Chain ClassNotFoundException ex,
+        String arg0 ) ;
     
+    String proxyClassNotFound = "Could not find Proxy class for "
+        + "interfaces {0} while reading a proxy" ;
+
     @Log( level=LogLevel.WARNING, id=63 )
-    @Message( "Could not find Proxy class for interfaces {0} while reading a proxy" )
-    MARSHAL proxyClassNotFound( String arg0 ) ;
+    @Message( proxyClassNotFound )
+    MARSHAL proxyClassNotFound( @Chain ClassNotFoundException exc,
+        List<String> interfaceNames ) ;
+
+    @Log( level=LogLevel.WARNING, id=63 )
+    @Message( proxyClassNotFound )
+    MARSHAL proxyClassNotFound( @Chain ClassNotFoundException exc, 
+        String interfaceNames ) ;
     
     @Log( level=LogLevel.WARNING, id=64 )
     @Message( "Unable to load proxy class for interfaces {0} because "
         + "codebase URL {1} is malformed" )
-    MARSHAL malformedProxyUrl( String arg0, String arg1 ) ;
+    MARSHAL malformedProxyUrl( @Chain MalformedURLException exc,
+        List<String> interfaceNames, String url ) ;
     
     @Log( level=LogLevel.WARNING, id=65 )
     @Message( "Unable to create proxy instance because the interface list "
         + "specified is empty" )
-    MARSHAL emptyProxyInterfaceList(  ) ;
+    MARSHAL emptyProxyInterfaceList( @Chain NullPointerException exc ) ;
     
     @Log( level=LogLevel.WARNING, id=66 )
     @Message( "Unable to create proxy instance because "
         + "Proxy.getProxyClass(..) called with violated restrictions." )
-    MARSHAL proxyWithIllegalArgs(  ) ;
+    MARSHAL proxyWithIllegalArgs( @Chain IllegalArgumentException exc ) ;
     
     @Log( level=LogLevel.WARNING, id=67 )
     @Message( "An instance of class {0} could not be marshalled: the class is "
@@ -1586,6 +1689,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=5 )
     @Message( "IDL type long double is not supported in Java" )
+    @CS( CSValue.MAYBE )
     NO_IMPLEMENT longDoubleNotImplemented(  ) ;
     
     @Log( level=LogLevel.WARNING, id=6 )
@@ -1599,7 +1703,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Error in connecting servant to ORB" )
-    OBJ_ADAPTER orbConnectError(  ) ;
+    OBJ_ADAPTER orbConnectError( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=3 )
     @Message( "StubAdapter.getDelegate failed to activate a Servant" )

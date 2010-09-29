@@ -41,10 +41,8 @@
 package com.sun.corba.se.impl.oa.rfm;
 
 import org.omg.CORBA.LocalObject ;
-import org.omg.CORBA.Policy ;
 
 import org.omg.PortableServer.POA ;
-import org.omg.PortableServer.POAManager ;
 
 import org.omg.PortableInterceptor.IORInterceptor_3_0 ;
 import org.omg.PortableInterceptor.IORInfo ;
@@ -62,7 +60,7 @@ import com.sun.corba.se.spi.legacy.interceptor.IORInfoExt ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
-import com.sun.corba.se.impl.logging.POASystemException ;
+import com.sun.corba.se.spi.logging.POASystemException ;
 
 /** Used to initialize the ReferenceManager in the ORB.
  * The ReferenceManager is an optional component built
@@ -77,7 +75,8 @@ import com.sun.corba.se.impl.logging.POASystemException ;
  * </ol>
  */
 public class ReferenceManagerConfigurator implements ORBConfigurator {
-    private POASystemException wrapper ;
+    private static final POASystemException wrapper =
+        POASystemException.self ;
 
     private class RMIORInterceptor 
 	extends LocalObject 
@@ -116,8 +115,9 @@ public class ReferenceManagerConfigurator implements ORBConfigurator {
 	public void components_established( IORInfo info ) {
 	    IORInfoExt ext = IORInfoExt.class.cast( info ) ;
 	    ObjectAdapter oa = ext.getObjectAdapter() ;
-	    if (!(oa instanceof POA))
-		return ; // if not POA, then there is no chance of a conflict.
+	    if (!(oa instanceof POA)) {
+                return;
+            } // if not POA, then there is no chance of a conflict.
 	    POA poa = POA.class.cast( oa ) ;
 	    rm.validatePOACreation( poa ) ;
 	}
@@ -148,7 +148,6 @@ public class ReferenceManagerConfigurator implements ORBConfigurator {
 
     public void configure( DataCollector collector, ORB orb ) 
     {
-	wrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_POA() ;
 	try {
 	    ReferenceFactoryManagerImpl rm = new ReferenceFactoryManagerImpl( orb ) ;
 	    orb.register_initial_reference( ORBConstants.REFERENCE_FACTORY_MANAGER, rm ) ;

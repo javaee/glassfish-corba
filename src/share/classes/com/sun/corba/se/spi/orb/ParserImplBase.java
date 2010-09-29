@@ -50,9 +50,7 @@ import java.security.AccessController ;
 
 import java.lang.reflect.Field ;
 
-import org.omg.CORBA.INTERNAL ;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
@@ -60,7 +58,8 @@ import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 // a dynamic proxy that satisfies the interfaces that are inherited by the
 // more derived class.  Do we want to go that far?
 public abstract class ParserImplBase {
-    private ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     protected abstract PropertyParser makeParser() ;
 
@@ -73,8 +72,6 @@ public abstract class ParserImplBase {
 
     public ParserImplBase()
     {
-	// Do nothing in this case: no parsing takes place
-	wrapper = ORB.getStaticLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
     }
 
     public void init( DataCollector coll )
@@ -99,8 +96,9 @@ public abstract class ParserImplBase {
 	    result = cls.getDeclaredField( name ) ;
 	    while (result == null) {
 		cls = cls.getSuperclass() ;
-		if (cls == null)
-		    break ;
+		if (cls == null) {
+                    break;
+                }
 
 		result = cls.getDeclaredField( name ) ;
 	    }
@@ -108,8 +106,9 @@ public abstract class ParserImplBase {
 	    throw wrapper.fieldNotFound( exc, name ) ;
 	}
 
-	if (result == null)
-	    throw wrapper.fieldNotFound( name ) ;
+	if (result == null) {
+            throw wrapper.fieldNotFound(name);
+        }
 
 	return result ;
     }
@@ -139,8 +138,7 @@ public abstract class ParserImplBase {
 	    } catch (PrivilegedActionException exc) {
 		// Since exc wraps the actual exception, use exc.getCause()
 		// instead of exc.
-		throw wrapper.errorSettingField( exc.getCause(), name,
-		    ObjectUtility.compactObjectToString(value) ) ;
+		throw wrapper.errorSettingField( exc.getCause(), name, value ) ;
 	    }
 	}
     }

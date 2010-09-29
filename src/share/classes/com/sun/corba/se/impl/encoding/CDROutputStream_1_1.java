@@ -39,9 +39,7 @@
  */
 package com.sun.corba.se.impl.encoding;
 
-import org.omg.CORBA.CompletionStatus;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.encoding.CodeSetConversion;
 
 public class CDROutputStream_1_1 extends CDROutputStream_1_0
 {
@@ -60,6 +58,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
     //
     protected int fragmentOffset = 0;
 
+    @Override
     protected void alignAndReserve(int align, int n) {
 
         // Notice that in 1.1, we won't end a fragment with
@@ -88,6 +87,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
         bbwi.position(bbwi.position() + alignment);
     }
 
+    @Override
     protected void grow(int align, int n) {
         // Save the current size for possible post-fragmentation calculation
         int oldSize = bbwi.position();
@@ -110,14 +110,17 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
         }
     }
 
+    @Override
     public int get_offset() {
 	return bbwi.position() + fragmentOffset;
     }
 
+    @Override
     public GIOPVersion getGIOPVersion() {
         return GIOPVersion.V1_1;
     }
 
+    @Override
     public void write_wchar(char x)
     {
         // In GIOP 1.1, interoperability with wchar is limited
@@ -129,7 +132,7 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
         converter.convert(x);
 
         if (converter.getNumBytes() != 2)
-	    throw wrapper.badGiop11Ctb(CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.badGiop11Ctb();
 
         alignAndReserve(converter.getAlignment(),
                         converter.getNumBytes());
@@ -139,10 +142,11 @@ public class CDROutputStream_1_1 extends CDROutputStream_1_0
                                  converter.getNumBytes());
     }
 
+    @Override
     public void write_wstring(String value)
     {
         if (value == null) {
-	    throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.nullParam();
         }
 
         // The length is the number of code points (which are 2 bytes each)

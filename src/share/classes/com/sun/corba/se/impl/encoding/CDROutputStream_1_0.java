@@ -72,7 +72,6 @@ import javax.rmi.CORBA.ValueHandlerMultiFormat;
 import org.omg.CORBA.CustomMarshal;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.SystemException;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.VM_CUSTOM;
@@ -82,7 +81,6 @@ import org.omg.CORBA.portable.IDLEntity;
 import org.omg.CORBA.portable.CustomValue;
 import org.omg.CORBA.portable.StreamableValue;
 import org.omg.CORBA.portable.BoxedValueHelper;
-import org.omg.CORBA.portable.ValueBase;
 
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.spi.transport.ByteBufferPool;
@@ -102,7 +100,7 @@ import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
 import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
 import com.sun.corba.se.impl.orbutil.RepositoryIdFactory;
 import com.sun.corba.se.impl.util.Utility;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
@@ -122,7 +120,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     ByteBufferWithInfo bbwi;
 
     protected ORB orb;
-    protected ORBUtilSystemException wrapper ;
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     // XXX These appear to always contain the same value: remove one
     protected int blockSizeIndex = -1;
@@ -191,7 +190,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     {
         // ORB must not be null.  See CDROutputStream constructor.
         this.orb = (ORB)orb;
-	this.wrapper = this.orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 
         this.littleEndian = littleEndian;
         this.bufferManagerWrite = bufferManager;
@@ -209,7 +207,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
        init(orb, littleEndian, bufferManager, streamFormatVersion, true);
    }
 
-    private final void createRepositoryIdHandlers()
+    private void createRepositoryIdHandlers()
     {
         repIdUtil = RepositoryIdFactory.getRepIdUtility();
         repIdStrs = RepositoryIdFactory.getRepIdStringsFactory();
@@ -330,10 +328,8 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     // No such type in java
-    public final void write_longdouble(double x) 
-    {
-	throw wrapper.longDoubleNotImplemented(
-	    CompletionStatus.COMPLETED_MAYBE ) ;
+    public final void write_longdouble(double x) {
+	throw wrapper.longDoubleNotImplemented() ;
     }
 
     @PrimitiveWrite
@@ -363,47 +359,47 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // of characters, a single instance of the char type may only
         // hold one octet of any multi-byte character encoding."
         if (converter.getNumBytes() > 1) {
-            throw wrapper.invalidSingleCharCtb(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.invalidSingleCharCtb();
         }
 
         write_octet(converter.getBytes()[0]);
     }
 
-    private final void writeLittleEndianWchar(char x) {
+    private void writeLittleEndianWchar(char x) {
         bbwi.getByteBuffer().put((byte)(x & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
     }
 
-    private final void writeBigEndianWchar(char x) {
+    private void writeBigEndianWchar(char x) {
         bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
     	bbwi.getByteBuffer().put((byte)(x & 0xFF));
     }
 
-    private final void writeLittleEndianShort(short x) {
+    private void writeLittleEndianShort(short x) {
         bbwi.getByteBuffer().put((byte)(x & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
     }
 
-    private final void writeBigEndianShort(short x) {
+    private void writeBigEndianShort(short x) {
         bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
     	bbwi.getByteBuffer().put((byte)(x & 0xFF));
     }
 
-    private final void writeLittleEndianLong(int x) {
+    private void writeLittleEndianLong(int x) {
      	bbwi.getByteBuffer().put((byte)(x & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 16) & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 24) & 0xFF));
     }
 
-    private final void writeBigEndianLong(int x) {
+    private void writeBigEndianLong(int x) {
         bbwi.getByteBuffer().put((byte)((x >>> 24) & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 16) & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
     	bbwi.getByteBuffer().put((byte)(x & 0xFF));
     }
 
-    private final void writeLittleEndianLongLong(long x) {
+    private void writeLittleEndianLongLong(long x) {
         bbwi.getByteBuffer().put((byte)(x & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 8) & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 16) & 0xFF));
@@ -414,7 +410,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     	bbwi.getByteBuffer().put((byte)((x >>> 56) & 0xFF));
     }
 
-    private final void writeBigEndianLongLong(long x) {
+    private void writeBigEndianLongLong(long x) {
         bbwi.getByteBuffer().put((byte)((x >>> 56) & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 48) & 0xFF));
     	bbwi.getByteBuffer().put((byte)((x >>> 40) & 0xFF));
@@ -431,7 +427,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // Don't allow transmission of wchar/wstring data with
         // foreign ORBs since it's against the spec.
         if (ORBUtility.isForeignORB(orb)) {
-            throw wrapper.wcharDataInGiop10(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.wcharDataInGiop10();
         }
 
         // If it's one of our legacy ORBs, do what they did:
@@ -513,7 +509,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @PrimitiveWrite
     protected int writeString(String value) {
         if (value == null) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         CodeSetConversion.CTBConverter converter = getCharConverter();
@@ -542,13 +538,13 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     public void write_wstring(String value)
     {
         if (value == null) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // Don't allow transmission of wchar/wstring data with
         // foreign ORBs since it's against the spec.
         if (ORBUtility.isForeignORB(orb)) {
-	    throw wrapper.wcharDataInGiop10(CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.wcharDataInGiop10();
         }
             
         // When talking to our legacy ORBs, do what they did:
@@ -603,7 +599,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     public final void write_octet_array(byte b[], int offset, int length)
     {
         if ( b == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -625,7 +621,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public void write_any(Any any) {
         if ( any == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         write_TypeCode(any.type());
@@ -636,7 +632,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     public void write_TypeCode(TypeCode tc)
     {
         if ( tc == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
         TypeCodeImpl tci;
         if (tc instanceof TypeCodeImpl) {
@@ -659,7 +655,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 		
         // IDL to Java formal 01-06-06 1.21.4.2
         if (ref instanceof org.omg.CORBA.LocalObject) {
-            throw wrapper.writeLocalObject(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.writeLocalObject();
         }
     
 	IOR ior = orb.getIOR( ref, true ) ;
@@ -1137,7 +1133,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public final void write_boolean_array(boolean[]value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -1154,7 +1150,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public final void write_char_array(char[]value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -1171,7 +1167,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public void write_wchar_array(char[]value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -1188,7 +1184,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public final void write_short_array(short[]value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -1209,7 +1205,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public final void write_long_array(int[]value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -1230,7 +1226,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public final void write_longlong_array(long[]value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -1251,7 +1247,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public final void write_float_array(float[]value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -1268,7 +1264,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public final void write_double_array(double[]value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 
         // This will only have an effect if we're already chunking
@@ -1285,7 +1281,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public void write_string_array(String[] value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 	    
     	for(int i = 0; i < length; i++) {
@@ -1296,7 +1292,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     public void write_wstring_array(String[] value, int offset, int length) {
         if ( value == null ) {
-            throw wrapper.nullParam(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullParam();
         }
 	    
     	for(int i = 0; i < length; i++) {
@@ -1367,13 +1363,13 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         bbwi.setByteBuffer(byteBuffer);
     }
 
-    private final void freeValueCache() {
+    private void freeValueCache() {
 	if (valueCache != null) {
             valueCache.done();
         }
     }
 
-    private final void updateIndirectionTable(int indirection, 
+    private void updateIndirectionTable(int indirection, 
         java.lang.Object key) {
 
 	if (valueCache == null) {
@@ -1383,7 +1379,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 	valueCache.put(key, indirection);
     }
 
-    private final boolean writeIndirectionIfPossible( final Serializable object ) {
+    private boolean writeIndirectionIfPossible( final Serializable object ) {
 	if (valueCache != null) {
 	    final int indir = valueCache.getVal( object ) ;
 	    if (indir != -1) {
@@ -1396,7 +1392,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @CdrWrite
-    private final void write_repositoryId(String id) {
+    private void write_repositoryId(String id) {
         // Use an indirection if available
 	if (repositoryIdCache != null) {
 	    int indir = repositoryIdCache.getVal( id ) ;
@@ -1445,7 +1441,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     }
 
     @CdrWrite
-    private final int writeValueTag(boolean chunkIt, boolean useRepId, 
+    private int writeValueTag(boolean chunkIt, boolean useRepId, 
 				    String codebase) {
 	int indirection = 0;
 	if (chunkIt && !useRepId){
@@ -1507,8 +1503,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
                         isCustom = true;
                     }
 	        } catch(BadKind ex) {
-		    throw wrapper.badTypecodeForCustomValue( CompletionStatus.COMPLETED_MAYBE,
-			ex ) ;
+		    throw wrapper.badTypecodeForCustomValue( ex ) ;
 		}  
 	    }
 
@@ -1655,7 +1650,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             }
 	    writeMethod.invoke(null, parent, object );
 	} catch (Exception exc) {
-	    throw wrapper.errorInvokingHelperWrite( CompletionStatus.COMPLETED_MAYBE, exc ) ;
+	    throw wrapper.errorInvokingHelperWrite( exc ) ;
 	}
 
 	endValueChunk(true) ;
@@ -1752,7 +1747,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             }
             digit = (byte)Character.digit(ch, 10);
             if (digit == -1) {
-		throw wrapper.badDigitInFixed( CompletionStatus.COMPLETED_MAYBE ) ;
+		throw wrapper.badDigitInFixed( ) ;
             }
             // If the fixed type has an odd number of decimal digits,
             // then the representation begins with the first (most significant) digit.

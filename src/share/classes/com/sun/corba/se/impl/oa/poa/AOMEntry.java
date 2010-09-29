@@ -41,8 +41,6 @@ package com.sun.corba.se.impl.oa.poa ;
 
 import java.util.concurrent.locks.Condition ;
 
-
-
 import com.sun.corba.se.spi.orbutil.fsm.Action ;
 import com.sun.corba.se.spi.orbutil.fsm.Guard ;
 import com.sun.corba.se.spi.orbutil.fsm.State ;
@@ -53,6 +51,7 @@ import com.sun.corba.se.spi.orbutil.fsm.Runner ;
 import com.sun.corba.se.spi.orbutil.fsm.StateEngine ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.PoaFSM;
+import com.sun.corba.se.spi.logging.POASystemException ;
 
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 
@@ -67,6 +66,9 @@ import static com.sun.corba.se.spi.orbutil.fsm.Guard.Base.* ;
 */
 @PoaFSM
 public class AOMEntry extends FSMImpl {
+    private static final POASystemException wrapper =
+        POASystemException.self ;
+
     private Runner runner ;
     private final Thread[] etherealizer ;   // The actual etherealize operation 
 					    // for this entry.  It is 
@@ -94,8 +96,9 @@ public class AOMEntry extends FSMImpl {
 	public FSM preAction( FSM fsm ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    Thread etherealizer = entry.etherealizer[0] ;
-	    if (etherealizer != null) 
-		etherealizer.start() ;
+	    if (etherealizer != null) {
+                etherealizer.start();
+            }
 	    return null ;
 	}
 
@@ -115,38 +118,43 @@ public class AOMEntry extends FSMImpl {
     static final Input ENTER	    = new Input.Base( "enter" ) ;
     static final Input EXIT	    = new Input.Base( "exit" ) ;
 
-    private static Action incrementAction = new Action.Base( "increment" ) {
-	public void doIt( FSM fsm, Input in ) {
-	    AOMEntry entry = (AOMEntry)fsm ;
-	    entry.counter[0]++ ;
-	}
-    } ;
+    private static final Action incrementAction =
+        new Action.Base( "increment" ) {
+            public void doIt( FSM fsm, Input in ) {
+                AOMEntry entry = (AOMEntry)fsm ;
+                entry.counter[0]++ ;
+            }
+        } ;
 
-    private static Action decrementAction = new Action.Base( "decrement" ) {
-	public void doIt( FSM fsm, Input in ) {
-	    AOMEntry entry = (AOMEntry)fsm ;
-	    if (entry.counter[0] > 0)
-		entry.counter[0]-- ;
-	    else
-		throw entry.poa.lifecycleWrapper().aomEntryDecZero() ;
-	}
-    } ;
+    private static final Action decrementAction =
+        new Action.Base( "decrement" ) {
+            public void doIt( FSM fsm, Input in ) {
+                AOMEntry entry = (AOMEntry)fsm ;
+                if (entry.counter[0] > 0) {
+                    entry.counter[0]--;
+                } else {
+                    throw wrapper.aomEntryDecZero();
+                }
+            }
+        } ;
 
-    private static Action throwIllegalStateExceptionAction = new Action.Base( 
-	"throwIllegalStateException" ) {
-	public void doIt( FSM fsm, Input in ) {
-	    throw new IllegalStateException( 
-		"No transitions allowed from the DESTROYED state" ) ;
-	} 
-    } ;
+    private static final Action throwIllegalStateExceptionAction =
+        new Action.Base(
+            "throwIllegalStateException" ) {
+            public void doIt( FSM fsm, Input in ) {
+                throw new IllegalStateException(
+                    "No transitions allowed from the DESTROYED state" ) ;
+            }
+        } ;
 
-    private static Action oaaAction = new Action.Base( "throwObjectAlreadyActive" ) {
-	public void doIt( FSM fsm, Input in ) {
-	    throw new RuntimeException( new ObjectAlreadyActive() ) ;
-	}
-    } ;
+    private static final Action oaaAction =
+        new Action.Base( "throwObjectAlreadyActive" ) {
+            public void doIt( FSM fsm, Input in ) {
+                throw new RuntimeException( new ObjectAlreadyActive() ) ;
+            }
+        } ;
 
-    private static Guard waitGuard = new Guard.Base( "wait" ) {
+    private static final Guard waitGuard = new Guard.Base( "wait" ) {
 	public Guard.Result evaluate( FSM fsm, Input in ) {
 	    AOMEntry entry = (AOMEntry)fsm ;
 	    try {
@@ -160,7 +168,7 @@ public class AOMEntry extends FSMImpl {
 	}
     } ;
 
-    private static IntFunc counterFunc = 
+    private static final IntFunc counterFunc =
 	new IntFunc( "counterFunc" ) {
 	    public int evaluate( FSM fsm, Input in ) {
 		AOMEntry entry = (AOMEntry)fsm ;
@@ -168,15 +176,15 @@ public class AOMEntry extends FSMImpl {
 	    }
 	} ;
 
-    private static IntFunc one = constant( 1 ) ;
-    private static IntFunc zero = constant( 0 ) ;
+    private static final IntFunc one = constant( 1 ) ;
+    private static final IntFunc zero = constant( 0 ) ;
 
-    private static Guard greaterZeroGuard = makeGuard( gt( counterFunc, zero ) ) ;
-    private static Guard zeroGuard = makeGuard( eq( counterFunc, zero ) ) ;
-    private static Guard greaterOneGuard = makeGuard( gt( counterFunc, one ) ) ;
-    private static Guard oneGuard = makeGuard( eq( counterFunc, one ) ) ;
+    private static final Guard greaterZeroGuard = makeGuard( gt( counterFunc, zero ) ) ;
+    private static final Guard zeroGuard = makeGuard( eq( counterFunc, zero ) ) ;
+    private static final Guard greaterOneGuard = makeGuard( gt( counterFunc, one ) ) ;
+    private static final Guard oneGuard = makeGuard( eq( counterFunc, one ) ) ;
 
-    private static StateEngine engine ;
+    private static final StateEngine engine ;
 
     static {
 	engine = StateEngine.create() ;
@@ -258,10 +266,11 @@ public class AOMEntry extends FSMImpl {
 	    runner.doIt( ACTIVATE ) ; 
 	} catch (RuntimeException exc) {
 	    Throwable thr = exc.getCause() ;
-	    if (thr instanceof ObjectAlreadyActive)
-		throw (ObjectAlreadyActive)thr ;
-	    else 
-		throw exc ;
+	    if (thr instanceof ObjectAlreadyActive) {
+                throw (ObjectAlreadyActive) thr;
+            } else {
+                throw exc;
+            }
 	}
     }
 }

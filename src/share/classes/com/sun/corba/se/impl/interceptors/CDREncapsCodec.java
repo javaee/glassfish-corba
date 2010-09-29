@@ -43,7 +43,6 @@ package com.sun.corba.se.impl.interceptors;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.LocalObject;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
@@ -52,7 +51,7 @@ import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import org.omg.IOP.Codec;
 import org.omg.IOP.CodecPackage.FormatMismatch;
@@ -70,7 +69,8 @@ public final class CDREncapsCodec
 {
     // The ORB that created the factory this codec was created from
     private transient ORB orb;
-    transient ORBUtilSystemException wrapper;
+    static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     // The GIOP version we are encoding for
     private transient GIOPVersion giopVersion;
@@ -92,8 +92,6 @@ public final class CDREncapsCodec
      */
     public CDREncapsCodec( ORB orb, int major, int minor ) {
         this.orb = orb;
-	wrapper = ((com.sun.corba.se.spi.orb.ORB)orb)
-	    .getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
         giopVersion = GIOPVersion.getInstance( (byte)major, (byte)minor );
     }
@@ -105,7 +103,7 @@ public final class CDREncapsCodec
         throws InvalidTypeForEncoding 
     {
 	if ( data == null ) 
-	    throw wrapper.nullParam() ;
+	    throw wrapper.nullParamNoComplete() ;
         return encodeImpl( data, true );
     }
 
@@ -117,7 +115,7 @@ public final class CDREncapsCodec
         throws FormatMismatch 
     {
 	if( data == null ) 
-	    throw wrapper.nullParam() ;
+	    throw wrapper.nullParamNoComplete() ;
 	return decodeImpl( data, null );
     }
 
@@ -129,7 +127,7 @@ public final class CDREncapsCodec
         throws InvalidTypeForEncoding 
     {
 	if( data == null ) 
-	    throw wrapper.nullParam() ;
+	    throw wrapper.nullParamNoComplete() ;
         return encodeImpl( data, false );
     }
 
@@ -142,9 +140,9 @@ public final class CDREncapsCodec
         throws FormatMismatch, TypeMismatch
     {
 	if( data == null ) 
-	    throw wrapper.nullParam() ;
+	    throw wrapper.nullParamNoComplete() ;
 	if( tc == null ) 
-	    throw  wrapper.nullParam() ;
+	    throw  wrapper.nullParamNoComplete() ;
 	return decodeImpl( data, tc );
     }
 
@@ -158,7 +156,7 @@ public final class CDREncapsCodec
         throws InvalidTypeForEncoding 
     {
 	if( data == null ) 
-	    throw wrapper.nullParam() ;
+	    throw wrapper.nullParamNoComplete() ;
 
 	// _REVISIT_ Note that InvalidTypeForEncoding is never thrown in
 	// the body of this method.  This is due to the fact that CDR*Stream
@@ -222,7 +220,7 @@ public final class CDREncapsCodec
         throws FormatMismatch 
     {
 	if( data == null ) 
-	    throw wrapper.nullParam() ;
+	    throw wrapper.nullParamNoComplete() ;
 
 	AnyImpl any = null;  // return value
 

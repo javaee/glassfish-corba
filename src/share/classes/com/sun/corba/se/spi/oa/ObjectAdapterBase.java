@@ -52,12 +52,10 @@ import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.PIHandler ;
 
-import com.sun.corba.se.impl.logging.POASystemException ;
-import com.sun.corba.se.impl.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.POASystemException ;
 import com.sun.corba.se.impl.oa.poa.Policies;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
-import org.omg.PortableInterceptor.ACTIVE;
 import org.omg.PortableInterceptor.ACTIVE;
 import org.omg.PortableInterceptor.DISCARDING;
 import org.omg.PortableInterceptor.HOLDING;
@@ -67,14 +65,10 @@ import org.omg.PortableInterceptor.NON_EXISTENT;
 abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject 
     implements ObjectAdapter
 {
-    private ORB orb;
+    protected static final POASystemException wrapper =
+        POASystemException.self ;
 
-    // Exception wrappers
-    private final POASystemException _iorWrapper ;
-    private final POASystemException _invocationWrapper ;
-    private final POASystemException _lifecycleWrapper ;
-    private final OMGSystemException _omgInvocationWrapper ;
-    private final OMGSystemException _omgLifecycleWrapper ;
+    private ORB orb;
 
     // Data related to the construction of object references and
     // supporting the Object Reference Template.
@@ -83,39 +77,12 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
     private ObjectReferenceTemplate adapterTemplate ;
     private ObjectReferenceFactory currentFactory ;  
    
-    public ObjectAdapterBase( ORB orb ) 
-    {
+    public ObjectAdapterBase( ORB orb ) {
 	this.orb = orb ;
-	_iorWrapper = orb.getLogWrapperTable().get_OA_IOR_POA() ;
-	_lifecycleWrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_POA() ;
-	_omgLifecycleWrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_OMG() ;
-	_invocationWrapper = orb.getLogWrapperTable().get_OA_INVOCATION_POA() ;
-	_omgInvocationWrapper = orb.getLogWrapperTable().get_OA_INVOCATION_OMG() ;
     }
 
-    public final POASystemException iorWrapper()
-    {
-	return _iorWrapper ;
-    }
-
-    public final POASystemException lifecycleWrapper()
-    {
-	return _lifecycleWrapper ;
-    }
-
-    public final OMGSystemException omgLifecycleWrapper()
-    {
-	return _omgLifecycleWrapper ;
-    }
-
-    public final POASystemException invocationWrapper()
-    {
-	return _invocationWrapper ;
-    }
-
-    public final OMGSystemException omgInvocationWrapper()
-    {
-	return _omgInvocationWrapper ;
+    public final POASystemException wrapper() {
+	return wrapper ;
     }
 
     /*
@@ -142,9 +109,9 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
 
 	if (notifyORB) {
 	    PIHandler pih = orb.getPIHandler() ;
-	    if (pih != null)
-		// This runs the IORInterceptors.
-		pih.objectAdapterCreated( this ) ;
+	    if (pih != null) {
+                pih.objectAdapterCreated(this);
+            }
 	}
 
 	iortemp.makeImmutable() ;
@@ -153,7 +120,7 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
     final public org.omg.CORBA.Object makeObject( String repId, byte[] oid )
     {
 	if (repId == null) {
-	    throw iorWrapper().nullRepositoryId();
+	    throw wrapper.nullRepositoryId();
 	}
 	return currentFactory.make_object( repId, oid ) ;
     }

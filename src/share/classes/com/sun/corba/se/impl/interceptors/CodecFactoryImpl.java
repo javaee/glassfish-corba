@@ -46,10 +46,9 @@ import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
 import org.omg.IOP.Encoding;
 import org.omg.IOP.ENCODING_CDR_ENCAPS;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.LocalObject;
 
 /**
  * CodecFactoryImpl is the implementation of the Codec Factory, as described
@@ -61,7 +60,8 @@ public final class CodecFactoryImpl
 {
     // The ORB that created this Codec Factory
     private transient ORB orb;
-    private transient ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     // The maximum minor version of GIOP supported by this codec factory.
     // Currently, this is 1.2.
@@ -77,8 +77,6 @@ public final class CodecFactoryImpl
      */
     public CodecFactoryImpl( ORB orb ) {
         this.orb = orb;
-	wrapper = ((com.sun.corba.se.spi.orb.ORB)orb)
-	    .getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
 	// Precreate a codec for version 1.0 through 
 	// 1.(MAX_MINOR_VERSION_SUPPORTED).  This can be
@@ -129,6 +127,6 @@ public final class CodecFactoryImpl
      */
     private void nullParam() 
     {
-	throw wrapper.nullParam() ;
+	throw wrapper.nullParamNoComplete() ;
     }
 }

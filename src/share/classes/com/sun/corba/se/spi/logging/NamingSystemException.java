@@ -8,13 +8,16 @@
  * Note: replace this header with the standard header.
  */
 
-package com.sun.corba.se.impl.logging ;
+package com.sun.corba.se.spi.logging ;
 
+import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
 import com.sun.corba.se.spi.orbutil.logex.Message ;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel ;
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper ;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
+import com.sun.corba.se.spi.orbutil.logex.corba.CS;
+import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
 
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
@@ -22,6 +25,7 @@ import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.INITIALIZE;
 import org.omg.CORBA.INTERNAL;
+import org.omg.CORBA.SystemException;
 import org.omg.CORBA.UNKNOWN;
 
 @ExceptionWrapper( idPrefix="IOP" )
@@ -40,8 +44,8 @@ public interface NamingSystemException {
     BAD_PARAM transientNameServerBadHost(  ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
-    @Message( "Invalid object reference passed in rebind or bind operation" )
-    BAD_PARAM objectIsNull(  ) ;
+    @Message( "Object is null" )
+    BAD_PARAM objectIsNull() ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Bad host address in -ORBInitDef" )
@@ -49,39 +53,49 @@ public interface NamingSystemException {
     
     @Log( level=LogLevel.WARNING, id=0 )
     @Message( "Updated context failed for bind" )
-    UNKNOWN bindUpdateContextFailed(  ) ;
+    UNKNOWN bindUpdateContextFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "bind failure" )
-    UNKNOWN bindFailure(  ) ;
+    UNKNOWN bindFailure( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Resolve conversion failed" )
-    UNKNOWN resolveConversionFailure(  ) ;
+    @CS( CSValue.MAYBE )
+    UNKNOWN resolveConversionFailure( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Resolve failure" )
-    UNKNOWN resolveFailure(  ) ;
+    @CS( CSValue.MAYBE )
+    UNKNOWN resolveFailure( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "Unbind failure" )
-    UNKNOWN unbindFailure(  ) ;
+    @CS( CSValue.MAYBE )
+    UNKNOWN unbindFailure( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=50 )
     @Message( "SystemException in transient name service while initializing" )
-    INITIALIZE transNsCannotCreateInitialNcSys(  ) ;
+    INITIALIZE transNsCannotCreateInitialNcSys( @Chain SystemException exc  ) ;
     
     @Log( level=LogLevel.WARNING, id=51 )
     @Message( "Java exception in transient name service while initializing" )
-    INITIALIZE transNsCannotCreateInitialNc(  ) ;
-    
+    INITIALIZE transNsCannotCreateInitialNc( @Chain Exception exc ) ;
+
+    String namingCtxRebindAlreadyBound = 
+        "Unexpected AlreadyBound exception in rebind" ;
+
     @Log( level=LogLevel.WARNING, id=0 )
-    @Message( "Unexpected AlreadyBound exception in rebind" )
-    INTERNAL namingCtxRebindAlreadyBound(  ) ;
+    @Message( namingCtxRebindAlreadyBound )
+    INTERNAL namingCtxRebindAlreadyBound( @Chain Exception exc ) ;
+
+    @Log( level=LogLevel.WARNING, id=0 )
+    @Message( namingCtxRebindAlreadyBound )
+    INTERNAL namingCtxRebindAlreadyBound() ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Unexpected AlreadyBound exception in rebind_context" )
-    INTERNAL namingCtxRebindctxAlreadyBound(  ) ;
+    INTERNAL namingCtxRebindctxAlreadyBound( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Bad binding type in internal binding implementation" )
@@ -94,7 +108,7 @@ public interface NamingSystemException {
     
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "Error in creating POA for BindingIterator" )
-    INTERNAL namingCtxBindingIteratorCreate(  ) ;
+    INTERNAL namingCtxBindingIteratorCreate( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=100 )
     @Message( "Bind implementation encountered a previous bind" )
@@ -103,16 +117,16 @@ public interface NamingSystemException {
     @Log( level=LogLevel.WARNING, id=101 )
     @Message( "list operation caught an unexpected Java exception while "
         + "creating list iterator" )
-    INTERNAL transNcListGotExc(  ) ;
+    INTERNAL transNcListGotExc( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=102 )
     @Message( "new_context operation caught an unexpected Java exception "
         + "creating the NewContext servant" )
-    INTERNAL transNcNewctxGotExc(  ) ;
+    INTERNAL transNcNewctxGotExc( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=103 )
     @Message( "Destroy operation caught a Java exception while disconnecting from ORB" )
-    INTERNAL transNcDestroyGotExc(  ) ;
+    INTERNAL transNcDestroyGotExc( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=105 )
     @Message( "Stringified object reference with unknown protocol specified" )

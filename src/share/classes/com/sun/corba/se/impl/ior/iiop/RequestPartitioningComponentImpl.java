@@ -44,24 +44,23 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 import com.sun.corba.se.spi.ior.TaggedComponentBase;
 import com.sun.corba.se.spi.ior.iiop.RequestPartitioningComponent;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-
-import com.sun.corba.se.spi.orb.ORB ;
 
 public class RequestPartitioningComponentImpl extends TaggedComponentBase 
     implements RequestPartitioningComponent
 {
-
-    private static ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_OA_IOR_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private int partitionToUse;
 
+    @Override
     public boolean equals(Object obj)
     {
-	if (!(obj instanceof RequestPartitioningComponentImpl))
-	    return false ;
+	if (!(obj instanceof RequestPartitioningComponentImpl)) {
+            return false;
+        }
 
 	RequestPartitioningComponentImpl other = 
 	    (RequestPartitioningComponentImpl)obj ;
@@ -69,11 +68,13 @@ public class RequestPartitioningComponentImpl extends TaggedComponentBase
 	return partitionToUse == other.partitionToUse ;
     }
 
+    @Override
     public int hashCode()
     {
 	return partitionToUse;
     }
 
+    @Override
     public String toString()
     {
 	return "RequestPartitioningComponentImpl[partitionToUse=" + partitionToUse + "]" ;

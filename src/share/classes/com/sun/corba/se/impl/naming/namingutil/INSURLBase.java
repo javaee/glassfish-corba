@@ -40,7 +40,7 @@
 
 package com.sun.corba.se.impl.naming.namingutil;
 
-import com.sun.corba.se.impl.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -51,10 +51,8 @@ import com.sun.corba.se.spi.orb.ORB ;
  *  @author  Hemanth
  */
 public abstract class INSURLBase implements INSURL {
-
-
-    private static OMGSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_NAMING_READ_OMG() ;
+    private static OMGSystemException wrapper =
+        OMGSystemException.self ;
 
     // If rirFlag is set to true that means internal
     // boot strapping technique will be used. If set to
@@ -69,9 +67,14 @@ public abstract class INSURLBase implements INSURL {
      *  A Utility method to throw BAD_PARAM exception to signal malformed
      *  INS URL.
      */
-    protected void badAddress( java.lang.Throwable e )
+    protected void badAddress( String name )
     {
-	throw wrapper.soBadAddress( e ) ;
+	throw wrapper.soBadAddress( name ) ;
+    }
+
+    protected void badAddress( java.lang.Throwable e, String name )
+    {
+	throw wrapper.soBadAddress( e, name ) ;
     }
 
     public boolean getRIRFlag( ) {

@@ -73,4 +73,8 @@ public class BufferQueue
     {
         list.addFirst(item);
     }
+
+    public void clear() {
+        list.clear() ;
+    }
 }

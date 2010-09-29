@@ -44,12 +44,6 @@ import java.util.Iterator ;
 
 import org.omg.IOP.TaggedComponent;
 
-import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.INV_POLICY;
-import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.LocalObject;
 
@@ -64,13 +58,12 @@ import com.sun.corba.se.spi.oa.ObjectAdapter;
 import com.sun.corba.se.spi.legacy.interceptor.IORInfoExt;
 import com.sun.corba.se.spi.legacy.interceptor.UnknownType;
 
-import com.sun.corba.se.spi.ior.IORTemplate;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate;
 import com.sun.corba.se.spi.ior.TaggedComponentFactoryFinder ;
 
-import com.sun.corba.se.impl.logging.InterceptorsSystemException ;
-import com.sun.corba.se.impl.logging.OMGSystemException ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.InterceptorsSystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  * IORInfoImpl is the implementation of the IORInfo class, as described
@@ -100,9 +93,12 @@ public final class IORInfoImpl
 
     private transient ORB orb ;
 
-    private transient ORBUtilSystemException orbutilWrapper ;
-    private transient InterceptorsSystemException wrapper ;
-    private transient OMGSystemException omgWrapper ;
+    private static final ORBUtilSystemException orbutilWrapper =
+        ORBUtilSystemException.self ;
+    private static final InterceptorsSystemException wrapper =
+        InterceptorsSystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
 
     /**
      * Creates a new IORInfo implementation.  This info object will establish
@@ -110,11 +106,6 @@ public final class IORInfoImpl
      */
     IORInfoImpl( ObjectAdapter adapter ) {
         this.orb = adapter.getORB() ;
-
-	orbutilWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
-	omgWrapper =  orb.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
-
 	this.adapter = adapter;
     }
 
@@ -295,7 +286,7 @@ public final class IORInfoImpl
      */
     private void nullParam() 
     {
-	throw orbutilWrapper.nullParam() ;
+	throw orbutilWrapper.nullParamNoComplete() ;
     }
 
     // REVISIT: add minor codes!
@@ -303,14 +294,13 @@ public final class IORInfoImpl
     private void checkState( int expectedState )
     {
 	if (expectedState != state)
-	    throw wrapper.badState1( Integer.valueOf(expectedState), Integer.valueOf(state) ) ;
+	    throw wrapper.badState1( expectedState, state ) ;
     }
 
     private void checkState( int expectedState1, int expectedState2 )
     {
 	if ((expectedState1 != state) && (expectedState2 != state))
-	    throw wrapper.badState2( Integer.valueOf(expectedState1), 
-		Integer.valueOf(expectedState2), Integer.valueOf(state) ) ;
+	    throw wrapper.badState2( expectedState1, expectedState2, state ) ;
     }
 
     void makeStateEstablished()

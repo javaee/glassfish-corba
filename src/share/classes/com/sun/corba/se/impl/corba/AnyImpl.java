@@ -56,7 +56,6 @@ import java.util.ArrayList ;
 
 import org.omg.CORBA.TypeCode ;
 import org.omg.CORBA.Any ;
-import org.omg.CORBA.CompletionStatus ;
 import org.omg.CORBA.TCKind ;
 
 import org.omg.CORBA.portable.Streamable;
@@ -76,7 +75,7 @@ import com.sun.corba.se.impl.io.ValueUtility;
 import com.sun.corba.se.impl.orbutil.RepositoryIdFactory;
 import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import java.io.ObjectInputStream;
 
 import com.sun.corba.se.spi.orbutil.copyobject.Copy ;
@@ -124,7 +123,8 @@ public class AnyImpl extends Any {
     protected transient ORB orb;
 
     @Copy( CopyType.IDENTITY ) 
-    private transient ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     //
     // Validity depends upon typecode. The 'value' and 'object' instance
@@ -198,7 +198,6 @@ public class AnyImpl extends Any {
 
         stream = null ;
         orb = null ;
-        wrapper = null ;
     }
 
     static AnyImpl convertToNative(ORB orb, Any any) {
@@ -223,8 +222,6 @@ public class AnyImpl extends Any {
     public AnyImpl(ORB orb)
     {
 	this.orb = orb;
-	wrapper = orb.getLogWrapperTable()
-	    .get_RPC_PRESENTATION_ORBUtil() ;
 
 	typeCode = orb.get_primitive_tc(TCKind._tk_null);
 	stream = null;
@@ -528,7 +525,7 @@ public class AnyImpl extends Any {
         } catch (BadKind badKind) { // impossible
             throw wrapper.badkindCannotOccur() ;
         } catch (Bounds bounds) { // impossible
-            throw wrapper.boundsCannotOccur() ;
+            throw wrapper.boundsCannotOccur( bounds ) ;
         }
     }
 
@@ -587,8 +584,7 @@ public class AnyImpl extends Any {
         typeCode = TypeCodeImpl.convertToNative(orb, tc);
         int kind = realType().kind().value();
         if (kind >= isStreamed.length) {
-            throw wrapper.invalidIsstreamedTckind( CompletionStatus.COMPLETED_MAYBE,
-                          kind) ;
+            throw wrapper.invalidIsstreamedTckind( kind) ;
         }
 
         if (AnyImpl.isStreamed[kind]) {
@@ -1013,8 +1009,7 @@ public class AnyImpl extends Any {
 
 	    // Check if bounded strings length is not exceeded
 	    if (length != 0 && s != null && s.length() > length) {
-		throw wrapper.badStringBounds( Integer.valueOf( s.length() ),
-                                               Integer.valueOf( length ) ) ;
+		throw wrapper.badStringBounds( s.length(), length ) ;
 	    }
 	} else {
 	    typeCode = orb.get_primitive_tc(TCKind._tk_wstring);
@@ -1068,8 +1063,7 @@ public class AnyImpl extends Any {
 		String[] ids = StubAdapter.getTypeIds( o ) ;
 		typeCode = new TypeCodeImpl(orb, TCKind._tk_objref, ids[0], "");
 	    } else {
-		throw wrapper.badInsertobjParam( 
-		    CompletionStatus.COMPLETED_MAYBE, o.getClass().getName() ) ;
+		throw wrapper.badInsertobjParam( o.getClass().getName() ) ;
 	    }
 	}
 	

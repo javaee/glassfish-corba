@@ -68,11 +68,11 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.orbutil.closure.ClosureFactory ;
 
-import com.sun.corba.se.impl.logging.POASystemException ;
-import com.sun.corba.se.impl.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.POASystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
-import java.util.HashMap;
+
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
@@ -85,6 +85,11 @@ import org.glassfish.gmbal.AMXMetadata;
 @AMXMetadata( isSingleton=true )
 public class POAFactory implements ObjectAdapterFactory 
 {
+    private static final POASystemException wrapper =
+        POASystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
+
     // Maps servants to POAs for deactivating servants when unexportObject is called.
     // Maintained by POAs activate_object and deactivate_object.
     private Map<Servant,POA> exportedServantsToPOA = new WeakHashMap<Servant,POA>();
@@ -95,8 +100,6 @@ public class POAFactory implements ObjectAdapterFactory
     private POAImpl rootPOA ;
     private DelegateImpl delegateImpl;
     private ORB orb ;
-    private POASystemException wrapper ;
-    private OMGSystemException omgWrapper ;
     private boolean isShuttingDown = false ;
     private ManagedObjectManager mom ;
 
@@ -192,8 +195,6 @@ public class POAFactory implements ObjectAdapterFactory
     public void init( ORB orb ) 
     {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_POA() ;
-	omgWrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_OMG() ;
 	delegateImpl = new DelegateImpl( orb, this ) ;
 	registerRootPOA() ;
 
@@ -215,8 +216,9 @@ public class POAFactory implements ObjectAdapterFactory
 		String name = (String)(iter.next()) ;
 
 		if (first) {
-		    if (!name.equals( ORBConstants.ROOT_POA_NAME ))
-			throw wrapper.makeFactoryNotPoa( name ) ;
+		    if (!name.equals( ORBConstants.ROOT_POA_NAME )) {
+                        throw wrapper.makeFactoryNotPoa(name);
+                    }
 		    first = false ;
 		} else {
 		    poa = poa.find_POA( name, true ) ;
@@ -232,8 +234,9 @@ public class POAFactory implements ObjectAdapterFactory
 	    throw wrapper.poaLookupError( ex ) ;
 	}
 
-	if ( poa == null )
-	    throw wrapper.poaLookupError() ;
+	if ( poa == null ) {
+            throw wrapper.poaLookupError();
+        }
 
 	return (ObjectAdapter)poa;
     }

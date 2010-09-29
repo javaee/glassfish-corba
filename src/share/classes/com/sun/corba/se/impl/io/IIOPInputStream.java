@@ -57,7 +57,6 @@ import java.io.InvalidClassException;
 import java.io.OptionalDataException;
 import java.io.Externalizable;
 import java.io.EOFException;
-import java.lang.reflect.*;
 
 import sun.corba.Bridge ;
 
@@ -82,9 +81,6 @@ import com.sun.org.omg.SendingContext.CodeBase;
 
 import javax.rmi.CORBA.ValueHandler;
 
-import java.security.*;
-import java.util.*;
-
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
@@ -97,8 +93,18 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 import com.sun.corba.se.impl.util.Utility ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
-
-import com.sun.corba.se.spi.trace.* ;
+import com.sun.corba.se.spi.trace.ValueHandlerRead;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * IIOPInputStream is used by the ValueHandlerImpl to handle Java serialization
@@ -143,7 +149,7 @@ public class IIOPInputStream
 
     private ObjectStreamClass currentClassDesc = null;
 
-    private Class currentClass = null;
+    private Class<?> currentClass = null;
 
     private int recursionDepth = 0;
 
@@ -168,7 +174,7 @@ public class IIOPInputStream
      * The vector is created as needed. The vector is maintained in
      * order of highest (first) priority to lowest
      */
-    private List callbacks;
+    private List<Object> callbacks;
 
     // Serialization machinery fields
     /* Arrays used to keep track of classes and ObjectStreamClasses
@@ -181,8 +187,10 @@ public class IIOPInputStream
 
     private static final String kEmptyStr = "";
 
-    public static final TypeCode kRemoteTypeCode = ORB.init().get_primitive_tc(TCKind.tk_objref);
-    public static final TypeCode kValueTypeCode =  ORB.init().get_primitive_tc(TCKind.tk_value);
+    public static final TypeCode kRemoteTypeCode =
+        ORB.init().get_primitive_tc(TCKind.tk_objref);
+    public static final TypeCode kValueTypeCode =
+        ORB.init().get_primitive_tc(TCKind.tk_value);
 
     // TESTING CODE - useFVDOnly should be made final before FCS in order to
     // optimize out the check.
@@ -220,9 +228,9 @@ public class IIOPInputStream
 		}
 	    );
             
-            if (result == null)
-		// XXX I18N, logging needed.
+            if (result == null) {
                 throw new Error("Unable to find OptionalDataException constructor");
+            }
         
             return result;
 
@@ -241,9 +249,9 @@ public class IIOPInputStream
                    OPT_DATA_EXCEPTION_CTOR.newInstance(new Object[] { 
                        Boolean.TRUE });
 
-            if (result == null)
-		// XXX I18N, logging needed.
+            if (result == null) {
                 throw new Error("Created null OptionalDataException");
+            }
 
             return result;
 
@@ -272,23 +280,16 @@ public class IIOPInputStream
 
         if (streamFormatVersion < 1 ||
             streamFormatVersion > vhandler.getMaximumStreamFormatVersion()) {
-            SystemException sysex = omgWrapper.unsupportedFormatVersion(
-                    CompletionStatus.COMPLETED_MAYBE);
-            // XXX I18N?  Logging for IOException?
-            IOException result = new IOException("Unsupported format version: "
-                                                 + streamFormatVersion);
-            result.initCause( sysex ) ;
-            throw result ;
+            SystemException sysex = omgWrapper.unsupportedFormatVersion();
+            throw new IOException("Unsupported format version: " +
+                streamFormatVersion, sysex) ;
         }
 
         if (streamFormatVersion == 2) {
             if (!(orbStream instanceof ValueInputStream)) {
-                SystemException sysex = omgWrapper.notAValueinputstream(
-                    CompletionStatus.COMPLETED_MAYBE);
-                // XXX I18N?  Logging for IOException?
-                IOException result = new IOException("Not a ValueInputStream");
-                result.initCause( sysex ) ;
-                throw result;
+                SystemException sysex = omgWrapper.notAValueinputstream() ;
+                   
+                throw new IOException("Not a ValueInputStream", sysex);
             }
         }
     }
@@ -404,12 +405,12 @@ public class IIOPInputStream
 
     @ValueHandlerRead
     final Object simpleReadObject(Class clz, ClassInfoCache.ClassInfo cinfo,
-        String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender, int offset)
-    {
+        String repositoryID, com.sun.org.omg.SendingContext.CodeBase sender, 
+        int offset) {
         /* Save the current state and get ready to read an object. */
         Object prevObject = currentObject;
         ObjectStreamClass prevClassDesc = currentClassDesc;
-        Class prevClass = currentClass;
+        Class<?> prevClass = currentClass;
         byte oldStreamFormatVersion = streamFormatVersion;
 
         simpleReadDepth++;	// Entering
@@ -449,8 +450,9 @@ public class IIOPInputStream
          * this is the last recursive call .
          */
         IOException exIOE = abortIOException;
-        if (simpleReadDepth == 0)
+        if (simpleReadDepth == 0) {
             abortIOException = null;
+        }
         if (exIOE != null){
             bridge.throwException( exIOE ) ;
             return null;
@@ -475,7 +477,7 @@ public class IIOPInputStream
         /* Save the current state and get ready to read an object. */
         Object prevObject = currentObject;
         ObjectStreamClass prevClassDesc = currentClassDesc;
-        Class prevClass = currentClass;
+        Class<?> prevClass = currentClass;
         byte oldStreamFormatVersion = streamFormatVersion;
 
         simpleReadDepth++;	// Entering
@@ -505,8 +507,9 @@ public class IIOPInputStream
          * this is the last recursive call .
          */
         IOException exIOE = abortIOException;
-        if (simpleReadDepth == 0)
+        if (simpleReadDepth == 0) {
             abortIOException = null;
+        }
         if (exIOE != null){
             bridge.throwException( exIOE ) ;
             return;
@@ -514,8 +517,9 @@ public class IIOPInputStream
 
 
         ClassNotFoundException exCNF = abortClassNotFoundException;
-        if (simpleReadDepth == 0)
+        if (simpleReadDepth == 0) {
             abortClassNotFoundException = null;
+        }
         if (exCNF != null) {
             bridge.throwException( exCNF ) ;
             return;
@@ -566,9 +570,9 @@ public class IIOPInputStream
     @ValueHandlerRead
     public final void defaultReadObjectDelegate() {
         try {
-	    if (currentObject == null || currentClassDesc == null)
-		// XXX I18N, logging needed.
-		throw new NotActiveException("defaultReadObjectDelegate");
+	    if (currentObject == null || currentClassDesc == null) {
+                throw new NotActiveException("defaultReadObjectDelegate");
+            }
 
             if (defaultReadObjectFVDMembers != null ) {
                 // Clear this here so that a recursion back to another
@@ -643,9 +647,7 @@ public class IIOPInputStream
         try {
             orbStream.reset();
         } catch (Error e) {
-            IOException err = new IOException(e.getMessage());
-	    err.initCause(e) ;
-	    throw err ;
+	    throw new IOException(e) ;
         }
     }
 
@@ -665,7 +667,7 @@ public class IIOPInputStream
         try{
             readObjectState.readData(this);
 
-            return (orbStream.read_octet() << 0) & 0x000000FF;
+            return (orbStream.read_octet()) & 0x000000FF;
         } catch (MARSHAL marshalException) {
             if (marshalException.minor 
                 == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1) {
@@ -675,9 +677,7 @@ public class IIOPInputStream
 
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e) ;
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -698,9 +698,7 @@ public class IIOPInputStream
 
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e) ;
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
 
     }
@@ -717,9 +715,7 @@ public class IIOPInputStream
             throw marshalException;
 
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -735,9 +731,7 @@ public class IIOPInputStream
             throw marshalException;
 
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -753,9 +747,7 @@ public class IIOPInputStream
             throw marshalException;
 
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -770,9 +762,7 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -787,9 +777,7 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -814,9 +802,7 @@ public class IIOPInputStream
             
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -831,13 +817,12 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public final String readLine() throws IOException{
 	// XXX I18N, logging needed.
         throw new IOException("Method readLine not supported");
@@ -854,9 +839,7 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -871,9 +854,7 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -888,14 +869,12 @@ public class IIOPInputStream
         try{
             readObjectState.readData(this);
 
-    	    return (orbStream.read_octet() << 0) & 0x000000FF;
+    	    return (orbStream.read_octet()) & 0x000000FF;
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
 	} catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -905,14 +884,12 @@ public class IIOPInputStream
         try{
             readObjectState.readData(this);
 
-    	    return (orbStream.read_ushort() << 0) & 0x0000FFFF;
+    	    return (orbStream.read_ushort()) & 0x0000FFFF;
         } catch (MARSHAL marshalException) {
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -939,9 +916,7 @@ public class IIOPInputStream
             handleOptionalDataMarshalException(marshalException, false);
             throw marshalException;
         } catch(Error e) {
-	    IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e);
-	    throw exc ;
+	    throw new IOException(e) ;
 	}
     }
 
@@ -967,10 +942,11 @@ public class IIOPInputStream
 
             IOException result;
 
-            if (!objectRead)
+            if (!objectRead) {
                 result = new EOFException("No more optional data");
-            else
+            } else {
                 result = createOptionalDataException();
+            }
 
             result.initCause(marshalException);
 
@@ -989,7 +965,7 @@ public class IIOPInputStream
     }
 
     @Override
-    protected final Class resolveClass(java.io.ObjectStreamClass v)
+    protected final Class<?> resolveClass(java.io.ObjectStreamClass v)
 	throws IOException, ClassNotFoundException{
 	// XXX I18N, logging needed.
         throw new IOException("Method resolveClass not supported");
@@ -1015,9 +991,7 @@ public class IIOPInputStream
             
             throw marshalException;
         } catch(Error e) {
-            IOException exc = new IOException(e.getMessage());
-	    exc.initCause(e) ;
-	    throw exc ;
+	    throw new IOException(e) ;
         }
     }
 
@@ -1031,19 +1005,19 @@ public class IIOPInputStream
     private void readingSerializable() { }
 
     @InfoMethod
-    private void newInstanceInfo( Class cls ) { }
+    private void newInstanceInfo( Class<?> cls ) { }
 
     @InfoMethod
-    private void readingDataForClass( Class cls ) { }
+    private void readingDataForClass( Class<?> cls ) { }
 
     @InfoMethod
     private void classHasWriteObject( boolean flag ) { }
 
     @InfoMethod
-    private void currentClassInfo( ObjectStreamClass ocs, Class cls ) { }
+    private void currentClassInfo( ObjectStreamClass ocs, Class<?> cls ) { }
 
     @InfoMethod
-    private void matchingClassInfo( Class cls ) { }
+    private void matchingClassInfo( Class<?> cls ) { }
 
     @ValueHandlerRead
     private void callReadExternal( Externalizable ext )
@@ -1123,7 +1097,7 @@ public class IIOPInputStream
                 readingSerializable();
 
                 ObjectStreamClass currdesc = currentClassDesc;
-                Class currclass = currentClass;
+                Class<?> currclass = currentClass;
 
                 // MS: cstack.mark() ;
                 spBase = spClass;	// current top of stack
@@ -1132,11 +1106,11 @@ public class IIOPInputStream
                      currdesc != null && currdesc.isSerializable();   
                      currdesc = currdesc.getSuperclass()) {
 
-                    Class cc = currdesc.forClass();
+                    Class<?> cc = currdesc.forClass();
 
                     currentClassInfo(currdesc, cc);
 
-                    Class cl;
+                    Class<?> cl;
                     for (cl = currclass; cl != null; cl = cl.getSuperclass()) {
                         if (cc == cl) {
                             matchingClassInfo(cl);
@@ -1150,7 +1124,7 @@ public class IIOPInputStream
                     spClass++;
                     if (spClass >= classes.length) {
                         int newlen = classes.length * 2;
-                        Class[] newclasses = new Class[newlen];
+                        Class<?>[] newclasses = new Class<?>[newlen];
                         ObjectStreamClass[] newclassdesc = new ObjectStreamClass[newlen];
 
                         System.arraycopy(classes, 0, newclasses, 0, classes.length);
@@ -1230,8 +1204,9 @@ public class IIOPInputStream
                             } else {
                                 classHasWriteObject( false ) ;
 
-                                if (currentClassDesc.hasReadObject())
+                                if (currentClassDesc.hasReadObject()) {
                                     setState(IN_READ_OBJECT_REMOTE_NOT_CUSTOM_MARSHALED);
+                                }
                             }
 
                             if (!invokeObjectReader(currentClassDesc, currentObject, 
@@ -1248,8 +1223,9 @@ public class IIOPInputStream
                                 }
                             }
 
-                            if (currentClassDesc.hasWriteObject())
+                            if (currentClassDesc.hasWriteObject()) {
                                 readObjectState.endUnmarshalCustomValue(this);
+                            }
                         } finally {
                             setState(oldState);
                         }
@@ -1305,8 +1281,9 @@ public class IIOPInputStream
             descs.add(0, aFVD);
             if ((aFVD.base_value != null) && !kEmptyStr.equals(aFVD.base_value)) {
                 aFVD = sender.meta(aFVD.base_value);
-            } else
+            } else {
                 return descs;
+            }
         }
 
         fullValueDescriptorsInfo(descs);
@@ -1536,7 +1513,7 @@ public class IIOPInputStream
                 readingSerializable() ;
 
                 ObjectStreamClass currdesc = currentClassDesc ;
-                Class currclass = currentClass = clz;
+                Class<?> currclass = currentClass = clz;
                 
                 // MS: cstack.mark() ;
                 spBase = spClass;	// current top of stack
@@ -1545,11 +1522,11 @@ public class IIOPInputStream
 		     currdesc != null && currdesc.isSerializable();   
 		     currdesc = currdesc.getSuperclass()) {
 
-		    Class cc = currdesc.forClass();
+		    Class<?> cc = currdesc.forClass();
 
                     currentClassInfo(currdesc, cc) ;
 					
-		    Class cl;
+		    Class<?> cl;
 		    for (cl = currclass; cl != null; cl = cl.getSuperclass()) {
 			if (cc == cl) {
                             matchingClassInfo(cl);
@@ -1563,11 +1540,14 @@ public class IIOPInputStream
 		    spClass++;
 		    if (spClass >= classes.length) {
 			int newlen = classes.length * 2;
-			Class[] newclasses = new Class[newlen];
-			ObjectStreamClass[] newclassdesc = new ObjectStreamClass[newlen];
+			Class<?>[] newclasses = new Class<?>[newlen];
+			ObjectStreamClass[] newclassdesc =
+                            new ObjectStreamClass[newlen];
 				
-			System.arraycopy(classes, 0, newclasses, 0, classes.length);
-			System.arraycopy(classdesc, 0, newclassdesc, 0, classes.length);
+			System.arraycopy(classes, 0, newclasses,
+                            0, classes.length);
+			System.arraycopy(classdesc, 0, newclassdesc,
+                            0, classes.length);
 						
 			classes = newclasses;
 			classdesc = newclassdesc;
@@ -1646,13 +1626,16 @@ public class IIOPInputStream
                                 readFormatVersion();
                                 boolean calledDefaultWriteObject = readBoolean();
 
-                                if (calledDefaultWriteObject)
-                                    inputClassFields(null, null, null, fvd.members, sender);
+                                if (calledDefaultWriteObject) {
+                                    inputClassFields(null, null, null,
+                                        fvd.members, sender);
+                                }
 
                                 if (getStreamFormatVersion() == 2) {
-
-                                    ((ValueInputStream)getOrbStream()).start_value();
-                                    ((ValueInputStream)getOrbStream()).end_value();
+                                    ((ValueInputStream)getOrbStream())
+                                        .start_value();
+                                    ((ValueInputStream)getOrbStream())
+                                        .end_value();
                                 }
 
                                 // WARNING: If stream format version is 1 and there's
@@ -1671,7 +1654,8 @@ public class IIOPInputStream
 			}
 		    }
 
-		    currdesc = currentClassDesc = ObjectStreamClass.lookup(currentClass);
+		    currdesc = currentClassDesc
+                        = ObjectStreamClass.lookup(currentClass);
 
 		    if (!repIDForClass.equals("java.lang.Object")) {
 
@@ -1696,8 +1680,9 @@ public class IIOPInputStream
 
                             // Always use readObject if it exists, and fall back to default
                             // unmarshaling if it doesn't.
-                            if (!fvd.is_custom && currentClassDesc.hasReadObject())
+                            if (!fvd.is_custom && currentClassDesc.hasReadObject()) {
                                 setState(IN_READ_OBJECT_REMOTE_NOT_CUSTOM_MARSHALED);
+                            }
 
                             usedReadObject = invokeObjectReader(currentClassDesc, 
                                 currentObject, currentClass, fvd.members );
@@ -1705,12 +1690,14 @@ public class IIOPInputStream
                             // Note that the !usedReadObject !calledDefaultWriteObject
                             // case is handled by the beginUnmarshalCustomValue method
                             // of the default state
-                            if (!usedReadObject || readObjectState == IN_READ_OBJECT_DEFAULTS_SENT)
-                                inputClassFields(currentObject, currentClass, currdesc, 
-				    fvd.members, sender);
+                            if (!usedReadObject || readObjectState == IN_READ_OBJECT_DEFAULTS_SENT) {
+                                inputClassFields(currentObject, currentClass,
+                                    currdesc, fvd.members, sender);
+                            }
 
-                            if (fvd.is_custom)
+                            if (fvd.is_custom) {
                                 readObjectState.endUnmarshalCustomValue(this);
+                            }
                         } finally {
                             setState(oldState);
                         }
@@ -1725,20 +1712,23 @@ public class IIOPInputStream
 			while (fvdsList.hasNext()){
 			    fvd = fvdsList.next();
 
-                            if (fvd.is_custom)
+                            if (fvd.is_custom) {
                                 skipCustomUsingFVD(fvd.members, sender);
-			    else
-                                inputClassFields(null, currentClass, null, fvd.members, sender);
+                            } else {
+                                inputClassFields(null, currentClass, null,
+                                    fvd.members, sender);
+                            }
 			}
 		    }
 		} // end : while(fvdsList.hasNext()) 
 
 		while (fvdsList.hasNext()){
 		    FullValueDescription fvd = fvdsList.next();
-		    if (fvd.is_custom)
+		    if (fvd.is_custom) {
                         skipCustomUsingFVD(fvd.members, sender);
-		    else 
-                        throwAwayData(fvd.members, sender);			
+                    } else {
+                        throwAwayData(fvd.members, sender);
+                    }
 		}
 	    }
 	} finally {
@@ -1782,8 +1772,9 @@ public class IIOPInputStream
                         
                     boolean calledDefaultWriteObject = readBoolean();
                         
-                    if (calledDefaultWriteObject)
+                    if (calledDefaultWriteObject) {
                         inputClassFields(null, null, null, fvd.members, sender);
+                    }
 
                     if (getStreamFormatVersion() == 2) {
                         ((ValueInputStream)getOrbStream()).start_value();
@@ -1807,7 +1798,8 @@ public class IIOPInputStream
     ///////////////////
 
     @ValueHandlerRead
-    private int findNextClass(String classname, Class classes[], int _spClass, int _spBase){
+    private int findNextClass(String classname, Class classes[],
+        int _spClass, int _spBase){
 
 	for (int i = _spClass; i > _spBase; i--){
 	    if (classname.equals(classes[i].getName())) {
@@ -1824,8 +1816,8 @@ public class IIOPInputStream
      * removed.
      */
     @ValueHandlerRead
-    private boolean invokeObjectReader(ObjectStreamClass osc, Object obj, Class aclass,
-        ValueMember[] valueMembers )
+    private boolean invokeObjectReader(ObjectStreamClass osc, Object obj, 
+        Class aclass, ValueMember[] valueMembers )
 	throws InvalidClassException, StreamCorruptedException,
 	       ClassNotFoundException, IOException
     {
@@ -1840,17 +1832,17 @@ public class IIOPInputStream
                 result = true ;
             } catch (InvocationTargetException e) {
                 Throwable t = e.getTargetException();
-                if (t instanceof ClassNotFoundException)
-                    throw (ClassNotFoundException)t;
-                else if (t instanceof IOException)
-                    throw (IOException)t;
-                else if (t instanceof RuntimeException)
+                if (t instanceof ClassNotFoundException) {
+                    throw (ClassNotFoundException) t;
+                } else if (t instanceof IOException) {
+                    throw (IOException) t;
+                } else if (t instanceof RuntimeException) {
                     throw (RuntimeException) t;
-                else if (t instanceof Error)
+                } else if (t instanceof Error) {
                     throw (Error) t;
-                else
-                    // XXX logging needed.
+                } else {
                     throw new Error("internal error");
+                }
             } catch (IllegalAccessException e) {
                 // XXX logging needed.
             } finally {
@@ -1874,21 +1866,22 @@ public class IIOPInputStream
     private void resetStream() throws IOException {
 
 	if (classes == null)
-	    classes = new Class[20];
+	    classes = new Class<?>[20];
 	else {
 	    for (int i = 0; i < classes.length; i++)
 		classes[i] = null;
 	}
-	if (classdesc == null)
-	    classdesc = new ObjectStreamClass[20];
-	else {
+	if (classdesc == null) {
+            classdesc = new ObjectStreamClass[20];
+        } else {
 	    for (int i = 0; i < classdesc.length; i++)
 		classdesc[i] = null;
 	}
 	spClass = 0;
 
-	if (callbacks != null)
-	    callbacks.clear(); // discard any pending callbacks
+	if (callbacks != null) {
+            callbacks.clear();
+        } // discard any pending callbacks
     }
 
     /**
@@ -1899,8 +1892,8 @@ public class IIOPInputStream
      * to set final fields. 
      */
     @ValueHandlerRead
-    private void inputPrimitiveField(Object o, Class cl, ObjectStreamField field)
-        throws InvalidClassException, IOException {
+    private void inputPrimitiveField(Object o, Class<?> cl,
+        ObjectStreamField field) throws InvalidClassException, IOException {
 
         try {
             switch (field.getTypeCode()) {
@@ -1966,7 +1959,7 @@ public class IIOPInputStream
     private void callTypeInfo( int ct ) { }
 
     @InfoMethod
-    private void typeInfo( Class type ) { }
+    private void typeInfo( Class<?> type ) { }
 
     @ValueHandlerRead
     private Object inputObjectField(org.omg.CORBA.ValueMember field,
@@ -1975,7 +1968,7 @@ public class IIOPInputStream
                StreamCorruptedException {
 
         Object objectValue = null;
-        Class type = null;
+        Class<?> type = null;
         String id = field.id;
 
         try {
@@ -1988,8 +1981,9 @@ public class IIOPInputStream
         typeInfo(type);
 
         String signature = null;
-        if (type != null)
+        if (type != null) {
             signature = ValueUtility.getSignature(field);
+        }
 
         if (signature != null && (signature.equals("Ljava/lang/Object;")
             || signature.equals("Ljava/io/Serializable;")
@@ -2046,22 +2040,27 @@ public class IIOPInputStream
 
             switch (callType) {
                 case ValueHandlerImpl.kRemoteType:
-                    if (type != null)
-                        objectValue = Utility.readObjectAndNarrow(orbStream, type);
-                    else
+                    if (type != null) {
+                        objectValue =
+                            Utility.readObjectAndNarrow(orbStream, type);
+                    } else {
                         objectValue = orbStream.read_Object();
+                    }
                     break;
                 case ValueHandlerImpl.kAbstractType:
-                    if (type != null)
-                        objectValue = Utility.readAbstractAndNarrow(orbStream, type);
-                    else
+                    if (type != null) {
+                        objectValue =
+                            Utility.readAbstractAndNarrow(orbStream, type);
+                    } else {
                         objectValue = orbStream.read_abstract_interface();
+                    }
                     break;
                 case ValueHandlerImpl.kValueType:
-                    if (type != null)
+                    if (type != null) {
                         objectValue = orbStream.read_value(type);
-                    else
+                    } else {
                         objectValue = orbStream.read_value();
+                    }
                     break;
                 default:
                     // XXX I18N, logging needed.
@@ -2093,8 +2092,8 @@ public class IIOPInputStream
         // fields have an API to provide the actual class
         // corresponding to the data type
         // Class type = osc.forClass();
-        Class fieldType = field.getType();
-	Class actualType = fieldType; // This may change if stub loaded.
+        Class<?> fieldType = field.getType();
+	Class<?> actualType = fieldType; // This may change if stub loaded.
 				
         // Decide what method call to make based on the fieldType. If
         // it is a type for which we need to load a stub, convert
@@ -2128,7 +2127,7 @@ public class IIOPInputStream
                 try {
                     String codebase = Util.getInstance().getCodebase(fieldType);
                     String repID = vhandler.createForAnyType(fieldType);
-                    Class stubType =
+                    Class<?> stubType =
 			Utility.loadStubClass(repID, codebase, fieldType); 
 		    actualType = stubType;
                 } catch (ClassNotFoundException e) {
@@ -2141,16 +2140,20 @@ public class IIOPInputStream
 
         switch (callType) {
             case ValueHandlerImpl.kRemoteType: 
-                if (!narrow) 
-                    objectValue = (Object)orbStream.read_Object(actualType);
-                else
-                    objectValue = Utility.readObjectAndNarrow(orbStream, actualType);
+                if (!narrow) {
+                    objectValue = (Object) orbStream.read_Object(actualType);
+                } else {
+                    objectValue =
+                        Utility.readObjectAndNarrow(orbStream, actualType);
+                }
                 break;
             case ValueHandlerImpl.kAbstractType: 
-                if (!narrow)
-                    objectValue = (Object)orbStream.read_abstract_interface(actualType); 
-                else
-                    objectValue = Utility.readAbstractAndNarrow(orbStream, actualType);
+                if (!narrow) {
+                    objectValue = orbStream.read_abstract_interface(actualType);
+                } else {
+                    objectValue =
+                        Utility.readAbstractAndNarrow(orbStream, actualType);
+                }
                 break;
             case ValueHandlerImpl.kValueType:
                 objectValue = (Object)orbStream.read_value(actualType);
@@ -2170,12 +2173,13 @@ public class IIOPInputStream
 
         if (defaultReadObjectFVDMembers != null) {
             inputRemoteMembersForReadFields(fieldToValueMap);
-        } else
+        } else {
             inputCurrentClassFieldsForReadFields(fieldToValueMap);
+        }
     }
 
     @ValueHandlerRead
-    private final void inputRemoteMembersForReadFields(
+    private void inputRemoteMembersForReadFields(
 	Map<String,Object> fieldToValueMap)
         throws InvalidClassException, StreamCorruptedException,
                ClassNotFoundException, IOException {
@@ -2274,7 +2278,7 @@ public class IIOPInputStream
      * corresponding java.lang Objects.
      */
     @ValueHandlerRead
-    private final void inputCurrentClassFieldsForReadFields(
+    private void inputCurrentClassFieldsForReadFields(
 	Map<String,Object> fieldToValueMap) throws InvalidClassException, 
 	    StreamCorruptedException, ClassNotFoundException, IOException {
 
@@ -2368,7 +2372,7 @@ public class IIOPInputStream
      * getField() is null!
      */
     @ValueHandlerRead
-    private void inputClassFields(Object o, Class cl,
+    private void inputClassFields(Object o, Class<?> cl,
 				  ObjectStreamField[] fields, 
 				  com.sun.org.omg.SendingContext.CodeBase sender)
 	throws InvalidClassException, StreamCorruptedException,
@@ -2380,8 +2384,9 @@ public class IIOPInputStream
         if (o != null) {
             for (int i = 0; i < primFields; ++i) {
                 OperationTracer.readingField( fields[i].getName() ) ;
-                if (fields[i].getField() == null)
+                if (fields[i].getField() == null) {
                     continue;
+                }
 
                 inputPrimitiveField(o, cl, fields[i]);
             }
@@ -2448,7 +2453,7 @@ public class IIOPInputStream
      * that field in the object.
      */
     @ValueHandlerRead
-    private void inputClassFields(Object o, Class cl, 
+    private void inputClassFields(Object o, Class<?> cl,
 				  ObjectStreamClass osc,
 				  ValueMember[] fields,
 				  com.sun.org.omg.SendingContext.CodeBase sender)
@@ -2467,13 +2472,15 @@ public class IIOPInputStream
 		    switch (fields[i].type.kind().value()) {
 		    case TCKind._tk_octet:
 			byte byteValue = orbStream.read_octet();
-			if ((o != null) && osc.hasField(fields[i]))
-			setByteField(o, cl, fields[i].name, byteValue);
+			if ((o != null) && osc.hasField(fields[i])) {
+                            setByteField(o, cl, fields[i].name, byteValue);
+                        }
 			break;
 		    case TCKind._tk_boolean:
 			boolean booleanValue = orbStream.read_boolean();
-			if ((o != null) && osc.hasField(fields[i]))
-			setBooleanField(o, cl, fields[i].name, booleanValue);
+			if ((o != null) && osc.hasField(fields[i])) {
+                            setBooleanField(o, cl, fields[i].name, booleanValue);
+                        }
 			break;
 		    case TCKind._tk_char:
                         // Backwards compatibility.  Older Sun ORBs sent
@@ -2483,33 +2490,39 @@ public class IIOPInputStream
                         // Fall through to the _tk_wchar case.
                     case TCKind._tk_wchar:
 			char charValue = orbStream.read_wchar();
-			if ((o != null) && osc.hasField(fields[i]))
-			setCharField(o, cl, fields[i].name, charValue);
+			if ((o != null) && osc.hasField(fields[i])) {
+                            setCharField(o, cl, fields[i].name, charValue);
+                        }
 			break;
 		    case TCKind._tk_short:
 			short shortValue = orbStream.read_short();
-			if ((o != null) && osc.hasField(fields[i]))
-			setShortField(o, cl, fields[i].name, shortValue);
+			if ((o != null) && osc.hasField(fields[i])) {
+                            setShortField(o, cl, fields[i].name, shortValue);
+                        }
 			break;
 		    case TCKind._tk_long:
 			int intValue = orbStream.read_long();
-			if ((o != null) && osc.hasField(fields[i]))
-			setIntField(o, cl, fields[i].name, intValue);
+			if ((o != null) && osc.hasField(fields[i])) {
+                            setIntField(o, cl, fields[i].name, intValue);
+                        }
 			break;
 		    case TCKind._tk_longlong:
 			long longValue = orbStream.read_longlong();
-			if ((o != null) && osc.hasField(fields[i]))
-			setLongField(o, cl, fields[i].name, longValue);
+			if ((o != null) && osc.hasField(fields[i])) {
+                            setLongField(o, cl, fields[i].name, longValue);
+                        }
 			break;
 		    case TCKind._tk_float:
 			float floatValue = orbStream.read_float();
-			if ((o != null) && osc.hasField(fields[i]))
-			setFloatField(o, cl, fields[i].name, floatValue);
+			if ((o != null) && osc.hasField(fields[i])) {
+                            setFloatField(o, cl, fields[i].name, floatValue);
+                        }
 			break;
 		    case TCKind._tk_double:
 			double doubleValue = orbStream.read_double();
-			if ((o != null) && osc.hasField(fields[i]))
-			setDoubleField(o, cl, fields[i].name, doubleValue);
+			if ((o != null) && osc.hasField(fields[i])) {
+                            setDoubleField(o, cl, fields[i].name, doubleValue);
+                        }
 			break;
                     case TCKind._tk_value:
 		    case TCKind._tk_objref:
@@ -2524,8 +2537,10 @@ public class IIOPInputStream
                             objectValue = activeRecursionMgr.getObject(cdrie.offset);
                         }
 								
-			if (o == null)
-			    continue;
+			if (o == null) {
+                            continue;
+                        }
+
 			try {
 			    if (osc.hasField(fields[i])){
                                 setObjectField(o, 
@@ -2586,8 +2601,9 @@ public class IIOPInputStream
         readFormatVersion();
         boolean calledDefaultWriteObject = readBoolean();
 
-        if (calledDefaultWriteObject)
+        if (calledDefaultWriteObject) {
             throwAwayData(fields, sender);
+        }
 
         if (getStreamFormatVersion() == 2) {
             
@@ -2643,7 +2659,7 @@ public class IIOPInputStream
                 case TCKind._tk_value:
 		case TCKind._tk_objref:
 		case TCKind._tk_value_box:
-		    Class type = null;
+		    Class<?> type = null;
 	            String id = fields[i].id;
 
 		    try {
@@ -2654,8 +2670,9 @@ public class IIOPInputStream
 			type = null;
 		    }
 		    String signature = null;
-		    if (type != null)
-			signature = ValueUtility.getSignature(fields[i]);
+		    if (type != null) {
+                        signature = ValueUtility.getSignature(fields[i]);
+                    }
 								
 		    // Read value
 		    try {
@@ -2742,7 +2759,7 @@ public class IIOPInputStream
     }
 
     @ValueHandlerRead
-    private static void setObjectField(Object o, Class c, String fieldName, 
+    private static void setObjectField(Object o, Class<?> c, String fieldName,
 	Object v) {
 
 	try {
@@ -2750,40 +2767,39 @@ public class IIOPInputStream
 	    long key = bridge.objectFieldOffset( fld ) ;
 	    bridge.putObject( o, key, v ) ;
 	} catch (Exception e) {
-	    throw utilWrapper.errorSetObjectField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ),
-		ObjectUtility.compactObjectToString( v )) ;
+	    throw utilWrapper.errorSetObjectField( e, fieldName, o, v ) ;
 	}
     }
 
     @ValueHandlerRead
-    private static void setBooleanField(Object o, Class c, String fieldName, boolean v)
+    private static void setBooleanField(Object o, Class<?> c, String fieldName,
+        boolean v)
     {
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
 	    long key = bridge.objectFieldOffset( fld ) ;
 	    bridge.putBoolean( o, key, v ) ;
 	} catch (Exception e) {
-	    throw utilWrapper.errorSetBooleanField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ), v ) ;
+	    throw utilWrapper.errorSetBooleanField( e, fieldName, o, v ) ;
 	}
     }
 
     @ValueHandlerRead
-    private static void setByteField(Object o, Class c, String fieldName, byte v)
+    private static void setByteField(Object o, Class<?> c, String fieldName,
+        byte v)
     {
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
 	    long key = bridge.objectFieldOffset( fld ) ;
 	    bridge.putByte( o, key, v ) ;
 	} catch (Exception e) {
-	    throw utilWrapper.errorSetByteField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ), v ) ;
+	    throw utilWrapper.errorSetByteField( e, fieldName, o, v ) ;
 	}
     }
 
     @ValueHandlerRead
-    private static void setCharField(Object o, Class c, String fieldName, char v)
+    private static void setCharField(Object o, Class<?> c, String fieldName,
+        char v)
     {
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
@@ -2791,12 +2807,13 @@ public class IIOPInputStream
 	    bridge.putChar( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetCharField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ), v ) ;
+		o, v ) ;
 	}
     }
 
     @ValueHandlerRead
-    private static void setShortField(Object o, Class c, String fieldName, short v)
+    private static void setShortField(Object o, Class<?> c, String fieldName,
+        short v)
     {
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
@@ -2809,33 +2826,34 @@ public class IIOPInputStream
     }
 
     @ValueHandlerRead
-    private static void setIntField(Object o, Class c, String fieldName, int v)
+    private static void setIntField(Object o, Class<?> c, String fieldName,
+        int v)
     {
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
 	    long key = bridge.objectFieldOffset( fld ) ;
 	    bridge.putInt( o, key, v ) ;
 	} catch (Exception e) {
-	    throw utilWrapper.errorSetIntField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ), v ) ;
+	    throw utilWrapper.errorSetIntField( e, fieldName, o, v ) ;
 	}
     }
 
     @ValueHandlerRead
-    private static void setLongField(Object o, Class c, String fieldName, long v)
+    private static void setLongField(Object o, Class<?> c, String fieldName,
+        long v)
     {
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
 	    long key = bridge.objectFieldOffset( fld ) ;
 	    bridge.putLong( o, key, v ) ;
 	} catch (Exception e) {
-	    throw utilWrapper.errorSetLongField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ), v ) ;
+	    throw utilWrapper.errorSetLongField( e, fieldName, o, v ) ;
 	}
     }
 
     @ValueHandlerRead
-    private static void setFloatField(Object o, Class c, String fieldName, float v)
+    private static void setFloatField(Object o, Class<?> c, String fieldName,
+        float v)
     {
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
@@ -2843,20 +2861,20 @@ public class IIOPInputStream
 	    bridge.putFloat( o, key, v ) ;
 	} catch (Exception e) {
 	    throw utilWrapper.errorSetFloatField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ), v ) ;
+		o, v ) ;
 	}
     }
 
     @ValueHandlerRead
-    private static void setDoubleField(Object o, Class c, String fieldName, double v)
+    private static void setDoubleField(Object o, Class<?> c, String fieldName,
+        double v)
     {
 	try {
 	    Field fld = c.getDeclaredField( fieldName ) ;
 	    long key = bridge.objectFieldOffset( fld ) ;
 	    bridge.putDouble( o, key, v ) ;
 	} catch (Exception e) {
-	    throw utilWrapper.errorSetDoubleField( e, fieldName, 
-		ObjectUtility.compactObjectToString( o ), v ) ;
+	    throw utilWrapper.errorSetDoubleField( e, fieldName, o, v ) ;
 	}
     }
 
@@ -2893,10 +2911,9 @@ public class IIOPInputStream
         public Object getObject(int offset) throws IOException {
             Integer position = Integer.valueOf(offset);
 
-            if (!offsetToObjectMap.containsKey(position))
-		// XXX I18N, logging needed.
-                throw new IOException(
-		    "Invalid indirection to offset " + offset);
+            if (!offsetToObjectMap.containsKey(position)) {
+                throw new IOException("Invalid indirection to offset " + offset);
+            }
 
             return offsetToObjectMap.get(position);
         }

@@ -42,7 +42,6 @@ package com.sun.corba.se.impl.encoding;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.WeakHashMap;
-import java.util.Collections;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -54,10 +53,9 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.charset.UnmappableCharacterException;
 
-import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 
 /**
  * Collection of classes, interfaces, and factory methods for
@@ -80,6 +78,11 @@ import com.sun.corba.se.impl.logging.OMGSystemException;
  */
 public class CodeSetConversion
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+    private static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
+
     /**
      * Abstraction for char to byte conversion.
      *
@@ -120,10 +123,6 @@ public class CodeSetConversion
         // of array.length!  The array may be used internally, so don't
         // save references.
         public abstract byte[] getBytes();
-
-	static final protected ORBUtilSystemException wrapper = ORB.getStaticLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-	static final protected OMGSystemException omgWrapper = ORB.getStaticLogWrapperTable().get_RPC_ENCODING_OMG() ;
-
     }
     
     /**
@@ -149,8 +148,6 @@ public class CodeSetConversion
         // calls.
         public abstract char[] getChars(byte[] bytes, int offset, int length);
 	public abstract char[] getChars(ByteBuffer buff, int offset, int length);
- 	static final protected ORBUtilSystemException wrapper = ORB.getStaticLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
-	static final protected OMGSystemException omgWrapper = ORB.getStaticLogWrapperTable().get_RPC_ENCODING_OMG() ;
 
     }
 
@@ -271,15 +268,17 @@ public class CodeSetConversion
 			" orgString ="+ strToConvert + 
 			" retString =" + charBuf.toString() );
 
-			ORBUtility.dprint("CodeSetConversion", "CharBuff pos =" + 
-				charBuf.position() + " limit=" + 
-				charBuf.limit() + " buff limit = " + 
-				buffer.limit() + "numByte =" + 
-				numBytes + " numChar " + numChars );
+			ORBUtility.dprint("CodeSetConversion",
+                            "CharBuff pos =" +
+                            charBuf.position() + " limit=" +
+                            charBuf.limit() + " buff limit = " +
+                            buffer.limit() + "numByte =" +
+                            numBytes + " numChar " + numChars );
 		    }
    	   	} catch (Exception ex) { 
-			ORBUtility.dprint("CodeSetConversion", "Exception in CodeSet cache");
-			ex.printStackTrace();
+                    ORBUtility.dprint("CodeSetConversion",
+                        "Exception in CodeSet cache");
+                    ex.printStackTrace();
 		}
         }
         
@@ -546,6 +545,7 @@ public class CodeSetConversion
             this.defaultToLittleEndian = defaultToLittleEndian;
         }
 
+        @Override
 	public char[] getChars(ByteBuffer bytes, int offset, int numBytes) {
             //bytes.position(offset);
             byte [] marker = { bytes.get(), bytes.get() };
@@ -570,6 +570,7 @@ public class CodeSetConversion
             }
 	}
 
+        @Override
         public char[] getChars(byte[] bytes, int offset, int numBytes) {
 
             if (hasUTF16ByteOrderMarker(bytes, offset, numBytes)) {
@@ -604,7 +605,7 @@ public class CodeSetConversion
                 int b1 = array[offset] & 0x00FF;
                 int b2 = array[offset + 1] & 0x00FF;
 
-                char marker = (char)((b1 << 8) | (b2 << 0));
+                char marker = (char)((b1 << 8) | (b2));
                 
                 return (marker == UTF16_BE_MARKER || marker == UTF16_LE_MARKER);
             } else
@@ -832,7 +833,7 @@ public class CodeSetConversion
     /**
      * CodeSetConversion is a singleton, and this is the access point.
      */
-    public final static CodeSetConversion impl() {
+    public static CodeSetConversion impl() {
 	return CodeSetConversionHolder.csc ;
     }
 
@@ -854,12 +855,14 @@ public class CodeSetConversion
     //  the weak HashMap of the respective converters.
     private ThreadLocal <HashMap<OSFCodeSetRegistry.Entry, BTCConverter>> 
 	cacheBTCC = new ThreadLocal() {
+        @Override
 	public HashMap<OSFCodeSetRegistry.Entry, BTCConverter> initialValue() {
             return new HashMap<OSFCodeSetRegistry.Entry, BTCConverter>() ;
 	}
     };
     private ThreadLocal <HashMap<OSFCodeSetRegistry.Entry, CTBConverter>> 
 	cacheCTBC = new ThreadLocal() {
+        @Override
 	public HashMap<OSFCodeSetRegistry.Entry, CTBConverter> initialValue() {
             return new HashMap<OSFCodeSetRegistry.Entry, CTBConverter>() ;
 	}

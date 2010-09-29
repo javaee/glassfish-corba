@@ -8,13 +8,16 @@
  * Note: replace this header with the standard header.
  */
 
-package com.sun.corba.se.impl.logging ;
+package com.sun.corba.se.spi.logging ;
 
+import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
 import com.sun.corba.se.spi.orbutil.logex.Message ;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel ;
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper ;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
+import com.sun.corba.se.spi.orbutil.logex.corba.CS;
+import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
 
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
@@ -59,7 +62,7 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "setDaemon() failed in creating destroy thread" )
-    BAD_OPERATION couldNotSetDaemon(  ) ;
+    BAD_OPERATION couldNotSetDaemon( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Bad transaction context" )
@@ -83,8 +86,8 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "persistent serverport error???" )
-    INTERNAL persistentServerportError(  ) ;
-    
+    INTERNAL persistentServerportError() ;
+
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "servant dispatch???" )
     INTERNAL servantDispatch(  ) ;
@@ -99,10 +102,11 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=7 )
     @Message( "POACurrent stack is unbalanced" )
-    INTERNAL poacurrentUnbalancedStack(  ) ;
+    INTERNAL poacurrentUnbalancedStack( @Chain Exception ex ) ;
     
     @Log( level=LogLevel.WARNING, id=8 )
     @Message( "Null field in POACurrent" )
+    @CS( CSValue.MAYBE )
     INTERNAL poacurrentNullField(  ) ;
     
     @Log( level=LogLevel.WARNING, id=9 )
@@ -139,19 +143,19 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=17 )
     @Message( "ObjectAlreadyActive in servantToId" )
-    INTERNAL servantToIdOaa(  ) ;
+    INTERNAL servantToIdOaa( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=18 )
     @Message( "ServantAlreadyActive in servantToId" )
-    INTERNAL servantToIdSaa(  ) ;
+    INTERNAL servantToIdSaa(@Chain Exception exc  ) ;
     
     @Log( level=LogLevel.WARNING, id=19 )
     @Message( "WrongPolicy in servantToId" )
-    INTERNAL servantToIdWp(  ) ;
+    INTERNAL servantToIdWp( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=20 )
     @Message( "Can't resolve root POA" )
-    INTERNAL cantResolveRootPoa(  ) ;
+    INTERNAL cantResolveRootPoa( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=21 )
     @Message( "Call made to local client request dispatcher with non-local servant" )
@@ -167,6 +171,7 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=24 )
     @Message( "Tried to add a POA to an inactive POAManager" )
+    @CS( CSValue.MAYBE )
     INTERNAL addPoaInactive(  ) ;
     
     @Log( level=LogLevel.WARNING, id=25 )
@@ -175,19 +180,19 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=26 )
     @Message( "Unexpected exception in POA {0}" )
-    INTERNAL unexpectedException( String arg0 ) ;
+    INTERNAL unexpectedException( @Chain Throwable thr, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=27 )
     @Message( "Exception occurred in RMORBInitializer.post_init" )
-    INTERNAL rfmPostInitException(  ) ;
+    INTERNAL rfmPostInitException( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=28 )
     @Message( "Exception occurred in ReferenceManagerConfigurator.configure" )
-    INTERNAL rfmConfigureException(  ) ;
+    INTERNAL rfmConfigureException( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=29 )
     @Message( "RFM was inactive on state change" )
-    INTERNAL rfmManagerInactive(  ) ;
+    INTERNAL rfmManagerInactive( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=30 )
     @Message( "Suspend condition wait was unexpectedly interrupted" )
@@ -201,9 +206,15 @@ public interface POASystemException {
     @Message( "This method is not implemented" )
     NO_IMPLEMENT methodNotImplemented(  ) ;
     
+    String poaLookupError = "Error in find_POA" ;
+
     @Log( level=LogLevel.WARNING, id=1 )
-    @Message( "Error in find_POA" )
-    OBJ_ADAPTER poaLookupError(  ) ;
+    @Message( poaLookupError )
+    OBJ_ADAPTER poaLookupError( @Chain Exception exc  ) ;
+
+    @Log( level=LogLevel.WARNING, id=1 )
+    @Message( poaLookupError )
+    OBJ_ADAPTER poaLookupError() ;
     
     @Log( level=LogLevel.FINE, id=2 )
     @Message( "POA is inactive" )
@@ -231,7 +242,7 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=9 )
     @Message( "POA ServantActivator lookup failed" )
-    OBJ_ADAPTER poaServantActivatorLookupFailed(  ) ;
+    OBJ_ADAPTER poaServantActivatorLookupFailed( @Chain Throwable exc ) ;
     
     @Log( level=LogLevel.WARNING, id=10 )
     @Message( "POA has bad servant manager" )
@@ -263,7 +274,7 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=17 )
     @Message( "Servant's _default_POA must be an instance of POAImpl" )
-    OBJ_ADAPTER defaultPoaNotPoaimpl(  ) ;
+    OBJ_ADAPTER defaultPoaNotPoaimpl( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=18 )
     @Message( "Wrong POA policies for _this_object called outside of an "
@@ -272,15 +283,15 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=19 )
     @Message( "ServantNotActive exception in _this_object" )
-    OBJ_ADAPTER thisObjectServantNotActive(  ) ;
+    OBJ_ADAPTER thisObjectServantNotActive( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=20 )
     @Message( "WrongPolicy exception in _this_object" )
-    OBJ_ADAPTER thisObjectWrongPolicy(  ) ;
+    OBJ_ADAPTER thisObjectWrongPolicy( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=21 )
     @Message( "Operation called outside of invocation context" )
-    OBJ_ADAPTER noContext(  ) ;
+    OBJ_ADAPTER noContext( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=22 )
     @Message( "ServantActivator.incarnate() returned a null Servant" )
@@ -289,7 +300,7 @@ public interface POASystemException {
     @Log( level=LogLevel.WARNING, id=23 )
     @Message( "ReferenceFactoryManager caught exception in "
         + "AdapterActivator.unknown_adaptor" )
-    OBJ_ADAPTER rfmAdapterActivatorFailed(  ) ;
+    OBJ_ADAPTER rfmAdapterActivatorFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=24 )
     @Message( "ReferenceFactoryManager is not active" )
@@ -301,7 +312,7 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=26 )
     @Message( "ReferenceFactoryManager activate method failed" )
-    OBJ_ADAPTER rfmActivateFailed(  ) ;
+    OBJ_ADAPTER rfmActivateFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=27 )
     @Message( "ReferenceFactoryManager restart called with a null argument" )
@@ -309,15 +320,15 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=28 )
     @Message( "ReferenceFactoryManager restart failed" )
-    OBJ_ADAPTER rfmRestartFailed(  ) ;
+    OBJ_ADAPTER rfmRestartFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=29 )
     @Message( "ReferenceFactoryManager createReference failed" )
-    OBJ_ADAPTER rfmCreateReferenceFailed(  ) ;
+    OBJ_ADAPTER rfmCreateReferenceFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=30 )
     @Message( "ReferenceFactoryManager destroy failed" )
-    OBJ_ADAPTER rfmDestroyFailed(  ) ;
+    OBJ_ADAPTER rfmDestroyFailed( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=31 )
     @Message( "Illegal use of ReferenceFactoryManager parent POA detected" )

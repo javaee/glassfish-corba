@@ -41,19 +41,15 @@
 package com.sun.corba.se.impl.interceptors;
 
 import org.omg.PortableInterceptor.Interceptor;
-import org.omg.PortableInterceptor.ORBInitInfo;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 
-import org.omg.CORBA.INTERNAL;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.lang.reflect.Array;
 
-import com.sun.corba.se.impl.logging.InterceptorsSystemException ;
+import com.sun.corba.se.spi.logging.InterceptorsSystemException ;
 
 /** 
  * Provides a repository of registered Portable Interceptors, organized
@@ -63,6 +59,8 @@ import com.sun.corba.se.impl.logging.InterceptorsSystemException ;
  * to easily allow for the addition of new interceptor types.
  */
 public class InterceptorList {
+    private static final InterceptorsSystemException wrapper =
+        InterceptorsSystemException.self ;
 
     // Interceptor type list.  If additional interceptors are needed,
     // add additional types in numerical order (do not skip numbers),
@@ -86,7 +84,6 @@ public class InterceptorList {
     
     // True if no further interceptors may be registered with this list.
     private boolean locked = false;
-    private InterceptorsSystemException wrapper ;
 
     // List of interceptors currently registered.  There are 
     // NUM_INTERCEPTOR_TYPES lists of registered interceptors.
@@ -99,8 +96,7 @@ public class InterceptorList {
      * Creates a new Interceptor List.  Constructor is package scope so
      * only the ORB can create it.
      */
-    InterceptorList( InterceptorsSystemException wrapper ) {
-	this.wrapper = wrapper ;
+    InterceptorList() {
         // Create empty interceptors arrays for each type:
         initInterceptorArrays();
     }

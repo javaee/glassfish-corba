@@ -40,11 +40,7 @@
 
 package com.sun.corba.se.impl.encoding;
 
-import com.sun.corba.se.impl.encoding.BufferManagerRead;
-import com.sun.corba.se.impl.encoding.BufferManagerReadGrow;
-import com.sun.corba.se.impl.encoding.BufferManagerReadStream;
-import com.sun.corba.se.impl.encoding.BufferManagerWrite;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB;
@@ -58,6 +54,9 @@ import org.omg.CORBA.INTERNAL;
 
 public class BufferManagerFactory
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     public static final int GROW    = 0;
     public static final int COLLECT = 1;
     public static final int STREAM  = 2;
@@ -97,8 +96,6 @@ public class BufferManagerFactory
 
 	if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
 	    if (strategy != BufferManagerFactory.GROW) {
-		ORBUtilSystemException wrapper =
-		    ((ORB)orb).getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 		throw wrapper.invalidBuffMgrStrategy("newBufferManagerRead");
 	    }
 	    return new BufferManagerReadGrow(orb);
@@ -120,8 +117,6 @@ public class BufferManagerFactory
             int strategy, byte encodingVersion,	ORB orb) {
 	if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
 	    if (strategy != BufferManagerFactory.GROW) {
-		ORBUtilSystemException wrapper =
-		    ((ORB)orb).getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
 		throw wrapper.invalidBuffMgrStrategy("newBufferManagerWrite");
 	    }
 	    return new BufferManagerWriteGrow(orb);

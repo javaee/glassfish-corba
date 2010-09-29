@@ -55,7 +55,6 @@ import org.omg.CORBA.ParameterMode;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.LocalObject;
 import org.omg.CORBA.NamedValue;
 import org.omg.CORBA.NVList;
@@ -88,12 +87,11 @@ import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.DprintUtil;
 
 import com.sun.corba.se.impl.util.RepositoryId;
 
-import com.sun.corba.se.impl.logging.InterceptorsSystemException;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.InterceptorsSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 
 /**
  * Implementation of the RequestInfo interface as specified in
@@ -103,6 +101,11 @@ public abstract class RequestInfoImpl
     extends LocalObject 
     implements RequestInfo, RequestInfoExt
 {
+    protected static final InterceptorsSystemException wrapper =
+        InterceptorsSystemException.self ;
+    protected static final OMGSystemException stdWrapper =
+        OMGSystemException.self ;
+
     //////////////////////////////////////////////////////////////////////
     //
     // NOTE: IF AN ATTRIBUTE IS ADDED, PLEASE UPDATE RESET();
@@ -111,8 +114,6 @@ public abstract class RequestInfoImpl
 
     // The ORB from which to get PICurrent and other info
     protected ORB myORB;
-    protected InterceptorsSystemException wrapper ;
-    protected OMGSystemException stdWrapper ;
 
     // The number of interceptors actually invoked for this client request.
     // See setFlowStackIndex for a detailed description.
@@ -244,8 +245,6 @@ public abstract class RequestInfoImpl
         super();
         
         this.myORB = myORB;
-	wrapper = myORB.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
-	stdWrapper = myORB.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
 
         // Capture the current TSC and make it the RSC of this request.
         PICurrent current = (PICurrent)(myORB.getPIHandler().getPICurrent());
@@ -488,17 +487,17 @@ public abstract class RequestInfoImpl
             // helper class.
 	    insertUserException( userException, result );
         } catch( ClassNotFoundException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e ) ;
+	    throw stdWrapper.unknownUserException( e ) ;
         } catch( NoSuchMethodException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e ) ;
+	    throw stdWrapper.unknownUserException( e ) ;
         } catch( SecurityException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e ) ;
+	    throw stdWrapper.unknownUserException( e ) ;
         } catch( IllegalAccessException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e ) ;
+	    throw stdWrapper.unknownUserException( e ) ;
         } catch( IllegalArgumentException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e ) ;
+	    throw stdWrapper.unknownUserException( e ) ;
         } catch( InvocationTargetException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e ) ;
+	    throw stdWrapper.unknownUserException( e ) ;
         }
     }
 
@@ -526,17 +525,17 @@ public abstract class RequestInfoImpl
                 insertMethod.invoke( null, result, userException );
             }
         } catch( ClassNotFoundException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e );
+	    throw stdWrapper.unknownUserException( e );
         } catch( NoSuchMethodException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e );
+	    throw stdWrapper.unknownUserException( e );
         } catch( SecurityException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e );
+	    throw stdWrapper.unknownUserException( e );
         } catch( IllegalAccessException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e );
+	    throw stdWrapper.unknownUserException( e );
         } catch( IllegalArgumentException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e );
+	    throw stdWrapper.unknownUserException( e );
         } catch( InvocationTargetException e ) {
-	    throw stdWrapper.unknownUserException( CompletionStatus.COMPLETED_MAYBE, e );
+	    throw stdWrapper.unknownUserException( e );
         } 
     }
 
@@ -709,11 +708,13 @@ public abstract class RequestInfoImpl
 
 	id = coreServiceContext.getId();
 
-	if (serviceContexts.get(id) != null)
-	    if (replace)
-		serviceContexts.delete( id );
-	    else 
-		throw stdWrapper.serviceContextAddFailed( id ) ;
+	if (serviceContexts.get(id) != null) {
+            if (replace) {
+                serviceContexts.delete(id);
+            } else {
+                throw stdWrapper.serviceContextAddFailed(id);
+            }
+        }
 
 	serviceContexts.put( coreServiceContext );
 

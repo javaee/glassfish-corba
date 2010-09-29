@@ -40,8 +40,6 @@
 
 package com.sun.corba.se.impl.ior;
 
-import java.io.IOException ;
-
 import org.omg.CORBA.MARSHAL ;
 import org.omg.CORBA.OctetSeqHolder ;
 import org.omg.CORBA_2_3.portable.InputStream ;
@@ -55,13 +53,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
-import com.sun.corba.se.impl.ior.JIDLObjectKeyTemplate ;
-import com.sun.corba.se.impl.ior.POAObjectKeyTemplate ;
-import com.sun.corba.se.impl.ior.WireObjectKeyTemplate ;
-import com.sun.corba.se.impl.ior.ObjectIdImpl ;
-import com.sun.corba.se.impl.ior.ObjectKeyImpl ;
-
-import com.sun.corba.se.impl.logging.IORSystemException ;
+import com.sun.corba.se.spi.logging.IORSystemException ;
 
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
 
@@ -80,6 +72,9 @@ interface Handler {
  */
 public class ObjectKeyFactoryImpl implements ObjectKeyFactory
 {
+    private static final IORSystemException wrapper =
+        IORSystemException.self ;
+
     public static final int MAGIC_BASE			= 0xAFABCAFE ;
 
     // Magic used in our object keys for JDK 1.2, 1.3, RMI-IIOP OP,
@@ -102,12 +97,10 @@ public class ObjectKeyFactoryImpl implements ObjectKeyFactory
     public static final byte JDK1_3_1_01_PATCH_LEVEL = 1;  
 
     private final ORB orb ;
-    private IORSystemException wrapper ;
 
     public ObjectKeyFactoryImpl( ORB orb ) 
     {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_IOR_IOR() ;
     }
    
     // XXX The handlers still need to be made pluggable.
@@ -146,15 +139,23 @@ public class ObjectKeyFactoryImpl implements ObjectKeyFactory
 
 		if ((scid >= ORBConstants.FIRST_POA_SCID) && 
 		    (scid <= ORBConstants.MAX_POA_SCID)) {
-		    if (magic >= JAVAMAGIC_NEWER)
-			oktemp = new POAObjectKeyTemplate( orb, magic, scid, is, osh ) ;
-		    else
-			oktemp = new OldPOAObjectKeyTemplate( orb, magic, scid, is, osh ) ;
+		    if (magic >= JAVAMAGIC_NEWER) {
+                        oktemp = new POAObjectKeyTemplate(orb, magic, scid,
+                            is, osh);
+                    } else {
+                        oktemp = new OldPOAObjectKeyTemplate(orb, magic, scid,
+                            is, osh);
+                    }
 		} else if ((scid >= 0) && (scid < ORBConstants.FIRST_POA_SCID)) {
-		    if (magic >= JAVAMAGIC_NEWER)
-			oktemp = new JIDLObjectKeyTemplate( orb, magic, scid, is, osh ) ;
-		    else
-			oktemp = new OldJIDLObjectKeyTemplate( orb, magic, scid, is, osh );
+		    if (magic >= JAVAMAGIC_NEWER) {
+                        oktemp =
+                            new JIDLObjectKeyTemplate(orb, magic, scid,
+                                is, osh);
+                    } else {
+                        oktemp =
+                            new OldJIDLObjectKeyTemplate(orb, magic, scid,
+                                is, osh);
+                    }
 		}
 
 		return oktemp ;
@@ -170,15 +171,20 @@ public class ObjectKeyFactoryImpl implements ObjectKeyFactory
 
 		if ((scid >= ORBConstants.FIRST_POA_SCID) && 
 		    (scid <= ORBConstants.MAX_POA_SCID)) {
-		    if (magic >= JAVAMAGIC_NEWER)
-			oktemp = new POAObjectKeyTemplate( orb, magic, scid, is ) ;
-		    else
-			oktemp = new OldPOAObjectKeyTemplate( orb, magic, scid, is ) ;
+		    if (magic >= JAVAMAGIC_NEWER) {
+                        oktemp = new POAObjectKeyTemplate(orb, magic, scid, is);
+                    } else {
+                        oktemp =
+                            new OldPOAObjectKeyTemplate(orb, magic, scid, is);
+                    }
 		} else if ((scid >= 0) && (scid < ORBConstants.FIRST_POA_SCID)) {
-		    if (magic >= JAVAMAGIC_NEWER)
-			oktemp = new JIDLObjectKeyTemplate( orb, magic, scid, is ) ;
-		    else
-			oktemp = new OldJIDLObjectKeyTemplate( orb, magic, scid, is ) ;
+		    if (magic >= JAVAMAGIC_NEWER) {
+                        oktemp =
+                            new JIDLObjectKeyTemplate(orb, magic, scid, is);
+                    } else {
+                        oktemp =
+                            new OldJIDLObjectKeyTemplate(orb, magic, scid, is);
+                    }
 		}
 
 		return oktemp ;

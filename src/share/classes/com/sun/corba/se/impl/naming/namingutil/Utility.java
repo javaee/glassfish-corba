@@ -43,11 +43,8 @@ package com.sun.corba.se.impl.naming.namingutil;
 import java.io.StringWriter;
 
 import org.omg.CORBA.DATA_CONVERSION;
-import org.omg.CORBA.CompletionStatus;
 
-import com.sun.corba.se.impl.logging.NamingSystemException;
-
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.se.spi.logging.NamingSystemException;
 
 /**
  *  Utility methods for Naming.
@@ -56,7 +53,7 @@ import com.sun.corba.se.spi.orb.ORB ;
  */
 class Utility {
     private static NamingSystemException wrapper =
-	ORB.getStaticLogWrapperTable().get_NAMING_Naming() ;
+        NamingSystemException.self ;
 
     /** 
      * cleanEscapes removes URL escapes as per IETF 2386 RFP.
@@ -91,16 +88,19 @@ class Utility {
         int val;
 
         val = x - '0';
-        if (val >=0 && val <= 9)
+        if (val >=0 && val <= 9) {
             return val;
+        }
 
         val = (x - 'a') + 10;
-        if (val >= 10 && val <= 15)
+        if (val >= 10 && val <= 15) {
             return val;
+        }
 
         val = (x - 'A') + 10;
-        if (val >= 10 && val <= 15)
+        if (val >= 10 && val <= 15) {
             return val;
+        }
 
         throw new DATA_CONVERSION( );
     }

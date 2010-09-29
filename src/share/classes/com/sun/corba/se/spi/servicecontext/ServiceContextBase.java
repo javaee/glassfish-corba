@@ -46,9 +46,8 @@ import org.omg.CORBA_2_3.portable.OutputStream ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 /** Base class for all ServiceContext classes.
 * There is a derived ServiceContext class for each service context that
@@ -74,6 +73,9 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 * received request or reply.
 */
 public abstract class ServiceContextBase {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     /** Simple default constructor used when subclass is constructed 
      * from its representation.
      */
@@ -82,11 +84,6 @@ public abstract class ServiceContextBase {
 
     protected ServiceContextBase() { }
 
-    private void dprint( String msg ) 
-    {
-	ORBUtility.dprint( this, msg ) ;
-    }
-    
     /** Stream constructor used when subclass is constructed from an
      * InputStream.  This constructor must be called by super( stream )
      * in the subclass.  After this constructor completes, the service
@@ -118,9 +115,6 @@ public abstract class ServiceContextBase {
 	        try {
 		    os.close();
 		} catch (java.io.IOException e) {
-		    ORBUtilSystemException wrapper;
-		    wrapper = ((ORB)(s.orb())).getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-
 		    wrapper.ioexceptionDuringStreamClose(e);
 		}
 	    }
@@ -141,6 +135,7 @@ public abstract class ServiceContextBase {
      */
     protected InputStream in = null ;
 
+    @Override
     public String toString() 
     {
 	return "ServiceContext[ id=" + getId() + " ]" ;

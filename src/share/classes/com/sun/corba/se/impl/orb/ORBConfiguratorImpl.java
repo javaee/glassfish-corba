@@ -93,7 +93,7 @@ import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 
 // XXX This should go away once we get rid of the port exchange for ORBD
@@ -111,7 +111,8 @@ import com.sun.corba.se.impl.dynamicany.DynAnyFactoryImpl ;
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 
 public class ORBConfiguratorImpl implements ORBConfigurator {
-    private ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     protected void persistentServerInitialization(ORB theOrb) {
         // Does nothing, but can be overridden in subclass.
@@ -142,7 +143,6 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
     public void configure( DataCollector collector, ORB orb ) 
     {
 	ORB theOrb = orb ;
-	wrapper = orb.getLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
 
 	initObjectCopiers( theOrb ) ;
 	initIORFinders( theOrb ) ;
@@ -345,7 +345,6 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 			} catch (NoSuchMethodException e) {
 			    // NOTE: If there is no method then it
 			    // is not ours - so ignore it.
-			    ;
 			} catch (IllegalAccessException e) {
 			    throw new RuntimeException(e);
 			} catch (InvocationTargetException e) {

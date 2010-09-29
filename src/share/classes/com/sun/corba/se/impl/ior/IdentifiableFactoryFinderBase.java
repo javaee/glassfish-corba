@@ -51,20 +51,21 @@ import com.sun.corba.se.spi.ior.Identifiable ;
 import com.sun.corba.se.spi.ior.IdentifiableFactory ;
 import com.sun.corba.se.spi.ior.IdentifiableFactoryFinder ;
 
-import com.sun.corba.se.impl.logging.IORSystemException ;
+import com.sun.corba.se.spi.logging.IORSystemException ;
 
 public abstract class IdentifiableFactoryFinderBase<E extends Identifiable> 
     implements IdentifiableFactoryFinder<E>
 {
+    protected static final IORSystemException wrapper =
+        IORSystemException.self ;
+
     private ORB orb ;
     private Map<Integer,IdentifiableFactory<E>> map ;
-    protected IORSystemException wrapper ;
 
     protected IdentifiableFactoryFinderBase( ORB orb )
     {
 	map = new HashMap<Integer,IdentifiableFactory<E>>() ;
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_IOR_IOR() ;
     }
 
     protected IdentifiableFactory<E> getFactory(int id) 
@@ -79,10 +80,11 @@ public abstract class IdentifiableFactoryFinderBase<E extends Identifiable>
     {
 	IdentifiableFactory<E> factory = getFactory( id ) ;
 
-	if (factory != null)
-	    return factory.create( orb, is ) ;
-	else 
-	    return handleMissingFactory( id, is ) ;
+	if (factory != null) {
+            return factory.create(orb, is);
+        } else {
+            return handleMissingFactory(id, is);
+        }
     }
     
     public void registerFactory(IdentifiableFactory<E> factory) 

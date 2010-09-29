@@ -87,7 +87,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
 
-import com.sun.corba.se.impl.logging.ActivationSystemException ;
+import com.sun.corba.se.spi.logging.ActivationSystemException ;
 
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
@@ -115,7 +115,7 @@ public class ServerManagerImpl extends _ServerManagerImplBase
 		      Repository repository, String dbDirName, boolean debug)
     {
         this.orb = orb;
-	wrapper =  orb.getLogWrapperTable().get_ORBD_ACTIVATOR_Activation() ;
+	wrapper = ActivationSystemException.self ;
 
         this.transportManager = transportManager; // REVISIT - NOT USED.
 	this.repository = repository;

@@ -40,8 +40,6 @@
 
 package com.sun.corba.se.impl.encoding;
 
-import org.omg.CORBA.CompletionStatus;
-
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
@@ -112,9 +110,10 @@ public class EncapsOutputStream extends CDROutputObject
 					orb),
 	      ORBConstants.STREAM_FORMAT_VERSION_1,
               usePooledByteBuffers,
-	      false); // IDLJavaSerializationOuputStream::directWrite == false
+	      false); 
     }
 
+    @Override
     public org.omg.CORBA.portable.InputStream create_input_stream() {
         freeInternalCaches();
 
@@ -125,30 +124,33 @@ public class EncapsOutputStream extends CDROutputObject
                                      getGIOPVersion());
     }
     
+    @Override
     protected CodeSetConversion.CTBConverter createCharCTBConverter() {
-        return CodeSetConversion.impl().getCTBConverter(OSFCodeSetRegistry.ISO_8859_1);
+        return CodeSetConversion.impl().getCTBConverter(
+            OSFCodeSetRegistry.ISO_8859_1);
     }
 
+    @Override
     protected CodeSetConversion.CTBConverter createWCharCTBConverter() {
         if (getGIOPVersion().equals(GIOPVersion.V1_0))
-	    throw wrapper.wcharDataInGiop10(CompletionStatus.COMPLETED_MAYBE);            
+	    throw wrapper.wcharDataInGiop10();            
 
-        // In the case of GIOP 1.1, we take the byte order of the stream and don't
-        // use byte order markers since we're limited to a 2 byte fixed width encoding.
+        // In the case of GIOP 1.1, we take the byte order of the stream 
+        // and don't use byte order markers since we're limited to a 2 byte
+        // fixed width encoding.
         if (getGIOPVersion().equals(GIOPVersion.V1_1))
-            return CodeSetConversion.impl().getCTBConverter(OSFCodeSetRegistry.UTF_16,
-                                                            isLittleEndian(),
-                                                            false);
+            return CodeSetConversion.impl().getCTBConverter(
+                OSFCodeSetRegistry.UTF_16, isLittleEndian(), false);
 
         // Assume anything else meets GIOP 1.2 requirements
         //
         // Use byte order markers?  If not, use big endian in GIOP 1.2.  
         // (formal 00-11-03 15.3.16)
 
-        boolean useBOM = ((ORB)orb()).getORBData().useByteOrderMarkersInEncapsulations();
+        boolean useBOM = ((ORB)orb()).getORBData()
+            .useByteOrderMarkersInEncapsulations();
 
-        return CodeSetConversion.impl().getCTBConverter(OSFCodeSetRegistry.UTF_16, 
-                                                        false, 
-                                                        useBOM);
+        return CodeSetConversion.impl().getCTBConverter(
+            OSFCodeSetRegistry.UTF_16, false, useBOM);
     }
 }

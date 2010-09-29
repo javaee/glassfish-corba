@@ -50,11 +50,18 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.spi.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.POASystemException;
 
 /** Implementation of POARequesHandler that provides policy specific
  * operations on the POA.
  */
 public abstract class POAPolicyMediatorBase implements POAPolicyMediator {
+    protected static final POASystemException wrapper =
+        POASystemException.self ;
+    protected static final OMGSystemException omgWrapper =
+        OMGSystemException.self ;
+
     protected POAImpl poa ;
     protected ORB orb ;
 
@@ -86,15 +93,16 @@ public abstract class POAPolicyMediatorBase implements POAPolicyMediator {
 
     POAPolicyMediatorBase( Policies policies, POAImpl poa ) 
     {
-	if (policies.isSingleThreaded())
-	    throw poa.invocationWrapper().singleThreadNotSupported() ;
+	if (policies.isSingleThreaded()) {
+            throw wrapper.singleThreadNotSupported();
+        }
 
 	POAManagerImpl poam = (POAManagerImpl)(poa.the_POAManager()) ;
 	POAFactory poaf = poam.getFactory() ;
 	delegateImpl = (DelegateImpl)(poaf.getDelegateImpl()) ;
 	this.policies = policies ;
 	this.poa = poa ;
-	orb = (ORB)poa.getORB() ;
+	orb = poa.getORB() ;
 
 	switch (policies.servantCachingLevel()) {
 	    case ServantCachingPolicy.NO_SERVANT_CACHING :
@@ -145,8 +153,9 @@ public abstract class POAPolicyMediatorBase implements POAPolicyMediator {
 
     public synchronized byte[] newSystemId() throws WrongPolicy
     {
-	if (!isSystemId)
-	    throw new WrongPolicy() ;
+	if (!isSystemId) {
+            throw new WrongPolicy();
+        }
 
 	byte[] array = new byte[8];
 	ORBUtility.intToBytes(++sysIdCounter, array, 0);

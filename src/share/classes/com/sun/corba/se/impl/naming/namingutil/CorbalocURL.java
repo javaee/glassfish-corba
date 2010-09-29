@@ -66,7 +66,7 @@ public class CorbalocURL extends INSURLBase
             } catch( Exception e ) {
                 // There is something wrong with the URL escapes used
                 // so throw an exception
-                badAddress( e );
+                badAddress( e, aURL );
             }
             int endIndex = url.indexOf( '/' );
             if( endIndex == -1 ) {
@@ -76,7 +76,7 @@ public class CorbalocURL extends INSURLBase
             // _REVISIT_: Add a testcase to check 'corbaloc:/'
             if( endIndex == 0 )  {
                 // The url starts with a '/', it's an error
-                badAddress( null );
+                badAddress( aURL );
             }
             // Anything between corbaloc: and / is the host,port information
             // of the server where the Service Object is located
@@ -101,7 +101,7 @@ public class CorbalocURL extends INSURLBase
                     // Right now we are not allowing any other protocol
                     // other than iiop:, rir: so raise exception indicating
                     // that the URL is malformed
-                    badAddress( null );
+                    badAddress( aURL );
                 }
                 if ( rirFlag == false ) {
                     // Add the Host information if RIR flag is set,
@@ -153,7 +153,7 @@ public class CorbalocURL extends INSURLBase
          if( ( tokenCount == 0 )
            ||( tokenCount > 2 )) 
          {
-             badAddress( null );
+             badAddress( iiopInfo );
          }
          if( tokenCount == 2 ) {
             // There is VersionInformation after iiop:
@@ -162,7 +162,7 @@ public class CorbalocURL extends INSURLBase
             // There is a version without ., which means
             // Malformed list
             if (dot == -1) {
-                badAddress( null );
+                badAddress( iiopInfo );
             }
             try {
                 iiopEndpointInfo.setVersion(
@@ -170,7 +170,7 @@ public class CorbalocURL extends INSURLBase
                     Integer.parseInt( version.substring(dot+1)) );
                 hostandport = tokenizer.nextToken( );
             } catch( Throwable e ) {
-                badAddress( e );
+                badAddress( e, iiopInfo );
             }
          }
          try {
@@ -217,7 +217,7 @@ public class CorbalocURL extends INSURLBase
            // Any kind of Exception is bad here.
            // Possible causes: A Number Format exception because port info is
            // malformed
-           badAddress( e );
+           badAddress( e, iiopInfo );
        }
        Utility.validateGIOPVersion( iiopEndpointInfo );
        return iiopEndpointInfo;
@@ -229,7 +229,7 @@ public class CorbalocURL extends INSURLBase
     private void handleRIRColon( String rirInfo )
     {
         if( rirInfo.length() != NamingConstants.RIRCOLON_LENGTH ) {
-            badAddress( null );
+            badAddress( rirInfo );
         }
     }
 

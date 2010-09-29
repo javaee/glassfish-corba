@@ -50,22 +50,19 @@ package com.sun.corba.se.impl.corba;
 
 import org.omg.CORBA.Any;
 import org.omg.CORBA.Context;
-import org.omg.CORBA.NO_IMPLEMENT;
-import org.omg.CORBA.SystemException;
 import org.omg.CORBA.NVList;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 public final class ContextImpl extends Context {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private org.omg.CORBA.ORB _orb;
-    private ORBUtilSystemException wrapper ;
 
     public ContextImpl(org.omg.CORBA.ORB orb) 
     {
         _orb = orb;
-	wrapper = ((com.sun.corba.se.spi.orb.ORB)orb)
-	    .getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
     }
 
     public ContextImpl(Context parent) 

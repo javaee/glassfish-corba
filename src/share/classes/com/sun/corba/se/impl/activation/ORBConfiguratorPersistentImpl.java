@@ -56,7 +56,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 // XXX This should go away once we get rid of the port exchange for ORBD
 import com.sun.corba.se.impl.orb.ORBConfiguratorImpl;
@@ -66,7 +66,7 @@ import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 public class ORBConfiguratorPersistentImpl extends ORBConfiguratorImpl {
-    private ORBUtilSystemException wrapper ;
+    private ORBUtilSystemException wrapper = ORBUtilSystemException.self ;
 
     @Override
     protected void persistentServerInitialization( ORB orb )
@@ -116,8 +116,7 @@ public class ORBConfiguratorPersistentImpl extends ORBConfiguratorImpl {
 		    data.getPersistentServerId(), data.getORBId(),
 			endpointList);
 	    } catch (Exception ex) {
-		throw wrapper.persistentServerInitError(
-		    CompletionStatus.COMPLETED_MAYBE, ex ) ;
+		throw wrapper.persistentServerInitError( ex ) ;
 	    }
 	}
     }

@@ -42,7 +42,7 @@ package com.sun.corba.se.impl.encoding;
 import java.nio.ByteBuffer;
 import com.sun.corba.se.spi.transport.ByteBufferPool;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.RequestCanceledException;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
@@ -54,12 +54,15 @@ import java.util.LinkedList;
 public class BufferManagerReadStream
     implements BufferManagerRead, MarkAndResetHandler
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private boolean receivedCancel = false;
     private int cancelReqId = 0;
 
     // We should convert endOfStream to a final static dummy end node
     private boolean endOfStream = true;
-    private BufferQueue fragmentQueue = new BufferQueue();
+    private final BufferQueue fragmentQueue = new BufferQueue();
 
     // XXX Should this be static?  Should we make it configurable?
     // Bug 6372405
@@ -70,12 +73,10 @@ public class BufferManagerReadStream
     //           might ought to be an abstract class instead of an
     //           interface.
     private final ORB orb ;
-    private final ORBUtilSystemException wrapper ;
 
     BufferManagerReadStream( ORB orb ) 
     {
 	this.orb = orb ;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_ENCODING_ORBUtil() ;
     }
 
     public void cancelProcessing(int requestId) {
@@ -206,34 +207,32 @@ public class BufferManagerReadStream
         ByteBufferPool byteBufferPool = getByteBufferPool();
 
         // release ByteBuffers on fragmentQueue
-        if (fragmentQueue != null) {
-            synchronized (fragmentQueue) {
-                // IMPORTANT: The fragment queue may have one ByteBuffer
-                //            on it that's also on the CDRInputStream if
-                //            this method is called when the stream is 'marked'.
-                //            Thus, we'll compare the ByteBuffer passed
-                //            in (from a CDRInputStream) with all ByteBuffers
-                //            on the stack. If one is found to equal, it will
-                //            not be released to the ByteBufferPool.
+        synchronized (fragmentQueue) {
+            // IMPORTANT: The fragment queue may have one ByteBuffer
+            //            on it that's also on the CDRInputStream if
+            //            this method is called when the stream is 'marked'.
+            //            Thus, we'll compare the ByteBuffer passed
+            //            in (from a CDRInputStream) with all ByteBuffers
+            //            on the stack. If one is found to equal, it will
+            //            not be released to the ByteBufferPool.
 
-                ByteBufferWithInfo abbwi = null;
-                while (fragmentQueue.size() != 0) {
-                    abbwi = fragmentQueue.dequeue();
-                    if (abbwi != null && abbwi.getByteBuffer() != null) {
-                        if (orb.transportDebugFlag) {
-                            int bbAddress = System.identityHashCode(abbwi.getByteBuffer());
-                            if (inputBbAddress != bbAddress) {
-                                 bufferMessage( " close() - fragmentQueue is "
-                                     + " releasing ByteBuffer id (", bbAddress,
-                                     ") to ByteBufferPool." ) ;
-                            }
+            ByteBufferWithInfo abbwi = null;
+            while (fragmentQueue.size() != 0) {
+                abbwi = fragmentQueue.dequeue();
+                if (abbwi != null && abbwi.getByteBuffer() != null) {
+                    if (orb.transportDebugFlag) {
+                        int bbAddress = System.identityHashCode(abbwi.getByteBuffer());
+                        if (inputBbAddress != bbAddress) {
+                             bufferMessage( " close() - fragmentQueue is "
+                                 + " releasing ByteBuffer id (", bbAddress,
+                                 ") to ByteBufferPool." ) ;
                         }
-                        byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                     }
+                    byteBufferPool.releaseByteBuffer(abbwi.getByteBuffer());
                 }
             }
-            fragmentQueue = null;
         }
+        fragmentQueue.clear() ;
 
         // release ByteBuffers on fragmentStack
         if (fragmentStack != null && fragmentStack.size() != 0)

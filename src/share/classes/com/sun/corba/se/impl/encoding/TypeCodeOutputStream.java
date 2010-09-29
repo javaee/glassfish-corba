@@ -40,7 +40,6 @@
 
 package com.sun.corba.se.impl.encoding;
 
-import org.omg.CORBA.CompletionStatus ;
 
 import org.omg.CORBA_2_3.portable.OutputStream;
 
@@ -66,6 +65,7 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
         super(orb, littleEndian);
     }
 
+    @Override
     public org.omg.CORBA.portable.InputStream create_input_stream()
     {
         TypeCodeInputStream tcis 
@@ -88,49 +88,42 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
 
     public int getTopLevelPosition() {
         if (enclosure != null && enclosure instanceof TypeCodeOutputStream) {
-            int pos = ((TypeCodeOutputStream)enclosure).getTopLevelPosition() + getPosition();
-            // Add four bytes for the encaps length, not another 4 for the byte order
-            // which is included in getPosition().
-            if (isEncapsulation) pos += 4;
-            //if (TypeCodeImpl.debug) {
-                //System.out.println("TypeCodeOutputStream.getTopLevelPosition using getTopLevelPosition " +
-                    //((TypeCodeOutputStream)enclosure).getTopLevelPosition() +
-                    //" + getPosition() " + getPosition() +
-                    //(isEncapsulation ? " + encaps length 4" : "") +
-                    //" = " + pos);
-            //}
+            int pos = ((TypeCodeOutputStream)enclosure).getTopLevelPosition()
+                + getPosition();
+            // Add four bytes for the encaps length, not another 4 for the 
+            // byte order which is included in getPosition().
+            if (isEncapsulation) {
+                pos += 4;
+            }
+
             return pos;
         }
-        //if (TypeCodeImpl.debug) {
-            //System.out.println("TypeCodeOutputStream.getTopLevelPosition returning getPosition() = " +
-                               //getPosition() + ", enclosure is " + enclosure);
-        //}
         return getPosition();
     }
 
     public void addIDAtPosition(String id, int position) {
         if (typeMap == null)
             typeMap = new HashMap<String,Integer>(16);
-        //if (TypeCodeImpl.debug) System.out.println(this + " adding id " + id + " at position " + position);
         typeMap.put(id, position);
     }
 
     public int getPositionForID(String id) {
         if (typeMap == null)
-	    throw wrapper.refTypeIndirType( CompletionStatus.COMPLETED_NO ) ;
-        //if (TypeCodeImpl.debug) System.out.println("Getting position " + typeMap.get(id) +
-            //" for id " + id);
-        return typeMap.get(id) ;
+	    throw wrapper.refTypeIndirType() ;
+        return
+            typeMap.get(id) ;
     }
 
-    public void writeRawBuffer(org.omg.CORBA.portable.OutputStream s, int firstLong) {
+    public void writeRawBuffer(org.omg.CORBA.portable.OutputStream s,
+        int firstLong) {
         // Writes this streams buffer to the given OutputStream
         // without byte order flag and length as is the case for encapsulations.
 
         // Make sure to align s to 4 byte boundaries.
         // Unfortunately we can't do just this:
         // s.alignAndReserve(4, 4);
-        // So we have to take the first four bytes given in firstLong and write them
+        // So we have to take the first four bytes given in firstLong
+        // and write them
         // with a call to write_long which will trigger the alignment.
         // Then write the rest of the byte array.
 
@@ -140,10 +133,10 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     }
 
     public TypeCodeOutputStream createEncapsulation(org.omg.CORBA.ORB _orb) {
-	TypeCodeOutputStream encap = new TypeCodeOutputStream((ORB)_orb, isLittleEndian());
+	TypeCodeOutputStream encap = new TypeCodeOutputStream((ORB)_orb,
+            isLittleEndian());
 	encap.setEnclosingOutputStream(this);
         encap.makeEncapsulation();
-        //if (TypeCodeImpl.debug) System.out.println("Created TypeCodeOutputStream " + encap + " with parent " + this);
 	return encap;
     }
 
@@ -154,10 +147,11 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     }
 
     public static TypeCodeOutputStream wrapOutputStream(OutputStream os) {
-        boolean littleEndian = ((os instanceof CDROutputObject) ? ((CDROutputObject)os).isLittleEndian() : false);
-        TypeCodeOutputStream tos = new TypeCodeOutputStream((ORB)os.orb(), littleEndian);
+        boolean littleEndian = ((os instanceof CDROutputObject) ?
+            ((CDROutputObject)os).isLittleEndian() : false);
+        TypeCodeOutputStream tos = new TypeCodeOutputStream((ORB)os.orb(),
+            littleEndian);
         tos.setEnclosingOutputStream(os);
-        //if (TypeCodeImpl.debug) System.out.println("Created TypeCodeOutputStream " + tos + " with parent " + os);
         return tos;
     }
 
@@ -165,10 +159,9 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
         return getIndex();
     }
 
+    @Override
     public int getRealIndex(int index) {
         int topPos = getTopLevelPosition();
-        //if (TypeCodeImpl.debug) System.out.println("TypeCodeOutputStream.getRealIndex using getTopLevelPosition " +
-            //topPos + " instead of getPosition " + getPosition());
 	return topPos;
     }
 
@@ -190,7 +183,8 @@ public final class TypeCodeOutputStream extends EncapsOutputStream
     public void printTypeMap() {
         System.out.println("typeMap = {");
 	for (String id : typeMap.keySet()) {
-            System.out.println("  key = " + id + ", value = " + typeMap.get(id));
+            System.out.println("  key = " + id + ", value = "
+                + typeMap.get(id));
 	}
         System.out.println("}");
     }

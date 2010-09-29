@@ -45,17 +45,18 @@ import org.omg.PortableServer.*;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.logging.POASystemException ;
+import com.sun.corba.se.spi.logging.POASystemException ;
 
 public class DelegateImpl implements org.omg.PortableServer.portable.Delegate
 {
+    private static final POASystemException wrapper =
+        POASystemException.self ;
+
     private ORB orb ;
-    private POASystemException wrapper ;
     private POAFactory factory;
 
     public DelegateImpl(ORB orb, POAFactory factory){
 	this.orb = orb ;
-	this.wrapper = orb.getLogWrapperTable().get_OA_POA() ;
         this.factory = factory;
     }
 
@@ -131,9 +132,11 @@ public class DelegateImpl implements org.omg.PortableServer.portable.Delegate
     public boolean is_a(Servant self, String repId)
     {
         String[] repositoryIds = self._all_interfaces(poa(self),object_id(self));
-	for ( int i=0; i<repositoryIds.length; i++ )
-	    if ( repId.equals(repositoryIds[i]) )
-		return true;
+	for ( int i=0; i<repositoryIds.length; i++ ) {
+            if (repId.equals(repositoryIds[i])) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -143,8 +146,7 @@ public class DelegateImpl implements org.omg.PortableServer.portable.Delegate
         //REVISIT
         try{
             byte[] oid = orb.peekInvocationInfo().id();
-            if( oid == null) return true;
-            else return false;
+            return oid == null ;
         } catch (EmptyStackException exception){
 	    throw wrapper.noContext(exception) ;
         }

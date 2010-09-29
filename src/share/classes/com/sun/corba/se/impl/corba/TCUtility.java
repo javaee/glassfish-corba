@@ -58,12 +58,14 @@ import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  *  Static functions for TypeCode interpretation.
  */
 public final class TCUtility {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     @SuppressWarnings({"deprecation"})
     static void marshalIn(org.omg.CORBA.portable.OutputStream s, TypeCode typeCode, long l, Object o) {
@@ -186,9 +188,6 @@ public final class TCUtility {
         case TCKind._tk_longdouble:
             // Unspecified for Java
         default:
-	    ORBUtilSystemException wrapper = 
-            ((com.sun.corba.se.spi.orb.ORB)s.orb())
-				.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
 	    throw wrapper.typecodeNotSupported() ;
         }
     }
@@ -321,9 +320,6 @@ public final class TCUtility {
         case TCKind._tk_longdouble:
             // Unspecified for Java
         default:
-	    ORBUtilSystemException wrapper = 
-			((com.sun.corba.se.spi.orb.ORB)s.orb())
-				.getLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
 	    throw wrapper.typecodeNotSupported() ;
         }
 

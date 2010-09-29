@@ -40,8 +40,6 @@
 
 package com.sun.corba.se.impl.orb ;
 
-import org.omg.CORBA.INITIALIZE ;
-
 import java.util.Properties ;
 import java.util.List ;
 import java.util.LinkedList ;
@@ -55,18 +53,19 @@ import com.sun.corba.se.spi.orb.Operation ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 public class PrefixParserAction extends ParserActionBase {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private Class componentType ;
-    private ORBUtilSystemException wrapper ;
 
     public PrefixParserAction( String propertyName, 
 	Operation operation, String fieldName, Class componentType )
     {
 	super( propertyName, true, operation, fieldName ) ;
 	this.componentType = componentType ;
-	this.wrapper = ORB.getStaticLogWrapperTable().get_ORB_LIFECYCLE_ORBUtil() ;
     }
 
     /** For each String s that matches the prefix given by getPropertyName(),
@@ -110,8 +109,7 @@ public class PrefixParserAction extends ParserActionBase {
 		result = Array.newInstance( componentType, size ) ;
 	    } catch (Throwable thr) {
 		throw wrapper.couldNotCreateArray( thr,
-		    getPropertyName(), componentType,
-		    Integer.valueOf( size ) ) ;
+		    getPropertyName(), componentType, size ) ;
 	    }
 
 	    Iterator iter2 = matches.iterator() ;
@@ -123,15 +121,15 @@ public class PrefixParserAction extends ParserActionBase {
 		    Array.set( result, ctr, obj ) ;
 		} catch (Throwable thr) {
 		    throw wrapper.couldNotSetArray( thr,
-			getPropertyName(), Integer.valueOf(ctr), 
-			componentType, Integer.valueOf(size),
-			ObjectUtility.compactObjectToString( obj )) ;
+			getPropertyName(), ctr, componentType, size,
+			obj ) ;
 		}
 		ctr++ ;
 	    }
 
 	    return result ;
-	} else 
-	    return null ;
+	} else {
+            return null;
+        }
     }
 }

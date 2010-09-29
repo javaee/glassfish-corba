@@ -41,19 +41,19 @@
 package com.sun.corba.se.impl.servicecontext;
 
 import java.io.Serializable ;
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.UNKNOWN;
 import org.omg.CORBA_2_3.portable.InputStream;
 import org.omg.CORBA_2_3.portable.OutputStream;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.servicecontext.ServiceContextBase ;
 import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext ;
-import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 public class UEInfoServiceContextImpl extends ServiceContextBase
     implements UEInfoServiceContext
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private Throwable unknown = null ;
 
     public UEInfoServiceContextImpl( Throwable ex )
@@ -68,11 +68,7 @@ public class UEInfoServiceContextImpl extends ServiceContextBase
 	try { 
 	    unknown = (Throwable) in.read_value() ;
 	} catch (Exception e) {
-	    ORB orb = (ORB)is.orb() ;
-	    ORBUtilSystemException wrapper =  
-		orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	    unknown = wrapper.couldNotReadInfo( CompletionStatus.COMPLETED_MAYBE,
-		e ) ;
+	    unknown = wrapper.couldNotReadInfo( e ) ;
 	}
     }
 
@@ -88,6 +84,7 @@ public class UEInfoServiceContextImpl extends ServiceContextBase
 
     public Throwable getUE() { return unknown ; } 
 
+    @Override
     public String toString()
     {
 	return "UEInfoServiceContextImpl[ unknown=" + unknown.toString() + " ]" ;

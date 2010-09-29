@@ -44,10 +44,8 @@ import com.sun.corba.se.spi.orb.ORB;
 import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.InvalidSlot;
 import org.omg.CORBA.Any;
-import org.omg.CORBA.BAD_INV_ORDER;
-import org.omg.CORBA.CompletionStatus;
 
-import com.sun.corba.se.impl.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
 
 /**
  * PICurrent is the implementation of Current as specified in the Portable
@@ -59,13 +57,14 @@ import com.sun.corba.se.impl.logging.OMGSystemException ;
 public class PICurrent extends org.omg.CORBA.LocalObject
     implements Current
 {
+    private static final OMGSystemException wrapper =
+        OMGSystemException.self ;
+
     // slotCounter is used to keep track of ORBInitInfo.allocate_slot_id()
     private int slotCounter;
 
     // The ORB associated with this PICurrent object.
     private transient ORB myORB;
-
-    private transient OMGSystemException wrapper ;
 
     // True if the orb is still initialzing and get_slot and set_slot are not
     // to be called.
@@ -75,6 +74,7 @@ public class PICurrent extends org.omg.CORBA.LocalObject
     // for resolve_initial_references( "PICurrent" );
     private transient ThreadLocal<SlotTableStack> threadLocalSlotTable
         = new ThreadLocal<SlotTableStack>() {
+        @Override
             protected SlotTableStack initialValue( ) {
                 return new SlotTableStack( myORB, PICurrent.this );
             }
@@ -86,7 +86,6 @@ public class PICurrent extends org.omg.CORBA.LocalObject
      */
     PICurrent( ORB myORB ) {
 	this.myORB = myORB;
-	wrapper = myORB.getLogWrapperTable().get_RPC_PROTOCOL_OMG() ;
 	this.orbInitializing = true;
         slotCounter = 0;
     }

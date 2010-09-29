@@ -70,7 +70,7 @@ import com.sun.corba.se.spi.oa.ObjectAdapter ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 
-import com.sun.corba.se.impl.logging.POASystemException ;
+import com.sun.corba.se.spi.logging.POASystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.trace.Poa;
 import org.glassfish.gmbal.Description;
@@ -83,6 +83,9 @@ public class ReferenceFactoryManagerImpl
     extends org.omg.CORBA.LocalObject
     implements ReferenceFactoryManager
 {
+    private static final POASystemException wrapper =
+        POASystemException.self ;
+
     private static final long serialVersionUID = -6689846523143143228L;
 
     private enum RFMState { READY, SUSPENDED } ;
@@ -94,7 +97,6 @@ public class ReferenceFactoryManagerImpl
     private final ReentrantLock lock ;
     private final Condition suspendCondition ;
     private final ORB orb ;
-    private final POASystemException wrapper ;
     // poatable contains the mapping from the ReferenceFactory name to
     // the ServantLocator and list of policies.  Note that the policy
     // list is stored in the form passed to the create() call: that is,
@@ -135,8 +137,9 @@ public class ReferenceFactoryManagerImpl
                     List<Policy> policies = new ArrayList<Policy>() ;
                     // XXX What should we do if data.second() contains
                     // policies with the same ID as standard policies?
-                    if (data.second() != null)
-                        policies.addAll( data.second() ) ;
+                    if (data.second() != null) {
+                        policies.addAll(data.second());
+                    }
                     policies.addAll( standardPolicies ) ;
                     Policy[] arr = policies.toArray( new Policy[policies.size()] ) ;
 
@@ -186,7 +189,6 @@ public class ReferenceFactoryManagerImpl
 	suspendCondition = lock.newCondition() ;
 	state = RFMState.READY ;
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_POA() ;
     	poatable = new HashMap<String,Pair<ServantLocator,List<Policy>>>() ;
 	factories = new HashMap<String,ReferenceFactory>() ;
 	isActive = false ;
@@ -202,8 +204,9 @@ public class ReferenceFactoryManagerImpl
     {
 	lock.lock() ;
 	try {
-	    if (isActive)
-		throw wrapper.rfmNotActive() ;
+	    if (isActive) {
+                throw wrapper.rfmNotActive();
+            }
 
 	    rootPOA = (POA)orb.resolve_initial_references( 
 		ORBConstants.ROOT_POA_NAME ) ;
@@ -253,23 +256,29 @@ public class ReferenceFactoryManagerImpl
     {
 	lock.lock() ;
 	try {
-	    if (state == RFMState.SUSPENDED)
-		throw wrapper.rfmMightDeadlock() ;
+	    if (state == RFMState.SUSPENDED) {
+                throw wrapper.rfmMightDeadlock();
+            }
 
-	    if (!isActive) 
-		throw wrapper.rfmNotActive() ;
+	    if (!isActive) {
+                throw wrapper.rfmNotActive();
+            }
 
 	    List<Policy> newPolicies = null ;
-	    if (policies != null)
-		newPolicies = new ArrayList<Policy>( policies ) ;
+	    if (policies != null) {
+                newPolicies =
+                    new ArrayList<Policy>(policies);
+            }
 
 	    // Store an entry for the appropriate POA in the POA table,
 	    // which is used by the AdapterActivator on the root.
 	    synchronized (poatable) {
-		poatable.put( name, new Pair( locator, newPolicies ) ) ;
+		poatable.put( name, new Pair<ServantLocator,List<Policy>>(
+                    locator, newPolicies ) ) ;
 	    }
 
-	    ReferenceFactory factory = new ReferenceFactoryImpl( this, name, repositoryId ) ;
+	    ReferenceFactory factory = new ReferenceFactoryImpl( this, name,
+                repositoryId ) ;
 	    factories.put( name, factory ) ;
 	    return factory ;
 	} finally {
@@ -282,8 +291,9 @@ public class ReferenceFactoryManagerImpl
     {
 	lock.lock() ;
 	try {
-	    if (state == RFMState.SUSPENDED)
-		throw wrapper.rfmMightDeadlock() ;
+	    if (state == RFMState.SUSPENDED) {
+                throw wrapper.rfmMightDeadlock();
+            }
 
 	    if (!isActive) {
 		return null;
@@ -291,12 +301,15 @@ public class ReferenceFactoryManagerImpl
 	    
 	    int expectedLength = parentPOAAdapterName.length + 1 ;
 
-	    if (expectedLength != adapterName.length)
-		return null ;
+	    if (expectedLength != adapterName.length) {
+                return null;
+            }
 
-	    for (int ctr=0; ctr<expectedLength-1; ctr++)
-		if (!adapterName[ctr].equals( parentPOAAdapterName[ctr] ))
-		    return null ;
+	    for (int ctr=0; ctr<expectedLength-1; ctr++) {
+                if (!adapterName[ctr].equals(parentPOAAdapterName[ctr])) {
+                    return null;
+                }
+            }
 
 	    return factories.get( adapterName[expectedLength-1] ) ;
 	} finally {
@@ -307,11 +320,13 @@ public class ReferenceFactoryManagerImpl
     public ReferenceFactory find( String name ) {
 	lock.lock() ;
 	try {
-	    if (state == RFMState.SUSPENDED)
-		throw wrapper.rfmMightDeadlock() ;
+	    if (state == RFMState.SUSPENDED) {
+                throw wrapper.rfmMightDeadlock();
+            }
 
-	    if (!isActive)
-		return null ;
+	    if (!isActive) {
+                return null;
+            }
 
 	    return factories.get( name ) ;
 	} finally {
@@ -343,12 +358,13 @@ public class ReferenceFactoryManagerImpl
                 throw wrapper.rfmNotActive() ;
             }
 
-            while (state == RFMState.SUSPENDED)
+            while (state == RFMState.SUSPENDED) {
                 try {
-                    suspendCondition.await() ;
+                    suspendCondition.await();
                 } catch (InterruptedException exc) {
-                    throw wrapper.rfmSuspendConditionWaitInterrupted() ;
+                    throw wrapper.rfmSuspendConditionWaitInterrupted();
                 }
+            }
 
             // At this point, the state must be READY, and any other
             // suspending thread has released the lock.  So now
@@ -378,8 +394,9 @@ public class ReferenceFactoryManagerImpl
         lock.lock() ;
 
         try {
-            if (!isActive)
-                throw wrapper.rfmNotActive() ;
+            if (!isActive) {
+                throw wrapper.rfmNotActive();
+            }
 
             state = RFMState.READY ;
             suspendCondition.signalAll() ;
@@ -404,17 +421,20 @@ public class ReferenceFactoryManagerImpl
     {
 	lock.lock() ;
 	try {
-	    if (!isActive)
-		throw wrapper.rfmNotActive() ;
+	    if (!isActive) {
+                throw wrapper.rfmNotActive();
+            }
 
-	    if (state != RFMState.SUSPENDED)
-		throw wrapper.rfmMethodRequiresSuspendedState( "restartFactories" ) ;
+	    if (state != RFMState.SUSPENDED) {
+                throw wrapper.rfmMethodRequiresSuspendedState("restartFactories");
+            }
 	} finally {
 	    lock.unlock() ;
 	}
 
-        if (updates == null)
-            throw wrapper.rfmNullArgRestart() ;
+        if (updates == null) {
+            throw wrapper.rfmNullArgRestart();
+        }
 
         synchronized (poatable) {
             // Update the poatable with the updates information.
@@ -507,16 +527,18 @@ public class ReferenceFactoryManagerImpl
 	// Some POAs are created before the ReferenceFactoryManager is created.
 	// In particular, the root POA and parentPOA are created before isActive
 	// is set to true.  Don't check in these case.
-	if (!isActive)
-	    return ;
+	if (!isActive) {
+            return;
+        }
 
 	// Only check the case where poa does not have the reference manager
 	// policy.  We assume that we handle the policy correctly inside
 	// the RFM itself.
 	Policy policy = ObjectAdapter.class.cast(poa).getEffectivePolicy( 
 	    ORBConstants.REFERENCE_MANAGER_POLICY ) ;
-	if (policy != null)
-	    return ;
+	if (policy != null) {
+            return;
+        }
 
 	// At this point, we know that poa comes from outside the
 	// active RFM.  If poa's parent POA has the policy, we have an
@@ -525,13 +547,15 @@ public class ReferenceFactoryManagerImpl
 	Policy parentPolicy = 
 	    ObjectAdapter.class.cast(parent).getEffectivePolicy(
 	    ORBConstants.REFERENCE_MANAGER_POLICY ) ;
-	if (parentPolicy != null)
-	    throw wrapper.rfmIllegalParentPoaUsage() ;
+	if (parentPolicy != null) {
+            throw wrapper.rfmIllegalParentPoaUsage();
+        }
 
 	// If poa's POAManager is the manager for the RFM, we have
 	// an error.
-	if (poa.the_POAManager() == manager) 
-	    throw wrapper.rfmIllegalPoaManagerUsage() ;
+	if (poa.the_POAManager() == manager) {
+            throw wrapper.rfmIllegalPoaManagerUsage();
+        }
     }
 
     // locking not required
@@ -544,12 +568,15 @@ public class ReferenceFactoryManagerImpl
 
         int expectedLength = parentPOAAdapterName.length + 1 ;
 
-        if (expectedLength != adapterName.length)
-            return false ;
+        if (expectedLength != adapterName.length) {
+            return false;
+        }
 
-        for (int ctr=0; ctr<expectedLength-1; ctr++)
-            if (!adapterName[ctr].equals( parentPOAAdapterName[ctr] ))
-                return false ;
+        for (int ctr=0; ctr<expectedLength-1; ctr++) {
+            if (!adapterName[ctr].equals(parentPOAAdapterName[ctr])) {
+                return false;
+            }
+        }
 
         return true ;
     }

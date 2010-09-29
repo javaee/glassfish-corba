@@ -40,14 +40,7 @@
 
 package com.sun.corba.se.impl.interceptors;
 
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.INTERNAL;
-import org.omg.PortableInterceptor.Current;
-import org.omg.PortableInterceptor.InvalidSlot;
-
-import com.sun.corba.se.impl.corba.AnyImpl;
-
-import com.sun.corba.se.impl.logging.InterceptorsSystemException;
+import com.sun.corba.se.spi.logging.InterceptorsSystemException;
 
 import com.sun.corba.se.spi.orb.ORB;
 
@@ -56,6 +49,9 @@ import com.sun.corba.se.spi.orb.ORB;
  */
 public class SlotTableStack
 {
+    private static final InterceptorsSystemException wrapper =
+        InterceptorsSystemException.self ;
+
     // Contains all the active SlotTables for each thread.
     // The List is made to behave like a stack.
     private java.util.List<SlotTable> tableContainer;
@@ -66,8 +62,6 @@ public class SlotTableStack
     // The ORB associated with this slot table stack
     private ORB orb;
 
-    private InterceptorsSystemException wrapper ;
-
     private PICurrent current ;
 
     /**
@@ -77,7 +71,6 @@ public class SlotTableStack
     SlotTableStack( ORB orb, PICurrent current ) {
        this.current = current ;
        this.orb = orb;
-       wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_Interceptors() ;
 
        currentIndex = 0;
        tableContainer = new java.util.ArrayList<SlotTable>( );
@@ -96,8 +89,8 @@ public class SlotTableStack
             // Add will cause the table to grow.
             tableContainer.add( currentIndex, table );
         } else if (currentIndex > tableContainer.size()) {
-	    throw wrapper.slotTableInvariant( Integer.valueOf( currentIndex ),
-		Integer.valueOf( tableContainer.size() ) ) ;
+	    throw wrapper.slotTableInvariant( currentIndex,
+		tableContainer.size() ) ;
         } else {
             // Set will override unused slots.
             tableContainer.set( currentIndex, table );

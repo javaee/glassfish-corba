@@ -108,7 +108,6 @@ import org.omg.CORBA.portable.OutputStream;
 // This means that any of the following com.sun.corba classes
 // must only occur in contexts that also handle the non-Sun case.
 
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
@@ -124,7 +123,7 @@ import com.sun.corba.se.impl.logging.OMGSystemException;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.IdentityHashtable;
 import com.sun.corba.se.impl.util.JDKBridge;
-import com.sun.corba.se.impl.logging.UtilSystemException;
+import com.sun.corba.se.spi.logging.UtilSystemException;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
@@ -143,12 +142,13 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
     private static ValueHandler valueHandlerSingleton;          
 
-    private static UtilSystemException utilWrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_ENCODING_Util() ; 
+    private static final UtilSystemException utilWrapper =
+        UtilSystemException.self ;
+
     private static Util instance = null;
 
-    private WeakHashMap<java.lang.Class, String> annotationMap = 
-                                    new WeakHashMap<java.lang.Class, String> ();
+    private WeakHashMap<Class<?>, String> annotationMap =
+        new WeakHashMap<Class<?>, String> ();
 
     private static final java.lang.Object annotObj = new java.lang.Object();
 
@@ -304,10 +304,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
             if (ex.minor == ORBConstants.LEGACY_SUN_NOT_SERIALIZABLE ||
                 ex.minor == OMGSystemException.NOT_SERIALIZABLE) {
 
-                if (ex.getMessage() != null)
+                if (ex.getMessage() != null) {
                     inner = new NotSerializableException(ex.getMessage());
-                else
+                } else {
                     inner = new NotSerializableException();
+                }
 
 		inner.initCause( ex ) ;
             }
@@ -364,10 +365,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     // If they're our Any and ORB implementations,
                     // we may want to do type code related versioning.
                     TypeCode tc = createTypeCode((Serializable)newObj, any, orb);
-                    if (tc == null)
-                        any.insert_Value((Serializable)newObj);
-                    else
-                        any.insert_Value((Serializable)newObj, tc);
+                    if (tc == null) {
+                        any.insert_Value((Serializable) newObj);
+                    } else {
+                        any.insert_Value((Serializable) newObj, tc);
+                    }
                 } else if (newObj instanceof Remote) {
                     ORBUtility.throwNotSerializableForCorba(newObj.getClass().getName());
                 } else {
@@ -407,9 +409,9 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
             ORB ourORB = (ORB)orb;
 
             return anyImpl.createTypeCodeForClass(obj.getClass(), ourORB);
-
-        } else
+        } else {
             return null;
+        }
     }
 
 
@@ -463,10 +465,11 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	}
 
 	Any any = in.read_any();
-        if ( any.type().kind().value() == TCKind._tk_objref )
-	    return any.extract_Object ();
-        else
-	    return any.extract_Value();
+        if ( any.type().kind().value() == TCKind._tk_objref ) {
+            return any.extract_Object();
+        } else {
+            return any.extract_Value();
+        }
     }
 
     /**
@@ -511,6 +514,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      * @param tie the tie to register.
      * @param target the target for the tie.
      */
+    @SuppressWarnings("unchecked")
     public void registerTarget(javax.rmi.CORBA.Tie tie, java.rmi.Remote target) 
     {
         synchronized (exportedServants) {
@@ -624,7 +628,9 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	        annot = RMIClassLoader.getClassAnnotation(clz);
 		annotationMap.put(clz, annot);
 		return annot;
-	    } else return annot;
+	    } else {
+                return annot;
+            }
 	}
     }
 
@@ -675,8 +681,8 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 		CorbaClientDelegate cdel = (CorbaClientDelegate)delegate ;
 		CorbaContactInfoList cil = cdel.getContactInfoList() ;
 		if (cil instanceof CorbaContactInfoList) {
-		    CorbaContactInfoList ccil = (CorbaContactInfoList)cil ;
-		    LocalClientRequestDispatcher lcs = ccil.getLocalClientRequestDispatcher() ;
+		    LocalClientRequestDispatcher lcs =
+                        cil.getLocalClientRequestDispatcher() ;
 		    result = lcs.useLocalInvocation( null ) ;
 		}
 	    } else {
@@ -711,10 +717,12 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
             throw (RuntimeException) orig;
     	}    	
         
-	if (orig instanceof Exception)
-	    return new UnexpectedException( orig.toString(), (Exception)orig );
-	else
-	    return new UnexpectedException( orig.toString());
+	if (orig instanceof Exception) {
+            return new UnexpectedException(orig.toString(),
+                (Exception) orig);
+        } else {
+            return new UnexpectedException(orig.toString());
+        }
     }
 
     /**
@@ -729,12 +737,9 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     public Object[] copyObjects (Object[] obj, org.omg.CORBA.ORB orb)
 	throws RemoteException 
     {
-	if (obj == null)
-	    // Bug fix for 5018613: JCK test expects copyObjects to throw
-	    // NPE when obj==null.  This is actually not in the spec, since
-	    // obj is not really an RMI-IDL data type, but we follow our
-	    // test here, and force this error to be thrown.
-	    throw new NullPointerException() ;
+	if (obj == null) {
+            throw new NullPointerException();
+        }
 
 	Class compType = obj.getClass().getComponentType() ;
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( compType ) ;
@@ -745,8 +750,9 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	    Remote[] result = new Remote[obj.length] ;
 	    System.arraycopy( (Object)obj, 0, (Object)result, 0, obj.length ) ;
 	    return (Object[])copyObject( result, orb ) ;
-	} else
-	    return (Object[])copyObject( obj, orb ) ;
+	} else {
+            return (Object[]) copyObject( obj, orb );
+        }
     }
 
     /**

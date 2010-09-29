@@ -43,9 +43,7 @@ package com.sun.corba.se.spi.extension ;
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.LocalObject ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 /** Policy used to support the request partitioning feature and to
@@ -53,8 +51,9 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 */
 public class RequestPartitioningPolicy extends LocalObject implements Policy
 {
-    private static ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_OA_IOR_ORBUtil() ;
+    private static ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     public final static int DEFAULT_VALUE = 0;
     private final int value;
 
@@ -90,6 +89,7 @@ public class RequestPartitioningPolicy extends LocalObject implements Policy
 	// NO-OP
     }
 
+    @Override
     public String toString() 
     {
 	return "RequestPartitioningPolicy[" + value + "]" ;

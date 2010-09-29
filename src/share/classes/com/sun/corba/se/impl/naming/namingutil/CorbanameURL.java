@@ -61,7 +61,7 @@ public class CorbanameURL extends INSURLBase
         try {
             url = Utility.cleanEscapes( url );
         } catch( Exception e ) {
-            badAddress( e );
+            badAddress( e, aURL );
         }
 
         int delimiterIndex = url.indexOf( '#' );
@@ -90,7 +90,7 @@ public class CorbanameURL extends INSURLBase
 		theStringifiedName = result ;
             } 
         } catch( Exception e ) {
-            badAddress( e );
+            badAddress( e, aURL );
         }
     }
 

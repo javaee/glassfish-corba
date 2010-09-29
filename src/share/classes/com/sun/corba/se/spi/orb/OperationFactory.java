@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 
 /** This is a static factory class for commonly used operations
@@ -88,49 +88,56 @@ import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 */
 public abstract class OperationFactory {
     // I18N for errors through log wrappers: bug 5051545
-    private static final ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private OperationFactory() {}
 
     private static String getString( Object obj )
     {
-	if (obj instanceof String)
-	    return (String)obj ;
-	else
-	    throw wrapper.stringExpectedInOperation() ; 
+	if (obj instanceof String) {
+            return (String) obj;
+        } else {
+            throw wrapper.stringExpectedInOperation();
+        }
     }
 
     private static Object[] getObjectArray( Object obj ) 
     {
-	if (obj instanceof Object[])
-	    return (Object[])obj ;
-	else
-	    throw wrapper.objectArrayExpected() ;
+	if (obj instanceof Object[]) {
+            return (Object[]) obj;
+        } else {
+            throw wrapper.objectArrayExpected();
+        }
     }
 
     private static Pair<String,String> getStringPair( Object obj )
     {
-	if (obj instanceof Pair)
-	    return (Pair<String,String>)obj ;
-	else
-	    throw wrapper.pairStringStringExpected() ;
+	if (obj instanceof Pair) {
+            return (Pair<String, String>) obj;
+        } else {
+            throw wrapper.pairStringStringExpected();
+        }
     }
 
     private static abstract class OperationBase implements Operation{
+        @Override
 	public boolean equals( Object obj ) 
 	{
-	    if (this==obj)
-		return true ;
+	    if (this==obj) {
+                return true;
+            }
 
-	    if (!(obj instanceof OperationBase))
-		return false ;
+	    if (!(obj instanceof OperationBase)) {
+                return false;
+            }
 
 	    OperationBase other = (OperationBase)obj ;
 
 	    return toString().equals( other.toString() ) ;
 	}
 
+        @Override
 	public int hashCode()
 	{
 	    return toString().hashCode() ;
@@ -155,6 +162,7 @@ public abstract class OperationFactory {
 	    }
 	}
 
+        @Override
 	public String toString()
 	{
 	    return "maskErrorAction(" + op + ")" ;
@@ -180,6 +188,7 @@ public abstract class OperationFactory {
 	    return getObjectArray( value )[ index ] ;
 	}
 
+        @Override
 	public String toString() 
 	{ 
 	    return "indexAction(" + index + ")" ; 
@@ -198,6 +207,7 @@ public abstract class OperationFactory {
 	    return getStringPair( value ).first() ;
 	}
 
+        @Override
 	public String toString() { return "suffixAction" ; }
     }
 
@@ -210,6 +220,7 @@ public abstract class OperationFactory {
 	    return getStringPair( value ).second() ;
 	}
 
+        @Override
 	public String toString() { return "valueAction" ; }
     }
 
@@ -222,6 +233,7 @@ public abstract class OperationFactory {
 	    return value ;
 	}
 
+        @Override
 	public String toString() { return "identityAction" ; }
     }
 
@@ -234,6 +246,7 @@ public abstract class OperationFactory {
 	    return Boolean.valueOf( getString( value ) ) ;
 	}
 
+        @Override
 	public String toString() { return "booleanAction" ; }
     }
 
@@ -246,6 +259,7 @@ public abstract class OperationFactory {
 	    return Integer.valueOf( getString( value ) ) ;
 	}
 
+        @Override
 	public String toString() { return "integerAction" ; }
     }
 
@@ -258,6 +272,7 @@ public abstract class OperationFactory {
 	    return value ;
 	}
 
+        @Override
 	public String toString() { return "stringAction" ; }
     }
 
@@ -276,13 +291,14 @@ public abstract class OperationFactory {
 	    String className = getString( value ) ;
 
 	    try {
-		Class result = resolver.evaluate( className ) ;
+		Class<?> result = resolver.evaluate( className ) ;
 		return result ;
 	    } catch (Exception exc) {
 		throw wrapper.classActionException( exc, className ) ;
 	    }
 	} 
 
+        @Override
 	public String toString() { return "classAction[" + resolver + "]" ; }
     }
 
@@ -293,6 +309,7 @@ public abstract class OperationFactory {
 	    return Boolean.TRUE ;
 	} 
 
+        @Override
 	public String toString() { return "setFlagAction" ; }
     }
 
@@ -310,6 +327,7 @@ public abstract class OperationFactory {
 	    }
 	}
 
+        @Override
 	public String toString() { return "URLAction" ; }
     }
 
@@ -375,12 +393,14 @@ public abstract class OperationFactory {
 	public Object operate( Object value ) 
 	{
 	    int result = Integer.parseInt( getString( value ) ) ;
-	    if ((result >= min) && (result <= max))
-		return new Integer( result ) ;
-	    else
-		throw wrapper.valueNotInRange( result, min, max ) ;
+	    if ((result >= min) && (result <= max)) {
+                return new Integer(result);
+            } else {
+                throw wrapper.valueNotInRange(result, min, max);
+            }
 	}
 
+        @Override
 	public String toString() { 
 	    return "integerRangeAction(" + min + "," + max + ")" ; 
 	}
@@ -415,14 +435,17 @@ public abstract class OperationFactory {
 	    while (st.hasMoreTokens()) {
 		String next = st.nextToken() ;
 		Object val = act.operate( next ) ;
-		if (result == null) 
-		    result = Array.newInstance( val.getClass(), length ) ;
+		if (result == null) {
+                    result =
+                        Array.newInstance(val.getClass(), length);
+                }
 		Array.set( result, ctr++, val ) ;	
 	    }
 
 	    return result ;
 	} 
 
+        @Override
 	public String toString() { 
 	    return "listAction(separator=\"" + sep + 
 		"\",action=" + act + ")" ; 
@@ -451,8 +474,10 @@ public abstract class OperationFactory {
 		sep ) ;
 
 	    int numTokens = st.countTokens() ;
-	    if (numTokens != actions.length)
-		throw wrapper.numTokensActionsDontMatch( numTokens, actions.length ) ;
+	    if (numTokens != actions.length) {
+                throw wrapper.numTokensActionsDontMatch(numTokens,
+                    actions.length);
+            }
 
 	    int ctr = 0 ;
 	    Object[] result = new Object[ numTokens ] ;
@@ -465,6 +490,7 @@ public abstract class OperationFactory {
 	    return result ;
 	} 
 
+        @Override
 	public String toString() { 
 	    return "sequenceAction(separator=\"" + sep + 
 		"\",actions=" + 
@@ -494,6 +520,7 @@ public abstract class OperationFactory {
 	    return op2.operate( op1.operate( value ) ) ;
 	} 
 
+        @Override
 	public String toString() { 
 	    return "composition(" + op1 + "," + op2 + ")" ;
 	}
@@ -506,7 +533,7 @@ public abstract class OperationFactory {
 
     private static class MapAction extends OperationBase
     {
-	Operation op ;
+	private Operation op ;
 
 	MapAction( Operation op )
 	{
@@ -517,11 +544,13 @@ public abstract class OperationFactory {
 	{
 	    Object[] values = (Object[])value ;
 	    Object[] result = new Object[ values.length ] ;
-	    for (int ctr=0; ctr<values.length; ctr++ )
-		result[ctr] = op.operate( values[ctr] ) ;
+	    for (int ctr=0; ctr<values.length; ctr++ ) {
+                result[ctr] = op.operate(values[ctr]);
+            }
 	    return result ;
 	}
 
+        @Override
 	public String toString() { 
 	    return "mapAction(" + op + ")" ;
 	}
@@ -548,11 +577,13 @@ public abstract class OperationFactory {
 	{
 	    Object[] values = (Object[])value ;
 	    Object[] result = new Object[ values.length ] ;
-	    for (int ctr=0; ctr<values.length; ctr++ )
-		result[ctr] = op[ctr].operate( values[ctr] ) ;
+	    for (int ctr=0; ctr<values.length; ctr++ ) {
+                result[ctr] = op[ctr].operate(values[ctr]);
+            }
 	    return result ;
 	}
 
+        @Override
 	public String toString() { 
 	    return "mapSequenceAction(" + 
 		ObjectUtility.compactObjectToString(op) + ")" ;

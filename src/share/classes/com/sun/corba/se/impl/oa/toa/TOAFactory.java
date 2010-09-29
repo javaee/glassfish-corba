@@ -55,7 +55,7 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 
 import com.sun.corba.se.impl.ior.ObjectKeyTemplateBase ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import org.glassfish.gmbal.AMXMetadata;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
@@ -66,8 +66,10 @@ import org.glassfish.gmbal.ManagedObject;
 @AMXMetadata( isSingleton=true )
 public class TOAFactory implements ObjectAdapterFactory 
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private ORB orb ;
-    private ORBUtilSystemException wrapper ;
 
     private TOAImpl toa ;
     private Map<String,TOAImpl> codebaseToTOA ;
@@ -87,18 +89,16 @@ public class TOAFactory implements ObjectAdapterFactory
 
     public ObjectAdapter find ( ObjectAdapterId oaid ) 
     {
-	if (oaid.equals( ObjectKeyTemplateBase.JIDL_OAID )  )
-	    // Return the dispatch-only TOA, which can dispatch
-	    // request for objects created by any TOA.
-	    return getTOA() ;
-	else 
-	    throw wrapper.badToaOaid() ;
+	if (oaid.equals( ObjectKeyTemplateBase.JIDL_OAID )  ) {
+            return getTOA();
+        } else {
+            throw wrapper.badToaOaid();
+        }
     }
 
     public void init( ORB orb )
     {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_ORBUtil() ;
 	tom = new TransientObjectManager( orb ) ;
 	codebaseToTOA = new HashMap<String,TOAImpl>() ;
         orb.mom().registerAtRoot( this ) ;
@@ -113,23 +113,24 @@ public class TOAFactory implements ObjectAdapterFactory
 
     public synchronized TOA getTOA( String codebase )
     {
-	TOAImpl toa = codebaseToTOA.get( codebase ) ;
-	if (toa == null) {
-	    toa = new TOAImpl( orb, tom, codebase ) ;
+	TOAImpl myToa = codebaseToTOA.get( codebase ) ;
+	if (myToa == null) {
+	    myToa = new TOAImpl( orb, tom, codebase ) ;
 
-	    codebaseToTOA.put( codebase, toa ) ;
+	    codebaseToTOA.put( codebase, myToa ) ;
 	}
 
-	return toa ;
+	return myToa ;
     }
 
     public synchronized TOA getTOA() 
     {
-	if (toa == null)
+	if (toa == null) {
 	    // The dispatch-only TOA is not used for creating
 	    // objrefs, so its codebase can be null (and must
 	    // be, since we do not have a servant at this point)
 	    toa = new TOAImpl( orb, tom, null ) ;
+        }
 
 	return toa ;
     }

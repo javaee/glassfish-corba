@@ -11,6 +11,7 @@
 package com.sun.corba.se.spi.logging ;
 
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
+import com.sun.corba.se.impl.ior.iiop.JavaSerializationComponent;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
@@ -24,7 +25,10 @@ import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
 import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.EventHandler;
 import java.net.MalformedURLException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.charset.MalformedInputException;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -48,6 +52,7 @@ import org.omg.CORBA.TRANSIENT;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.Bounds;
 import org.omg.CORBA.UNKNOWN;
+import org.osgi.framework.Bundle;
 
 @ExceptionWrapper( idPrefix="IOP" )
 @ORBException( omgException=false, group=CorbaExtension.ORBUtilGroup )
@@ -156,16 +161,19 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.FINE, id=33 )
     @Message( "ClassNotFoundException while attempting to load preferred "
         + "stub named {0}" )
-    BAD_OPERATION classNotFound1( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    BAD_OPERATION classNotFound1( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=34 )
     @Message( "ClassNotFoundException while attempting to load alternate "
         + "stub named {0}" )
-    BAD_OPERATION classNotFound2( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    BAD_OPERATION classNotFound2( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=35 )
     @Message( "ClassNotFoundException while attempting to load interface {0}" )
-    BAD_OPERATION classNotFound3( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    BAD_OPERATION classNotFound3( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=36 )
     @Message( "POA ServantNotActive exception while trying get an "
@@ -211,15 +219,21 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=46 )
     @Message( "Bad operation from _invoke: {0}" )
-    BAD_OPERATION badOperationFromInvoke( String arg0 ) ;
+    BAD_OPERATION badOperationFromInvoke( @Chain Exception exc, String arg0 ) ;
     
+    String couldNotAccessStubDelegate = "Could not access StubDelegateImpl" ;
+
     @Log( level=LogLevel.WARNING, id=47 )
-    @Message( "Could not access StubDelegateImpl" )
-    BAD_OPERATION couldNotAccessStubDelegate(  ) ;
+    @Message( couldNotAccessStubDelegate )
+    BAD_OPERATION couldNotAccessStubDelegate( @Chain Exception exc ) ;
+
+    @Log( level=LogLevel.WARNING, id=47 )
+    @Message( couldNotAccessStubDelegate )
+    BAD_OPERATION couldNotAccessStubDelegate( ) ;
     
     @Log( level=LogLevel.WARNING, id=48 )
     @Message( "Could not load interface {0} for creating stub" )
-    BAD_OPERATION couldNotLoadInterface( String arg0 ) ;
+    BAD_OPERATION couldNotLoadInterface( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=49 )
     @Message( "Could not activate POA from foreign ORB due to "
@@ -228,7 +242,8 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=50 )
     @Message( "Could not instantiate stub class {0} for dynamic RMI-IIOP" )
-    BAD_OPERATION couldNotInstantiateStubClass( String arg0 ) ;
+    BAD_OPERATION couldNotInstantiateStubClass( @Chain Exception exc,
+        String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=51 )
     @Message( "String expected in OperationFactory.getString()" )
@@ -273,19 +288,21 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=61 )
     @Message( "Bundle not found for class {0}" )
-    BAD_OPERATION classNotFoundInBundle( String arg0 ) ;
+    BAD_OPERATION classNotFoundInBundle( Object arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=62 )
     @Message( "Class {0} found in bundle {1}" )
-    BAD_OPERATION foundClassInBundle( String arg0, String arg1 ) ;
+    BAD_OPERATION foundClassInBundle( String arg0, Bundle arg1 ) ;
     
     @Log( level=LogLevel.FINE, id=63 )
     @Message( "Class {0} could not be loaded by bundle {1}" )
-    BAD_OPERATION bundleCouldNotLoadClass( String arg0, String arg1 ) ;
+    BAD_OPERATION bundleCouldNotLoadClass( @Chain Exception exc,
+        String arg0, Bundle arg1 ) ;
     
     @Log( level=LogLevel.FINE, id=64 )
     @Message( "Class {0} found in bundle {1} with version {2}" )
-    BAD_OPERATION foundClassInBundleVersion( String arg0, String arg1, String arg2 ) ;
+    BAD_OPERATION foundClassInBundleVersion( Object arg0,
+        String arg1, String arg2 ) ;
     
     @Log( level=LogLevel.FINE, id=65 )
     @Message( "Class {0} not found in bundle {1} with version {2}" )
@@ -325,15 +342,16 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=74 )
     @Message( "Could not load class {0} in bundle {1}" )
-    BAD_OPERATION couldNotLoadClassInBundle( String arg0, String arg1 ) ;
+    BAD_OPERATION couldNotLoadClassInBundle( @Chain Exception exc,
+        String arg0, String arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=75 )
     @Message( "Exception while handling event on {0}" )
-    BAD_OPERATION exceptionInSelector( String arg0 ) ;
+    BAD_OPERATION exceptionInSelector( @Chain Throwable t, EventHandler arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=76 )
     @Message( "Ignoring cancelled SelectionKey {0}: key will be removed from Selector" )
-    BAD_OPERATION canceledSelectionKey( String arg0 ) ;
+    BAD_OPERATION canceledSelectionKey( SelectionKey arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=77 )
     @Message( "The OSGi PackageAdmin service is not available" )
@@ -380,7 +398,10 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.FINE, id=5 )
     @Message( "Object reference came from foreign ORB" )
     BAD_PARAM objrefFromForeignOrb(  ) ;
-    
+
+    int LOCAL_OBJECT_NOT_ALLOWED = CorbaExtension.self.getMinorCode(
+        ORBUtilSystemException.class, "localObjectNotAllowed" ) ;
+
     @Log( level=LogLevel.FINE, id=6 )
     @Message( "Local object not allowed" )
     BAD_PARAM localObjectNotAllowed(  ) ;
@@ -438,11 +459,11 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=17 )
     @Message( "Runtime Exception during bootstrap operation" )
-    BAD_PARAM bootstrapRuntimeException(  ) ;
+    BAD_PARAM bootstrapRuntimeException( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=18 )
     @Message( "Exception during bootstrap operation" )
-    BAD_PARAM bootstrapException(  ) ;
+    BAD_PARAM bootstrapException( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=19 )
     @Message( "Expected a string, but argument was not of String type" )
@@ -462,7 +483,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=23 )
     @Message( "Reflective POA Servant requires an instance of org.omg.CORBA_2_3.ORB" )
-    BAD_PARAM badOrbForServant(  ) ;
+    BAD_PARAM badOrbForServant( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=24 )
     @Message( "Request partitioning value specified, {0}, "
@@ -478,7 +499,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=26 )
     @Message( "Invalid request partitioning id {0}, valid values are {1} - {2}" )
-    BAD_PARAM invalidRequestPartitioningId( String arg0, String arg1, String arg2 ) ;
+    BAD_PARAM invalidRequestPartitioningId( int arg0, int arg1, int arg2 ) ;
     
     @Log( level=LogLevel.FINE, id=27 )
     @Message( "ORBDynamicStubFactoryFactoryClass property had value {0}, "
@@ -494,8 +515,15 @@ public interface ORBUtilSystemException {
     @Message( "CORBA object is not an ObjectImpl in ORB.getIOR" )
     BAD_PARAM notAnObjectImpl(  ) ;
     
+    String badTimeoutStringData = "{0} is not a valid positive decimal "
+        + "integer for {1}" ;
+
     @Log( level=LogLevel.WARNING, id=30 )
-    @Message( "{0} is not a valid positive decimal integer for {1}" )
+    @Message( badTimeoutStringData )
+    BAD_PARAM badTimeoutStringData( @Chain Exception exc, String arg0, String arg1 ) ;
+
+    @Log( level=LogLevel.WARNING, id=30 )
+    @Message( badTimeoutStringData )
     BAD_PARAM badTimeoutStringData( String arg0, String arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=31 )
@@ -565,11 +593,18 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=1 )
     @Message( "Connection failure: socketType: {0}; hostname: {1}; port: {2}" )
-    COMM_FAILURE connectFailure( String arg0, String arg1, String arg2 ) ;
-    
+    COMM_FAILURE connectFailure( @Chain Throwable t, String arg0, String arg1, String arg2 ) ;
+
+    String writeErrorSend = "Write error sent" ;
+
     @Log( level=LogLevel.FINE, id=3 )
-    @Message( "Write error sent" )
-    COMM_FAILURE writeErrorSend(  ) ;
+    @Message( writeErrorSend )
+    @CS( CSValue.MAYBE )
+    COMM_FAILURE writeErrorSend( @Chain Exception exc ) ;
+
+    @Log( level=LogLevel.FINE, id=3 )
+    @Message( writeErrorSend )
+    COMM_FAILURE writeErrorSend() ;
     
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "Get properties error" )
@@ -590,11 +625,25 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=8 )
     @Message( "Connection abort" )
-    COMM_FAILURE connectionAbort(  ) ;
-    
+    COMM_FAILURE connectionAbort( @Chain Throwable thr  ) ;
+
+    int CONNECTION_REBIND = CorbaExtension.self.getMinorCode(
+        ORBUtilSystemException.class, "connectionRebind" ) ;
+
+    String connectionRebind = "Connection rebind" ;
+
     @Log( level=LogLevel.FINE, id=9 )
     @Message( "Connection rebind" )
-    COMM_FAILURE connectionRebind(  ) ;
+    COMM_FAILURE connectionRebind( @Chain Throwable thr  ) ;
+
+    @Log( level=LogLevel.FINE, id=9 )
+    @Message( "Connection rebind" )
+    @CS( CSValue.MAYBE )
+    COMM_FAILURE connectionRebindMaybe( @Chain Throwable thr  ) ;
+
+    @Log( level=LogLevel.FINE, id=9 )
+    @Message( "Connection rebind" )
+    COMM_FAILURE connectionRebind( ) ;
     
     @Log( level=LogLevel.WARNING, id=10 )
     @Message( "Received a GIOP MessageError, indicating header corruption or "
@@ -603,7 +652,8 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=11 )
     @Message( "IOException received when reading from connection {0}" )
-    COMM_FAILURE ioexceptionWhenReadingConnection( String arg0 ) ;
+    COMM_FAILURE ioexceptionWhenReadingConnection( @Chain Exception exc,
+        CorbaConnection arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=12 )
     @Message( "SelectionKey invalid on channel, {0}" )
@@ -620,16 +670,16 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=15 )
     @Message( "Read of full message failed : bytes requested = {0} "
         + "bytes read = {1} max wait time = {2} total time spent waiting = {3}" )
-    COMM_FAILURE transportReadTimeoutExceeded( String arg0, String arg1,
-        String arg2, String arg3 ) ;
+    COMM_FAILURE transportReadTimeoutExceeded( int arg0, int arg1,
+        int arg2, int arg3 ) ;
     
     @Log( level=LogLevel.SEVERE, id=16 )
-    @Message( "Unable to create IIOP listener on the specified host/port: {0}/{1}" )
-    COMM_FAILURE createListenerFailed( String arg0, String arg1 ) ;
+    @Message( "Unable to create IIOP listener on the specified port: {0}" )
+    COMM_FAILURE createListenerFailed( @Chain Throwable thr, int arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=17 )
     @Message( "Throwable received in ReadBits" )
-    COMM_FAILURE throwableInReadBits(  ) ;
+    COMM_FAILURE throwableInReadBits( @Chain Throwable exc ) ;
     
     @Log( level=LogLevel.WARNING, id=18 )
     @Message( "IOException in accept" )
@@ -637,11 +687,12 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=19 )
     @Message( "Communications timeout waiting for response.  Exceeded {0} milliseconds" )
-    COMM_FAILURE communicationsTimeoutWaitingForResponse( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    COMM_FAILURE communicationsTimeoutWaitingForResponse( long arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=20 )
     @Message( "Communications retry timeout.  Exceeded {0} milliseconds" )
-    COMM_FAILURE communicationsRetryTimeout( String arg0 ) ;
+    COMM_FAILURE communicationsRetryTimeout( @Chain Exception exc, long arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=21 )
     @Message( "Ignoring exception while waiting for retry" )
@@ -650,72 +701,74 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.SEVERE, id=22 )
     @Message( "Invalid request for a temporary write selector object for use "
         + "on a blocking connection: {0}." )
-    COMM_FAILURE temporaryWriteSelectorWithBlockingConnection( String arg0 ) ;
+    COMM_FAILURE temporaryWriteSelectorWithBlockingConnection( CorbaConnection arg0 ) ;
     
     @Log( level=LogLevel.SEVERE, id=23 )
     @Message( "Invalid request for a temporary read selector object for use "
         + "on a blocking connection: {0}." )
-    COMM_FAILURE temporaryReadSelectorWithBlockingConnection( String arg0 ) ;
+    COMM_FAILURE temporaryReadSelectorWithBlockingConnection( CorbaConnection arg0 ) ;
     
     @Log( level=LogLevel.SEVERE, id=24 )
     @Message( "TemporarySelector's Selector, {0} .select(timeout) must called "
         + "with timeout value greater than 0, called with a timeout value of, {1}." )
-    COMM_FAILURE temporarySelectorSelectTimeoutLessThanOne( String arg0, String arg1 ) ;
+    COMM_FAILURE temporarySelectorSelectTimeoutLessThanOne( Selector arg0, long arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=25 )
     @Message( "Write of message exceeded TCP timeout : max wait time = {0} ms, "
         + "total time spent blocked, waiting to write = {1} ms." )
-    COMM_FAILURE transportWriteTimeoutExceeded( String arg0, String arg1 ) ;
+    COMM_FAILURE transportWriteTimeoutExceeded( int arg0, int arg1 ) ;
     
     @Log( level=LogLevel.SEVERE, id=26 )
     @Message( "Unexpected exception when reading with a temporary selector: "
         + "bytes read = {0}, bytes requested = {1}, "
         + "time spent waiting = {2} ms, max time to wait = {3}." )
-    COMM_FAILURE exceptionWhenReadingWithTemporarySelector( String arg0,
-        String arg1, String arg2, String arg3 ) ;
+    COMM_FAILURE exceptionWhenReadingWithTemporarySelector( @Chain Exception exc,
+        int arg0, int arg1, int arg2, int arg3 ) ;
     
     @Log( level=LogLevel.SEVERE, id=27 )
     @Message( "Unexpected exception when writing with a temporary selector:  "
         + "bytes written = {0}, total bytes requested to write = {1}, "
         + "time spent waiting = {2} ms, max time to wait = {3}." )
-    COMM_FAILURE exceptionWhenWritingWithTemporarySelector( String arg0,
-        String arg1, String arg2, String arg3 ) ;
+    COMM_FAILURE exceptionWhenWritingWithTemporarySelector( @Chain Exception exc,
+        int arg0, int arg1, int arg2, int arg3 ) ;
     
     @Log( level=LogLevel.FINE, id=28 )
     @Message( "Throwable received in doOptimizedReadStrategy" )
-    COMM_FAILURE throwableInDoOptimizedReadStrategy(  ) ;
+    COMM_FAILURE throwableInDoOptimizedReadStrategy( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=29 )
     @Message( "Blocking read failed, expected to read additional bytes:  "
         + "max wait time = {0}ms total time spent waiting = {1}ms" )
-    COMM_FAILURE blockingReadTimeout( String arg0, String arg1 ) ;
+    COMM_FAILURE blockingReadTimeout( long arg0, long arg1 ) ;
     
     @Log( level=LogLevel.FINE, id=30 )
     @Message( "Exception in a blocking read on connection {0} with a "
         + "temporary selector" )
-    COMM_FAILURE exceptionBlockingReadWithTemporarySelector( String arg0 ) ;
+    COMM_FAILURE exceptionBlockingReadWithTemporarySelector( @Chain Exception exc,
+        CorbaConnection arg0 ) ;
     
     @Log( level=LogLevel.SEVERE, id=31 )
     @Message( "Invalid operation, attempting a non-blocking read on blocking "
         + "connection, {0}" )
-    COMM_FAILURE nonBlockingReadOnBlockingSocketChannel( String arg0 ) ;
+    COMM_FAILURE nonBlockingReadOnBlockingSocketChannel( CorbaConnection arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=32 )
     @Message( "Unexpected exception when canceling SelectionKey and "
         + "flushing temporary Selector" )
-    COMM_FAILURE unexpectedExceptionCancelAndFlushTempSelector(  ) ;
+    COMM_FAILURE unexpectedExceptionCancelAndFlushTempSelector( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=33 )
     @Message( "Ignoring request to read a message which exceeds read size "
         + "threshold of {0} bytes, requested size was {1}. "
         + "Use ORB property -D{2}=<# of bytes> to set threshold higher." )
-    COMM_FAILURE maximumReadByteBufferSizeExceeded( String arg0,
-        String arg1, String arg2 ) ;
+    COMM_FAILURE maximumReadByteBufferSizeExceeded( int arg0,
+        int arg1, String arg2 ) ;
     
     @Log( level=LogLevel.FINE, id=34 )
     @Message( "Received {0}, in a blocking read on connection, {1}, "
         + "because an 'end of stream' was detected" )
-    COMM_FAILURE blockingReadEndOfStream( String arg0, String arg1 ) ;
+    COMM_FAILURE blockingReadEndOfStream( @Chain Exception exc, String arg0,
+        String arg1 ) ;
     
     @Log( level=LogLevel.FINE, id=35 )
     @Message( "Received {0}, in a non-blocking read on connection, {1}, "
@@ -736,7 +789,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Bad stringified IOR" )
-    DATA_CONVERSION badStringifiedIor(  ) ;
+    DATA_CONVERSION badStringifiedIor( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Unable to perform resolve_initial_references due to bad host or "
@@ -950,14 +1003,17 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=20 )
     @Message( "Error in GIOP magic" )
+    @CS( CSValue.MAYBE )
     INTERNAL giopMagicError(  ) ;
     
     @Log( level=LogLevel.WARNING, id=21 )
     @Message( "Error in GIOP version" )
+    @CS( CSValue.MAYBE )
     INTERNAL giopVersionError(  ) ;
     
     @Log( level=LogLevel.WARNING, id=22 )
     @Message( "Illegal reply status in GIOP reply message" )
+    @CS( CSValue.MAYBE )
     INTERNAL illegalReplyStatus(  ) ;
     
     @Log( level=LogLevel.WARNING, id=23 )
@@ -966,6 +1022,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=24 )
     @Message( "Fragmentation not allowed for this message type" )
+    @CS( CSValue.MAYBE )
     INTERNAL fragmentationDisallowed(  ) ;
     
     @Log( level=LogLevel.WARNING, id=25 )
@@ -987,6 +1044,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=29 )
     @Message( "Illegal target address disposition value" )
+    @CS( CSValue.MAYBE )
     INTERNAL illegalTargetAddressDisposition(  ) ;
     
     @Log( level=LogLevel.WARNING, id=30 )
@@ -1022,7 +1080,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=37 )
     @Message( "Application exception in special method: should not happen" )
-    INTERNAL applicationExceptionInSpecialMethod(  ) ;
+    INTERNAL applicationExceptionInSpecialMethod( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=38 )
     @Message( "Assertion failed: statement not reachable (1)" )
@@ -1050,7 +1108,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=44 )
     @Message( "Unexpected exception while unmarshalling DII user exception" )
-    INTERNAL unexpectedDiiException(  ) ;
+    INTERNAL unexpectedDiiException( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=45 )
     @Message( "This method should never be called" )
@@ -1062,11 +1120,11 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=47 )
     @Message( "Empty stack exception while calling runServantPostInvoke" )
-    INTERNAL emptyStackRunServantPostInvoke(  ) ;
+    INTERNAL emptyStackRunServantPostInvoke( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=48 )
     @Message( "Bad exception typecode" )
-    INTERNAL problemWithExceptionTypecode(  ) ;
+    INTERNAL problemWithExceptionTypecode( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=49 )
     @Message( "Illegal Subcontract id {0}" )
@@ -1078,15 +1136,18 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=51 )
     @Message( "Bad system exception in reply" )
-    INTERNAL badSystemExceptionInReply(  ) ;
+    @CS( CSValue.MAYBE )
+    INTERNAL badSystemExceptionInReply( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=52 )
     @Message( "Bad CompletionStatus {0} in locate reply" )
-    INTERNAL badCompletionStatusInLocateReply( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    INTERNAL badCompletionStatusInLocateReply( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=53 )
     @Message( "Bad CompletionStatus {0} in reply" )
-    INTERNAL badCompletionStatusInReply( String arg0 ) ;
+    @CS( CSValue.MAYBE )
+    INTERNAL badCompletionStatusInReply( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=54 )
     @Message( "The BadKind exception should never occur here" )
@@ -1176,7 +1237,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=74 )
     @Message( "BootstrapResolver caught an unexpected ApplicationException" )
-    INTERNAL bootstrapApplicationException(  ) ;
+    INTERNAL bootstrapApplicationException( @Chain Exception exc  ) ;
     
     @Log( level=LogLevel.FINE, id=75 )
     @Message( "Old entry in serialization indirection table has a "
@@ -1215,27 +1276,28 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=84 )
     @Message( "Exception when sending close connection" )
-    INTERNAL exceptionWhenSendingCloseConnection(  ) ;
+    INTERNAL exceptionWhenSendingCloseConnection( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=85 )
     @Message( "A reflective tie got an error while invoking method {0} on class {1}" )
-    INTERNAL invocationErrorInReflectiveTie( String arg0, String arg1 ) ;
+    INTERNAL invocationErrorInReflectiveTie( @Chain Exception exc,
+        String arg0, String arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=86 )
     @Message( "Could not find or invoke write method on exception Helper class {0}" )
-    INTERNAL badHelperWriteMethod( String arg0 ) ;
+    INTERNAL badHelperWriteMethod( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=87 )
     @Message( "Could not find or invoke read method on exception Helper class {0}" )
-    INTERNAL badHelperReadMethod( String arg0 ) ;
+    INTERNAL badHelperReadMethod( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=88 )
     @Message( "Could not find or invoke id method on exception Helper class {0}" )
-    INTERNAL badHelperIdMethod( String arg0 ) ;
+    INTERNAL badHelperIdMethod( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=89 )
     @Message( "Tried to write exception of type {0} that was not declared on method" )
-    INTERNAL writeUndeclaredException( String arg0 ) ;
+    INTERNAL writeUndeclaredException( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=90 )
     @Message( "Tried to read undeclared exception with ID {0}" )
@@ -1247,7 +1309,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=92 )
     @Message( "Unexpected exception occurred where no exception should occur" )
-    INTERNAL unexpectedException(  ) ;
+    INTERNAL unexpectedException( @Chain Throwable exc ) ;
     
     @Log( level=LogLevel.WARNING, id=93 )
     @Message( "No invocation handler available for {0}" )
@@ -1271,7 +1333,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=98 )
     @Message( "No such threadpool or queue {0}" )
-    INTERNAL noSuchThreadpoolOrQueue( String arg0 ) ;
+    INTERNAL noSuchThreadpoolOrQueue( @Chain Throwable thr, int arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=99 )
     @Message( "Successfully created IIOP listener on the specified host/port: {0}/{1}" )
@@ -1283,7 +1345,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.SEVERE, id=101 )
     @Message( "Invalid Java serialization version {0}" )
-    INTERNAL invalidJavaSerializationVersion( String arg0 ) ;
+    INTERNAL invalidJavaSerializationVersion( JavaSerializationComponent arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=102 )
     @Message( "Object in ServiceContext map was not of the correct type" )
@@ -1301,7 +1363,7 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=118 )
     @Message( "Ignoring unexpected InterruptedException while waiting for "
         + "next fragment in CorbaMessageMediatorImpl.resumeOptimizedReadProcessing." )
-    INTERNAL resumeOptimizedReadThreadInterrupted(  ) ;
+    INTERNAL resumeOptimizedReadThreadInterrupted( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.SEVERE, id=119 )
     @Message( "Not allowed to get the integer value for an undefined CorbaRequestId." )
@@ -1335,19 +1397,19 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=132 )
     @Message( "Exception occurred in reader thread" )
-    INTERNAL exceptionInReaderThread(  ) ;
+    INTERNAL exceptionInReaderThread( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.FINE, id=133 )
     @Message( "Exception occurred in listener thread" )
-    INTERNAL exceptionInListenerThread(  ) ;
+    INTERNAL exceptionInListenerThread( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=134 )
     @Message( "Exception occurred in handleRequest for a Request message" )
-    INTERNAL exceptionInHandleRequestForRequest(  ) ;
+    INTERNAL exceptionInHandleRequestForRequest( @Chain Throwable thr  ) ;
     
     @Log( level=LogLevel.WARNING, id=135 )
     @Message( "Exception occurred in handleRequest for a LocateRequest message" )
-    INTERNAL exceptionInHandleRequestForLocateRequest(  ) ;
+    INTERNAL exceptionInHandleRequestForLocateRequest( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Data read past end of chunk without closing the chunk" )
@@ -1467,6 +1529,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=24 )
     @Message( "Out call descriptor is missing" )
+    @CS( CSValue.MAYBE )
     MARSHAL nullOutCall(  ) ;
     
     @Log( level=LogLevel.WARNING, id=25 )
@@ -1525,6 +1588,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=35 )
     @Message( "Request message reserved bytes has invalid length" )
+    @CS(CSValue.MAYBE)
     MARSHAL badReservedLength(  ) ;
     
     @Log( level=LogLevel.WARNING, id=36 )
@@ -1712,7 +1776,10 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Locate response indicated that the object was unknown" )
     OBJECT_NOT_EXIST locateUnknownObject(  ) ;
-    
+
+    int BAD_SERVER_ID = CorbaExtension.self.getMinorCode(
+        ORBUtilSystemException.class, "badServerId" ) ;
+
     @Log( level=LogLevel.FINE, id=2 )
     @Message( "The server ID in the target object key does not match the "
         + "server key expected by the server" )
@@ -1744,34 +1811,40 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=1 )
     @Message( "Request cancelled by exception" )
-    TRANSIENT requestCanceled(  ) ;
+    TRANSIENT requestCanceled( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Unknown user exception while unmarshalling" )
+    @CS( CSValue.MAYBE )
     UNKNOWN unknownCorbaExc(  ) ;
     
     @Log( level=LogLevel.WARNING, id=2 )
     @Message( "Unknown user exception thrown by the server - "
         + "exception: {0}; message: {1}" )
-    UNKNOWN runtimeexception( String arg0, String arg1 ) ;
+    @CS( CSValue.MAYBE )
+    UNKNOWN runtimeexception( @Chain Throwable exc, String arg0, String arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Error while marshalling SystemException after DSI-based invocation" )
+    @CS(CSValue.MAYBE)
     UNKNOWN unknownDsiSysex(  ) ;
     
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "Error while unmarshalling SystemException" )
-    UNKNOWN unknownSysex(  ) ;
+    @CS(CSValue.MAYBE)
+    UNKNOWN unknownSysex( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=5 )
     @Message( "InterfaceDef object of wrong type returned by server" )
+    @CS(CSValue.MAYBE)
     UNKNOWN wrongInterfaceDef(  ) ;
     
     @Log( level=LogLevel.WARNING, id=6 )
     @Message( "org.omg.CORBA._InterfaceDefStub class not available" )
-    UNKNOWN noInterfaceDefStub(  ) ;
+    UNKNOWN noInterfaceDefStub( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=7 )
     @Message( "UnknownException in dispatch" )
-    UNKNOWN unknownExceptionInDispatch(  ) ;
+    @CS( CSValue.MAYBE )
+    UNKNOWN unknownExceptionInDispatch( @Chain Exception exc ) ;
 }

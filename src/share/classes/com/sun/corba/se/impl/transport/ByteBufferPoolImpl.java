@@ -43,15 +43,16 @@ package com.sun.corba.se.impl.transport;
 import java.nio.ByteBuffer;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.ByteBufferPool;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 /**
  * @author Charlie Hunt
  */
 public class ByteBufferPoolImpl implements ByteBufferPool {
-    final private static ORBUtilSystemException wrapper = 
-	       ORB.getStaticLogWrapperTable().get_RPC_TRANSPORT_ORBUtil();
+    final private static ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private ByteBuffer byteBufferSlab;
     final private boolean useDirectBuffers;
     final private int byteBufferSlabSize;

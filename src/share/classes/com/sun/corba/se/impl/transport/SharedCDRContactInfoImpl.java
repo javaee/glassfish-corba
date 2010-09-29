@@ -40,10 +40,7 @@
 
 package com.sun.corba.se.impl.transport;
 
-import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 
 import com.sun.corba.se.spi.orb.ORB;
@@ -56,7 +53,7 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.encoding.BufferManagerFactory;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
 import com.sun.corba.se.impl.protocol.SharedCDRClientRequestDispatcherImpl;
 
@@ -69,7 +66,8 @@ public class SharedCDRContactInfoImpl
     // Rather than rewrite the test, just fake it.
     private static int requestId = 0;
 
-    private ORBUtilSystemException wrapper;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     public SharedCDRContactInfoImpl(
         ORB orb,
@@ -81,7 +79,6 @@ public class SharedCDRContactInfoImpl
 	this.contactInfoList = contactInfoList;
 	this.effectiveTargetIOR = effectiveTargetIOR;
         this.addressingDisposition = addressingDisposition;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
 
     public String getType()

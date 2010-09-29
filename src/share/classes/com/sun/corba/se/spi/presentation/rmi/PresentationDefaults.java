@@ -43,11 +43,6 @@ package com.sun.corba.se.spi.presentation.rmi;
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
-import com.sun.corba.se.spi.orb.ORB;
-
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
-import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor;
-
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.presentation.rmi.StubFactoryFactoryStaticImpl;
@@ -55,10 +50,6 @@ import com.sun.corba.se.impl.presentation.rmi.StubFactoryStaticImpl;
 import com.sun.corba.se.impl.presentation.rmi.PresentationManagerImpl ;
 
 import com.sun.corba.se.impl.presentation.rmi.codegen.StubFactoryFactoryCodegenImpl ;
-
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-
-import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
 
 public abstract class PresentationDefaults
 {
@@ -70,8 +61,10 @@ public abstract class PresentationDefaults
     public synchronized static PresentationManager.StubFactoryFactory 
 	getDynamicStubFactoryFactory()
     {
-	if (dynamicImpl == null)
-	    dynamicImpl = new StubFactoryFactoryCodegenImpl( );
+	if (dynamicImpl == null) {
+            dynamicImpl =
+                new StubFactoryFactoryCodegenImpl();
+        }
 
 	return dynamicImpl ;
     }
@@ -79,8 +72,10 @@ public abstract class PresentationDefaults
     public synchronized static PresentationManager.StubFactoryFactory 
 	getStaticStubFactoryFactory()
     {
-	if (staticImpl == null)
-	    staticImpl = new StubFactoryFactoryStaticImpl( );
+	if (staticImpl == null) {
+            staticImpl =
+                new StubFactoryFactoryStaticImpl();
+        }
 
 	return staticImpl ;
     }

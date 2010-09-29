@@ -39,6 +39,7 @@
  */
 package com.sun.corba.se.impl.transport;
 
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import java.nio.channels.SelectionKey;
 
 import com.sun.corba.se.spi.transport.EventHandler;
@@ -56,6 +57,9 @@ public abstract class EventHandlerBase
     implements
 	EventHandler
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     protected ORB orb;
     protected Work work;
     protected boolean useWorkerThreadForEvent;
@@ -118,8 +122,7 @@ public abstract class EventHandlerBase
 	    // REVISIT: need to close connection.
 	    if (throwable != null) {
                 display( "unexpected exception", throwable ) ;
-		throw orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil()
-                         .noSuchThreadpoolOrQueue(throwable);
+		throw wrapper.noSuchThreadpoolOrQueue(throwable, 0);
 	    }
 	} else {
             display( "doWork" ) ;

@@ -49,9 +49,7 @@
 
 package com.sun.corba.se.impl.protocol;
 
-import javax.rmi.CORBA.Tie;
 
-import org.omg.PortableServer.Servant ;
 
 import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.SystemException;
@@ -98,8 +96,8 @@ import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.logging.POASystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.POASystemException;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
 
@@ -107,9 +105,12 @@ import com.sun.corba.se.spi.trace.Subcontract;
 public class CorbaServerRequestDispatcherImpl
     implements CorbaServerRequestDispatcher 
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+    private static final POASystemException poaWrapper =
+        POASystemException.self ;
+
     protected ORB orb; // my ORB instance
-    private ORBUtilSystemException wrapper ;
-    private POASystemException poaWrapper ;
 
     // Added from last version because it broke the build - RTW
     // XXX remove me and rebuild: probably no longer needed
@@ -118,8 +119,6 @@ public class CorbaServerRequestDispatcherImpl
     public CorbaServerRequestDispatcherImpl(ORB orb) 
     {
 	this.orb = orb;
-	wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	poaWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_POA() ;
     }
 
     /** XXX/REVISIT: 
@@ -261,8 +260,7 @@ public class CorbaServerRequestDispatcherImpl
 
             contexts.put( usc ) ;
 
-            SystemException sysex = wrapper.unknownExceptionInDispatch(
-                    CompletionStatus.COMPLETED_MAYBE, ex ) ;
+            SystemException sysex = wrapper.unknownExceptionInDispatch( ex ) ;
             request.getProtocolHandler()
                 .createSystemExceptionResponse(request, sysex,
                     contexts);
@@ -320,8 +318,9 @@ public class CorbaServerRequestDispatcherImpl
         // This must be set just after the enter so that exceptions thrown by
         // enter do not cause
         // the exception reply to pop the thread stack and do an extra oa.exit.
-        if (request != null)
+        if (request != null) {
             request.setExecuteReturnServantInResponseConstructor(true);
+        }
 
         java.lang.Object servant = getServant(objectAdapter, objectId,
             operation);
@@ -332,10 +331,12 @@ public class CorbaServerRequestDispatcherImpl
         // exception.
         String mdi = "unknown" ;
 
-        if (servant instanceof NullServant)
-            handleNullServant(operation, (NullServant)servant);
-        else
-            mdi = objectAdapter.getInterfaces(servant, objectId)[0] ;
+        if (servant instanceof NullServant) {
+            handleNullServant(operation,
+                (NullServant) servant);
+        } else {
+            mdi = objectAdapter.getInterfaces(servant, objectId)[0];
+        }
 
         orb.getPIHandler().setServerPIInfo(servant, mdi);
 
@@ -425,8 +426,7 @@ public class CorbaServerRequestDispatcherImpl
 		IOR ior = scsc.getIOR() ;
 
 		try {
-		    ((CorbaConnection)request.getConnection())
-			.setCodeBaseIOR(ior);
+		    request.getConnection().setCodeBaseIOR(ior);
 		} catch (ThreadDeath td) {
 		    throw td ;
 		} catch (Throwable t) {
@@ -539,14 +539,14 @@ public class CorbaServerRequestDispatcherImpl
 
 		OutputStream stream = null;
 		try {
-		    stream = (OutputStream)invhandle._invoke( operation, 
-                        (org.omg.CORBA.portable.InputStream)req.getInputObject(), req);
+		    stream = invhandle._invoke(operation,
+                        (org.omg.CORBA.portable.InputStream) req.getInputObject(),
+                        req);
 		} catch (BAD_OPERATION e) {
 		    wrapper.badOperationFromInvoke(e, operation);
 		    throw e;
 		}
-		response = (CorbaMessageMediator) 
-		    ((CDROutputObject)stream).getMessageMediator();
+		response = ((CDROutputObject)stream).getMessageMediator();
 	    }
 
 	    return response ;
@@ -662,8 +662,7 @@ public class CorbaServerRequestDispatcherImpl
 
             // The connection's codeSetContext is null until we've received a
             // request with a code set context with the negotiated code sets.
-            CorbaConnection connection =
-                (CorbaConnection)request.getConnection() ;
+            CorbaConnection connection = request.getConnection() ;
 
             synchronized (connection) {
                 if (connection.getCodeSetContext() == null) {

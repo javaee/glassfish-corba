@@ -41,14 +41,10 @@
 package com.sun.corba.se.impl.protocol.giopmsgheaders;
 
 import java.nio.ByteBuffer;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /*
  * This implements the GIOP 1.1 & 1.2 Message header.
@@ -63,15 +59,15 @@ public class Message_1_1
     // Constants
     final static int UPPER_THREE_BYTES_OF_INT_MASK = 0xFF;
 
-    private static ORBUtilSystemException wrapper =  
-	ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
+    private static ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     // Instance variables
-    int magic = (int) 0;
+    int magic = 0;
     GIOPVersion GIOP_version = null;
-    byte flags = (byte) 0;
-    byte message_type = (byte) 0;
-    int message_size = (int) 0;
+    byte flags = 0;
+    byte message_type = 0;
+    int message_size = 0;
 
     // Constructor
 
@@ -158,13 +154,11 @@ public class Message_1_1
         case GIOPCancelRequest :
         case GIOPCloseConnection :
         case GIOPMessageError :
-	    throw wrapper.fragmentationDisallowed(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.fragmentationDisallowed() ;
         case GIOPLocateRequest :
         case GIOPLocateReply :
             if (this.GIOP_version.equals(GIOPVersion.V1_1)) {
-		throw wrapper.fragmentationDisallowed(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.fragmentationDisallowed() ;
             }
             break;
         }
@@ -183,7 +177,7 @@ public class Message_1_1
             return new FragmentMessage_1_2(this);
         }
 
-	throw wrapper.giopVersionError( CompletionStatus.COMPLETED_MAYBE);
+	throw wrapper.giopVersionError() ;
     }
 
     // IO methods

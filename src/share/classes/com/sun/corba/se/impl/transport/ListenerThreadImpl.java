@@ -46,7 +46,7 @@ import com.sun.corba.se.spi.transport.ListenerThread;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 
@@ -56,18 +56,19 @@ public class ListenerThreadImpl
 	ListenerThread,
 	Work
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private ORB orb;
     private CorbaAcceptor acceptor;
     private boolean keepRunning;
     private long enqueueTime;
-    private ORBUtilSystemException wrapper;
 
     public ListenerThreadImpl(ORB orb, CorbaAcceptor acceptor)
     {
 	this.orb = orb;
 	this.acceptor = acceptor;
 	keepRunning = true;
-        wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
 
     ////////////////////////////////////////////////////

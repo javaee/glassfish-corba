@@ -45,7 +45,7 @@ import com.sun.corba.se.spi.transport.ReaderThread;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 
@@ -55,14 +55,14 @@ public class ReaderThreadImpl implements ReaderThread, Work {
     private CorbaConnection connection;
     private boolean keepRunning;
     private long enqueueTime;
-    private ORBUtilSystemException wrapper;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     public ReaderThreadImpl(ORB orb, CorbaConnection connection)
     {
 	this.orb = orb;
 	this.connection = connection;
 	keepRunning = true;
-        wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
 
     ////////////////////////////////////////////////////

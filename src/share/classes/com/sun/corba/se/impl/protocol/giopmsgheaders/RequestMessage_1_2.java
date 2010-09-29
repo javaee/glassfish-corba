@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.spi.trace.Transport ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.2 Request header.
@@ -64,10 +64,12 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 public final class RequestMessage_1_2 extends Message_1_2
         implements RequestMessage {
 
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // Instance variables
 
     private ORB orb = null;
-    private ORBUtilSystemException wrapper = null ;
     private byte response_flags = (byte) 0;
     private byte reserved[] = null;
     private TargetAddress target = null;
@@ -80,7 +82,6 @@ public final class RequestMessage_1_2 extends Message_1_2
     RequestMessage_1_2(ORB orb) {
         this.orb = orb;
 	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
     }
 
     RequestMessage_1_2(ORB orb, int _request_id, byte _response_flags,
@@ -89,7 +90,6 @@ public final class RequestMessage_1_2 extends Message_1_2
         super(Message.GIOPBigMagic, GIOPVersion.V1_2, FLAG_NO_FRAG_BIG_ENDIAN,
             Message.GIOPRequest, 0);
         this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
         request_id = _request_id;
         response_flags = _response_flags;
         reserved = _reserved;
@@ -188,8 +188,7 @@ public final class RequestMessage_1_2 extends Message_1_2
         ostream.write_octet(this.response_flags);
         nullCheck(this.reserved);
         if (this.reserved.length != (3)) {
-            throw wrapper.badReservedLength(
-                org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.badReservedLength() ;
         }
         for (int _i0 = 0;_i0 < (3); ++_i0) {
             ostream.write_octet(this.reserved[_i0]);

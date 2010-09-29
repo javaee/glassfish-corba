@@ -64,7 +64,7 @@ import com.sun.corba.se.spi.servicecontext.ServiceContexts;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaTransportManager;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.orb.ObjectKeyCacheEntryNoObjectAdapterImpl;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
@@ -95,8 +95,8 @@ public abstract class MessageBase implements Message{
     // (encodingVersion >  0x00) implies Java serialization encoding version.
     private byte encodingVersion = ORBConstants.CDR_ENC_VERSION;
 
-    private static ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     // Static methods
 
@@ -139,7 +139,7 @@ public abstract class MessageBase implements Message{
 	    buf = connection.read(GIOPMessageHeaderLength,
 			  0, GIOPMessageHeaderLength );
 	} catch (IOException e) {
-	    throw wrapper.ioexceptionWhenReadingConnection(e, connection.toString());
+	    throw wrapper.ioexceptionWhenReadingConnection(e, connection );
 	}
         
         MessageBase msg = parseGiopHeader(orb, connection, buf, 0);
@@ -191,14 +191,14 @@ public abstract class MessageBase implements Message{
         b1 = (it[0] << 24) & 0xFF000000;
         b2 = (it[1] << 16) & 0x00FF0000;
         b3 = (it[2] << 8)  & 0x0000FF00;
-        b4 = (it[3] << 0)  & 0x000000FF;
+        b4 = (it[3])  & 0x000000FF;
 
         int magic = (b1 | b2 | b3 | b4);
 
         if (magic != GIOPBigMagic) {
             // If Magic is incorrect, it is an error.
             // ACTION : send MessageError and close the connection.
-	    throw wrapper.giopMagicError( CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopMagicError() ;
         }
 
 	// Extract the encoding version from the request GIOP Version,
@@ -240,7 +240,7 @@ public abstract class MessageBase implements Message{
             // ACTION : Send back a MessageError() with the the highest version
             // the server ORB supports, and close the connection.
             if ( it[7] != GIOPMessageError ) {
-		throw wrapper.giopVersionError( CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError() ;
             }
         }
 
@@ -264,8 +264,7 @@ public abstract class MessageBase implements Message{
             } else if ( (it[4] == 0x01) && (it[5] == 0x02) ) { // 1.2
                 msg = new RequestMessage_1_2(orb);
             } else {
-		throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError() ;
             }
             break;
 
@@ -281,8 +280,7 @@ public abstract class MessageBase implements Message{
             } else if ( (it[4] == 0x01) && (it[5] == 0x02) ) { // 1.2
                 msg = new LocateRequestMessage_1_2(orb);
             } else {
-		throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError();
             }
             break;
 
@@ -298,8 +296,7 @@ public abstract class MessageBase implements Message{
             } else if ( (it[4] == 0x01) && (it[5] == 0x02) ) { // 1.2
                 msg = new CancelRequestMessage_1_2();
             } else {
-		throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError() ;
             }
             break;
 
@@ -315,8 +312,7 @@ public abstract class MessageBase implements Message{
             } else if ( (it[4] == 0x01) && (it[5] == 0x02) ) { // 1.2
                 msg = new ReplyMessage_1_2(orb);
             } else {
-		throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError() ;
             }
             break;
 
@@ -332,8 +328,7 @@ public abstract class MessageBase implements Message{
             } else if ( (it[4] == 0x01) && (it[5] == 0x02) ) { // 1.2
                 msg = new LocateReplyMessage_1_2(orb);
             } else {
-		throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError() ;
             }
             break;
 
@@ -367,8 +362,7 @@ public abstract class MessageBase implements Message{
             } else if ( (it[4] == 0x01) && (it[5] == 0x02) ) { // 1.2
                 msg = new Message_1_1();
             } else {
-		throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError() ;
             }
             break;
 
@@ -381,26 +375,23 @@ public abstract class MessageBase implements Message{
                 // not possible (error checking done already)
                 // Throw exception just for completeness, and
                 // for proper dataflow analysis in FindBugs
-		throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError() ;
             } else if ( (it[4] == 0x01) && (it[5] == 0x01) ) { // 1.1
                 msg = new FragmentMessage_1_1();
             } else if ( (it[4] == 0x01) && (it[5] == 0x02) ) { // 1.2
                 msg = new FragmentMessage_1_2();
             } else {
-		throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.giopVersionError() ;
             }
             break;
 
         default:
-            if (orb.giopDebugFlag)
-                dprint(".parseGIOPHeader: UNKNOWN MESSAGE TYPE: "
-		       + it[7]);
+            if (orb.giopDebugFlag) {
+                dprint(".parseGIOPHeader: UNKNOWN MESSAGE TYPE: " + it[7]);
+            }
             // unknown message type ?
             // ACTION : send MessageError and close the connection
-	    throw wrapper.giopVersionError(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopVersionError() ;
         }
 
         //
@@ -463,7 +454,7 @@ public abstract class MessageBase implements Message{
                                                   GIOPMessageHeaderLength);
             viewBuf.get(msgBuf,0,msgBuf.length);
 	    // REVISIT: is giopHeader still used?
-            ((MessageBase)msg).giopHeader = msgBuf;
+            msg.giopHeader = msgBuf;
         }
 
 	msg.setByteBuffer(buf);
@@ -476,8 +467,7 @@ public abstract class MessageBase implements Message{
 			               CorbaConnection connection,
 				       Message msg)
     {
-	CorbaTransportManager ctm = 
-	    (CorbaTransportManager)orb.getTransportManager() ;
+	CorbaTransportManager ctm = orb.getTransportManager() ;
 	MessageTraceManagerImpl mtm = 
 	    (MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
 
@@ -490,7 +480,7 @@ public abstract class MessageBase implements Message{
 	    buf = connection.read(buf, 
 			  GIOPMessageHeaderLength, msgSizeMinusHeader ) ;
 	} catch (IOException e) {
-	    throw wrapper.ioexceptionWhenReadingConnection(e, connection.toString());
+	    throw wrapper.ioexceptionWhenReadingConnection(e, connection );
 	}
 
 	msg.setByteBuffer(buf);
@@ -561,8 +551,7 @@ public abstract class MessageBase implements Message{
 	    msg.setEncodingVersion(encodingVersion);
 	    return msg;
         } else {
-	    throw wrapper.giopVersionError(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopVersionError() ;
         }
     }
 
@@ -592,8 +581,7 @@ public abstract class MessageBase implements Message{
             if (!(gv.equals(GIOPVersion.V1_2))) {        
                 // only object_key based target addressing is allowed for 
                 // GIOP 1.0 & 1.1
-	        throw wrapper.giopVersionError(
-		    CompletionStatus.COMPLETED_MAYBE);
+	        throw wrapper.giopVersionError() ;
             }
     
             // Note: Currently we use response_expected flag to decide if the
@@ -617,8 +605,7 @@ public abstract class MessageBase implements Message{
                 target.ior(iorInfo);  
             } else { 
                 // invalid target addressing disposition value
-	        throw wrapper.illegalTargetAddressDisposition(
-		    CompletionStatus.COMPLETED_NO);
+	        throw wrapper.illegalTargetAddressDisposition() ;
             }
         
 	    requestMessage =
@@ -669,8 +656,7 @@ public abstract class MessageBase implements Message{
 	    msg.setEncodingVersion(encodingVersion);
 	    return msg;
         } else {
-	    throw wrapper.giopVersionError(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopVersionError() ;
         }
     }
 
@@ -690,8 +676,7 @@ public abstract class MessageBase implements Message{
 	    msg.setEncodingVersion(encodingVersion);
 	    return msg;
         } else {
-	    throw wrapper.giopVersionError(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopVersionError() ;
         }
     }
 
@@ -712,8 +697,7 @@ public abstract class MessageBase implements Message{
 	    msg.setEncodingVersion(encodingVersion);
 	    return msg;
         } else {
-	    throw wrapper.giopVersionError(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopVersionError() ;
         }
     }
 
@@ -727,8 +711,7 @@ public abstract class MessageBase implements Message{
         } else if (gv.equals(GIOPVersion.V1_2)) { // 1.2
             return new CancelRequestMessage_1_2(request_id);
         } else {
-	    throw wrapper.giopVersionError(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopVersionError() ;
         }
     }
 
@@ -745,8 +728,7 @@ public abstract class MessageBase implements Message{
                                    FLAG_NO_FRAG_BIG_ENDIAN,
                                    Message.GIOPCloseConnection, 0);
         } else {
-	    throw wrapper.giopVersionError(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopVersionError() ;
         }
     }
 
@@ -763,8 +745,7 @@ public abstract class MessageBase implements Message{
                                    FLAG_NO_FRAG_BIG_ENDIAN,
                                    Message.GIOPMessageError, 0);
         } else {
-	    throw wrapper.giopVersionError(
-		CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.giopVersionError() ;
         }
     }
 
@@ -782,8 +763,7 @@ public abstract class MessageBase implements Message{
 
         if ( (major == 0x01) && (minor == 0x00) ) { // 1.0
             if (msgType == GIOPFragment) {
-		throw wrapper.fragmentationDisallowed( 
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.fragmentationDisallowed( ) ;
             }
         }
 
@@ -792,13 +772,11 @@ public abstract class MessageBase implements Message{
             case GIOPCancelRequest :
             case GIOPCloseConnection :
             case GIOPMessageError :
-		throw wrapper.fragmentationDisallowed( 
-		    CompletionStatus.COMPLETED_MAYBE);
+		throw wrapper.fragmentationDisallowed( ) ;
             case GIOPLocateRequest :
             case GIOPLocateReply :
                 if ( (major == 0x01) && (minor == 0x01) ) { // 1.1
-		    throw wrapper.fragmentationDisallowed( 
-			CompletionStatus.COMPLETED_MAYBE);
+		    throw wrapper.fragmentationDisallowed( ) ;
                 }
                 break;
             }
@@ -888,12 +866,12 @@ public abstract class MessageBase implements Message{
             a1 = (b1 << 24) & 0xFF000000;
             a2 = (b2 << 16) & 0x00FF0000;
             a3 = (b3 << 8)  & 0x0000FF00;
-            a4 = (b4 << 0)  & 0x000000FF;
+            a4 = (b4)  & 0x000000FF;
         } else {
             a1 = (b4 << 24) & 0xFF000000;
             a2 = (b3 << 16) & 0x00FF0000;
             a3 = (b2 << 8)  & 0x0000FF00;
-            a4 = (b1 << 0)  & 0x000000FF;
+            a4 = (b1)  & 0x000000FF;
         }
 
         return (a1 | a2 | a3 | a4);
@@ -912,18 +890,17 @@ public abstract class MessageBase implements Message{
 	SystemException sysEx = null;
 
         try {
-	    Class clazz = ORBClassLoader.loadClass(exClassName);
+	    Class<?> clazz = ORBClassLoader.loadClass(exClassName);
 	    if (message == null) {
 		sysEx = (SystemException) clazz.newInstance();
 	    } else {
-		Class[] types = { String.class };
-		Constructor constructor = clazz.getConstructor(types);
+		Class<?>[] types = { String.class };
+		Constructor<?> constructor = clazz.getConstructor(types);
 		Object[] args = { message };
 		sysEx = (SystemException)constructor.newInstance(args);
 	    }
         } catch (Exception someEx) {
-	    throw wrapper.badSystemExceptionInReply( 
-		CompletionStatus.COMPLETED_MAYBE, someEx );
+	    throw wrapper.badSystemExceptionInReply( someEx );
         }
 
         sysEx.minor = minorCode;
@@ -1049,12 +1026,12 @@ public abstract class MessageBase implements Message{
             b1 = (byteBuffer.get(offset+0) << 24) & 0xFF000000;
             b2 = (byteBuffer.get(offset+1) << 16) & 0x00FF0000;
             b3 = (byteBuffer.get(offset+2) << 8)  & 0x0000FF00;
-            b4 = (byteBuffer.get(offset+3) << 0)  & 0x000000FF;
+            b4 = (byteBuffer.get(offset + 3))  & 0x000000FF;
         } else {
             b1 = (byteBuffer.get(offset+3) << 24) & 0xFF000000;
             b2 = (byteBuffer.get(offset+2) << 16) & 0x00FF0000;
             b3 = (byteBuffer.get(offset+1) << 8)  & 0x0000FF00;
-            b4 = (byteBuffer.get(offset+0) << 0)  & 0x000000FF;
+            b4 = (byteBuffer.get(offset + 0))  & 0x000000FF;
         }
         
         return (b1 | b2 | b3 | b4);

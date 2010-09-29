@@ -40,9 +40,8 @@
 
 package com.sun.corba.se.impl.protocol;
 
-import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.protocol.CorbaRequestId;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 /**
  * Represents a protocol request id.  Currently used to ensure proper
@@ -51,6 +50,9 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
  * @author Charlie Hunt
  */
 public class CorbaRequestIdImpl implements CorbaRequestId {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     final private int value;
     final private boolean defined;
     final static private String UNDEFINED = "?";
@@ -76,8 +78,6 @@ public class CorbaRequestIdImpl implements CorbaRequestId {
         if (defined) {
             return this.value;
         } else {
-            ORBUtilSystemException wrapper =
-                    ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil();
             throw wrapper.undefinedCorbaRequestIdNotAllowed();
         }
     }
@@ -88,6 +88,7 @@ public class CorbaRequestIdImpl implements CorbaRequestId {
     }
 
     /** Does this CorbaRequestId equal another CorbaRequestId ? */
+    @Override
     public boolean equals(Object requestId) {
 
         if (requestId == null || !(requestId instanceof CorbaRequestId)) {
@@ -108,11 +109,13 @@ public class CorbaRequestIdImpl implements CorbaRequestId {
     }
 
     /** Return this CorbaRequestId's hashCode */
+    @Override
     public int hashCode() {
         return this.value;
     }
     
     /** String representing this CorbaRequestId */
+    @Override
     public String toString() {
         if (defined) {
             return Integer.toString(this.value);

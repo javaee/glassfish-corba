@@ -40,8 +40,6 @@
 
 package com.sun.corba.se.impl.protocol.giopmsgheaders;
 
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 
 import org.omg.CORBA_2_3.portable.InputStream;
@@ -51,11 +49,9 @@ import com.sun.corba.se.spi.ior.IORFactories;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.0 LocateReply header.
@@ -66,6 +62,9 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 public final class LocateReplyMessage_1_0 extends Message_1_0
         implements LocateReplyMessage {
+
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     // Instance variables
 
@@ -143,9 +142,7 @@ public final class LocateReplyMessage_1_0 extends Message_1_0
         case OBJECT_FORWARD :
             break;
         default :
-	    ORBUtilSystemException localWrapper = 
-		ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	    throw localWrapper.illegalReplyStatus( CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.illegalReplyStatus() ;
         }
     }
 

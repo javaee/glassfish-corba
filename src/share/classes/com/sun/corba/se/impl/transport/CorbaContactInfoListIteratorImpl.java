@@ -58,7 +58,7 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
 
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
@@ -71,10 +71,12 @@ public class CorbaContactInfoListIteratorImpl
     implements
 	CorbaContactInfoListIterator
 {
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     protected ORB orb;
     protected CorbaContactInfoList contactInfoList;
     protected RuntimeException failureException;
-    protected ORBUtilSystemException wrapper;
     private boolean usePRLB ;
     protected TcpTimeouts tcpTimeouts ;
 
@@ -100,7 +102,6 @@ public class CorbaContactInfoListIteratorImpl
         boolean usePerRequestLoadBalancing )
     {
 	this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 	this.tcpTimeouts = orb.getORBData().getTransportTcpConnectTimeouts() ;
 	this.contactInfoList = corbaContactInfoList;
 	this.primaryContactInfo = primaryContactInfo;
@@ -159,8 +160,7 @@ public class CorbaContactInfoListIteratorImpl
                 // NOTE: Need to indicate the timeout.
                 // And it needs to break the loop in the delegate.
                 failureException = wrapper.communicationsRetryTimeout(
-                    failureException,
-                        Long.toString(tcpTimeouts.get_max_time_to_wait()));
+                    failureException, tcpTimeouts.get_max_time_to_wait());
                 return false;
             }
 
@@ -306,9 +306,7 @@ public class CorbaContactInfoListIteratorImpl
     public RuntimeException getFailureException()
     {
 	if (failureException == null) {
-	    return
-		orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil()
-		    .invalidContactInfoListIteratorFailureException();
+	    return wrapper.invalidContactInfoListIteratorFailureException() ;
 	} else {
 	    return failureException;
 	}

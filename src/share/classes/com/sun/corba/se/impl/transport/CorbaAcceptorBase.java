@@ -42,7 +42,7 @@ package com.sun.corba.se.impl.transport;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.oa.poa.Policies;
 import com.sun.corba.se.spi.extension.RequestPartitioningPolicy;
 import com.sun.corba.se.spi.ior.IORTemplate;
@@ -88,6 +88,9 @@ public abstract class CorbaAcceptorBase
 	LegacyServerSocketEndPointInfo
 	// END Legacy
 {
+    protected ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     protected int port ;
     protected long enqueueTime;
     protected boolean initialized = false ;
@@ -99,7 +102,6 @@ public abstract class CorbaAcceptorBase
     protected int locatorPort;
     // END legacy
 
-    protected ORBUtilSystemException wrapper;
     protected CorbaInboundConnectionCache connectionCache;
 
     public int getPort() {
@@ -128,7 +130,6 @@ public abstract class CorbaAcceptorBase
 				       String name, String type)
     {
 	this.orb = orb;
-	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 
 	setWork(this);
 

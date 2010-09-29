@@ -46,20 +46,19 @@ import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
 import com.sun.corba.se.spi.ior.TaggedComponentBase;
 import com.sun.corba.se.spi.ior.iiop.ClusterInstanceInfoComponent;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-
-import com.sun.corba.se.spi.orb.ORB ;
 
 public class ClusterInstanceInfoComponentImpl extends TaggedComponentBase 
     implements ClusterInstanceInfoComponent {
 
     private final ClusterInstanceInfo clusterInstanceInfoValue;
 
+    @Override
     public boolean equals(Object obj)
     {
-	if (!(obj instanceof ClusterInstanceInfoComponentImpl))
-	    return false ;
+	if (!(obj instanceof ClusterInstanceInfoComponentImpl)) {
+            return false;
+        }
 
 	ClusterInstanceInfoComponentImpl other = 
 	    (ClusterInstanceInfoComponentImpl)obj ;
@@ -68,10 +67,12 @@ public class ClusterInstanceInfoComponentImpl extends TaggedComponentBase
             other.clusterInstanceInfoValue ) ;
     }
 
+    @Override
     public int hashCode() {
 	return clusterInstanceInfoValue.hashCode() ;
     }
 
+    @Override
     public String toString() {
 	return "ClusterInstanceInfoComponentImpl[clusterInstanceInfoValue=" 
             + clusterInstanceInfoValue + "]" ;

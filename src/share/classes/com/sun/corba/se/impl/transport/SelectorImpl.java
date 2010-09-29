@@ -62,7 +62,7 @@ import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 
@@ -83,6 +83,9 @@ public class SelectorImpl
     implements
 	com.sun.corba.se.spi.transport.Selector
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private ORB orb;
     private Selector selector;
     private long timeout;
@@ -92,7 +95,6 @@ public class SelectorImpl
     private final Map<EventHandler,ReaderThread>  readerThreads;
     private boolean selectorStarted;
     private volatile boolean closed;
-    private ORBUtilSystemException wrapper ;
 
     // XXX This needs more work on statistics:
     // - how many registered events of different types?
@@ -122,7 +124,6 @@ public class SelectorImpl
 	listenerThreads = new HashMap<EventHandler,ListenerThread>();
 	readerThreads = new HashMap<EventHandler,ReaderThread>();
 	closed = false;
-	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
     }
 
     public void setTimeout(long timeout) 

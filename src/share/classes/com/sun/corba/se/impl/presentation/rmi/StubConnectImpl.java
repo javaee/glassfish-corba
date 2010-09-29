@@ -58,15 +58,14 @@ import com.sun.corba.se.impl.util.Utility;
 
 import com.sun.corba.se.impl.ior.StubIORImpl ;
 
-import com.sun.corba.se.impl.logging.UtilSystemException ;
+import com.sun.corba.se.spi.logging.UtilSystemException ;
 
 import com.sun.corba.se.impl.corba.CORBAObjectImpl ;
 
 public abstract class StubConnectImpl 
 {
     private static UtilSystemException wrapper = 
-	com.sun.corba.se.spi.orb.ORB
-	    .getStaticLogWrapperTable().get_RMIIIOP_Util() ;
+        UtilSystemException.self ;
 
     /** Connect the stub to the orb if necessary.  
     * @param ior The StubIORImpl for this stub (may be null)

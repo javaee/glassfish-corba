@@ -40,19 +40,15 @@
 
 package com.sun.corba.se.impl.presentation.rmi;
 
-import java.rmi.Remote ;
 import javax.rmi.CORBA.Tie ;
 
 import org.omg.CORBA.CompletionStatus;
 
-import org.omg.CORBA.portable.IDLEntity ;
-
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
-import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
@@ -61,11 +57,10 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 public abstract class StubFactoryFactoryDynamicBase extends 
     StubFactoryFactoryBase
 {
-    protected final ORBUtilSystemException wrapper ; 
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
-    public StubFactoryFactoryDynamicBase() 
-    {
-	wrapper = ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
+    public StubFactoryFactoryDynamicBase() {
     }
 
     public PresentationManager.StubFactory createStubFactory(
@@ -78,8 +73,7 @@ public abstract class StubFactoryFactoryDynamicBase extends
 	    cls = Util.getInstance().loadClass( className, remoteCodeBase, 
 		classLoader ) ;
 	} catch (ClassNotFoundException exc) {
-	    throw wrapper.classNotFound3( 
-		CompletionStatus.COMPLETED_MAYBE, exc, className ) ;
+	    throw wrapper.classNotFound3( exc, className ) ;
 	}
 
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
@@ -106,7 +100,7 @@ public abstract class StubFactoryFactoryDynamicBase extends
     public Tie getTie( Class cls )
     {
 	PresentationManager pm = ORB.getPresentationManager() ;
-	return new ReflectiveTie( pm, wrapper ) ;
+	return new ReflectiveTie( pm ) ;
     }
 
     public boolean createsDynamicStubs() 

@@ -54,8 +54,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher;
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 /**
  * INSServerRequestDispatcher handles all INS related discovery request. The INS Service
@@ -68,13 +67,13 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 public class INSServerRequestDispatcher 
     implements CorbaServerRequestDispatcher 
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private ORB orb = null;
-    private ORBUtilSystemException wrapper ;
 
     public INSServerRequestDispatcher( ORB orb ) {
         this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
     }
 
     // Need to signal one of OBJECT_HERE, OBJECT_FORWARD, OBJECT_NOT_EXIST.

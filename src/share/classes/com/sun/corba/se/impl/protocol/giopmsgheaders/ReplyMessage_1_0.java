@@ -40,12 +40,10 @@
 
 package com.sun.corba.se.impl.protocol.giopmsgheaders;
 
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA_2_3.portable.InputStream;
 
-import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactories;
 
 import com.sun.corba.se.spi.orb.ORB;
@@ -57,7 +55,7 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.0 Reply header.
@@ -69,10 +67,12 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 public final class ReplyMessage_1_0 extends Message_1_0
         implements ReplyMessage {
 
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // Instance variables
 
     private ORB orb = null;
-    private ORBUtilSystemException wrapper = null ;
     private ServiceContexts service_contexts = null;
     private int request_id = (int) 0;
     private int reply_status = (int) 0;
@@ -86,14 +86,12 @@ public final class ReplyMessage_1_0 extends Message_1_0
     ReplyMessage_1_0(ORB orb) {
 	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
         this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
     }
 
     ReplyMessage_1_0(ORB orb, ServiceContexts _service_contexts,
             int _request_id, int _reply_status, IOR _ior) {
         super(Message.GIOPBigMagic, false, Message.GIOPReply, 0);
         this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
         service_contexts = _service_contexts;
         request_id = _request_id;
         reply_status = _reply_status;
@@ -161,8 +159,7 @@ public final class ReplyMessage_1_0 extends Message_1_0
                 this.completionStatus = CompletionStatus.COMPLETED_MAYBE;
                 break;
             default:
-		throw wrapper.badCompletionStatusInReply( 
-		    CompletionStatus.COMPLETED_MAYBE, status );
+		throw wrapper.badCompletionStatusInReply( status );
             }
 
         } else if (this.reply_status == USER_EXCEPTION) {
@@ -194,9 +191,7 @@ public final class ReplyMessage_1_0 extends Message_1_0
         case LOCATION_FORWARD :
             break;
         default :
-	    ORBUtilSystemException localWrapper = 
-		ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	    throw localWrapper.illegalReplyStatus( CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.illegalReplyStatus();
         }
     }
 

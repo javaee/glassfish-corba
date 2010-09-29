@@ -40,7 +40,6 @@
 
 package com.sun.corba.se.impl.protocol.giopmsgheaders;
 
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA_2_3.portable.InputStream;
@@ -58,9 +57,8 @@ import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.spi.trace.Transport ;
 
@@ -75,15 +73,17 @@ import com.sun.corba.se.spi.trace.Transport ;
 public final class ReplyMessage_1_2 extends Message_1_2
         implements ReplyMessage {
 
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // Instance variables
 
     private ORB orb = null;
-    private ORBUtilSystemException wrapper = null ;
-    private int reply_status = (int) 0;
+    private int reply_status = 0;
     private ServiceContexts service_contexts = null ;
     private IOR ior = null;
     private String exClassName = null;
-    private int minorCode = (int) 0;
+    private int minorCode = 0;
     private CompletionStatus completionStatus = null;
     private short addrDisposition = KeyAddr.value; // default;
     
@@ -92,7 +92,6 @@ public final class ReplyMessage_1_2 extends Message_1_2
     ReplyMessage_1_2(ORB orb) {
 	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
         this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
     }
 
     ReplyMessage_1_2(ORB orb, int _request_id, int _reply_status,
@@ -100,12 +99,13 @@ public final class ReplyMessage_1_2 extends Message_1_2
         super(Message.GIOPBigMagic, GIOPVersion.V1_2, FLAG_NO_FRAG_BIG_ENDIAN,
             Message.GIOPReply, 0);
         this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
         request_id = _request_id;
         reply_status = _reply_status;
         service_contexts = _service_contexts;
-	if (service_contexts == null)
-	    service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
+	if (service_contexts == null) {
+            service_contexts =
+                ServiceContextDefaults.makeServiceContexts(orb);
+        }
         ior = _ior;
     }
 
@@ -178,8 +178,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
                 this.completionStatus = CompletionStatus.COMPLETED_MAYBE;
                 break;
             default:
-                throw wrapper.badCompletionStatusInReply( 
-                    CompletionStatus.COMPLETED_MAYBE, status );
+                throw wrapper.badCompletionStatusInReply( status ) ;
             }
 
         } else if (this.reply_status == USER_EXCEPTION) {
@@ -227,9 +226,7 @@ public final class ReplyMessage_1_2 extends Message_1_2
         case NEEDS_ADDRESSING_MODE :
             break;
         default :
-	    ORBUtilSystemException localWrapper = 
-		ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	    throw localWrapper.illegalReplyStatus( CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.illegalReplyStatus() ;
         }
     }
 

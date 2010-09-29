@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.TemporarySelectorState;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.trace.Transport;
 
 /**
@@ -63,6 +63,8 @@ import com.sun.corba.se.spi.trace.Transport;
  */
 @Transport
 public class TemporarySelectorStateOpen implements TemporarySelectorState {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     final static AtomicInteger tsCount = new AtomicInteger(0);
     private ORB itsOrb;
@@ -88,8 +90,6 @@ public class TemporarySelectorStateOpen implements TemporarySelectorState {
             if (theTimeout > 0) {
                 result = theSelector.select(theTimeout);
             } else {
-                ORBUtilSystemException wrapper =
-		     itsOrb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
                 throw wrapper.temporarySelectorSelectTimeoutLessThanOne(
                     theSelector, theTimeout);
             }

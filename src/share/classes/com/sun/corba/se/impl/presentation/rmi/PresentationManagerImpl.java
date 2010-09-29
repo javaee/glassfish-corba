@@ -70,7 +70,7 @@ import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 
 import com.sun.corba.se.impl.util.RepositoryId ;
@@ -83,11 +83,13 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 public final class PresentationManagerImpl implements PresentationManager
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private Map<Class<?>,ClassData> classToClassData ;
     private Map<Method,DynamicMethodMarshaller> methodToDMM ;
     private PresentationManager.StubFactoryFactory staticStubFactoryFactory ;
     private PresentationManager.StubFactoryFactory dynamicStubFactoryFactory ;
-    private ORBUtilSystemException wrapper = null ;
     private boolean useDynamicStubs ;
     private boolean debug ;
     private PrintStream ps ;
@@ -95,8 +97,6 @@ public final class PresentationManagerImpl implements PresentationManager
     public PresentationManagerImpl( boolean useDynamicStubs )
     {
 	this.useDynamicStubs = useDynamicStubs ;
-	wrapper = ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
-
 	classToClassData = new WeakHashMap<Class<?>,ClassData>() ;
 	methodToDMM = new WeakHashMap<Method,DynamicMethodMarshaller>() ;
     }

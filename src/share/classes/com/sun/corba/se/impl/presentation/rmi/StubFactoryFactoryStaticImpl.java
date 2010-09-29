@@ -53,15 +53,15 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 public class StubFactoryFactoryStaticImpl extends 
     StubFactoryFactoryBase 
 {
-    private ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     public PresentationManager.StubFactory createStubFactory(
 	String className, boolean isIDLStub, String remoteCodeBase, Class 
@@ -100,14 +100,12 @@ public class StubFactoryFactoryStaticImpl extends
 		expectedTypeClassLoader ) ;
 	} catch (ClassNotFoundException e1) {
 	    // log only at FINE level
-	    wrapper.classNotFound1( CompletionStatus.COMPLETED_MAYBE,
-		e1, firstStubName ) ;
+	    wrapper.classNotFound1( e1, firstStubName ) ;
 	    try {
 		clz = Util.getInstance().loadClass( secondStubName, remoteCodeBase, 
 		    expectedTypeClassLoader ) ;
 	    } catch (ClassNotFoundException e2) {
-		throw wrapper.classNotFound2( 
-		    CompletionStatus.COMPLETED_MAYBE, e2, secondStubName ) ;
+		throw wrapper.classNotFound2( e2, secondStubName ) ;
 	    }
 	}
 

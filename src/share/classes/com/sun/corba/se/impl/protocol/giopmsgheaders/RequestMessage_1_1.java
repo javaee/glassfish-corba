@@ -46,7 +46,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.1 Request header.
@@ -58,12 +58,14 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 public final class RequestMessage_1_1 extends Message_1_1
         implements RequestMessage {
 
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // Instance variables
 
     private ORB orb = null;
-    private ORBUtilSystemException wrapper = null ;
     private ServiceContexts service_contexts = null;
-    private int request_id = (int) 0;
+    private int request_id = 0;
     private boolean response_expected = false;
     private byte[] reserved = null; // Added in GIOP 1.1
     private byte[] object_key = null;
@@ -77,7 +79,6 @@ public final class RequestMessage_1_1 extends Message_1_1
     RequestMessage_1_1(ORB orb) {
         this.orb = orb;
 	this.service_contexts = ServiceContextDefaults.makeServiceContexts( orb ) ;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
     }
 
     @SuppressWarnings({"deprecation"})
@@ -88,7 +89,6 @@ public final class RequestMessage_1_1 extends Message_1_1
         super(Message.GIOPBigMagic, GIOPVersion.V1_1, FLAG_NO_FRAG_BIG_ENDIAN,
             Message.GIOPRequest, 0);
         this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
         service_contexts = _service_contexts;
         request_id = _request_id;
         response_expected = _response_expected;
@@ -169,8 +169,7 @@ public final class RequestMessage_1_1 extends Message_1_1
         ostream.write_boolean(this.response_expected);
         nullCheck(this.reserved);
         if (this.reserved.length != (3)) {
-	    throw wrapper.badReservedLength( 
-		org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.badReservedLength( );
         }
         for (int _i0 = 0;_i0 < (3); ++_i0) {
             ostream.write_octet(this.reserved[_i0]);

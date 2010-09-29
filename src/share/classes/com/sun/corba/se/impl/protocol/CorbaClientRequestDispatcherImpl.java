@@ -90,7 +90,7 @@ import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.CodeSetConversion;
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
@@ -109,6 +109,9 @@ public class CorbaClientRequestDispatcherImpl
     implements
 	CorbaClientRequestDispatcher
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // Used for locking
     private final Object lock = new Object();
 
@@ -328,8 +331,6 @@ public class CorbaClientRequestDispatcherImpl
                 return beginRequest(self, opName, isOneWay, contactInfo);
             } else {
                 retryMessage( "RemarshalException: hasNext false" ) ;
-                ORBUtilSystemException wrapper =
-                    orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
                 throw wrapper.remarshalWithNowhereToGo();
             }
         }
@@ -456,9 +457,6 @@ public class CorbaClientRequestDispatcherImpl
     protected CDRInputObject processResponse(ORB orb, 
         CorbaMessageMediator messageMediator, CDRInputObject inputObject)
 	throws ApplicationException, org.omg.CORBA.portable.RemarshalException {
-
-	ORBUtilSystemException wrapper = 
-	    orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
         operationAndId(messageMediator.getOperationName(),
             messageMediator.getRequestId() );
@@ -816,8 +814,6 @@ public class CorbaClientRequestDispatcherImpl
     {
 	ServiceContexts ctxts = messageMediator.getReplyServiceContexts();
 	ServiceContext sc ;
-	ORBUtilSystemException wrapper = 
-	    orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
         if (ctxts == null) {
             return; // no service context available, return gracefully.

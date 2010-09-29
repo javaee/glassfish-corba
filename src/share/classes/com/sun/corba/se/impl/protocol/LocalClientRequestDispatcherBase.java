@@ -61,8 +61,8 @@ import com.sun.corba.se.spi.ior.TaggedProfile;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
 import com.sun.corba.se.spi.ior.ObjectId; 
 
-import com.sun.corba.se.impl.logging.POASystemException;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.POASystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
@@ -70,6 +70,11 @@ import com.sun.corba.se.spi.trace.Subcontract;
 @Subcontract
 public abstract class LocalClientRequestDispatcherBase implements LocalClientRequestDispatcher
 {
+    protected static final POASystemException poaWrapper =
+        POASystemException.self ;
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // XXX May want to make some of this configuratble as in the remote case
     // XXX Should this be unified?  How can we better handle this retry/backoff
     // implementation with a single implementation?
@@ -87,8 +92,6 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     protected ObjectAdapterFactory oaf ;
     protected ObjectAdapterId oaid ;
     protected byte[] objectId ;
-    protected POASystemException poaWrapper ;
-    protected ORBUtilSystemException wrapper ;
 
     // If isNextIsLocalValid.get() == Boolean.TRUE, 
     // the next call to isLocal should be valid
@@ -102,8 +105,6 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     protected LocalClientRequestDispatcherBase(ORB orb, int scid, IOR ior)
     {
 	this.orb = orb ;
-	wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	poaWrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_POA() ;
 
 	TaggedProfile prof = ior.getProfile() ;
 	servantIsLocal = orb.getORBData().isLocalOptimizationAllowed() && 
@@ -145,10 +146,11 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     */
     public boolean useLocalInvocation( org.omg.CORBA.Object self ) 
     {
-	if (isNextCallValid.get() == Boolean.TRUE)
-	    return servantIsLocal ;
-	else
-	    isNextCallValid.set( Boolean.TRUE ) ;
+	if (isNextCallValid.get() == Boolean.TRUE) {
+            return servantIsLocal;
+        } else {
+            isNextCallValid.set(Boolean.TRUE);
+        }
 
 	return false ;    
     }
@@ -160,8 +162,9 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     protected boolean checkForCompatibleServant( ServantObject so, 
 	Class expectedType )
     {
-	if (so == null)
-	    return false ;
+	if (so == null) {
+            return false;
+        }
 
 	// Normally, this test will never fail.  However, if the servant
 	// and the stub were loaded in different class loaders, this test
@@ -268,9 +271,7 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
                 setLocatedIOR( ior ) ;
                 */
                 display( "Unsupported ForwardException" ) ;
-                RuntimeException runexc = new RuntimeException("deal with this.");
-                runexc.initCause( ex ) ;
-                throw runexc ;
+                throw new RuntimeException("deal with this.", ex) ;
             } catch ( ThreadDeath ex ) {
                 // ThreadDeath on the server side should not cause a client
                 // side thread death in the local case.  We want to preserve

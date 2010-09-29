@@ -40,25 +40,22 @@
 
 package com.sun.corba.se.impl.protocol ;
 
-import javax.rmi.CORBA.Tie;
 
-import org.omg.CORBA.SystemException ;
-import org.omg.CORBA.NO_IMPLEMENT ;
-import org.omg.CORBA.OBJECT_NOT_EXIST ;
-import org.omg.CORBA.CompletionStatus ;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 
 import com.sun.corba.se.spi.oa.ObjectAdapter;
-import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import com.sun.corba.se.spi.oa.NullServant ;
 
 public abstract class SpecialMethod {
+    static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     public abstract boolean isNonExistentMethod() ;
     public abstract String getName();
     public abstract CorbaMessageMediator invoke(java.lang.Object servant,
@@ -67,9 +64,11 @@ public abstract class SpecialMethod {
 						ObjectAdapter objectAdapter);
 
     public static final SpecialMethod getSpecialMethod(String operation) {
-	for(int i = 0; i < methods.length; i++)
-	    if (methods[i].getName().equals(operation))
-		return methods[i];
+	for(int i = 0; i < methods.length; i++) {
+            if (methods[i].getName().equals(operation)) {
+                return methods[i];
+            }
+        }
 	return null;
     }
 
@@ -105,6 +104,7 @@ class NonExistent extends SpecialMethod {
 }
 
 class NotExistent extends NonExistent {
+    @Override
     public String getName() {		// _not_existent
 	return "_not_existent";
     }
@@ -125,10 +125,6 @@ class IsA extends SpecialMethod  {	// _is_a
 				       ObjectAdapter objectAdapter)
     {
 	if ((servant == null) || (servant instanceof NullServant)) {
-	    ORB orb = (ORB)request.getBroker() ;
-	    ORBUtilSystemException wrapper = 
-		orb.getLogWrapperTable().get_OA_INVOCATION_ORBUtil() ;
-
 	    return request.getProtocolHandler().createSystemExceptionResponse(
 		request, wrapper.badSkeleton(), null);
 	}
@@ -137,11 +133,12 @@ class IsA extends SpecialMethod  {	// _is_a
 	String clientId = 
 	    ((InputStream)request.getInputObject()).read_string();
 	boolean answer = false;
-	for(int i = 0; i < ids.length; i++)
-	    if (ids[i].equals(clientId)) {
-    		answer = true;
-    		break;
-	    }
+	for(int i = 0; i < ids.length; i++) {
+            if (ids[i].equals(clientId)) {
+                answer = true;
+                break;
+            }
+        }
 	    
 	CorbaMessageMediator response =
 	    request.getProtocolHandler().createResponse(request, null);
@@ -164,10 +161,6 @@ class GetInterface extends SpecialMethod  {	// _get_interface
 				       byte[] objectId,
 				       ObjectAdapter objectAdapter)
     {
-	ORB orb = (ORB)request.getBroker() ;
-	ORBUtilSystemException wrapper = 
-	    orb.getLogWrapperTable().get_OA_INVOCATION_ORBUtil() ;
-
 	if ((servant == null) || (servant instanceof NullServant)) {
 	    return request.getProtocolHandler().createSystemExceptionResponse(
 		request, wrapper.badSkeleton(), null);

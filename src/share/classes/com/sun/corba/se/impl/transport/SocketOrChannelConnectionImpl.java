@@ -87,7 +87,7 @@ import com.sun.corba.se.spi.transport.TcpTimeouts;
 import com.sun.corba.se.impl.encoding.CachedCodeBase;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
@@ -111,8 +111,8 @@ public class SocketOrChannelConnectionImpl
         CorbaConnection,
 	Work
 {
-
-    final private static boolean dprintWriteLocks = false;
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     ///
     // New transport.
@@ -169,7 +169,6 @@ public class SocketOrChannelConnectionImpl
     // necessary.
     protected CachedCodeBase cachedCodeBase = new CachedCodeBase(this);
 
-    protected ORBUtilSystemException wrapper ;
 
     // transport read / write timeout values
     protected TcpTimeouts tcpTimeouts;
@@ -202,7 +201,6 @@ public class SocketOrChannelConnectionImpl
     protected SocketOrChannelConnectionImpl(ORB orb)
     {
 	this.orb = orb;
-	wrapper =  orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 
 	setWork(this);
 	responseWaitingRoom = new CorbaResponseWaitingRoomImpl(orb, this);
@@ -369,7 +367,7 @@ public class SocketOrChannelConnectionImpl
 		throw 
 		    new RuntimeException("SocketOrChannelConnectionImpl.readBits");
 	    }
-	    return (CorbaMessageMediator) messageMediator;
+	    return messageMediator;
 
 	} catch (ThreadDeath td) {
 	    try {
@@ -991,7 +989,7 @@ public class SocketOrChannelConnectionImpl
 
         try {
             // Write the fragment/message
-	    CDROutputObject cdrOutputObject = (CDROutputObject) outputObject;
+	    CDROutputObject cdrOutputObject = outputObject;
 	    cdrOutputObject.writeTo(this);
 
 	    // REVISIT - no flush?
@@ -1007,8 +1005,8 @@ public class SocketOrChannelConnectionImpl
             // IIOPOutputStream will cleanup the connection info when it
             // sees this exception.
 	    final SystemException sysexc = (state == CLOSE_RECVD) ?
-		wrapper.connectionRebind( CompletionStatus.COMPLETED_MAYBE, exc ) :
-	        wrapper.writeErrorSend(CompletionStatus.COMPLETED_MAYBE, exc ) ;
+		wrapper.connectionRebindMaybe( exc ) :
+	        wrapper.writeErrorSend(exc ) ;
 
 	    purgeCalls( sysexc, false, true ) ;
 
@@ -1128,8 +1126,7 @@ public class SocketOrChannelConnectionImpl
 
     public CorbaMessageMediator serverRequestMapGet(int reqId)
     {
-	return (CorbaMessageMediator)
-	    serverRequestMap.get(reqId);
+	return serverRequestMap.get(reqId);
     }
 
     public void serverRequestMapRemove(int reqId)
@@ -1334,7 +1331,7 @@ public class SocketOrChannelConnectionImpl
         // Notify waiters (server-side processing only)
 
         if (serverRequest_1_1 != null) { // GIOP 1.1
-            ((CorbaMessageMediator)serverRequest_1_1).cancelRequest();
+            serverRequest_1_1.cancelRequest();
         }
 
         if (serverRequestMap != null) { // GIOP 1.2
@@ -1406,7 +1403,7 @@ public class SocketOrChannelConnectionImpl
     {
 	// REVISIT: See comments in CDROutputObject constructor.
         CDROutputObject outputObject = 
-	    new CDROutputObject((ORB)orb, null, giopVersion, this, msg,
+	    new CDROutputObject(orb, null, giopVersion, this, msg,
 				ORBConstants.STREAM_FORMAT_VERSION_1);
         msg.write(outputObject);
 
@@ -1591,8 +1588,9 @@ public class SocketOrChannelConnectionImpl
                         // reset waiter because we got some data
 			waiter = tcpTimeouts.waiter() ;
                     } else if (bytesRead < 0) {
+                        Exception exc = new IOException("End-of-stream") ;
                         throw wrapper.blockingReadEndOfStream( 
-			    new IOException("End-of-Stream"), this.toString());
+			    exc, exc.toString(), this.toString());
                     } else { // bytesRead == 0, unlikely but possible
 			waiter.advance() ;
                     }
@@ -1608,8 +1606,7 @@ public class SocketOrChannelConnectionImpl
                 // failed to read data when we were expecting more
                 // and exceeded time willing to wait for additional data
                 throw wrapper.blockingReadTimeout(
-		    Long.valueOf(tcpTimeouts.get_max_time_to_wait()), 
-		    Long.valueOf(waiter.timeWaiting()));
+		    tcpTimeouts.get_max_time_to_wait(), waiter.timeWaiting());
             }
         } catch (IOException ioe) {
             throw wrapper.exceptionBlockingReadWithTemporarySelector( ioe, this ) ;
@@ -1779,8 +1776,9 @@ public class SocketOrChannelConnectionImpl
                                final CorbaMessageMediatorImpl messageMediator) {
         // Add messageMediator to work queue
         Throwable throwable = null;
+        int poolToUse = -1 ;
         try {
-            int poolToUse = messageMediator.getThreadPoolToUse();
+            poolToUse = messageMediator.getThreadPoolToUse();
             orb.getThreadPoolManager().getThreadPool(poolToUse)
                .getWorkQueue(0).addWork(messageMediator);
         } catch (NoSuchThreadPoolException e) {
@@ -1790,7 +1788,7 @@ public class SocketOrChannelConnectionImpl
         }
         // REVISIT: need to close connection?
         if (throwable != null) {
-            throw wrapper.noSuchThreadpoolOrQueue(throwable);
+            throw wrapper.noSuchThreadpoolOrQueue(throwable, poolToUse );
         }
     }
 

@@ -40,15 +40,7 @@
 
 package com.sun.corba.se.impl.presentation.rmi ;
 
-import java.io.Serializable ;
-import java.io.Externalizable ;
-
-import javax.rmi.PortableRemoteObject ;
-
-import java.rmi.RemoteException ;
 import java.rmi.UnexpectedException ;
-
-import org.omg.CORBA.UserException ;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
@@ -56,7 +48,7 @@ import org.omg.CORBA.portable.ApplicationException ;
 
 import java.lang.reflect.Method ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -64,9 +56,10 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 public class ExceptionHandlerImpl implements ExceptionHandler 
 {
-    private ExceptionRW[] rws ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self;
 
-    private final ORBUtilSystemException wrapper ;
+    private ExceptionRW[] rws ;
 
 ///////////////////////////////////////////////////////////////////////////////
 // ExceptionRW interface and implementations.  
@@ -192,8 +185,6 @@ public class ExceptionHandlerImpl implements ExceptionHandler
 
     public ExceptionHandlerImpl( Class[] exceptions )
     {
-	wrapper = ORB.getStaticLogWrapperTable().get_RPC_PRESENTATION_ORBUtil() ;
-
 	int count = 0 ;
 	for (int ctr=0; ctr<exceptions.length; ctr++) {
 	    Class cls = exceptions[ctr] ;

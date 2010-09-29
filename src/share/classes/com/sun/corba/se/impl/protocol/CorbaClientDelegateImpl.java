@@ -42,8 +42,6 @@ package com.sun.corba.se.impl.protocol;
 
 import java.util.Iterator;
 
-
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.Context;
 import org.omg.CORBA.ContextList;
 import org.omg.CORBA.ExceptionList;
@@ -73,7 +71,7 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.corba.RequestImpl;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.util.JDKBridge;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -92,7 +90,8 @@ import com.sun.corba.se.spi.trace.Subcontract;
 public class CorbaClientDelegateImpl extends CorbaClientDelegate 
 {
     private ORB orb;
-    private ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private CorbaContactInfoList contactInfoList;
 
@@ -101,7 +100,6 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     {
 	this.orb = orb;
 	// this.tp = orb.getTimerManager().points() ;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 	this.contactInfoList = contactInfoList;
     }
     
@@ -275,9 +273,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 
     private CorbaClientRequestDispatcher getClientRequestDispatcher()
     {
-        return (CorbaClientRequestDispatcher)
-            ((CorbaInvocationInfo)orb.getInvocationInfo())
-	    .getClientRequestDispatcher();
+        return ((CorbaInvocationInfo) orb.getInvocationInfo()).getClientRequestDispatcher();
     }
 
     public org.omg.CORBA.Object get_interface_def(org.omg.CORBA.Object obj) 
@@ -288,14 +284,14 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 
         try {
 	    OutputStream os = request(null, "_interface", true);
-	    is = (InputStream) invoke((org.omg.CORBA.Object)null, os);
+	    is = invoke((org.omg.CORBA.Object) null, os);
 
-	    org.omg.CORBA.Object objimpl = 
-		(org.omg.CORBA.Object) is.read_Object();
+	    org.omg.CORBA.Object objimpl = is.read_Object();
 
 	    // check if returned object is of correct type
-	    if ( !objimpl._is_a("IDL:omg.org/CORBA/InterfaceDef:1.0") )
-		throw wrapper.wrongInterfaceDef(CompletionStatus.COMPLETED_MAYBE);
+	    if ( !objimpl._is_a("IDL:omg.org/CORBA/InterfaceDef:1.0") ) {
+                throw wrapper.wrongInterfaceDef();
+            }
 
 	    try {
                 stub = (org.omg.CORBA.Object)
@@ -314,7 +310,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	} catch (RemarshalException e) {
 	    return get_interface_def(obj);
 	} finally {
-	    releaseReply((org.omg.CORBA.Object)null, (InputStream)is);
+	    releaseReply((org.omg.CORBA.Object)null, is);
         }
 
 	return stub;
@@ -364,7 +360,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 
                 OutputStream os = request(null, "_is_a", true);
                 os.write_string(dest);
-                is = (InputStream) invoke((org.omg.CORBA.Object) null, os);
+                is = invoke((org.omg.CORBA.Object) null, os);
                 boolean result = is.read_boolean();
 
                 serverReturned() ;
@@ -383,7 +379,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
                     // ignore the exception
                 }
             } finally {
-                releaseReply((org.omg.CORBA.Object)null, (InputStream)is);
+                releaseReply((org.omg.CORBA.Object)null, is);
             }
         }
     }
@@ -392,7 +388,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	InputStream is = null;
         try {
             OutputStream os = request(null, "_non_existent", true);
-            is = (InputStream) invoke((org.omg.CORBA.Object)null, os);
+            is = invoke((org.omg.CORBA.Object) null, os);
 
 	    return is.read_boolean();
 
@@ -402,7 +398,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	} catch (RemarshalException e) {
 	    return non_existent(obj);
 	} finally {
-	    releaseReply((org.omg.CORBA.Object)null, (InputStream)is);
+	    releaseReply((org.omg.CORBA.Object)null, is);
         }
     }
     
@@ -419,28 +415,32 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     // portable.ObjectImpl, so we just ignore obj here.
     public boolean is_equivalent(org.omg.CORBA.Object obj,
 				 org.omg.CORBA.Object ref) {
-	if ( ref == null )
-	    return false;
+	if ( ref == null ) {
+            return false;
+        }
 
 	// If ref is a local object, it is not a Stub!
-	if (!StubAdapter.isStub(ref))
-	    return false ;
+	if (!StubAdapter.isStub(ref)) {
+            return false;
+        }
 
 	Delegate del = StubAdapter.getDelegate(ref) ;
-	if (del == null)
-	    return false ;
+	if (del == null) {
+            return false;
+        }
 
 	// Optimize the x.is_equivalent( x ) case
-	if (del == this)
-	    return true;
+	if (del == this) {
+            return true;
+        }
 
 	// If delegate was created by a different ORB, return false
-	if (!(del instanceof CorbaClientDelegateImpl))
-	    return false ;
+	if (!(del instanceof CorbaClientDelegateImpl)) {
+            return false;
+        }
 
 	CorbaClientDelegateImpl corbaDelegate = (CorbaClientDelegateImpl)del ;
-	CorbaContactInfoList ccil = 
-	    (CorbaContactInfoList)corbaDelegate.getContactInfoList() ;
+	CorbaContactInfoList ccil = corbaDelegate.getContactInfoList() ;
 	return this.contactInfoList.getTargetIOR().isEquivalent( 
 	    ccil.getTargetIOR() );
     }
@@ -451,16 +451,18 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
      */
     @Override
     public boolean equals(org.omg.CORBA.Object self, java.lang.Object other) {
-	if (other == null)
-	    return false ;
+	if (other == null) {
+            return false;
+        }
 
         if (!StubAdapter.isStub(other)) {
             return false;   
         }
         
 	Delegate delegate = StubAdapter.getDelegate( other ) ;
-	if (delegate == null)
-	    return false ;
+	if (delegate == null) {
+            return false;
+        }
 
         if (delegate instanceof CorbaClientDelegateImpl) {
             CorbaClientDelegateImpl otherDel = (CorbaClientDelegateImpl)
@@ -480,8 +482,9 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 
     public int hash(org.omg.CORBA.Object obj, int maximum) {
 	int h = this.hashCode();
-	if ( h > maximum )
-	    return 0;
+	if ( h > maximum ) {
+            return 0;
+        }
 	return h;
     }
     

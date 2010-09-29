@@ -52,29 +52,20 @@
 
 package com.sun.corba.se.impl.copyobject ;
 
-import java.rmi.MarshalException;
 import java.rmi.Remote;
-import java.rmi.ServerError;
 import java.rmi.RemoteException;
 
-import java.util.Collections;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.Hashtable;
-import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.Properties;
 
 import java.io.Serializable;
 import java.io.Externalizable;
-import java.io.NotSerializableException;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
@@ -88,29 +79,9 @@ import java.util.logging.Logger;
 
 import sun.corba.Bridge; 
 
-import org.omg.CORBA.Any;
-import org.omg.CORBA.portable.InputStream;
-import org.omg.CORBA.portable.OutputStream;
-import org.omg.CORBA.portable.ObjectImpl;
-import org.omg.CORBA.COMM_FAILURE;
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.INV_OBJREF;
-import org.omg.CORBA.NO_PERMISSION;
-import org.omg.CORBA.MARSHAL;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
-import org.omg.CORBA.TRANSACTION_REQUIRED;
-import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
-import org.omg.CORBA.INVALID_TRANSACTION;
-import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.portable.UnknownException;
-import org.omg.CORBA.TCKind;
-
 import com.sun.corba.se.impl.util.Utility;
 
 import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.impl.logging.CORBALogDomains;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier;
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException;
@@ -127,13 +98,11 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
 {
     private IdentityHashMap objRefs;
     private ORB orb ;
-    private Logger _logger ;
 
     public OldReflectObjectCopierImpl( org.omg.CORBA.ORB orb ) 
     {
         objRefs = new IdentityHashMap();
 	this.orb = (ORB)orb ;
-	_logger = this.orb.getLogger( CORBALogDomains.RMIIIOP_DELEGATE ) ;
     }
 
     /**
@@ -213,11 +182,6 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
             cons.setAccessible(true);
             return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ?  cons : null;
         } catch (NoSuchMethodException ex) {
-             if (_logger.isLoggable(Level.FINEST)) {
-               _logger.log(Level.FINEST,
-                   "com.iplanet.ias.util.orbutil.CopyObjectLocal.getExternalizableConstructor(class)" +
-                   " Threw an exception:  Cannot obtain a externalizable constructor.", ex);
-             }
             //test for null on calling routine will avoid NPE just to be safe
             return null;
         }
@@ -243,11 +207,6 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
         Class initCl = cl;
         if (initCl == null) {
             //should not be possible for initCl==null but log and return null
-            if (_logger.isLoggable(Level.FINEST)) {
-             _logger.log(Level.FINEST,
-                 "com.iplanet.ias.util.orbutil.CopyObjectLocal.getSerializableConstructor(class)" +
-                 " Class past to method is null. Could not get constructor.");
-            }
             //test for null on calling routine will avoid NPE just to be safe
             return null;
         }
@@ -263,11 +222,6 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
                 ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) == 0 &&
                  !packageEquals(cl, initCl)))
             {
-              if (_logger.isLoggable(Level.FINEST)) {
-               _logger.log(Level.FINEST,
-                   "com.iplanet.ias.util.orbutil.CopyObjectLocal.getSerializableConstructor(class)" +
-                   " Class " + cl.getName() + "does not define an appropriate constructor.");
-              }
                //test for null on calling routine will avoid NPE just to be safe
                return null;
             }
@@ -275,11 +229,6 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
             cons.setAccessible(true);
             return cons;
         } catch (NoSuchMethodException ex) {
-            if (_logger.isLoggable(Level.FINEST)) {
-               _logger.log(Level.FINEST,
-                   "com.iplanet.ias.util.orbutil.CopyObjectLocal.getSerializableConstructor(class)" +
-                   " Cannot obtain a serializable constructor.", ex);
-            }
             //test for null on calling routine will avoid NPE just to be safe
             return null;
         }
@@ -338,17 +287,9 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
         throws RemoteException, InstantiationException, 
 	IllegalAccessException, InvocationTargetException
     {
-        if (_logger.isLoggable(Level.FINER)) { 
-           _logger.log(Level.FINER,
-               "ReflectCopyLocal: ReflectAttrs: in arrayCopy");
-        }
         Object acopy = null;
 
 	if (aClass.isPrimitive()) {
-            if (_logger.isLoggable(Level.FINER)) {
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: arrayCopy: is a primitive array");
-            }
 	    if (aClass == byte.class) {
 		acopy = ((byte[])obj).clone();
 	    } else if (aClass == char.class) {
@@ -368,67 +309,20 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
 	    }
 	    objRefs.put(obj, acopy);
 	} else if (aClass == String.class) {
-            if (_logger.isLoggable(Level.FINER)) {
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: arrayCopy: is a String array");
-            }
-
 	    acopy = ((String [])obj).clone();
 	    objRefs.put(obj, acopy);
 	} else {
-            if (_logger.isLoggable(Level.FINER)) {
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: arrayCopy: is another type of array, (not primitive or String)");
-            }
-
 	    int alen = Array.getLength(obj);
-
-            if (_logger.isLoggable(Level.FINER)) {
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: arrayCopy: array length is " + alen);
-            }
 
             aClass = obj.getClass().getComponentType();
 
-            if (_logger.isLoggable(Level.FINER)) {
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: arrayCopy: got class and name is " + aClass.getName());
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: arrayCopy: before Array.newInstance ClassLoader is " +
-                    aClass.getClass().getClassLoader());
-            }
-
             acopy = Array.newInstance(aClass, alen);
 
-            if (_logger.isLoggable(Level.FINER)) {
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: arrayCopy: after Array.newInstance ClassLoader is " +
-                    acopy.getClass().getClassLoader());
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: arrayCopy: created a new array");
-            }
 
 		objRefs.put(obj, acopy);
 		for (int idx=0; idx<alen; idx++) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: arrayCopy: copying number " + idx);
-                    }
-
 		    Object aobj = Array.get(obj, idx);
-
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: arrayCopy: calling reflectCopy");
-                    }
-
 		    aobj = reflectCopy(aobj);
-
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: arrayCopy: calling Array.set");
-                    }
-
 		    Array.set(acopy, idx, aobj);
 		}
 	}
@@ -446,17 +340,6 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
 	Object copy) throws RemoteException, IllegalAccessException,
 	InstantiationException, InvocationTargetException
     {
-        if (_logger.isLoggable(Level.FINER)) {
-           _logger.log(Level.FINER,
-               "ReflectCopyLocal: copyFields: entering copyFields");
-           _logger.log(Level.FINER,
-               "ReflectCopyLocal: copyFields: object where fields need copy " + obj.getClass().getName());
-           _logger.log(Level.FINER,
-               "ReflectCopyLocal: copyFields: class " + cls.getName() + " and is " + cls.toString());
-           _logger.log(Level.FINER,
-               "ReflectCopyLocal: copyFields: num of fields = " + fields.length);
-        }
-
         if (fields == null || fields.length == 0) {
             return;
         }
@@ -467,82 +350,27 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
 	    int modifiers = fld.getModifiers() ;
 	    Object fobj = null;
 	    Class fieldClass = fld.getType();
-            if (_logger.isLoggable(Level.FINER)) {
-               _logger.log(Level.FINER,
-                   "ReflectCopyLocal: copyFields: field number " + idx + " is " +
-                    Modifier.toString(fld.getModifiers()) + " " + fieldClass + " " +
-                    fld.getName());
-            }
 
 	    if (!Modifier.isStatic(modifiers)) {
-                if (_logger.isLoggable(Level.FINER)) {
-                   _logger.log(Level.FINER,
-                       "ReflectCopyLocal: copyFields: field is non-static primitive");
-                }
-
 		if (fieldClass == int.class) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is an integer");
-                    }
 		    fld.setInt(copy, fld.getInt(obj));
 		} else if (fieldClass == long.class) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is a long");
-                    }
 		    fld.setLong(copy, fld.getLong(obj));
 		} else if (fieldClass == double.class) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is a double");
-                    }
 		    fld.setDouble(copy, fld.getDouble(obj));
 		} else if (fieldClass == byte.class) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is a byte");
-                    }
 		    fld.setByte(copy, fld.getByte(obj));
 		} else if (fieldClass == char.class) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is a char");
-                    }
 		    fld.setChar(copy, fld.getChar(obj));
 		} else if (fieldClass == short.class) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is a short");
-                    }
 		    fld.setShort(copy, fld.getShort(obj));
 		} else if (fieldClass == float.class) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is a float");
-                    }
 		    fld.setFloat(copy, fld.getFloat(obj));
 		} else if (fieldClass == boolean.class) {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is an boolean");
-                    }
 		    fld.setBoolean(copy, fld.getBoolean(obj));
 		} else {
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: field is not a non-static primitive");
-                    }
 		    fobj = fld.get(obj);
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: calling reflectCopy(fobj)");
-                    }
 		    Object newfobj = reflectCopy(fobj);
-                    if (_logger.isLoggable(Level.FINER)) {
-                       _logger.log(Level.FINER,
-                           "ReflectCopyLocal: copyFields: caching field");
-                    }
 		    fld.set(copy, newfobj);
 		}
 	    }
@@ -689,11 +517,6 @@ public class OldReflectObjectCopierImpl implements ObjectCopier
         } catch (ThreadDeath td) {
             throw td ;
         } catch (Throwable thr) {
-            if (_logger.isLoggable(Level.FINEST)) {
-                _logger.log(Level.FINEST, 
-                    "com.iplanet.ias.util.orbutil.CopyObjectLocal.reflectCopy(object) " +
-                    "Threw an exception:", thr);
-            }
             throw new ReflectiveCopyException( "Could not copy object of class " + 
                 obj.getClass().getName(), thr ) ;
         }

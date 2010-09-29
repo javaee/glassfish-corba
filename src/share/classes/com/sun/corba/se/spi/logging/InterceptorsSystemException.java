@@ -62,7 +62,8 @@ public interface InterceptorsSystemException {
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "IOException during cancel request" )
-    COMM_FAILURE ioexceptionDuringCancelRequest(  ) ;
+    @CS( CSValue.MAYBE )
+    COMM_FAILURE ioexceptionDuringCancelRequest( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Exception was null" )

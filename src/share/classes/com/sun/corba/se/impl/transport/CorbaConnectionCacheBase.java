@@ -47,7 +47,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaConnectionCache;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 
@@ -71,6 +71,8 @@ public abstract class CorbaConnectionCacheBase
     implements
 	CorbaConnectionCache
 {
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
     private static final String STAT_UNIT = "count" ;
 
     private static final String TOTAL_ID_STD    = "TotalConnections" ;
@@ -91,7 +93,6 @@ public abstract class CorbaConnectionCacheBase
     protected long timestamp = 0;
     protected String cacheType;
     protected String monitoringName;
-    protected ORBUtilSystemException wrapper;
 
     protected CorbaConnectionCacheBase(ORB orb, String cacheType,
 				       String monitoringName)
@@ -99,7 +100,6 @@ public abstract class CorbaConnectionCacheBase
 	this.orb = orb;
 	this.cacheType = cacheType;
 	this.monitoringName = monitoringName;
-	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 	dprintCreation();
     }
     

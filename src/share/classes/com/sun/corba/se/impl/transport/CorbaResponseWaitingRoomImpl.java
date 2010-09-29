@@ -57,7 +57,7 @@ import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.CorbaResponseWaitingRoom;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
@@ -72,6 +72,9 @@ public class CorbaResponseWaitingRoomImpl
     implements
 	CorbaResponseWaitingRoom
 {
+    final private static ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     final static class OutCallDesc
     {
 	CorbaMessageMediator messageMediator;
@@ -85,13 +88,11 @@ public class CorbaResponseWaitingRoomImpl
     final private Map<Integer, OutCallDesc> out_calls;
     final private ORB orb;
     final private CorbaConnection connection;
-    final private ORBUtilSystemException wrapper ;
 
 
     public CorbaResponseWaitingRoomImpl(ORB orb, CorbaConnection connection)
     {
 	this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 	this.connection = connection;
         this.out_calls = 
                Collections.synchronizedMap(new HashMap<Integer, OutCallDesc>());
@@ -152,7 +153,7 @@ public class CorbaResponseWaitingRoomImpl
         
         OutCallDesc call = out_calls.get(requestId);
         if (call == null) {
-            throw wrapper.nullOutCall(CompletionStatus.COMPLETED_MAYBE);
+            throw wrapper.nullOutCall() ;
         }
 
         // Value from ORBData is in milliseconds, will convert it nanoseconds
@@ -180,9 +181,8 @@ public class CorbaResponseWaitingRoomImpl
                         } else {
                             // timed out waiting for data
                             call.exception =
-                                    wrapper.communicationsTimeoutWaitingForResponse(
-                                    CompletionStatus.COMPLETED_MAYBE,
-                                    orb.getORBData().getWaitForResponseTimeout());
+                                wrapper.communicationsTimeoutWaitingForResponse(
+                                orb.getORBData().getWaitForResponseTimeout());
                             // REVISIT:
                             // Normally the inputObject or exception is
                             // created from the response stream.

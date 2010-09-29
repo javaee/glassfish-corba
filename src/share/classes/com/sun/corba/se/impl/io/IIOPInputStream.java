@@ -65,7 +65,6 @@ import org.omg.CORBA.portable.ValueInputStream;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.ORB; 
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.portable.IndirectionException;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.TypeCode;
@@ -85,7 +84,7 @@ import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 
-import com.sun.corba.se.impl.logging.OMGSystemException ;
+import com.sun.corba.se.spi.logging.OMGSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
@@ -670,7 +669,7 @@ public class IIOPInputStream
             return (orbStream.read_octet()) & 0x000000FF;
         } catch (MARSHAL marshalException) {
             if (marshalException.minor 
-                == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1) {
+                == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE) {
                 setState(IN_READ_OBJECT_NO_MORE_OPT_DATA);
                 return -1;
             }
@@ -691,7 +690,7 @@ public class IIOPInputStream
             return length;
         } catch (MARSHAL marshalException) {
             if (marshalException.minor 
-                == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1) {
+                == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE) {
                 setState(IN_READ_OBJECT_NO_MORE_OPT_DATA);
                 return -1;
             }
@@ -938,7 +937,7 @@ public class IIOPInputStream
         // primitive data reads, or throw an OptionalDataException
         // with the eof field set to true for object reads."
         if (marshalException.minor 
-            == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1) {
+            == OMGSystemException.RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE) {
 
             IOException result;
 

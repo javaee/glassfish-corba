@@ -189,7 +189,10 @@ public interface OMGSystemException {
     @Log( level=LogLevel.WARNING, id=5 )
     @Message( "Name clash in inherited context" )
     BAD_PARAM nameClash(  ) ;
-    
+
+    int NOT_SERIALIZABLE = CorbaExtension.self.getMinorCode(
+        OMGSystemException.class, "notSerializable" ) ;
+
     @Log( level=LogLevel.WARNING, id=6 )
     @Message( "Class {0} is not Serializable" )
     @CS( CSValue.MAYBE )
@@ -213,7 +216,7 @@ public interface OMGSystemException {
     @Log( level=LogLevel.FINE, id=9 )
     @Message( "string_to_object conversion failed due to bad schema specific "
         + "part in name {0}" )
-    BAD_PARAM soBadSchemaSpecific( String arg0 ) ;
+    BAD_PARAM soBadSchemaSpecific( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=10 )
     @Message( "string_to_object conversion failed due to non specific reason" )
@@ -456,7 +459,11 @@ public interface OMGSystemException {
     @Message( "Unsupported RMI/IDL custom value type stream format" )
     @CS( CSValue.MAYBE )
     MARSHAL unsupportedFormatVersion(  ) ;
-    
+
+    int RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE =
+        CorbaExtension.self.getMinorCode( OMGSystemException.class,
+        "rmiiiopOptionalDataIncompatible1" ) ;
+
     @Log( level=LogLevel.FINE, id=8 )
     @Message( "No optional data available" )
     MARSHAL rmiiiopOptionalDataIncompatible1(  ) ;

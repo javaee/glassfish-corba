@@ -46,7 +46,6 @@ import java.io.Externalizable ;
 import javax.rmi.PortableRemoteObject ;
 
 import org.omg.CORBA.ORB ;
-import org.omg.CORBA.portable.IDLEntity ;
 
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
@@ -58,7 +57,7 @@ import java.rmi.RemoteException ;
 
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
@@ -77,9 +76,8 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
     private ReaderWriter[] argRWs = null ;
     private ReaderWriter resultRW = null ;
 
-    private static final ORBUtilSystemException wrapper = 
-	com.sun.corba.se.spi.orb.ORB.getStaticLogWrapperTable()
-	    .get_RPC_PRESENTATION_ORBUtil() ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private static boolean isAnyClass( Class cls )
     {
@@ -96,10 +94,11 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	// Either cls is an interface that extends IDLEntity, or else
 	// cls does not extend java.rmi.Remote and all of its methods
 	// throw RemoteException.
-	if (cinfo.isAIDLEntity(cls))
-	    return cinfo.isInterface() ;
-	else 
-	    return cinfo.isInterface() && allMethodsThrowRemoteException( cls ) ;
+	if (cinfo.isAIDLEntity(cls)) {
+            return cinfo.isInterface();
+        } else {
+            return cinfo.isInterface() && allMethodsThrowRemoteException(cls);
+        }
     }
 
     private static boolean allMethodsThrowRemoteException( Class cls ) 
@@ -110,9 +109,11 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	// throw an exception that is a subclass of RemoteException.
 	for (int ctr=0; ctr<methods.length; ctr++) {
 	    Method method = methods[ctr] ;
-	    if (method.getDeclaringClass() != Object.class)
-		if (!throwsRemote( method ))
-		    return false ;
+	    if (method.getDeclaringClass() != Object.class) {
+                if (!throwsRemote(method)) {
+                    return false;
+                }
+            }
 	}	
 
 	return true ;
@@ -125,8 +126,9 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	// Check that some exceptionType is a subclass of RemoteException
 	for (int ctr=0; ctr<exceptionTypes.length; ctr++) {
 	    Class exceptionType = exceptionTypes[ctr] ;
-	    if (ClassInfoCache.get( exceptionType ).isARemoteException(exceptionType))
-		return true ;
+	    if (ClassInfoCache.get( exceptionType ).isARemoteException(exceptionType)) {
+                return true;
+            }
 	}
 
 	return false ;
@@ -141,13 +143,14 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 
     abstract static class ReaderWriterBase implements ReaderWriter 
     {
-	String name ;
+	private String name ;
 
 	public ReaderWriterBase( String name ) 
 	{
 	    this.name = name ;
 	}
 
+        @Override
 	public String toString()
 	{
 	    return "ReaderWriter[" + name + "]" ;
@@ -327,62 +330,56 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
     public static ReaderWriter makeReaderWriter( final Class cls ) 
     {
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( cls ) ;
-	if (cls.equals( boolean.class ))
-	    return booleanRW ;
-	else if (cls.equals( byte.class ))
-	    return byteRW ;
-	else if (cls.equals( char.class ))
-	    return charRW ;
-	else if (cls.equals( short.class ))
-	    return shortRW ;
-	else if (cls.equals( int.class ))
-	    return intRW ;
-	else if (cls.equals( long.class ))
-	    return longRW ;
-	else if (cls.equals( float.class ))
-	    return floatRW ;
-	else if (cls.equals( double.class ))
-	    return doubleRW ;
-	else if (cinfo.isARemote(cls)) 
-	    return new ReaderWriterBase( "remote(" + cls.getName() + ")" ) 
-	    {
-		public Object read( InputStream is ) 
-		{
-		    return PortableRemoteObject.narrow( is.read_Object(), 
-			cls ) ;
-		}
+	if (cls.equals( boolean.class )) {
+            return booleanRW;
+        } else if (cls.equals( byte.class )) {
+            return byteRW;
+        } else if (cls.equals( char.class )) {
+            return charRW;
+        } else if (cls.equals( short.class )) {
+            return shortRW;
+        } else if (cls.equals( int.class )) {
+            return intRW;
+        } else if (cls.equals( long.class )) {
+            return longRW;
+        } else if (cls.equals( float.class )) {
+            return floatRW;
+        } else if (cls.equals( double.class )) {
+            return doubleRW;
+        } else if (cinfo.isARemote(cls)) {
+            return new ReaderWriterBase("remote(" + cls.getName() + ")") {
 
-		public void write( OutputStream os, Object value ) 
-		{
-		    Util.getInstance().writeRemoteObject( os, value ) ;
-		}
-	    } ;
-	else if (cls.equals(org.omg.CORBA.Object.class))
-	    return corbaObjectRW ;
-	else if (cinfo.isACORBAObject(cls))
-	    return new ReaderWriterBase( "org.omg.CORBA.Object(" + 
-		cls.getName() + ")" ) 
-	    {
-		public Object read( InputStream is ) 
-		{
-		    return is.read_Object(cls) ;
-		}
-	    
-		public void write( OutputStream os, Object value ) 
-		{
-		    os.write_Object( (org.omg.CORBA.Object)value ) ;
-		}
-	    } ;
-	else if (isAnyClass(cls))
-	    return anyRW ;
-	else if (isAbstractInterface(cls))
-	    return abstractInterfaceRW ;
+                public Object read(InputStream is) {
+                    return PortableRemoteObject.narrow(is.read_Object(), cls);
+                }
+
+                public void write(OutputStream os, Object value) {
+                    Util.getInstance().writeRemoteObject(os, value);
+                }
+            };
+        } else if (cls.equals(org.omg.CORBA.Object.class)) {
+            return corbaObjectRW;
+        } else if (cinfo.isACORBAObject(cls)) {
+            return new ReaderWriterBase("org.omg.CORBA.Object(" + cls.getName() +
+                ")") {
+
+                public Object read(InputStream is) {
+                    return is.read_Object(cls);
+                }
+
+                public void write(OutputStream os, Object value) {
+                    os.write_Object((org.omg.CORBA.Object) value);
+                }
+            };
+        } else if (isAnyClass(cls)) {
+            return anyRW;
+        } else if (isAbstractInterface(cls)) {
+            return abstractInterfaceRW;
+        }
 
 	// For anything else, just read it as a value type.
-	return new ReaderWriterBase( "value(" + cls.getName() + ")" ) 
-	{
-	    public Object read( InputStream is ) 
-	    {
+	return new ReaderWriterBase( "value(" + cls.getName() + ")" ) {
+	    public Object read( InputStream is ) {
                 try {
                     return is.read_value(cls) ;
                 } finally {
@@ -390,8 +387,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
                 }
 	    }
 
-	    public void write( OutputStream os, Object value )
-	    {
+	    public void write( OutputStream os, Object value ) {
 		if (value == null) {
 		    os.write_value( null, cls ) ;
 		} else if (value instanceof Serializable) {
@@ -404,8 +400,7 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	} ;
     }
 
-    public DynamicMethodMarshallerImpl( Method method )
-    {
+    public DynamicMethodMarshallerImpl( Method method ) {
 	this.method = method ;
 	ehandler = new ExceptionHandlerImpl( method.getExceptionTypes() ) ;
 	needsArgumentCopy = false ;
@@ -418,8 +413,9 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 		// This could be further optimized to avoid
 		// copying if argTypes contains at most one
 		// immutable object type.
-		if (!argTypes[ctr].isPrimitive())
-		    needsArgumentCopy = true ;
+		if (!argTypes[ctr].isPrimitive()) {
+                    needsArgumentCopy = true;
+                }
 		argRWs[ctr] = makeReaderWriter( argTypes[ctr] ) ;
 	    }
 	}
@@ -433,79 +429,76 @@ public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller
 	}
     }
 
-    public Method getMethod() 
-    {
+    public Method getMethod() {
 	return method ;
     }
 
     public Object[] copyArguments( Object[] args, 
-	ORB orb ) throws RemoteException
-    {
-	if (needsArgumentCopy)
-	    return Util.getInstance().copyObjects( args, orb ) ;
-	else
-	    return args ;
+	ORB orb ) throws RemoteException {
+	if (needsArgumentCopy) {
+            return Util.getInstance().copyObjects(args, orb);
+        } else {
+            return args;
+        }
     }
 
-    public Object[] readArguments( InputStream is ) 
-    {
+    public Object[] readArguments( InputStream is ) {
 	Object[] result = null ;
 
 	if (hasArguments) {
 	    result = new Object[ argRWs.length ] ;
-	    for (int ctr=0; ctr<argRWs.length; ctr++ ) 
-		result[ctr] = argRWs[ctr].read( is ) ;
+	    for (int ctr=0; ctr<argRWs.length; ctr++ ) {
+                result[ctr] = argRWs[ctr].read(is);
+            }
 	}
 
 	return result ;
     }
 
-    public void writeArguments( OutputStream os, Object[] args ) 
-    {
+    public void writeArguments( OutputStream os, Object[] args ) {
 	if (hasArguments) {
-	    if (args.length != argRWs.length)
-		throw new IllegalArgumentException( "Expected " + argRWs.length +
-		    " arguments, but got " + args.length + " arguments." ) ;
+	    if (args.length != argRWs.length) {
+                throw new IllegalArgumentException("Expected " + argRWs.length +
+                    " arguments, but got " + args.length + " arguments.");
+            }
 
-	    for (int ctr=0; ctr<argRWs.length; ctr++ ) 
-		argRWs[ctr].write( os, args[ctr] ) ;
+	    for (int ctr=0; ctr<argRWs.length; ctr++ ) {
+                argRWs[ctr].write(os, args[ctr]);
+            }
 	}
     }
 
-    public Object copyResult( Object result, ORB orb ) throws RemoteException
-    {
-	if (needsResultCopy)
-	    return Util.getInstance().copyObject( result, orb ) ;
-	else 
-	    return result ;
+    public Object copyResult( Object result, ORB orb ) throws RemoteException {
+	if (needsResultCopy) {
+            return Util.getInstance().copyObject(result, orb);
+        } else {
+            return result;
+        }
     }
 
-    public Object readResult( InputStream is ) 
-    {
-	if (hasVoidResult)
-	    return null ;
-	else
-	    return resultRW.read( is ) ;
+    public Object readResult( InputStream is ) {
+	if (hasVoidResult) {
+            return null;
+        } else {
+            return resultRW.read(is);
+        }
     }
 
-    public void writeResult( OutputStream os, Object result ) 
-    {
-	if (!hasVoidResult)
-	    resultRW.write( os, result ) ;
+    public void writeResult( OutputStream os, Object result ) {
+	if (!hasVoidResult) {
+            resultRW.write(os, result);
+        }
     }
 
-    public boolean isDeclaredException( Throwable thr )
-    {
+    public boolean isDeclaredException( Throwable thr ) {
 	return ehandler.isDeclaredException( thr.getClass() ) ;
     }
 
-    public void writeException( OutputStream os, Exception ex ) 
-    {
+    public void writeException( OutputStream os, Exception ex ) {
 	ehandler.writeException( os, ex ) ;
     }
 
-    public Exception readException( ApplicationException ae ) 
-    {
+    public Exception readException( ApplicationException ae ) {
 	return ehandler.readException( ae ) ;
     }
 }

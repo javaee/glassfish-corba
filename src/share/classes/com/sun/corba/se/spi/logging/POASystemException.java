@@ -58,7 +58,7 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=3 )
     @Message( "Illegal Forward Request???" )
-    BAD_OPERATION illegalForwardRequest(  ) ;
+    BAD_OPERATION illegalForwardRequest( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=4 )
     @Message( "setDaemon() failed in creating destroy thread" )
@@ -266,7 +266,7 @@ public interface POASystemException {
     
     @Log( level=LogLevel.WARNING, id=15 )
     @Message( "Error in local servant lookup" )
-    OBJ_ADAPTER localServantLookup(  ) ;
+    OBJ_ADAPTER localServantLookup( @Chain Throwable thr ) ;
     
     @Log( level=LogLevel.WARNING, id=16 )
     @Message( "Bad type for servant manager" )

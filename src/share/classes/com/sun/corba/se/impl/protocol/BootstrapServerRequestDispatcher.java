@@ -52,7 +52,7 @@ import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
 import com.sun.corba.se.impl.encoding.MarshalInputStream ;
 import com.sun.corba.se.impl.encoding.MarshalOutputStream ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  * Class BootstrapServerRequestDispatcher handles the requests coming to the
@@ -72,14 +72,14 @@ public class BootstrapServerRequestDispatcher
 {
     private ORB orb;
 
-    ORBUtilSystemException wrapper ;
+    static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private static final boolean debug = false;
 
     public BootstrapServerRequestDispatcher(ORB orb )
     {
 	this.orb = orb;
-	this.wrapper = orb.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
     }
     
     /**

@@ -41,13 +41,9 @@
 package com.sun.corba.se.impl.protocol.giopmsgheaders;
 
 import java.nio.ByteBuffer;
-import org.omg.CORBA.INTERNAL;
-import org.omg.CORBA.CompletionStatus;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-
-import com.sun.corba.se.spi.orb.ORB ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /*
  * This implements the GIOP 1.0 Message header.
@@ -59,11 +55,11 @@ import com.sun.corba.se.spi.orb.ORB ;
 public class Message_1_0
         extends com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase {
 
-    private static ORBUtilSystemException wrapper = 
-	ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
+    private static ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     // Instance variables
-    int magic = (int) 0;
+    int magic = 0;
     GIOPVersion GIOP_version = null;
     boolean byte_order = false;
     byte message_type = (byte) 0;
@@ -118,9 +114,9 @@ public class Message_1_0
             byteBuffer.put(8,  (byte)((patch >>> 24) & 0xFF));
             byteBuffer.put(9,  (byte)((patch >>> 16) & 0xFF));
             byteBuffer.put(10, (byte)((patch >>> 8)  & 0xFF));
-            byteBuffer.put(11, (byte)((patch >>> 0)  & 0xFF));
+            byteBuffer.put(11, (byte)((patch)  & 0xFF));
         } else {
-            byteBuffer.put(8,  (byte)((patch >>> 0)  & 0xFF));
+            byteBuffer.put(8,  (byte)((patch)  & 0xFF));
             byteBuffer.put(9,  (byte)((patch >>> 8)  & 0xFF));
             byteBuffer.put(10, (byte)((patch >>> 16) & 0xFF));
             byteBuffer.put(11, (byte)((patch >>> 24) & 0xFF));
@@ -128,8 +124,7 @@ public class Message_1_0
     }
 
     public FragmentMessage createFragmentMessage() {
-	throw wrapper.fragmentationDisallowed(
-	    CompletionStatus.COMPLETED_MAYBE);
+	throw wrapper.fragmentationDisallowed() ;
     }
         
     // IO methods

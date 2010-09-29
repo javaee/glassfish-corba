@@ -70,7 +70,7 @@ import com.sun.corba.se.impl.encoding.CachedCodeBase;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
@@ -91,6 +91,9 @@ public class BufferConnectionImpl
         CorbaConnection,
 	Work
 {
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     //
     // New transport.
     //
@@ -117,8 +120,8 @@ public class BufferConnectionImpl
     protected int requestId = 5;
     protected CorbaResponseWaitingRoom responseWaitingRoom;
     protected int state;
-    protected java.lang.Object stateEvent = new java.lang.Object();
-    protected java.lang.Object writeEvent = new java.lang.Object();
+    protected final java.lang.Object stateEvent = new java.lang.Object();
+    protected final java.lang.Object writeEvent = new java.lang.Object();
     protected boolean writeLocked;
     protected int serverRequestCount = 0;
     
@@ -144,14 +147,12 @@ public class BufferConnectionImpl
     // necessary.
     protected CachedCodeBase cachedCodeBase = new CachedCodeBase(this);
 
-    protected ORBUtilSystemException wrapper ;
 
     List buffers ;
 
     public BufferConnectionImpl(ORB orb)
     {
 	this.orb = orb;
-	wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 	buffers = new ArrayList() ;
     }
 
@@ -232,8 +233,9 @@ public class BufferConnectionImpl
 	int index = 0 ;
 	while (remaining > 0) {
 	    ByteBuffer buff = (ByteBuffer)buffers.get(0) ; 
-	    if (buff == null)
-		throw new IOException( "No more data" ) ;
+	    if (buff == null) {
+                throw new IOException("No more data");
+            }
 	    int dataSize = buff.remaining() ;
 	    int xferSize = dataSize ;
 	    if (dataSize >= remaining) {
@@ -685,6 +687,7 @@ public class BufferConnectionImpl
     {
     }
 
+    @Override
     public String toString()
     {
         synchronized ( stateEvent ){

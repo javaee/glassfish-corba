@@ -46,6 +46,8 @@ import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
 import java.lang.reflect.Constructor;
 
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.omg.CORBA.ACTIVITY_COMPLETED;
 import org.omg.CORBA.ACTIVITY_REQUIRED;
@@ -90,8 +92,7 @@ import org.omg.CORBA.TRANSIENT;
 import org.omg.CORBA.UNKNOWN;
 
 public class CorbaExtension implements WrapperGenerator.Extension {
-    public static final WrapperGenerator.Extension self =
-        new CorbaExtension() ;
+    public static final CorbaExtension self = new CorbaExtension() ;
 
     private CorbaExtension() {}
 
@@ -186,6 +187,16 @@ public class CorbaExtension implements WrapperGenerator.Extension {
 	final Log log = getLog( method ) ;
 	final int minorCode = getMinorCode( orbex, log ) ;
 	return minorCode ;
+    }
+
+    public int getMinorCode( Class<?> cls, String methodName ) {
+        Method method = null ;
+        try {
+            method = cls.getDeclaredMethod(methodName);
+        } catch (Exception ex) {
+            throw new RuntimeException( ex ) ;
+        }
+        return getMinorCode( method ) ;
     }
 
     // Format of result:  ExceptionId OmgID MinorCode, where

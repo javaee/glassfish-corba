@@ -40,7 +40,6 @@
 
 package com.sun.corba.se.impl.protocol.giopmsgheaders;
 
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA_2_3.portable.InputStream;
@@ -53,7 +52,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  * This implements the GIOP 1.1 LocateReply header.
@@ -65,11 +64,14 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 public final class LocateReplyMessage_1_1 extends Message_1_1
         implements LocateReplyMessage {
 
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // Instance variables
 
     private ORB orb = null;
-    private int request_id = (int) 0;
-    private int reply_status = (int) 0;
+    private int request_id = 0;
+    private int reply_status = 0;
     private IOR ior = null;
 
     // Constructors
@@ -112,6 +114,7 @@ public final class LocateReplyMessage_1_1 extends Message_1_1
 
     // IO methods
 
+    @Override
     public void read(org.omg.CORBA.portable.InputStream istream) {
         super.read(istream);
         this.request_id = istream.read_ulong();
@@ -127,6 +130,7 @@ public final class LocateReplyMessage_1_1 extends Message_1_1
 
     // Note, this writes only the header information. SystemException or
     // IOR may be written afterwards into the reply mesg body.
+    @Override
     public void write(org.omg.CORBA.portable.OutputStream ostream) {
         super.write(ostream);
         ostream.write_ulong(this.request_id);
@@ -142,9 +146,7 @@ public final class LocateReplyMessage_1_1 extends Message_1_1
         case OBJECT_FORWARD :
             break;
         default :
-	    ORBUtilSystemException localWrapper = 
-		ORB.getStaticLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	    throw localWrapper.illegalReplyStatus( CompletionStatus.COMPLETED_MAYBE);
+	    throw wrapper.illegalReplyStatus();
         }
     }
 

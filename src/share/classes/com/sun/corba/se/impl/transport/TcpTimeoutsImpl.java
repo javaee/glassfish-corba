@@ -40,11 +40,9 @@
 
 package com.sun.corba.se.impl.transport;
 
-import com.sun.corba.se.spi.orb.ORB;
-
 import com.sun.corba.se.spi.transport.TcpTimeouts;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 /**
  * @author Charlie Hunt
@@ -52,7 +50,8 @@ import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
  */
 public class TcpTimeoutsImpl implements TcpTimeouts
 {
-    private ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     private final int initial_time_to_wait;
     private final int max_time_to_wait;
@@ -60,18 +59,19 @@ public class TcpTimeoutsImpl implements TcpTimeouts
     private final int max_single_wait_time;
 
     public TcpTimeoutsImpl( String args ) {
-	this.wrapper = ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
 	String[] data = args.split( ":" ) ;
-	if ((data.length < 3) || (data.length > 4))
-	    throw wrapper.badTimeoutDataLength() ;
+	if ((data.length < 3) || (data.length > 4)) {
+            throw wrapper.badTimeoutDataLength();
+        }
 
 	initial_time_to_wait = parseArg( "initial_time_to_wait", data[0] ) ;
 	max_time_to_wait     = parseArg( "max_time_to_wait", data[1] ) ;
 	setBackoffFactor( parseArg( "backoff_factor", data[2] ) ) ;
-	if (data.length == 4)
-	    max_single_wait_time = parseArg( "max_single_wait_time", data[3] ) ;
-	else
-	    max_single_wait_time = Integer.MAX_VALUE ;
+	if (data.length == 4) {
+            max_single_wait_time = parseArg("max_single_wait_time", data[3]);
+        } else {
+            max_single_wait_time = Integer.MAX_VALUE;
+        }
     }
 
     public TcpTimeoutsImpl( int initial_time, int max_time, 
@@ -81,7 +81,6 @@ public class TcpTimeoutsImpl implements TcpTimeouts
 
     public TcpTimeoutsImpl( int initial_time, int max_time, 
 	int backoff_percent, int max_single_wait_time ) {
-	this.wrapper = ORB.getStaticLogWrapperTable().get_UTIL_ORBUtil() ;
 	this.initial_time_to_wait = initial_time;
 	this.max_time_to_wait = max_time;
 	setBackoffFactor( backoff_percent ) ;
@@ -97,8 +96,9 @@ public class TcpTimeoutsImpl implements TcpTimeouts
     private int parseArg( String name, String value ) {
 	try {
 	    int result = Integer.parseInt( value ) ;
-	    if (result <= 0)
-		throw wrapper.badTimeoutStringData( value, name ) ;
+	    if (result <= 0) {
+                throw wrapper.badTimeoutStringData(value, name);
+            }
 	    return result ;
 	} catch (NumberFormatException exc) {
 	    throw wrapper.badTimeoutStringData( exc, value, name ) ;
@@ -123,8 +123,9 @@ public class TcpTimeoutsImpl implements TcpTimeouts
 	    public void advance() {
 		if (current_wait != max_single_wait_time) {
 		    current_wait = (current_wait * backoff_factor) / 100 ;
-		    if (current_wait > max_single_wait_time)
-			current_wait = max_single_wait_time ;
+		    if (current_wait > max_single_wait_time) {
+                        current_wait = max_single_wait_time;
+                    }
 		}
 	    }
 
@@ -138,8 +139,9 @@ public class TcpTimeoutsImpl implements TcpTimeouts
 
 	    public int getTimeForSleep() {
 		int result = (int)current_wait ;
-		if (total_time < max_time_to_wait)
-		    total_time += current_wait ;
+		if (total_time < max_time_to_wait) {
+                    total_time += current_wait;
+                }
 		return result ;
 	    }
 
@@ -148,8 +150,9 @@ public class TcpTimeoutsImpl implements TcpTimeouts
 	    }
 
 	    public boolean sleepTime() {
-		if (isExpired())
-		    return false ;
+		if (isExpired()) {
+                    return false;
+                }
 
 		try {
 		    Thread.sleep( getTimeForSleep() ) ;
@@ -170,6 +173,7 @@ public class TcpTimeoutsImpl implements TcpTimeouts
 	} ;
     }
 
+    @Override
     public String toString() {
 	return "TcpTimeoutsImpl[" 
 	    + initial_time_to_wait + ":"
@@ -178,12 +182,15 @@ public class TcpTimeoutsImpl implements TcpTimeouts
 	    + max_single_wait_time + "]" ;
     }
 
+    @Override
     public boolean equals( Object obj ) {
-	if (obj == this)
-	    return true ;
+	if (obj == this) {
+            return true;
+        }
 
-	if (!(obj instanceof TcpTimeouts))
-	    return false ;
+	if (!(obj instanceof TcpTimeouts)) {
+            return false;
+        }
 
 	TcpTimeouts other = (TcpTimeouts)obj ;
 
@@ -193,6 +200,7 @@ public class TcpTimeoutsImpl implements TcpTimeouts
 	    (max_single_wait_time == other.get_max_single_wait_time()) ;
     }
 
+    @Override
     public int hashCode() {
 	return initial_time_to_wait ^ max_time_to_wait ^
 	    backoff_factor ^ max_single_wait_time ;

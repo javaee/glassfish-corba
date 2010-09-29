@@ -76,7 +76,7 @@ public class SocketFactoryAcceptorImpl
 		.getLegacySocketFactory().createServerSocket(type, port);
 	    internalInitialize();
 	} catch (Throwable t) {
-	    throw wrapper.createListenerFailed( t, port ) ;
+	    throw wrapper.createListenerFailed( t, "localhost", port ) ;
 	}
 	initialized = true;
 	return true;

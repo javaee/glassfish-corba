@@ -95,7 +95,7 @@ import com.sun.corba.se.spi.trace.Transport;
 		wrapper.infoCreateListenerSucceeded(host, Integer.toString(port));
 	    }
 	} catch (Throwable t) {
-	    throw wrapper.createListenerFailed(t, host, Integer.toString(port));
+	    throw wrapper.createListenerFailed(t, host, port);
 	}
 	initialized = true;
 	return true;
@@ -242,7 +242,7 @@ import com.sun.corba.se.spi.trace.Transport;
             wrapper.securityExceptionInAccept(se, permissionStr);
 	} catch (Exception ex) {
             otherException( ex ) ;
-            wrapper.exceptionInAccept(ex);
+            wrapper.exceptionInAccept(ex, ex.toString() );
 	} catch (Throwable t) {
             otherException( t ) ;
 	} finally {

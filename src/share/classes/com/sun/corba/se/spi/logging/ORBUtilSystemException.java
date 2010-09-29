@@ -661,11 +661,11 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=13 )
     @Message( "Unexpected {0} in accept" )
-    COMM_FAILURE exceptionInAccept( String arg0 ) ;
+    COMM_FAILURE exceptionInAccept( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=14 )
     @Message( "Unexpected exception, has permissions {0}" )
-    COMM_FAILURE securityExceptionInAccept( String arg0 ) ;
+    COMM_FAILURE securityExceptionInAccept( @Chain Exception exc, String arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=15 )
     @Message( "Read of full message failed : bytes requested = {0} "
@@ -675,7 +675,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.SEVERE, id=16 )
     @Message( "Unable to create IIOP listener on the specified port: {0}" )
-    COMM_FAILURE createListenerFailed( @Chain Throwable thr, int arg0 ) ;
+    COMM_FAILURE createListenerFailed( @Chain Throwable thr, String host, int port ) ;
     
     @Log( level=LogLevel.FINE, id=17 )
     @Message( "Throwable received in ReadBits" )
@@ -683,7 +683,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.WARNING, id=18 )
     @Message( "IOException in accept" )
-    COMM_FAILURE ioexceptionInAccept(  ) ;
+    COMM_FAILURE oexceptionInAccept(  ) ;
     
     @Log( level=LogLevel.WARNING, id=19 )
     @Message( "Communications timeout waiting for response.  Exceeded {0} milliseconds" )
@@ -775,9 +775,13 @@ public interface ORBUtilSystemException {
         + "because an 'end of stream' was detected" )
     COMM_FAILURE nonblockingReadEndOfStream( String arg0, String arg1 ) ;
     
+    @Log( level=LogLevel.WARNING, id=36 )
+    @Message( "IOException in accept" )
+    COMM_FAILURE ioexceptionInAccept( @Chain Exception exc ) ;
+
     @Log( level=LogLevel.FINE, id=36 )
     @Message( "IOException in accept" )
-    COMM_FAILURE ioexceptionInAcceptFine(  ) ;
+    COMM_FAILURE ioexceptionInAcceptFine( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=37 )
     @Message( "Timeout while reading data in buffer manager" )

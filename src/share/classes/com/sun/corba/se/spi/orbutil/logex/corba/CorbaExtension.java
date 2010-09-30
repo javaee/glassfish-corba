@@ -40,7 +40,7 @@
 
 package com.sun.corba.se.spi.orbutil.logex.corba ;
 
-import com.sun.corba.se.impl.util.SUNVMCID;  // this is in the JDK, not the ORB
+import com.sun.corba.se.org.omg.CORBA.SUNVMCID;  // this is in the JDK, not the ORB
 import com.sun.corba.se.spi.orbutil.logex.Log;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
 import java.lang.reflect.Constructor;

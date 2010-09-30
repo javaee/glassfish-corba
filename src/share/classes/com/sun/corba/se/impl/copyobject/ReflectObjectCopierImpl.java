@@ -57,7 +57,6 @@ import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.logging.LogWrapperBase ;
 
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
@@ -146,7 +145,7 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 		    return corbaClassCopier ;
 
 		// Need this case to handle TypeCode.
-		if (cinfo.isAORB(cls) || cinfo.isALogWrapperBase(cls))
+		if (cinfo.isAORB(cls)) 
 		    return DefaultClassCopiers.getIdentityClassCopier() ;
 
 		return null ;

@@ -63,7 +63,6 @@ import org.omg.CORBA.portable.ValueBase ;
 import org.omg.CORBA.portable.IDLEntity ;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.logging.LogWrapperBase ;
 
 /** This class caches information about classes that is somewhat expensive
  * to obtain, notably the results of isInterface(), isArray(), and isAssignableFrom.
@@ -121,8 +120,6 @@ public class ClassInfoCache {
 	    ObjectImpl.class ) ;
 	private LazyWrapper isAORB = new LazyWrapper( 
 	    ORB.class ) ;
-	private LazyWrapper isALogWrapperBase = new LazyWrapper( 
-	    LogWrapperBase.class ) ;
 	private LazyWrapper isAStreamable = new LazyWrapper( 
 	    Streamable.class ) ;
 	private LazyWrapper isAStreamableValue = new LazyWrapper( 
@@ -178,9 +175,6 @@ public class ClassInfoCache {
 	}
 	public boolean isAORB( Class cls ) { 
 	    return isAORB.get(cls) ; 
-	}
-	public boolean isALogWrapperBase( Class cls ) { 
-	    return isALogWrapperBase.get(cls) ; 
 	}
 	public boolean isAIDLEntity( Class cls ) { 
 	    return isAIDLEntity ; 

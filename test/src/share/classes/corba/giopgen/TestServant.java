@@ -60,7 +60,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.generic.SPair ;
 
-import com.sun.corba.se.impl.logging.UtilSystemException ;
+import com.sun.corba.se.spi.logging.UtilSystemException ;
 
 public class TestServant
     extends PortableRemoteObject
@@ -80,8 +80,8 @@ public class TestServant
         return x;
     }
 
-    private static UtilSystemException wrapper = 
-        ORB.getStaticLogWrapperTable().get_UTIL_Util() ;
+    private static UtilSystemException wrapper =
+        UtilSystemException.self ;
     
     private static class ThrowsSysEx implements Serializable {
         private void readObject( java.io.ObjectInputStream is ) {
@@ -91,7 +91,7 @@ public class TestServant
 
     private static class ThrowsSimpleSysEx implements Serializable {
         private void readObject( java.io.ObjectInputStream is ) {
-            throw wrapper.simpleTestException( CompletionStatus.COMPLETED_MAYBE, new Exception() ) ;
+            throw wrapper.simpleTestException( new Exception() ) ;
         }
     }
 

@@ -44,12 +44,9 @@
 
 package corba.hcks;
 
-import org.omg.CORBA.BAD_PARAM;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.IMP_LIMIT;
 import org.omg.CORBA.PERSIST_STORE;
 import org.omg.CORBA.SystemException;
-import org.omg.CORBA.TRANSIENT;
 import org.omg.IOP.ServiceContext;
 import org.omg.PortableInterceptor.ClientRequestInterceptor;
 import org.omg.PortableInterceptor.ClientRequestInfo;
@@ -59,8 +56,6 @@ import org.omg.PortableInterceptor.ServerRequestInfo;
 
 import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
 
 import java.util.Hashtable;
 

@@ -105,7 +105,8 @@ public class ClientCircular extends ClientBase {
 
             Assert.fail( "Circular timeout failed: call incorrectly succeeded" ) ;
         } catch (Exception e) {
-            SystemException cf = wrapper.connectFailure("dummy", "dummy", "dummy");
+            SystemException cf = wrapper.connectFailure( new RuntimeException(),
+                "dummy", "dummy", "dummy");
             checkMarshalException("Circular timeout", e, cf);
         }
     }

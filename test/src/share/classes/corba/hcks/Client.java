@@ -48,10 +48,7 @@
 
 package corba.hcks;
 
-import java.io.NotSerializableException;
 import java.rmi.MarshalException;
-import java.util.Properties;
-import java.util.Iterator;
 
 import corba.framework.Controller;
 
@@ -60,25 +57,21 @@ import corba.framework.Controller;
 //
 
 import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.IMP_LIMIT;
 import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.PERSIST_STORE;
 import org.omg.CORBA.SystemException;
-import org.omg.CORBA.UNKNOWN;
 import org.omg.DynamicAny.DynAny;
 import org.omg.DynamicAny.DynAnyFactory;
 import org.omg.DynamicAny.DynAnyFactoryHelper;
 
-import org.omg.CORBA.portable.UnknownException;
 
 //
 // RMI-IIOP imports.
 //
 
-import java.rmi.RemoteException; 
 
 // JRMP
 //import java.rmi.Naming; 
@@ -90,10 +83,8 @@ import javax.naming.InitialContext;
 //
 
 import org.omg.CORBA.Any;
-import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.IMP_LIMIT;
 import org.omg.CORBA.OBJ_ADAPTER;
-import org.omg.CORBA.portable.Delegate;
 import org.omg.CosNaming.NamingContext;
 import org.omg.CosNaming.NamingContextHelper;
 import org.omg.IOP.Codec;
@@ -104,19 +95,13 @@ import org.omg.PortableInterceptor.ForwardRequest;
 import org.omg.PortableInterceptor.ForwardRequestHelper;
 import org.omg.PortableInterceptor.Current;
 
-import javax.rmi.CORBA.Stub;
-import javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.spi.protocol.ClientDelegate;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.presentation.rmi.StubWrapper;
-import com.sun.corba.se.impl.transport.SocketOrChannelContactInfoImpl;
 
 
 //
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 public class Client 
 {

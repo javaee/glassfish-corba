@@ -130,11 +130,13 @@ public interface POASystemException {
     INTERNAL preinvokePoaDestroyed(  ) ;
     
     @Log( level=LogLevel.WARNING, id=14 )
-    @Message( "Bad dispatch policy for RETAIN policy in POAPolicyMediatorFactory" )
+    @Message( "Bad dispatch policy for RETAIN policy in "
+        + "POAPolicyMediatorFactory" )
     INTERNAL pmfCreateRetain(  ) ;
     
     @Log( level=LogLevel.WARNING, id=15 )
-    @Message( "Bad dispatch policy for NON_RETAIN policy in POAPolicyMediatorFactory" )
+    @Message( "Bad dispatch policy for NON_RETAIN policy in "
+        + "POAPolicyMediatorFactory" )
     INTERNAL pmfCreateNonRetain(  ) ;
     
     @Log( level=LogLevel.WARNING, id=16 )
@@ -158,7 +160,8 @@ public interface POASystemException {
     INTERNAL cantResolveRootPoa( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=21 )
-    @Message( "Call made to local client request dispatcher with non-local servant" )
+    @Message( "Call made to local client request dispatcher with non-local "
+        + "servant" )
     INTERNAL servantMustBeLocal(  ) ;
     
     @Log( level=LogLevel.WARNING, id=22 )

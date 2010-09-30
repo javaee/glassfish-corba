@@ -53,7 +53,7 @@ import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.folb.ClientGroupManager;
 
@@ -72,6 +72,9 @@ import org.omg.CORBA.SystemException ;
  * @author Harold Carr
  */
 public abstract class ClientBase {    
+    protected static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     public static final boolean SEND_MEMBERSHIP_LABEL = true;
     public static final boolean NO_MEMBERSHIP_LABEL = ! SEND_MEMBERSHIP_LABEL;
     public static final boolean RECEIVE_IOR_UPDATE = true;
@@ -84,7 +87,6 @@ public abstract class ClientBase {
     protected GroupInfoServiceTest gisPoaWithoutAddressesWithoutLabel = null ;
     protected EchoTest testRfmWithAddressesWithLabel = null ;
     protected EchoTest testRfmWithAddressesWithoutLabel = null ;
-    protected ORBUtilSystemException wrapper ;
 
     protected Properties getDefaultProperties() {
         Properties props = new Properties();
@@ -124,8 +126,6 @@ public abstract class ClientBase {
             dprint("ORB.init");
             dprint("--------------------------------------------------");
             orb = (ORB) ORB.init((String[])null, props);
-
-            wrapper = orb.getLogWrapperTable().get_RPC_TRANSPORT_ORBUtil() ;
 
             dprint("--------------------------------------------------");
             dprint("Lookup GIS and addObserver for IORUpdates");

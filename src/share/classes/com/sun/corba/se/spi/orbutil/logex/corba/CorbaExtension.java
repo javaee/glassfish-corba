@@ -40,14 +40,12 @@
 
 package com.sun.corba.se.spi.orbutil.logex.corba ;
 
-import com.sun.corba.se.org.omg.CORBA.SUNVMCID;  // this is in the JDK, not the ORB
+import com.sun.corba.se.org.omg.CORBA.SUNVMCID;
 import com.sun.corba.se.spi.orbutil.logex.Log;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
 import java.lang.reflect.Constructor;
 
 import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.omg.CORBA.ACTIVITY_COMPLETED;
 import org.omg.CORBA.ACTIVITY_REQUIRED;

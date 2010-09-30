@@ -41,42 +41,30 @@
 package corba.dynamicrmiiiop  ;
 
 import java.rmi.Remote ;
-import java.rmi.RemoteException ;
-import java.rmi.UnexpectedException ;
 
 import java.io.Serializable ;
 import java.io.Externalizable ;
 
 import javax.rmi.CORBA.Tie ;
 
-import org.omg.CORBA.BAD_PARAM ;
-import org.omg.CORBA.BAD_OPERATION ;
 import org.omg.CORBA.SystemException ;
 import org.omg.CORBA.portable.ApplicationException ;
 import org.omg.CORBA.portable.ResponseHandler ;
 import org.omg.CORBA.portable.UnknownException ;
-import org.omg.CORBA.portable.Delegate ;
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import java.util.Map ;
 import java.util.Set ;
 import java.util.HashSet ;
 import java.util.Properties ;
 
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException ;
 
-import junit.framework.AssertionFailedError ;
 import junit.framework.TestCase ;
 import junit.framework.Test ;
 import junit.framework.TestResult ;
 import junit.framework.TestSuite ;
-import junit.framework.TestListener ;
-import junit.extensions.RepeatedTest ;
-import junit.extensions.RepeatedTest ;
-import junit.textui.TestRunner ;
 
 import corba.framework.TestCaseTools ;
 
@@ -85,11 +73,9 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
-import com.sun.corba.se.spi.presentation.rmi.DynamicStub ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
-import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
@@ -113,17 +99,14 @@ import corba.dynamicrmiiiop.testclasses.C3 ;
 import corba.dynamicrmiiiop.testclasses.C4 ;
 import corba.dynamicrmiiiop.testclasses.C5 ;
 import corba.dynamicrmiiiop.testclasses.C6 ;
-import corba.dynamicrmiiiop.testclasses.MyApplicationException ;
 
 import corba.dynamicrmiiiop.testclasses.TieTest ;
 import corba.dynamicrmiiiop.testclasses.TieTestImpl ;
 import corba.dynamicrmiiiop.testclasses.DMMImplTestClasses ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.presentation.rmi.ExceptionHandlerImpl ;
 
-import com.sun.corba.se.impl.util.RepositoryId ;
 
 // Included to directly test makeReaderWriter, which is not
 // needed in the PresentationManager API.

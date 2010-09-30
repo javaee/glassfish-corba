@@ -297,7 +297,10 @@ public interface OMGSystemException {
     @Log( level=LogLevel.FINE, id=28 )
     @Message( "Invalid component Id {0} in portable interceptor" )
     BAD_PARAM invalidComponentId( int arg0 ) ;
-    
+
+    int INVALID_PROFILE_ID = CorbaExtension.self.getMinorCode(
+        OMGSystemException.class, "invalidProfileId" ) ;
+
     @Log( level=LogLevel.WARNING, id=29 )
     @Message( "Profile ID does not define a known profile or it is impossible "
         + "to add components to that profile" )
@@ -448,11 +451,13 @@ public interface OMGSystemException {
     MARSHAL notAnObjectImpl( @Chain BAD_PARAM exception ) ;
     
     @Log( level=LogLevel.WARNING, id=5 )
-    @Message( "wchar or wstring data erroneously sent by client over GIOP 1.0 connection " )
+    @Message( "wchar or wstring data erroneously sent by client over "
+        + "GIOP 1.0 connection " )
     MARSHAL wcharBadGiopVersionSent(  ) ;
     
     @Log( level=LogLevel.WARNING, id=6 )
-    @Message( "wchar or wstring data erroneously returned by server over GIOP 1.0 connection " )
+    @Message( "wchar or wstring data erroneously returned by server over "
+        + "GIOP 1.0 connection " )
     MARSHAL wcharBadGiopVersionReturned(  ) ;
     
     @Log( level=LogLevel.WARNING, id=7 )
@@ -580,7 +585,8 @@ public interface OMGSystemException {
     TRANSIENT poaDestroyed(  ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
-    @Message( "Attempt to pass an unactivated (unregistered) value as an object reference" )
+    @Message( "Attempt to pass an unactivated (unregistered) value as an "
+        + "object reference" )
     OBJECT_NOT_EXIST unregisteredValueAsObjref(  ) ;
     
     String noObjectAdaptor = "Failed to create or locate Object Adaptor" ;

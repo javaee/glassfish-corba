@@ -45,25 +45,22 @@ import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import Util.*;
 import HelloStuff.*;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.logging.POASystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.POASystemException ;
 
 // Will this test exit with value 1 when errors in WorkerThreads?  REVISIT
 
 public class HelloClient {
     private static final int N_LOOPS = 10;
-    private static ORBUtilSystemException orbutilWrapper ;
-    private static POASystemException poaWrapper ;
+    private static final ORBUtilSystemException orbutilWrapper =
+        ORBUtilSystemException.self ;
+    private static final POASystemException poaWrapper =
+        POASystemException.self ;
     
     public static void main(String[] args) 
     {
 	try {
 	    Utility u = new Utility(args);
-
-	    orbutilWrapper = ((com.sun.corba.se.spi.orb.ORB)u.getORB())
-		.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
-	    poaWrapper = ((com.sun.corba.se.spi.orb.ORB)u.getORB())
-		.getLogWrapperTable().get_OA_POA() ;
 
 	    GenericFactory f = u.readFactory();
 
@@ -259,8 +256,8 @@ public class HelloClient {
     public static void checkTransient(String msg, COMM_FAILURE e)
     {
 	SystemException expected = 
-	    orbutilWrapper.communicationsRetryTimeout(
-		new Integer(-1));
+	    orbutilWrapper.communicationsRetryTimeout( new RuntimeException(),
+		-1);
 	SystemException expectedCause = poaWrapper.poaDiscarding();
 	if (e.getClass().isInstance(expected)
 	    && ((SystemException)e).minor == expected.minor

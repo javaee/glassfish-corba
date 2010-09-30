@@ -44,13 +44,14 @@ import org.omg.CORBA.Object;
 import org.omg.CORBA.SystemException;
 import java.util.*;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 public class Client implements Runnable {
 
     private String[] args;
-    private static ORBUtilSystemException wrapper ;
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
 
     public Client(String[] args) {
         this.args = args;
@@ -68,9 +69,6 @@ public class Client implements Runnable {
 	    //props.put("com.sun.corba.se.ORBDebug", "transport,subcontract");
 	    props.setProperty(ORBConstants.TRANSPORT_TCP_CONNECT_TIMEOUTS_PROPERTY, "250:1000:100");
             ORB orb = ORB.init(args, props);
-
-	    wrapper = ((com.sun.corba.se.spi.orb.ORB)orb)
-		.getLogWrapperTable().get_RPC_PROTOCOL_ORBUtil() ;
 
             String corbalocURL =
 		System.getProperty(InvocationTest.URL_PROPERTY);
@@ -93,7 +91,8 @@ public class Client implements Runnable {
 
 	    } catch (org.omg.CORBA.COMM_FAILURE e) {
 		SystemException connectException =
-		    wrapper.connectFailure("foo", "bar", "baz");
+		    wrapper.connectFailure( new RuntimeException(),
+                        "foo", "bar", "baz");
 		if (e.getClass().isInstance(connectException)
 		    && e.minor == connectException.minor
 		    && e.completed == connectException.completed)

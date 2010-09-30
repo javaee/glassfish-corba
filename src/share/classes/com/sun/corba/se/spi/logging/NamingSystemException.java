@@ -125,7 +125,8 @@ public interface NamingSystemException {
     INTERNAL transNcNewctxGotExc( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=103 )
-    @Message( "Destroy operation caught a Java exception while disconnecting from ORB" )
+    @Message( "Destroy operation caught a Java exception while "
+        + "disconnecting from ORB" )
     INTERNAL transNcDestroyGotExc( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=105 )

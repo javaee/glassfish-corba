@@ -39,7 +39,6 @@
  */
 package corba.dynamicrmiiiop.testclasses ; 
 
-import java.rmi.Remote ;
 import java.rmi.RemoteException ;
 
 import java.util.Map ;
@@ -54,11 +53,14 @@ import org.omg.CORBA.SystemException ;
 
 import org.omg.CORBA.portable.UnknownException ;
 
-import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
 public class TieTestImpl implements TieTest 
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private static Object wrapException( Throwable thr ) 
     {
 	try {
@@ -92,7 +94,7 @@ public class TieTestImpl implements TieTest
 	    new Class[] { byte[].class } },
 	{   "foo_bar_baz", Boolean.TRUE,
 	    new BAD_OPERATION( 
-		ORBUtilSystemException.METHOD_NOT_FOUND_IN_TIE,
+		wrapper.METHOD_NOT_FOUND_IN_TIE,
 		CompletionStatus.COMPLETED_NO ),
 	    null,
 	    new Object[] { new Integer(37) }, 

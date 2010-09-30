@@ -50,16 +50,16 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
-import com.sun.corba.se.impl.logging.UtilSystemException ;
+import com.sun.corba.se.spi.logging.UtilSystemException ;
 
 import corba.misc.BuckPasserAL  ;
 import corba.misc.BuckPasserV  ;
 
 public class EchoImpl extends PortableRemoteObject implements Echo {
     private String name ;
-    private static UtilSystemException wrapper = 
-        ORB.getStaticLogWrapperTable().get_UTIL_Util() ;
-    
+    private static final UtilSystemException wrapper =
+        UtilSystemException.self ;
+
     private static class ThrowsSysEx {
         private void readObject( java.io.ObjectInputStream is ) {
             throw wrapper.testException( 42 ) ;

@@ -59,7 +59,8 @@ public interface UtilSystemException {
     BAD_OPERATION exceptionInLoadStub( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.WARNING, id=6 )
-    @Message( "Unable to make stub from any of the repository IDs of the interface" )
+    @Message( "Unable to make stub from any of the repository IDs of the "
+        + "interface" )
     BAD_OPERATION couldNotMakeStubFromRepositoryId(  ) ;
     
     @Log( level=LogLevel.WARNING, id=7 )
@@ -80,7 +81,8 @@ public interface UtilSystemException {
     BAD_PARAM noPoa( @Chain Exception exc ) ;
     
     @Log( level=LogLevel.FINE, id=3 )
-    @Message( "Tried to connect already connected Stub Delegate to a different ORB" )
+    @Message( "Tried to connect already connected Stub Delegate to a "
+        + "different ORB" )
     BAD_PARAM connectWrongOrb(  ) ;
     
     @Log( level=LogLevel.WARNING, id=4 )
@@ -200,11 +202,12 @@ public interface UtilSystemException {
     
     @Log( level=LogLevel.INFO, id=15 )
     @Message( "This is a test exception with number {0}" )
-    INTERNAL testException( String arg0 ) ;
+    INTERNAL testException( int arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=16 )
     @Message( "This is another test exception with no parameters" )
-    INTERNAL simpleTestException(  ) ;
+    @CS( CSValue.MAYBE )
+    INTERNAL simpleTestException( @Chain Exception exc  ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Unknown System Exception" )

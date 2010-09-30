@@ -51,7 +51,7 @@ import org.omg.IOP.CodecPackage.*;
 import org.omg.IOP.CodecFactoryPackage.*;
 import org.omg.IOP.TaggedComponent;
 import org.omg.IOP.TAG_INTERNET_IOP;
-import com.sun.corba.se.impl.logging.OMGSystemException;
+import com.sun.corba.se.spi.logging.OMGSystemException;
 
 /**
  * Thoroughly tests IORInterceptor support.
@@ -60,6 +60,8 @@ public class SampleIORInterceptor
     extends LocalObject 
     implements IORInterceptor 
 {
+    private static final OMGSystemException wrapper =
+        OMGSystemException.self ;
 
     // The name for this interceptor
     private String name;
@@ -157,7 +159,7 @@ public class SampleIORInterceptor
             }
             catch( BAD_PARAM e ) {
                 out.println( "      + Correct exception thrown" );
-                if( e.minor != OMGSystemException.INVALID_PROFILE_ID ) {
+                if( e.minor != wrapper.INVALID_PROFILE_ID ) {
                     out.println( "      + Incorrect minor code ( " + e.minor + 
                         ") detected." );
                     establishComponentsPassed = false;

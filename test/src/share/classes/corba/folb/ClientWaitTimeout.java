@@ -92,8 +92,8 @@ public class ClientWaitTimeout extends ClientBase {
             testRfmWithAddressesWithLabel.neverReturns();
             Assert.fail( "should not return, but did return" ) ;
         } catch (java.rmi.MarshalException e) {
-            SystemException cf = wrapper.communicationsTimeoutWaitingForResponse(
-                    CompletionStatus.COMPLETED_MAYBE, -1);
+            SystemException cf = 
+                wrapper.communicationsTimeoutWaitingForResponse( -1);
             checkMarshalException("neverReturns", e, cf);
         }
     }

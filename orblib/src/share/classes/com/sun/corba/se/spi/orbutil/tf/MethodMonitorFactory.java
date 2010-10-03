@@ -40,6 +40,8 @@
 
 package com.sun.corba.se.spi.orbutil.tf;
 
+import java.util.Collection;
+
 /** Since each MethodMonitor generally needs a reference to the class it is
  * monitoring, we actually work with MethodMonitorFactory instances instead
  * of simply using MethodMonitor.
@@ -55,4 +57,12 @@ public interface MethodMonitorFactory {
      * @return The MethodMonitor for cls.
      */
     MethodMonitor create( Class<?> cls ) ;
+
+    /** Returns the contents of this method monitor factory.  If it is a composite
+     * method monitor factory, all the component MethoMonitorFactory instances are 
+     * returned.  If it is a single MethodMonitorFactory, it just returns itself.
+     */
+    Collection<MethodMonitorFactory> contents() ;
+
+    String name() ;
 }

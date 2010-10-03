@@ -40,6 +40,8 @@
 
 package com.sun.corba.se.spi.orbutil.tf;
 
+import java.util.Collection;
+
 /** Interface representing some action that takes place on entry and exit to
  * a method that is being traced.
  *
@@ -98,4 +100,14 @@ public interface MethodMonitor {
      *
      */
     void clear() ;
+
+    /** Returns the contents of this method monitor.  If it is a composite
+     * method monitor, all the component MethoMonitor instances are 
+     * returned.  If it is a single MethodMonitor, it just returns itself.
+     */
+    Collection<MethodMonitor> contents() ;
+
+    /** Factory used to create this MethodMonitor
+     */
+    MethodMonitorFactory factory() ;
 }

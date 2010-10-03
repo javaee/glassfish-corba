@@ -40,18 +40,93 @@
 
 package com.sun.corba.se.spi.orbutil.tf;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 /**
  *
  * @author ken
  */
 public abstract class MethodMonitorBase implements MethodMonitor {
     private Class<?> cls ;
+    private Collection<MethodMonitor> myContents = null ;
+    private MethodMonitorFactory mmf ;
 
-    protected MethodMonitorBase( Class<?> cls ) {
+    private boolean isInit = false ;
+    private String toStringValue = null ;
+    private int hashValue = -1 ;
+
+    private void init() {
+        StringBuilder sb = new StringBuilder() ;
+        sb.append( "MethodMonitor[" ) ;
+        boolean first = true ;
+        for (MethodMonitor mm : contents()) {
+            sb.append( mm.getClass().getSimpleName() ) ;
+            if (first) {
+                first = false ;
+            } else {
+                sb.append( "," ) ;
+            }
+        }
+        sb.append( ']' ) ;
+
+        toStringValue = sb.toString() ;
+        hashValue = toStringValue.hashCode() ;
+    }
+
+    protected MethodMonitorBase( final Class<?> cls, 
+        final MethodMonitorFactory mmf ) {
+
         this.cls = cls ;
+        this.mmf = mmf ;
     }
 
     public Class<?> myClass() {
         return cls ;
+    }
+
+    protected void initContents() {
+        myContents.add( this ) ;
+    }
+    public synchronized Collection<MethodMonitor> contents() {
+        if (myContents == null) {
+            myContents = new HashSet<MethodMonitor>() ;
+            initContents() ;
+        }
+
+        return myContents ;
+    }
+
+    public MethodMonitorFactory factory() {
+        return mmf ;
+    }
+
+    @Override
+    public synchronized boolean equals( Object obj ) {
+        if (obj == this) {
+            return true ;
+        }
+
+        if (obj == null) {
+            return false ;
+        }
+
+        return toString().equals( obj.toString() ) ;
+    }
+
+    @Override
+    public synchronized int hashCode() {
+        if (!isInit) {
+            init() ;
+        }
+        return hashValue ;
+    }
+
+    @Override
+    public synchronized String toString() {
+        if (!isInit) {
+            init() ;
+        }
+        return toStringValue ;
     }
 }

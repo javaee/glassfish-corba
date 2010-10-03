@@ -62,6 +62,13 @@ public class MethodMonitorRegistry {
     private static final Set<String> mmAnnotations =
 	new HashSet<String>() ;
 
+    /** Merges the behaviors of the method monitors together.
+     *
+     */
+    public synchronized static MethodMonitor merge( MethodMonitor[] mms) {
+        return null ;
+    }
+
     public synchronized static Set<String> getMMAnnotations() {
 	return new HashSet<String>( mmAnnotations ) ;
     }

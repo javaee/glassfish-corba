@@ -50,8 +50,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,6 +63,31 @@ import java.util.logging.Logger;
  */
 public class MethodMonitorFactoryDefaults {
     private MethodMonitorFactoryDefaults() {}
+
+    private abstract static class MethodMonitorFactoryBase
+        implements MethodMonitorFactory {
+
+        private String name ;
+
+        MethodMonitorFactoryBase( String name ) {
+            this.name = name ;
+        }
+
+        public String name() {
+            return name ;
+        }
+
+        private List<MethodMonitorFactory> myContents = null ;
+
+        public synchronized Collection<MethodMonitorFactory> contents() {
+            if (myContents == null) {
+                myContents = new ArrayList<MethodMonitorFactory>() ;
+                myContents.add( this ) ;
+            } 
+
+            return myContents ;
+        }
+    }
 
     private static Map<String,String> prefixTable =
         new HashMap<String,String>() ;
@@ -96,13 +123,9 @@ public class MethodMonitorFactoryDefaults {
     }
 
     private static MethodMonitorFactory operationTracerImpl =
-        new MethodMonitorFactory() {
+        new MethodMonitorFactoryBase( "OperationTracerImpl" ) {
             public MethodMonitor create( final Class<?> cls) {
-                return new MethodMonitor() {
-                    public Class<?> myClass() {
-                        return cls ;
-                    }
-
+                return new MethodMonitorBase( cls, this ) {
                     public void enter(int ident, Object... args) {
                         String mname = MethodMonitorRegistry.getMethodName(
                             cls, ident) ;
@@ -217,11 +240,13 @@ public class MethodMonitorFactoryDefaults {
         }
     }
 
-    private static MethodMonitorFactory dprintImpl = new MethodMonitorFactory() {
+    private static MethodMonitorFactory dprintImpl = 
+        new MethodMonitorFactoryBase( "DprintImpl" ) {
+
         private static final boolean USE_LOGGER = false ;
 
         public MethodMonitor create( final Class<?> cls ) {
-            return new MethodMonitorBase( cls ) {
+            return new MethodMonitorBase( cls, this ) {
                 final String loggerName =
                     USE_LOGGER ? cls.getPackage().getName()
                                : null ;
@@ -309,9 +334,9 @@ public class MethodMonitorFactoryDefaults {
     } ;
 
     private static MethodMonitorFactory noOpImpl =
-        new MethodMonitorFactory() {
+        new MethodMonitorFactoryBase( "NoOpImpl" ) {
             public MethodMonitor create(final Class<?> cls) {
-                return new MethodMonitorBase( cls ) {
+                return new MethodMonitorBase( cls, this ) {
                     public void enter(int ident, Object... args) { }
 
                     public void info(Object[] args, int callerId,
@@ -331,9 +356,9 @@ public class MethodMonitorFactoryDefaults {
     public static <T> MethodMonitorFactory makeTimingImpl(
         final TimerManager<T> tm ) {
 
-        return new MethodMonitorFactory() {
+        return new MethodMonitorFactoryBase( "TimingImpl" ) {
             public MethodMonitor create(final Class<?> cls) {
-                return new MethodMonitorBase( cls ) {
+                return new MethodMonitorBase( cls, this ) {
                     private TimerEventController tec = tm.controller() ;
 
                     private final List<Timer> timers =
@@ -394,10 +419,72 @@ public class MethodMonitorFactoryDefaults {
         return dprintImpl ;
     }
 
+    static MethodMonitor composeMM( final List<MethodMonitor> mms ) {
+        // Flatten the contents: if we add a composite, flatten it.
+        final Set<MethodMonitorFactory> factories = new HashSet<MethodMonitorFactory>() ;
+        Class<?> cls = null ;
+        for (MethodMonitor mm: mms) {
+            factories.add( mm.factory() )  ;
+            if (cls == null) {
+                cls = mms.getClass() ;
+            } else if (!cls.equals( mms.getClass() )) {
+                throw new RuntimeException( "MethodMonitors not composable: "
+                    + "not all instantiated from the same class") ;
+            }
+        }
+        final MethodMonitorFactory mmf = compose(factories) ;
+
+        return new MethodMonitorBase( cls, mmf ) {
+            public void enter(int ident, Object... args) {
+                for (MethodMonitor mm : mms) {
+                    mm.enter( ident, args ) ;
+                }
+            }
+
+            public void info( Object[] args, int callerId,
+                int selfId ) {
+
+                for (MethodMonitor mm : mms) {
+                    mm.info( args, callerId, selfId ) ;
+                }
+            }
+
+            public void exit(int ident) {
+                for (MethodMonitor mm : mms) {
+                    mm.exit( ident ) ;
+                }
+            }
+
+            public void exit(int ident, Object result) {
+                for (MethodMonitor mm : mms) {
+                    mm.exit( ident, result ) ;
+                }
+            }
+
+            public void exception(int ident, Throwable thr) {
+                for (MethodMonitor mm : mms) {
+                    mm.exception( ident, thr ) ;
+                }
+            }
+
+            public void clear() {
+                for (MethodMonitor mm : mms) {
+                    mm.clear() ;
+                }
+            }
+
+            public List<MethodMonitor> contents() {
+                return mms ;
+            }
+        } ;
+    }
+
     public static MethodMonitorFactory compose(
         final Collection<MethodMonitorFactory> factories ) {
 
         return new MethodMonitorFactory() {
+            private List<MethodMonitorFactory> myContents = null ;
+
             public MethodMonitor create(final Class<?> cls) {
                 if (factories.size() == 0) {
                     // null is a very efficient no-op indicator
@@ -407,51 +494,25 @@ public class MethodMonitorFactoryDefaults {
                         new MethodMonitorFactory[1])[0] ;
                     return mmf.create( cls ) ;
                 } else {
-                    final List<MethodMonitor> mms = new ArrayList<MethodMonitor>() ;
-                    for (MethodMonitorFactory f : factories) {
-                        mms.add( f.create( cls ) ) ;
+                    List<MethodMonitor> mms = new ArrayList<MethodMonitor>() ;
+                    for (MethodMonitorFactory mmf : contents()) {
+                        mms.add( mmf.create( cls ) ) ;
                     }
 
-                    return new MethodMonitorBase( cls ) {
-                        public void enter(int ident, Object... args) {
-                            for (MethodMonitor mm : mms) {
-                                mm.enter( ident, args ) ;
-                            }
-                        }
-
-                        public void info( Object[] args, int callerId,
-                            int selfId ) {
-
-                            for (MethodMonitor mm : mms) {
-                                mm.info( args, callerId, selfId ) ;
-                            }
-                        }
-
-                        public void exit(int ident) {
-                            for (MethodMonitor mm : mms) {
-                                mm.exit( ident ) ;
-                            }
-                        }
-
-                        public void exit(int ident, Object result) {
-                            for (MethodMonitor mm : mms) {
-                                mm.exit( ident, result ) ;
-                            }
-                        }
-
-                        public void exception(int ident, Throwable thr) {
-                            for (MethodMonitor mm : mms) {
-                                mm.exception( ident, thr ) ;
-                            }
-                        }
-
-                        public void clear() {
-                            for (MethodMonitor mm : mms) {
-                                mm.clear() ;
-                            }
-                        }
-                    } ;
+                    return composeMM( mms ) ;
                 }
+            }
+
+            @Override
+            public List<MethodMonitorFactory> contents() {
+                if (myContents == null) {
+                    myContents = new ArrayList<MethodMonitorFactory>() ;
+                    for (MethodMonitorFactory mmf : factories) {
+                        myContents.addAll( mmf.contents() ) ;
+                    }
+                } 
+
+                return myContents ;
             }
         } ;
     }

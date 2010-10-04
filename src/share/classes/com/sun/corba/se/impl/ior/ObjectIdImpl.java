@@ -85,6 +85,10 @@ public final class ObjectIdImpl implements ObjectId
         return ORBUtility.dumpBinary( id ) ;
     }
 
+    public String toString() {
+        return "ObjectIdImpl[" + getIdString() + "]" ;
+    }
+
     public byte[] getId()
     {
 	return (byte[])id.clone() ;

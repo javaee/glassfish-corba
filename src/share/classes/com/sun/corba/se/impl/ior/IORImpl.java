@@ -136,6 +136,18 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
 	return cachedHashValue;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder() ;
+	sb.append( "IORImpl[type=") ;
+	sb.append( typeId ) ;
+	sb.append( " iorTemplates=" ) ;
+
+	IORTemplateList list = getIORTemplates() ;
+	sb.append( list.toString() ) ;
+	return sb.toString() ;
+    }
+
     /** Construct an empty IOR.  This is needed for null object references.
     */
     public IORImpl( ORB orb )

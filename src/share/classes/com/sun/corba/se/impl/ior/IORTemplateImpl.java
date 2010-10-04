@@ -67,6 +67,17 @@ public class IORTemplateImpl
     private ObjectKeyTemplate oktemp ;
 
     @Override
+    public String toString() {
+	StringBuilder sb = new StringBuilder() ;
+	sb.append( "IORTemplate[oktemp=") ;
+	sb.append( oktemp.toString() ) ;
+	sb.append( " profile templates:") ;
+	sb.append( super.toString() ) ;
+	sb.append( ']' ) ;
+	return sb.toString() ;
+    }
+
+    @Override
     public boolean equals( Object obj )
     {
 	if (obj == null)

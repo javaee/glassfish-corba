@@ -63,12 +63,14 @@ import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.NotLocalLocalCRDImpl;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Transport;
 
 /**
  * @author Harold Carr
  */
 @Transport
+@IsLocal
 public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     protected ORB orb;
     protected LocalClientRequestDispatcher localClientRequestDispatcher;
@@ -294,9 +296,9 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     @Transport
     private void createContactInfoList() {
 	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
+        final boolean isLocal = iiopProfile.isLocal() ;
 
 	if (effectiveTargetIORContactInfoList == null) {
-
 	    effectiveTargetIORContactInfoList = 
 		new ArrayList<CorbaContactInfo>();
 
@@ -310,7 +312,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	    primaryContactInfo = 
 		createContactInfo(SocketInfo.IIOP_CLEAR_TEXT, hostname, port);
 
-	    if (iiopProfile.isLocal()) {
+	    if (isLocal) {
 		// NOTE: IMPORTANT:
 		// Only do local.  The APP Server interceptors check
 		// effectiveTarget.isLocal - which is determined via
@@ -326,7 +328,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	    }
             display( "First time for iiopProfile", iiopProfile ) ;
 	} else {
-	    if (! iiopProfile.isLocal()) {
+	    if (!isLocal) {
                 display( "Subsequent time for iiopProfile", iiopProfile ) ;
 		// 6152681 - this is so SSL can change its selection on each
 		// invocation
@@ -385,6 +387,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
      * allows local optimization, because ServantManagers in the POA
      * ALWAYS use local optimization ONLY (they do not have a remote case).
      */
+    @IsLocal
     protected void setLocalSubcontract() {
 	if (!effectiveTargetIOR.getProfile().isLocal()) {
 	    localClientRequestDispatcher = new NotLocalLocalCRDImpl();

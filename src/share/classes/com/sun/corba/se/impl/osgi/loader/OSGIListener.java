@@ -82,6 +82,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
     private static PackageAdmin pkgAdmin ;
 
+    private static setPackageAdmin( PackageAdmin pa ) {
+        pkgAdmin = pa ;
+    }
+
     // Map from class name to Bundle, which identifies all known 
     // ORB-Class-Providers.
     private static Map<String,Bundle> classNameMap =
@@ -330,7 +334,8 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         // do ANYTHING else.
         final ServiceReference sref = context.getServiceReference( 
             "org.osgi.service.packageadmin.PackageAdmin" ) ;
-        pkgAdmin = (PackageAdmin)context.getService( sref ) ;
+        setPackageAdmin( (PackageAdmin)context.getService( sref ) ) ;
+
         if (pkgAdmin == null) {
             wrapper.packageAdminServiceNotAvailable() ;
         }

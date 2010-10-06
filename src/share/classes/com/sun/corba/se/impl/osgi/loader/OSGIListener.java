@@ -82,7 +82,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
     private static PackageAdmin pkgAdmin ;
 
-    private static setPackageAdmin( PackageAdmin pa ) {
+    private static void setPackageAdmin( PackageAdmin pa ) {
         pkgAdmin = pa ;
     }
 

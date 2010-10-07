@@ -1,27 +1,31 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * Sun designates this particular file as subject to the "Classpath" exception
- * as provided by Sun in the GPL Version 2 section of the License file that
- * accompanied this code.  If applicable, add the following below the License
- * Header, with the fields enclosed by brackets [] replaced by your own
- * identifying information: "Portions Copyrighted [year]
- * [name of copyright owner]"
- *
+ * 
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ * 
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ * 
  * Contributor(s):
- *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -161,7 +165,7 @@ public class CopyrightProcessor {
 
     // Block tags
     private static final String COPYRIGHT_BLOCK_TAG = "CopyrightBlock" ;
-    private static final String SUN_COPYRIGHT_TAG = "SunCopyright" ;
+    private static final String ORACLE_COPYRIGHT_TAG = "OracleCopyright" ;
     private static final String CORRECT_COPYRIGHT_TAG = "CorrectCopyright" ;
 
     private static void trace( String msg ) {
@@ -309,7 +313,7 @@ public class CopyrightProcessor {
     }
 
     // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
-    private static Pair<String,String> getSunCopyrightPair( String str ) {
+    private static Pair<String,String> getOracleCopyrightPair( String str ) {
         StringParser sp = new StringParser( str ) ;
         if (!sp.skipToString( COPYRIGHT )) 
             return null ;
@@ -334,17 +338,17 @@ public class CopyrightProcessor {
         return new Pair<String,String>( start, end ) ;
     }
 
-    public static void testGetSunCopyrightPair() {
+    public static void testGetOracleCopyrightPair() {
         final String data = 
-            " * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved." ;
+            " * Copyright 1997-2007 Oracle. All rights reserved." ;
 
-        Pair<String,String> pair = getSunCopyrightPair( data ) ;
+        Pair<String,String> pair = getOracleCopyrightPair( data ) ;
 
         System.out.println( pair ) ;
     }
 
     // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
-    private static Pair<String,String> getSunCopyrights( String str ) {
+    private static Pair<String,String> getOracleCopyrights( String str ) {
 	int index = str.indexOf( COPYRIGHT ) ;
 	if (index == -1) 
 	    return null ;
@@ -377,7 +381,7 @@ public class CopyrightProcessor {
     }
 
     // Copyright year is first non-blank after COPYRIGHT
-    private static String getSunCopyrightStart( String str ) {
+    private static String getOracleCopyrightStart( String str ) {
 	int index = str.indexOf( COPYRIGHT ) ;
 	if (index == -1) 
 	    return null ;
@@ -480,7 +484,7 @@ public class CopyrightProcessor {
 	}
     }
 
-    // Strip out old Sun copyright block.  Prepend new copyrightText.
+    // Strip out old Oracle copyright block.  Prepend new copyrightText.
     // copyrightText is a Block containing a copyright template in the correct comment format.
     // parseCall is the correct block parser for splitting the file into Blocks.
     // defaultStartYear is the default year to use in copyright comments if not
@@ -512,7 +516,7 @@ public class CopyrightProcessor {
                     String currentYear = "" + cy ;
                     Pair<String,String> years = 
                         new Pair<String,String>( defaultStartYear, currentYear ) ;
-		    boolean hadAnOldSunCopyright = false ;
+		    boolean hadAnOldOracleCopyright = false ;
 		    
 		    // Convert file into blocks
 		    final List<Block> fileBlocks = parserCall.evaluate( fw ) ;
@@ -522,13 +526,13 @@ public class CopyrightProcessor {
 			String str = block.find( COPYRIGHT ) ;
 			if (str != null) {
 			    block.addTag( COPYRIGHT_BLOCK_TAG ) ;
-			    if (str.contains( "Sun" )) {
-				Pair<String,String> scp = getSunCopyrightPair( str ) ;
+			    if (str.contains( "Oracle" )) {
+				Pair<String,String> scp = getOracleCopyrightPair( str ) ;
                                 if (scp != null) {
                                     years = scp ;
                                 }
-				block.addTag( SUN_COPYRIGHT_TAG ) ;
-				hadAnOldSunCopyright = true ;
+				block.addTag( ORACLE_COPYRIGHT_TAG ) ;
+				hadAnOldOracleCopyright = true ;
 			    }
 			}
 		    }
@@ -546,14 +550,14 @@ public class CopyrightProcessor {
 		    Block cb = makeCopyrightBlock( years, copyrightText ) ;
 
 		    if (validate) {
-			// There should be a Sun copyright block in the first block
+			// There should be a Oracle copyright block in the first block
 			// (if afterFirstBlock is false), otherwise in the second block.
 			// It should entirely match copyrightText
 			int count = 0 ;
 			for (Block block : fileBlocks) {
 			    // Generally always return true, because we want to see ALL validation errors.
 			    if (!afterFirstBlock && (count == 0)) {
-				if (block.hasTags( SUN_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
+				if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
 				    BlockParser.COMMENT_BLOCK_TAG)) {
 				    if (!cb.equals( block )) {
 					validationError( block, "First block has incorrect copyright text", fw ) ;
@@ -564,7 +568,7 @@ public class CopyrightProcessor {
 
 				return true ;
 			    } else if (afterFirstBlock && (count == 1)) {
-				if (block.hasTags( SUN_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
+				if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
 				    BlockParser.COMMENT_BLOCK_TAG)) {
 				    if (!cb.equals( block )) {
 					validationError( block, "Second block has incorrect copyright text", fw ) ;
@@ -587,7 +591,7 @@ public class CopyrightProcessor {
 			}
 		    } else {
 			// Re-write file, replacing the first block tagged
-			// SUN_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, and commentBlock with
+			// ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, and commentBlock with
 			// the copyrightText block.
 			
 			if (fw.canWrite()) {
@@ -600,7 +604,7 @@ public class CopyrightProcessor {
 			    boolean firstMatch = true ;
 			    boolean firstBlock = true ;
 			    for (Block block : fileBlocks) {
-				if (!hadAnOldSunCopyright && firstBlock) {
+				if (!hadAnOldOracleCopyright && firstBlock) {
 				    if (afterFirstBlock) {
 					block.write( fw ) ;
 					cb.write( fw ) ;
@@ -609,10 +613,10 @@ public class CopyrightProcessor {
 					block.write( fw ) ;
 				    }
 				    firstBlock = false ;
-				} else if (block.hasTags( SUN_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
+				} else if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
 				    BlockParser.COMMENT_BLOCK_TAG) && firstMatch)  {
 				    firstMatch = false ;
-				    if (hadAnOldSunCopyright) {
+				    if (hadAnOldOracleCopyright) {
 					cb.write( fw ) ;
 				    }
 				} else {
@@ -681,7 +685,7 @@ public class CopyrightProcessor {
 	}
 
         if (args.test()) {
-            testGetSunCopyrightPair() ;
+            testGetOracleCopyrightPair() ;
         }
 
 	try {

@@ -1,27 +1,31 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * Sun designates this particular file as subject to the "Classpath" exception
- * as provided by Sun in the GPL Version 2 section of the License file that
- * accompanied this code.  If applicable, add the following below the License
- * Header, with the fields enclosed by brackets [] replaced by your own
- * identifying information: "Portions Copyrighted [year]
- * [name of copyright owner]"
- *
+ * 
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ * 
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ * 
  * Contributor(s):
- *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -60,12 +64,14 @@ import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.NotLocalLocalCRDImpl;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Transport;
 
 /**
  * @author Harold Carr
  */
 @Transport
+@IsLocal
 public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     protected ORB orb;
     private ReadWriteLock lcrdLock = new ReentrantReadWriteLock() ;
@@ -297,9 +303,9 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     @Transport
     private void createContactInfoList() {
 	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
+        final boolean isLocal = iiopProfile.isLocal() ;
 
 	if (effectiveTargetIORContactInfoList == null) {
-
 	    effectiveTargetIORContactInfoList = 
 		new ArrayList<CorbaContactInfo>();
 
@@ -313,7 +319,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	    primaryContactInfo = 
 		createContactInfo(SocketInfo.IIOP_CLEAR_TEXT, hostname, port);
 
-	    if (iiopProfile.isLocal()) {
+	    if (isLocal) {
 		// NOTE: IMPORTANT:
 		// Only do local.  The APP Server interceptors check
 		// effectiveTarget.isLocal - which is determined via
@@ -329,7 +335,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	    }
             display( "First time for iiopProfile", iiopProfile ) ;
 	} else {
-	    if (! iiopProfile.isLocal()) {
+	    if (!isLocal) {
                 display( "Subsequent time for iiopProfile", iiopProfile ) ;
 		// 6152681 - this is so SSL can change its selection on each
 		// invocation
@@ -388,6 +394,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
      * allows local optimization, because ServantManagers in the POA
      * ALWAYS use local optimization ONLY (they do not have a remote case).
      */
+    @IsLocal
     protected void setLocalSubcontract() {
         lcrdLock.writeLock().lock() ;
         try {

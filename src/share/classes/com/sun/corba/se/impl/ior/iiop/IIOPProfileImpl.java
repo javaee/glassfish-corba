@@ -1,27 +1,31 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 2002-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * Sun designates this particular file as subject to the "Classpath" exception
- * as provided by Sun in the GPL Version 2 section of the License file that
- * accompanied this code.  If applicable, add the following below the License
- * Header, with the fields enclosed by brackets [] replaced by your own
- * identifying information: "Portions Copyrighted [year]
- * [name of copyright owner]"
- *
+ * 
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ * 
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ * 
  * Contributor(s):
- *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -81,10 +85,13 @@ import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 import com.sun.corba.se.impl.util.JDKBridge;
 
 import com.sun.corba.se.impl.logging.IORSystemException;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 
 /**
  * @author
  */
+@IsLocal
 public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 {
     private ORB orb ;
@@ -116,6 +123,17 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
     }
 
     private GIOPVersion giopVersion = null;
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder() ;
+        sb.append( "IIOPProfileImpl[proftemp=") ;
+        sb.append( proftemp.toString() ) ;
+        sb.append( " oktemp=" ) ;
+        sb.append( oktemp.toString() ) ;
+        sb.append( " oid=" ) ;
+        sb.append( oid.toString() ) ;
+        return sb.toString() ;
+    }
 
     public boolean equals( Object obj )
     {
@@ -293,21 +311,31 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
         return oktemp.getORBVersion();
     }
 
+    @InfoMethod
+    private void computingIsLocal( String host, int scid, int sid, int port ) {}
+
+    @InfoMethod
+    private void isLocalResults( boolean isLocalHost, boolean isLocalServerId,
+         boolean isLocalPort ) {}
+
+    @IsLocal
     public synchronized boolean isLocal()
     {
 	if (!checkedIsLocal) {
 	    checkedIsLocal = true ;
-	    final String host = proftemp.getPrimaryAddress().getHost() ;
-            final boolean isLocalHost = orb.isLocalHost( host ) ;
 
+	    final String host = proftemp.getPrimaryAddress().getHost() ;
             final int scid = oktemp.getSubcontractId() ;
             final int sid = oktemp.getServerId() ;
+            final int port = proftemp.getPrimaryAddress().getPort() ;
+            computingIsLocal( host, scid, sid, port ) ;
+
+            final boolean isLocalHost = orb.isLocalHost( host ) ;
             final boolean isLocalServerId = (sid == -1) ||
                 orb.isLocalServerId( scid, sid ) ;
-
             final boolean isLocalServerPort = 
-                orb.getLegacyServerSocketManager().legacyIsLocalServerPort( 
-                    proftemp.getPrimaryAddress().getPort() );
+                orb.getLegacyServerSocketManager().legacyIsLocalServerPort( port ) ;
+            isLocalResults( isLocalHost, isLocalServerId, isLocalServerPort ) ;
 
 	    cachedIsLocal = isLocalHost && isLocalServerId 
                 && isLocalServerPort ;
@@ -322,6 +350,7 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
      * XXX revisit: do we want this at all?  If we do, it might move to the
      * ObjectKeyTemplate instead.
      */
+    @IsLocal
     public java.lang.Object getServant()
     {
 	if (!isLocal())

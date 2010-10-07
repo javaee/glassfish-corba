@@ -1,27 +1,31 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 2003-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * Sun designates this particular file as subject to the "Classpath" exception
- * as provided by Sun in the GPL Version 2 section of the License file that
- * accompanied this code.  If applicable, add the following below the License
- * Header, with the fields enclosed by brackets [] replaced by your own
- * identifying information: "Portions Copyrighted [year]
- * [name of copyright owner]"
- *
+ * 
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ * 
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ * 
  * Contributor(s):
- *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -71,7 +75,10 @@ import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler ;
 import com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 
+@IsLocal
 public final class StubInvocationHandlerImpl implements LinkedInvocationHandler  
 {
     private transient PresentationManager.ClassData classData ;
@@ -104,6 +111,7 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 	this.stub = stub ;
     }
 
+    @IsLocal
     private boolean isLocal(Delegate delegate)
     {
 	boolean result = false ;
@@ -158,10 +166,17 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 	}
     }
 
+    @InfoMethod
+    private void takingRemoteBranch() {}
+
+    @InfoMethod
+    private void takingLocalBranch() {}
+
     /** Invoke the given method with the args and return the result.
      *  This may result in a remote invocation.
      *  @param proxy The proxy used for this class (null if not using java.lang.reflect.Proxy)
      */
+    @IsLocal
     private Object privateInvoke( Delegate delegate, Object proxy, final Method method,
 	Object[] args ) throws Throwable
     {
@@ -175,6 +190,7 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 	   
 	    if (!isLocal(delegate)) {
 	        try {
+		    takingRemoteBranch() ;
 		    org.omg.CORBA_2_3.portable.InputStream in = null ;
 		    try {
 		        // create request
@@ -200,7 +216,7 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 		    throw Util.getInstance().mapSystemException(ex) ;
 		} 
 	    } else {
-	        // local branch
+	        takingLocalBranch();
 	        org.omg.CORBA.ORB orb = delegate.orb( stub ) ;
 		ServantObject so = delegate.servant_preinvoke( stub, giopMethodName,
 							       method.getDeclaringClass() );

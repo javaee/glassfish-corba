@@ -1,27 +1,31 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 2004-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
- * or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * Sun designates this particular file as subject to the "Classpath" exception
- * as provided by Sun in the GPL Version 2 section of the License file that
- * accompanied this code.  If applicable, add the following below the License
- * Header, with the fields enclosed by brackets [] replaced by your own
- * identifying information: "Portions Copyrighted [year]
- * [name of copyright owner]"
- *
+ * 
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ * 
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ * 
  * Contributor(s):
- *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -39,6 +43,8 @@ package corba.misc ;
 import java.util.Properties ;
 import java.util.Random ;
 import java.util.Date ;
+import java.util.List ;
+import java.util.ArrayList ;
 
 import java.nio.ByteBuffer ;
 
@@ -48,7 +54,14 @@ import java.io.IOException ;
 import java.io.PrintStream ;
 import java.io.ByteArrayOutputStream ;
 
+import java.rmi.Remote ;
+import java.rmi.RemoteException ;
+
 import javax.jdo.identity.LongIdentity ;
+
+import javax.rmi.PortableRemoteObject ;
+
+import javax.rmi.CORBA.Tie ;
 
 import org.omg.CORBA_2_3.portable.OutputStream ;
 import org.omg.CORBA_2_3.portable.InputStream ;
@@ -57,10 +70,13 @@ import org.omg.CosNaming.NamingContextExt ;
 import org.omg.CosNaming.NamingContextExtHelper ;
 
 import org.omg.CORBA.Policy ;
+import org.omg.CORBA.Any ;
+import org.omg.CORBA.LocalObject ;
 
 import org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS ;
 
 import org.omg.PortableServer.POA ;
+import org.omg.PortableServer.ServantLocator ;
 import org.omg.PortableServer.Servant ;
 import org.omg.PortableServer.ServantRetentionPolicyValue ;
 import org.omg.PortableServer.LifespanPolicyValue ;
@@ -70,6 +86,11 @@ import org.omg.PortableServer.IdUniquenessPolicyValue ;
 import org.omg.PortableServer.IdAssignmentPolicyValue ;
 
 import org.omg.PortableServer.POAPackage.ObjectNotActive ;
+
+import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
+
+import org.omg.PortableServer.ForwardRequest ;
+import org.omg.PortableServer.ForwardRequestHelper ;
 
 import junit.framework.TestCase ;
 import junit.framework.Test ;
@@ -86,7 +107,6 @@ import com.sun.corba.se.spi.orbutil.generic.SPair ;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
 import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
 import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent ;
- 
 
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactoryBuilder ;
@@ -104,6 +124,10 @@ import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
+import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
+
+import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
+import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
 
 import corba.folb_8_1.IIOPPrimaryToContactInfoImpl ;
 
@@ -169,7 +193,7 @@ public class Client extends TestCase
 	debug = (args.length>0) && args[0].equals( "-debug" ) ;
 
 	Client root = new Client() ;
-	TestResult result = junit.textui.TestRunner.run(root.suite()) ;
+	TestResult result = junit.textui.TestRunner.run(Client.suite()) ;
 
 	if (result.errorCount() + result.failureCount() > 0) {
 	    System.out.println( "Error: failures or errrors in JUnit test" ) ;
@@ -188,7 +212,6 @@ public class Client extends TestCase
     {
 	super( name ) ;
     }
-
 
     public static Test suite()
     {
@@ -1066,6 +1089,104 @@ public class Client extends TestCase
         } finally {
             if (orb != null)
                 orb.destroy() ;
+        }
+    }
+
+    private interface ETest extends Remote {
+        int echo( int arg ) throws RemoteException ;
+    }
+    
+    private static class ETestImpl extends PortableRemoteObject implements ETest {
+        ETestImpl() throws RemoteException {
+            super() ;
+        }
+
+        public int echo( int arg ) { return arg ; }
+    }
+
+    private static class TestServantLocator extends LocalObject
+        implements ServantLocator {
+
+        private final ORB orb ;
+        private final Servant servant ;
+
+        public TestServantLocator( ORB orb ) {
+            this.orb = orb ;
+            ETestImpl impl = null ;
+	    try {
+	        impl = new ETestImpl() ;
+	    } catch (Exception exc) {
+		// do nothing
+	    }
+            Tie tie = orb.getPresentationManager().getTie() ;
+            tie.setTarget( impl ) ;
+            servant = Servant.class.cast( tie ) ;
+        }
+
+	public synchronized Servant preinvoke( byte[] oid, POA adapter,
+	    String operation, CookieHolder the_cookie ) throws ForwardRequest {
+	    return servant ;
+	}
+
+	public void postinvoke( byte[] oid, POA adapter,
+	    String operation, Object the_cookie, Servant the_servant ) {
+	}
+    }
+
+    public void testTypeCode() {
+        System.out.println( "Test case testTypeCode" ) ;
+        try {
+            final String[] args = new String[0] ;
+            final Properties props = new Properties() ;
+            props.setProperty( ORBConstants.RFM_PROPERTY, "1" ) ;
+            props.setProperty( ORBConstants.USE_DYNAMIC_STUB_PROPERTY, "true" ) ;
+            props.setProperty( ORBConstants.ORB_SERVER_ID_PROPERTY,
+                "300" ) ;
+            props.setProperty( ORBConstants.PERSISTENT_SERVER_PORT_PROPERTY,
+                "3755" ) ;
+            orb = ORB.class.cast( ORB.init( args, props ) ) ;
+
+            // Just get some object referece for testing
+            final ServantLocator locator = new TestServantLocator( orb ) ;
+
+	    ReferenceFactoryManager rfm = null ;
+
+	    try {
+                rfm = ReferenceFactoryManager.class.cast(
+                    orb.resolve_initial_references( "ReferenceFactoryManager" )) ;
+		} catch (Exception exc) {
+		    // do nthing
+		}
+            rfm.activate() ;
+
+            final PresentationManager pm = 
+                com.sun.corba.se.spi.orb.ORB.getPresentationManager() ;
+            String repositoryId ;
+
+            try {
+                repositoryId = pm.getRepositoryId( new ETestImpl() ) ;
+            } catch (Exception exc) {
+                throw new RuntimeException( exc ) ;
+            }
+	
+            final List<Policy> policies = new ArrayList<Policy>() ;
+            final ReferenceFactory rf = rfm.create( "factory", repositoryId, 
+                policies, locator ) ;
+
+            // arbitrary
+            final byte[] oid = new byte[] { 0, 3, 5, 7 } ;
+
+            final org.omg.CORBA.Object ref = rf.createReference( oid ) ;
+
+            final Any any = orb.create_any() ;
+            final ForwardRequest fr = new ForwardRequest(ref) ;
+
+            // The whole point of this test
+            ForwardRequestHelper.insert(any, fr) ;
+        } finally {
+            if (orb != null) {
+                orb.destroy() ;
+            }
         }
     }
 }

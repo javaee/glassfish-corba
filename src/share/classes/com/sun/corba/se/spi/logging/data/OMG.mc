@@ -1,26 +1,30 @@
 ;  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-; 
-;  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
-; 
+;  
+;  Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+;  
 ;  The contents of this file are subject to the terms of either the GNU
 ;  General Public License Version 2 only ("GPL") or the Common Development
 ;  and Distribution License("CDDL") (collectively, the "License").  You
-;  may not use this file except in compliance with the License. You can obtain
-;  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
-;  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+;  may not use this file except in compliance with the License.  You can
+;  obtain a copy of the License at
+;  https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+;  or packager/legal/LICENSE.txt.  See the License for the specific
 ;  language governing permissions and limitations under the License.
-; 
+;  
 ;  When distributing the software, include this License Header Notice in each
 ;  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
-;  Sun designates this particular file as subject to the "Classpath" exception
-;  as provided by Sun in the GPL Version 2 section of the License file that
-;  accompanied this code.  If applicable, add the following below the License
-;  Header, with the fields enclosed by brackets [] replaced by your own
-;  identifying information: "Portions Copyrighted [year]
-;  [name of copyright owner]"
-; 
+;  
+;  GPL Classpath Exception:
+;  Oracle designates this particular file as subject to the "Classpath"
+;  exception as provided by Oracle in the GPL Version 2 section of the License
+;  file that accompanied this code.
+;  
+;  Modifications:
+;  If applicable, add the following below the License Header, with the fields
+;  enclosed by brackets [] replaced by your own identifying information:
+;  "Portions Copyright [year] [name of copyright owner]"
+;  
 ;  Contributor(s):
-; 
 ;  If you wish your version of this file to be governed by only the CDDL or
 ;  only the GPL Version 2, indicate your decision by adding "[Contributor]
 ;  elects to include this software in this distribution under the [CDDL or GPL
@@ -43,7 +47,7 @@
 	    (SHUTDOWN_WAIT_FOR_COMPLETION_DEADLOCK    3  WARNING "Operation would deadlock")
 	    (BAD_OPERATION_AFTER_SHUTDOWN   4  WARNING "ORB has shutdown")
 	    (BAD_INVOKE			    5  WARNING "Attempt to invoke send or invoke operation of the same Request object more than once ")
-	    (BAD_SET_SERVANT_MANAGER	    6  WARNING "Attempt to set a servent manager after one has already been set")
+	    (BAD_SET_SERVANT_MANAGER	    6  WARNING "Attempt to set a servant manager after one has already been set")
 	    (BAD_ARGUMENTS_CALL		    7  WARNING "ServerRequest::arguments called more than once or after a call to ServerRequest::set_exception")
 	    (BAD_CTX_CALL		    8  WARNING "ServerRequest::ctx called more than once or before ServerRequest::arguments or after ServerRequest::ctx, ServerRequest::set_result or ServerRequest::set_exception")
 	    (BAD_RESULT_CALL 		    9  WARNING "ServerRequest::set_result called more than once or before ServerRequest::arguments or after ServerRequest::set_result or ServerRequest::set_exception")
@@ -135,7 +139,7 @@
 	    (SET_RESULT_BEFORE_CTX	    2  WARNING "ServerRequest::set_result called before ServerRequest::ctx when the operation IDL contains a context clause ")
 	    (BAD_NVLIST			    3  WARNING "NVList passed to ServerRequest::arguments does not describe all parameters passed by client")
 	    (NOT_AN_OBJECT_IMPL		    4  WARNING "Attempt to marshal Local object")
-	    (WCHAR_BAD_GIOP_VERSION_SENT    5  WARNING "wchar or wstring data erroneosly sent by client over GIOP 1.0 connection ")
+	    (WCHAR_BAD_GIOP_VERSION_SENT    5  WARNING "wchar or wstring data erroneously sent by client over GIOP 1.0 connection ")
 	    (WCHAR_BAD_GIOP_VERSION_RETURNED 6 WARNING "wchar or wstring data erroneously returned by server over GIOP 1.0 connection ")
 	    (UNSUPPORTED_FORMAT_VERSION	    7  WARNING "Unsupported RMI/IDL custom value type stream format")
 	    (RMIIIOP_OPTIONAL_DATA_INCOMPATIBLE1 8 FINE "No optional data available")

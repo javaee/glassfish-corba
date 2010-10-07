@@ -1,26 +1,30 @@
 ;  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-; 
-;  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
-; 
+;  
+;  Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+;  
 ;  The contents of this file are subject to the terms of either the GNU
 ;  General Public License Version 2 only ("GPL") or the Common Development
 ;  and Distribution License("CDDL") (collectively, the "License").  You
-;  may not use this file except in compliance with the License. You can obtain
-;  a copy of the License at https://glassfish.dev.java.net/public/CDDL+GPL.html
-;  or glassfish/bootstrap/legal/LICENSE.txt.  See the License for the specific
+;  may not use this file except in compliance with the License.  You can
+;  obtain a copy of the License at
+;  https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+;  or packager/legal/LICENSE.txt.  See the License for the specific
 ;  language governing permissions and limitations under the License.
-; 
+;  
 ;  When distributing the software, include this License Header Notice in each
 ;  file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
-;  Sun designates this particular file as subject to the "Classpath" exception
-;  as provided by Sun in the GPL Version 2 section of the License file that
-;  accompanied this code.  If applicable, add the following below the License
-;  Header, with the fields enclosed by brackets [] replaced by your own
-;  identifying information: "Portions Copyrighted [year]
-;  [name of copyright owner]"
-; 
+;  
+;  GPL Classpath Exception:
+;  Oracle designates this particular file as subject to the "Classpath"
+;  exception as provided by Oracle in the GPL Version 2 section of the License
+;  file that accompanied this code.
+;  
+;  Modifications:
+;  If applicable, add the following below the License Header, with the fields
+;  enclosed by brackets [] replaced by your own identifying information:
+;  "Portions Copyright [year] [name of copyright owner]"
+;  
 ;  Contributor(s):
-; 
 ;  If you wish your version of this file to be governed by only the CDDL or
 ;  only the GPL Version 2, indicate your decision by adding "[Contributor]
 ;  elects to include this software in this distribution under the [CDDL or GPL
@@ -46,11 +50,11 @@
 	    (EXCEPTION_IN_LOAD_STUB 5 WARNING 
 	     "Exception in loadStub")
 	    (COULD_NOT_MAKE_STUB_FROM_REPOSITORY_ID 6 WARNING 
-	     "???nable to make stub from any of the repository IDs of the interface")
+	     "Unable to make stub from any of the repository IDs of the interface")
 	    (EXCEPTION_IN_CREATE_IIOP_OUTPUT_STREAM 7 WARNING
-	     "An IOException occured while creating an IIOPOutputStream")
+	     "An IOException occurred while creating an IIOPOutputStream")
 	    (EXCEPTION_IN_CREATE_IIOP_INPUT_STREAM 8 WARNING
-	     "An IOException occured while creating an IIOPInputStream")
+	     "An IOException occurred while creating an IIOPInputStream")
 	    (ONLY_ONE_CALL_TO_CONSTRUCTOR_ALLOWED 
 	     9 WARNING "Only one call to the Util constructor is allowed; normally Util.getInstance should be called")
 	    )

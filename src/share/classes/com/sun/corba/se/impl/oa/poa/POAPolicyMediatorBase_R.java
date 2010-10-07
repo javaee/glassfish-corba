@@ -56,8 +56,9 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 	super( policies, poa ) ;
 
 	// assert policies.retainServants() && policies.useActiveObjectMapOnly()
-	if (!policies.retainServants())
-	    throw poa.invocationWrapper().policyMediatorBadPolicyInFactory() ;
+	if (!policies.retainServants()) {
+            throw poa.invocationWrapper().policyMediatorBadPolicyInFactory();
+        }
 
         activeObjectMap = ActiveObjectMap.create(poa, !isUnique);
     }
@@ -76,8 +77,9 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     protected Servant internalKeyToServant( ActiveObjectMap.Key key )
     {
 	AOMEntry entry = activeObjectMap.get(key);
-	if (entry == null)
-	    return null ;
+	if (entry == null) {
+            return null;
+        }
 
 	return activeObjectMap.getServant( entry ) ;
     }
@@ -91,7 +93,7 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     @Poa
     protected void activateServant( ActiveObjectMap.Key key, AOMEntry entry, Servant servant )
     {
-	setDelegate(servant, key.id );
+	setDelegate(servant, key.id() );
 
 	activeObjectMap.putServant( servant, entry ) ;
 
@@ -104,8 +106,9 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     public final void activateObject(byte[] id, Servant servant) 
 	throws WrongPolicy, ServantAlreadyActive, ObjectAlreadyActive
     {
-	if (isUnique && activeObjectMap.contains(servant))
-	    throw new ServantAlreadyActive();
+	if (isUnique && activeObjectMap.contains(servant)) {
+            throw new ServantAlreadyActive();
+        }
 	ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
 
 	AOMEntry entry = activeObjectMap.get( key ) ;
@@ -146,12 +149,14 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 	throws ObjectNotActive, WrongPolicy {
 
 	AOMEntry entry = activeObjectMap.get(key);
-	if (entry == null)
-	    throw new ObjectNotActive();
+	if (entry == null) {
+            throw new ObjectNotActive();
+        }
 
 	Servant s = activeObjectMap.getServant( entry ) ;
-	if (s == null)
-	    throw new ObjectNotActive();
+	if (s == null) {
+            throw new ObjectNotActive();
+        }
 
 	deactivatingObject( s, poa ) ;
 
@@ -165,30 +170,32 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     {	
 	// XXX needs to handle call from an invocation on this POA
 
-	if (!isUnique && !isImplicit)
-	    throw new WrongPolicy();
+	if (!isUnique && !isImplicit) {
+            throw new WrongPolicy();
+        }
 
 	if (isUnique) {
 	    ActiveObjectMap.Key key = activeObjectMap.getKey(servant);
-	    if (key != null)
-		return key.id ;
+	    if (key != null) {
+                return key.id();
+            }
 	} 
 
 	// assert !isUnique || (servant not in activateObjectMap)
 	
-	if (isImplicit)
-	    try {
-		byte[] id = newSystemId() ;
-		activateObject( id, servant ) ;
-		return id ; 
-	    } catch (ObjectAlreadyActive oaa) {
-		// This can't occur here, since id is always brand new.
-		throw poa.invocationWrapper().servantToIdOaa( oaa ) ;
-	    } catch (ServantAlreadyActive s) {
-		throw poa.invocationWrapper().servantToIdSaa( s ) ;
-	    } catch (WrongPolicy w) {
-		throw poa.invocationWrapper().servantToIdWp( w ) ;
-	    }
+	if (isImplicit) {
+            try {
+                byte[] id = newSystemId();
+                activateObject(id, servant);
+                return id;
+            } catch (ObjectAlreadyActive oaa) {
+                throw poa.invocationWrapper().servantToIdOaa(oaa);
+            } catch (ServantAlreadyActive s) {
+                throw poa.invocationWrapper().servantToIdSaa(s);
+            } catch (WrongPolicy w) {
+                throw poa.invocationWrapper().servantToIdWp(w);
+            }
+        }
 
 	throw new ServantNotActive();
     }

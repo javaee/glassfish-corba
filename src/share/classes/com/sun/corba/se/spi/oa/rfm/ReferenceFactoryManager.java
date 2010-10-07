@@ -76,9 +76,11 @@ import com.sun.corba.se.spi.orbutil.generic.Pair ;
 public interface ReferenceFactoryManager extends org.omg.CORBA.Object,
     org.omg.CORBA.portable.IDLEntity 
 {
+    public enum RFMState { READY, SUSPENDED }
+
     /** The state of the ReferenceFactoryManager.
      */
-    public org.omg.PortableServer.POAManagerPackage.State getState();
+    public RFMState getState();
 
     /** Must be called before any other operation.
      * Used to activate the ORB reference creation function.

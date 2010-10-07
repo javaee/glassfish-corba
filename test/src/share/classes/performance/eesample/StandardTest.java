@@ -54,8 +54,6 @@ import java.util.Properties ;
 
 import java.rmi.RemoteException ;
 import java.rmi.Remote ;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.rmi.CORBA.Tie ;
 import javax.rmi.CORBA.Stub ;
@@ -127,7 +125,7 @@ import com.sun.japex.TestCase ;
 
 /** Standard top-level ORB test.  Does the following:
  * <OL>
- * <LI>Tests CDR stream marshalling (for a copy) for a trivial call (long as arg) and
+ * <LI>Tests CDR stream marshaling (for a copy) for a trivial call (long as arg) and
  * for more complex data (ArrayList of simple instances)
  * <LI>Tests inter ORB call with trivial data (long arg and result) and returning
  * complex data (same ArrayList).  The ORB instances are in the same VM, so loopback

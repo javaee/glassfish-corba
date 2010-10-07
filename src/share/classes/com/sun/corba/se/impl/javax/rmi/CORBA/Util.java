@@ -143,8 +143,10 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	ORB.getStaticLogWrapperTable().get_RPC_ENCODING_Util() ; 
     private static Util instance = null;
 
-    private WeakHashMap<java.lang.Class, String> annotationMap = 
-                                    new WeakHashMap<java.lang.Class, String> ();
+    // XXX Would like to have a WeakConcurrentHashMap here to reduce contention,
+    // but that is only available with Google collections at present.
+    private WeakHashMap<java.lang.Class<?>, String> annotationMap =
+        new WeakHashMap<java.lang.Class<?>, String> ();
 
     private static final java.lang.Object annotObj = new java.lang.Object();
 
@@ -614,14 +616,21 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      * @return a space-separated list of URLs, or null.
      */
     public String getCodebase(java.lang.Class clz) {
+        String annot ;
         synchronized (annotObj) {
-	    String annot = annotationMap.get(clz);
-	    if (annot == null) {
-	        annot = RMIClassLoader.getClassAnnotation(clz);
-		annotationMap.put(clz, annot);
-		return annot;
-	    } else return annot;
-	}
+	    annot = annotationMap.get(clz);
+        }
+
+        if (annot == null) {
+            // This can be an expensive operation, so don't hold the lock here.
+            annot = RMIClassLoader.getClassAnnotation(clz);
+
+            synchronized( annotObj ) {
+                annotationMap.put(clz, annot);
+            }
+        }
+
+        return annot;
     }
 
     /**

@@ -119,7 +119,7 @@ public class WorkQueueImpl implements WorkQueue
 
                 wait(waitTime);
                 
-                if (System.currentTimeMillis() >= timeOutTime) {
+                if (this.isQueueEmpty() && System.currentTimeMillis() >= timeOutTime) {
                     int availableThreads = 
                             workerThreadPool.numberOfAvailableThreads();
                     int minThreads = workerThreadPool.minimumNumberOfThreads();

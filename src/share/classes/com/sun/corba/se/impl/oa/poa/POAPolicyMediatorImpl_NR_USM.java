@@ -36,7 +36,6 @@
 
 package com.sun.corba.se.impl.oa.poa ;
 
-import java.util.Enumeration ;
 
 import org.omg.PortableServer.POA ;
 import org.omg.PortableServer.Servant ;
@@ -51,8 +50,6 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.impl.oa.NullServantImpl ;
@@ -61,6 +58,7 @@ import com.sun.corba.se.impl.oa.NullServantImpl ;
  * operations on the POA.
  */
 public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
+    // XXX How do we protect locator from multi-threaded access?
     private ServantLocator locator ;
 
     POAPolicyMediatorImpl_NR_USM( Policies policies, POAImpl poa ) 
@@ -68,11 +66,13 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
 	super( policies, poa ) ;
 
 	// assert !policies.retainServants() && policies.useServantManager()
-	if (policies.retainServants())
-	    throw poa.invocationWrapper().policyMediatorBadPolicyInFactory() ;
+	if (policies.retainServants()) {
+            throw poa.invocationWrapper().policyMediatorBadPolicyInFactory();
+        }
 
-	if (!policies.useServantManager())
-	    throw poa.invocationWrapper().policyMediatorBadPolicyInFactory() ;
+	if (!policies.useServantManager()) {
+            throw poa.invocationWrapper().policyMediatorBadPolicyInFactory();
+        }
 
 	locator = null ;
     }
@@ -80,24 +80,20 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
     protected java.lang.Object internalGetServant( byte[] id, 
 	String operation ) throws ForwardRequest
     { 
-	if (locator == null)
-	    throw poa.invocationWrapper().poaNoServantManager() ;
+	if (locator == null) {
+            throw poa.invocationWrapper().poaNoServantManager();
+        }
     
 	CookieHolder cookieHolder = orb.peekInvocationInfo().getCookieHolder() ;
 
-	// Try - finally is J2EE requirement.
-	java.lang.Object servant;
-	try{
-	    poa.unlock() ;
+	java.lang.Object servant = locator.preinvoke(id, poa, operation,
+            cookieHolder);
 
-	    servant = locator.preinvoke(id, poa, operation, cookieHolder);
-	    if (servant == null)
-		servant = new NullServantImpl( poa.omgInvocationWrapper().nullServantReturned() ) ;
-	    else
-		setDelegate( (Servant)servant, id);
-	} finally {
-	    poa.lock() ;
-	}
+        if (servant == null) {
+            servant = new NullServantImpl(poa.omgInvocationWrapper().nullServantReturned());
+        } else {
+            setDelegate((Servant) servant, id);
+        }
 
 	return servant;
     }
@@ -105,18 +101,15 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
     public void returnServant() 
     {
 	OAInvocationInfo info = orb.peekInvocationInfo();
-        // 6878245: added info == null check.
-	if (locator == null || info == null)
-	    return;
 
-	try {
-	    poa.unlock() ;
-	    locator.postinvoke(info.id(), (POA)(info.oa()),
-		info.getOperation(), info.getCookieHolder().value,
-		(Servant)(info.getServantContainer()) );
-	} finally {
-	    poa.lock() ;
-	}
+        // 6878245: added info == null check.
+	if (locator == null || info == null) {
+            return;
+        }
+
+        locator.postinvoke(info.id(), (POA)(info.oa()),
+            info.getOperation(), info.getCookieHolder().value,
+            (Servant)(info.getServantContainer()) );
     }
 
     public void etherealizeAll() 
@@ -136,13 +129,15 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
 
     public void setServantManager( ServantManager servantManager ) throws WrongPolicy
     {
-	if (locator != null)
-	    throw poa.invocationWrapper().servantManagerAlreadySet() ;
+	if (locator != null) {
+            throw poa.invocationWrapper().servantManagerAlreadySet();
+        }
 
-	if (servantManager instanceof ServantLocator)
-	    locator = (ServantLocator)servantManager;
-	else
-	    throw poa.invocationWrapper().servantManagerBadType() ;
+	if (servantManager instanceof ServantLocator) {
+            locator = (ServantLocator) servantManager;
+        } else {
+            throw poa.invocationWrapper().servantManagerBadType();
+        }
     }
 
     public Servant getDefaultServant() throws NoServant, WrongPolicy 

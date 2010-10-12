@@ -55,9 +55,8 @@ import javax.rmi.PortableRemoteObject ;
 import com.sun.corba.se.spi.orb.ORB;
 
 import java.rmi.Remote;
-import java.rmi.server.ExportException;
 
-// XXX This creates a dependendcy on the implementation
+// This creates a dependendcy on the implementation
 // of the CosNaming service provider.
 import com.sun.jndi.cosnaming.CNCtx ;
 
@@ -77,21 +76,20 @@ public class JNDIStateFactoryImpl implements StateFactory
     private static final Field orbField ;
 
     static {
-	orbField = (Field) AccessController.doPrivileged( 
-	    new PrivilegedAction() {
-		public Object run() {
-		    Field fld = null ;
-		    try {
-			Class cls = CNCtx.class ;
-			fld = cls.getDeclaredField( "_orb" ) ;
-			fld.setAccessible( true ) ;
-		    } catch (Exception exc) {
-			// XXX log exception at FINE
-		    }
-		    return fld ;
-		}
-	    } 
-	) ;
+	orbField = AccessController.doPrivileged(
+            new PrivilegedAction<Field>() {
+
+            public Field run() {
+                Field fld = null;
+                try {
+                    Class cls = CNCtx.class;
+                    fld = cls.getDeclaredField("_orb");
+                    fld.setAccessible(true);
+                } catch (Exception exc) {
+                }
+                return fld;
+            }
+        }) ;
     }
 
     public JNDIStateFactoryImpl() 
@@ -117,25 +115,27 @@ public class JNDIStateFactoryImpl implements StateFactory
     public Object getStateToBind(Object orig, Name name, Context ctx,
 	Hashtable<?,?> env) throws NamingException 
     {
-	if (orig instanceof org.omg.CORBA.Object)
-	    return orig ;
+	if (orig instanceof org.omg.CORBA.Object) {
+            return orig;
+        }
 
-        if (!(orig instanceof Remote)) 
-	    // Not for this StateFactory
-	    return null ;
+        if (!(orig instanceof Remote)) {
+            return null;
+        }
 
 	ORB orb = getORB( ctx ) ; 
-	if (orb == null)
+	if (orb == null) {
 	    // Wrong kind of context, so just give up and let another StateFactory
 	    // try to satisfy getStateToBind.
 	    return null ;
+        }
 
 	Remote stub = null;
 
 	try {
 	    stub = PortableRemoteObject.toStub( (Remote)orig ) ;
 	} catch (Exception exc) {
-	    // XXX log at FINE level?
+            Exceptions.self.noStub( exc ) ;
 	    // Wrong sort of object: just return null to allow another StateFactory
 	    // to handle this.  This can happen easily because this StateFactory
 	    // is specified for the application, not the service context provider.
@@ -146,8 +146,9 @@ public class JNDIStateFactoryImpl implements StateFactory
 	    try {
 		StubAdapter.connect( stub, orb ) ; 
 	    } catch (Exception exc) {
+                Exceptions.self.couldNotConnect( exc ) ;
+
 		if (!(exc instanceof java.rmi.RemoteException)) {
-		    // XXX log at FINE level?
 		    // Wrong sort of object: just return null to allow another StateFactory
 		    // to handle this call.
 		    return null ;
@@ -174,7 +175,7 @@ public class JNDIStateFactoryImpl implements StateFactory
 	try {
 	    orb = (ORB)orbField.get( ctx ) ;
 	} catch (Exception exc) {
-	    // XXX log this exception at FINE level
+            Exceptions.self.couldNotGetORB( exc, ctx ) ;
 	    // ignore the exception and return null.
 	    // Note that the exception may be because ctx
 	    // is not a CosNaming context.

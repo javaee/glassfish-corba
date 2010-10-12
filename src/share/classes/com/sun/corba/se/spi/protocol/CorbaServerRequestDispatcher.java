@@ -43,7 +43,6 @@ package com.sun.corba.se.spi.protocol;
 
 import com.sun.corba.se.spi.ior.ObjectKey;
 
-// XXX These must all be replaced by Sun private APIs.
 import com.sun.corba.se.spi.ior.IOR ;
 
 /**

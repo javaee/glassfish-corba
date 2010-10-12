@@ -74,7 +74,6 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.spi.logging.IORSystemException ;
 
-// XXX remove this once getProfile is gone
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 
 /** An IOR is represented as a list of profiles.

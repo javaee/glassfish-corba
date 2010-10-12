@@ -59,8 +59,6 @@ import org.omg.CORBA.ORB ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
-// XXX Getting rid of this requires introducing an ObjectAdapterManager abstraction
-// as an interface into the OA framework. 
 import com.sun.corba.se.impl.oa.poa.POAManagerImpl ;
 
 /** Provide access to stub delegate and type id information

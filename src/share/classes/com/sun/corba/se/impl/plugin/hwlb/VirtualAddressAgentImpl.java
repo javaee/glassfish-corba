@@ -98,9 +98,8 @@ import com.sun.corba.se.impl.orb.ORBDataParserImpl ;
 
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
 
-// Import this to allow running on JDK 1.4, which does
-// not contain the CORBA 3.0 IORInfo.
 import com.sun.corba.se.impl.interceptors.IORInfoImpl ;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
 
@@ -109,6 +108,9 @@ public class VirtualAddressAgentImpl
     extends LocalObject 
     implements ORBConfigurator, ORBInitializer, IORInterceptor_3_0
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     public static final String VAA_HOST_PROPERTY = ORBConstants.SUN_PREFIX + 
 	"ORBVAAHost" ;
     public static final String VAA_PORT_PROPERTY = ORBConstants.SUN_PREFIX + 
@@ -207,10 +209,7 @@ public class VirtualAddressAgentImpl
 			fld.set( odata, newOrbInits ) ;
 			return null ;
 		    } catch (Exception exc) {
-		      exc.printStackTrace();
-			// XXX should log something here
-			throw new RuntimeException( 
-			    "Could not set ORBData.orbInitializers", exc ) ;
+                        throw wrapper.couldNotSetOrbInitializer( exc ) ;
 		    }
 		}
 	    }
@@ -228,9 +227,7 @@ public class VirtualAddressAgentImpl
 	try {
 	    info.add_ior_interceptor( this ) ;
 	} catch (Exception exc) {
-	    // XXX Ignore this for now, but probably should log.
-	    // Main exception here is duplicate name for the
-	    // interceptr.
+            wrapper.vaaErrorInPostInit( exc ) ;
 	}
     }
 

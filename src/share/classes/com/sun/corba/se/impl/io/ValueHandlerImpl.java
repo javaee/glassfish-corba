@@ -167,7 +167,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                            java.io.Serializable value,
                            byte streamFormatVersion) {
 
-	// XXX Do we really want this check here?  It will probably never fail.
         if (streamFormatVersion == 2) {
             if (!(out instanceof org.omg.CORBA.portable.ValueOutputStream)) {
 		throw omgWrapper.notAValueoutputstream() ;
@@ -501,9 +500,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 		out.write_ulong(length);
 		out.write_boolean_array(array, 0, length);
             } else {
-		// XXX I18N, logging needed.
-		throw new Error("Invalid primitive type : " + 
-		    obj.getClass().getName());
+                throw Exceptions.self.invalidPrimitiveType(
+                    obj.getClass().getName() ) ;
             }
         } else if (type == java.lang.Object.class) {
             Object[] array = (Object[])((Object)obj);
@@ -547,9 +545,9 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 		    try{
 			out.write_value((java.io.Serializable)array[i]);
 		    } catch(ClassCastException cce){
-			if (array[i] instanceof java.io.Serializable)
-			    throw cce;
-			else {
+			if (array[i] instanceof java.io.Serializable) {
+                            throw cce;
+                        } else {
 			    Utility.throwNotSerializableForCorba(
 				array[i].getClass().getName());
 			}
@@ -634,8 +632,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 		    in.read_boolean_array(array, 0, length);
 		    return ((java.io.Serializable)((Object)array));
                 } else {
-		    // XXX I18N, logging needed.
-		    throw new Error("Invalid primitive componentType : " + sequence.getName());
+                    throw Exceptions.self.invalidPrimitiveComponentType(
+                        sequence.getName());
                 }
             } else if (componentType == java.lang.Object.class) {
 		Object[] array = (Object[])java.lang.reflect.Array.newInstance(

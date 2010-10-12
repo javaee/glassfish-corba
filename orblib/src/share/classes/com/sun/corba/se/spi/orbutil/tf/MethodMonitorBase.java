@@ -37,96 +37,75 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.corba.se.spi.orbutil.tf;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
  * @author ken
  */
-public abstract class MethodMonitorBase implements MethodMonitor {
-    private Class<?> cls ;
-    private Collection<MethodMonitor> myContents = null ;
-    private MethodMonitorFactory mmf ;
+public abstract class MethodMonitorBase extends Named
+    implements MethodMonitor {
 
-    private boolean isInit = false ;
-    private String toStringValue = null ;
-    private int hashValue = -1 ;
+    private final Class<?> cls;
+    private final MethodMonitorFactory mmf;
+    private final Collection<MethodMonitor> myContents;
 
-    private void init() {
-        StringBuilder sb = new StringBuilder() ;
-        sb.append( "MethodMonitor[" ) ;
-        boolean first = true ;
-        for (MethodMonitor mm : contents()) {
-            sb.append( mm.getClass().getSimpleName() ) ;
-            if (first) {
-                first = false ;
-            } else {
-                sb.append( "," ) ;
-            }
-        }
-        sb.append( ']' ) ;
+    public static class MethodMonitorFactorySelfImpl extends
+        MethodMonitorFactoryBase {
+        private MethodMonitor mm ;
 
-        toStringValue = sb.toString() ;
-        hashValue = toStringValue.hashCode() ;
-    }
-
-    protected MethodMonitorBase( final Class<?> cls, 
-        final MethodMonitorFactory mmf ) {
-
-        this.cls = cls ;
-        this.mmf = mmf ;
-    }
-
-    public Class<?> myClass() {
-        return cls ;
-    }
-
-    protected void initContents() {
-        myContents.add( this ) ;
-    }
-    public synchronized Collection<MethodMonitor> contents() {
-        if (myContents == null) {
-            myContents = new HashSet<MethodMonitor>() ;
-            initContents() ;
+        public MethodMonitorFactorySelfImpl( String name ) {
+            super( name ) ;
         }
 
-        return myContents ;
-    }
-
-    public MethodMonitorFactory factory() {
-        return mmf ;
-    }
-
-    @Override
-    public synchronized boolean equals( Object obj ) {
-        if (obj == this) {
-            return true ;
+        public void init( MethodMonitor mm ) {
+            this.mm = mm ;
         }
 
-        if (obj == null) {
-            return false ;
+        public MethodMonitor create(Class<?> cls) {
+            return mm ;
         }
-
-        return toString().equals( obj.toString() ) ;
     }
 
-    @Override
-    public synchronized int hashCode() {
-        if (!isInit) {
-            init() ;
-        }
-        return hashValue ;
+    protected MethodMonitorBase(final String name, final Class<?> cls ) {
+        this( name, cls, new MethodMonitorFactorySelfImpl( name )) ;
+        ((MethodMonitorFactorySelfImpl)factory()).init(this);
     }
 
-    @Override
-    public synchronized String toString() {
-        if (!isInit) {
-            init() ;
-        }
-        return toStringValue ;
+    protected MethodMonitorBase(final String name, final Class<?> cls,
+        final MethodMonitorFactory mmf) {
+
+        super("MethodMonitor", name);
+        this.cls = cls;
+        this.mmf = mmf;
+        final Set<MethodMonitor> temp = new HashSet<MethodMonitor>();
+        temp.add(this);
+        this.myContents = Collections.unmodifiableSet(temp);
+    }
+
+    protected MethodMonitorBase(final String name, final Class<?> cls,
+        final MethodMonitorFactory mmf, Set<MethodMonitor> contents) {
+
+        super("MethodMonitor", name);
+        this.cls = cls;
+        this.mmf = mmf;
+        this.myContents = Collections.unmodifiableSet(contents);
+    }
+
+    public final Class<?> myClass() {
+        return cls;
+    }
+
+    public final MethodMonitorFactory factory() {
+        return mmf;
+    }
+
+    public final Collection<MethodMonitor> contents() {
+        return myContents;
     }
 }

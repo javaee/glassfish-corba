@@ -69,7 +69,6 @@ public interface IIOPProfile extends TaggedProfile
     /** Return the servant for this profile, if it is local 
      * AND if the OA that implements this objref supports direct access to servants 
      * outside of an invocation.
-     * XXX move this to the ObjectKeyTemplate
      */
     java.lang.Object getServant() ;
 

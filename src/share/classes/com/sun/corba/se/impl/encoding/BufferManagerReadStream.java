@@ -64,10 +64,6 @@ public class BufferManagerReadStream
     private boolean endOfStream = true;
     private final BufferQueue fragmentQueue = new BufferQueue();
 
-    // XXX Should this be static?  Should we make it configurable?
-    // Bug 6372405
-    private static final long FRAGMENT_TIMEOUT = 6000 ;
-
     // REVISIT - This should go in BufferManagerRead. But, since
     //           BufferManagerRead is an interface. BufferManagerRead
     //           might ought to be an abstract class instead of an
@@ -138,15 +134,15 @@ public class BufferManagerReadStream
 		boolean interrupted = false ;
                 try {
 		    // Bug 6372405
-                    fragmentQueue.wait( FRAGMENT_TIMEOUT );
+                    fragmentQueue.wait( orb.getORBData().fragmentReadTimeout());
                 } catch (InterruptedException e) {
 		    interrupted = true ;
 		}
 
 		// Bug 6372405
-		if (!interrupted && fragmentQueue.size() == 0)
-		    // XXX Can we add some debug info here?
-		    throw wrapper.bufferReadManagerTimeout() ;
+		if (!interrupted && fragmentQueue.size() == 0) {
+                    throw wrapper.bufferReadManagerTimeout();
+                }
 
                 if (receivedCancel) {
                     underflowMessage( "underflow() - Cancel request id after wait:", 
@@ -190,8 +186,9 @@ public class BufferManagerReadStream
     }
 
     public void init(Message msg) {
-        if (msg != null)
+        if (msg != null) {
             endOfStream = !msg.moreFragmentsToFollow();
+        }
     }
 
     // Release any queued ByteBufferWithInfo's byteBuffers to the
@@ -297,11 +294,14 @@ public class BufferManagerReadStream
     // Collects fragments received since the mark was engaged.
     public void fragmentationOccured(ByteBufferWithInfo newFragment)
     {
-        if (!markEngaged)
+        if (!markEngaged) {
             return;
+        }
 
-        if (fragmentStack == null)
-            fragmentStack = new LinkedList<ByteBufferWithInfo>();
+        if (fragmentStack == null) {
+            fragmentStack =
+                new LinkedList<ByteBufferWithInfo>();
+        }
 
         fragmentStack.addFirst(new ByteBufferWithInfo(newFragment));
     }

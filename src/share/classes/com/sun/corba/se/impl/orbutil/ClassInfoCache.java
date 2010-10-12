@@ -213,7 +213,7 @@ public class ClassInfoCache {
 	public boolean isProxyClass() { return isProxyClass ; }
     }
 
-    // XXX This shows up as a locking hotspot in heavy marshaling tests.
+    // This shows up as a locking hotspot in heavy marshaling tests.
     // Ideally we need a WeakConccurrentMap, which is not available in
     // the JDK (Google's MapMaker can easily construct such a class).
 

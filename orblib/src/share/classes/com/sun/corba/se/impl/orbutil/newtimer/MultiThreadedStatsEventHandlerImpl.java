@@ -82,7 +82,6 @@ public class MultiThreadedStatsEventHandlerImpl extends StatsEventHandlerBase {
 	synchronized (saListLock) {
 	    super.clear() ;
 	}
-	// XXX need to do something about thread local state: set flag to cause clearing?
     }
 
     protected void recordDuration( int id, long duration ) {

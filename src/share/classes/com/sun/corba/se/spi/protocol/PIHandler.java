@@ -57,11 +57,8 @@ import org.omg.CORBA.portable.RemarshalException;
 
 import com.sun.corba.se.spi.oa.ObjectAdapter ;
 
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator ;
-
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 
-// XXX These need to go away.
 import com.sun.corba.se.impl.corba.RequestImpl ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage ;
 

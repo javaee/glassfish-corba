@@ -272,10 +272,6 @@ public abstract class Test implements java.lang.Runnable
 	    // If FVD_FLAG exists, set test boolean on IIOPInputStream.
 	    // This forces the runtime to always use FullValueDescription 
 	    // instead of ObjectStreamClass
-
-	    // XXX This is causing a NoClassDefFoundError
-	    // com.sun.corba.se.impl.io.IIOPInputStream.setTestFVDFlag(
-		// args.containsKey(FVD_FLAG));
 	} catch (java.lang.Throwable thr) {
 	    System.out.println( "Caught exception " + thr ) ;
 	    thr.printStackTrace() ;

@@ -71,7 +71,6 @@ public class Client
         String[] args = new String[0] ;
         orb = ORB.init(args, System.getProperties());
 
-        // XXX Why is this needed here, but not everywhere else?
         System.getProperties().setProperty( ORBConstants.INITIAL_PORT_PROPERTY, 
             "1049" ) ;
 

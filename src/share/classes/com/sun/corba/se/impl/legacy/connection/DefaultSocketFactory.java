@@ -132,7 +132,7 @@ public class DefaultSocketFactory
 	try {
 	    socket.setTcpNoDelay(true);
 	} catch (Exception e) {
-            // XXX log this
+            wrapper.couldNotSetTcpNoDelay( e ) ;
 	}
 	return socket;
     }

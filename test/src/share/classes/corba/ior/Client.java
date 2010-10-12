@@ -1385,7 +1385,7 @@ public class Client
 	if (!equal( oid, okey.getId().getId() ))
 	    error( "Bad object id returned from object key" ) ;
 	
-	// XXX it would be better to check for equals rather than =,
+	// it would be better to check for equals rather than =,
 	// but that would require defining equals on the ObjectKeyTemplate
 	// classes, which is not currently supported.
 	if (temp != okey.getTemplate())

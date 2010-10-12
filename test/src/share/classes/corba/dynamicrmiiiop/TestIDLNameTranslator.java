@@ -136,14 +136,6 @@ public class TestIDLNameTranslator extends TestCase {
                                  
         doIDLNameTranslationTest(new String[] { "J_ContainerCLASH4_" },
                                  _ContainerClash4.class);    
-
-        /* XXX hold off for now until verifying ordering of container clash
-           with other mangling rules
-        doIDLNameTranslationTest(IDLContainerClashTest3.class,
-                                 IDLContainerClashTest3.ContainerClash.class);
-        doIDLNameTranslationTest(IDLContainerClashTest4.class,
-                                 IDLContainerClashTest4.ContainerClash.class);
-        */
     }
 
     public void testLeadingUnderscores()

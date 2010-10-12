@@ -127,7 +127,7 @@ public class BootstrapResolverImpl implements Resolver {
 	    } catch (ApplicationException e) {
 		throw wrapper.bootstrapApplicationException( e ) ;
 	    } catch (RemarshalException e) {
-		// XXX log this
+                wrapper.bootstrapRemarshalException( e ) ;
 		remarshal = true;
 	    }
 	}

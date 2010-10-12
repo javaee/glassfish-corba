@@ -41,6 +41,8 @@
 package corba.tf  ;
 
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitor;
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorBase;
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryBase;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactory;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryDefaults;
 import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry;
@@ -115,7 +117,8 @@ public class Client
         System.out.println( "result = " + tc.mult( 10, 10 ) ) ;
     }
 
-    MethodMonitorFactory tracingMonitorFactory = new MethodMonitorFactory() {
+    private MethodMonitorFactory tracingMonitorFactory =
+        new MethodMonitorFactoryBase( "TestTracing" ) {
         public MethodMonitor create(Class<?> cls) {
             return new MethodMonitorTracingImpl( cls ) ;
         }
@@ -212,8 +215,17 @@ public class Client
     private static final int METHODC ;
     private static final int INSYNC ;
 
-    private static final MethodMonitor expected =
-        new MethodMonitorTracingImpl( TestCombination.class ) ;
+    private static final MethodMonitor expected ;
+    
+    static {
+        MethodMonitorBase.MethodMonitorFactorySelfImpl mmf = 
+            new MethodMonitorBase.MethodMonitorFactorySelfImpl(
+                "Tracing") ;
+        MethodMonitor mm = new MethodMonitorTracingImpl(
+            TestCombination.class ) ;
+        mmf.init( mm ) ;
+        expected = mm ;
+    }
 
     private static final TestCombination tc ;
 

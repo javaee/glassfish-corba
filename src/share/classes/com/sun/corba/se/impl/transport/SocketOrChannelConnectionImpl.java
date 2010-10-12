@@ -761,7 +761,7 @@ public class SocketOrChannelConnectionImpl
             purgeCalls(wrapper.connectionRebind(), false, true);
 
         } catch (Exception ex) {
-            // XXX log this
+            wrapper.exceptionInPurgeCalls( ex ) ;
         }
 
         closeConnectionResources();
@@ -802,7 +802,7 @@ public class SocketOrChannelConnectionImpl
             }
             
         } catch (IOException e) {
-            // XXX log this
+            wrapper.exceptionOnClose( e ) ;
         }
     }
 
@@ -912,7 +912,7 @@ public class SocketOrChannelConnectionImpl
                     try {
                         stateEvent.wait();
                     } catch (InterruptedException ie) {
-                        // XXX log this
+                        wrapper.openingWaitInterrupted( ie ) ;
                     }
                 }
                 // Loop back
@@ -932,17 +932,12 @@ public class SocketOrChannelConnectionImpl
                             writeEvent.wait(100);
                         }
                     } catch (InterruptedException ie) {
-                        // XXX log this
+                        wrapper.establishedWaitInterrupted( ie ) ;
                     }
                 }
                 // Loop back
                 break;
             
-                //
-                // XXX
-                // Need to distinguish between client and server roles
-                // here probably.
-                //
             case ABORT:
                 synchronized ( stateEvent ){
                     if (state != ABORT) {

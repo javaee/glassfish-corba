@@ -52,6 +52,8 @@ import java.util.List;
 public class MethodMonitorTracingImpl extends MethodMonitorBase
     implements Iterable<TraceNode>  {
 
+    private static final String myName = "Tracing" ;
+
     public Iterator<TraceNode> iterator() {
         return state.iterator() ;
     }
@@ -61,7 +63,10 @@ public class MethodMonitorTracingImpl extends MethodMonitorBase
     private final List<TraceNode> state = new ArrayList<TraceNode>() ;
 
     public MethodMonitorTracingImpl( Class<?> cls ) {
-        super( cls ) ;
+        super( myName, cls,
+            new MethodMonitorBase.MethodMonitorFactorySelfImpl(myName)) ;
+        ((MethodMonitorBase.MethodMonitorFactorySelfImpl)factory()).init(
+            this ) ;
     }
 
     public void enter(int ident, Object... args) {
@@ -86,30 +91,5 @@ public class MethodMonitorTracingImpl extends MethodMonitorBase
 
     public void clear() {
         state.clear() ;
-    }
-
-    @Override
-    public int hashCode() {
-        return state.hashCode() ;
-    }
-
-    @Override
-    public boolean equals( Object obj ) {
-        if (this == obj) {
-            return true ;
-        }
-
-        if (!(obj instanceof MethodMonitorTracingImpl)) {
-            return false ;
-        }
-
-        MethodMonitorTracingImpl other = (MethodMonitorTracingImpl)obj ;
-
-        return state.equals( other.state ) ;
-    }
-
-    @Override 
-    public String toString() {
-        return "MethodMonitorTracingImpl[" + state.toString() + "]" ;
     }
 }

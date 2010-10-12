@@ -96,17 +96,13 @@ import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
 
-// XXX This should go away once we get rid of the port exchange for ORBD
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.impl.legacy.connection.SocketFactoryAcceptorImpl;
 import com.sun.corba.se.impl.legacy.connection.SocketFactoryContactInfoListImpl;
 import com.sun.corba.se.impl.legacy.connection.USLPort;
 
-// XXX These should move to SPI
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
-
-// XXX This needs an SPI
 import com.sun.corba.se.impl.dynamicany.DynAnyFactoryImpl ;
+import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.spi.transport.CorbaAcceptor;
 

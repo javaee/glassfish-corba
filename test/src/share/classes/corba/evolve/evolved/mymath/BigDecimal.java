@@ -3434,7 +3434,6 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
      */
     private String layoutString(boolean sci) {                     /*ibm@91995*/
         /*ibm@83584...*/
-        // TODO: Room for improvement a la toPlainString.
         // For E notations we currently we touch each digit twice by calling
         // Long.toString() and then walking the buffer to insert the required characters.
         // Could potentially be done in 1 pass.

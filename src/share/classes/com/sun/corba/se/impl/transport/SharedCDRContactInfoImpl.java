@@ -131,8 +131,7 @@ public class SharedCDRContactInfoImpl
 						 boolean isOneWay)
     {
 	if (connection != null) {
-	    /// XXX LOGGING
-	    throw new RuntimeException("connection is not null");
+            throw wrapper.connectionNotNullInCreateMessageMediator( connection ) ;
 	}
 
 	CorbaMessageMediator messageMediator =

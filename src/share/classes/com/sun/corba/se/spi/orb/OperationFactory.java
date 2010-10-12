@@ -570,9 +570,6 @@ public abstract class OperationFactory {
 	    this.op = op ;
 	}
 
-	// XXX Does this correctly handle array types?  It seems
-	// that hetereogeneous arrays work this way, while
-	// homogeneous arrays need to use Array.newInstance tricks.
 	public Object operate( Object value )
 	{
 	    Object[] values = (Object[])value ;

@@ -145,7 +145,6 @@ public class Common
 			return null ;
 		    } catch (Exception exc) {
 		      exc.printStackTrace();
-			// XXX should log something here
 			throw new RuntimeException( 
 			    "Could not set ORBData.orbInitializers", exc ) ;
 		    }

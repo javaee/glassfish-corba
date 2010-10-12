@@ -56,7 +56,7 @@ public interface ServiceContexts {
      * SendingContext service context.  This is required so that
      * the codebase is available to handle value types if
      * necessary.
-     * XXX
+     * 
      * We should really do this as SendingContext goes first, so
      * that we can guarantee correct marshalling of non-standard
      * service contexts.

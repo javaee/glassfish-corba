@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,20 +11,20 @@
  * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
  * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * 
+ *
  * GPL Classpath Exception:
  * Oracle designates this particular file as subject to the "Classpath"
  * exception as provided by Oracle in the GPL Version 2 section of the License
  * file that accompanied this code.
- * 
+ *
  * Modifications:
  * If applicable, add the following below the License Header, with the fields
  * enclosed by brackets [] replaced by your own identifying information:
  * "Portions Copyright [year] [name of copyright owner]"
- * 
+ *
  * Contributor(s):
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
@@ -38,37 +38,40 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.tf;
+package com.sun.corba.se.impl.presentation.rmi;
 
-import java.util.Collection;
+import com.sun.corba.se.spi.orbutil.logex.Chain;
+import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
+import com.sun.corba.se.spi.orbutil.logex.Log;
+import com.sun.corba.se.spi.orbutil.logex.LogLevel;
+import com.sun.corba.se.spi.orbutil.logex.Message;
+import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
+import com.sun.corba.se.spi.orbutil.logex.corba.StandardLogger;
+import javax.naming.Context;
 
-/** Since each MethodMonitor generally needs a reference to the class it is
- * monitoring, we actually work with MethodMonitorFactory instances instead
- * of simply using MethodMonitor.
+/**
  *
  * @author ken
  */
-public interface MethodMonitorFactory {
-    /** Return an instance of a MethodMonitor suitable for use in the given
-     * class cls, according to the currently registered MethodMonitorFactory 
-     * instances in the MethodMonitorRegistry.
-     * 
-     * @param cls The class for which we need the MethodMonitor.
-     * @return The MethodMonitor for cls.
-     */
-    MethodMonitor create( Class<?> cls ) ;
+@ExceptionWrapper( idPrefix="ORBPRES" )
+public interface Exceptions {
+    Exceptions self = WrapperGenerator.makeWrapper( Exceptions.class,
+        StandardLogger.self ) ;
 
-    /** Returns the contents of this method monitor factory.  If it is a composite
-     * method monitor factory, all the component MethoMonitorFactory instances are 
-     * returned.  If it is a single MethodMonitorFactory, it just returns itself.
-     * It is required that the elements of contents are not composite method
-     * monitors, i.e. for each mmf in contants(), mmf.contents.size() == 1.
-     */
-    Collection<MethodMonitorFactory> contents() ;
+    int EXCEPTIONS_PER_CLASS = 100 ;
 
-    /** The name of this mmf.  Given any two mmf a and b, a.equals( b ) iff
-     * a.name().equals( b.name() ).
-     * @return
-     */
-    String name() ;
+// JNDISateFactoryImpl
+    int JSFI_START = 0 ;
+
+    @Message( "No stub could be created" )
+    @Log( level=LogLevel.FINE, id = JSFI_START + 1 )
+    public void noStub(@Chain Exception exc);
+
+    @Message( "Could not connect stub" )
+    @Log( level=LogLevel.FINE, id = JSFI_START + 2 )
+    public void couldNotConnect(@Chain Exception exc);
+
+    @Message( "Could not get ORB from naming context" )
+    @Log( level=LogLevel.FINE, id = JSFI_START + 2 )
+    public void couldNotGetORB(@Chain Exception exc, Context nc );
 }

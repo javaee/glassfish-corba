@@ -169,7 +169,7 @@ public final class Utility {
      * Get a new instance of an RMI-IIOP Tie for the
      * given server object.
      *
-     * XXX This code is rather confused.  tieCache maps impls to Ties,
+     * This code is rather confused.  tieCache maps impls to Ties,
      * but loadTie returns a new Tie instance if the impl is already
      * cached.  Also this method is useless with dynamic RMI-IIOP, since
      * we just call new ReflectiveTie to create a Tie.  Even with
@@ -617,7 +617,7 @@ public final class Utility {
 		ids = StubAdapter.getTypeIds( tie ) ;
             } else {
 		// This will throw an exception if the tie
-		// is not a Servant.  XXX Handle this better?
+		// is not a Servant.  
                 ids = ((org.omg.PortableServer.Servant)tie).
                       _all_interfaces( null, null );
             }
@@ -819,11 +819,6 @@ public final class Utility {
 	    // for our own ORB.  Consequently, we need to check here
 	    // whether our own ORB is in use or not.  If not,
 	    // we must use the static StubFactoryFactory ONLY.
-	    //
-	    // XXX Should we support dynamic RMI-IIOP for other ORBs?
-	    // It appears that this is mostly a matter of handling
-	    // the DMM and copyObject code in StubInvocationHandlerImpl
-	    // without requiring the Sun ORB.
 	    ORB orb = delegate.orb(narrowFrom) ;
 	    PresentationManager.StubFactoryFactory sff = null ;
 	    if (orb instanceof com.sun.corba.se.spi.orb.ORB) {

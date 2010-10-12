@@ -47,7 +47,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
 /** Static library class to provide access to test configuration data.
- * XXX This thing need to be further re-written to a class that is instantiated,
+ * This thing need to be further re-written to a class that is instantiated,
  * instead of the current static approach.  It should set up the defaults from
  * system properties and arguments to the constructor in the constructor.
  * It should provide setters and getters as needed for the tests.

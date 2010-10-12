@@ -454,7 +454,8 @@ public class ObjectStreamClass implements java.io.Serializable {
 				fields = translateFields( f ) ;
 			    }
 			} catch (Exception e) {
-			    // XXX log this at fine level
+                            Exceptions.self.couldNotAccessSerialPersistentFields(
+                                e, cl.getName() ) ;
 			}
 
 			if (fields == null) {
@@ -494,11 +495,16 @@ public class ObjectStreamClass implements java.io.Serializable {
 					reflField.setAccessible(true);
 					fields[j].setField(reflField);
 				    } else {
-					// XXX I really think this needs to be handled.
+                                        Exceptions.self.fieldTypeMismatch(
+                                            cl.getName(),
+                                            fields[j].getName(),
+                                            fields[j].getType(),
+                                            reflField.getName(),
+                                            reflField.getType() ) ;
 				    }
 				} catch (NoSuchFieldException e) {
-				    // Nothing to do
-				    // XXX needs a fine log
+                                    Exceptions.self.noSuchField( e, cl.getName(),
+                                        fields[j].getName() ) ;
 				}
 			    }
 			}
@@ -1398,37 +1404,21 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     private static boolean hasStaticInitializer(Class cl) {
         if (hasStaticInitializerMethod == null) {
-            Class classWithThisMethod = null;
+            Class classWithThisMethod = ObjectStreamClass.class ;
             
             try {
-                try {
-                    // When using rip-int with Merlin or when this is a Merlin
-                    // workspace, the method we want is in sun.misc.ClassReflector
-                    // and absent from java.io.ObjectStreamClass.
-                    //
-                    // When compiling rip-int with JDK 1.3.x, we have to get it
-                    // from java.io.ObjectStreamClass.
-                    classWithThisMethod = Class.forName("sun.misc.ClassReflector");
-                } catch (ClassNotFoundException cnfe) {
-                    // Do nothing.  This is either not a Merlin workspace,
-                    // or rip-int is being compiled with something other than
-                    // Merlin, probably JDK 1.3.  Fall back on java.io.ObjectStreaClass.
-                }
-                if (classWithThisMethod == null)
-                    classWithThisMethod = java.io.ObjectStreamClass.class;
-                
                 hasStaticInitializerMethod =
                     classWithThisMethod.getDeclaredMethod(
 			"hasStaticInitializer", Class.class );
             } catch (NoSuchMethodException ex) {
+                // NOP: reported below
             }
             
             if (hasStaticInitializerMethod == null) {
-		// XXX I18N, logging needed
-                throw new InternalError(
-		    "Can't find hasStaticInitializer method on "
-		    + classWithThisMethod.getName());
+                throw Exceptions.self.cantFindHasStaticInitializer(
+		    classWithThisMethod.getName());
             }
+
             hasStaticInitializerMethod.setAccessible(true);
         }
 
@@ -1437,11 +1427,7 @@ public class ObjectStreamClass implements java.io.Serializable {
                 hasStaticInitializerMethod.invoke(null, cl );
             return retval.booleanValue();
         } catch (Exception ex) {
-	    // XXX I18N, logging needed
-            InternalError ie = new InternalError( 
-		"Error invoking hasStaticInitializer" ) ;
-	    ie.initCause( ex ) ;
-	    throw ie ;
+            throw Exceptions.self.errorInvokingHasStaticInitializer( ex ) ;
         }
     }
 

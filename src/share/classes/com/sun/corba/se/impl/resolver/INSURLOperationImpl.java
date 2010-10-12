@@ -152,7 +152,6 @@ public class INSURLOperationImpl implements Operation
     }
 
     private org.omg.CORBA.Object resolveINSURL( INSURL theURLObject ) {
-	// XXX resolve should be a method on INSURL
         if( theURLObject.isCorbanameURL() ) {
             return resolveCorbaname( (CorbanameURL)theURLObject );
         } else {
@@ -227,9 +226,9 @@ public class INSURLOperationImpl implements Operation
             }
         } catch( Exception e ) {
             clearRootNamingContextCache( );
-            // XXX Should this throw an exception or simply return null?
-            // See bug 6475580
-	    throw omgWrapper.soBadSchemaSpecific( e, theCorbaName.getStringifiedName() ) ;
+            // Bug 6475580
+	    throw omgWrapper.soBadSchemaSpecific( e,
+                theCorbaName.getStringifiedName() ) ;
         }
      }
 

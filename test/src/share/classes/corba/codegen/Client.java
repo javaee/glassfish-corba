@@ -538,7 +538,7 @@ public class Client extends TestCase {
 	}
     }	
     
-    // Bytecode generator testing (and TODO list)
+    // Bytecode generator testing (and work list)
     //
     // There is a lot that needs testing here.  One test is simply
     // to make sure that the main test samples generate valid

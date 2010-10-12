@@ -39,7 +39,6 @@
  */
 package com.sun.corba.se.spi.transport;
 
-// XXX we need better SPIs here
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message ;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 

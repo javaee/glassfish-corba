@@ -40,14 +40,9 @@
 
 package com.sun.corba.se.impl.copyobject ;
 
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import java.util.IdentityHashMap ;
 import java.util.Map ;
-import java.util.Iterator ;
-import java.util.HashMap ;
-import java.util.TreeMap ;
-import java.util.Hashtable ;
-
-import java.rmi.Remote ;
 
 import org.omg.CORBA.portable.ObjectImpl ;
 import org.omg.CORBA.portable.Delegate ;
@@ -56,9 +51,6 @@ import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 
 import com.sun.corba.se.spi.orb.ORB ;
-
-
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
 import com.sun.corba.se.impl.orbutil.copyobject.DefaultClassCopiers ;
 import com.sun.corba.se.impl.orbutil.copyobject.DefaultClassCopierFactories ;
@@ -71,7 +63,6 @@ import com.sun.corba.se.impl.orbutil.copyobject.PipelineClassCopierFactory ;
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
-// XXX Not good to be importing this, but seems to be necessary.
 import com.sun.corba.se.impl.util.Utility ;
 
 /** Class used to deep copy arbitrary data.  A single 
@@ -79,7 +70,10 @@ import com.sun.corba.se.impl.util.Utility ;
  * instance will preserve all object aliasing across multiple calls
  * to copy.
  */
-public class ReflectObjectCopierImpl implements ObjectCopier {    
+public class ReflectObjectCopierImpl implements ObjectCopier {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     // Note that this class is the only part of the copyObject
     // framework that is dependent on the ORB.  This is in
     // fact specialized just for CORBA objrefs and RMI-IIOP stubs.
@@ -122,8 +116,8 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 
 		    return result ;
 		} catch (Exception exc) {
-		    // XXX log this
-		    throw new RuntimeException(exc) ;
+		    throw wrapper.exceptionInCreateCopy( exc ) ;
+
 		}
 	    }
 	} ;
@@ -137,16 +131,19 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 		
 		// Handle Remote: this must come before CORBA.Object,
 		// since a corba Object may also be a Remote.
-		if (cinfo.isARemote(cls))
-		    return remoteClassCopier ;
+		if (cinfo.isARemote(cls)) {
+                    return remoteClassCopier;
+                }
 
 		// Handle org.omg.CORBA.portable.ObjectImpl
-		if (cinfo.isAObjectImpl(cls))
-		    return corbaClassCopier ;
+		if (cinfo.isAObjectImpl(cls)) {
+                    return corbaClassCopier;
+                }
 
 		// Need this case to handle TypeCode.
-		if (cinfo.isAORB(cls)) 
-		    return DefaultClassCopiers.getIdentityClassCopier() ;
+		if (cinfo.isAORB(cls)) {
+                    return DefaultClassCopiers.getIdentityClassCopier();
+                }
 
 		return null ;
 	    }
@@ -172,10 +169,12 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
     public ReflectObjectCopierImpl( ORB orb )
     {
 	localORB.set( orb ) ;
-	if (DefaultClassCopierFactories.USE_FAST_CACHE)
-	    oldToNew = new FastCache( new IdentityHashMap() ) ;
-	else
-	    oldToNew = new IdentityHashMap() ;
+	if (DefaultClassCopierFactories.USE_FAST_CACHE) {
+            oldToNew =
+                new FastCache(new IdentityHashMap());
+        } else {
+            oldToNew = new IdentityHashMap();
+        }
     }
 
     /** Return a deep copy of obj.  Aliasing is preserved within
@@ -189,11 +188,12 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 
     public Object copy( Object obj, boolean debug ) throws ReflectiveCopyException
     {
-	if (obj == null)
-	    return null ;
+	if (obj == null) {
+            return null;
+        }
 
         OperationTracer.begin( "ReflectObjectCopierImpl" ) ;
-	Class cls = obj.getClass() ;
+	Class<?> cls = obj.getClass() ;
 	ClassCopier copier = ccf.getClassCopier( cls ) ;
 
 	/* too much detail!

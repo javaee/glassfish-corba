@@ -72,7 +72,6 @@ public class DynamicStubImpl extends ObjectImpl
 
     public void setSelf( DynamicStub self ) 
     {
-	// XXX Should probably only allow this once.
 	this.self = self ;
     }
 

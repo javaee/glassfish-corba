@@ -246,7 +246,7 @@ public class PIHandlerImpl implements PIHandler
 					// cleanupClientPIRequest.
 	hasServerInterceptors = true ;  // same as hasClientInterceptors.
 
-	// XXX We could just remove the optimization, or perhaps we should
+	// We could just remove the optimization, or perhaps we should
 	// solve this as in InterceptorInvoker?  But that would still
 	// require the creation of a stack entry.   Perhaps we should
 	// merge the PI and request stacks and then re-visit this question.
@@ -283,7 +283,7 @@ public class PIHandlerImpl implements PIHandler
 	    // registered of a given type.
 	    hasIORInterceptors = interceptorList.hasInterceptorsOfType(
 		InterceptorList.INTERCEPTOR_TYPE_IOR );
-	    // XXX This must always be true, so that using the new generic
+	    // This must always be true, so that using the new generic
 	    // RPC framework can pass info between the PI stack and the
 	    // framework invocation stack.  Temporary until Harold fixes
 	    // this.  Note that this must never be true until after the

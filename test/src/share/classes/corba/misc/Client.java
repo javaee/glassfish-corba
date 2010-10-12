@@ -387,9 +387,6 @@ public class Client extends TestCase
 
 	ps.close() ;
 	byte[] data = os.toByteArray() ; 
-
-	// XXX need to write a validator here which verifies
-	// that the data does not get interleaved.
     }
 
     public void testBrooksPOAActivationProblem() {
@@ -834,7 +831,6 @@ public class Client extends TestCase
                 exc.printStackTrace() ;
             }
 	} finally {
-	    // XXX Analyze the event stream to determine if the test passed or not.
             if (debug) {
                 leh.display( System.out, "Connection timer log contents" ) ;
                 validateLogEvents( orb, leh, expectedInitialTimeout, expectedMaxWait,

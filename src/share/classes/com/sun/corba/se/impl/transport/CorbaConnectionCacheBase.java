@@ -262,10 +262,6 @@ public abstract class CorbaConnectionCacheBase
                 numberOfConnections - numberOfConnections() );
         }
 
-        // XXX is necessary to do a GC to reclaim
-        // closed network connections ??
-        // java.lang.System.gc();
-
         return true;
     }
 

@@ -428,7 +428,6 @@ public class Client
 
 
         // --------------------------------------------------
-        // XXX replace this with a test that does not use the old POA hooks.
         // Cause a runtime exception to happen and be handled
         // by PI in stub's _releaseReply
         // KMC: I have removed this test since I have removed the

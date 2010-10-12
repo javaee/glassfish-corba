@@ -51,7 +51,7 @@ import java.util.Properties ;
  * <ul>
  * <li>emma.rt.control true (the default)
  * <li>emma.rt.control.host localhost (the default)
- * <li>emma.rt.control.port XXX (defaults to 47653)
+ * <li>emma.rt.control.port somePort (defaults to 47653)
  * </ul>
  * The port should be one obtained from allocatePort, but that is
  * not too important.
@@ -59,7 +59,6 @@ import java.util.Properties ;
  * have a unique port.  This is yet another CORBA test framework
  * feature that prevents more than one concurrent test run per
  * machine.
- * XXX it would be better to probe for an unused port somehow.
  */
 public class EmmaControl {
     private EmmaControl() {}

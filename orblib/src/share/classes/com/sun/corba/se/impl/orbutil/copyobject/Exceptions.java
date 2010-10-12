@@ -48,6 +48,7 @@ import com.sun.corba.se.spi.orbutil.logex.Message;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
+import com.sun.corba.se.spi.orbutil.logex.corba.StandardLogger;
 
 /** Exception wrapper class.  The logex WrapperGenerator uses this interface
  * to generate an implementation which returns the appropriate exception, and
@@ -64,7 +65,7 @@ import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 @ExceptionWrapper( idPrefix="ORBOCOPY" )
 public interface Exceptions {
     static final Exceptions self = WrapperGenerator.makeWrapper(
-        Exceptions.class ) ;
+        Exceptions.class, StandardLogger.self ) ;
 
     // Allow 100 exceptions per class
     static final int EXCEPTIONS_PER_CLASS = 100 ;

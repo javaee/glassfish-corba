@@ -59,16 +59,6 @@ import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
  */
 public class ServerMain
 {
-    /* TODO:
-    * 1.  Rewrite all uses of ORB properties to use constants from someplace.
-    *     The strings are scattered between here, the ORB classes, and 
-    *     ServerTableEntry.
-    * 2.  Consider a more general log facility.
-    * 3.  Remove ServerCallback from POAORB.
-    * 4.  Needs to be merged with Harold's changes to support SSL.
-    * 5.  Logs need to be internationalized.
-    */
-
     public final static int OK = 0;
     public final static int MAIN_CLASS_NOT_FOUND = 1;
     public final static int NO_MAIN_METHOD = 2;

@@ -234,8 +234,7 @@ public class IIOPInputStream
             return result;
 
         } catch (Exception ex) {
-	    // XXX I18N, logging needed.
-            throw new ExceptionInInitializerError(ex);
+            throw Exceptions.self.noOptionalDataExceptionConstructor(ex);
         }
     }
 
@@ -255,8 +254,7 @@ public class IIOPInputStream
             return result;
 
         } catch (Exception ex) {
-	    // XXX I18N, logging needed.
-            throw new Error("Couldn't create OptionalDataException", ex);
+            throw Exceptions.self.cantCreateOptionalDataException( ex ) ;
         }
     }
 
@@ -459,8 +457,9 @@ public class IIOPInputStream
 
 
         ClassNotFoundException exCNF = abortClassNotFoundException;
-        if (simpleReadDepth == 0)
+        if (simpleReadDepth == 0) {
             abortClassNotFoundException = null;
+        }
         if (exCNF != null) {
             bridge.throwException( exCNF ) ;
             return null;
@@ -823,8 +822,7 @@ public class IIOPInputStream
     @Override
     @SuppressWarnings("deprecation")
     public final String readLine() throws IOException{
-	// XXX I18N, logging needed.
-        throw new IOException("Method readLine not supported");
+        throw Exceptions.self.readLineMethodNotSupported() ;
     }
 
     @ValueHandlerRead
@@ -959,21 +957,18 @@ public class IIOPInputStream
     public final synchronized void registerValidation(ObjectInputValidation obj,
 						      int prio)
 	throws NotActiveException, InvalidObjectException{
-	// XXX I18N, logging needed.
-        throw new Error("Method registerValidation not supported");
+        throw Exceptions.self.registerValidationNotSupport() ;
     }
 
     @Override
     protected final Class<?> resolveClass(java.io.ObjectStreamClass v)
 	throws IOException, ClassNotFoundException{
-	// XXX I18N, logging needed.
-        throw new IOException("Method resolveClass not supported");
+        throw Exceptions.self.resolveClassNotSupported() ;
     }
 
     @Override
     protected final Object resolveObject(Object obj) throws IOException{
-	// XXX I18N, logging needed.
-        throw new IOException("Method resolveObject not supported");
+        throw Exceptions.self.resolveObjectNotSupported() ;
     }
 
     @ValueHandlerRead
@@ -1843,7 +1838,7 @@ public class IIOPInputStream
                     throw new Error("internal error");
                 }
             } catch (IllegalAccessException e) {
-                // XXX logging needed.
+                Exceptions.self.illegalAccessInvokingObjectRead( e ) ;
             } finally {
                 // Make sure this is cleared no matter what
                 // the readObject method does.  If the readObject
@@ -1864,17 +1859,20 @@ public class IIOPInputStream
     @ValueHandlerRead
     private void resetStream() throws IOException {
 
-	if (classes == null)
-	    classes = new Class<?>[20];
-	else {
-	    for (int i = 0; i < classes.length; i++)
-		classes[i] = null;
+	if (classes == null) {
+            classes = new Class<?>[20];
+        } else {
+	    for (int i = 0; i < classes.length; i++) {
+                classes[i] = null;
+            }
 	}
+
 	if (classdesc == null) {
             classdesc = new ObjectStreamClass[20];
         } else {
-	    for (int i = 0; i < classdesc.length; i++)
-		classdesc[i] = null;
+	    for (int i = 0; i < classdesc.length; i++) {
+                classdesc[i] = null;
+            }
 	}
 	spClass = 0;
 
@@ -1937,8 +1935,8 @@ public class IIOPInputStream
 		    //reflective code: field.getField().setDouble( o, doubleValue ) ;
                     break;
 		default:
-		    // XXX I18N, logging needed.
-                    throw new InvalidClassException(cl.getName());
+                    throw Exceptions.self.invalidClassForPrimitive(
+                        cl.getName() ) ;
             }
         } catch (IllegalArgumentException e) {
             /* This case should never happen. If the field types
@@ -2062,8 +2060,7 @@ public class IIOPInputStream
                     }
                     break;
                 default:
-                    // XXX I18N, logging needed.
-                    throw new StreamCorruptedException("Unknown callType: " + callType);
+                    throw Exceptions.self.unknownCallType( callType ) ;
             }
         }
 
@@ -2158,8 +2155,7 @@ public class IIOPInputStream
                 objectValue = (Object)orbStream.read_value(actualType);
                 break;
             default:
-		// XXX I18N, logging needed.
-                throw new StreamCorruptedException("Unknown callType: " + callType);
+                throw Exceptions.self.unknownCallType(callType) ;
         }
 
         return objectValue;
@@ -2256,9 +2252,8 @@ public class IIOPInputStream
                     fieldToValueMap.put(fields[i].name, objectValue);
                     break;
                 default:
-		    // XXX I18N, logging needed.
-                    throw new StreamCorruptedException(
-                        "Unknown kind: " + fields[i].type.kind().value());
+                    throw Exceptions.self.unknownTypecodeKind(
+                        fields[i].type.kind().value());
                 }
             }
         } catch (Throwable t) {
@@ -2329,8 +2324,8 @@ public class IIOPInputStream
                                         Double.valueOf(doubleValue));
                     break;
 		default:
-		    // XXX I18N, logging needed.
-                    throw new InvalidClassException(currentClassDesc.getName());
+                    throw Exceptions.self.invalidClassForPrimitive(
+                        currentClassDesc.getName() );
 	    }
 	}
 
@@ -2542,52 +2537,29 @@ public class IIOPInputStream
 
 			try {
 			    if (osc.hasField(fields[i])){
-                                setObjectField(o, 
-                                               cl, 
-                                               fields[i].name, 
-                                               objectValue);
+                                setObjectField(o, cl, fields[i].name,
+                                    objectValue);
 			    } else {
-                                // REVISIT.  Convert to a log message.
-                                // This is a normal case when fields have
-                                // been added as part of evolution, but
-                                // silently skipping can make it hard to
-                                // debug if there's an error
-//                                 System.out.println("**** warning, not setting field: "
-//                                                    + fields[i].name
-//                                                    + " since not on class "
-//                                                    + osc.getName());
-
+                                Exceptions.self.notSettingField( fields[i].name,
+                                    osc.getName() ) ;
                             }
 			} catch (IllegalArgumentException e) {
-			    // XXX I18N, logging needed.
-			    ClassCastException cce = new ClassCastException("Assigning instance of class " + 
-				objectValue.getClass().getName() + " to field " + fields[i].name);
-			    cce.initCause(e) ;
-			    throw cce ;
+                            throw Exceptions.self.couldNotAssignObjectToField(
+                                e, objectValue.getClass().getName(),
+                                fields[i].name ) ;
 			}		
 			break;
                     default:
-			// XXX I18N, logging needed.
-                        throw new StreamCorruptedException("Unknown kind: "
-                                                           + fields[i].type.kind().value());
+                        throw Exceptions.self.unknownTypecodeKind( 
+                            fields[i].type.kind().value());
 		    }
 		} catch (IllegalArgumentException e) {
-		    /* This case should never happen. If the field types
-		       are not the same, InvalidClassException is raised when
-		       matching the local class to the serialized ObjectStreamClass. */
-		    // XXX I18N, logging needed.
-		    ClassCastException cce = new ClassCastException(
-			"Assigning instance of class " + fields[i].id + 
-			" to field " + currentClassDesc.getName() + '#' + fields[i].name);
-		    cce.initCause( e ) ;
-		    throw cce ;
+                    throw Exceptions.self.couldNotAssignObjectToField( e,
+                        fields[i].id, fields[i].name ) ;
 		}
 	    }
 	} catch(Throwable t){
-	    // XXX I18N, logging needed.
-	    StreamCorruptedException sce = new StreamCorruptedException(t.getMessage());
-	    sce.initCause(t) ;
-	    throw sce ;
+            throw Exceptions.self.streamCorrupted( t ) ;
         }
     }
 
@@ -2723,9 +2695,7 @@ public class IIOPInputStream
 				}
 				break;
                             default:
-				// XXX I18N, logging needed.
-                                throw new StreamCorruptedException(
-				    "Unknown callType: " + callType);
+                                throw Exceptions.self.unknownCallType(callType) ;
 			    }
 			}
 		    } catch(IndirectionException cdrie) {
@@ -2736,22 +2706,12 @@ public class IIOPInputStream
 									
 		    break;
                 default:
-		    // XXX I18N, logging needed.
-                    throw new StreamCorruptedException(
-			"Unknown kind: " + fields[i].type.kind().value());
+                    throw Exceptions.self.unknownTypecodeKind(
+			fields[i].type.kind().value());
 		}
 	    } catch (IllegalArgumentException e) {
-		/* This case should never happen. If the field types
-		   are not the same, InvalidClassException is raised when
-		   matching the local class to the serialized ObjectStreamClass.
-		*/
-		// XXX I18N, logging needed.
-		ClassCastException cce = new ClassCastException(
-		    "Assigning instance of class " + 
-		    fields[i].id + " to field " + currentClassDesc.getName() + 
-		    '#' + fields[i].name);
-		cce.initCause(e) ;
-		throw cce ;
+                throw Exceptions.self.couldNotAssignObjectToField( e,
+		    fields[i].id, currentClassDesc.getName() ) ;
 	    }
 	}
 		

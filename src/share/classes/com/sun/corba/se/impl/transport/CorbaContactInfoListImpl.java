@@ -391,12 +391,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	    return;
 	}
 
-	// XXX Note that this always uses the first IIOP profile to get the
-	// scid.  What about multi-profile IORs?  This should perhaps be
-	// tied to the current ContactInfo in some way, together with an
-	// implementation of ClientDelegate that generally prefers co-located
-	// ContactInfo.  This may in fact mean that we should do this at
-	// the ContactInfo level, rather than the IOR/profile level.
+        // Note that we have no plan to support multi-profile IORs.
 	int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
 	    getSubcontractId() ;
 	LocalClientRequestDispatcherFactory lcsf = 

@@ -51,7 +51,6 @@ public class ORBDefaultInitRefResolverImpl implements Resolver {
     {
 	this.urlHandler = urlHandler ;
 
-	// XXX Validate the URL?
 	this.orbDefaultInitRef = orbDefaultInitRef ;
     }
 

@@ -526,7 +526,7 @@ public class Client extends TestCase
 	// For now, we will just run this test for 747 and 748, since
 	// I don't have time to fix the other typecode problem.
 	final int lowerBound = 747 ;
-	final int upperBound = 749 ;	// XXX set this to a larger value to
+	final int upperBound = 749 ;	// set this to a larger value to
 					// reproduce bug. 
 	for (int ctr=lowerBound; ctr<upperBound; ctr++) {
 	    byte[] pad = makeBytes( ctr ) ;

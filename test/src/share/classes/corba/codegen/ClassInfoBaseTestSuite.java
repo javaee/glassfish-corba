@@ -166,9 +166,6 @@ public class ClassInfoBaseTestSuite extends TestCase {
 
 	assertTrue( w_protectedInC3.isAccessibleInContext( C3Type, C3Type ) ) ;
 	assertTrue( t_defaultInC3.isAccessibleInContext( C3Type, C3Type ) ) ;
-
-	// XXX Need to define classes in different packages to test the rest of 
-	// protected and default access
     }
 
     public void testClassName() {

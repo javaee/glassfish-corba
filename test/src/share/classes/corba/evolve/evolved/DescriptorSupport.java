@@ -594,7 +594,6 @@ public class DescriptorSupport
      * otherwise.
      *
      */
-    // XXXX TODO: This is not very efficient! 
     // Note: this Javadoc is copied from javax.management.Descriptor
     //       due to 6369229.
     public synchronized boolean equals(Object o) {
@@ -624,7 +623,6 @@ public class DescriptorSupport
      * @return A hash code value for this object.
      *
      */
-    // XXXX TODO: This is not very efficient! 
     // Note: this Javadoc is copied from javax.management.Descriptor
     //       due to 6369229.
     public synchronized int hashCode() {

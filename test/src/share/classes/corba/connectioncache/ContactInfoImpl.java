@@ -40,8 +40,6 @@
 
 package corba.connectioncache ;
 
-// XXX Do we need to list all ContactInfos?
-
 import com.sun.corba.se.spi.orbutil.transport.ContactInfo;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +47,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-// XXX Do we need to list all connections created from a ContactInfo?
 public class ContactInfoImpl implements ContactInfo<ConnectionImpl> {
     private String address ;
 

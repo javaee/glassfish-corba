@@ -269,7 +269,6 @@ public class counterClient implements InternalProcess
 	db.top.enable() ;
 
         // Enabled everything in the invocation path.
-        // XXX Should we add an annotation just to include all of these?
 	db.tp.DynamicType().enable() ;
 	db.tp.Transport().enable() ;
 	db.tp.Giop().enable() ;

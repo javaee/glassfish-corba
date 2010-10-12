@@ -104,10 +104,16 @@ public interface MethodMonitor {
     /** Returns the contents of this method monitor.  If it is a composite
      * method monitor, all the component MethoMonitor instances are 
      * returned.  If it is a single MethodMonitor, it just returns itself.
+     * It is required that a composite method monitor only return MethodMonitor
+     * instances which are not themselves composite.
      */
     Collection<MethodMonitor> contents() ;
 
     /** Factory used to create this MethodMonitor
+     * Note: is is required that this.factory().create(myClass()).equals( this )
+     * for any MethodMonitor.
      */
     MethodMonitorFactory factory() ;
+
+    String name() ;
 }

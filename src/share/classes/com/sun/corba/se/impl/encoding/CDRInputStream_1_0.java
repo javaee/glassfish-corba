@@ -1555,7 +1555,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 	    // use new-style OBV support (factory object)
 	    factory = Utility.getFactory(clazz, codebase, orb, repId);
 	} catch (MARSHAL marshal) {
-	    // XXX log marshal at one of the INFO levels
+            wrapper.marshalErrorInReadIDLValue( marshal ) ;
 
 	    // Could not get a factory, so try alternatives
 	    if (!cinfo.isAStreamableValue(clazz) && 

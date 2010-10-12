@@ -54,8 +54,6 @@ import java.io.ObjectOutput;
 import java.util.Map;
 import java.util.HashMap;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
 import com.sun.corba.se.spi.trace.StreamFormatVersion;
 
 @StreamFormatVersion
@@ -282,8 +280,7 @@ public abstract class OutputStreamHook extends ObjectOutputStream
         @Override
         @StreamFormatVersion
         public void enterWriteObjectOverride(OutputStreamHook stream) throws IOException {
-	    // XXX I18N, logging needed.
-            throw new IOException("Internal state failure: Entered writeObject twice");
+            throw Exceptions.self.calledWriteObjectTwice() ;
         }
         
         @Override
@@ -297,8 +294,9 @@ public abstract class OutputStreamHook extends ObjectOutputStream
             // If we're in stream format verison 2, we must
             // put the "null" marker to say that there isn't
             // any optional data
-            if (stream.getStreamFormatVersion() == 2)
+            if (stream.getStreamFormatVersion() == 2) {
                 stream.getOrbStream().write_long(0);
+            }
 
             stream.setState(NOT_IN_WRITE_OBJECT);
         }
@@ -339,8 +337,9 @@ public abstract class OutputStreamHook extends ObjectOutputStream
             // We only wrote default data, so if in stream format
             // version 2, put the null indicator to say that there
             // is no optional data
-            if (stream.getStreamFormatVersion() == 2)
+            if (stream.getStreamFormatVersion() == 2) {
                 stream.getOrbStream().write_long(0);
+            }
             
             stream.setState(NOT_IN_WRITE_OBJECT);
         }
@@ -348,8 +347,7 @@ public abstract class OutputStreamHook extends ObjectOutputStream
         @Override
         @StreamFormatVersion
         public void defaultWriteObjectOverride(OutputStreamHook stream) throws IOException {
-	    // XXX I18N, logging needed.
-            throw new IOException("Called defaultWriteObject/writeFields twice");
+            throw Exceptions.self.calledDefaultWriteObjectTwice() ;
         }
 
         @Override
@@ -372,8 +370,9 @@ public abstract class OutputStreamHook extends ObjectOutputStream
         public void exitWriteObjectOverride(OutputStreamHook stream) throws IOException {
             // In stream format version 2, we must tell the ORB
             // stream to close the fake custom valuetype.
-            if (stream.getStreamFormatVersion() == 2)
-                ((org.omg.CORBA.portable.ValueOutputStream)stream.getOrbStream()).end_value();
+            if (stream.getStreamFormatVersion() == 2) {
+                ((org.omg.CORBA.portable.ValueOutputStream) stream.getOrbStream()).end_value();
+            }
 
             stream.setState(NOT_IN_WRITE_OBJECT);
         }
@@ -382,11 +381,7 @@ public abstract class OutputStreamHook extends ObjectOutputStream
         @StreamFormatVersion
         public void defaultWriteObjectOverride(OutputStreamHook stream) 
 	    throws IOException {
-	    
-	    // XXX I18N, logging needed.
-            throw new IOException(
-		"Cannot call defaultWriteObject/writeFields after"
-		+ " writing custom data in RMI-IIOP");
+	    throw Exceptions.self.defaultWriteObjectAfterCustomData() ;
         }
 
         // We don't have to do anything special here, just let

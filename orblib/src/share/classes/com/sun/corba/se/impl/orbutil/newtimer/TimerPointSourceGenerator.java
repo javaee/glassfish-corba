@@ -638,8 +638,6 @@ public class TimerPointSourceGenerator {
 	}
     }
 
-    // XXX we should add JavaDoc support to codegen, and use it
-    // for the enter/exit methods.
     private static void generateMethod( String op, String timer, 
 	GenerationType gtype ) {
 

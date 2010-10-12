@@ -93,18 +93,15 @@ public class NPEIORInterceptor
 	throw new NullPointerException();
     }
 
-    // XXX test me
     public void components_established( IORInfo info )
     {
     }
 
-    // XXX test me
     public void adapter_state_changed( ObjectReferenceTemplate[] templates, 
 	short state )
     {
     }
 
-    // XXX test me
     public void adapter_manager_state_changed( int managerId, short state )
     {
     }

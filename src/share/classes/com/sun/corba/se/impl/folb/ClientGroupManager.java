@@ -79,6 +79,7 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.CorbaContactInfo;
 
 import com.sun.corba.se.impl.interceptors.ClientRequestInfoImpl;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 // BEGIN imports for IIOPPrimaryToContactInfo
@@ -86,7 +87,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 // END imports for IIOPPrimaryToContactInfo
 
 // BEGIN import for IORToSocketInfo
@@ -123,6 +123,9 @@ public class ClientGroupManager
 	ORBConfigurator,
 	ORBInitializer
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private static final long serialVersionUID = 7849660203226017842L;
     public final String baseMsg = ClientGroupManager.class.getName();
 
@@ -352,10 +355,7 @@ public class ClientGroupManager
 	try {
 	    map.remove(getKey(primary));
 	} catch (Throwable t) {
-	    RuntimeException rte =
-		new RuntimeException(baseMsg + ".reset error");
-	    rte.initCause(t);
-	    throw rte;
+            throw wrapper.exceptionInReset( t ) ;
 	}
     }
 
@@ -476,10 +476,7 @@ public class ClientGroupManager
 	    }
 	    return (CorbaContactInfo) result;
 	} catch (Throwable t) {
-	    RuntimeException rte =
-		new RuntimeException(baseMsg + ".next error");
-	    rte.initCause(t);
-	    throw rte;
+            throw wrapper.exceptionInNext( t ) ;
 	}
     }
 
@@ -490,7 +487,7 @@ public class ClientGroupManager
 	    // When CSIv2 is used the primary will have a zero port.
 	    // Therefore type/host/port will NOT be unique.
 	    // So use the entire IOR for the key in that case.
-	    return ((CorbaContactInfoList)contactInfo.getContactInfoList())
+	    return contactInfo.getContactInfoList()
 		.getEffectiveTargetIOR();
 	} else {
 	    return contactInfo;
@@ -550,11 +547,13 @@ public class ClientGroupManager
 	    return results;
 	}
 
+        @Override
 	public boolean shouldAddAddressesToNonReferenceFactory(String[] x)
 	{
 	    throw new RuntimeException("Should not be called in this context");
 	}
 
+        @Override
 	public boolean shouldAddMembershipLabel (String[] adapterName)
 	{
 	    throw new RuntimeException("Should not be called in this context");
@@ -679,8 +678,7 @@ public class ClientGroupManager
                 ri.get_reply_service_context(
                     ORBConstants.FOLB_IOR_UPDATE_SERVICE_CONTEXT_ID);
         } catch (BAD_PARAM e) {
-            // Not present.  Do nothing.
-            // XXX log this to catch app server mis-configuration?
+            wrapper.noIORUpdateServicateContext( e ) ;
         }
 
         if (iorServiceContext == null) {

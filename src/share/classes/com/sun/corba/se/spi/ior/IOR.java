@@ -108,8 +108,6 @@ public interface IOR extends List<TaggedProfile>, Writeable, MakeImmutable
     IORTemplateList getIORTemplates() ;
 
     /** Return the first IIOPProfile in this IOR.
-     * XXX THIS IS TEMPORARY FOR BACKWARDS COMPATIBILITY AND WILL BE REMOVED
-     * SOON!
      */
     IIOPProfile getProfile() ;
 }

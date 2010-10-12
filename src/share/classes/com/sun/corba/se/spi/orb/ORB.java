@@ -99,16 +99,13 @@ import com.sun.corba.se.spi.transport.CorbaContactInfoList;
 // import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsDisabledImpl ;
 // import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsEnabledImpl ;
 
-// XXX needs an SPI or else it does not belong here
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;
 import com.sun.corba.se.impl.corba.TypeCodeFactory ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
-// XXX This goes away when we convert ORBD to ORT
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
 
-// XXX Should add a factory method for this
 import com.sun.corba.se.impl.ior.WireObjectKeyTemplate;
 
 import com.sun.corba.se.impl.transport.ByteBufferPoolImpl;
@@ -359,7 +356,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     // This map is needed for resolving recursive type code placeholders
     // based on the unique repository id.
-    // XXX Should this be a WeakHashMap for GC?
     private Map<String,TypeCodeImpl> typeCodeMap ;
 
     private TypeCodeImpl[] primitiveTypeCodeConstants ;
@@ -371,7 +367,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     WireObjectKeyTemplate wireObjectKeyTemplate;
 
     // Local testing
-    // XXX clean this up, probably remove these
     public abstract boolean isLocalHost( String hostName ) ;
     public abstract boolean isLocalServerId( int subcontractId, int serverId ) ;
 
@@ -551,7 +546,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     public abstract void setORBVersion( ORBVersion version ) ;
 
-    // XXX This needs a better name
     @ManagedAttribute
     @Description( "The IOR used for the Full Value Description" ) 
     public abstract IOR getFVDCodeBaseIOR() ;
@@ -560,7 +554,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
      * Handle a bad server id for the given object key.  This should 
      * always through an exception: either a ForwardException to
      * allow another server to handle the request, or else an error
-     * indication.  XXX Remove after ORT for ORBD work is integrated.
+     * indication.  
      * @param okey The ObjectKey to check for a valid server id.
      */
     public abstract void handleBadServerId( ObjectKey okey ) ;
@@ -618,8 +612,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         + "possible endpoints in an IOR" ) 
     public abstract CorbaContactInfoListFactory getCorbaContactInfoListFactory() ;
 
-    // XXX These next 7 methods should be moved to a ResolverManager.
-
     /** Set the resolver used in this ORB.  This resolver will be used for list_initial_services
      * and resolve_initial_references.
      */
@@ -657,8 +649,6 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     /** Set the ServerRequestDispatcher that should be used for handling INS requests.
      */
     public abstract void setINSDelegate( CorbaServerRequestDispatcher insDelegate ) ;
-
-    // XXX The next 5 operations should be moved to an IORManager.
 
     /** Factory finders for the various parts of the IOR: tagged components, tagged
      * profiles, and tagged profile templates.

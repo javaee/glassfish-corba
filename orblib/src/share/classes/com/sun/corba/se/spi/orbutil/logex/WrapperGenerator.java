@@ -90,14 +90,51 @@ import java.util.logging.Logger;
  * @author ken
  */
 public class WrapperGenerator {
+    /** Extension API available to override the default behavior of the
+     * WrapperGenerator.
+     */
     public interface Extension {
+        /** Get a message id for this log.
+         *
+         * @param method The method defining this log.
+         * @return The message id.
+         */
         String getLogId( Method method ) ;
 
         /** Construct an exception from the message and the exception type.
          * The method provides access to any additional annotations that may
          * be needed.
+         *
+         * @param msg The message to use in the exception.
+         * @param method The method creating the exception.
          */
-        Exception makeException( String msg, Method method ) ;
+        Throwable makeException( String msg, Method method ) ;
+
+        /** Modify the default logger name if needed.
+         * 
+         * @param str The standard logger name
+         * @return A possibly updated logger name
+         */
+        String getLoggerName(String str);
+    }
+
+    /** Convenience base class for implementations of Extension that don't
+     * need to override every method.
+     */
+    public static abstract class ExtensionBase implements Extension {
+
+        public String getLogId(Method method) {
+            return WrapperGenerator.getStandardLogId(method) ;
+        }
+
+        public Throwable makeException(String msg, Method method) {
+            return WrapperGenerator.makeStandardException(msg, method) ;
+        }
+
+        public String getLoggerName(String str) {
+            return str ;
+        }
+
     }
 
     private WrapperGenerator() {}
@@ -134,19 +171,23 @@ public class WrapperGenerator {
         }
     }
 
+    public static String getStandardLogId( Method method ) {
+        Log log = method.getAnnotation( Log.class ) ;
+        if (log == null) {
+            throw new RuntimeException(
+                "No Log annotation present for " + method ) ;
+        }
+
+        return Integer.toString(log.id()) ;
+    }
+
     // Extension: handle more complex CORBA log id.
     // CORBA case needs: method return type, info from ORBException
     private static String getLogId( Method method, Extension extension ) {
         if (extension != null) {
             return extension.getLogId( method ) ;
         } else {
-	    Log log = method.getAnnotation( Log.class ) ;
-	    if (log == null) {
-		throw new RuntimeException(
-		    "No Log annotation present for " + method ) ;
-	    }
-
-            return Integer.toString(log.id()) ;
+            return getStandardLogId(method) ;
         }
     }
 
@@ -211,36 +252,45 @@ public class WrapperGenerator {
 	}
     }
 
-    // Extend: for making system exception based on data 
-    // used for minor code and completion status
-    private static Exception makeException( String msg, Method method,
-        Extension extension ) {
-        Exception result = null ;
-        if (extension != null) {
-            result = extension.makeException( msg, method ) ;
+    /** Create the standard exception for this message and method.
+     * 
+     * @param msg The formatted message to appear in the exception.
+     * @param method The method defining this exception.
+     * @return The exception.
+     */
+    public static Throwable makeStandardException( String msg, Method method ) {
+        Throwable result ;
+        Class<?> rtype = method.getReturnType() ;
+        try {
+            Constructor cons = rtype.getConstructor(String.class);
+            result = (Throwable) cons.newInstance(msg);
+        } catch (InstantiationException ex) {
+            throw new RuntimeException( ex ) ;
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException( ex ) ;
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException( ex ) ;
+        } catch (InvocationTargetException ex) {
+            throw new RuntimeException( ex ) ;
+        } catch (NoSuchMethodException ex) {
+            throw new RuntimeException( ex ) ;
+        } catch (SecurityException ex) {
+            throw new RuntimeException( ex ) ;
         }
 
-        if (result == null) {
-	    Class<?> rtype = method.getReturnType() ;
-            try {
-                Constructor cons = rtype.getConstructor(String.class);
-                result = (Exception) cons.newInstance(msg);
-            } catch (InstantiationException ex) {
-                throw new RuntimeException( ex ) ;
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException( ex ) ;
-            } catch (IllegalArgumentException ex) {
-                throw new RuntimeException( ex ) ;
-            } catch (InvocationTargetException ex) {
-                throw new RuntimeException( ex ) ;
-            } catch (NoSuchMethodException ex) {
-                throw new RuntimeException( ex ) ;
-            } catch (SecurityException ex) {
-                throw new RuntimeException( ex ) ;
-            }
-        }
-        
         return result ;
+
+    }
+
+    // Extend: for making system exception based on data 
+    // used for minor code and completion status
+    private static Throwable makeException( String msg, Method method,
+        Extension extension ) {
+        if (extension != null) {
+            return extension.makeException( msg, method ) ;
+        } else {
+            return makeStandardException( msg, method ) ;
+        }
     }
 
     private static String handleMessageOnly( Method method, Logger logger,
@@ -248,7 +298,7 @@ public class WrapperGenerator {
 
         // Just format the message: no exception ID or log level
         // This code is adapted from java.util.logging.Formatter.formatMessage
-        String msg = (String)method.getAnnotation( Message.class ).value() ;
+        String msg = method.getAnnotation(Message.class).value() ;
         String transMsg ;
         ResourceBundle catalog = logger.getResourceBundle() ;
         try {
@@ -331,7 +381,7 @@ public class WrapperGenerator {
             messageParams, logger ) ;
         final String message = formatter.format( lrec ) ;
 
-        Exception exc = null ;
+        Throwable exc = null ;
         if (rtype == ReturnType.EXCEPTION) {
             exc = makeException( message, method, extension ) ;
             if (cause != null) {
@@ -360,10 +410,26 @@ public class WrapperGenerator {
         }
     }
 
+    /** Given an interface annotated with @ExceptionWrapper, return a proxy
+     * implementing the interface.
+     *
+     * @param <T> The annotated interface type.
+     * @param cls The class of the annotated interface.
+     * @return An instance of the interface.
+     */
     public static <T> T makeWrapper( final Class<T> cls ) {
         return makeWrapper(cls, null) ;
     }
 
+    /** Given an interface annotated with @ExceptionWrapper, return a proxy
+     * implementing the interface.
+     *
+     * @param <T> The annotated interface type.
+     * @param cls The class of the annotated interface.
+     * @param extention The extension instance used to override the default
+     * behavior.
+     * @return An instance of the interface.
+     */
     public static <T> T makeWrapper( final Class<T> cls,
         final Extension extension ) {
 
@@ -379,7 +445,8 @@ public class WrapperGenerator {
         if (str.length() == 0) {
             str = cls.getPackage().getName() ;
         }
-        final String name = str ;
+        final String name = extension == null 
+            ? str : extension.getLoggerName( str );
 
         InvocationHandler inh = new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args)

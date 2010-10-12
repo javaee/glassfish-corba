@@ -265,8 +265,7 @@ public class IIOPOutputStream
 
     @Override
     protected final void annotateClass(Class<?> cl) throws IOException{
-	// XXX I18N, Logging needed.
-        throw new IOException("Method annotateClass not supported");
+        throw Exceptions.self.annotateClassNotSupported() ;
     }
 
     @Override
@@ -292,8 +291,7 @@ public class IIOPOutputStream
     @ValueHandlerWrite
     @Override
     protected final Object replaceObject(Object obj) throws IOException{
-	// XXX I18N, Logging needed.
-        throw new IOException("Method replaceObject not supported");
+        throw Exceptions.self.replaceObjectNotSupported() ;
     }
 
     /**
@@ -532,8 +530,7 @@ public class IIOPOutputStream
     	//}
 
     	if (obj instanceof ObjectStreamClass) {
-	    // XXX I18N, Logging needed.
-            throw new IOException("Serialization of ObjectStreamClass not supported");
+            throw Exceptions.self.serializationObjectStreamClassNotSupported() ;
     	}
 
     	return false;
@@ -567,8 +564,7 @@ public class IIOPOutputStream
          */
         currentClassDesc = ObjectStreamClass.lookup(currclass);
         if (currentClassDesc == null) {
-            // XXX I18N, Logging needed.
-            throw new NotSerializableException(currclass.getName());
+            throw Exceptions.self.notSerializable( currclass.getName() ) ;
         }
 
         /* If the object is externalizable,
@@ -733,8 +729,8 @@ public class IIOPOutputStream
                 writeObjectField(field, value);
 		break;
 	    default:
-		// XXX I18N, Logging needed.
-		throw new InvalidClassException(currentClassDesc.getName());
+                throw Exceptions.self.invalidClassForWrite(
+                    currentClassDesc.getName());
 	    }
     }
 
@@ -850,8 +846,8 @@ public class IIOPOutputStream
 		    writeObjectField(fields[i], objectValue);
 		    break;
 		default:
-		    // XXX I18N, Logging needed.
-		    throw new InvalidClassException(cl.getName());
+                    throw Exceptions.self.invalidClassForWrite(
+                        cl.getName() ) ;
 	    }
     	}
     }

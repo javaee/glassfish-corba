@@ -201,7 +201,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private static final byte STATUS_DESTROYED = 4;
     private byte status = STATUS_OPERATING;
 
-    // XXX Should we move invocation tracking to the first level server dispatcher?
     private final java.lang.Object invocationObj = new java.lang.Object();
     private int numInvocations = 0;
 
@@ -390,9 +389,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	// belongs to the current ORB. This problem is taken care of by checking
 	// to see if the IOR port matches ORB server port in legacyIsLocalServerPort()
 	// method.
-	//
-	// XXX need to move server ID to a string for CORBA 3.0.  At that point,
-	// make this more unique (possibly use java.rmi.server.UID).
 	transientServerId = (int)System.currentTimeMillis();
 
 	orbVersionThreadLocal  = new ThreadLocal<ORBVersion>() {
@@ -1730,7 +1726,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         return serviceContextsCache;
     }
 
-    // XXX All of the isLocalXXX checking needs to be revisited.
+    // XXX All of the isLocalYYY checking needs to be revisited.
     // First of all, all three of these methods are called from
     // only one place in impl.ior.IORImpl.  Second, we have problems
     // both with multi-homed hosts and with multi-profile IORs.
@@ -1740,8 +1736,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     // the IOR, then iterator over ContactInfo.  If any ContactInfo is
     // local, the IOR is local, and we can pick one to create the 
     // LocalClientRequestDispatcher as well.  Bottom line: this code needs to move.
-
-    // XXX What about multi-homed host?
     public boolean isLocalHost( String hostName ) 
     {
 	return hostName.equals( configData.getORBServerHost() ) ||
@@ -2054,7 +2048,6 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private final Object threadPoolManagerAccessLock = new Object();
 
     public void setThreadPoolManager(ThreadPoolManager mgr) {
-        // XXX Consider making it an error to set the thread pool manager more than once?
 	synchronized (threadPoolManagerAccessLock) {
 	    threadpoolMgr = mgr;
 	}

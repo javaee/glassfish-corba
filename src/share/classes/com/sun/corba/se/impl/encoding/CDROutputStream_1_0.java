@@ -123,7 +123,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     protected static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
-    // XXX These appear to always contain the same value: remove one
     protected int blockSizeIndex = -1;
     protected int blockSizePosition = 0;
 
@@ -940,7 +939,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             end_block();
         }
 
-	// XXX Should we classify once, then use a switch to dispatch?
 	if (cinfo.isArray()) {
             // Handle arrays
             writeArray(object, clazz);

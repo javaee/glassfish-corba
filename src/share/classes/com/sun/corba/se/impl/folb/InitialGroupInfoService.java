@@ -66,6 +66,7 @@ import org.omg.PortableServer.ServantLocator ;
 
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
@@ -99,6 +100,9 @@ import com.sun.corba.se.spi.trace.Folb;
  */
 @Folb
 public class InitialGroupInfoService {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     public interface InitialGIS extends Remote {
 	public List<ClusterInstanceInfo> getClusterInstanceInfo()
             throws RemoteException ;
@@ -145,7 +149,7 @@ public class InitialGroupInfoService {
 	    try {
 		impl = new InitialGISImpl(orb) ;
 	    } catch (Exception exc) {
-                // XXX log me
+                wrapper.couldNotInitializeInitialGIS( exc ) ;
 	    }
 
 	    Tie tie = com.sun.corba.se.spi.orb.ORB.class.cast( orb )
@@ -208,7 +212,7 @@ public class InitialGroupInfoService {
 	NameComponent path[] = {nc};
 	ncRef.rebind(path, provider);	
       } catch (Exception e) {
-          // XXX log me
+          throw wrapper.bindNameException( e ) ;
       }
     }
 }

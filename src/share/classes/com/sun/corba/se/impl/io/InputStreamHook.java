@@ -431,8 +431,7 @@ public abstract class InputStreamHook extends ObjectInputStream
         @Override
         public void beginDefaultReadObjectOverride(InputStreamHook stream) throws IOException 
 	{
-	    // XXX I18N and logging needed.
-            throw new StreamCorruptedException("Default data already read");
+            throw Exceptions.self.defaultDataAlreadyRead() ;
         }
 
 
@@ -501,8 +500,7 @@ public abstract class InputStreamHook extends ObjectInputStream
 	    // calledDefaultWriteObject always returns true.
 	    if ((ORBVersionFactory.getPEORB().compareTo(clientOrbVersion) <= 0) || 
 		    (clientOrbVersion.equals(ORBVersionFactory.getFOREIGN()))) {
-		// XXX I18N and logging needed.
-		throw new StreamCorruptedException("Default data must be read first");
+                throw Exceptions.self.defaultDataMustBeReadFirst() ;
 	    }
         }
     }
@@ -530,8 +528,7 @@ public abstract class InputStreamHook extends ObjectInputStream
         @Override
         public void beginDefaultReadObjectOverride(InputStreamHook stream) throws IOException 
 	{
-	    // XXX I18N and logging needed.
-            throw new StreamCorruptedException("Default data not sent or already read/passed");
+            throw Exceptions.self.defaultDataNotPresent() ;
         }
 
         

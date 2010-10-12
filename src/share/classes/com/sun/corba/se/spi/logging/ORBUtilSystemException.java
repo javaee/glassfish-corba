@@ -26,6 +26,7 @@ import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.EventHandler;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -52,6 +53,7 @@ import org.omg.CORBA.TRANSIENT;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.Bounds;
 import org.omg.CORBA.UNKNOWN;
+import org.omg.CORBA.portable.RemarshalException;
 import org.osgi.framework.Bundle;
 
 @ExceptionWrapper( idPrefix="IOP" )
@@ -381,6 +383,26 @@ public interface ORBUtilSystemException {
     @Message( "Could not make an instance of Class {0}" )
     BAD_OPERATION couldNotMakeInstance( @Chain Exception ex, Class<?> arg0 ) ;
     
+    @Log( level=LogLevel.WARNING, id=82 )
+    @Message( "Exception in createCopy`")
+    BAD_OPERATION exceptionInCreateCopy( @Chain Exception exc);
+
+    @Message( "Exception in reset method in ClientGroupManager")
+    @Log( level=LogLevel.FINE, id=83 )
+    BAD_OPERATION exceptionInReset(@Chain Throwable t);
+
+    @Message( "No IORUpdate service context present in ClientGroupManager")
+    @Log( level=LogLevel.FINE, id=84 )
+    BAD_OPERATION noIORUpdateServicateContext(@Chain BAD_PARAM e);
+
+    @Message( "Exception in next method in ClientGroupManager")
+    @Log( level=LogLevel.FINE, id=85 )
+    BAD_OPERATION exceptionInNext(@Chain Throwable t);
+
+    @Message( "Could not bind initial GIS to name service")
+    @Log( level=LogLevel.FINE, id=86 )
+    BAD_OPERATION bindNameException(@Chain Exception e);
+
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Null parameter" )
     @CS( CSValue.MAYBE )
@@ -1453,6 +1475,15 @@ public interface ORBUtilSystemException {
     @Message( "Exception occurred in handleRequest for a LocateRequest message" )
     INTERNAL exceptionInHandleRequestForLocateRequest( @Chain Throwable thr ) ;
     
+    @Log( level=LogLevel.WARNING, id=136 )
+    @Message( "Could not set ORBData.orbInitializers")
+    INTERNAL couldNotSetOrbInitializer(@Chain Exception exc);
+
+    @Log( id=137 )
+    @Message( "Connection {0} not null in createMessageMediator" )
+    INTERNAL connectionNotNullInCreateMessageMediator(
+        CorbaConnection connection);
+
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Data read past end of chunk without closing the chunk" )
     MARSHAL chunkOverflow(  ) ;
@@ -1706,7 +1737,7 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=54 )
     @Message( "Could not instantiate Helper class {0}" )
     MARSHAL couldNotInstantiateHelper( @Chain InstantiationException exc,
-        Class arg0 ) ;
+        Class<?> arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=55 )
     @Message( "Bad ObjectAdapterId for TOA" )
@@ -1715,7 +1746,7 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=56 )
     @Message( "Could not invoke helper read method for helper {0}" )
     MARSHAL couldNotInvokeHelperReadMethod( @Chain Exception exc,
-         Class arg0 ) ;
+         Class<?> arg0 ) ;
     
     @Log( level=LogLevel.WARNING, id=57 )
     @Message( "Could not load class {0}" )
@@ -1892,4 +1923,48 @@ public interface ORBUtilSystemException {
     @Message( "UnknownException in dispatch" )
     @CS( CSValue.MAYBE )
     UNKNOWN unknownExceptionInDispatch( @Chain Exception exc ) ;
+
+    @Log( level=LogLevel.FINE, id=8 )
+    @Message( "MARSHAL exception while trying to get value factory")
+    UNKNOWN marshalErrorInReadIDLValue(@Chain MARSHAL marshal);
+
+    @Message( "Exception in post_init in VirtualAddressAgentImpl")
+    @Log( level=LogLevel.FINE, id=9 )
+    UNKNOWN vaaErrorInPostInit( @Chain Exception exc);
+
+    @Message( "Could not set tcpNoDelay on socket")
+    @Log( level=LogLevel.FINE, id=10 )
+    UNKNOWN couldNotSetTcpNoDelay(@Chain Exception e);
+
+    @Message( "Exception in purgeCalls")
+    @Log( level=LogLevel.FINE, id=11 )
+    UNKNOWN exceptionInPurgeCalls(@Chain Exception ex);
+
+    @Message( "Exception while closing socket")
+    @Log( level=LogLevel.FINE, id=12 )
+    UNKNOWN exceptionOnClose(IOException e);
+
+    @Message( "Interrupted while waiting in writeLock on OPENING state")
+    @Log( level=LogLevel.FINE, id=13 )
+    UNKNOWN openingWaitInterrupted(InterruptedException ie);
+
+    @Message( "Interrupted while waiting in writeLock on ESTABLISHED state")
+    @Log( level=LogLevel.FINE, id=14 )
+    UNKNOWN establishedWaitInterrupted(InterruptedException ie);
+
+    @Message( "Exception while creating Typecode from native representation")
+    @Log( level=LogLevel.FINE, id=15 )
+    UNKNOWN exceptionOnCreatingTypecode(@Chain Exception e);
+
+    @Message( "Exception in Typecode equals")
+    @Log( level=LogLevel.FINE, id=16 )
+    UNKNOWN exceptionInTypecodeEquals(@Chain Exception e);
+
+    @Message( "Remarshal exception in bootstrap resolver")
+    @Log( level=LogLevel.FINE, id=17 )
+    UNKNOWN bootstrapRemarshalException(@Chain RemarshalException e);
+
+    @Message( "Could not initialize initial GIS")
+    @Log( level=LogLevel.FINE, id=18 )
+    UNKNOWN couldNotInitializeInitialGIS(@Chain Exception exc);
 }

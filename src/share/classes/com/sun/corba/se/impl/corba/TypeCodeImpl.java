@@ -320,9 +320,9 @@ public final class TypeCodeImpl extends TypeCode {
                 _contentType = convertToNative(_orb, tc.content_type());
             }
         } catch (org.omg.CORBA.TypeCodePackage.Bounds e) {
-            // XXX log
+            wrapper.exceptionOnCreatingTypecode( e ) ;
         } catch (BadKind e) {
-            // XXX log
+            wrapper.exceptionOnCreatingTypecode( e ) ;
         }
         // dont have to worry about these since code ensures we dont step
         // out of bounds.
@@ -924,9 +924,9 @@ public final class TypeCodeImpl extends TypeCode {
                 }
             }
         } catch (org.omg.CORBA.TypeCodePackage.Bounds e) {
-            // XXX log
+            wrapper.exceptionInTypecodeEquals( e ) ;
         } catch (BadKind e) {
-            // XXX log
+            wrapper.exceptionInTypecodeEquals( e ) ;
         }
 
         return false;
@@ -2304,7 +2304,7 @@ public final class TypeCodeImpl extends TypeCode {
     }
 
     private String indent(int level) {
-        StringBuffer sb = new StringBuffer() ;
+        StringBuilder sb = new StringBuilder() ;
         for(int i=0; i<level; i++) {
             sb.append( "  " ) ;
         }

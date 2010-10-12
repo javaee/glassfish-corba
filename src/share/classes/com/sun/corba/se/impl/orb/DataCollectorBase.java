@@ -82,8 +82,6 @@ public abstract class DataCollectorBase implements DataCollector {
     public DataCollectorBase( Properties props, String localHostName,
 	String configurationHostName )
     {
-	// XXX This is fully initialized here.  So do we ever want to 
-	// generalize this (or perhaps this is the wrong place for this?)
 	URLPropertyNames = new HashSet() ;
 	URLPropertyNames.add( ORBConstants.INITIAL_SERVICES_PROPERTY ) ;
 

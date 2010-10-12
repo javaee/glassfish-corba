@@ -255,7 +255,6 @@ public class Arguments extends com.sun.tools.corba.se.idl.Arguments
   /**
    *
    **/
-  // XXX Either generalize this facility or remove it completely.
   protected void packageFromProps (Properties props) throws InvalidArgument
   {
     Enumeration propsEnum = props.propertyNames ();

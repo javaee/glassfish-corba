@@ -166,13 +166,12 @@ import org.glassfish.gmbal.ManagedObject;
 *    <li>push newinfo</li>
 *    <li>oa.enter()</li>
 *    <li>dispatch to servant</li>
-*    <li>oa.returnServant()</li>  // XXX This is probably wrong: remove it.
+*    <li>oa.returnServant()</li>  
 *    <li>oa.exit()</li>
 *    <li>pop info</li>
 *    </ol>
 * </li>
 * </ol>
-* XXX fast local should not call returnServant: what is correct here?
 */
 @ManagedObject
 @Description( "ObjectAdapter used to dispatch requests and manage servants")

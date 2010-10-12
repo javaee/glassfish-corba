@@ -42,14 +42,10 @@ package com.sun.corba.se.impl.presentation.rmi;
 
 import javax.rmi.CORBA.Tie ;
 
-import org.omg.CORBA.CompletionStatus;
-
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
 
 import com.sun.corba.se.impl.util.PackagePrefixChecker;
 import com.sun.corba.se.impl.util.Utility;
-
-import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
 
@@ -69,10 +65,12 @@ public class StubFactoryFactoryStaticImpl extends
     {
 	String stubName = null ;
 
-	if (isIDLStub) 
-	    stubName = Utility.idlStubName( className ) ;
-	else
-	    stubName = Utility.stubNameForCompiler( className ) ;
+	if (isIDLStub) {
+            stubName = Utility.idlStubName(className);
+        } else {
+            stubName =
+                Utility.stubNameForCompiler(className);
+        }
 
 	ClassLoader expectedTypeClassLoader = 
 	    (expectedClass == null ? classLoader : 
@@ -88,12 +86,15 @@ public class StubFactoryFactoryStaticImpl extends
 	String firstStubName = stubName ;
 	String secondStubName = stubName ;
 
-	if (PackagePrefixChecker.hasOffendingPrefix(stubName))
-	    firstStubName = PackagePrefixChecker.packagePrefix() + stubName ;
-	else
-	    secondStubName = PackagePrefixChecker.packagePrefix() + stubName ;
+	if (PackagePrefixChecker.hasOffendingPrefix(stubName)) {
+            firstStubName =
+                PackagePrefixChecker.packagePrefix() + stubName;
+        } else {
+            secondStubName =
+                PackagePrefixChecker.packagePrefix() + stubName;
+        }
 
-	Class clz = null;
+	Class<?> clz = null;
 
 	try {
 	    clz = Util.getInstance().loadClass( firstStubName, remoteCodeBase, 
@@ -118,11 +119,9 @@ public class StubFactoryFactoryStaticImpl extends
 	    try {
 		clz = ORBClassLoader.loadClass(className);
 	    } catch (Exception exc) {
-		// XXX make this a system exception
-		IllegalStateException ise = new IllegalStateException( 
-		    "Could not load class " + stubName ) ;
-		ise.initCause( exc ) ;
-		throw ise ;
+                // XXX use framework
+		throw new IllegalStateException("Could not load class " +
+                    stubName, exc) ;
 	    }
         }
 
@@ -131,7 +130,7 @@ public class StubFactoryFactoryStaticImpl extends
 
     public Tie getTie( Class cls )
     {
-	Class tieClass = null ;
+	Class<?> tieClass = null ;
 	String className = Utility.tieName(cls.getName());
 
 	// XXX log exceptions at FINE level

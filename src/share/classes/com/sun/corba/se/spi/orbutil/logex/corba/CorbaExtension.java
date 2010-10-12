@@ -89,7 +89,7 @@ import org.omg.CORBA.TRANSACTION_UNAVAILABLE;
 import org.omg.CORBA.TRANSIENT;
 import org.omg.CORBA.UNKNOWN;
 
-public class CorbaExtension implements WrapperGenerator.Extension {
+public class CorbaExtension extends StandardLogger {
     public static final CorbaExtension self = new CorbaExtension() ;
 
     private CorbaExtension() {}
@@ -176,10 +176,6 @@ public class CorbaExtension implements WrapperGenerator.Extension {
 	return 200*orbex.group() + log.id() ;
     }
 
-    // XXX Should we add a version of this method that takes (Class, String)
-    // and looks up the method by name?  Should we support overloading as well?
-    // Should we have a (Class, String, Class...) version to handle 
-    // overloading?
     public int getMinorCode( Method method ) {
 	final ORBException orbex = getORBException( method ) ;
 	final Log log = getLog( method ) ;

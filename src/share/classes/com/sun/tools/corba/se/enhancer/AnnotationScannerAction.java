@@ -212,7 +212,6 @@ public class AnnotationScannerAction implements Scanner.Action {
             ClassVisitor as = new AnnoScanner() ;
             cr.accept( as, 0 );
         } catch (IOException ex) {
-            // XXX if debugging, emit message
             return true ; // ignore things we can't read
         }
 

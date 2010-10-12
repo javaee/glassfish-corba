@@ -219,7 +219,8 @@ public class JDKBridge {
                                    ClassLoader loader)
 	throws ClassNotFoundException {
         
-        // XXX GFv3 Disable use of the cache for now: it is caching different classes incorrectly that have
+        // XXX GFv3 Disable use of the cache for now:
+        // it is caching different classes incorrectly that have
         // the same name, but different ClassLoaders.
 	Class cls = null ; // XXX LoadClassCache.get( className, remoteCodebase, loader ) ;
 	if (cls == null) {

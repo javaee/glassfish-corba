@@ -165,7 +165,8 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 	    // WebLogic.  The string concat is essential: it prevents the code 
 	    // from being affected by the ORB rename. The same reason makes it impossible
 	    // to just call new.
-	    // XXX vhName = "com.sun.corba." + "se.impl.io.ValueHandlerImpl" ;
+            //
+	    // vhName = "com.sun.corba." + "se.impl.io.ValueHandlerImpl" ;
         }
 
 	try {
@@ -784,8 +785,6 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     } catch (java.util.EmptyStackException exc) {
                         // copyObject was invoked outside of an invocation, probably by
                         // a test.  Get the default copier from the ORB.
-                        // XXX should we just make the default copier available directly
-                        // and avoid constructing one on each call?
                         CopierManager cm = lorb.getCopierManager() ;
                         ObjectCopier copier = cm.getDefaultObjectCopierFactory().make() ;
                         return copier.copy( obj ) ;
@@ -796,10 +795,6 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     throw rexc ;
                 }
             } else {
-                // XXX The code in this else branch is identical to the code in
-                // ORBStreamObjectCopierImpl: Refactor.  Assume that orb may
-                // in fact be a foreign ORB: probably need a static method for this.
-
                 if (obj instanceof Remote) {
                     // Make sure obj is connected and converted to a stub,
                     // if necessary.

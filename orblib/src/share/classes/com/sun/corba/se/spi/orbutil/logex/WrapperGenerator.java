@@ -115,7 +115,7 @@ public class WrapperGenerator {
          * @param str The standard logger name
          * @return A possibly updated logger name
          */
-        String getLoggerName(String str);
+        String getLoggerName( Class<?> cls );
     }
 
     /** Convenience base class for implementations of Extension that don't
@@ -131,8 +131,8 @@ public class WrapperGenerator {
             return WrapperGenerator.makeStandardException(msg, method) ;
         }
 
-        public String getLoggerName(String str) {
-            return str ;
+        public String getLoggerName(Class<?> cls) {
+            return WrapperGenerator.getStandardLoggerName( cls ) ;
         }
 
     }
@@ -282,6 +282,15 @@ public class WrapperGenerator {
 
     }
 
+    public static String getStandardLoggerName( Class<?> cls ) {
+        final ExceptionWrapper ew = cls.getAnnotation( ExceptionWrapper.class ) ;
+        String str = ew.loggerName() ;
+        if (str.length() == 0) {
+            str = cls.getPackage().getName() ;
+        }
+        return str ;
+    }
+
     // Extend: for making system exception based on data 
     // used for minor code and completion status
     private static Throwable makeException( String msg, Method method,
@@ -323,7 +332,7 @@ public class WrapperGenerator {
 
     private static ReturnType classifyReturnType( Method method ) {
         Class<?> rtype = method.getReturnType() ;
-        if (Exception.class.isAssignableFrom(rtype)) {
+        if (Throwable.class.isAssignableFrom(rtype)) {
             return ReturnType.EXCEPTION ;
         } else if (rtype.equals( String.class)) {
             return ReturnType.STRING ;
@@ -384,13 +393,15 @@ public class WrapperGenerator {
         Throwable exc = null ;
         if (rtype == ReturnType.EXCEPTION) {
             exc = makeException( message, method, extension ) ;
-            if (cause != null) {
-                exc.initCause( cause ) ;
-            }
+	    if (exc != null) {
+		if (cause != null) {
+		    exc.initCause( cause ) ;
+		}
 
-            if (level != Level.INFO) {
-                lrec.setThrown( exc ) ;
-            }
+		if (level != Level.INFO) {
+		    lrec.setThrown( exc ) ;
+		}
+	    }
         }
 
         if (logger.isLoggable(level)) {
@@ -439,14 +450,10 @@ public class WrapperGenerator {
                 "is not an interface" ) ;
         }
 
-        ExceptionWrapper ew = cls.getAnnotation( ExceptionWrapper.class ) ;
+        final ExceptionWrapper ew = cls.getAnnotation( ExceptionWrapper.class ) ;
         final String idPrefix = ew.idPrefix() ;
-        String str = ew.loggerName() ;
-        if (str.length() == 0) {
-            str = cls.getPackage().getName() ;
-        }
         final String name = extension == null 
-            ? str : extension.getLoggerName( str );
+            ? getStandardLoggerName( cls ) : extension.getLoggerName( cls );
 
         InvocationHandler inh = new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args)

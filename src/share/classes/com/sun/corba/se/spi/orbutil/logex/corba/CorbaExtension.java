@@ -41,11 +41,13 @@
 package com.sun.corba.se.spi.orbutil.logex.corba ;
 
 import com.sun.corba.se.org.omg.CORBA.SUNVMCID;
+import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
 import com.sun.corba.se.spi.orbutil.logex.Log;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
 import java.lang.reflect.Constructor;
 
 import java.lang.reflect.Method;
+import javax.management.StandardEmitterMBean;
 
 import org.omg.CORBA.ACTIVITY_COMPLETED;
 import org.omg.CORBA.ACTIVITY_REQUIRED;
@@ -151,7 +153,7 @@ public class CorbaExtension extends StandardLogger {
     }
 
     private ORBException getORBException( Method method) {
-        final Class<?> cls = method.getClass() ;
+        final Class<?> cls = method.getDeclaringClass() ;
 	final ORBException orbex = cls.getAnnotation( ORBException.class ) ;
 	return orbex ;
     }
@@ -185,12 +187,18 @@ public class CorbaExtension extends StandardLogger {
 
     public int getMinorCode( Class<?> cls, String methodName ) {
         Method method = null ;
-        try {
-            method = cls.getDeclaredMethod(methodName);
-        } catch (Exception ex) {
-            throw new RuntimeException( ex ) ;
+        for (Method m : cls.getDeclaredMethods()) {
+            if (methodName.equals( m.getName())) {
+                method = m ;
+                break ;
+            }
         }
-        return getMinorCode( method ) ;
+
+        if (method == null) {
+            return -1 ;
+        } else {
+            return getMinorCode( method ) ;
+        }
     }
 
     // Format of result:  ExceptionId OmgID MinorCode, where
@@ -198,6 +206,7 @@ public class CorbaExtension extends StandardLogger {
     //     padded to 3 places
     // OmgId is 0 for OMG exceptions, 1 for Old Sun exceptions
     // MinorCode is 200*groupId + id
+    @Override
     public String getLogId( Method method ) {
 	final ORBException orbex = getORBException( method ) ;
 	final Log log = getLog( method ) ;
@@ -212,6 +221,7 @@ public class CorbaExtension extends StandardLogger {
 	return result ;
     }
 
+    @Override
     public Exception makeException( String msg, Method method ) {
 	try {
 	    final ORBException orbex = getORBException( method ) ;
@@ -229,11 +239,32 @@ public class CorbaExtension extends StandardLogger {
 		OMGVMCID.value ;
 
 	    SystemException result = (SystemException)cons.newInstance(
-	        msg, csv.getCompletionStatus(), base + minorCode ) ;
+	        msg, base + minorCode, csv.getCompletionStatus() ) ;
 
 	    return result ;
 	} catch (Exception exc) {
-	    return null ;
+	    throw new RuntimeException( exc ) ;
 	}
+    }
+
+    private static final String CLASS_NAME_SUFFIX = "SystemException" ;
+
+    @Override
+    public String getLoggerName( Class<?> cls ) {
+        final ExceptionWrapper ew = cls.getAnnotation(
+            ExceptionWrapper.class ) ;
+
+        String str = ew.loggerName() ;
+        if (str.length() == 0) {
+            str = cls.getSimpleName() ;
+            if (str.endsWith(CLASS_NAME_SUFFIX)) {
+                str = str.substring( 0,
+                    str.length() - CLASS_NAME_SUFFIX.length()) ;
+            }
+
+            return StandardLogger.CORBA_LOGGER_PREFIX + str ;
+        }
+
+        return str ;
     }
 }

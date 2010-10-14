@@ -1404,7 +1404,8 @@ public class ObjectStreamClass implements java.io.Serializable {
      */
     private static boolean hasStaticInitializer(Class cl) {
         if (hasStaticInitializerMethod == null) {
-            Class classWithThisMethod = ObjectStreamClass.class ;
+            Class classWithThisMethod = 
+		java.io.ObjectStreamClass.class ;
             
             try {
                 hasStaticInitializerMethod =

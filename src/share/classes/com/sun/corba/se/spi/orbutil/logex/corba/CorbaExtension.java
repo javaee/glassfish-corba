@@ -262,7 +262,7 @@ public class CorbaExtension extends StandardLogger {
                     str.length() - CLASS_NAME_SUFFIX.length()) ;
             }
 
-            return StandardLogger.CORBA_LOGGER_PREFIX + str ;
+            return StandardLogger.CORBA_LOGGER_PREFIX + "." + str ;
         }
 
         return str ;

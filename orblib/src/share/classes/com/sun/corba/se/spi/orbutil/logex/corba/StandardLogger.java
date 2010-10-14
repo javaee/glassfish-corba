@@ -72,6 +72,6 @@ public class StandardLogger extends WrapperGenerator.ExtensionBase {
             shortName = name ;
         }
 
-        return CORBA_LOGGER_PREFIX + shortName ;
+        return CORBA_LOGGER_PREFIX + "." + shortName ;
     }
 }

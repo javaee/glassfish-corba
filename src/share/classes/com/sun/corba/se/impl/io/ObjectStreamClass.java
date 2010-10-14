@@ -494,7 +494,8 @@ public class ObjectStreamClass implements java.io.Serializable {
 					reflField.setAccessible(true);
 					fields[j].setField(reflField);
 				    } else {
-					// XXX I really think this needs to be handled.
+					// XXX I really think this needs to be handled. 
+                                        // Probably just log an error.
 				    }
 				} catch (NoSuchFieldException e) {
 				    // Nothing to do

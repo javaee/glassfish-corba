@@ -167,8 +167,6 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     @Poa
     public byte[] servantToId( Servant servant ) throws ServantNotActive, WrongPolicy
     {	
-	// XXX needs to handle call from an invocation on this POA
-
 	if (!isUnique && !isImplicit)
 	    throw new WrongPolicy();
 

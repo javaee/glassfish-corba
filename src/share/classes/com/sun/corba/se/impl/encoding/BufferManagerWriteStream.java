@@ -113,9 +113,8 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 	    if (retry) {
 	        Bridge bridge = Bridge.get();
 	        bridge.throwException(new RemarshalException());
-	    } else { // re-throw the SystemException
-		// XXX This exception is lost, and not reported correctly to PI.
-		// Do we need to call the client PI end method?
+	    } else { 
+                // re-throw the SystemException
 	        throw se;
 	    }
 	}

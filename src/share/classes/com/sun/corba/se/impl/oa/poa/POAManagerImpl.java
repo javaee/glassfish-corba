@@ -276,7 +276,6 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
     synchronized void addPOA(POA poa)
     {
-	// XXX This is probably not the correct error
 	if (state.value() == State._INACTIVE) {
 	    POASystemException wrapper = factory.getWrapper();
 	    throw wrapper.addPoaInactive( CompletionStatus.COMPLETED_NO ) ;

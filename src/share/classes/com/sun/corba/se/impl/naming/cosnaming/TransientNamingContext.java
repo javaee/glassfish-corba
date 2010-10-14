@@ -101,9 +101,6 @@ public class TransientNamingContext extends NamingContextImpl implements NamingC
 {
     private Logger readLogger, updateLogger, lifecycleLogger;
 
-    // XXX: the wrapper calls are all preceded by logger updates.
-    // These can be combined, and then we simply use 3 NamingSystemException wrappers,
-    // for read, update, and lifecycl.
     private NamingSystemException wrapper ;
 
     /**

@@ -155,31 +155,9 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     private static final String SUN_JAVA_VENDOR = "Sun Microsystems Inc." ;
 
     static {
-	final String vendor = System.getProperty( "java.vendor" ) ;
-	String vhName = "com.sun.corba.se.impl.io.ValueHandlerImpl" ;
-
-	if (vendor.equals( SUN_JAVA_VENDOR )) {
-            // GFv3: remove this for now (and maybe forever)
-	    // We are running with Sun's JDK, so use the ValueHandler in the JDK.
-	    // This is needed in GlassFish for compatibility with embedded use of
-	    // WebLogic.  The string concat is essential: it prevents the code 
-	    // from being affected by the ORB rename. The same reason makes it impossible
-	    // to just call new.
-	    // XXX vhName = "com.sun.corba." + "se.impl.io.ValueHandlerImpl" ;
-        }
-
-	try {
-	    valueHandlerSingleton = (ValueHandler) Class.forName(vhName).newInstance() ;
-	} catch (ClassNotFoundException ce) {
-	    valueHandlerSingleton = new ValueHandlerImpl();
-	    utilWrapper.couldNotFindJdkValueHandler(ce);
-	} catch (java.lang.InstantiationException ie) {	  
-	    valueHandlerSingleton = new ValueHandlerImpl();
-	    utilWrapper.couldNotFindJdkValueHandler(ie);
-	} catch (java.lang.IllegalAccessException iae) {	  
-	    valueHandlerSingleton = new ValueHandlerImpl();
-	    utilWrapper.couldNotFindJdkValueHandler(iae);
-	}
+        // Note: there uses to be code here to use the JDK value handler for embedded
+        // web logic.  I removed it after 3.1.0-b008.
+        valueHandlerSingleton = new ValueHandlerImpl();
     }
 
     // This constructor MUST be public, or Util.createDelegateIfSpecified will fail!
@@ -778,8 +756,6 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     } catch (java.util.EmptyStackException exc) {
                         // copyObject was invoked outside of an invocation, probably by
                         // a test.  Get the default copier from the ORB.
-                        // XXX should we just make the default copier available directly
-                        // and avoid constructing one on each call?
                         CopierManager cm = lorb.getCopierManager() ;
                         ObjectCopier copier = cm.getDefaultObjectCopierFactory().make() ;
                         return copier.copy( obj ) ;
@@ -790,10 +766,6 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     throw rexc ;
                 }
             } else {
-                // XXX The code in this else branch is identical to the code in
-                // ORBStreamObjectCopierImpl: Refactor.  Assume that orb may
-                // in fact be a foreign ORB: probably need a static method for this.
-
                 if (obj instanceof Remote) {
                     // Make sure obj is connected and converted to a stub,
                     // if necessary.

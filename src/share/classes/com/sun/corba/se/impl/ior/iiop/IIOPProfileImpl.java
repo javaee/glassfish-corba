@@ -347,8 +347,6 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
     /** Return the servant for this IOR, if it is local AND if the OA that
      * implements this objref supports direct access to servants outside of an
      * invocation.
-     * XXX revisit: do we want this at all?  If we do, it might move to the
-     * ObjectKeyTemplate instead.
      */
     @IsLocal
     public java.lang.Object getServant()

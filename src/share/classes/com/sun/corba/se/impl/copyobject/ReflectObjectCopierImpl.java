@@ -72,7 +72,6 @@ import com.sun.corba.se.impl.orbutil.copyobject.PipelineClassCopierFactory ;
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
-// XXX Not good to be importing this, but seems to be necessary.
 import com.sun.corba.se.impl.util.Utility ;
 
 /** Class used to deep copy arbitrary data.  A single 
@@ -196,14 +195,6 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
         OperationTracer.begin( "ReflectObjectCopierImpl" ) ;
 	Class cls = obj.getClass() ;
 	ClassCopier copier = ccf.getClassCopier( cls ) ;
-
-	/* too much detail!
-	if (debug) {
-	    System.out.println( "Contents of ClassCopier:" +
-		ObjectUtility.defaultObjectToString( copier ) ) ; 
-	}
-	*/
-
 	return copier.copy( oldToNew, obj, debug ) ;
     }
 }

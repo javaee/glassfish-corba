@@ -448,8 +448,6 @@ public class ServerGroupManager
 	    try { 
 		worker.join(); 
 	    } catch (InterruptedException e) { 
-		// clear the interrupted status
-                // XXX Is this the correct thread?
 		Thread.currentThread().interrupted() ; 
 		tryAgain = true; 
 	    }

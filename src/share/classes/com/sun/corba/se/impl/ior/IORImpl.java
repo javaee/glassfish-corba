@@ -74,13 +74,12 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.logging.IORSystemException ;
 
-// XXX remove this once getProfile is gone
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 
 /** An IOR is represented as a list of profiles.
 * Only objects that extend TaggedProfile should be added to an IOR.
 * However, enforcing this restriction requires overriding all
-* of the addXXX methods inherited from List, so no check
+* of the addYYY methods inherited from List, so no check
 * is included here.
 * @author Ken Cavanaugh
 */

@@ -58,11 +58,9 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.logging.ORBUtilSystemException ;
 
-// XXX This should go away once we get rid of the port exchange for ORBD
 import com.sun.corba.se.impl.orb.ORBConfiguratorImpl;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 
-// XXX These should move to SPI
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 public class ORBConfiguratorPersistentImpl extends ORBConfiguratorImpl {

@@ -421,7 +421,6 @@ public class IIOPInputStream
          * Check for reset, handle it before reading an object.
          */
         try {
-            // d4365188: backward compatability
             if (vhandler.useFullValueDescription(clz, repositoryID)) {
                 obj = inputObjectUsingFVD(clz, cinfo, repositoryID, sender, offset);
             } else {
@@ -1284,6 +1283,7 @@ public class IIOPInputStream
     }
 
     @InfoMethod
+    // XXX see displayFVD
     private void fullValueDescriptorsInfo( List<FullValueDescription>  fvds ) { }
 
     // This retrieves a vector of FVD's for the hierarchy of serializable 
@@ -1316,6 +1316,12 @@ public class IIOPInputStream
 
     // XXX Do we want to replace this with something integrated with the 
     // tracing facility?
+    // Interesting question.  The full display of an FVD is likely to be
+    // valuable for debugging FVD issues (which we haven't had in >10 years),
+    // but it's too verbose for the dprint MethodMonitor.  Possibly some kind
+    // of extra data display (not inline) might be interesting here: need 
+    // to revisit dprint, and think about how to flag alternate formatting/handling
+    // of arguments.
     private String displayFVD( FullValueDescription fvd ) {
         StringBuilder sb = new StringBuilder() ;
         sb.append( "FVD(" ) ;

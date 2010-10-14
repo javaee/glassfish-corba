@@ -180,10 +180,6 @@ public class TOAImpl extends ObjectAdapterBase implements TOA
 	return StubAdapter.getTypeIds( servant ) ;
     }
 
-    // XXX For now, this does nothing.
-    // This will need fixing once we support ORB and thread level policies,
-    // but for now, there is no way to associate policies with the TOA, so
-    // getEffectivePolicy must always return null.
     public Policy getEffectivePolicy( int type ) 
     {
 	return null ;
@@ -223,8 +219,6 @@ public class TOAImpl extends ObjectAdapterBase implements TOA
 	org.omg.CORBA.Object obj = orf.make_object( id, key ) ;
 
 	// Copy the delegate from the new objref to the argument
-	// XXX handle the case of an attempt to connect a local object.
-
 	org.omg.CORBA.portable.Delegate delegate = StubAdapter.getDelegate( 
 	    obj ) ;
 	CorbaContactInfoList ccil = (CorbaContactInfoList)

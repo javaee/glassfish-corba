@@ -268,7 +268,6 @@ public final class ORBInitInfoImpl
 	ClientRequestInterceptor interceptor, Policy[] policies ) 
         throws DuplicateName
     {
-	// XXX ignore policies for now
 	add_client_request_interceptor( interceptor ) ;
     }
 
@@ -295,7 +294,6 @@ public final class ORBInitInfoImpl
 	ServerRequestInterceptor interceptor, Policy[] policies ) 
         throws DuplicateName, PolicyError
     {
-	// XXX ignore policies for now
 	add_server_request_interceptor( interceptor ) ;
     }
 
@@ -322,7 +320,6 @@ public final class ORBInitInfoImpl
 	IORInterceptor interceptor, Policy[] policies ) 
         throws DuplicateName, PolicyError
     {
-	// XXX ignore policies for now
 	add_ior_interceptor( interceptor ) ;
     }
 

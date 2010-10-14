@@ -66,7 +66,6 @@ public final class TransientObjectManager {
 
     @ManagedAttribute() 
     @Description( "The element array mapping indices into servants" ) 
-    // XXX Really should return a deep clone!
     private synchronized Element[] getElements() {
         return elementArray.clone() ;
     }

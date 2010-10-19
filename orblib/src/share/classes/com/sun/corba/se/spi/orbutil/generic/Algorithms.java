@@ -39,6 +39,8 @@
  */
 package com.sun.corba.se.spi.orbutil.generic ;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List ;
 import java.util.Map ;
 import java.util.ArrayList ;
@@ -101,8 +103,9 @@ public abstract class Algorithms {
 
 	for (A a : arg) {
 	    R newArg = func.evaluate( a ) ;
-	    if (newArg != null)
-		result.add( newArg ) ;
+	    if (newArg != null) {
+                result.add(newArg);
+            }
 	}
     }
 
@@ -148,16 +151,55 @@ public abstract class Algorithms {
     }
 
     public static <T> T getOne( List<T> list, String zeroMsg, String manyMsg ) {
-        if (list.size() == 0)
-            throw new IllegalArgumentException( zeroMsg ) ;
-        if (list.size() > 0)
-            throw new IllegalArgumentException( manyMsg ) ;
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException(zeroMsg);
+        }
+        if (list.size() > 1) {
+            throw new IllegalArgumentException(manyMsg);
+        }
         return list.get(0) ;
     }
 
     public static <T> T getFirst( List<T> list, String zeroMsg ) {
-        if (list.size() == 0)
-            throw new IllegalArgumentException( zeroMsg ) ;
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException(zeroMsg);
+        }
         return list.get(0) ;
+    }
+
+    public static interface Action<T> {
+        T run() throws Exception ;
+    }
+
+    private static <T> PrivilegedAction<T> makePrivilegedAction(
+        final Action<T> act ) {
+
+        return new PrivilegedAction<T>() {
+            public T run() {
+                try {
+                    return act.run() ;
+                } catch (RuntimeException exc) {
+                    throw exc ;
+                } catch (Exception ex) {
+                    throw new RuntimeException( ex ) ;
+                }
+            }
+        } ;
+    }
+
+    public static <T> T doPrivileged( Action<T> func ) {
+        SecurityManager sman = System.getSecurityManager() ;
+        try {
+            if (sman == null) {
+                return func.run() ;
+            } else {
+                return AccessController.doPrivileged( makePrivilegedAction(
+                    func ) ) ;
+            }
+        } catch (RuntimeException rex) {
+            throw rex ;
+        } catch (Exception ex) {
+            throw new RuntimeException( ex ) ;
+        }
     }
 }

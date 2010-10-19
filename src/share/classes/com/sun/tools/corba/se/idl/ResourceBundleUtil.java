@@ -83,7 +83,7 @@ public class ResourceBundleUtil
 
   public static String getMessage (String key, String... fill)
   {
-    String pattern = fBundle.getString(key) ;
+    String pattern = getResourceBundle().getString(key) ;
     MessageFormat mf = new MessageFormat( pattern ) ;
     return mf.format( fill, new StringBuffer(), null ).toString() ;
   } // getMessage
@@ -101,14 +101,11 @@ public class ResourceBundleUtil
   /** Gets the current ResourceBundle.  */
   public static ResourceBundle getResourceBundle ()
   {
+    if (fBundle == null) {
+      fBundle = ResourceBundle.getBundle("com.sun.tools.corba.se.idl.idl");
+    }
     return fBundle;
   } // getResourceBundle
 
-  private static ResourceBundle  fBundle;
-  static
-  {
-    // get the resource bundle for the locale on this machine
-    fBundle = ResourceBundle.getBundle("com.sun.tools.corba.se.idl.idl");
-  }
-
+  private static ResourceBundle  fBundle = null ;
 } // class ResourceBundleUtil

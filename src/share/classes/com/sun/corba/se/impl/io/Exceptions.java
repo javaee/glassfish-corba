@@ -57,8 +57,8 @@ import java.io.StreamCorruptedException;
  * @author ken
  */
 @ExceptionWrapper( idPrefix="ORBIO" )
-interface Exceptions {
-    Exceptions self = WrapperGenerator.makeWrapper( Exceptions.class,
+public interface Exceptions {
+    public Exceptions self = WrapperGenerator.makeWrapper( Exceptions.class,
         StandardLogger.self );
 
     // Allow 100 exceptions per class

@@ -43,11 +43,11 @@ package com.sun.corba.se.spi.orbutil.logex.corba ;
 import com.sun.corba.se.org.omg.CORBA.SUNVMCID;
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
 import com.sun.corba.se.spi.orbutil.logex.Log;
-import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
 import java.lang.reflect.Constructor;
 
 import java.lang.reflect.Method;
-import javax.management.StandardEmitterMBean;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.omg.CORBA.ACTIVITY_COMPLETED;
 import org.omg.CORBA.ACTIVITY_REQUIRED;
@@ -119,25 +119,28 @@ public class CorbaExtension extends StandardLogger {
 	TRANSACTION_UNAVAILABLE.class, BAD_QOS.class, INVALID_ACTIVITY.class,
         ACTIVITY_COMPLETED.class, ACTIVITY_REQUIRED.class } ;
 
-    private static final Constructor[] SYS_EX_CONSTRUCTORS =
-	new Constructor[SYS_EX_CLASSES.length] ;
+    @SuppressWarnings("unchecked")
+    private static final List<Constructor<SystemException>> SYS_EX_CONSTRUCTORS =
+	new ArrayList<Constructor<SystemException>>(
+            SYS_EX_CLASSES.length) ;
 
     static {
 	Class<?>[] ptypes = { String.class, int.class,
 	    CompletionStatus.class } ;
 
-	for (int ctr=0; ctr<SYS_EX_CLASSES.length; ctr++) {
-	    final Class<?> cls = SYS_EX_CLASSES[ctr] ;
+        for (Class<?> cls : SYS_EX_CLASSES) {
 		try {
-		    final Constructor cons = cls.getDeclaredConstructor(ptypes);
-		    SYS_EX_CONSTRUCTORS[ctr] = cons ;
-		} catch (NoSuchMethodException ex) {
-		    throw new RuntimeException(
-			"Cound not find constructor for " + cls, ex ) ;
-		} catch (SecurityException ex) {
+                    @SuppressWarnings("unchecked")
+		    final Constructor<SystemException> cons =
+                        (Constructor<SystemException>)cls.getDeclaredConstructor(
+                            ptypes);
+		    SYS_EX_CONSTRUCTORS.add(cons) ;
+		} catch (Exception ex) {
 		    throw new RuntimeException(
 			"Cound not find constructor for " + cls, ex ) ;
 		}
+
+
         }
     }
 
@@ -229,7 +232,7 @@ public class CorbaExtension extends StandardLogger {
 	    final int minorCode = getMinorCode( orbex, log ) ;
 	    final int exceptionId = getExceptionId(method) ;
 
-	    final Constructor cons = SYS_EX_CONSTRUCTORS[exceptionId] ;
+	    final Constructor<SystemException> cons = SYS_EX_CONSTRUCTORS.get(exceptionId) ;
 
 	    final CS cs = method.getAnnotation( CS.class ) ;
 	    final CSValue csv = cs == null ? CSValue.NO : cs.value() ;
@@ -238,8 +241,8 @@ public class CorbaExtension extends StandardLogger {
 		SUNVMCID.value :
 		OMGVMCID.value ;
 
-	    SystemException result = (SystemException)cons.newInstance(
-	        msg, base + minorCode, csv.getCompletionStatus() ) ;
+	    SystemException result = cons.newInstance(msg, base + minorCode,
+                csv.getCompletionStatus()) ;
 
 	    return result ;
 	} catch (Exception exc) {

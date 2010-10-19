@@ -43,10 +43,10 @@
 <!--
     The source code is divided into 3 areas:
         orb-library:
-            Contents: Contains libraries that can be used independently of the ORB.
-                This includes the codegen library, the timing facility, an
-                FSM library, and a number of generic utilities.  This also includes
-                a copy of the ASM library from ObjectWeb.  
+            Contents: Contains libraries that can be used independently of the 
+                ORB.  This includes the codegen library, the timing facility, an
+                FSM library, and a number of generic utilities.  This also 
+                includes a copy of the ASM library from ObjectWeb.
             Dependencies: May not depend on classes from any other area.  
             Delivery: as OSGi bundles:
                 glassfish-corba-codegen
@@ -81,27 +81,31 @@
             - felix
 -->
 
-<project name="corba-src" default="all" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="corba-src" default="all" basedir=".."
+    xmlns:artifact="antlib:org.apache.maven.artifact.ant">
     <description>
 	This is the Ant file that builds the GlassFish ORB.
     </description>
 
     <property name="root.dir"			value="${basedir}"/>
 
-    <!-- ========================= set up for the maven ant tasks ============================ -->
+    <!-- ========================= set up for the maven ant tasks ========= -->
 
-    <property name="maven.ant.file"                 value="maven-ant-tasks-2.0.10.jar"/>
-    <path id="maven-ant-tasks.classpath" path="${root.dir}/lib/${maven.ant.file}" />
+    <property name="maven.ant.file"         value="maven-ant-tasks-2.0.10.jar"/>
+    <path id="maven-ant-tasks.classpath" path="${root.dir}/lib/${maven.ant.file}"/>
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" 
         uri="antlib:org.apache.maven.artifact.ant" 
         classpathref="maven-ant-tasks.classpath">
     </typedef>
 
-    <target name="build" depends="init, prepare-dirs, compile, enhance-orb, compile-timing-points, orb-jar, make-bundles, archive-bundles"/>
+    <target name="build" depends="init, prepare-dirs, compile, 
+        generate-orb-resources, enhance-orb,
+        compile-timing-points, make-bundles, archive-bundles"/>
 
     <target name="enhance-orb" depends="init">
         <!-- Run the tracing enhancer on the class files for corba.tf -->
-	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool" classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
+	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool"
+            classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar:${classes.dir}:${gmbal-jar}"/>
             <arg value="-dir"/>
             <arg value="com/sun/corba/se/"/>
@@ -126,67 +130,81 @@
 
         <!-- environmental dependencies -->
         <property environment="env"/>
-        <property name="java.home"                      value="${env.JAVA_HOME}"/>
+        <property name="java.home"              value="${env.JAVA_HOME}"/>
         <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
-        <property name="maven.repo.local"                    value="${env.HOME}/.m2"/>
+        <property name="maven.repo.local"       value="${env.HOME}/.m2"/>
         <echo message="maven.repo.local=${maven.repo.local}"/> 
 
         <!-- Required JAR files -->
-        <property name="tools-jar"			value="${java.home}/../lib/tools.jar"/>
-        <property name="emma-jar"			value="${root.dir}/lib/emma.jar"/>
+        <property name="tools-jar"		value="${java.home}/../lib/tools.jar"/>
+        <property name="emma-jar"		value="${root.dir}/lib/emma.jar"/>
 
         <!-- Places where the build puts things -->
-        <property name="build.dir"                      location="build"/>
-        <property name="lib.dir"                        location="${build.dir}/lib"/>
-        <property name="libcache.dir"                   location="${build.dir}/libcache"/>
-        <property name="gmbal-jar"                      location="${libcache.dir}/gmbal.jar"/>
-        <property name="management-api-jar"             location="${libcache.dir}/management-api.jar"/>
-	<property name="gensrc.dir"                     location="${build.dir}/gensrc"/>
-	<property name="classes.dir"                    location="${build.dir}/classes"/>
-	<property name="releaselib.dir"                 location="${build.dir}/release/lib"/>   
+        <property name="build.dir"              location="build"/>
+        <property name="lib.dir"                location="${build.dir}/lib"/>
+        <property name="libcache.dir"           location="${build.dir}/libcache"/>
+        <property name="gmbal-jar"              location="${libcache.dir}/gmbal.jar"/>
+        <property name="management-api-jar"     location="${libcache.dir}/management-api.jar"/>
+	<property name="gensrc.dir"             location="${build.dir}/gensrc"/>
+	<property name="classes.dir"            location="${build.dir}/classes"/>
+	<property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
 
         <!-- ORB library build directories -->
-	<property name="orblib.src.dir"                 location="orblib/src/share/classes"/>
-	<property name="orblib.build.dir"               location="orblib/build"/>
-	<property name="orblib.classes.dir"             location="${orblib.build.dir}/classes"/>
+	<property name="orblib.src.dir"         location="orblib/src/share/classes"/>
+	<property name="orblib.build.dir"       location="orblib/build"/>
+	<property name="orblib.classes.dir"     location="${orblib.build.dir}/classes"/>
 
         <!-- Main ORB build directories -->
-        <property name="src.dir"		        value="src/share/classes"/>
-        <property name="javadoc.dir"		        value="www/javadoc"/>
-        <property name="build.sysclasspath"	        value="ignore"/>
+        <property name="src.dir"		value="src/share/classes"/>
+        <property name="javadoc.dir"		value="www/javadoc"/>
+        <property name="build.sysclasspath"	value="ignore"/>
 
         <!-- javac flags -->
-        <property name="deprecation"                    value="off"/>
-        <property name="javac.optimize"		        value="true"/>
-        <property name="javac.debug"		        value="true"/>
+        <property name="deprecation"            value="off"/>
+        <property name="javac.optimize"		value="true"/>
+        <property name="javac.debug"		value="true"/>
 
 	<!-- properties needed for updating and validating copyright headers -->
-	<property name="copyright.file"                 value="${root.dir}/make/copyright-information/copyright.txt"/>
-	<property name="copyright.roots"                value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/> 
-	<property name="copyright.skip"                 value=".hg,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom"/>
+	<property name="copyright.file"
+            value="${root.dir}/make/copyright-information/copyright.txt"/>
+	<property name="copyright.roots"
+            value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/>
+	<property name="copyright.skip"
+            value=".hg,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom"/>
 
         <!-- properties needed for pushing jar to maven repository -->
-        <property name="orb.version"                    value="${release.version}-${build.version}"/>
-        <property name="orb.groupId"                    value="com.sun.corba"/>
-        <property name="repo.url"                       value="java-net:/maven2-repository/trunk/repository"/>
-        <property name="file.url"                       value="file:/tmp/maven"/>
-        <property name="local.url"                      value="file:${maven.repo.local}"/>
-        <property name="bundle.name.prefix"             value="glassfish-corba-"/>
-        <property name="bnd.properties.file"            value="make/bnd/bnd.properties"/>
+        <property name="orb.version"
+            value="${release.version}-${build.version}"/>
+        <property name="orb.groupId"            value="com.sun.corba"/>
+        <property name="repo.url"
+            value="java-net:/maven2-repository/trunk/repository"/>
+        <property name="file.url"               value="file:/tmp/maven"/>
+        <property name="local.url"              value="file:${maven.repo.local}"/>
+        <property name="bundle.name.prefix"     value="glassfish-corba-"/>
+        <property name="bnd.properties.file"    value="make/bnd/bnd.properties"/>
         
         <artifact:remoteRepository id="gf.repo" url="${gf.repository}"/>
         <artifact:remoteRepository id="aqute.repo" url="${aqute.repository}"/>
 
-        <artifact:dependencies versionsId="dependency.versions" filesetId="dependency.fileset" pathId="dependency.classpath">
+        <artifact:dependencies versionsId="dependency.versions"
+            filesetId="dependency.fileset" pathId="dependency.classpath">
             <remoteRepository refid="gf.repo"/>
-            <dependency groupId="${gmbal.groupid}" artifactId="${gmbal.artifactid}" version="${gmbal.version}" scope="runtime"/>
-            <dependency groupId="${management-api.groupid}" artifactId="${management-api.artifactid}" version="${management-api.version}" scope="runtime"/>
-            <dependency groupId="${felix.groupid}" artifactId="${felix.artifactid}" version="${felix.version}" scope="runtime"/>
+            <dependency groupId="${gmbal.groupid}" 
+                artifactId="${gmbal.artifactid}"
+                version="${gmbal.version}" scope="runtime"/>
+            <dependency groupId="${management-api.groupid}" 
+                artifactId="${management-api.artifactid}"
+                version="${management-api.version}" scope="runtime"/>
+            <dependency groupId="${felix.groupid}" 
+                artifactId="${felix.artifactid}"
+                version="${felix.version}" scope="runtime"/>
         </artifact:dependencies>
 
         <artifact:dependencies pathId="bnd.classpath">
             <remoteRepository refid="aqute.repo"/>
-            <dependency groupId="${bnd.groupid}" artifactId="${bnd.artifactid}" version="${bnd.version}" scope="compile"/>
+            <dependency groupId="${bnd.groupid}" 
+                artifactId="${bnd.artifactid}"
+                version="${bnd.version}" scope="compile"/>
         </artifact:dependencies>
 
 	<path id="classpath.master">
@@ -194,7 +212,7 @@
 
 	    <pathelement location="${orblib.classes.dir}"/>
 	    <pathelement location="${classes.dir}"/>
-	    <pathelement location="${tools-jar}"/>          <!-- needed to build rmic -->
+	    <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
 	</path>
     </target>
 
@@ -237,7 +255,9 @@
 	</javac>
     </target>
 
-    <target name="compile" depends="init, prepare-dirs, get-dependencies, orb-library, compile-enhancer, compile-idl-compiler, run-all-idl, delete-java-sources, copy-resources">
+    <target name="compile" depends="init, prepare-dirs, get-dependencies, 
+        orb-library, compile-enhancer, compile-idl-compiler, run-all-idl,
+        delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"
@@ -264,10 +284,36 @@
 	    <include name="com/sun/corba/se/tool/**"/>
 	    <include name="sun/corba/**"/>
 	    <include name="sun/rmi/rmic/**"/>
-	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+	    <compilerarg
+                value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
+	    <compilerarg
+                value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
 	</javac>
     </target>
+
+    <target name="generate-orb-resources"
+     depends="init, orb-library, compile">
+	<java classname="com.sun.corba.se.spi.orbutil.logex.ExceptionResourceGenerator"
+            fork="true"
+            classpathref="classpath.master"
+	    dir="${root.dir}">
+
+            <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+
+<!--
+	    <jvmarg value="-Xdebug"/>
+	    <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=12321"/>
+-->
+	    <arg value="-verbose"/>
+	    <arg value="1"/>
+            <arg value="-source"/>
+            <arg value="${classes.dir}"/>
+            <arg value="-destination"/>
+            <arg value="${classes.dir}"/>
+	</java>
+    </target>
+
 
     <!-- ========================= COPY-RESOURCES ========================= -->
     <target name="copy-resources" depends="init">
@@ -277,13 +323,11 @@
 		<include name="com/sun/corba/se/impl/orbutil/resources/sunorb.properties"/>
 		<include name="sun/rmi/rmic/resources/rmic.properties"/>
 	    </fileset>
-	    <fileset dir="${gensrc.dir}">
-		<include name="com/sun/corba/se/impl/logging/LogStrings.properties"/>
-	    </fileset>
 	</copy>
 	<copy todir="${classes.dir}" flatten="true" overwrite="false">
 	    <fileset dir="${src.dir}">
-		<include name="com/sun/corba/se/impl/presentation/rmi/jndi.properties"/>
+		<include
+                    name="com/sun/corba/se/impl/presentation/rmi/jndi.properties"/>
 	    </fileset>
 	</copy>
     </target>
@@ -445,7 +489,8 @@
     <target name="compile-idl-compiler" depends="init">
 	<echo message="Copying .prp files"/>
 	<copy todir="${classes.dir}" overwrite="false">
-	    <fileset dir="${src.dir}" includes="com/sun/tools/corba/se/idl/**/*.prp"/>
+	    <fileset dir="${src.dir}"
+                includes="com/sun/tools/corba/se/idl/**/*.prp"/>
 	</copy>
 	<echo message="Compiling idl compiler"/>
 	<javac srcdir="${src.dir}" destdir="${classes.dir}" 
@@ -462,13 +507,15 @@
 	</copy>
     </target>
 
-    <!-- =========================== OSGi bundles for the ORB ============================== -->
+    <!-- ================== OSGi bundles for the ORB ======================= -->
 
     <macrodef name="make-bundle">
         <attribute name="classpath"/>
         <attribute name="file"/>
             <sequential>
-                <java classpathref="bnd.classpath" classname="aQute.bnd.main.bnd" fork="true" failonerror="true">
+                <java classpathref="bnd.classpath" 
+                    classname="aQute.bnd.main.bnd" fork="true"
+                    failonerror="true">
                     <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
                     <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
                     <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
@@ -484,7 +531,8 @@
     </macrodef>
 
     <target name="make-src-bundle" depends="init">
-        <jar jarfile="${releaselib.dir}/bundles/glassfish-corba-source.jar" duplicate="fail">
+        <jar jarfile="${releaselib.dir}/bundles/glassfish-corba-source.jar"
+            duplicate="fail">
             <fileset dir="${src.dir}">
                 <include name="**/*.java"/>
             </fileset>
@@ -497,7 +545,8 @@
         </jar>
     </target>
 
-    <target name="make-bundles" depends="init,generate-bnd-properties,make-src-bundle">
+    <target name="make-bundles"
+        depends="init,generate-bnd-properties,make-src-bundle">
         <make-bundle classpath="${classes.dir}" file="orb"/>
         <make-bundle classpath="${classes.dir}" file="omgapi"/>
         <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>
@@ -518,8 +567,9 @@
                 <exclude name="glassfish-corba-osgi-test.jar"/> 
             </fileset>
         </copy>
-        <zip destfile="${releaselib.dir}/bundles-archive.zip" compress="false" basedir="${releaselib.dir}"
-         includes="glassfish/modules/*"/>
+        <zip destfile="${releaselib.dir}/bundles-archive.zip" compress="false"
+            basedir="${releaselib.dir}"
+            includes="glassfish/modules/*"/>
         <delete dir="${releaselib.dir}/glassfish/modules"/>
     </target>
 
@@ -532,8 +582,9 @@
 
     <!-- ========================= Build the ORB library ====================  
 	The ORB library is a collection of all the reuseable, ORB-independent
-	modules that the ORB uses.  This is currently used in the build to generate
-	the timing points file, and to handle copyright processing and renaming.
+	modules that the ORB uses.  This is currently used in the build to 
+        generate the timing points file, and to handle copyright processing
+        and renaming.
 
 	Note that this must work either renamed or not renamed, so both 
 	the relocated directory and the non-relocated directory for
@@ -544,7 +595,8 @@
         OSGi bundles for GFv3.
      -->
 
-    <target name="orb-library" depends="init, compile-orb-library"> 
+    <target name="orb-library" 
+     depends="init, compile-orb-library, generate-orb-lib-resources">
 	<jar jarfile="${releaselib.dir}/orblib.jar"
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
@@ -552,14 +604,28 @@
 	    </fileset>
 	</jar>
     </target>
-   
-    <target name="orb-jar" depends="init, compile"> 
-	<jar jarfile="${releaselib.dir}/orb.jar"
-		    duplicate="fail">
-	    <fileset dir="${classes.dir}">
-		<include name="**"/>
-	    </fileset>
-	</jar>
+
+    <target name="generate-orb-lib-resources"
+     depends="init, compile-orb-library">
+	<java classname="com.sun.corba.se.spi.orbutil.logex.ExceptionResourceGenerator"
+            fork="true"
+	    dir="${root.dir}">
+            <jvmarg value="-Xbootclasspath/p:${orblib.classes.dir}:${gmbal-jar}:${mnagement-api-jar}"/>
+            <!--
+	    <jvmarg value="-Xdebug"/>
+	    <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=12321"/>
+            -->
+	    <classpath>
+		<pathelement location="${orblib.classes.dir}:${gmbal-jar}:${mnagement-api-jar}"/>
+	    </classpath>
+	    <arg value="-verbose"/>
+	    <arg value="1"/>
+            <arg value="-source"/>
+            <arg value="${orblib.classes.dir}"/>
+            <arg value="-destination"/>
+            <arg value="${orblib.classes.dir}"/>
+	</java>
     </target>
    
     <target name="compile-orb-library" depends="init, prepare-dirs">
@@ -574,19 +640,23 @@
 		memoryMaximumSize="512m"> 
 	    <src path="${orblib.src.dir}"/>
 	    <include name="**"/>
-	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
+	    <compilerarg
+                value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
 	    <compilerarg value="-Xbootclasspath/p:${orblib.classes.dir}"/>
 	</javac>
     </target>
 
-    <!-- =================================== Copyright header mainenance ========================== -->
+    <!-- =================== Copyright header mainenance ================== -->
 
     <target name="update-copyright-headers" depends="init, orb-library">
 	<!--
-		This target is used when it is necessary to update the copyright headers.
-		See com.sun.corba.se.spi.orbutil.file.CopyrightProcessor for all of the details.
+		This target is used when it is necessary to update the 
+                copyright headers.  See
+                com.sun.corba.se.spi.orbutil.file.CopyrightProcessor
+                for all of the details.
 		Notes:
-		    - Certain directories are ignored, mainly Mercurial and CodeManager related directories.
+		    - Certain directories are ignored, mainly Mercurial
+                      and CodeManager related directories.
 		    - Files are classified as follows:
 			- Java-like; uses /* ... */ style block comments
 			- JavaLine-like; uses // ... style line comments
@@ -595,15 +665,21 @@
 			- Shell-like; uses # ... line comments
 			- Binary-like; can not be modified by this tool
 		    - The classification is done as follows, in the order listed:
-			1. Some files are recognized by exact name (primarily makefiles)
+			1. Some files are recognized by exact name (primarily
+                           makefiles)
 			2. Most files are classified by suffix
 			3. If a file starts with "#!", it is a shell script.
-			4. Otherwise we stop and complain, because we need to be correct for all files.
-		    - The current copyright text lives in make/headers/copyright.txt.  This is just
-		      the text: it must be formatted appropriately based on the file type.
-		    - CopyrightProcessor supports a verbose flag, and a dryrun flag.  Turning both of these
-		      on gives the details of what will happen, without actually changing anything.
-		    - DO NOT INTERRUPT THIS TARGET!  It can destroy files, which is hardly catastrophic,
+			4. Otherwise we stop and complain, because we need to
+                           be correct for all files.
+		    - The current copyright text lives in
+                      make/headers/copyright.txt.  This is just
+		      the text: it must be formatted appropriately based on
+                      the file type.
+		    - CopyrightProcessor supports a verbose flag, and a 
+                      dryrun flag.  Turning both of these on gives the details
+                      of what will happen, without actually changing anything.
+		    - DO NOT INTERRUPT THIS TARGET!  It can destroy files,
+                      which is hardly catastrophic,
 		      because the file is still in the version control system.
 		    - Do NOT mix header comment changes with other changes!
 
@@ -614,14 +690,18 @@
 			experimental, make, nbproject, src, test, tools, www
 		    -skipdirs: set to the directories to skip:
 			.hg, Codemgr_wsdata, deleted_files, headers, freezepoint
-		    -copyright: this is set to the copyright template, currently in make/headers/copyrights.txt
-		    -startYear: set to the default start year for the header (1997)
+		    -copyright: this is set to the copyright template, currently
+                     in make/headers/copyrights.txt
+		    -startYear: set to the default start year for the header
+                     (1997)
 			
-		The tool is flexible enough to remove old Sun copyright headers, leave non-Sun copyright headers in
-		place, ignore copyright info that is not in comments, and insert the correct start year into the
-		new copyright header.
+		The tool is flexible enough to remove old Sun or Oracle
+                copyright headers, leave non-Sun/Oracle copyright headers in
+                place, ignore copyright info that is not in comments, and
+                insert the correct start year into the new copyright header.
 	-->
-	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor" fork="true"
+	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor"
+            fork="true"
 	    dir="${root.dir}">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
@@ -650,7 +730,8 @@
 	    but instead it validates that all files have the correct headers.
 
 	-->
-	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor" fork="true"
+	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor"
+            fork="true"
 	    dir="${root.dir}">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
@@ -673,11 +754,13 @@
 	</java>
     </target>
 
-    <!-- =========================== Timing points file generation ====================== -->
+    <!-- ================= Timing points file generation ================ -->
 
     <target name="check-timing-file-changed" depends="init">
-        <property name="tsrcfile" value="${src.dir}/com/sun/tools/corba/se/timer/timing.xml"/>
-        <property name="tjavafile" value="${gensrc.dir}/com/sun/corba/se/impl/orbutil/newtimer/generated/TimingPoints.java"/>
+        <property name="tsrcfile"
+            value="${src.dir}/com/sun/tools/corba/se/timer/timing.xml"/>
+        <property name="tjavafile"
+            value="${gensrc.dir}/com/sun/corba/se/impl/orbutil/newtimer/generated/TimingPoints.java"/>
 	<condition property="timing-file-changed">
 	    <or>
 		<not>
@@ -690,9 +773,12 @@
 	</condition>
     </target>
 
-    <target name="generate-timing-points" depends="init, check-timing-file-changed, orb-library" if="timing-file-changed">
+    <target name="generate-timing-points" 
+        depends="init, check-timing-file-changed, orb-library"
+        if="timing-file-changed">
 	<!-- tp-src-dir contains timing.xml and timing.dtd and
-	     must be the current directory for the forked TimerPointSourceGenerator.
+	     must be the current directory for the forked
+             TimerPointSourceGenerator.
 
 	     TPSG takes three arguments:
 		1. The input file.
@@ -701,13 +787,16 @@
 
 	    We should be able to debug this by adding:
 
-	    <jvmarg value="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=12321"/>
+	    <jvmarg value="-Xdebug -Xnoagent
+             -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=12321"/>
 
 	    to the java command, but that does not work.
 	  -->
-	<property name="tp-src-dir" value="${src.dir}/com/sun/tools/corba/se/timer"/>
-	<java classname="com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator" fork="true"
-	    dir="${tp-src-dir}">
+	<property name="tp-src-dir"
+            value="${src.dir}/com/sun/tools/corba/se/timer"/>
+	<java
+            classname="com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator"
+            fork="true" dir="${tp-src-dir}">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
@@ -720,7 +809,8 @@
     
     <!-- ========================= CLEAN ========================= -->
 
-    <target name="clean" depends="init,clean-emma,clean-tests,clean-experimental">
+    <target name="clean"
+        depends="init,clean-emma,clean-tests,clean-experimental">
         <delete file="${bnd.properties.file}"/>
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
@@ -755,10 +845,12 @@
 		 windowtitle="Sun Java CORBA ORB SPI"/>
     </target>
 
-    <!-- also depends on orb-library, but we need to prevent the recompilation -->
+    <!-- also depends on orb-library, but we need to prevent the recompilation
+     -->
     <target name="rename" depends="init">
 	<mkdir dir="build/rename/ee"/>
-	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
+	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename"
+         fork="true"
 	    dir="${root.dir}" failonerror="true">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
@@ -779,7 +871,8 @@
 
     <target name="rename-quiet" depends="init">
 	<mkdir dir="build/rename/ee"/>
-	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename" fork="true"
+	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename"
+         fork="true"
 	    dir="${root.dir}" failonerror="true">
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
@@ -800,7 +893,8 @@
 
     <target name="generate-bnd-properties" depends="init">
         <propertyfile file="${bnd.properties.file}">
-            <entry key="Bundle-Version" value="${release.version}-${build.version}"/>
+            <entry key="Bundle-Version"
+             value="${release.version}-${build.version}"/>
         </propertyfile>
     </target> 
 
@@ -814,16 +908,19 @@
                     <available file="${idl-gensrc-dir}"/>
                 </not>
                 <uptodate property="idl-file-changed" targetfile="${idl-value}">
-                    <srcfiles dir="${idl-gensrc-dir}" includes="${generated-files}"/>
+                    <srcfiles dir="${idl-gensrc-dir}"
+                     includes="${generated-files}"/>
                 </uptodate>
             </or>
         </condition>
     </target>
 
     <!-- This target is called repeatedly for each IDL invocation -->
-    <target name="call-idl" depends="check-idl-file-changed" if="idl-file-changed">
+    <target name="call-idl" depends="check-idl-file-changed"
+     if="idl-file-changed">
         <echo message="Running IDL compiler ${idl-value}"/>
-        <java classname="com.sun.tools.corba.se.idl.toJavaPortable.Compile" classpathref="classpath.master" fork="true">
+        <java classname="com.sun.tools.corba.se.idl.toJavaPortable.Compile"
+         classpathref="classpath.master" fork="true">
             <arg line="${td-value}"/>
             <arg line="${includes-value}"/>
             <arg line="${corba-value}"/>
@@ -842,67 +939,81 @@
     <target name="run-all-idl" depends="compile-idl-compiler">
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix PortableServer org.omg"/>
-            <param name="idl-value" value="${src.dir}/org/omg/PortableServer/poa.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/PortableServer"/>
+            <param name="pkg-prefixes"
+             value="-pkgPrefix PortableServer org.omg"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/PortableServer/poa.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/org/omg/PortableServer"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value="-D CORBA3"/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes" value="-pkgPrefix IOP org.omg"/>
-            <param name="idl-value" value="${src.dir}/org/omg/PortableInterceptor/IOP.idl"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/PortableInterceptor/IOP.idl"/>
             <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/IOP"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${src.dir}/org/omg/PortableInterceptor/CORBAX.idl"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/PortableInterceptor/CORBAX.idl"/>
             <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/CORBA"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes" value="-pkgPrefix Messaging org.omg"/>
-            <param name="idl-value" value="${src.dir}/org/omg/PortableInterceptor/Messaging.idl"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/PortableInterceptor/Messaging.idl"/>
             <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/Messaging"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value="-D CORBA3"/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix PortableInterceptor org.omg -pkgPrefix Dynamic org.omg -pkgPrefix IOP org.omg"/>
-            <param name="idl-value" value="${src.dir}/org/omg/PortableInterceptor/Interceptors.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/PortableInterceptor"/>
+            <param name="pkg-prefixes"
+             value="-pkgPrefix PortableInterceptor org.omg -pkgPrefix Dynamic org.omg -pkgPrefix IOP org.omg"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/PortableInterceptor/Interceptors.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/org/omg/PortableInterceptor"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
@@ -914,8 +1025,10 @@
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes" value="-pkgPrefix DynamicAny org.omg"/>
-            <param name="idl-value" value="${src.dir}/org/omg/DynamicAny/DynamicAny.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/DynamicAny"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/DynamicAny/DynamicAny.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/org/omg/DynamicAny"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
@@ -927,94 +1040,122 @@
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes" value="-pkgPrefix CosNaming org.omg"/>
-            <param name="idl-value" value="${src.dir}/org/omg/CosNaming/nameservice.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/CosNaming"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/CosNaming/nameservice.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/org/omg/CosNaming"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer -i ${src.dir}/org/omg/CosTransactions"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer -i ${src.dir}/org/omg/CosTransactions"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value="-D CORBA3"/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix CosTransactions org.omg"/>
-            <param name="idl-value" value="${src.dir}/org/omg/CosTransactions/CosTransactions.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/CosTransactions"/>
+            <param name="pkg-prefixes"
+             value="-pkgPrefix CosTransactions org.omg"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/CosTransactions/CosTransactions.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/org/omg/CosTransactions"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value="-D CORBA3"/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix CosTSInteroperation org.omg"/>
-            <param name="idl-value" value="${src.dir}/org/omg/CosTransactions/CosTSInteroperation.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/org/omg/CosTSInteroperation"/>
+            <param name="pkg-prefixes"
+             value="-pkgPrefix CosTSInteroperation org.omg"/>
+            <param name="idl-value"
+             value="${src.dir}/org/omg/CosTransactions/CosTSInteroperation.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/org/omg/CosTSInteroperation"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
             <param name="corba-value" value=""/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix CSI com.sun.corba.se.org.omg"/>
-            <param name="idl-value" value="${src.dir}/com/sun/corba/se/org/omg/CSI/CSI.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/com/sun/corba/se/org/omg/CSI"/>
+            <param name="pkg-prefixes"
+             value="-pkgPrefix CSI com.sun.corba.se.org.omg"/>
+            <param name="idl-value"
+             value="${src.dir}/com/sun/corba/se/org/omg/CSI/CSI.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/com/sun/corba/se/org/omg/CSI"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
             <param name="corba-value" value=""/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix GSSUP com.sun.corba.se.org.omg -pkgPrefix CSI com.sun.corba.se.org.omg"/>
-            <param name="idl-value" value="${src.dir}/com/sun/corba/se/org/omg/GSSUP/GSSUP.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/com/sun/corba/se/org/omg/GSSUP"/>
+            <param name="pkg-prefixes"
+             value="-pkgPrefix GSSUP com.sun.corba.se.org.omg -pkgPrefix CSI com.sun.corba.se.org.omg"/>
+            <param name="idl-value"
+             value="${src.dir}/com/sun/corba/se/org/omg/GSSUP/GSSUP.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/com/sun/corba/se/org/omg/GSSUP"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
+            <param name="includes-value"
+             value="-i ${src.dir}/org/omg/PortableInterceptor -i ${src.dir}/org/omg/PortableServer -i ${src.dir}/com/sun/corba/se/org/omg/CSI"/>
             <param name="corba-value" value="-corba 3.0"/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value="-D CORBA3"/>
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value="-pkgTranslate IOP org.omg.IOP"/>
-            <param name="pkg-prefixes" value="-pkgPrefix CSIIOP com.sun.corba.se.org.omg -pkgPrefix CSI com.sun.corba.se.org.omg"/>
-            <param name="idl-value" value="${src.dir}/com/sun/corba/se/org/omg/CSIIOP/CSIIOP.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/com/sun/corba/se/org/omg/CSIIOP"/>
+            <param name="pkg-prefixes"
+             value="-pkgPrefix CSIIOP com.sun.corba.se.org.omg -pkgPrefix CSI com.sun.corba.se.org.omg"/>
+            <param name="idl-value"
+             value="${src.dir}/com/sun/corba/se/org/omg/CSIIOP/CSIIOP.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/com/sun/corba/se/org/omg/CSIIOP"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${gensrc.dir}"/>
-            <param name="includes-value" value="-i ${gensrc.dir}/com/sun/corba/se/spi/activation"/>
+            <param name="includes-value"
+             value="-i ${gensrc.dir}/com/sun/corba/se/spi/activation"/>
             <param name="corba-value" value=""/>
             <param name="fall-value" value="-fall"/>
             <param name="D-value" value=""/>
             <param name="oldImplBase-value" value="-oldImplBase"/>
             <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value="-pkgPrefix activation com.sun.corba.se.spi"/>
-            <param name="idl-value" value="${src.dir}/com/sun/corba/se/spi/activation/activation.idl"/>
-            <param name="idl-gensrc-dir" value="${gensrc.dir}/com/sun/corba/se/spi/activation"/>
+            <param name="pkg-prefixes"
+             value="-pkgPrefix activation com.sun.corba.se.spi"/>
+            <param name="idl-value"
+             value="${src.dir}/com/sun/corba/se/spi/activation/activation.idl"/>
+            <param name="idl-gensrc-dir"
+             value="${gensrc.dir}/com/sun/corba/se/spi/activation"/>
             <param name="generated-files" value="**/*.java"/>
         </antcall>
     </target>
 
     <target name="mavenize" depends="init" description="initialize maven ">
         <!-- Download the SVN provider-->
-        <artifact:install-provider artifactId="wagon-svn" groupId="org.jvnet.wagon-svn" version="1.7">
-            <artifact:remoteRepository id="java.net.maven2.repository" url="http://download.java.net/maven/2/" />
+        <artifact:install-provider artifactId="wagon-svn"
+         groupId="org.jvnet.wagon-svn" version="1.7">
+            <artifact:remoteRepository id="java.net.maven2.repository"
+             url="http://download.java.net/maven/2/" />
             <!-- store the provider in temp local repository-->
         </artifact:install-provider>
     </target>
@@ -1025,8 +1166,9 @@
         jarName         the name of the jar file (glassfish-corba-<module>)
         version         the current CORBA version
         jarDescription  a brief description of the jar contents
-        HEADER-@{module} the expanded version of make/pom/header.xml inserted into the pom file
-                        Note that all properties must have unique names.  Ant is COMPLETELY
+        HEADER-@{module} the expanded version of make/pom/header.xml inserted 
+                        into the pom file. Note that all properties must have
+                        unique names.  Ant is COMPLETELY
                         braindead: see Greenberg's 10th law.
 
     naming conventions:
@@ -1049,10 +1191,12 @@
         <attribute name="module"/>
         <attribute name="description"/>
         <sequential>
-            <loadfile property="HEADER-@{module}" srcFile="make/pom/header.xml">
+            <loadfile property="HEADER-@{module}"
+             srcFile="make/pom/header.xml">
                 <filterchain>
                     <replacetokens>
-                        <token key="artifactId" value="glassfish-corba-@{module}"/>
+                        <token key="artifactId"
+                         value="glassfish-corba-@{module}"/>
                         <token key="version" value="${orb.version}"/>
                         <token key="jarDescription" value="@{description}"/>
                         <token key="groupId" value="${orb.groupId}"/>
@@ -1060,7 +1204,8 @@
                     </replacetokens>
                 </filterchain>
             </loadfile>
-            <copy file="make/pom/@{module}.template.xml" tofile="make/corba.temp.pom" overwrite="true">
+            <copy file="make/pom/@{module}.template.xml"
+             tofile="make/corba.temp.pom" overwrite="true">
                 <filterset>
                   <filter token="HEADER" value="${HEADER-@{module}}"/>
                   <filter token="version" value="${orb.version}"/>
@@ -1071,10 +1216,10 @@
     </macrodef>
 
     <!--  
-    Note that we use a temporary file to store the pom because maven is based on 'single 
-    project produces single jar file'. But, we are producing 9 jars from a single 
-    project. Hence, we need a template to for each pom that generates the POM we use each
-    time we publish.
+    Note that we use a temporary file to store the pom because maven is based 
+    on 'single project produces single jar file'. But, we are producing 9 jars
+    from a single project. Hence, we need a template to for each pom that
+    generates the POM we use each time we publish.
 
     Refer: http://maven.apache.org/guides/mini/guide-using-one-source-directory.html
     Section: Producing Multiple JARs from a single POM (maven limitations)
@@ -1087,8 +1232,10 @@
         <sequential>
             <make-file module="@{module}" description="@{description}"/>
 
-            <artifact:pom id="glassfish.corba.project" file="make/corba.temp.pom" />
-            <artifact:deploy file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
+            <artifact:pom id="glassfish.corba.project"
+             file="make/corba.temp.pom" />
+            <artifact:deploy
+             file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
                 <remoteRepository url="@{destination}">
                 </remoteRepository>
                 <pom refid="glassfish.corba.project"/>
@@ -1101,14 +1248,23 @@
         <attribute name="destination"/>
         <sequential>
             <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <push-to-maven destination="@{destination}" module="asm" description="ASM version used in the ORB"/>
-            <push-to-maven destination="@{destination}" module="codegen" description="Dynamic code generation library"/>
-            <push-to-maven destination="@{destination}" module="csiv2-idl" description="IDL generated definitions for CSIv2"/>
-            <push-to-maven destination="@{destination}" module="newtimer" description="ORB timer library"/>
-            <push-to-maven destination="@{destination}" module="omgapi" description="OMG standard APIs"/>
-            <push-to-maven destination="@{destination}" module="orb" description="The ORB implementation"/>
-            <push-to-maven destination="@{destination}" module="orbgeneric" description="Generic libraries"/>
-            <push-to-maven destination="@{destination}" module="source" description="ORB source code"/>
+            <push-to-maven destination="@{destination}"
+             module="asm" description="ASM version used in the ORB"/>
+            <push-to-maven destination="@{destination}"
+             module="codegen" description="Dynamic code generation library"/>
+            <push-to-maven destination="@{destination}" 
+             module="csiv2-idl"
+             description="IDL generated definitions for CSIv2"/>
+            <push-to-maven destination="@{destination}" module="newtimer"
+             description="ORB timer library"/>
+            <push-to-maven destination="@{destination}" module="omgapi"
+             description="OMG standard APIs"/>
+            <push-to-maven destination="@{destination}" module="orb"
+             description="The ORB implementation"/>
+            <push-to-maven destination="@{destination}" module="orbgeneric"
+             description="Generic libraries"/>
+            <push-to-maven destination="@{destination}" module="source"
+             description="ORB source code"/>
         </sequential>
     </macrodef>
 

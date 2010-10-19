@@ -41,13 +41,18 @@
 package com.sun.corba.se.spi.orbutil.logex;
 
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
+import com.sun.corba.se.spi.orbutil.proxy.CompositeInvocationHandler;
+import com.sun.corba.se.spi.orbutil.proxy.CompositeInvocationHandlerImpl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -57,6 +62,16 @@ import java.util.logging.Logger;
  * Interface must be annotated with @ExceptionWrapper( String idPrefix, String loggerName ).
  * id prefix defaults to empty, loggerName defaults to the package name of the annotated
  * class.
+ *
+ * Also, note that this returned wrapper will always implement the MessageInfo
+ * interface, which provides a way to capture all of the messages and IDs used
+ * in the interface.  This is used to generate resource bundles. In order for
+ * this to work, it is required that the interface declare a field
+ *
+ * public static final [class name] self = makeWrapper( ... ) ;
+ *
+ * This is necessary because the extension mechanism allows the construction
+ * of message IDs that cannot be predicted based on the annotations alone.
  *
  * The behavior of the implementation of each method on the interface is determined
  * in part by its return type as follows:
@@ -90,6 +105,19 @@ import java.util.logging.Logger;
  * @author ken
  */
 public class WrapperGenerator {
+    /** Hidden interface implemented by the result of the makeWrapper call.
+     * This is needed in the resource file generation tool.
+     */
+    public interface MessageInfo {
+        /** Return a map from message ID to message for all exceptions
+         * defined in a @ExceptionWrapper interface.
+         * The key in the result is the message ID, and the value is the
+         * message string (defined in @Message).
+         * @return map from message ID to message.
+         */
+        Map<String,String> getMessageInfo() ;
+    }
+
     /** Extension API available to override the default behavior of the
      * WrapperGenerator.
      */
@@ -137,6 +165,9 @@ public class WrapperGenerator {
 
     }
 
+    // Used whenever there is no user-supplied Extension.
+    private static final Extension stdExtension = new ExtensionBase() {} ;
+
     private WrapperGenerator() {}
 
     // Find the outer index in pannos for which the element array
@@ -178,20 +209,25 @@ public class WrapperGenerator {
                 "No Log annotation present for " + method ) ;
         }
 
-        return Integer.toString(log.id()) ;
+        return String.format( "%05d", log.id() ) ;
     }
 
-    // Extension: handle more complex CORBA log id.
-    // CORBA case needs: method return type, info from ORBException
-    private static String getLogId( Method method, Extension extension ) {
-        if (extension != null) {
-            return extension.getLogId( method ) ;
-        } else {
-            return getStandardLogId(method) ;
+    private static Map<String,String> getMessageMap( Class<?> cls,
+        Extension extension ) {
+
+        final Map<String,String> result = new TreeMap<String,String>() ;
+        final ExceptionWrapper ew = cls.getAnnotation( ExceptionWrapper.class ) ;
+        final String idPrefix = ew.idPrefix() ;
+        for (Method method : cls.getDeclaredMethods()) {
+            final String msgId = extension.getLogId( method ) ;
+            final String msg = getMessage( method, idPrefix, msgId ) ;
+            result.put( idPrefix + msgId, msg ) ;
         }
+
+        return result ;
     }
 
-    private static String getMessage( Method method, int numParams, 
+    private static String getMessage( Method method, 
         String idPrefix, String logId ) {
 
         final Message message = method.getAnnotation( Message.class ) ;
@@ -203,7 +239,7 @@ public class WrapperGenerator {
         if (message == null) {
             sb.append( method.getName() ) ;
             sb.append( ' ' ) ;
-            for (int ctr=0; ctr<numParams; ctr++) {
+            for (int ctr=0; ctr<method.getParameterTypes().length; ctr++) {
                 if (ctr>0) {
                     sb.append( ", " ) ;
                 }
@@ -262,8 +298,10 @@ public class WrapperGenerator {
         Throwable result ;
         Class<?> rtype = method.getReturnType() ;
         try {
-            Constructor cons = rtype.getConstructor(String.class);
-            result = (Throwable) cons.newInstance(msg);
+            @SuppressWarnings("unchecked")
+            Constructor<Throwable> cons =
+                (Constructor<Throwable>)rtype.getConstructor(String.class);
+            result = cons.newInstance(msg);
         } catch (InstantiationException ex) {
             throw new RuntimeException( ex ) ;
         } catch (IllegalAccessException ex) {
@@ -293,32 +331,22 @@ public class WrapperGenerator {
 
     // Extend: for making system exception based on data 
     // used for minor code and completion status
-    private static Throwable makeException( String msg, Method method,
-        Extension extension ) {
-        if (extension != null) {
-            return extension.makeException( msg, method ) ;
-        } else {
-            return makeStandardException( msg, method ) ;
-        }
-    }
-
-    private static String handleMessageOnly( Method method, Logger logger,
-        Object[] messageParams ) {
+    private static String handleMessageOnly( Method method, Extension extension,
+        Logger logger, Object[] messageParams ) {
 
         // Just format the message: no exception ID or log level
         // This code is adapted from java.util.logging.Formatter.formatMessage
-        String msg = method.getAnnotation(Message.class).value() ;
+        final String msg = method.getAnnotation(Message.class).value() ;
         String transMsg ;
-        ResourceBundle catalog = logger.getResourceBundle() ;
-        try {
-            transMsg = catalog.getString( msg ) ;
-        } catch (Exception exc) {
-            // Ignore exc: hard to report here.
-            // Ignore findbugs: regardless of exception, just use msg as result.
+        final ResourceBundle catalog = logger.getResourceBundle() ;
+        if (catalog == null) {
             transMsg = msg ;
+        } else {
+            final String logId = extension.getLogId( method ) ;
+            transMsg = catalog.getString( logId ) ;
         }
 
-        String result ;
+        final String result ;
         if (transMsg.indexOf( "{0" ) >= 0 ) {
             result = java.text.MessageFormat.format( transMsg, messageParams ) ;
         } else {
@@ -383,16 +411,15 @@ public class WrapperGenerator {
 
         final Level level = log.level().getLevel() ;
         final ReturnType rtype = classifyReturnType( method ) ;
-        final int len = messageParams == null ? 0 : messageParams.length ;
-        final String msgString = getMessage( method, len, idPrefix, 
-	    getLogId( method, extension )) ;
+        final String msgString = getMessage( method, idPrefix, 
+	    extension.getLogId( method )) ;
         final LogRecord lrec = makeLogRecord( level, msgString,
             messageParams, logger ) ;
         final String message = formatter.format( lrec ) ;
 
         Throwable exc = null ;
         if (rtype == ReturnType.EXCEPTION) {
-            exc = makeException( message, method, extension ) ;
+            exc = extension.makeException( message, method ) ;
 	    if (exc != null) {
 		if (cause != null) {
 		    exc.initCause( cause ) ;
@@ -429,7 +456,7 @@ public class WrapperGenerator {
      * @return An instance of the interface.
      */
     public static <T> T makeWrapper( final Class<T> cls ) {
-        return makeWrapper(cls, null) ;
+        return makeWrapper(cls, stdExtension ) ;
     }
 
     /** Given an interface annotated with @ExceptionWrapper, return a proxy
@@ -441,6 +468,7 @@ public class WrapperGenerator {
      * behavior.
      * @return An instance of the interface.
      */
+    @SuppressWarnings("unchecked")
     public static <T> T makeWrapper( final Class<T> cls,
         final Extension extension ) {
 
@@ -452,8 +480,7 @@ public class WrapperGenerator {
 
         final ExceptionWrapper ew = cls.getAnnotation( ExceptionWrapper.class ) ;
         final String idPrefix = ew.idPrefix() ;
-        final String name = extension == null 
-            ? getStandardLoggerName( cls ) : extension.getLoggerName( cls );
+        final String name = extension.getLoggerName( cls );
 
         InvocationHandler inh = new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args)
@@ -468,7 +495,20 @@ public class WrapperGenerator {
                     cause = (Throwable)args[chainIndex] ;
                 }
 
-                final Logger logger = Logger.getLogger( name ) ;
+                // Get the logger with the resource bundle if it is available,
+                // otherwise without it.  This is needed because sometimes
+                // when we load a class to generate a .properties file, the
+                // ResourceBundle is (obviously!) not availabe, and a static
+                // initializer must initialize a log wrapper WITHOUT a
+                // ResourceBundle, in order to generate a properties file which
+                // implements the ResourceBundle.
+                Logger logger = null ;
+                try {
+                    logger = Logger.getLogger( name, name ) ;
+                } catch (MissingResourceException exc) {
+                    logger = Logger.getLogger( name ) ;
+                }
+
                 final Class<?> rtype = method.getReturnType() ;
                 final Log log = method.getAnnotation( Log.class ) ;
 
@@ -479,7 +519,8 @@ public class WrapperGenerator {
                             + cls.getName() + "." + method.getName() ) ;
                     }
 
-                    return handleMessageOnly( method, logger, messageParams ) ;
+                    return handleMessageOnly( method, extension, logger,
+                        messageParams ) ;
                 } else {
                     return handleFullLogging( log, method, logger, idPrefix,
                         messageParams, cause, extension ) ;
@@ -487,9 +528,27 @@ public class WrapperGenerator {
             }
         } ;
 
+        InvocationHandler inhmi = new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args)
+                throws Throwable {
+
+                if (method.getName().equals( "getMessageInfo")) {
+                    return getMessageMap( cls, extension ) ;
+                }
+
+                throw new RuntimeException( "Unexpected method " + method ) ;
+            }
+        } ;
+
+        final CompositeInvocationHandler cih =
+            new CompositeInvocationHandlerImpl() ;
+
+        cih.addInvocationHandler( cls, inh ) ;
+        cih.addInvocationHandler( MessageInfo.class, inhmi) ;
+
         // Load the Proxy using the same ClassLoader that loaded the interface
         ClassLoader loader = cls.getClassLoader() ;
-        Class[] classes = { cls  } ;
-        return (T)Proxy.newProxyInstance(loader, classes, inh ) ;
+        Class<?>[] classes = { cls, MessageInfo.class } ;
+        return (T)Proxy.newProxyInstance(loader, classes, cih ) ;
     }
 }

@@ -185,7 +185,10 @@ public class CorbaExtension extends StandardLogger {
 	final ORBException orbex = getORBException( method ) ;
 	final Log log = getLog( method ) ;
 	final int minorCode = getMinorCode( orbex, log ) ;
-	return minorCode ;
+        final int base = orbex.omgException() ?
+            SUNVMCID.value :
+            OMGVMCID.value ;
+	return base + minorCode ;
     }
 
     public int getMinorCode( Class<?> cls, String methodName ) {

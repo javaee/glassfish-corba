@@ -70,6 +70,19 @@ public class CompositeInvocationHandlerImpl implements
 	// Note that the declaring class in method is the interface
 	// in which the method was defined, not the proxy class.
 	Class<?> cls = method.getDeclaringClass() ;
+
+        // Handle Object methods here.  This allows overridding of
+        // toString, equals, and hashCode in a class that extends
+        // CompositeInvocationHandlerImpl.
+        if (cls.equals( Object.class )) {
+            try {
+                return method.invoke( this, args ) ;
+            } catch (Exception exc) {
+                throw new RuntimeException( "Invocation error on Object method",
+                    exc ) ;
+            }
+        }
+
 	InvocationHandler handler = classToInvocationHandler.get(cls) ;
 
 	if (handler == null) {

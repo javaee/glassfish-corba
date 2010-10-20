@@ -596,7 +596,7 @@
      -->
 
     <target name="orb-library" 
-     depends="init, compile-orb-library, generate-orb-lib-resources">
+     depends="init, get-dependencies, compile-orb-library, generate-orb-lib-resources">
 	<jar jarfile="${releaselib.dir}/orblib.jar"
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">

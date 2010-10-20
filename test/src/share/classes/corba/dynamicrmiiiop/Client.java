@@ -227,11 +227,13 @@ public class Client extends TestCase
 	Throwable thr1 = (Throwable)obj1 ;
 	Throwable thr2 = (Throwable)obj2 ;
 
+        /* Don't care about matching messages: that's up to the logex code.
 	boolean sameMessage = equalOrNull( thr1.getMessage(), thr2.getMessage() ) ;
 	if (!sameMessage) {
 	    fail( "thr1 and thr2 do not have the same message: thr1 message = " 
 		+ thr1.getMessage() + " thr2 message = " + thr2.getMessage() ) ;
 	}
+        */
 	    
 	sameException( thr1.getCause(), thr2.getCause() ) ;
 

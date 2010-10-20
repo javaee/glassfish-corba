@@ -541,7 +541,11 @@ public class WrapperGenerator {
         } ;
 
         final CompositeInvocationHandler cih =
-            new CompositeInvocationHandlerImpl() ;
+            new CompositeInvocationHandlerImpl() {
+                public String toString() {
+                    return "ExceptionWrapper[" + cls.getName() + "]" ;
+                }
+            } ;
 
         cih.addInvocationHandler( cls, inh ) ;
         cih.addInvocationHandler( MessageInfo.class, inhmi) ;

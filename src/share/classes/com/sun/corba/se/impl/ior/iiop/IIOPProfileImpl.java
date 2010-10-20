@@ -83,10 +83,13 @@ import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 import com.sun.corba.se.impl.util.JDKBridge;
 
 import com.sun.corba.se.spi.logging.IORSystemException;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 
 /**
  * @author
  */
+@IsLocal
 public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
 {
     private static final IORSystemException wrapper =
@@ -120,6 +123,17 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
     }
 
     private GIOPVersion giopVersion = null;
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder() ;
+        sb.append( "IIOPProfileImpl[proftemp=") ;
+        sb.append( proftemp.toString() ) ;
+        sb.append( " oktemp=" ) ;
+        sb.append( oktemp.toString() ) ;
+        sb.append( " oid=" ) ;
+        sb.append( oid.toString() ) ;
+        return sb.toString() ;
+    }
 
     @Override
     public boolean equals( Object obj )
@@ -302,21 +316,31 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
         return oktemp.getORBVersion();
     }
 
+    @InfoMethod
+    private void computingIsLocal( String host, int scid, int sid, int port ) {}
+
+    @InfoMethod
+    private void isLocalResults( boolean isLocalHost, boolean isLocalServerId,
+         boolean isLocalPort ) {}
+
+    @IsLocal
     public synchronized boolean isLocal()
     {
 	if (!checkedIsLocal) {
 	    checkedIsLocal = true ;
-	    final String host = proftemp.getPrimaryAddress().getHost() ;
-            final boolean isLocalHost = orb.isLocalHost( host ) ;
 
+	    final String host = proftemp.getPrimaryAddress().getHost() ;
             final int scid = oktemp.getSubcontractId() ;
             final int sid = oktemp.getServerId() ;
+            final int port = proftemp.getPrimaryAddress().getPort() ;
+            computingIsLocal( host, scid, sid, port ) ;
+
+            final boolean isLocalHost = orb.isLocalHost( host ) ;
             final boolean isLocalServerId = (sid == -1) ||
                 orb.isLocalServerId( scid, sid ) ;
-
             final boolean isLocalServerPort = 
-                orb.getLegacyServerSocketManager().legacyIsLocalServerPort( 
-                    proftemp.getPrimaryAddress().getPort() );
+                orb.getLegacyServerSocketManager().legacyIsLocalServerPort( port ) ;
+            isLocalResults( isLocalHost, isLocalServerId, isLocalServerPort ) ;
 
 	    cachedIsLocal = isLocalHost && isLocalServerId 
                 && isLocalServerPort ;
@@ -329,6 +353,7 @@ public class IIOPProfileImpl extends IdentifiableBase implements IIOPProfile
      * implements this objref supports direct access to servants outside of an
      * invocation.
      */
+    @IsLocal
     public java.lang.Object getServant()
     {
 	if (!isLocal()) {

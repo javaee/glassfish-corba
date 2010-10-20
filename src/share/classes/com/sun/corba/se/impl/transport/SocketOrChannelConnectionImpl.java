@@ -774,35 +774,30 @@ public class SocketOrChannelConnectionImpl
         closeSocketAndTemporarySelectors();
     }
 
+    @InfoMethod
+    private void closingSocketChannel() {}
+
+    @InfoMethod
+    private void IOExceptionOnClose(Exception e) {}
+
     @Transport
     protected void closeSocketAndTemporarySelectors() {
         try {
             if (socketChannel != null) {
                 closeTemporarySelectors();
-                // NOTE: Until JDK bug 6215050 is fixed in Java 5, do not use
-                //       socketChannel.close(). Instead shutdown input &
-                //       output streams on the Socket and use socket.close().
-                //       JDK bug 6215050 was fixed in JDK 1.5.0_07. Can use
-                //       socketChannel.close() for 1.5.0_07 and later JDKs.
-                if (!socketChannel.socket().isInputShutdown()) {
-                    shuttingDownConnectionInputStream() ;
-                    socketChannel.socket().shutdownInput();
-                }
-                if (!socketChannel.socket().isOutputShutdown()) {
-                    shuttingDownConnectionOutputStream() ;
-                    socketChannel.socket().shutdownOutput();
-                }
-                if (!socketChannel.socket().isClosed()) {
-                    socketChannel.socket().close();
-                }
+                closingSocketChannel() ;
+                socketChannel.socket().close();
             }
-            
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
-            }
-            
         } catch (IOException e) {
             wrapper.exceptionOnClose( e ) ;
+        } finally {
+            try {
+                if (socket != null && !socket.isClosed()) {
+                    socket.close() ;
+                }
+            } catch (Exception e) {
+                wrapper.exceptionOnClose(e);
+            }
         }
     }
 
@@ -824,7 +819,9 @@ public class SocketOrChannelConnectionImpl
     public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator)
     {
 	// REVISIT - remove this method from Connection and all it subclasses.
-	throw new RuntimeException("*****SocketOrChannelConnectionImpl.createOutputObject - should not be called.");
+	throw new RuntimeException(
+            "*****SocketOrChannelConnectionImpl.createOutputObject "
+            + "- should not be called.");
     }
 
     // This is used by the GIOPOutputObject in order to

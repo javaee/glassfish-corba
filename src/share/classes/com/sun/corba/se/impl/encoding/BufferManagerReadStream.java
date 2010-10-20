@@ -115,8 +115,6 @@ public class BufferManagerReadStream
       ByteBufferWithInfo result = null;
 
       try {
-	  //System.out.println("ENTER underflow");
-	
         synchronized (fragmentQueue) {
 
             if (receivedCancel) {
@@ -134,14 +132,15 @@ public class BufferManagerReadStream
 		boolean interrupted = false ;
                 try {
 		    // Bug 6372405
-                    fragmentQueue.wait( orb.getORBData().fragmentReadTimeout());
+                    fragmentQueue.wait( 
+                        orb.getORBData().fragmentReadTimeout() );
                 } catch (InterruptedException e) {
 		    interrupted = true ;
 		}
 
 		// Bug 6372405
 		if (!interrupted && fragmentQueue.size() == 0) {
-                    throw wrapper.bufferReadManagerTimeout();
+		    throw wrapper.bufferReadManagerTimeout() ;
                 }
 
                 if (receivedCancel) {

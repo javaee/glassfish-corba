@@ -65,9 +65,11 @@ import com.sun.corba.se.spi.logging.POASystemException;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Subcontract;
 
 @Subcontract
+@IsLocal
 public abstract class LocalClientRequestDispatcherBase implements LocalClientRequestDispatcher
 {
     protected static final POASystemException poaWrapper =
@@ -124,6 +126,7 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
 	return objectId ;
     }
 
+    @IsLocal
     public boolean is_local(org.omg.CORBA.Object self)
     {
 	return false;
@@ -144,6 +147,7 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     *	    servant_postinvoke is called
     *
     */
+    @IsLocal
     public boolean useLocalInvocation( org.omg.CORBA.Object self ) 
     {
 	if (isNextCallValid.get() == Boolean.TRUE) {
@@ -155,10 +159,14 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
 	return false ;    
     }
 
+    @InfoMethod
+    private void servantNotCompatible() {}
+
     /** Check that the servant in info (which must not be null) is
     * an instance of the expectedType.  If not, set the thread local flag
     * and return false.
     */
+    @IsLocal
     protected boolean checkForCompatibleServant( ServantObject so, 
 	Class expectedType )
     {
@@ -170,6 +178,7 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
 	// and the stub were loaded in different class loaders, this test
 	// will fail.
 	if (!expectedType.isInstance( so.servant )) {
+            servantNotCompatible() ;
 	    isNextCallValid.set( Boolean.FALSE ) ;
 
 	    // When servant_preinvoke returns null, the stub will

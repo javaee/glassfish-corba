@@ -147,40 +147,19 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
     private static Util instance = null;
 
-    private WeakHashMap<Class<?>, String> annotationMap =
-        new WeakHashMap<Class<?>, String> ();
+    // XXX Would like to have a WeakConcurrentHashMap here to reduce contention,
+    // but that is only available with Google collections at present.
+    private WeakHashMap<java.lang.Class<?>, String> annotationMap =
+        new WeakHashMap<java.lang.Class<?>, String> ();
 
     private static final java.lang.Object annotObj = new java.lang.Object();
 
     private static final String SUN_JAVA_VENDOR = "Sun Microsystems Inc." ;
 
     static {
-	final String vendor = System.getProperty( "java.vendor" ) ;
-	String vhName = "com.sun.corba.se.impl.io.ValueHandlerImpl" ;
-
-	if (vendor.equals( SUN_JAVA_VENDOR )) {
-            // GFv3: remove this for now (and maybe forever)
-	    // We are running with Sun's JDK, so use the ValueHandler in the JDK.
-	    // This is needed in GlassFish for compatibility with embedded use of
-	    // WebLogic.  The string concat is essential: it prevents the code 
-	    // from being affected by the ORB rename. The same reason makes it impossible
-	    // to just call new.
-            //
-	    // vhName = "com.sun.corba." + "se.impl.io.ValueHandlerImpl" ;
-        }
-
-	try {
-	    valueHandlerSingleton = (ValueHandler) Class.forName(vhName).newInstance() ;
-	} catch (ClassNotFoundException ce) {
-	    valueHandlerSingleton = new ValueHandlerImpl();
-	    utilWrapper.couldNotFindJdkValueHandler(ce);
-	} catch (java.lang.InstantiationException ie) {	  
-	    valueHandlerSingleton = new ValueHandlerImpl();
-	    utilWrapper.couldNotFindJdkValueHandler(ie);
-	} catch (java.lang.IllegalAccessException iae) {	  
-	    valueHandlerSingleton = new ValueHandlerImpl();
-	    utilWrapper.couldNotFindJdkValueHandler(iae);
-	}
+        // Note: there uses to be code here to use the JDK value handler for embedded
+        // web logic.  I removed it after 3.1.0-b008.
+        valueHandlerSingleton = new ValueHandlerImpl();
     }
 
     // This constructor MUST be public, or Util.createDelegateIfSpecified will fail!
@@ -623,16 +602,21 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      * @return a space-separated list of URLs, or null.
      */
     public String getCodebase(java.lang.Class clz) {
+        String annot ;
         synchronized (annotObj) {
-	    String annot = annotationMap.get(clz);
-	    if (annot == null) {
-	        annot = RMIClassLoader.getClassAnnotation(clz);
-		annotationMap.put(clz, annot);
-		return annot;
-	    } else {
-                return annot;
+	    annot = annotationMap.get(clz);
+        }
+
+        if (annot == null) {
+            // This can be an expensive operation, so don't hold the lock here.
+            annot = RMIClassLoader.getClassAnnotation(clz);
+
+            synchronized( annotObj ) {
+                annotationMap.put(clz, annot);
             }
-	}
+        }
+
+        return annot;
     }
 
     /**

@@ -58,11 +58,11 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 import static com.sun.corba.se.spi.orbutil.fsm.Guard.Base.* ;
 
 /** AOMEntry represents a Servant or potential Servant in the ActiveObjectMap.
-* It may be in several states to allow for long incarnate or etherealize operations.
-* The methods on this class mostly represent input symbols to the state machine
-* that controls the lifecycle of the entry.  A library is used to build the state
-* machine rather than the more usual state pattern so that the state machine
-* transitions are explicitly visible.
+* It may be in several states to allow for long incarnate or etherealize 
+* operations.  The methods on this class mostly represent input symbols to
+* the state machine that controls the lifecycle of the entry.  A library is
+* used to build the state machine rather than the more usual state pattern
+* so that the state machine transitions are explicitly visible.
 */
 @PoaFSM
 public class AOMEntry extends FSMImpl {
@@ -81,7 +81,9 @@ public class AOMEntry extends FSMImpl {
 
     final POAImpl poa ;
 
-    public static final State INVALID = new State( "Invalid", State.Kind.INITIAL ) ;
+    public static final State INVALID = new State( "Invalid", 
+        State.Kind.INITIAL ) ;
+
     public static final State INCARN  = new State( "Incarnating" ) {
 	@Override
 	public void postAction( FSM fsm ) {
@@ -89,8 +91,11 @@ public class AOMEntry extends FSMImpl {
 	    entry.wait.signalAll() ;
 	}
     };
+
     public static final State VALID   = new State( "Valid" ) ;
+
     public static final State ETHP    = new State( "EtherealizePending" ) ;
+
     public static final State ETH     = new State( "Etherealizing" ) {
         @Override
 	public FSM preAction( FSM fsm ) {
@@ -108,6 +113,7 @@ public class AOMEntry extends FSMImpl {
 	    entry.wait.signalAll() ;
 	}
     };
+
     public static final State DESTROYED = new State( "Destroyed" ) ;
 
     static final Input START_ETH    = new Input.Base( "startEtherealize" ) ;
@@ -179,16 +185,18 @@ public class AOMEntry extends FSMImpl {
     private static final IntFunc one = constant( 1 ) ;
     private static final IntFunc zero = constant( 0 ) ;
 
-    private static final Guard greaterZeroGuard = makeGuard( gt( counterFunc, zero ) ) ;
-    private static final Guard zeroGuard = makeGuard( eq( counterFunc, zero ) ) ;
-    private static final Guard greaterOneGuard = makeGuard( gt( counterFunc, one ) ) ;
-    private static final Guard oneGuard = makeGuard( eq( counterFunc, one ) ) ;
+    private static final Guard greaterZeroGuard =
+        makeGuard( gt( counterFunc, zero ) ) ;
+    private static final Guard zeroGuard =
+        makeGuard( eq( counterFunc, zero ) ) ;
+    private static final Guard greaterOneGuard =
+        makeGuard( gt( counterFunc, one ) ) ;
+    private static final Guard oneGuard =
+        makeGuard( eq( counterFunc, one ) ) ;
 
-    private static final StateEngine engine ;
+    private static final StateEngine engine = StateEngine.create() ;
 
     static {
-	engine = StateEngine.create() ;
-
 	//	    State,   Input,     Guard,			Action,		    new State
 
 	engine.add( INVALID, ENTER,				incrementAction,    INCARN	) ;
@@ -233,7 +241,7 @@ public class AOMEntry extends FSMImpl {
 	etherealizer[0] = null ;
 	counter = new int[1] ;
 	counter[0] = 0 ;
-	wait = poa.poaMutex.newCondition() ;
+	wait = poa.makeCondition() ;
     }
 
     @InfoMethod

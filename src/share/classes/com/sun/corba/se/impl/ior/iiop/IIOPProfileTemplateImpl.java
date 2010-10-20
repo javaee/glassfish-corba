@@ -82,6 +82,17 @@ public class IIOPProfileTemplateImpl extends TaggedProfileTemplateBase
         return iterator() ;
     }
 
+    @Override
+    public String toString() {
+	StringBuilder sb = new StringBuilder() ;
+	sb.append( "IIOPProfileTemplateImpl[giopVersion=") ;
+	sb.append(giopVersion.getMajor()).append('.').append(giopVersion.getMinor()) ;
+	sb.append( " primary=" ) ;
+	sb.append(primary.getHost()).append(':').append(primary.getPort()) ;
+	sb.append( ']' ) ;
+	return sb.toString() ;
+    }
+
     public boolean equals( Object obj )
     {
 	if (!(obj instanceof IIOPProfileTemplateImpl))

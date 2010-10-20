@@ -79,7 +79,7 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 /** An IOR is represented as a list of profiles.
 * Only objects that extend TaggedProfile should be added to an IOR.
 * However, enforcing this restriction requires overriding all
-* of the addXXX methods inherited from List, so no check
+* of the addYYY methods inherited from List, so no check
 * is included here.
 * @author Ken Cavanaugh
 */
@@ -136,6 +136,18 @@ public class IORImpl extends IdentifiableContainerBase<TaggedProfile>
 	    isCachedHashValue = true; 
 	}
 	return cachedHashValue;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder() ;
+	sb.append( "IORImpl[type=") ;
+	sb.append( typeId ) ;
+	sb.append( " iorTemplates=" ) ;
+
+	IORTemplateList list = getIORTemplates() ;
+	sb.append( list.toString() ) ;
+	return sb.toString() ;
     }
 
     /** Construct an empty IOR.  This is needed for null object references.

@@ -463,7 +463,7 @@ public class OutputStream extends ObjectOutputStream {
     private void writePrimitiveArrayHeader( EmergeCode arrCode, 
 	LabelManager.Label label, int length ) {
 
-	writer.putByte( (byte)arrCode.code() ) ;  // XXX_ARR
+	writer.putByte( (byte)arrCode.code() ) ;  // <>_ARR
 	label.put( writer ) ;		    // self-label
 	VarOctetUtility.put( writer, 0 ) ;	    // offset (not used here)
 	VarOctetUtility.put( writer, length ) ;	    // length
@@ -717,7 +717,7 @@ public class OutputStream extends ObjectOutputStream {
 	}
     }
 
-    // ObjectOutputStream methods (other than basic writeXXX primitives)
+    // ObjectOutputStream methods (other than basic write<> primitives)
     //
 
     public void defaultWriteObject() throws IOException {

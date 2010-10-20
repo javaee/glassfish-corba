@@ -73,6 +73,8 @@ import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 import com.sun.corba.se.spi.logging.POASystemException ;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.trace.Poa;
+import java.util.HashSet;
+import java.util.Set;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedObject;
 
@@ -88,8 +90,6 @@ public class ReferenceFactoryManagerImpl
 
     private static final long serialVersionUID = -6689846523143143228L;
 
-    private enum RFMState { READY, SUSPENDED } ;
-
     private static final String PARENT_POA_NAME = "#RFMBase#" ;
 
     // Initialized in the constructor
@@ -103,7 +103,8 @@ public class ReferenceFactoryManagerImpl
     // it does not contain the standard policies.
     private final Map<String,Pair<ServantLocator,List<Policy>>> poatable ;
     private final Map<String,ReferenceFactory> factories ;
-
+    private final Set<POAManager> managers ;
+    private final AdapterActivator activator ;
     private volatile boolean isActive ;
 
     // Initialized on activation because the root POA is required.
@@ -111,9 +112,21 @@ public class ReferenceFactoryManagerImpl
     private List<Policy> standardPolicies ;
     private POA parentPOA ;
     private String[] parentPOAAdapterName ;
-    private POAManager manager ; 
-    private AdapterActivator activator ; 
 	
+    public ReferenceFactoryManagerImpl( ORB orb )
+    {
+	lock = new ReentrantLock() ;
+	suspendCondition = lock.newCondition() ;
+	state = RFMState.READY ;
+	this.orb = orb ;
+	wrapper = orb.getLogWrapperTable().get_OA_LIFECYCLE_POA() ;
+    	poatable = new HashMap<String,Pair<ServantLocator,List<Policy>>>() ;
+	factories = new HashMap<String,ReferenceFactory>() ;
+        managers = new HashSet<POAManager>() ;
+        activator = new AdapterActivatorImpl() ;
+	isActive = false ;
+    }
+
     @Poa
     private class AdapterActivatorImpl 
 	extends LocalObject 
@@ -143,8 +156,18 @@ public class ReferenceFactoryManagerImpl
                     policies.addAll( standardPolicies ) ;
                     Policy[] arr = policies.toArray( new Policy[policies.size()] ) ;
 
-                    POA child = parentPOA.create_POA( name, manager, arr ) ;
+                    POA child = parentPOA.create_POA( name, null, arr ) ;
+                    POAManager pm = child.the_POAManager() ;
+
+                    lock.lock() ;
+                    try {
+                        managers.add(pm) ;
+                    } finally {
+                        lock.unlock() ;
+                    }
+
                     child.set_servant_manager( data.first() ) ;
+                    pm.activate() ;
                     return true ;
                 } catch (Exception exc) {
                     wrapper.rfmAdapterActivatorFailed( exc ) ;
@@ -183,20 +206,14 @@ public class ReferenceFactoryManagerImpl
 	}
     }
 
-    public ReferenceFactoryManagerImpl( ORB orb ) 
+    public RFMState getState()
     {
-	lock = new ReentrantLock() ;
-	suspendCondition = lock.newCondition() ;
-	state = RFMState.READY ;
-	this.orb = orb ;
-    	poatable = new HashMap<String,Pair<ServantLocator,List<Policy>>>() ;
-	factories = new HashMap<String,ReferenceFactory>() ;
-	isActive = false ;
-    }
-
-    public org.omg.PortableServer.POAManagerPackage.State getState()
-    {
-	return manager.get_state();
+        lock.lock() ;
+        try {
+            return state ;
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Poa
@@ -228,10 +245,9 @@ public class ReferenceFactoryManagerImpl
 		.getIORTemplate().getObjectKeyTemplate().getObjectAdapterId()
 		.getAdapterName() ;
 
-	    manager = parentPOA.the_POAManager() ;
-	    activator = new AdapterActivatorImpl() ;
+	    POAManager pm = parentPOA.the_POAManager() ;
 	    parentPOA.the_activator( activator ) ;
-	    manager.activate() ;
+	    pm.activate() ;
 
 	    // Don't activate if there is a failure
 	    isActive = true ;
@@ -266,8 +282,7 @@ public class ReferenceFactoryManagerImpl
 
 	    List<Policy> newPolicies = null ;
 	    if (policies != null) {
-                newPolicies =
-                    new ArrayList<Policy>(policies);
+                newPolicies = new ArrayList<Policy>(policies);
             }
 
 	    // Store an entry for the appropriate POA in the POA table,
@@ -340,17 +355,25 @@ public class ReferenceFactoryManagerImpl
     // hold_requests or discard_requests.  Hold will
     // cause incoming requests to be suspended, which
     // could rapidly consume all of the threads in the
-    // threadpool.  Instead, we will discard the 
-    // requests, which causes a TRANSIENT system
+    // threadpool.  It may be preferable to discard the
+    // requests, which would cause a TRANSIENT system
     // exception to be sent to the client.  All
     // TRANSIENT system exceptions will be retried
     // on the client side to the same endpoint.
-    // manager.discard_requests( true ) ; 
+    // But at one time, the client retry logic was not
+    // robust enough to handle the resulting TRANSIENT
+    // exceptions.  The retry logic has since been fixed.
+    //
+    // XXX We may still want to switch to discard semantics,
+    // but that would require significant testing.
 
     @Poa
     public void suspend() 
     {
         lock.lock() ;
+
+        // Clone managers so we can safely iterator over it.
+        final Set<POAManager> pms = new HashSet<POAManager>( managers ) ;
 
         // wait until all requests in the manager have completed.
         try {
@@ -381,7 +404,9 @@ public class ReferenceFactoryManagerImpl
         // could reverse the order, leading to a deadlock.  See bug
         // 6586417.
         try {
-            manager.hold_requests( true ) ;
+            for (POAManager pm : pms) {
+                pm.hold_requests( true ) ;
+            }
         } catch (AdapterInactive ai) {
             // This should never happen
             throw wrapper.rfmManagerInactive( ai ) ;
@@ -392,6 +417,9 @@ public class ReferenceFactoryManagerImpl
     public void resume() 
     {
         lock.lock() ;
+
+        // Clone managers so we can safely iterator over it.
+        final Set<POAManager> pms = new HashSet<POAManager>( managers ) ;
 
         try {
             if (!isActive) {
@@ -407,11 +435,36 @@ public class ReferenceFactoryManagerImpl
         // Allow new requests to start.  This will lazily
         // re-create POAs as needed through the parentPOA's
         // AdapterActivator.
+        // 6933574.  But note that these POAManagers belong to
+        // destroyed POAs (from the restartFactories call),
+        // so the activation here results in
+        // an PADestrpyed exception, which causes a retry in
+        // the server request dispatcher.  Re-creating the
+        // POA also re-creates the POAManager, so after
+        // activating the POAmanagers, we remove the (old)
+        // POAManagers from the list.  Note that the list
+        // may (probably will) have changed by then, since other
+        // threads may (probably will) be re-creating the POAs and hence
+        // re-creates the POAmanagers and adding the new POAmanagers
+        // to managers.
         try {
-            manager.activate() ;
+            for (POAManager pm : pms) {
+                pm.activate() ;
+            }
         } catch (AdapterInactive ai) {
             // This should never happen
             throw wrapper.rfmManagerInactive( ai ) ;
+        }
+
+        lock.lock() ;
+        try {
+            // 6933574: As noted above, we need to remove all
+            // of the old POAManagers (to avoid a memory leak).
+            // Note that managers may contain new POAManagers by
+            // this time, so we can't just call managers.clear().
+            managers.removeAll( pms ) ;
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -460,7 +513,7 @@ public class ReferenceFactoryManagerImpl
      * any request against object references created from these factories
      * complete correctly.  Restart does not return until all restart
      * activity completes.
-     * @param policyUpdates is a map giving the updated policies for
+     * @param updates is a map giving the updated policies for
      * some or all of the ReferenceFactory instances in this ReferenceFactoryManager.
      * This parameter must not be null.
      */
@@ -510,6 +563,8 @@ public class ReferenceFactoryManagerImpl
             lock.lock() ;
             try {
                 factories.remove( name ) ;
+                POAManager pm = child.the_POAManager() ;
+                managers.remove( pm ) ;
             } finally {
                 lock.unlock() ;
             }
@@ -553,8 +608,13 @@ public class ReferenceFactoryManagerImpl
 
 	// If poa's POAManager is the manager for the RFM, we have
 	// an error.
-	if (poa.the_POAManager() == manager) {
-            throw wrapper.rfmIllegalPoaManagerUsage();
+        lock.lock() ;
+        try {
+            if (managers.contains( poa.the_POAManager())) {
+                throw wrapper.rfmIllegalPoaManagerUsage() ;
+            }
+        } finally {
+            lock.unlock();
         }
     }
 

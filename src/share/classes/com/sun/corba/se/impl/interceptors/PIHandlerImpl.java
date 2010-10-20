@@ -245,11 +245,6 @@ public class PIHandlerImpl implements PIHandler
 					// initiateClientPIRequest and
 					// cleanupClientPIRequest.
 	hasServerInterceptors = true ;  // same as hasClientInterceptors.
-
-	// We could just remove the optimization, or perhaps we should
-	// solve this as in InterceptorInvoker?  But that would still
-	// require the creation of a stack entry.   Perhaps we should
-	// merge the PI and request stacks and then re-visit this question.
     }
 
     @TraceInterceptor

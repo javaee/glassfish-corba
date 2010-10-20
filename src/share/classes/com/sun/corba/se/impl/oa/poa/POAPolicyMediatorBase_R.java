@@ -97,7 +97,7 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     @Poa
     protected void activateServant( ActiveObjectMap.Key key, AOMEntry entry, Servant servant )
     {
-	setDelegate(servant, key.id );
+	setDelegate(servant, key.id() );
 
 	activeObjectMap.putServant( servant, entry ) ;
 
@@ -159,7 +159,7 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
 
 	Servant s = activeObjectMap.getServant( entry ) ;
 	if (s == null) {
-	    throw new ObjectNotActive();
+            throw new ObjectNotActive();
         }
 
 	deactivatingObject( s, poa ) ;
@@ -172,16 +172,14 @@ public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {
     @Poa
     public byte[] servantToId( Servant servant ) throws ServantNotActive, WrongPolicy
     {	
-	// XXX needs to handle call from an invocation on this POA
-
 	if (!isUnique && !isImplicit) {
-	    throw new WrongPolicy();
+            throw new WrongPolicy();
         }
 
 	if (isUnique) {
 	    ActiveObjectMap.Key key = activeObjectMap.getKey(servant);
 	    if (key != null) {
-		return key.id ;
+                return key.id();
             }
 	} 
 

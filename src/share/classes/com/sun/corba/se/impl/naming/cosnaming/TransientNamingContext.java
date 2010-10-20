@@ -89,9 +89,6 @@ import com.sun.corba.se.spi.trace.Naming;
 @Naming
 public class TransientNamingContext extends NamingContextImpl implements NamingContextDataStore
 {
-    // XXX: the wrapper calls are all preceded by logger updates.
-    // These can be combined, and then we simply use 3 NamingSystemException wrappers,
-    // for read, update, and lifecycl.
     private static final NamingSystemException wrapper =
         NamingSystemException.self ;
 

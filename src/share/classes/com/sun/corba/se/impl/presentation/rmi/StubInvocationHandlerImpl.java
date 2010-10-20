@@ -75,7 +75,10 @@ import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler ;
 import com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 
+@IsLocal
 public final class StubInvocationHandlerImpl implements LinkedInvocationHandler  
 {
     private transient PresentationManager.ClassData classData ;
@@ -108,6 +111,7 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 	this.stub = stub ;
     }
 
+    @IsLocal
     private boolean isLocal(Delegate delegate)
     {
 	boolean result = false ;
@@ -162,10 +166,17 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 	}
     }
 
+    @InfoMethod
+    private void takingRemoteBranch() {}
+
+    @InfoMethod
+    private void takingLocalBranch() {}
+
     /** Invoke the given method with the args and return the result.
      *  This may result in a remote invocation.
      *  @param proxy The proxy used for this class (null if not using java.lang.reflect.Proxy)
      */
+    @IsLocal
     private Object privateInvoke( Delegate delegate, Object proxy, final Method method,
 	Object[] args ) throws Throwable
     {
@@ -179,6 +190,7 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 	   
 	    if (!isLocal(delegate)) {
 	        try {
+		    takingRemoteBranch() ;
 		    org.omg.CORBA_2_3.portable.InputStream in = null ;
 		    try {
 		        // create request
@@ -204,7 +216,7 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 		    throw Util.getInstance().mapSystemException(ex) ;
 		} 
 	    } else {
-	        // local branch
+	        takingLocalBranch();
 	        org.omg.CORBA.ORB orb = delegate.orb( stub ) ;
 		ServantObject so = delegate.servant_preinvoke( stub, giopMethodName,
 							       method.getDeclaringClass() );

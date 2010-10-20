@@ -70,44 +70,42 @@ public class POAPolicyMediatorImpl_R_AOM extends POAPolicyMediatorBase_R {
     
     protected java.lang.Object internalGetServant( byte[] id, 
 	String operation ) throws ForwardRequest
-    { 
-	java.lang.Object servant = internalIdToServant( id ) ;
-	if (servant == null) {
-            servant =
-                new NullServantImpl(wrapper.nullServant());
+    {
+        poa.lock() ;
+        try {
+            java.lang.Object servant = internalIdToServant( id ) ;
+            if (servant == null) {
+                servant = new NullServantImpl(wrapper.nullServant());
+            }
+            return servant ;
+        } finally {
+            poa.unlock() ;
         }
-	return servant ;
     }
 
-    public void etherealizeAll() 
-    {	
+    public void etherealizeAll() {	
 	// NO-OP
     }
 
-    public ServantManager getServantManager() throws WrongPolicy
-    {
+    public ServantManager getServantManager() throws WrongPolicy {
         throw new WrongPolicy();
     }
 
     public void setServantManager( ServantManager servantManager ) 
-	throws WrongPolicy
-    {
+	throws WrongPolicy {
         throw new WrongPolicy();
     }
 
-    public Servant getDefaultServant() throws NoServant, WrongPolicy 
-    {
+    public Servant getDefaultServant() throws NoServant, WrongPolicy {
 	throw new WrongPolicy();
     }
 
-    public void setDefaultServant( Servant servant ) throws WrongPolicy
-    {
+    public void setDefaultServant( Servant servant ) throws WrongPolicy {
 	throw new WrongPolicy();
     }
 
     public Servant idToServant( byte[] id ) 
-	throws WrongPolicy, ObjectNotActive
-    {
+	throws WrongPolicy, ObjectNotActive {
 	Servant s = internalIdToServant( id ) ; 
 
 	if (s == null) {

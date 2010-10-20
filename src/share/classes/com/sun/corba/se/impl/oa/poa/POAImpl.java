@@ -502,7 +502,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
         } else if (state == STATE_INIT) {
             state = STATE_INIT_DONE;
         } else {
-            throw lifecycleWrapper().illegalPoaStateTrans();
+            throw wrapper.illegalPoaStateTrans();
         }
     }
 

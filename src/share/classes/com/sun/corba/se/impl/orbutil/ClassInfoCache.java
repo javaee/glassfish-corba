@@ -214,7 +214,7 @@ public class ClassInfoCache {
     }
 
     // This shows up as a locking hotspot in heavy marshaling tests.
-    // Ideally we need a WeakConccurrentMap, which is not available in
+    // Ideally we need a WeakConcurrentMap, which is not available in
     // the JDK (Google's MapMaker can easily construct such a class).
 
     /* Version using ConcurrentMap for testing ONLY

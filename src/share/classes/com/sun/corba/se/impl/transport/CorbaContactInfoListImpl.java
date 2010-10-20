@@ -407,7 +407,8 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	    int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
 	        getSubcontractId() ;
 	    LocalClientRequestDispatcherFactory lcsf = 
-                orb.getRequestDispatcherRegistry().getLocalClientRequestDispatcherFactory( scid ) ;
+                orb.getRequestDispatcherRegistry().
+                    getLocalClientRequestDispatcherFactory( scid ) ;
             if (lcsf != null) {
                 localClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
             }

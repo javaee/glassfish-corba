@@ -157,7 +157,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     private static final String SUN_JAVA_VENDOR = "Sun Microsystems Inc." ;
 
     static {
-        // Note: there used to be code here to use the JDK value handler for embedded
+        // Note: there uses to be code here to use the JDK value handler for embedded
         // web logic.  I removed it after 3.1.0-b008.
         valueHandlerSingleton = new ValueHandlerImpl();
     }

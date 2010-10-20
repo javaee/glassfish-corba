@@ -62,6 +62,7 @@ import com.sun.corba.se.impl.oa.NullServantImpl ;
  * operations on the POA.
  */
 public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
+    // XXX How do we protect locator from multi-threaded access?
     private ServantLocator locator ;
 
     POAPolicyMediatorImpl_NR_USM( Policies policies, POAImpl poa ) 
@@ -97,6 +98,7 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
         } else {
             setDelegate((Servant) servant, id);
         }
+
 
 	return servant;
     }

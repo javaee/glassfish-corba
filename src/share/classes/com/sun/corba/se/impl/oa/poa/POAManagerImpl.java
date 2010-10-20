@@ -88,7 +88,7 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     private static final POASystemException wrapper =
         POASystemException.self ;
 
-    private static final long serialVersionUID = -751471445699682659L;
+    private static final long serialVersionUID = -3308938242684343402L;
 
     // final fields: no synchronization needed
     private final POAFactory factory ;	// factory which contains global state 

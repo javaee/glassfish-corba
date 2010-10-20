@@ -130,7 +130,7 @@ public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate
 	this.orbid = orbid ;
 	this.oaid = oaid ;
 
-	adapterId = null;
+        adapterId = null;
     }
 
     @Override

@@ -70,13 +70,17 @@ public class POAPolicyMediatorImpl_R_AOM extends POAPolicyMediatorBase_R {
     
     protected java.lang.Object internalGetServant( byte[] id, 
 	String operation ) throws ForwardRequest
-    { 
-	java.lang.Object servant = internalIdToServant( id ) ;
-	if (servant == null) {
-            servant =
-                new NullServantImpl(wrapper.nullServant());
+    {
+        poa.lock() ;
+        try {
+            java.lang.Object servant = internalIdToServant( id ) ;
+            if (servant == null) {
+                servant = new NullServantImpl(wrapper.nullServant());
+            }
+            return servant ;
+        } finally {
+            poa.unlock() ;
         }
-	return servant ;
     }
 
     public void etherealizeAll() {	

@@ -1256,7 +1256,7 @@
              file="make/corba.temp.pom" />
             <artifact:deploy
              file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
-                <remoteRepository url="@{destination}"/> 
+                <remoteRepository url="@{destination}"/>
                 <pom refid="glassfish.corba.project"/>
             </artifact:deploy>
             <delete file="make/corba.temp.pom" verbose="true"/>

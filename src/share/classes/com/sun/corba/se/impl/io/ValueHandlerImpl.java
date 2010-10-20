@@ -125,9 +125,9 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             // or really let the system shutdown with this Error?
             if (result < 1 || result > MAX_SUPPORTED_FORMAT_VERSION) {
                 throw new ExceptionInInitializerError(
-                    "Invalid stream format version: " +
-                    result + ".  Valid range is 1 through " +
-                    MAX_SUPPORTED_FORMAT_VERSION);
+                    "Invalid stream format version: " + result
+                    + ".  Valid range is 1 through "
+                    + MAX_SUPPORTED_FORMAT_VERSION);
             }
 
             return result;

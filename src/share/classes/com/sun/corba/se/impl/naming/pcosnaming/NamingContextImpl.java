@@ -127,13 +127,13 @@ public class NamingContextImpl extends NamingContextExtPOA
     private static POA biPOA = null;
 
     // Defined so that we can get FindBugs to shut up about the transient fields.
-    // The various setXXX methods are called in ServantManagerImpl to correctly
+    // The various setYYY methods are called in ServantManagerImpl to correctly
     // re-set the transient fields after deserialization.
     private void readObject( ObjectInputStream is ) 
         throws IOException, ClassNotFoundException {
         is.defaultReadObject() ;
 
-        // The following fields are restored by the setXXX methods.
+        // The following fields are restored by the setYYY methods.
         orb = null ;
         theNameServiceHandle = null ;
         theServantManagerImplHandle = null ;
@@ -1112,7 +1112,7 @@ public class NamingContextImpl extends NamingContextExtPOA
 	// that needs to be cleaned up in ServerManagerImpl which we will
 	// look into further at another time.
 	/*
-	// XXX This needs to be replaced by cleaning up the
+	// This needs to be replaced by cleaning up the
 	// file that backs up the naming context.  No explicit
 	// action is necessary at the POA level, since this is
 	// created with the non-retain policy.

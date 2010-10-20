@@ -66,7 +66,7 @@ public class Server
 	    ORB orb = ORB.init((String[])null, (Properties) null);
 	    org.omg.CORBA.Object o = new IServantConnect();
 	    orb.connect(o);
-	    props.put(Client.initialEntryName, o.toString());
+	    props.put(Client.initialEntryName, orb.object_to_string(o));
 	    Client.writeProperties(props, getBootstrapFilePathAndName());
 
 	    // Set up args.

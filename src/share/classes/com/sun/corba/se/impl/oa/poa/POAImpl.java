@@ -90,7 +90,6 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.NON_EXISTENT ;
 
-
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.oa.OADestroyed ;
@@ -115,6 +114,9 @@ import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
@@ -226,40 +228,40 @@ public class POAImpl extends ObjectAdapterBase implements POA
     private POAPolicyMediator mediator;
 
     // Representation of object adapter ID
-    private int numLevels;	    // counts depth of tree.  Root = 1.
-    private ObjectAdapterId poaId ; // the actual object adapter ID for this POA
+    private final int numLevels;	    // counts depth of tree.  Root = 1.
+    private final ObjectAdapterId poaId ; // the actual object adapter ID for this POA
 
-    private String name;	    // the name of this POA
+    private final String name;	    // the name of this POA
 
     private POAManagerImpl manager; // This POA's POAManager
-    private int uniquePOAId ;	    // ID for this POA that is unique relative 
+    private final int uniquePOAId ;	    // ID for this POA that is unique relative
 				    // to the POAFactory, which has the same 
 				    // lifetime as the ORB.
     private POAImpl parent;	    // The POA that created this POA.
-    private Map<String,POAImpl> children; // Map from name to POA of POAs created by
-				    // this POA.
+    private final Map<String,POAImpl> children; // Map from name to POA of POAs
+                                          // created by this POA.
 
     private AdapterActivator activator;
-    private int invocationCount ; // pending invocations on this POA.
+    private final AtomicInteger invocationCount ; // pending invocations on this POA.
 
     // Data used to control POA concurrency
 
     // Master lock for all POA synchronization.  See lock and unlock.
     // package private for access by AOMEntry.
-    ReentrantLock poaMutex ;
+    final ReadWriteLock poaMutex ;
 
     // Wait on this CV for AdapterActivator upcalls to complete 
-    private Condition adapterActivatorCV ;
+    private final Condition adapterActivatorCV ;
 
     // Wait on this CV for all active invocations to complete 
-    private Condition invokeCV ;
+    private final Condition invokeCV ;
 
     // Wait on this CV for the destroy method to complete doing its work
-    private Condition beingDestroyedCV ;
+    private final Condition beingDestroyedCV ;
 
     // thread local variable to store a boolean to detect deadlock in 
     // POA.destroy().
-    protected ThreadLocal isDestroying ;
+    private final ThreadLocal<Boolean> isDestroying ;
 
     // Used for synchronized access to the ManagedObjectManager.
     private static final Object momLock = new Object() ;
@@ -272,7 +274,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	return "POA[" + poaId.toString() + 
 	    ", uniquePOAId=" + uniquePOAId + 
 	    ", state=" + stateToString() + 
-	    ", invocationCount=" + invocationCount + "]" ;
+	    ", invocationCount=" + invocationCount.get() + "]" ;
     }
 
     @ManagedAttribute( id="POAState")
@@ -314,7 +316,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     static POAImpl makeRootPOA( ORB orb )
     {
 	POAManagerImpl poaManager = new POAManagerImpl( getPOAFactory( orb ), 
-	    orb ) ;
+	    orb.getPIHandler() ) ;
         registerMBean( orb, poaManager ) ;
 
 	POAImpl result = new POAImpl( ORBConstants.ROOT_POA_NAME, 
@@ -341,7 +343,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     @Poa
     void lock()
     {
-	poaMutex.lock() ;
+	poaMutex.writeLock().lock() ;
 	thisPoa( this ) ;
     }
 
@@ -350,7 +352,27 @@ public class POAImpl extends ObjectAdapterBase implements POA
     void unlock()
     {
 	thisPoa( this ) ;
-	poaMutex.unlock() ;
+	poaMutex.writeLock().unlock() ;
+    }
+
+    @Poa
+    void readLock()
+    {
+	poaMutex.readLock().lock() ;
+	thisPoa( this ) ;
+    }
+
+    // package private so that POAPolicyMediator can access it.
+    @Poa
+    void readUnlock()
+    {
+	thisPoa( this ) ;
+	poaMutex.readLock().unlock() ;
+    }
+
+    @Poa
+    final Condition makeCondition() {
+        return poaMutex.writeLock().newCondition() ;
     }
 
     // package private so that DelegateImpl can access it.
@@ -362,7 +384,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
     @Poa
     private void newPOACreated( String name, String parentName ) { }
 
-    // Note that the parent POA must be locked when this constructor is called.
+    // Note that the parent POA must be write locked when this constructor
+    // is called.
     private POAImpl( String name, POAImpl parent, ORB orb, int initialState ) 
     {
 	super( orb ) ;
@@ -399,22 +422,23 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	POAImpl poaImpl = this ;
 	int ctr = numLevels - 1 ;
 	while (poaImpl != null) {
-	    names[ctr--] = poaImpl.name ;
+	    names[ctr] = poaImpl.name ;
+            ctr-- ;
 	    poaImpl = poaImpl.parent ;
 	}
 
 	poaId = new ObjectAdapterIdArray( names ) ;
 
-	invocationCount = 0; 
+	invocationCount = new AtomicInteger(0) ;
 
-	poaMutex = new ReentrantLock() ;
-	adapterActivatorCV = poaMutex.newCondition() ; 
-	invokeCV           = poaMutex.newCondition() ; 
-	beingDestroyedCV   = poaMutex.newCondition() ; 
+	poaMutex = new ReentrantReadWriteLock() ;
+	adapterActivatorCV = makeCondition() ;
+	invokeCV           = makeCondition() ;
+	beingDestroyedCV   = makeCondition() ;
 
-	isDestroying = new ThreadLocal () {
+	isDestroying = new ThreadLocal<Boolean>() {
             @Override
-	    protected java.lang.Object initialValue() {
+	    protected Boolean initialValue() {
 		return Boolean.FALSE;
 	    }
 	};
@@ -439,7 +463,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     private void initializingPoa( int scid, int serverid, String orbid,
 	ObjectAdapterId poaId ) { }
 
-    // The POA lock must be held when this method is called.
+    // The POA write lock must be held when this method is called.
     @Poa
     private void initialize( POAManagerImpl manager, Policies policies ) 
     {
@@ -482,7 +506,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
         }
     }
 
-    // The poaMutex must be held when this method is called
+    // The POA read lock must be held when this method is called
+    // The lock may be upgraded to write.
     @Poa
     private boolean waitUntilRunning() 
     {
@@ -563,11 +588,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	// If ior was created in this POA, the same ID was used for 
 	// every profile through the profile templates in the currentFactory,
 	// so we will get the same result from any profile.
-	Iterator iter = ior.iterator() ;
+	Iterator<TaggedProfile> iter = ior.iterator() ;
 	if (!iter.hasNext()) {
             throw wrapper.noProfilesInIor();
         }
-	TaggedProfile prof = (TaggedProfile)(iter.next()) ;
+	TaggedProfile prof = (iter.next()) ;
 	ObjectId oid = prof.getObjectId() ;
 
 	return oid.getId();
@@ -576,12 +601,12 @@ public class POAImpl extends ObjectAdapterBase implements POA
     // Converted from anonymous class to local class
     // so that we can call performDestroy() directly.
     @Poa
-    static class DestroyThread extends Thread {
+    private static class DestroyThread extends Thread {
 	private boolean wait ;
 	private boolean etherealize ;
 	private POAImpl thePoa ;
 
-	public DestroyThread( boolean etherealize ) {
+	DestroyThread( boolean etherealize ) {
 	    this.etherealize = etherealize ;
 	}
 
@@ -615,13 +640,13 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	    performDestroy( thePoa, destroyedPOATemplates );
 
-	    Iterator<ObjectReferenceTemplate> iter =
-                destroyedPOATemplates.iterator() ;
+	    Iterator<ObjectReferenceTemplate> iter = destroyedPOATemplates.iterator() ;
 	    ObjectReferenceTemplate[] orts = new ObjectReferenceTemplate[ 
 		destroyedPOATemplates.size() ] ;
 	    int index = 0 ;
 	    while (iter.hasNext()) {
-                orts[index++] = iter.next();
+                orts[index] = iter.next();
+                index++ ;
             }
 
             ORB myORB = thePoa.getORB() ;
@@ -637,7 +662,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	// destroying poa.
 	@Poa
 	private boolean prepareForDestruction( POAImpl poa, 
-	    Set destroyedPOATemplates )
+	    Set<ObjectReferenceTemplate> destroyedPOATemplates )
 	{
 	    POAImpl[] childPoas = null ;
 
@@ -690,7 +715,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	}
 
 	@Poa
-        public void performDestroy( POAImpl poa, Set destroyedPOATemplates ) 
+        public void performDestroy( POAImpl poa, 
+            Set<ObjectReferenceTemplate> destroyedPOATemplates )
 	{
 	    if (!prepareForDestruction( poa, destroyedPOATemplates )) {
                 return;
@@ -721,12 +747,9 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		} finally {
 		    poa.unlock() ;
 
-		    if (isRoot)
-			// We have just destroyed the root POA, so we need to 
-			// make sure that the next call to 
-			// resolve_initial_reference( "RootPOA" )
-			// will recreate a valid root POA.
-			poa.manager.getFactory().registerRootPOA() ;
+		    if (isRoot) {
+                        poa.manager.getFactory().registerRootPOA();
+                    }
 		}
 	    } finally {
 		if (!isRoot) {
@@ -744,10 +767,10 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	@Poa
 	private void completeDestruction( POAImpl poa, POAImpl parent, 
-	    Set destroyedPOATemplates )
+	    Set<ObjectReferenceTemplate> destroyedPOATemplates )
 	{
 	    try {
-		while (poa.invocationCount != 0) {
+		while (poa.invocationCount.get() != 0) {
 		    try {
 			poa.invokeCV.await() ;
 		    } catch (InterruptedException ex) { 
@@ -852,7 +875,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		POAManagerImpl newManager = (POAManagerImpl)theManager ;
 		if (newManager == null) {
 		    newManager = new POAManagerImpl( manager.getFactory(),
-			getORB() );
+			getORB().getPIHandler() );
                     registerMBean( getORB(), newManager ) ;
                 }
 
@@ -1158,7 +1181,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    Iterator<POAImpl> iter = coll.iterator() ;
 	    while (iter.hasNext()) {
 	        POA poa = iter.next() ;
-	        result[ index++ ] = poa ;
+	        result[ index ] = poa ;
+                index++ ;
 	    }
 
 	    return result ;
@@ -1359,7 +1383,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 	    // Clone the id to avoid possible errors due to aliasing
 	    // (e.g. the client passes the id in and then changes it later).
-	    byte[] idClone = (id.clone()) ;
+	    byte[] idClone = id.clone() ;
 
 	    mediator.activateObject( idClone, servant ) ;
 	} finally {
@@ -1600,29 +1624,42 @@ public class POAImpl extends ObjectAdapterBase implements POA
     {
 	manager.enter();
 
-	try {
-	    lock() ;
+        readLock() ;
+        try {
+            // Hold only the read lock to check the state
+            if (state == STATE_RUN) {
+                // fast path
+                invocationCount.incrementAndGet();
+                return ;
+            }
+        } finally {
+            readUnlock();
+        }
 
-	    // Avoid deadlock if this is the thread that is processing the 
-	    // POA.destroy because this is the only thread that can notify 
-	    // waiters on beingDestroyedCV.  This can happen if an
-	    // etherealize upcall invokes a method on a colocated object
-	    // served by this POA.
-	    while ((state == STATE_DESTROYING) && 
-		(isDestroying.get() == Boolean.FALSE)) {
-		try {
-		    beingDestroyedCV.await();
-		} catch (InterruptedException ex) { 
-		    // NO-OP
-		}
-	    }
+        // acquire lock: may need slow path
+        lock() ;
 
-	    if (!waitUntilRunning()) {
-		manager.exit() ;
-		throw new OADestroyed() ;
-	    }
-		
-	    invocationCount++;
+        try {
+            // Avoid deadlock if this is the thread that is processing the
+            // POA.destroy because this is the only thread that can notify
+            // waiters on beingDestroyedCV.  This can happen if an
+            // etherealize upcall invokes a method on a colocated object
+            // served by this POA.
+            while ((state == STATE_DESTROYING) &&
+                (isDestroying.get() == Boolean.FALSE)) {
+                try {
+                    beingDestroyedCV.await();
+                } catch (InterruptedException ex) {
+                    // NO-OP
+                }
+            }
+
+            if (!waitUntilRunning()) {
+                manager.exit() ;
+                throw new OADestroyed() ;
+            }
+
+            invocationCount.incrementAndGet();
 	} finally {
 	    unlock() ;
 	}
@@ -1631,19 +1668,32 @@ public class POAImpl extends ObjectAdapterBase implements POA
     @Poa
     public void exit() 
     {
-	try {
+        try {
+            readLock() ;
+            try {
+                // Hold only a read lock to check the state
+                if (state == STATE_RUN) {
+                    // fast path
+                    invocationCount.decrementAndGet();
+                    return ;
+                }
+            } finally {
+                readUnlock();
+            }
+
 	    lock() ;
-
-	    invocationCount--;
-
-	    if ((invocationCount == 0) && (state == STATE_DESTROYING)) {
-		invokeCV.signalAll();
-	    }
+            try {
+                if ((invocationCount.decrementAndGet() == 0)
+                    && (state == STATE_DESTROYING)) {
+                    invokeCV.signalAll();
+                }
+            } finally {
+                unlock() ;
+            }
 	} finally {
-	    unlock() ;
+            manager.exit();
 	}
 
-	manager.exit();
     }
 
     @ManagedAttribute
@@ -1652,36 +1702,29 @@ public class POAImpl extends ObjectAdapterBase implements POA
     private int getInvocationCount() {
         try {
             lock() ;
-            return invocationCount ;
+            return invocationCount.get() ;
         } finally {
             unlock() ;
         }
     }
 
     @Poa
-    public void getInvocationServant( OAInvocationInfo info ) 
-    {
+    public void getInvocationServant( OAInvocationInfo info ) {
         // 6878245
         if (info == null) {
             return ;
         }
 
-	try {
-	    lock() ;
+        java.lang.Object servant = null ;
 
-	    java.lang.Object servant = null ;
+        try {
+            servant = mediator.getInvocationServant( info.id(),
+                info.getOperation() );
+        } catch (ForwardRequest freq) {
+            throw new ForwardException( getORB(), freq.forward_reference ) ;
+        }
 
-	    try {
-		servant = mediator.getInvocationServant( info.id(), 
-		    info.getOperation() );
-	    } catch (ForwardRequest freq) {
-		throw new ForwardException( getORB(), freq.forward_reference ) ;
-	    }
-
-	    info.setServant( servant ) ;
-	} finally {
-	    unlock() ;
-	}
+        info.setServant( servant ) ;
     }
 
     public org.omg.CORBA.Object getLocalServant( byte[] objectId ) 
@@ -1695,20 +1738,16 @@ public class POAImpl extends ObjectAdapterBase implements POA
      *  called multiple times for a single request.
      */
     @Poa
-    public void returnServant()
-    {
+    public void returnServant() {
 	try {
-	    lock() ;
-
 	    mediator.returnServant();
 	} catch (Throwable thr) {
 	    if (thr instanceof Error) {
                 throw (Error) thr;
-            } else if (thr instanceof RuntimeException)
-		throw (RuntimeException)thr ;
+            } else if (thr instanceof RuntimeException) {
+                throw (RuntimeException) thr;
+            }
 
-	} finally {
-	    unlock() ;
-	}
+	} 
     }
 }

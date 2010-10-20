@@ -50,8 +50,6 @@ package com.sun.corba.se.impl.io;
 
 
 import java.util.Map ;
-import java.util.HashMap ;
-import java.util.Collections ;
 import java.io.IOException;
 
 import com.sun.corba.se.impl.util.RepositoryId;
@@ -76,6 +74,7 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 import com.sun.corba.se.spi.trace.ValueHandlerWrite ;
 import com.sun.corba.se.spi.trace.ValueHandlerRead ;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ValueHandlerRead
 @ValueHandlerWrite
@@ -147,14 +146,16 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
     public static final short kAbstractType = 1;
     public static final short kValueType = 2;
 
-    // Both of these must be synchronized maps, or corruption will ensue!
-    private Map<org.omg.CORBA.portable.InputStream,IIOPInputStream> 
-	inputStreamPairs = null;
-    private Map<org.omg.CORBA.portable.OutputStream,IIOPOutputStream> 
-	outputStreamPairs = null;
-
-    private IIOPOutputStream outputStreamBridge = null;
-    private IIOPInputStream inputStreamBridge = null;
+    // Since the Input/OutputStream is unique to a thread, only one thread
+    // can ever put a particular key into the stream pairs maps.  Multiple threads
+    // will simultaneously update these maps, so we need a ConcurrentHashMap.
+    // But we don't need to use putIfAbsent to store into the maps.
+    private final Map<org.omg.CORBA.portable.InputStream,IIOPInputStream>
+	inputStreamPairs = new ConcurrentHashMap<org.omg.CORBA.portable.InputStream,
+            IIOPInputStream>();
+    private final Map<org.omg.CORBA.portable.OutputStream,IIOPOutputStream>
+	outputStreamPairs = new ConcurrentHashMap<org.omg.CORBA.portable.OutputStream,
+           IIOPOutputStream>();
 
     // See javax.rmi.CORBA.ValueHandlerMultiFormat
     public byte getMaximumStreamFormatVersion() {
@@ -183,7 +184,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 
     /**
      * Writes the value to the stream using java semantics.
-     * @param out The stream to write the value to
+     * @param _out The stream to write the value to
      * @param value The value to be written to the stream
      **/
     @ValueHandlerWrite
@@ -201,13 +202,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             (org.omg.CORBA_2_3.portable.OutputStream) _out;
 
         IIOPOutputStream jdkToOrbOutputStreamBridge = null;
-
-        if (outputStreamPairs == null) {
-            outputStreamPairs =
-                Collections.synchronizedMap(
-                    new HashMap<org.omg.CORBA.portable.OutputStream,
-                        IIOPOutputStream>());
-        }
 
         jdkToOrbOutputStreamBridge = outputStreamPairs.get(_out);
 
@@ -244,13 +238,16 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 
     /**
      * Reads a value from the stream using java semantics.
-     * @param in The stream to read the value from
+     * @param _in The stream to read the value from
+     * @param offset offset position in the stream
      * @param clazz The type of the value to be read in
-     * @param sender The sending context runtime
+     * @param repositoryID repo ID for the value to read
+     * @param _sender The sending context runtime
+     * @return The serializable value read from the stream
      **/
     @ValueHandlerRead
     public java.io.Serializable readValue(org.omg.CORBA.portable.InputStream _in, 
-	int offset, java.lang.Class clazz, String repositoryID, 
+	int offset, java.lang.Class clazz, String repositoryID,
 	org.omg.SendingContext.RunTime _sender) {
 
         java.io.Serializable result = null;
@@ -262,16 +259,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         org.omg.CORBA_2_3.portable.InputStream in =
             (org.omg.CORBA_2_3.portable.InputStream) _in;
 
-        IIOPInputStream jdkToOrbInputStreamBridge = null;
-        if (inputStreamPairs == null) {
-            inputStreamPairs =
-                Collections.synchronizedMap(
-                    new HashMap<org.omg.CORBA.portable.InputStream,
-                        IIOPInputStream>());
-        }
-
-        jdkToOrbInputStreamBridge = inputStreamPairs.get(_in);
-
+        IIOPInputStream jdkToOrbInputStreamBridge = inputStreamPairs.get(_in);
         if (jdkToOrbInputStreamBridge == null) {
             jdkToOrbInputStreamBridge = createInputStream();
             jdkToOrbInputStreamBridge.setOrbStream(in);
@@ -297,7 +285,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
     @ValueHandlerRead
     private java.io.Serializable readValueInternal(IIOPInputStream bridge, 
 	org.omg.CORBA_2_3.portable.InputStream in, int offset, 
-	java.lang.Class clazz, String repositoryID, 
+	java.lang.Class<?> clazz, String repositoryID,
 	com.sun.org.omg.SendingContext.CodeBase sender) {
 
 	java.io.Serializable result = null;
@@ -743,7 +731,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                             break;
                         case kAbstractType: 
                             if (!narrow) {
-                                array[i] = in.read_abstract_interface(actualType);
+                                array[i] = in.read_abstract_interface(
+                                    actualType);
                             } else {
                                 array[i] = Utility.readAbstractAndNarrow(in, 
 				    actualType);

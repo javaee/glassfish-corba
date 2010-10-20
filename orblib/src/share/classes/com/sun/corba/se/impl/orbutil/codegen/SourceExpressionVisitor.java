@@ -116,8 +116,6 @@ public class SourceExpressionVisitor extends TreeWalker {
 	else if (type == Type._char())
 	    javaRep = "\'" + value + "\'" ;
 	else 
-	    // XXX we may want to add Java flags for
-	    // different sized numbers.
 	    javaRep = value.toString() ;
 	
 	sb.append( javaRep ) ;

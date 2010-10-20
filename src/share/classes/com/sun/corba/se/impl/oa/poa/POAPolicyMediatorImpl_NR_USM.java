@@ -89,21 +89,14 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
     
 	CookieHolder cookieHolder = orb.peekInvocationInfo().getCookieHolder() ;
 
-	// Try - finally is J2EE requirement.
-	java.lang.Object servant;
-	try{
-	    poa.unlock() ;
+	java.lang.Object servant = locator.preinvoke(id, poa, operation,
+            cookieHolder);
 
-	    servant = locator.preinvoke(id, poa, operation, cookieHolder);
-	    if (servant == null) {
-                servant =
-                    new NullServantImpl(omgWrapper.nullServantReturned());
-            } else {
-                setDelegate((Servant) servant, id);
-            }
-	} finally {
-	    poa.lock() ;
-	}
+        if (servant == null) {
+            servant = new NullServantImpl(omgWrapper.nullServantReturned());
+        } else {
+            setDelegate((Servant) servant, id);
+        }
 
 	return servant;
     }
@@ -111,19 +104,15 @@ public class POAPolicyMediatorImpl_NR_USM extends POAPolicyMediatorBase {
     public void returnServant() 
     {
 	OAInvocationInfo info = orb.peekInvocationInfo();
+
         // 6878245: added info == null check.
 	if (locator == null || info == null) {
             return;
         }
 
-	try {
-	    poa.unlock() ;
-	    locator.postinvoke(info.id(), (POA)(info.oa()),
-		info.getOperation(), info.getCookieHolder().value,
-		(Servant)(info.getServantContainer()) );
-	} finally {
-	    poa.lock() ;
-	}
+        locator.postinvoke(info.id(), (POA)(info.oa()),
+            info.getOperation(), info.getCookieHolder().value,
+            (Servant)(info.getServantContainer()) );
     }
 
     public void etherealizeAll() 

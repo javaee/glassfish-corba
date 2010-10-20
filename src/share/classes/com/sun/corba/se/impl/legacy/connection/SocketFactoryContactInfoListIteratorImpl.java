@@ -52,7 +52,9 @@ import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
 import com.sun.corba.se.impl.transport.SharedCDRContactInfoImpl;
+import com.sun.corba.se.spi.trace.IsLocal;
 
+@IsLocal
 public class SocketFactoryContactInfoListIteratorImpl
     extends CorbaContactInfoListIteratorImpl
 {
@@ -71,12 +73,14 @@ public class SocketFactoryContactInfoListIteratorImpl
     //
 
     @Override
+    @IsLocal
     public boolean hasNext()
     {
 	return true;
     }
 
     @Override
+    @IsLocal
     public CorbaContactInfo next()
     {
 	if (contactInfoList.getEffectiveTargetIOR().getProfile().isLocal()){

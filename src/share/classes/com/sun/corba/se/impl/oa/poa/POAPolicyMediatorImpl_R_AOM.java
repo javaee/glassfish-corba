@@ -79,35 +79,29 @@ public class POAPolicyMediatorImpl_R_AOM extends POAPolicyMediatorBase_R {
 	return servant ;
     }
 
-    public void etherealizeAll() 
-    {	
+    public void etherealizeAll() {	
 	// NO-OP
     }
 
-    public ServantManager getServantManager() throws WrongPolicy
-    {
+    public ServantManager getServantManager() throws WrongPolicy {
         throw new WrongPolicy();
     }
 
     public void setServantManager( ServantManager servantManager ) 
-	throws WrongPolicy
-    {
+	throws WrongPolicy {
         throw new WrongPolicy();
     }
 
-    public Servant getDefaultServant() throws NoServant, WrongPolicy 
-    {
+    public Servant getDefaultServant() throws NoServant, WrongPolicy {
 	throw new WrongPolicy();
     }
 
-    public void setDefaultServant( Servant servant ) throws WrongPolicy
-    {
+    public void setDefaultServant( Servant servant ) throws WrongPolicy {
 	throw new WrongPolicy();
     }
 
     public Servant idToServant( byte[] id ) 
-	throws WrongPolicy, ObjectNotActive
-    {
+	throws WrongPolicy, ObjectNotActive {
 	Servant s = internalIdToServant( id ) ; 
 
 	if (s == null) {

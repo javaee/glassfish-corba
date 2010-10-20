@@ -114,6 +114,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 	        Bridge bridge = Bridge.get();
 	        bridge.throwException(new RemarshalException());
 	    } else { 
+                // re-throw the SystemException
 	        throw se;
 	    }
 	}

@@ -63,7 +63,6 @@ public class BufferManagerReadStream
     // We should convert endOfStream to a final static dummy end node
     private boolean endOfStream = true;
     private final BufferQueue fragmentQueue = new BufferQueue();
-
     // REVISIT - This should go in BufferManagerRead. But, since
     //           BufferManagerRead is an interface. BufferManagerRead
     //           might ought to be an abstract class instead of an
@@ -115,8 +114,6 @@ public class BufferManagerReadStream
       ByteBufferWithInfo result = null;
 
       try {
-	  //System.out.println("ENTER underflow");
-	
         synchronized (fragmentQueue) {
 
             if (receivedCancel) {
@@ -134,14 +131,15 @@ public class BufferManagerReadStream
 		boolean interrupted = false ;
                 try {
 		    // Bug 6372405
-                    fragmentQueue.wait( orb.getORBData().fragmentReadTimeout());
+                    fragmentQueue.wait( 
+                        orb.getORBData().fragmentReadTimeout() );
                 } catch (InterruptedException e) {
 		    interrupted = true ;
 		}
 
 		// Bug 6372405
 		if (!interrupted && fragmentQueue.size() == 0) {
-                    throw wrapper.bufferReadManagerTimeout();
+		    throw wrapper.bufferReadManagerTimeout() ;
                 }
 
                 if (receivedCancel) {

@@ -195,14 +195,6 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
         OperationTracer.begin( "ReflectObjectCopierImpl" ) ;
 	Class<?> cls = obj.getClass() ;
 	ClassCopier copier = ccf.getClassCopier( cls ) ;
-
-	/* too much detail!
-	if (debug) {
-	    System.out.println( "Contents of ClassCopier:" +
-		ObjectUtility.defaultObjectToString( copier ) ) ; 
-	}
-	*/
-
 	return copier.copy( oldToNew, obj, debug ) ;
     }
 }

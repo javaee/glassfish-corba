@@ -44,7 +44,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
-
+import java.util.concurrent.locks.ReentrantReadWriteLock ;
+import java.util.concurrent.locks.ReadWriteLock ;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
@@ -63,14 +64,17 @@ import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.NotLocalLocalCRDImpl;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Transport;
 
 /**
  * @author Harold Carr
  */
 @Transport
+@IsLocal
 public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     protected ORB orb;
+    private ReadWriteLock lcrdLock = new ReentrantReadWriteLock() ;
     protected LocalClientRequestDispatcher localClientRequestDispatcher;
     protected IOR targetIOR;
     protected IOR effectiveTargetIOR;
@@ -249,7 +253,12 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 
     public synchronized LocalClientRequestDispatcher getLocalClientRequestDispatcher()
     {
-	return localClientRequestDispatcher;
+        lcrdLock.readLock().lock() ;
+        try {
+            return localClientRequestDispatcher;
+        } finally {
+            lcrdLock.readLock().unlock() ;
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -294,9 +303,9 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     @Transport
     private void createContactInfoList() {
 	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
+        final boolean isLocal = iiopProfile.isLocal() ;
 
 	if (effectiveTargetIORContactInfoList == null) {
-
 	    effectiveTargetIORContactInfoList = 
 		new ArrayList<CorbaContactInfo>();
 
@@ -310,7 +319,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	    primaryContactInfo = 
 		createContactInfo(SocketInfo.IIOP_CLEAR_TEXT, hostname, port);
 
-	    if (iiopProfile.isLocal()) {
+	    if (isLocal) {
 		// NOTE: IMPORTANT:
 		// Only do local.  The APP Server interceptors check
 		// effectiveTarget.isLocal - which is determined via
@@ -326,7 +335,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	    }
             display( "First time for iiopProfile", iiopProfile ) ;
 	} else {
-	    if (! iiopProfile.isLocal()) {
+	    if (!isLocal) {
                 display( "Subsequent time for iiopProfile", iiopProfile ) ;
 		// 6152681 - this is so SSL can change its selection on each
 		// invocation
@@ -385,19 +394,25 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
      * allows local optimization, because ServantManagers in the POA
      * ALWAYS use local optimization ONLY (they do not have a remote case).
      */
+    @IsLocal
     protected void setLocalSubcontract() {
-	if (!effectiveTargetIOR.getProfile().isLocal()) {
-	    localClientRequestDispatcher = new NotLocalLocalCRDImpl();
-	    return;
-	}
+        lcrdLock.writeLock().lock() ;
+        try {
+            if (!effectiveTargetIOR.getProfile().isLocal()) {
+                localClientRequestDispatcher = new NotLocalLocalCRDImpl();
+                return;
+            }
 
-        // Note that we have no plan to support multi-profile IORs.
-	int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
-	    getSubcontractId() ;
-	LocalClientRequestDispatcherFactory lcsf = 
-            orb.getRequestDispatcherRegistry().getLocalClientRequestDispatcherFactory( scid ) ;
-        if (lcsf != null) {
-            localClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
+            // Note that we have no plan to support multi-profile IORs.
+	    int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
+	        getSubcontractId() ;
+	    LocalClientRequestDispatcherFactory lcsf = 
+                orb.getRequestDispatcherRegistry().getLocalClientRequestDispatcherFactory( scid ) ;
+            if (lcsf != null) {
+                localClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
+            }
+        } finally {
+            lcrdLock.writeLock().unlock() ;
         }
     }
 

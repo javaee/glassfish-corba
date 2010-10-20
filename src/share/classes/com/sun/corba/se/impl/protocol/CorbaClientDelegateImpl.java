@@ -78,6 +78,7 @@ import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Subcontract;
 
 // implements com.sun.corba.se.impl.core.ClientRequestDispatcher
@@ -87,6 +88,7 @@ import com.sun.corba.se.spi.trace.Subcontract;
  * @author Harold Carr
  */
 @Subcontract
+@IsLocal
 public class CorbaClientDelegateImpl extends CorbaClientDelegate 
 {
     private ORB orb;
@@ -529,6 +531,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
      * this ORB. 
      */
     @Override
+    @IsLocal
     public boolean is_local(org.omg.CORBA.Object self) {
 	// XXX this needs to check isNextCallValid
         return contactInfoList.getEffectiveTargetIOR().getProfile().
@@ -567,7 +570,7 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 
     @Override
     public String toString(org.omg.CORBA.Object self) {
-	return contactInfoList.getTargetIOR().stringify();
+	return contactInfoList.getTargetIOR().toString();
     }
 
     @Override

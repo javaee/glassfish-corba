@@ -131,6 +131,7 @@ import com.sun.corba.se.spi.trace.TraceInterceptor;
 import com.sun.corba.se.spi.trace.Naming;
 import com.sun.corba.se.spi.trace.OrbLifeCycle;
 import com.sun.corba.se.spi.trace.DynamicType ;
+import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Orbd;
 import com.sun.corba.se.spi.trace.Poa;
 import com.sun.corba.se.spi.trace.PoaFSM;
@@ -258,11 +259,14 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     @DynamicType
     public boolean dynamicTypeDebugFlag = false ;
 
+    @IsLocal
+    public boolean isLocalDebugFlag = false ;
+
     @ManagedAttribute
     @Description( "The current settings of the ORB debug flags" )
     private Map<String,Boolean> getDebugFlags() {
         Map<String,Boolean> result = new HashMap<String,Boolean>() ;
-        for (Field fld : this.getClass().getDeclaredFields()) {
+        for (Field fld : this.getClass().getFields()) {
             if (fld.getName().endsWith("DebugFlag")) {
                 Boolean value = false ;
                 try {

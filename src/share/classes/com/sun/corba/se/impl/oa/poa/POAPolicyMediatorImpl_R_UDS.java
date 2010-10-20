@@ -53,8 +53,7 @@ import org.omg.PortableServer.POAPackage.NoServant ;
 public class POAPolicyMediatorImpl_R_UDS extends POAPolicyMediatorBase_R {
     private Servant defaultServant ;
 
-    POAPolicyMediatorImpl_R_UDS( Policies policies, POAImpl poa ) 
-    {
+    POAPolicyMediatorImpl_R_UDS( Policies policies, POAImpl poa ) {
 	// assert policies.retainServants() 
 	super( policies, poa ) ;
 	defaultServant = null ;
@@ -65,37 +64,39 @@ public class POAPolicyMediatorImpl_R_UDS extends POAPolicyMediatorBase_R {
         } }
     
     protected java.lang.Object internalGetServant( byte[] id, 
-	String operation ) throws ForwardRequest
-    { 
-	Servant servant = internalIdToServant( id ) ;
-	if (servant == null) {
-            servant = defaultServant;
-        }
+	String operation ) throws ForwardRequest {
 
-	if (servant == null) {
-            throw wrapper.poaNoDefaultServant();
-        }
+        poa.readLock() ;
+        try {
+            Servant servant = internalIdToServant( id ) ;
+            if (servant == null) {
+                servant = defaultServant;
+            }
 
-	return servant ;
+            if (servant == null) {
+                throw wrapper.poaNoDefaultServant();
+            }
+
+            return servant ;
+        } finally {
+            poa.readUnlock();
+        }
     }
 
-    public void etherealizeAll() 
-    {	
+    public void etherealizeAll() {	
 	// NO-OP
     }
 
-    public ServantManager getServantManager() throws WrongPolicy
-    {
+    public ServantManager getServantManager() throws WrongPolicy {
 	throw new WrongPolicy();
     }
 
-    public void setServantManager( ServantManager servantManager ) throws WrongPolicy
-    {
+    public void setServantManager( 
+        ServantManager servantManager ) throws WrongPolicy {
 	throw new WrongPolicy();
     }
 
-    public Servant getDefaultServant() throws NoServant, WrongPolicy 
-    {
+    public Servant getDefaultServant() throws NoServant, WrongPolicy {
 	if (defaultServant == null) {
             throw new NoServant();
         } else {
@@ -103,15 +104,14 @@ public class POAPolicyMediatorImpl_R_UDS extends POAPolicyMediatorBase_R {
         }
     }
 
-    public void setDefaultServant( Servant servant ) throws WrongPolicy
-    {
+    public void setDefaultServant( Servant servant ) throws WrongPolicy {
 	defaultServant = servant;
 	setDelegate(defaultServant, "DefaultServant".getBytes());
     }
 
     public Servant idToServant( byte[] id ) 
-	throws WrongPolicy, ObjectNotActive
-    {
+	throws WrongPolicy, ObjectNotActive {
+
 	ActiveObjectMap.Key key = new ActiveObjectMap.Key( id ) ;
 	Servant s = internalKeyToServant(key);
 	

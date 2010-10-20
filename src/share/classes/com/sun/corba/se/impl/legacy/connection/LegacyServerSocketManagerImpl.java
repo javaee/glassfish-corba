@@ -117,7 +117,6 @@ public class LegacyServerSocketManagerImpl
     }
 
     // Check to see if the given port is equal to any of the ORB Server Ports.
-    // XXX Does this need to change for the multi-homed case?
     // Used in IIOPProfileImpl, ORBImpl.
     public boolean legacyIsLocalServerPort(int port) 
     {

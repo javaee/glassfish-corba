@@ -177,7 +177,6 @@ public final class ClassGeneratorImpl extends ClassInfoBase
     public MethodGenerator startMethod( int modifiers, Type rtype, String name, 
 	List<Type> exceptions ) {
 	if (isInterface() && !isAbstract(modifiers))
-	    // XXX should check for other modifiers as well?
 	    throw new IllegalArgumentException(
 		"All methods in an interface must be abstract" ) ;
 

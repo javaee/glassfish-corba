@@ -44,7 +44,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
-
+import java.util.concurrent.locks.ReentrantReadWriteLock ;
+import java.util.concurrent.locks.ReadWriteLock ;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
@@ -73,6 +74,7 @@ import com.sun.corba.se.spi.trace.Transport;
 @IsLocal
 public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     protected ORB orb;
+    private ReadWriteLock lcrdLock = new ReentrantReadWriteLock() ;
     protected LocalClientRequestDispatcher localClientRequestDispatcher;
     protected IOR targetIOR;
     protected IOR effectiveTargetIOR;
@@ -251,7 +253,12 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 
     public synchronized LocalClientRequestDispatcher getLocalClientRequestDispatcher()
     {
-	return localClientRequestDispatcher;
+        lcrdLock.readLock().lock() ;
+        try {
+            return localClientRequestDispatcher;
+        } finally {
+            lcrdLock.readLock().unlock() ;
+        }
     }
 
     ////////////////////////////////////////////////////
@@ -389,23 +396,28 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
      */
     @IsLocal
     protected void setLocalSubcontract() {
-	if (!effectiveTargetIOR.getProfile().isLocal()) {
-	    localClientRequestDispatcher = new NotLocalLocalCRDImpl();
-	    return;
-	}
+        lcrdLock.writeLock().lock() ;
+        try {
+            if (!effectiveTargetIOR.getProfile().isLocal()) {
+                localClientRequestDispatcher = new NotLocalLocalCRDImpl();
+                return;
+            }
 
-	// XXX Note that this always uses the first IIOP profile to get the
-	// scid.  What about multi-profile IORs?  This should perhaps be
-	// tied to the current ContactInfo in some way, together with an
-	// implementation of ClientDelegate that generally prefers co-located
-	// ContactInfo.  This may in fact mean that we should do this at
-	// the ContactInfo level, rather than the IOR/profile level.
-	int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
-	    getSubcontractId() ;
-	LocalClientRequestDispatcherFactory lcsf = 
-            orb.getRequestDispatcherRegistry().getLocalClientRequestDispatcherFactory( scid ) ;
-        if (lcsf != null) {
-            localClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
+            // XXX Note that this always uses the first IIOP profile to get the
+            // scid.  What about multi-profile IORs?  This should perhaps be
+            // tied to the current ContactInfo in some way, together with an
+            // implementation of ClientDelegate that generally prefers co-located
+            // ContactInfo.  This may in fact mean that we should do this at
+            // the ContactInfo level, rather than the IOR/profile level.
+            int scid = effectiveTargetIOR.getProfile().getObjectKeyTemplate().
+                getSubcontractId() ;
+            LocalClientRequestDispatcherFactory lcsf = 
+                orb.getRequestDispatcherRegistry().getLocalClientRequestDispatcherFactory( scid ) ;
+            if (lcsf != null) {
+                localClientRequestDispatcher = lcsf.create( scid, effectiveTargetIOR ) ;
+            }
+        } finally {
+            lcrdLock.writeLock().unlock() ;
         }
     }
 

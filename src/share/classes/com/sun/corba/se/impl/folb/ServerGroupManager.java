@@ -87,7 +87,6 @@ import com.sun.corba.se.spi.orb.DataCollector ;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Folb;
 
@@ -387,6 +386,7 @@ public class ServerGroupManager
         private void resumeRFM() { }
 
         @Folb
+        @Override
         public void run() {
             try {
                 suspendRFM() ;
@@ -534,8 +534,9 @@ public class ServerGroupManager
 	try {
 	    adapterName = ri.adapter_name();
 
-	    if (referenceFactoryManager.getState().value() == 
-		org.omg.PortableServer.POAManagerPackage.State._HOLDING) {
+	    if (referenceFactoryManager.getState() ==
+		ReferenceFactoryManager.RFMState.SUSPENDED) {
+
                 rfmIsHolding();
 		return;
 	    }

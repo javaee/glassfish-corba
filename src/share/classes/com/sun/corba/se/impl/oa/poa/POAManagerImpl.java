@@ -47,15 +47,12 @@ import org.omg.CORBA.CompletionStatus ;
 
 import org.omg.PortableServer.POAManager;
 import org.omg.PortableServer.POAManagerPackage.State;
-import org.omg.PortableServer.POA;
 
 import org.omg.PortableInterceptor.DISCARDING ;
 import org.omg.PortableInterceptor.ACTIVE ;
 import org.omg.PortableInterceptor.HOLDING ;
 import org.omg.PortableInterceptor.INACTIVE ;
 import org.omg.PortableInterceptor.NON_EXISTENT ;
-
-import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.protocol.PIHandler ;
 
@@ -65,6 +62,10 @@ import com.sun.corba.se.impl.logging.POASystemException ;
 
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.glassfish.gmbal.ManagedObject ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -84,45 +85,41 @@ import org.glassfish.gmbal.NameValue ;
 public class POAManagerImpl extends org.omg.CORBA.LocalObject implements 
     POAManager
 {
-    private static final long serialVersionUID = -751471445699682659L;
+    private static final long serialVersionUID = -3308938242684343402L;
 
+    // final fields: no synchronization needed
     private final POAFactory factory ;	// factory which contains global state 
-					// for all POAManagers 
-    private ORB orb ;
+					// for all POAManagers
+    private final PIHandler pihandler ; // for AdapterManagerStateChanged
+    private final int myId ;		// This POAManager's ID
+
+    // Making this a fair lock due to expected very high numbers of readers
+    // with an occasional writer that must NOT be starved.
+    //
+    // The state and poas fields may be READ while holding the read lock.
+    // Updates require holding the write lock.
+    private final ReentrantReadWriteLock stateLock =
+        new ReentrantReadWriteLock( true ) ;
+
+    // Condition var used for waiting.  Can only wait on this when the
+    // write lock is held!
+    private final Condition stateCV = stateLock.writeLock().newCondition() ;
+
+    // fields protected by stateLock
     private State state;		// current state of this POAManager
+
     private Set<POAImpl> poas =
         new HashSet<POAImpl>(4) ;       // all poas controlled by this POAManager
-    private int nInvocations=0;		// Number of invocations in progress
-    private int nWaiters=0;		// Number of threads waiting for 
+
+    // fields using other synchronization methods
+    private AtomicInteger nInvocations=
+        new AtomicInteger(0);		// Number of invocations in progress
+    private AtomicInteger nWaiters =
+        new AtomicInteger(0) ;		// Number of threads waiting for
 					// invocations to complete
-    private int myId = 0 ;		// This POAManager's ID
-    private boolean explicitStateChange ; // initially false, set true as soon as 
+    private volatile boolean explicitStateChange ; // initially false, set true as soon as
 					// one of activate, hold_request, 
 					// discard_request, or deactivate is called.
-
-    @ManagedAttribute
-    @Description( "The set of POAs managed by this POAManager" )
-    Set<POAImpl> getManagedPOAs() {
-        return new HashSet<POAImpl>( poas ) ;
-    }
-
-    @ManagedAttribute
-    @Description( "Number of active invocations executing in this POAManager" )
-    public synchronized int numberOfInvocations() {
-        return nInvocations ;
-    }
-
-    @ManagedAttribute
-    @Description( "Number of threads waiting for invocations to complete in this POAManager" )
-    public synchronized int numberOfWaiters() {
-        return nWaiters ;
-    }
-
-    @ManagedAttribute
-    @Description( "The current state of this POAManager" ) 
-    public synchronized String displayState() {
-        return stateToString( state ) ;
-    }
 
     /** activeManagers is the set of POAManagerImpls for which a thread has called
      * enter without exit 1 or more times.  Once a thread has entered a POAManager,
@@ -130,11 +127,11 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * because state transitions can be deferred until all threads have completed execution
      * and called exit().  Without this change, one thread can be blocked on the
      * state change method, and another thread that has entered the POAManager once
-     * can be blocked from re-entry on a nested co-located call.  This leads to a 
+     * can be blocked from re-entry on a nested co-located call.  This leads to a
      * permanent deadlock between the two threads.  See Bug 6586417.
      *
      * To avoid this, we create a set of active managers, and record which managers
-     * a particular thread is using.  A thread may re-enter any manager in HOLDING state 
+     * a particular thread is using.  A thread may re-enter any manager in HOLDING state
      * once it has entered it for the first time.  Note that POAManagerImpl uses the
      * default equals and hashCode methods inherited from Object.  This is fine,
      * because two distinct POAManagerImpl instances always represent distinct
@@ -144,32 +141,31 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
      * the app server, because all EJBs in the app server share the same POAManager.
      * The problem in general is that state changes between multiple POAManager and
      * invocation threads that make co-located calls to different POAManagers can still
-     * deadlock.  This problem requires a different solution, because the hold_requests 
-     * method may have already returned when the active thread needs to enter the 
+     * deadlock.  This problem requires a different solution, because the hold_requests
+     * method may have already returned when the active thread needs to enter the
      * holding POAManager, so we can't just let the thread in.  I think in this case
      * we need to reject the request because it may cause a deadlock.  So, checkState
      * needs to throw a TRANSIENT exception if it finds that the thread is already active
      * in one or more POAManagers, AND it tries to enter a new POAManager.  Such exceptions
-     * should be re-tried by the client, and will succeed after 
+     * should be re-tried by the client, and will succeed after
      * the holding POAManagers have been resumed.
      *
-     * Another possible route to fix the app server bug (more globally) is to have the RFM 
-     * suspend method use discard instead of hold.  This may be better in some ways, 
-     * but early tests with that approach led to some problems (which I can't recall right now).  
+     * Another possible route to fix the app server bug (more globally) is to have the RFM
+     * suspend method use discard instead of hold.  This may be better in some ways,
+     * but early tests with that approach led to some problems (which I can't recall right now).
      * I suspect the issues may have been related to problems with the client-side retry logic,
      * but those problems have now been fixed.  In any case, we need to fix the POAManager
      * issues.
      */
     private static ThreadLocal<MultiSet<POAManagerImpl>> activeManagers =
 	new ThreadLocal<MultiSet<POAManagerImpl>>() {
+        @Override
 	    public MultiSet<POAManagerImpl> initialValue() {
 		return new MultiSet<POAManagerImpl>() ;
 	    }
 	} ;
 
-
-    private String stateToString( State state )
-    {
+    private String stateToString( State state ) {
 	switch (state.value()) {
 	    case State._HOLDING : return "HOLDING" ;
 	    case State._ACTIVE : return "ACTIVE" ;
@@ -181,13 +177,13 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     }
 
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
 	return myId ;
     }
 
     @Override
-    public boolean equals( Object obj ) 
+    public boolean equals( Object obj )
     {
 	if (obj == this) {
 	    return true ;
@@ -203,12 +199,45 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     }
 
     @Override
-    public synchronized String toString()
-    {
-	return "POAManagerImpl[" + myId + 
-	    "," + stateToString(state) +
-	    ",nInvocations=" + nInvocations + 
-	    ",nWaiters=" + nWaiters + "]" ;
+    public String toString() {
+        stateLock.readLock().lock();
+        try {
+            return "POAManagerImpl[" + myId +
+                "," + stateToString(state) +
+                ",nInvocations=" + nInvocations +
+                ",nWaiters=" + nWaiters + "]" ;
+        } finally {
+            stateLock.readLock().unlock();
+        }
+    }
+
+    @ManagedAttribute
+    @Description( "The set of POAs managed by this POAManager" )
+    Set<POAImpl> getManagedPOAs() {
+        return new HashSet<POAImpl>( poas ) ;
+    }
+
+    @ManagedAttribute
+    @Description( "Number of active invocations executing in this POAManager" )
+    public int numberOfInvocations() {
+        return nInvocations.get() ;
+    }
+
+    @ManagedAttribute
+    @Description( "Number of threads waiting for invocations to complete in this POAManager" )
+    public int numberOfWaiters() {
+        return nWaiters.get() ;
+    }
+
+    @ManagedAttribute
+    @Description( "The current state of this POAManager" ) 
+    public String displayState() {
+        stateLock.readLock().lock();
+        try {
+            return stateToString( state ) ;
+        } finally {
+            stateLock.readLock().unlock();
+        }
     }
 
     @ManagedAttribute
@@ -220,40 +249,46 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
     PIHandler getPIHandler()
     {
-	return orb.getPIHandler() ;
+	return pihandler ;
     }
 
-    private void reportStateChange() {
-        final PIHandler pih = getPIHandler() ;
-        if (pih != null) {
-	    pih.adapterManagerStateChanged( myId, getORTState() ) ;
-        }
-    }
+    @InfoMethod
+    private void numWaitersStart( int value ) {}
+
+    @InfoMethod
+    private void numWaitersEnd( int value ) {}
 
     @Poa
+    // Note: caller MUST hold write lock
     private void countedWait()
     {
 	try {
-	    nWaiters++ ;
+            int num = nWaiters.incrementAndGet() ;
+            numWaitersStart( num ) ;
+
             // 6878245: I can see some sense in the timeout, but why this value?
-	    wait(nWaiters*1000L); 
+	    stateCV.await(num*1000L, TimeUnit.MILLISECONDS);
 	} catch ( java.lang.InterruptedException ex ) {
 	    // NOP
 	} finally {
-	    nWaiters-- ;
+            int num = nWaiters.decrementAndGet() ;
+            numWaitersEnd( num ) ;
 	}
     }
 
     @InfoMethod
+    // Note: caller MUST hold write lock
     private void nWaiters( int value ) { }
 
     @Poa
     private void notifyWaiters() 
     {
-	nWaiters( nWaiters ) ;
+        int num = nWaiters.get() ;
+	nWaiters( num ) ;
 
-	if (nWaiters >0)
-	    notifyAll() ;
+	if (num >0) {
+            stateCV.signalAll() ;
+        }
     }
 
     @ManagedAttribute
@@ -264,32 +299,42 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	return myId ;
     }
 
-    POAManagerImpl( POAFactory factory, ORB orb )
+    POAManagerImpl( POAFactory factory, PIHandler pih )
     {
 	this.factory = factory ;
         factory.addPoaManager(this);
-	this.orb = orb ;
+        pihandler = pih ;
 	myId = factory.newPOAManagerId() ;
 	state = State.HOLDING;
 	explicitStateChange = false ;
     }
 
-    synchronized void addPOA(POA poa)
+    void addPOA(POAImpl poa)
     {
-	if (state.value() == State._INACTIVE) {
-	    POASystemException wrapper = factory.getWrapper();
-	    throw wrapper.addPoaInactive( CompletionStatus.COMPLETED_NO ) ;
-	}
-	    
-        poas.add( (POAImpl)poa );
+        stateLock.writeLock().lock();
+        try {
+            if (state.value() == State._INACTIVE) {
+                POASystemException wrapper = factory.getWrapper();
+                throw wrapper.addPoaInactive( CompletionStatus.COMPLETED_NO ) ;
+            }
+
+            poas.add( poa);
+        } finally {
+            stateLock.writeLock().unlock();
+        }
     }
 
-    synchronized void removePOA(POA poa)
+    void removePOA(POAImpl poa)
     {
-        poas.remove( (POAImpl)poa );
-        if ( poas.isEmpty() ) {
-            factory.removePoaManager(this);
-	}
+        stateLock.writeLock().lock();
+        try {
+            poas.remove( poa);
+            if ( poas.isEmpty() ) {
+                factory.removePoaManager(this);
+            }
+        } finally {
+            stateLock.writeLock().unlock();
+        }
     }
 
     @ManagedAttribute
@@ -307,20 +352,6 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 
 /****************************************************************************
  * The following four public methods are used to change the POAManager's state.
- *
- * A note on the design of synchronization code:
- * There are 4 places where a thread would need to wait for a condition:
- *      - in hold_requests, discard_requests, deactivate, enter 
- * There are 5 places where a thread notifies a condition:
- *      - in activate, hold_requests, discard_requests, deactivate, exit 
- *
- * Since each notify needs to awaken waiters in several of the 4 places,
- * and since wait() in Java has the nice property of releasing the lock
- * on its monitor before sleeping, it seemed simplest to have just one
- * monitor object: "this". Thus all notifies will awaken all waiters.
- * On waking up, each waiter verifies that the condition it was waiting 
- * for is satisfied, otherwise it goes back into a wait().
- * 
  ****************************************************************************/
 
     /**
@@ -330,23 +361,30 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     @Poa
     @ManagedOperation
     @Description( "Make this POAManager active, so it can handle new requests" ) 
-    public synchronized void activate()
+    public void activate()
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
 	explicitStateChange = true ;
 
-	if ( state.value() == State._INACTIVE )
-	    throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+        stateLock.writeLock().lock() ;
 
-	// set the state to ACTIVE
-	state = State.ACTIVE;
+        try {
+            if ( state.value() == State._INACTIVE ) {
+                throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+            }
 
-	reportStateChange() ;
+            // set the state to ACTIVE
+            state = State.ACTIVE;
 
-	// Notify any invocations that were waiting because the previous
-	// state was HOLDING, as well as notify any threads that were waiting
-	// inside hold_requests() or discard_requests().
-	notifyWaiters();
+            pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
+
+            // Notify any invocations that were waiting because the previous
+            // state was HOLDING, as well as notify any threads that were waiting
+            // inside hold_requests() or discard_requests().
+            notifyWaiters();
+        } finally {
+            stateLock.writeLock().unlock() ;
+        }
     }
 
     /**
@@ -356,28 +394,37 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     @Poa
     @ManagedOperation
     @Description( "Hold all requests to this POAManager" ) 
-    public synchronized void hold_requests(boolean wait_for_completion)
+    public void hold_requests(boolean wait_for_completion)
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
 	explicitStateChange = true ;
 
-	if ( state.value() == State._INACTIVE )
-	    throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
-	// set the state to HOLDING
-	state  = State.HOLDING;
+        stateLock.writeLock().lock() ;
 
-	reportStateChange() ;
+        try {
+            if ( state.value() == State._INACTIVE ) {
+                throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+            }
+            // set the state to HOLDING
+            state  = State.HOLDING;
 
-	// Notify any threads that were waiting in the wait() inside
-	// discard_requests. This will cause discard_requests to return
-	// (which is in conformance with the spec).
-	notifyWaiters();
+            pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
 
-	if ( wait_for_completion ) {
-	    while ( state.value() == State._HOLDING && nInvocations > 0 ) {
-		countedWait() ;
-	    }
-	}
+            // Notify any threads that were waiting in the wait() inside
+            // discard_requests. This will cause discard_requests to return
+            // (which is in conformance with the spec).
+            notifyWaiters();
+
+            if ( wait_for_completion ) {
+                while ( state.value() == State._HOLDING
+                    && nInvocations.get() > 0 ) {
+
+                    countedWait() ;
+                }
+            }
+        } finally {
+            stateLock.writeLock().unlock();
+        }
     }
 
     /**
@@ -388,30 +435,42 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     @ManagedOperation
     @ParameterNames( { "waitForCompletion" } )
     @Description( "Make this POAManager discard all incoming requests" ) 
-    public synchronized void discard_requests(boolean wait_for_completion)
+    public void discard_requests(boolean wait_for_completion)
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
 	explicitStateChange = true ;
 
-	if ( state.value() == State._INACTIVE )
-	    throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+        stateLock.writeLock().lock();
 
-	// set the state to DISCARDING
-	state = State.DISCARDING;
+        try {
+            if ( state.value() == State._INACTIVE ) {
+                throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+            }
 
-	reportStateChange() ;
+            // set the state to DISCARDING
+            state = State.DISCARDING;
 
-	// Notify any invocations that were waiting because the previous
-	// state was HOLDING. Those invocations will henceforth be rejected with
-	// a TRANSIENT exception. Also notify any threads that were waiting
-	// inside hold_requests().
-	notifyWaiters();
+            pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
 
-	if ( wait_for_completion ) {
-	    while ( state.value() == State._DISCARDING && nInvocations > 0 ) {
-		countedWait() ;
-	    }
-	}
+            // Notify any invocations that were waiting because the previous
+            // state was HOLDING. Those invocations will henceforth be rejected with
+            // a TRANSIENT exception. Also notify any threads that were waiting
+            // inside hold_requests().
+            //
+            // Must hold writeLock for this call.
+            notifyWaiters();
+
+            if ( wait_for_completion ) {
+                while ( state.value() == State._DISCARDING
+                    && nInvocations.get() > 0 ) {
+
+                    // Must hold writeLock for this call.
+                    countedWait() ;
+                }
+            }
+        } finally {
+            stateLock.writeLock().unlock();
+        }
     }
 
     /**
@@ -424,29 +483,34 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     public void deactivate(boolean etherealize_objects, boolean wait_for_completion)
         throws org.omg.PortableServer.POAManagerPackage.AdapterInactive
     {
-	synchronized( this ) {
+        stateLock.writeLock().lock();
+
+        try {
 	    explicitStateChange = true ;
 
-	    if ( state.value() == State._INACTIVE )
-		throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+	    if ( state.value() == State._INACTIVE ) {
+                throw new org.omg.PortableServer.POAManagerPackage.AdapterInactive();
+            }
 
 	    state = State.INACTIVE;
 
-	    reportStateChange() ;
+            pihandler.adapterManagerStateChanged( myId, getORTState() ) ;
 
 	    // Notify any invocations that were waiting because the previous
 	    // state was HOLDING. Those invocations will then be rejected with
 	    // an OBJ_ADAPTER exception. Also notify any threads that were waiting
 	    // inside hold_requests() or discard_requests().
 	    notifyWaiters();
-	}
+	} finally {
+            stateLock.writeLock().unlock();
+        }
 
 	POAManagerDeactivator deactivator = new POAManagerDeactivator( this,
 	    etherealize_objects ) ;
 
-	if (wait_for_completion)
-	    deactivator.run() ;
-	else {
+	if (wait_for_completion) {
+            deactivator.run();
+        } else {
 	    Thread thr = new Thread(deactivator) ;
 	    thr.start() ;
 	}
@@ -477,21 +541,27 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	@Poa
 	public void run() 
 	{
-	    synchronized (pmi) {
+	    pmi.stateLock.writeLock().lock();
+            try {
 		poaManagerDeactivatorCall( etherealize_objects, pmi ) ;
-		while ( pmi.nInvocations > 0 ) {
+		while ( pmi.nInvocations.get() > 0 ) {
 		    pmi.countedWait() ;
 		}
-	    }
+	    } finally {
+                pmi.stateLock.writeLock().unlock();
+            }
 
 	    if (etherealize_objects) {
 		Set<POAImpl> copyOfPOAs ;
 
 		// Make sure that poas cannot change while we copy it!
-		synchronized (pmi) {
+                pmi.stateLock.readLock().lock();
+                try {
 		    preparingToEtherealize( pmi ) ;
 		    copyOfPOAs = new HashSet<POAImpl>( pmi.poas ) ;
-		}
+		} finally {
+                    pmi.stateLock.readLock().unlock();
+                }
 
 		for (POAImpl poa : copyOfPOAs) {
 		    // Each RETAIN+USE_SERVANT_MGR poa
@@ -499,15 +569,15 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 		    poa.etherealizeAll();
 		}
 
-		// XXX What if a new POA is created here before
-		// etherealization completes?  We would fail to call
-		// etherealize!
-		synchronized (pmi) {
+                pmi.stateLock.writeLock().lock();
+                try {
 		    removeAndClear( pmi ) ;
 
 		    pmi.factory.removePoaManager(pmi);
 		    pmi.poas.clear();
-		}
+		} finally {
+                    pmi.stateLock.writeLock().unlock();
+                }
 	    }
 	}
     }
@@ -540,37 +610,55 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	MultiSet<POAManagerImpl> am = activeManagers.get() ;
 	activeManagers( am ) ;
 
-	while ( state.value() != State._ACTIVE ) {
-	    switch ( state.value() ) {
-		case State._HOLDING:
-		    // Never block a thread that is already active in this POAManager.
-		    if (am.contains( this )) {
-			alreadyActive( this ) ;
+        stateLock.readLock().lock();
+        try {
+            while ( state.value() != State._ACTIVE ) {
+                switch ( state.value() ) {
+                    case State._HOLDING:
+                        // Never block a thread that is already active in this POAManager.
+                        if (am.contains( this )) {
+                            alreadyActive( this ) ;
 
-			return ;
-		    } else {
-			if (am.size() == 0) {
-			    while ( state.value() == State._HOLDING ) {
-				countedWait() ;
-			    }
-			} else {
-			    activeInDifferentPoaManager() ;
+                            return ;
+                        } else {
+                            if (am.size() == 0) {
+                                if (state.value() == State._HOLDING) {
+                                    // Can't upgrade, so drop the read lock,
+                                    // then separately acquite the write lock.
+                                    stateLock.readLock().unlock();
+                                    stateLock.writeLock().lock();
+                                }
 
-			    // This thread is already active in one or more other POAManagers.
-			    // This could cause a deadlock, so throw a TRANSIENT exception 
-			    // to prevent it.
-			    throw factory.getWrapper().poaManagerMightDeadlock() ;
-			}
-		    }
-		    break;
+                                try {
+                                    while ( state.value() == State._HOLDING ) {
+                                        countedWait() ;
+                                    }
+                                } finally {
+                                    // downgrade to read lock
+                                    stateLock.writeLock().unlock();
+                                    stateLock.readLock().lock();
+                                }
+                            } else {
+                                activeInDifferentPoaManager() ;
 
-		case State._DISCARDING:
-		    throw factory.getWrapper().poaDiscarding() ;
+                                // This thread is already active in one or more other POAManagers.
+                                // This could cause a deadlock, so throw a TRANSIENT exception
+                                // to prevent it.
+                                throw factory.getWrapper().poaManagerMightDeadlock() ;
+                            }
+                        }
+                        break;
 
-		case State._INACTIVE:
-		    throw factory.getWrapper().poaInactive() ;
-	    }
-	}
+                    case State._DISCARDING:
+                        throw factory.getWrapper().poaDiscarding() ;
+
+                    case State._INACTIVE:
+                        throw factory.getWrapper().poaInactive() ;
+                }
+            }
+        } finally {
+            stateLock.readLock().unlock();
+        }
     }
 
     @InfoMethod
@@ -580,29 +668,32 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     private void removingThreadFromActiveManagers( POAManagerImpl pmi ) { }
 
     @Poa
-    synchronized void enter()
+    void enter()
     {
 	checkState();
-	nInvocations++;
+	nInvocations.getAndIncrement() ;
 
 	activeManagers.get().add( this ) ;
 	addingThreadToActiveManagers( this ) ;
     }
 
     @Poa
-    synchronized void exit()
+    void exit()
     {
 	try {
 	    activeManagers.get().remove( this ) ;
 	    removingThreadFromActiveManagers( this ) ;
 	} finally {
-            // 6878245: moved finally above the decrement.  I don't see the need for this.
-	    nInvocations--; 
+	    if ( nInvocations.decrementAndGet() == 0 ) {
+                stateLock.writeLock().lock();
 
-	    if ( nInvocations == 0 ) {
-		// This notifies any threads that were in the 
-		// wait_for_completion loop in hold/discard/deactivate().
-		notifyWaiters();
+                try {
+                    // This notifies any threads that were in the
+                    // wait_for_completion loop in hold/discard/deactivate().
+                    notifyWaiters();
+                } finally {
+                    stateLock.writeLock().unlock();
+                }
 	    }
 	}
     }
@@ -610,13 +701,13 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     /** Activate the POAManager if no explicit state change has ever been
      * previously invoked.
      */
-    public synchronized void implicitActivation() 
+    public void implicitActivation() 
     {
-	if (!explicitStateChange)
-	    try {
-		activate() ;
-	    } catch (org.omg.PortableServer.POAManagerPackage.AdapterInactive ai) {
-		// ignore the exception.
-	    }
+	if (!explicitStateChange) {
+            try {
+                activate();
+            } catch (org.omg.PortableServer.POAManagerPackage.AdapterInactive ai) {
+            }
+        }
     }
 }

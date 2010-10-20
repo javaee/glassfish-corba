@@ -50,8 +50,6 @@ package com.sun.corba.se.impl.io;
 
 
 import java.util.Map ;
-import java.util.HashMap ;
-import java.util.Collections ;
 import java.io.IOException;
 
 import com.sun.corba.se.impl.util.RepositoryId;
@@ -80,6 +78,7 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 
 import com.sun.corba.se.spi.trace.ValueHandlerWrite ;
 import com.sun.corba.se.spi.trace.ValueHandlerRead ;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ValueHandlerRead
 @ValueHandlerWrite
@@ -115,19 +114,20 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             });
 
             // The property wasn't set
-            if (propValue == null)
+            if (propValue == null) {
                 return MAX_SUPPORTED_FORMAT_VERSION;
+            }
 
             byte result = Byte.parseByte(propValue);
 
             // REVISIT.  Just set to MAX_SUPPORTED_FORMAT_VERSION
             // or really let the system shutdown with this Error?
-            if (result < 1 || result > MAX_SUPPORTED_FORMAT_VERSION)
-		// XXX I18N, logging needed.
-                throw new ExceptionInInitializerError("Invalid stream format version: "
-                                                      + result
-                                                      + ".  Valid range is 1 through "
-                                                      + MAX_SUPPORTED_FORMAT_VERSION);
+            if (result < 1 || result > MAX_SUPPORTED_FORMAT_VERSION) {
+                throw new ExceptionInInitializerError(
+                    "Invalid stream format version: " + result
+                    + ".  Valid range is 1 through "
+                    + MAX_SUPPORTED_FORMAT_VERSION);
+            }
 
             return result;
 
@@ -145,14 +145,16 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
     public static final short kAbstractType = 1;
     public static final short kValueType = 2;
 
-    // Both of these must be synchronized maps, or corruption will ensue!
-    private Map<org.omg.CORBA.portable.InputStream,IIOPInputStream> 
-	inputStreamPairs = null;
-    private Map<org.omg.CORBA.portable.OutputStream,IIOPOutputStream> 
-	outputStreamPairs = null;
-
-    private IIOPOutputStream outputStreamBridge = null;
-    private IIOPInputStream inputStreamBridge = null;
+    // Since the Input/OutputStream is unique to a thread, only one thread
+    // can ever put a particular key into the stream pairs maps.  Multiple threads
+    // will simultaneously update these maps, so we need a ConcurrentHashMap.
+    // But we don't need to use putIfAbsent to store into the maps.
+    private final Map<org.omg.CORBA.portable.InputStream,IIOPInputStream>
+	inputStreamPairs = new ConcurrentHashMap<org.omg.CORBA.portable.InputStream,
+            IIOPInputStream>();
+    private final Map<org.omg.CORBA.portable.OutputStream,IIOPOutputStream>
+	outputStreamPairs = new ConcurrentHashMap<org.omg.CORBA.portable.OutputStream,
+           IIOPOutputStream>();
 
     private OMGSystemException omgWrapper = 
 	ORB.getStaticLogWrapperTable().get_RPC_ENCODING_OMG() ;
@@ -186,7 +188,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 
     /**
      * Writes the value to the stream using java semantics.
-     * @param out The stream to write the value to
+     * @param _out The stream to write the value to
      * @param value The value to be written to the stream
      **/
     @ValueHandlerWrite
@@ -204,10 +206,6 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             (org.omg.CORBA_2_3.portable.OutputStream) _out;
 
         IIOPOutputStream jdkToOrbOutputStreamBridge = null;
-
-        if (outputStreamPairs == null)
-            outputStreamPairs = Collections.synchronizedMap(
-                new HashMap<org.omg.CORBA.portable.OutputStream,IIOPOutputStream>());
 
         jdkToOrbOutputStreamBridge = outputStreamPairs.get(_out);
 
@@ -233,23 +231,27 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 	org.omg.CORBA_2_3.portable.OutputStream out, 
 	java.io.Serializable value, byte streamFormatVersion) {
 
-        Class clazz = value.getClass();
+        Class<?> clazz = value.getClass();
         ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
-        if (cinfo.isArray())
+        if (cinfo.isArray()) {
             write_Array(out, value, clazz.getComponentType());
-        else
+        } else {
             bridge.simpleWriteObject(value, streamFormatVersion);
+        }
     }
 
     /**
      * Reads a value from the stream using java semantics.
-     * @param in The stream to read the value from
+     * @param _in The stream to read the value from
+     * @param offset offset position in the stream
      * @param clazz The type of the value to be read in
-     * @param sender The sending context runtime
+     * @param repositoryID repo ID for the value to read
+     * @param _sender The sending context runtime
+     * @return The serializable value read from the stream
      **/
     @ValueHandlerRead
     public java.io.Serializable readValue(org.omg.CORBA.portable.InputStream _in, 
-	int offset, java.lang.Class clazz, String repositoryID, 
+	int offset, java.lang.Class clazz, String repositoryID,
 	org.omg.SendingContext.RunTime _sender) {
 
         java.io.Serializable result = null;
@@ -261,15 +263,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
         org.omg.CORBA_2_3.portable.InputStream in =
             (org.omg.CORBA_2_3.portable.InputStream) _in;
 
-        IIOPInputStream jdkToOrbInputStreamBridge = null;
-        if (inputStreamPairs == null)
-            inputStreamPairs = Collections.synchronizedMap(
-                new HashMap<org.omg.CORBA.portable.InputStream,IIOPInputStream>());
-
-        jdkToOrbInputStreamBridge = inputStreamPairs.get(_in);
-
+        IIOPInputStream jdkToOrbInputStreamBridge = inputStreamPairs.get(_in);
         if (jdkToOrbInputStreamBridge == null) {
-
             jdkToOrbInputStreamBridge = createInputStream();
             jdkToOrbInputStreamBridge.setOrbStream(in);
             jdkToOrbInputStreamBridge.setSender(sender);
@@ -280,8 +275,8 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 
         try {
             jdkToOrbInputStreamBridge.increaseRecursionDepth();
-            result = (java.io.Serializable) readValueInternal(
-                jdkToOrbInputStreamBridge, in, offset, clazz, repositoryID, sender);
+            result = readValueInternal(jdkToOrbInputStreamBridge, in, offset,
+                clazz, repositoryID, sender);
         } finally {
             if (jdkToOrbInputStreamBridge.decreaseRecursionDepth() == 0) {
                 inputStreamPairs.remove(_in);
@@ -294,7 +289,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
     @ValueHandlerRead
     private java.io.Serializable readValueInternal(IIOPInputStream bridge, 
 	org.omg.CORBA_2_3.portable.InputStream in, int offset, 
-	java.lang.Class clazz, String repositoryID, 
+	java.lang.Class<?> clazz, String repositoryID,
 	com.sun.org.omg.SendingContext.CodeBase sender) {
 
 	java.io.Serializable result = null;
@@ -582,16 +577,17 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
             int i;
 
 	    if (sequence == null) {
-		for (i = 0; i < length; i++)
-		    in.read_value();
+		for (i = 0; i < length; i++) {
+                    in.read_value();
+                }
 
 		return null;
 	    }
 			
             OperationTracer.startReadArray( sequence.getName(), length ) ;
 
-	    Class componentType = sequence.getComponentType();
-	    Class actualType = componentType;
+	    Class<?> componentType = sequence.getComponentType();
+	    Class<?> actualType = componentType;
 	    ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( 
 		componentType ) ;
 
@@ -712,7 +708,7 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
 				componentType);
                             String repID = RepositoryId.createForAnyType(
 				componentType);
-                            Class stubType = 
+                            Class<?> stubType =
 				Utility.loadStubClass(repID, codebase, 
 				    componentType); 
 			    actualType = stubType;
@@ -739,10 +735,10 @@ public class ValueHandlerImpl implements javax.rmi.CORBA.ValueHandlerMultiFormat
                             }
                             break;
                         case kAbstractType: 
-                            if (!narrow)
-                                array[i] = (Object)in.read_abstract_interface(
-				    actualType); 
-                            else {
+                            if (!narrow) {
+                                array[i] = in.read_abstract_interface(
+                                    actualType);
+                            } else {
                                 array[i] = Utility.readAbstractAndNarrow(in, 
 				    actualType);
                             }

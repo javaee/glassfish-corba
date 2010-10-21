@@ -374,7 +374,10 @@ public interface POASystemException {
     @Log( level=LogLevel.WARNING, id=33 )
     @Message( "Method {0} can only be called when RFM is suspended" )
     OBJ_ADAPTER rfmMethodRequiresSuspendedState( String arg0 ) ;
-    
+
+    int JTS_INIT_ERROR = CorbaExtension.self.getMinorCode(
+        POASystemException.class, "jtsInitError" ) ;
+
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "JTS initialization error" )
     INITIALIZE jtsInitError(  ) ;

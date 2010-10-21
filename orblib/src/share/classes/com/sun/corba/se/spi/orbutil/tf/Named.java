@@ -104,7 +104,7 @@ public abstract class Named {
             init() ;
         }
 
-        return toString() ;
+        return toString ;
     }
 
 }

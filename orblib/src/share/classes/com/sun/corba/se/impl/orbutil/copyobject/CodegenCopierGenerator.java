@@ -68,7 +68,7 @@ import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
 public class CodegenCopierGenerator {
     private static final String DEBUG = "false" ;
 
-    private Class	       classToCopy ;
+    private Class<?>	       classToCopy ;
     private String	       className ;
 
     private static final Bridge bridge = AccessController.doPrivileged(
@@ -79,12 +79,12 @@ public class CodegenCopierGenerator {
 	} 
     ) ;
 
-    public CodegenCopierGenerator( String className, Class classToCopy ) {
+    public CodegenCopierGenerator( String className, Class<?> classToCopy ) {
 	this.className = className ;
 	this.classToCopy = classToCopy ;
     }
 
-    public Class create( ProtectionDomain pd, ClassLoader cl ) {
+    public Class<?> create( ProtectionDomain pd, ClassLoader cl ) {
 	_clear() ;
 
 	Pair<String,String> pc = splitClassName( className ) ;
@@ -146,28 +146,29 @@ public class CodegenCopierGenerator {
 	debugProps.setProperty( TRACE_BYTE_CODE_GENERATION, DEBUG ) ;
 	debugProps.setProperty( USE_ASM_VERIFIER, DEBUG ) ;
 	
-	Class cls = _generate( cl, pd, debugProps ) ;
+	Class<?> cls = _generate( cl, pd, debugProps ) ;
 	return cls ;
     }
 
-    private String getCopyMethodName( Class fieldType ) { 
-	if (fieldType.equals( Boolean.TYPE ))
-	    return "copyBoolean" ;
-        else if (fieldType.equals( Byte.TYPE ))
-	    return "copyByte" ;
-        else if (fieldType.equals( Character.TYPE ))
-	    return "copyChar" ;
-        else if (fieldType.equals( Integer.TYPE ))
-	    return "copyInt" ;
-        else if (fieldType.equals( Short.TYPE ))
-	    return "copyShort" ;
-        else if (fieldType.equals( Long.TYPE ))
-	    return "copyLong" ;
-        else if (fieldType.equals( Float.TYPE ))
-	    return "copyFloat" ;
-        else if (fieldType.equals( Double.TYPE ))
-	    return "copyDouble" ;
-	else 
-	    return "copyObject" ;
+    private String getCopyMethodName( Class<?> fieldType ) {
+	if (fieldType.equals( Boolean.TYPE )) {
+            return "copyBoolean";
+        } else if (fieldType.equals( Byte.TYPE )) {
+            return "copyByte";
+        } else if (fieldType.equals( Character.TYPE )) {
+            return "copyChar";
+        } else if (fieldType.equals( Integer.TYPE )) {
+            return "copyInt";
+        } else if (fieldType.equals( Short.TYPE )) {
+            return "copyShort";
+        } else if (fieldType.equals( Long.TYPE )) {
+            return "copyLong";
+        } else if (fieldType.equals( Float.TYPE )) {
+            return "copyFloat";
+        } else if (fieldType.equals( Double.TYPE )) {
+            return "copyDouble";
+        } else {
+            return "copyObject";
+        }
     }
 }

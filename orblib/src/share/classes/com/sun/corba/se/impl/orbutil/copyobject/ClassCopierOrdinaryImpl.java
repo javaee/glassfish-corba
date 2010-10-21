@@ -45,7 +45,6 @@ import java.io.Externalizable ;
 
 import java.util.WeakHashMap ;
 import java.util.Map ;
-import java.util.StringTokenizer ;
 
 import java.security.ProtectionDomain ;
 import java.security.AccessController ;
@@ -88,14 +87,13 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
      * calls.  Because of the dangerous nature of Unsafe, its use 
      * must be carefully protected.
      */
-    private static final Bridge bridge = 
-	(Bridge)AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public Object run() {
-		    return Bridge.get() ;
-		}
-	    } 
-	) ;
+    private static final Bridge bridge = AccessController.doPrivileged(
+        new PrivilegedAction<Bridge>() {
+            public Bridge run() {
+                return Bridge.get() ;
+            }
+        }
+    ) ;
     
     /**
      * Returns true if classes are defined in the same package, false
@@ -125,9 +123,9 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
     private static Method getInheritableMethod( final Class<?> cl, final String name, 
 	final Class<?> returnType, final Class<?>... argTypes )
     {
-	return (Method)AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public Object run() {
+	return AccessController.doPrivileged(
+	    new PrivilegedAction<Method>() {
+		public Method run() {
 		    Method meth = null;
 		    Class<?> defCl = cl;
 		    while (defCl != null) {
@@ -162,14 +160,15 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
     private Object resolve( Object obj ) 
     {
-	if (readResolveMethod != null)
-	    try {
-		return readResolveMethod.invoke( obj ) ;
-	    } catch (Throwable t) {
-		throw new RuntimeException(t) ;
-	    }
-	else
-	    return obj ;
+	if (readResolveMethod != null) {
+            try {
+                return readResolveMethod.invoke(obj);
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        } else {
+            return obj;
+        }
     }
 
 //******************************************************************************
@@ -192,10 +191,10 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	 * <p>
 	 * Copied from the Merlin java.io.ObjectStreamClass.
 	 */
-	private static Constructor getExternalizableConstructor(Class<?> cl) 
+	private static Constructor<?> getExternalizableConstructor(Class<?> cl)
 	{
 	    try {
-		Constructor cons = cl.getDeclaredConstructor();
+		Constructor<?> cons = cl.getDeclaredConstructor();
 		cons.setAccessible(true);
 		return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ? 
 		    cons : null;
@@ -213,7 +212,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	 * <p>
 	 * Copied from the Merlin java.io.ObjectStreamClass.
 	 */
-	private static Constructor getSerializableConstructor(Class<?> cl) 
+	private static Constructor<?> getSerializableConstructor(Class<?> cl)
 	{
 	    Class<?> initCl = cl;
 	    while (Serializable.class.isAssignableFrom(initCl)) {
@@ -223,7 +222,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    }
 
 	    try {
-		Constructor cons = initCl.getDeclaredConstructor();
+		Constructor<?> cons = initCl.getDeclaredConstructor();
 		int mods = cons.getModifiers();
 		if ((mods & Modifier.PRIVATE) != 0 ||
 		    ((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) == 0 &&
@@ -244,9 +243,9 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	 * the super class chain.  This allows us to construct an instance
 	 * of any class at all, serializable or not.
 	 */
-	private static Constructor getDefaultConstructor(Class<?> cl) 
+	private static Constructor<?> getDefaultConstructor(Class<?> cl)
 	{
-	    Constructor cons = null;
+	    Constructor<?> cons = null;
 	    Class<?> defCl = cl;
 	    while (defCl != null) {
 		try {
@@ -257,17 +256,17 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		}
 	    }
 
-	    if (cons == null) 
-		// XXX log error: should always be able to use Object's
-		// no-args constructor if nothing else
-		return null ;
+	    if (cons == null) {
+                return null;
+            }
 
-	    Constructor result ;
+	    Constructor<?> result ;
 
-	    if (defCl == cl)
-		result = cons ;
-	    else
-		result = bridge.newConstructorForSerialization( cl, cons ) ;
+	    if (defCl == cl) {
+                result = cons;
+            } else {
+                result = bridge.newConstructorForSerialization(cl, cons);
+            }
 
 	    result.setAccessible(true) ;
 	    return result ;
@@ -277,29 +276,21 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	/** Analyze the class to determine the correct constructor type.
 	 * Returns the appropriate constructor.
 	 */
-	private static Constructor makeConstructor( final Class<?> cls ) 
-	{
-	    return (Constructor)AccessController.doPrivileged(
-		new PrivilegedAction() {
-		    public Object run() {
+	private static Constructor<?> makeConstructor( final Class<?> cls ) {
+	    return AccessController.doPrivileged(
+		new PrivilegedAction<Constructor<?>>() {
+		    public Constructor<?> run() {
 			Constructor constructor ;
 
 			// We must check for Externalizable first, since Externalizable
 			// extends Serializable.  
-			if (Externalizable.class.isAssignableFrom( cls ))
-			    // Note that the constructor may be null
-			    // here, but that's OK, as a class that implements 
-			    // Externalizable may not have an appropriate constructor, 
-			    // but may be a base class for a class that DOES have the 
-			    // appropriate constructor.  This is not an error.
-			    constructor = getExternalizableConstructor(cls) ;
-			else if (Serializable.class.isAssignableFrom( cls ))
-			    constructor = getSerializableConstructor(cls) ;
-			else 
-			    // For serialization, this case would be an error.
-			    // But we are doing a reflective copy, so we need 
-			    // this case, in order to copy transient fields.
-			    constructor = getDefaultConstructor(cls) ;
+			if (Externalizable.class.isAssignableFrom( cls )) {
+                            constructor = getExternalizableConstructor(cls);
+                        } else if (Serializable.class.isAssignableFrom( cls )) {
+                            constructor = getSerializableConstructor(cls);
+                        } else {
+                            constructor = getDefaultConstructor(cls);
+                        }
 
 			return constructor ;
 		    }
@@ -332,7 +323,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	 * all fields declared in the class, as well as in the 
 	 * super class.  
 	 */
-	void copy( Map oldToNew, 
+	void copy( Map<Object,Object> oldToNew,
 	    Object src, Object dest, boolean debug ) throws ReflectiveCopyException ;
     }
 
@@ -357,6 +348,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
     
     private static ThreadLocal<Boolean> isCodegenCopierAllowed =
 	new ThreadLocal<Boolean>() {
+            @Override
 	    public Boolean initialValue() {
 		return Boolean.TRUE ;
 	    }
@@ -376,19 +368,24 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
 	if (copier == null) {
 	    try {
-		copier = (ClassFieldCopier) AccessController.doPrivileged( 
-		    new PrivilegedExceptionAction() {
-			public Object run() throws ReflectiveCopyException {
-			    // Note that we can NOT generate a copier for classes used in codegen!
-			    // If we try, generating the copier uses codegen which calls
-			    // the copier, which generates a copier using codegen, which...
-			    // Just don't do this for anything that is in the codegen packages.
-			    if (useCodegenCopier() && isCodegenCopierAllowed.get())
-				return makeClassFieldCopierUnsafeCodegenImpl( 
-				    cls, classCopierFactory ) ;
-			    else
-				return new ClassFieldCopierUnsafeImpl(
-				    cls, classCopierFactory ) ;
+		copier = AccessController.doPrivileged( 
+		    new PrivilegedExceptionAction<ClassFieldCopier>() {
+			public ClassFieldCopier run()
+                            throws ReflectiveCopyException {
+			    // Note that we can NOT generate a copier for 
+                            // classes used in codegen!  If we try, generating
+                            // the copier uses codegen which calls the copier,
+                            // which generates a copier using codegen, which...
+			    // Just don't do this for anything that is in the
+                            // codegen packages.
+			    if (useCodegenCopier()
+                                && isCodegenCopierAllowed.get()) {
+                                return makeClassFieldCopierUnsafeCodegenImpl(
+                                    cls, classCopierFactory);
+                            } else {
+                                return new ClassFieldCopierUnsafeImpl(cls,
+                                    classCopierFactory);
+                            }
 			}
 		    }
 		) ;
@@ -414,19 +411,22 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
 	    // If there is a cached ClassCopier, and it is not reflective, then cls
 	    // should not be copied by reflection.
-	    if ((cachedCopier != null) && (!cachedCopier.isReflectiveClassCopier()))
-		throw new ReflectiveCopyException( 
-		    "Cannot create ClassFieldCopier for superclass " + 
-		    superClass.getName() + 
-		    ": This class already has a ClassCopier." ) ;
+	    if ((cachedCopier != null)
+                && (!cachedCopier.isReflectiveClassCopier())) {
+                throw new ReflectiveCopyException(
+                    "Cannot create ClassFieldCopier for superclass "
+                        + superClass.getName()
+                            + ": This class already has a ClassCopier.");
+            }
 
 	    // Return an error immediately, rather than waiting until the
 	    // superClass copier is invoked.
-	    if (!ccf.reflectivelyCopyable( superClass ))
+	    if (!ccf.reflectivelyCopyable( superClass )) {
 		throw new ReflectiveCopyException(
 		    "Cannot create ClassFieldCopier for superclass " + 
 		    superClass.getName() + 
 		    ": This class cannot be copied." ) ;
+            }
 		    
 	    superCopier = getClassFieldCopier( superClass, ccf ) ;
 	}
@@ -477,8 +477,9 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		this.bridge = bridge ;
 	    }
 
-	    abstract void copy( Map oldToNew, long offset, Object src, 
-		Object dest, boolean debug ) throws ReflectiveCopyException ;
+	    abstract void copy( Map<Object,Object> oldToNew, long offset,
+                Object src, Object dest, boolean debug )
+                throws ReflectiveCopyException ;
 	}
 
 	// All of the XXXInitializer instances simply set the field to 0 or null
@@ -490,6 +491,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putByte( dest, offset, (byte)0 ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "byteUnsafeFieldInitializer" ;
 	    }
@@ -503,6 +505,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putChar( dest, offset, (char)0 ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "charUnsafeFieldInitializer" ;
 	    }
@@ -516,6 +519,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putShort( dest, offset, (short)0 ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "shortUnsafeFieldInitializer" ;
 	    }
@@ -529,6 +533,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putInt( dest, offset, 0 ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "intUnsafeFieldInitializer" ;
 	    }
@@ -542,6 +547,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putLong( dest, offset, 0 ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "longUnsafeFieldInitializer" ;
 	    }
@@ -555,6 +561,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putBoolean( dest, offset, false ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "booleanUnsafeFieldInitializer" ;
 	    }
@@ -568,6 +575,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putFloat( dest, offset, 0 ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "floatUnsafeFieldInitializer" ;
 	    }
@@ -581,33 +589,37 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putDouble( dest, offset, 0 ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "doubleUnsafeFieldInitializer" ;
 	    }
 	} ;
 
 	private UnsafeFieldCopier getPrimitiveFieldInitializer( Class<?> cls ) {
-	    if (cls.equals( byte.class ))
+	    if (cls.equals( byte.class )) {
 		return byteUnsafeFieldInitializer ;
-	    if (cls.equals( char.class ))
+            } else if (cls.equals( char.class )) {
 		return charUnsafeFieldInitializer ;
-	    if (cls.equals( short.class ))
+            } else if (cls.equals(short.class)) {
 		return shortUnsafeFieldInitializer ;
-	    if (cls.equals( int.class ))
+            } else if (cls.equals(int.class)) {
 		return intUnsafeFieldInitializer ;
-	    if (cls.equals( long.class ))
+            } else if (cls.equals(long.class)) {
 		return longUnsafeFieldInitializer ;
-	    if (cls.equals( boolean.class ))
-		return booleanUnsafeFieldInitializer ;
-	    if (cls.equals( float.class ))
-		return floatUnsafeFieldInitializer ;
-	    if (cls.equals( double.class ))
-		return doubleUnsafeFieldInitializer ;
-	    else
-		throw new IllegalArgumentException( "cls must be a primitive type" ) ;
+            } else if (cls.equals(boolean.class)) {
+                return booleanUnsafeFieldInitializer;
+            } else if (cls.equals( float.class )) {
+                return floatUnsafeFieldInitializer;
+            } else if (cls.equals( double.class )) {
+                return doubleUnsafeFieldInitializer;
+            } else {
+                // XXX use Exceptions
+                throw new IllegalArgumentException(
+                    "cls must be a primitive type");
+            }
 	}
 
-	// The XXXUnsafeFieldCopier instances copy a field from source
+	// The YYYUnsafeFieldCopier instances copy a field from source
 	// to destination
 	private static UnsafeFieldCopier byteUnsafeFieldCopier = 
 	    new UnsafeFieldCopier( bridge ) {
@@ -618,6 +630,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putByte( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "byteUnsafeFieldCopier" ;
 	    }
@@ -632,6 +645,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putChar( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "charUnsafeFieldCopier" ;
 	    }
@@ -646,6 +660,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putShort( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "shortUnsafeFieldCopier" ;
 	    }
@@ -660,6 +675,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putInt( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "intUnsafeFieldCopier" ;
 	    }
@@ -674,6 +690,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putLong( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "longUnsafeFieldCopier" ;
 	    }
@@ -688,6 +705,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putBoolean( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "booleanUnsafeFieldCopier" ;
 	    }
@@ -702,6 +720,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putFloat( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "floatUnsafeFieldCopier" ;
 	    }
@@ -716,30 +735,39 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putDouble( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "doubleUnsafeFieldCopier" ;
 	    }
 	} ;
 
 	private UnsafeFieldCopier getPrimitiveFieldCopier( Class<?> cls ) {
-	    if (cls.equals( byte.class ))
-		return byteUnsafeFieldCopier ;
-	    if (cls.equals( char.class ))
-		return charUnsafeFieldCopier ;
-	    if (cls.equals( short.class ))
-		return shortUnsafeFieldCopier ;
-	    if (cls.equals( int.class ))
-		return intUnsafeFieldCopier ;
-	    if (cls.equals( long.class ))
-		return longUnsafeFieldCopier ;
-	    if (cls.equals( boolean.class ))
-		return booleanUnsafeFieldCopier ;
-	    if (cls.equals( float.class ))
-		return floatUnsafeFieldCopier ;
-	    if (cls.equals( double.class ))
-		return doubleUnsafeFieldCopier ;
-	    else
-		throw new IllegalArgumentException( "cls must be a primitive type" ) ;
+	    if (cls.equals( byte.class )) {
+                return byteUnsafeFieldCopier;
+            }
+	    if (cls.equals( char.class )) {
+                return charUnsafeFieldCopier;
+            }
+	    if (cls.equals( short.class )) {
+                return shortUnsafeFieldCopier;
+            }
+	    if (cls.equals( int.class )) {
+                return intUnsafeFieldCopier;
+            }
+	    if (cls.equals( long.class )) {
+                return longUnsafeFieldCopier;
+            }
+	    if (cls.equals( boolean.class )) {
+                return booleanUnsafeFieldCopier;
+            }
+	    if (cls.equals( float.class )) {
+                return floatUnsafeFieldCopier;
+            }
+	    if (cls.equals( double.class )) {
+                return doubleUnsafeFieldCopier;
+            }
+            // XXX use Exceptions
+            throw new IllegalArgumentException("cls must be a primitive type");
 	}
 	
 	// Various kinds of Object copiers
@@ -783,8 +811,8 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    }
 	    */
 
-	    private void noDebugCopy( Map oldToNew, long offset, Object src, 
-		Object dest ) throws ReflectiveCopyException
+	    private void noDebugCopy( Map<Object,Object> oldToNew, long offset,
+                Object src, Object dest ) throws ReflectiveCopyException
 	    {
 		Object obj = bridge.getObject( src, offset ) ;
 
@@ -802,8 +830,9 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putObject( dest, offset, result ) ;
 	    }
 
-	    public void copy( Map oldToNew, long offset, Object src, 
-		Object dest, boolean debug ) throws ReflectiveCopyException
+	    public void copy( Map<Object,Object> oldToNew, long offset,
+                Object src, Object dest, boolean debug )
+                throws ReflectiveCopyException
 	    {
 		/*
 		if (debug)
@@ -813,6 +842,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		    noDebugCopy( oldToNew, offset, src, dest ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "objectUnsafeFieldCopier" ;
 	    }
@@ -826,6 +856,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putObject( dest, offset, null ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "objectUnsafeFieldInitializer" ;
 	    }
@@ -839,6 +870,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putObject( dest, offset, src ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "objectUnsafeFieldSourceCopier" ;
 	    }
@@ -852,6 +884,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putObject( dest, offset, src ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "objectUnsafeFieldResultCopier" ;
 	    }
@@ -866,6 +899,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		bridge.putObject( dest, offset, value ) ;
 	    }
 
+            @Override
 	    public String toString() {
 		return "objectUnsafeFieldIdentityCopier" ;
 	    }
@@ -878,27 +912,31 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    Copy copyAnnotation = fld.getAnnotation( Copy.class ) ;
 
 	    if (copyAnnotation == null) {
-		if (fldType.isPrimitive()) 
-		    return getPrimitiveFieldCopier( fldType ) ;
-		else
-		    return objectUnsafeFieldCopier;
+		if (fldType.isPrimitive()) {
+                    return getPrimitiveFieldCopier(fldType);
+                } else {
+                    return objectUnsafeFieldCopier;
+                }
 	    } else {
 		switch (copyAnnotation.value()) {
 		    case RECURSE:
-			if (fldType.isPrimitive()) 
-			    return getPrimitiveFieldCopier( fldType ) ;
-			else
-			    return objectUnsafeFieldCopier;
+			if (fldType.isPrimitive()) {
+                            return getPrimitiveFieldCopier(fldType);
+                        } else {
+                            return objectUnsafeFieldCopier;
+                        }
 		    case IDENTITY:
-			if (fldType.isPrimitive()) 
-			    return getPrimitiveFieldCopier( fldType ) ;
-			else
-			    return objectUnsafeFieldIdentityCopier;
+			if (fldType.isPrimitive()) {
+                            return getPrimitiveFieldCopier(fldType);
+                        } else {
+                            return objectUnsafeFieldIdentityCopier;
+                        }
 		    case NULL:
-			if (fldType.isPrimitive()) 
-			    return getPrimitiveFieldInitializer( fldType ) ;
-			else
-			    return objectUnsafeFieldInitializer;
+			if (fldType.isPrimitive()) {
+                            return getPrimitiveFieldInitializer(fldType);
+                        } else {
+                            return objectUnsafeFieldInitializer;
+                        }
 		    case SOURCE:
 			if (fldType.isAssignableFrom(defType)) {
 			    return objectUnsafeFieldSourceCopier ;
@@ -944,9 +982,11 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    // ones we must copy.
 	    Field[] fields = cls.getDeclaredFields() ;
 	    int numFields = 0 ;
-	    for (int ctr=0; ctr<fields.length; ctr++)
-		if (fieldIsCopyable( fields[ctr] )) 
-		    numFields++ ;
+	    for (int ctr=0; ctr<fields.length; ctr++) {
+                if (fieldIsCopyable(fields[ctr])) {
+                    numFields++;
+                }
+            }
 
 	    fieldOffsets = new long[ numFields ] ;
 	    fieldCopiers = new UnsafeFieldCopier[ numFields ] ;
@@ -964,6 +1004,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    }
 	}
 	
+        @Override
 	public String toString() 
 	{
 	    StringBuilder sb = new StringBuilder() ;
@@ -1004,12 +1045,13 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	}
 	*/
 
-	public void noDebugCopy( Map oldToNew, Object source,
+	public void noDebugCopy( Map<Object,Object> oldToNew, Object source,
 	    Object result ) throws ReflectiveCopyException
 	{
-	    if (superCopier != null)
-		((ClassFieldCopierUnsafeImpl)superCopier).noDebugCopy( 
-		    oldToNew, source, result ) ;
+	    if (superCopier != null) {
+                ((ClassFieldCopierUnsafeImpl) superCopier).noDebugCopy(
+                    oldToNew, source, result);
+            }
 
 	    for (int ctr=0; ctr<fieldOffsets.length; ctr++ ) {
 		fieldCopiers[ctr].copy( oldToNew, fieldOffsets[ctr],
@@ -1017,7 +1059,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    }
 	}
 
-	public void copy( Map oldToNew, Object source, 
+	public void copy( Map<Object,Object> oldToNew, Object source,
 	    Object result, boolean debug ) throws ReflectiveCopyException 
 	{
 	    /* Commented out to avoid overhead of testing debug
@@ -1032,10 +1074,11 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 //******************************************************************************
 //******************************************************************************
 
-    private static Map classToConstructor = 
+    private static Map<Class<?>,Constructor<?>> classToConstructor =
 	DefaultClassCopierFactories.USE_FAST_CACHE ?
-	    new FastCache(new WeakHashMap()) :
-	    new WeakHashMap() ;
+	    new FastCache<Class<?>,Constructor<?>>(
+                new WeakHashMap<Class<?>,Constructor<?>>()) :
+	    new WeakHashMap<Class<?>,Constructor<?>>() ;
 
     /** Use bridge with code generated by codegen to copy objects.  
      * This method must be invoked
@@ -1046,7 +1089,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	final Class<?> cls, final PipelineClassCopierFactory classCopierFactory ) 
 	throws ReflectiveCopyException
     {
-	Constructor cons = (Constructor)classToConstructor.get( cls ) ;
+	Constructor<?> cons = classToConstructor.get( cls ) ;
 	if (cons == null) {
 	    final String className = "com.sun.corba.se.impl.generated.copiers." +
 		cls.getName() + "Copier" ;
@@ -1060,11 +1103,10 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		cons = copierClass.getDeclaredConstructor( 
 		    PipelineClassCopierFactory.class, ClassFieldCopier.class ) ;
 	    } catch (Exception exc) {
-		ReflectiveCopyException rce = new ReflectiveCopyException( 
-		    "Could not access unsafe codegen copier constructor" ) ;
-		rce.initCause( exc ) ;
-		throw rce ;
-	    } ;
+                // XXX use Exceptions
+		throw new ReflectiveCopyException(
+                    "Could not access unsafe codegen copier constructor", exc) ;
+	    } 
 
 	    classToConstructor.put( cls, cons ) ;
 	}
@@ -1077,10 +1119,9 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    Object[] args = new Object[] { classCopierFactory, superCopier } ;
 	    copier = (ClassFieldCopier)cons.newInstance( args ) ;
 	} catch (Exception exc) {
-	    ReflectiveCopyException rce = new ReflectiveCopyException( 
-		"Could not create unsafe codegen copier" ) ;
-	    rce.initCause( exc ) ;
-	    throw rce ;
+            // XXX use Exceptions
+	    throw new ReflectiveCopyException(
+                 "Could not create unsafe codegen copier", exc) ;
 	}
 	    
 	return copier ;
@@ -1098,7 +1139,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
     // The appropriate constructor for this class, as defined by Java 
     // serialization, or the default constructor if the class is not serializable.
-    private Constructor constructor ;		    
+    private Constructor<?> constructor ;
 
     // Null unless the class defines a readResolve() method.
     private Method readResolveMethod ;		    
@@ -1133,8 +1174,9 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
     }
 
     // Copy all of the non-static fields from source to dest, starting with 
-    // java.lang.Object.  
-    public Object doCopy( Map oldToNew, Object source, 
+    // java.lang.Object.
+    @Override
+    public Object doCopy( Map<Object,Object> oldToNew, Object source,
 	Object result, boolean debug ) throws ReflectiveCopyException
     {
 	if (source instanceof CopyInterceptor) {

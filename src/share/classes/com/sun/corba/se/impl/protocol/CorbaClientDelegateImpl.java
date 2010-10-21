@@ -533,7 +533,6 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     @Override
     @IsLocal
     public boolean is_local(org.omg.CORBA.Object self) {
-	// XXX this needs to check isNextCallValid
         return contactInfoList.getEffectiveTargetIOR().getProfile().
 	    isLocal();
     }
@@ -554,7 +553,6 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 	    .servant_postinvoke(self, servant);
     }
     
-    // XXX Should this be public?
     /* Returns the codebase for object reference provided.
      * @param self the object reference whose codebase needs to be returned.
      * @return the codebase as a space delimited list of url strings or

@@ -444,4 +444,8 @@ public interface POASystemException {
     @Log( level=LogLevel.WARNING, id=5 )
     @Message( "POA has been destroyed" )
     OBJECT_NOT_EXIST adapterDestroyed(  ) ;
+
+    @Log( level=LogLevel.FINE, id=1 )
+    @Message( "waitGuard was interrupted" )
+    UNKNOWN waitGuardInterrupted();
 }

@@ -292,6 +292,11 @@
 	    <arg file="${findbugs.exclude.file}"/>
 	    <arg value="-sourcepath"/>
 	    <arg path="${src.dir}:${orblib.src.dir}:${test.src.dir}"/>
+            <arg file="${gmbal-jar}"/>
+            <arg file="${management-api-jar}"/>
+            <arg file="${gmbal-jar}"/>
+            <arg file="${libcache.dir}/org.osgi.core.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>

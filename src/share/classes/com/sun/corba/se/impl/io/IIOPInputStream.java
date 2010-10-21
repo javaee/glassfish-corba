@@ -1253,7 +1253,6 @@ public class IIOPInputStream
     }
 
     @InfoMethod
-    // XXX see displayFVD
     private void fullValueDescriptorsInfo( List<FullValueDescription>  fvds ) { }
 
     // This retrieves a vector of FVD's for the hierarchy of serializable 
@@ -1285,7 +1284,7 @@ public class IIOPInputStream
         return descs;
     }
 
-    // XXX Do we want to replace this with something integrated with the 
+    // TODO Do we want to replace this with something integrated with the
     // tracing facility?
     // Interesting question.  The full display of an FVD is likely to be
     // valuable for debugging FVD issues (which we haven't had in >10 years),

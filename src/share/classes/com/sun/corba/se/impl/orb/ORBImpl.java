@@ -162,7 +162,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.copyobject.CopierManagerImpl;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
-import com.sun.corba.se.spi.orbutil.concurrent.ResourceFactory;
+import com.sun.corba.se.spi.orbutil.generic.ResourceFactory;
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.OrbLifeCycle;

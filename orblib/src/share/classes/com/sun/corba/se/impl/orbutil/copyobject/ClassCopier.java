@@ -57,10 +57,10 @@ public interface ClassCopier {
      * source.  This may occur in some implementations, depending
      * on the mechanism used to copy the class.
      */
-    Object copy( Map oldToNew, 
+    Object copy( Map<Object,Object> oldToNew,
 	Object source ) throws ReflectiveCopyException  ;
 
-    Object copy( Map oldToNew, 
+    Object copy( Map<Object,Object> oldToNew,
 	Object source, boolean debug ) throws ReflectiveCopyException  ;
 
     /** We need to know whether this class copier operates via reflection

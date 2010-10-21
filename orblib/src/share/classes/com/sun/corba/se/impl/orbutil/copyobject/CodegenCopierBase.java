@@ -43,8 +43,6 @@ package com.sun.corba.se.impl.orbutil.copyobject;
 
 import java.util.Map ;
 
-import java.security.AccessController ;
-import java.security.PrivilegedAction ;
 import java.security.Permission ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
@@ -72,13 +70,14 @@ public abstract class CodegenCopierBase
     public CodegenCopierBase( PipelineClassCopierFactory factory )
     {
 	SecurityManager sman = System.getSecurityManager() ;
-	if (sman != null)
-	    sman.checkPermission( getBridgePermission ) ;
+	if (sman != null) {
+            sman.checkPermission(getBridgePermission);
+        }
 
 	this.factory = factory ;
     }
 
-    final protected void copyObject( Map oldToNew, 
+    final protected void copyObject( Map<Object,Object> oldToNew,
 	long offset, Object src, Object dest ) 
 	throws ReflectiveCopyException
     {

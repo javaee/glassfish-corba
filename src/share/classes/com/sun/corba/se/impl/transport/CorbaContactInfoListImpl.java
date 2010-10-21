@@ -113,7 +113,6 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     // ClientGroupManager decides to update the iterator, which is only
     // supposed to happen when the cluster shape changes.  Unfortunately it
     // is happening on EVERY REQUEST, at least in the Argela test.
-    // XXX Fix the wrong behavior and remove this hack!
     public static void setSkipRotate() {
         skipRotate.set( true ) ;
     }
@@ -139,13 +138,13 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
             display( "startCount", startCount ) ;
             LinkedList<CorbaContactInfo> tempList = null ; 
 
-            // XXX  This may be the best way to support PRLB for now.
+            // This may be the best way to support PRLB for now.
             // The GIS will return types like "iiop-listener-1", but we also get
             // IIOP_CLEAR_TEXT for some, for both SSL and non-SSL ports.  Invoking
             // clear on an SSL port leads to bad failures that are not retryable.
             tempList = new LinkedList<CorbaContactInfo>( filter( arg, testPred ) ) ;
 
-            // XXX Really should just be this:
+            // Really should just be this:
             // tempList = new LinkedList<CorbaContactInfo>( arg ) ;
 
             if (startCount >= tempList.size()) {
@@ -187,7 +186,6 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 
         /* This doesn't work due to some strange behavior in FOLB: we are getting far
          * too many IOR updates.  Updates are received even when the cluster shape has not changed.
-         * XXX This should be found and fixed at some point.
          */
         /*
         if (usePerRequestLoadBalancing) {

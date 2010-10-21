@@ -60,7 +60,6 @@ import com.sun.corba.se.impl.ior.StubIORImpl ;
 import com.sun.corba.se.impl.util.RepositoryId ;
 import com.sun.corba.se.impl.util.JDKBridge ;
 
-// XXX Do we need _get_codebase?
 public class DynamicStubImpl extends ObjectImpl 
     implements DynamicStub, Serializable
 {
@@ -153,7 +152,7 @@ public class DynamicStubImpl extends ObjectImpl
 	try {
 	    cls = JDKBridge.loadClass( cname, null, null ) ;
 	} catch (ClassNotFoundException exc) {
-	    // XXX log this
+            Exceptions.self.readResolveClassNotFound( exc, cname ) ;
 	}
 
 	PresentationManager pm = 

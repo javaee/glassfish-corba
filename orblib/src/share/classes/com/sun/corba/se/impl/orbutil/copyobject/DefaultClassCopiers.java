@@ -42,7 +42,6 @@ package com.sun.corba.se.impl.orbutil.copyobject;
 
 import java.util.Map ;
 import java.util.Iterator ;
-import java.util.IdentityHashMap ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 
@@ -109,18 +108,20 @@ public abstract class DefaultClassCopiers
 		}
 	    }
 
-	    private Object myCopy( Map oldToNew, 
+	    private Object myCopy( Map<Object,Object> oldToNew,
 		Object obj ) throws ReflectiveCopyException
 	    {
-		if (obj == null)
-		    return null ;
+		if (obj == null) {
+                    return null;
+                }
 
 		Class cls = obj.getClass() ;
 		ClassCopier copier = ccf.getClassCopier( cls ) ;
 		return copier.copy( oldToNew, obj ) ;
 	    }
 
-	    public Object doCopy( Map oldToNew, 
+            @Override
+	    public Object doCopy( Map<Object,Object> oldToNew,
 		Object source, Object result, boolean debug ) throws ReflectiveCopyException
 	    {
 		Map sourceMap = (Map)source ;

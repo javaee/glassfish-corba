@@ -40,13 +40,8 @@
 
 package com.sun.corba.se.impl.orbutil.copyobject;
 
-import java.util.Map ;
-import java.util.HashMap ;
 import java.util.LinkedHashMap ;
-import java.util.TreeMap ;
-import java.util.Hashtable ;
 import java.util.IdentityHashMap ;
-import java.util.Properties ;
 
 import java.lang.reflect.Field ;
 import java.lang.reflect.Method ;
@@ -55,6 +50,14 @@ import java.lang.reflect.Constructor ;
 import java.security.AccessControlContext ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /** A factory used for creating ClassCopier instances.
  * An instance of this factory can be created and customized to
@@ -84,16 +87,15 @@ public class ClassCopierFactoryPipelineImpl implements
     // never be copied reflectively.  This is an optimization,
     // as these would also be picked up in DefaultClassCopierFactory
     // in the internal notCopyable method.
-    private Class[] notCopyable = new Class[] {
+    private static final Class<?>[] notCopyable = new Class<?>[] {
 	Thread.class, 
 	ThreadGroup.class, 
 	ProcessBuilder.class,
-        LinkedHashMap.class     // recursive copy may lead to stack overflow: bug 6917814
     } ;
 
     // List of some immutable classes that are copied simply
     // with the identity copier.
-    private Class[] immutable = new Class[] {
+    private static final Class<?>[] immutable = new Class<?>[] {
 	Process.class,
 	Class.class,
 	ClassLoader.class,
@@ -117,6 +119,20 @@ public class ClassCopierFactoryPipelineImpl implements
 	Boolean.class 
     } ;
 
+    private static final Class<?>[] mapClasses = {
+        ConcurrentHashMap.class,
+        ConcurrentSkipListMap.class,
+        EnumMap.class,
+        HashMap.class,
+        Hashtable.class,
+        IdentityHashMap.class,
+        LinkedHashMap.class,
+        Properties.class,
+        TreeMap.class,
+        WeakHashMap.class
+    } ;
+
+
     private CachingClassCopierFactory cacheFactory ;
     private ClassCopierFactory specialFactory ;
     private ClassCopierFactory arrayFactory ;
@@ -136,29 +152,39 @@ public class ClassCopierFactoryPipelineImpl implements
 	errorCopier = DefaultClassCopiers.getErrorClassCopier() ;
 
 	// Register Immutables
-	for (Class cls : immutable)
-	    registerImmutable( cls ) ;
+	for (Class<?> cls : immutable) {
+            registerImmutable(cls);
+        }
 
 	ClassCopier mapCopier = 
 	    DefaultClassCopiers.makeMapClassCopier( this ) ;
 	
-	// Identity hash map can never be copied by reflection, due
+	// Note that the identity hash map can never be copied by reflection, due
 	// to the identity equality semantics required by NULL_KEY.
 	// This also means that no subclass can ever be copied by
-	// reflection.
-	cacheFactory.put( IdentityHashMap.class, mapCopier ) ;
+	// reflection.  
+        // 
+        // Another problem is that Linked classes (like LinkedHashMap) can
+        // cause stack overflow if analyzed reflectively (issue 13996),
+        // so make sure that LinkedHashMap is copied this way as well.
+        for (Class<?> cls : mapClasses) {
+            cacheFactory.put( cls, mapCopier ) ;
+        }
 
 	// Make sure that all non-copyable classes have the error
 	// copier in the cache.
-	for (Class cls : notCopyable)
-	    cacheFactory.put( cls, errorCopier ) ;
+	for (Class<?> cls : notCopyable) {
+            cacheFactory.put(cls, errorCopier);
+        }
     }
 
     public boolean reflectivelyCopyable( Class<?> cls ) 
     {
-	for (Class<?> cl : notCopyable)
-	    if (cls == cl)
-		return false ;
+	for (Class<?> cl : notCopyable) {
+            if (cls == cl) {
+                return false;
+            }
+        }
 
 	return true ;
     }
@@ -166,7 +192,7 @@ public class ClassCopierFactoryPipelineImpl implements
     /** Look for cls only in the cache; do not create a ClassCopier
      * if there isn't one already in the cache.
      */
-    public ClassCopier lookupInCache( Class cls ) {
+    public ClassCopier lookupInCache( Class<?> cls ) {
 	try {
 	    // TIME enter_lookupInCache
 	    return cacheFactory.getClassCopier( cls ) ;
@@ -180,7 +206,7 @@ public class ClassCopierFactoryPipelineImpl implements
     /** Register an immutable class, so that it will not be copied, but just
      * passed by reference.
      */
-    public synchronized void registerImmutable( Class cls ) {
+    public synchronized final void registerImmutable( Class<?> cls ) {
 	cacheFactory.put( cls, DefaultClassCopiers.getIdentityClassCopier() ) ;
     }
 
@@ -197,29 +223,32 @@ public class ClassCopierFactoryPipelineImpl implements
      */
     public synchronized ClassCopier getClassCopier( 
 	// TIME enter_getClassCopier
-	Class cls ) throws ReflectiveCopyException {
-	if (cls.isInterface())
-	    // XXX log this
-	    throw new IllegalArgumentException( 
-		"Cannot create a ClassCopier for an interface." ) ;
+	Class<?> cls ) throws ReflectiveCopyException {
+	if (cls.isInterface()) {
+            // XXX use Exceptions class here
+            throw new IllegalArgumentException("Cannot create a ClassCopier for an interface.");
+        }
 
 	ClassCopier result = cacheFactory.getClassCopier( cls ) ;
 	if (result == null) {
 	    // New for Java SE 5.0: all Enums are immutable.
 	    // We'll figure that out here and cache the result.
-	    if (Enum.class.isAssignableFrom(cls))
-		result = DefaultClassCopiers.getIdentityClassCopier() ;
-	    if (result == null)
-		result = specialFactory.getClassCopier( cls ) ;
-	    if (result == null)
-		result = arrayFactory.getClassCopier( cls ) ;
-	    if (result == null)
-		result = ordinaryFactory.getClassCopier( cls ) ;
-	    if (result == null)
-		// result should never be null: throw exception if it is.
-		// XXX log this
-		throw new IllegalStateException( "Could not find ClassCopier for " +
-		    cls.getClass() ) ;
+	    if (Enum.class.isAssignableFrom(cls)) {
+                result = DefaultClassCopiers.getIdentityClassCopier();
+            }
+	    if (result == null) {
+                result = specialFactory.getClassCopier(cls);
+            }
+	    if (result == null) {
+                result = arrayFactory.getClassCopier(cls);
+            }
+	    if (result == null) {
+                result = ordinaryFactory.getClassCopier(cls);
+            }
+	    if (result == null) {
+                // XXX use Exceptions
+                throw new IllegalStateException("Could not find ClassCopier for " + cls.getClass());
+            }
 
 	    // Result was not cached, so update the cache
 	    cacheFactory.put( cls, result ) ;

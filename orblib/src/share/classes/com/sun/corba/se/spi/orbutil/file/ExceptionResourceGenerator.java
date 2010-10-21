@@ -39,13 +39,13 @@
  */
 
 
-package com.sun.corba.se.spi.orbutil.logex;
+package com.sun.corba.se.spi.orbutil.file;
 
 import com.sun.corba.se.spi.orbutil.argparser.ArgParser;
 import com.sun.corba.se.spi.orbutil.argparser.DefaultValue;
 import com.sun.corba.se.spi.orbutil.argparser.Help;
-import com.sun.corba.se.spi.orbutil.file.FileWrapper;
-import com.sun.corba.se.spi.orbutil.file.Scanner;
+import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
+import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;

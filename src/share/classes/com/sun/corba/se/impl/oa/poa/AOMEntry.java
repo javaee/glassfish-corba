@@ -165,8 +165,7 @@ public class AOMEntry extends FSMImpl {
 	    try {
 		entry.wait.await() ;
 	    } catch (InterruptedException exc) {
-		// XXX Log this
-		// NO-OP
+                wrapper.waitGuardInterrupted() ;
 	    }
 
 	    return Guard.Result.DEFERRED ;

@@ -40,9 +40,6 @@
 
 package com.sun.corba.se.impl.orbutil.copyobject ;
 
-import java.util.Map ;
-import java.util.HashMap ;
-
 /** A version of a ClassCopierFactory that implements caching, and so
  * needs a way to update the cache.
  */
@@ -55,5 +52,5 @@ public interface CachingClassCopierFactory extends ClassCopierFactory
      * ClassLoaders in memory.  Consequently entries in the cache
      * MAY silently disappear.
      */
-    public void put( Class cls, ClassCopier copier ) ;
+    public void put( Class<?> cls, ClassCopier copier ) ;
 }

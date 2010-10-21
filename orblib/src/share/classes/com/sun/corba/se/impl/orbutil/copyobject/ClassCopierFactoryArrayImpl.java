@@ -40,10 +40,6 @@
 
 package com.sun.corba.se.impl.orbutil.copyobject;
 
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.WeakHashMap ;
-import java.util.HashMap ;
 import java.util.Map ;
 
 import java.lang.reflect.Array ;
@@ -81,7 +77,8 @@ public class ClassCopierFactoryArrayImpl implements ClassCopierFactory {
 		return result ;
 	    }
 
-	    public Object doCopy( Map oldToNew, Object source, 
+            @Override
+	    public Object doCopy( Map<Object,Object> oldToNew, Object source,
 		Object result, boolean debug ) throws ReflectiveCopyException 
 	    {
 		int alen = Array.getLength( source ) ;
@@ -183,34 +180,43 @@ public class ClassCopierFactoryArrayImpl implements ClassCopierFactory {
 	    } 
 	} ;
 
-    public ClassCopier getClassCopier( Class cls )
+    public ClassCopier getClassCopier( Class<?> cls )
     {
-	Class compType = cls.getComponentType() ;
+	Class<?> compType = cls.getComponentType() ;
 
-	if (compType == null)
-	    return null ;
+	if (compType == null) {
+            return null;
+        }
 
 	if (compType.isPrimitive()) {
 	    // The primitives could be pre-registered in the cache, but
 	    // I like having the handling of all arrays grouped together
 	    // in the same place.  The result is basically lazy initialization
 	    // of the ClassCopierFactoryCachingImpl instance.
-	    if (compType == boolean.class)
-		return booleanArrayClassCopier ;
-	    if (compType == byte.class)
-		return byteArrayClassCopier ;
-	    if (compType == char.class)
-		return charArrayClassCopier ;
-	    if (compType == short.class)
-		return shortArrayClassCopier ;
-	    if (compType == int.class)
-		return intArrayClassCopier ;
-	    if (compType == long.class)
-		return longArrayClassCopier ;
-	    if (compType == float.class)
-		return floatArrayClassCopier ;
-	    if (compType == double.class)
-		return doubleArrayClassCopier ;
+	    if (compType == boolean.class) {
+                return booleanArrayClassCopier;
+            }
+	    if (compType == byte.class) {
+                return byteArrayClassCopier;
+            }
+	    if (compType == char.class) {
+                return charArrayClassCopier;
+            }
+	    if (compType == short.class) {
+                return shortArrayClassCopier;
+            }
+	    if (compType == int.class) {
+                return intArrayClassCopier;
+            }
+	    if (compType == long.class) {
+                return longArrayClassCopier;
+            }
+	    if (compType == float.class) {
+                return floatArrayClassCopier;
+            }
+	    if (compType == double.class) {
+                return doubleArrayClassCopier;
+            }
 
 	    // XXX log an internal error
 	    return null ;

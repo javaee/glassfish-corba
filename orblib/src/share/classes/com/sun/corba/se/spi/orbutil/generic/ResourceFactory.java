@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.concurrent;
+package com.sun.corba.se.spi.orbutil.generic;
 
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction;
 

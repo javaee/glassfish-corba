@@ -112,26 +112,12 @@ public class CorbaServerRequestDispatcherImpl
 
     protected ORB orb; // my ORB instance
 
-    // Added from last version because it broke the build - RTW
-    // XXX remove me and rebuild: probably no longer needed
-    // public static final int UNKNOWN_EXCEPTION_INFO_ID = 9;
-
     public CorbaServerRequestDispatcherImpl(ORB orb) 
     {
 	this.orb = orb;
     }
 
-    /** XXX/REVISIT: 
-     * We do not want to look for a servant in the POA/ServantManager case,
-     * but we could in most other cases.  The OA could have a method that
-     * returns true if the servant MAY exist, and false only if the servant
-     * definitely DOES NOT exist.
-     *
-     * XXX/REVISIT:
-     * We may wish to indicate OBJECT_HERE by some mechanism other than
-     * returning a null result.
-     * 
-     * Called from ORB.locate when a LocateRequest arrives.
+    /** Called from ORB.locate when a LocateRequest arrives.
      * Result is not always absolutely correct: may indicate OBJECT_HERE
      * for non-existent objects, which is resolved on invocation.  This
      * "bug" is unavoidable, since in general the object may be destroyed

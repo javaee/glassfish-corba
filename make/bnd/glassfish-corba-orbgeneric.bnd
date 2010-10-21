@@ -1,3 +1,3 @@
 -include bnd.properties
-Export-Package: com.sun.corba.se.spi.orbutil.generic, com.sun.corba.se.spi.orbutil.closure, com.sun.corba.se.spi.orbutil.proxy, com.sun.corba.se.impl.orbutil.graph, com.sun.corba.se.spi.orbutil.fsm, com.sun.corba.se.spi.orbutil.misc, com.sun.corba.se.spi.orbutil.logex, com.sun.corba.se.spi.orbutil.threadpool, com.sun.corba.se.impl.orbutil.threadpool
+Export-Package: com.sun.corba.se.spi.orbutil.generic, com.sun.corba.se.spi.orbutil.closure, com.sun.corba.se.spi.orbutil.proxy, com.sun.corba.se.impl.orbutil.graph, com.sun.corba.se.spi.orbutil.fsm, com.sun.corba.se.spi.orbutil.misc, com.sun.corba.se.spi.orbutil.logex, com.sun.corba.se.spi.orbutil.logex.corba, com.sun.corba.se.spi.orbutil.threadpool, com.sun.corba.se.impl.orbutil.threadpool
 Private-Package: com.sun.corba.se.impl.orbutil.closure

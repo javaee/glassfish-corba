@@ -74,21 +74,28 @@ public abstract class ClassCopierBase implements ClassCopier {
     // Implement hashCode() to satisfy the general contracts of equals and
     // hash.
 
+    @Override
     public final String toString()
     {
 	return "ClassCopier[" + name + "]" ;
     }
 
+    @Override
     public final int hashCode()
     {
 	return name.hashCode() ;
     }
 
+    @Override
     public final boolean equals( Object obj )
     {
-	if (this == obj) return true ;
+	if (this == obj) {
+            return true;
+        }
 
-	if (!(obj instanceof ClassCopierBase)) return false ;
+	if (!(obj instanceof ClassCopierBase)) {
+            return false;
+        }
 
 	ClassCopierBase other = (ClassCopierBase)obj ;
 
@@ -110,13 +117,13 @@ public abstract class ClassCopierBase implements ClassCopier {
      * and then do the copy, as otherwise self-references would cause 
      * infinite recursion.
      */
-    public final Object copy( Map oldToNew, 
+    public final Object copy( Map<Object,Object> oldToNew,
 	Object source ) throws ReflectiveCopyException 
     {
 	return copy( oldToNew, source, false ) ;
     }
 
-    public final Object copy( Map oldToNew, 
+    public final Object copy( Map<Object,Object> oldToNew,
 	Object source, boolean debug ) throws ReflectiveCopyException
     {
 	Object result = oldToNew.get( source ) ;
@@ -151,7 +158,7 @@ public abstract class ClassCopierBase implements ClassCopier {
      * in a subclass.  When this method completes, result must be fully
      * initialized.
      */
-    protected Object doCopy( Map oldToNew, 
+    protected Object doCopy( Map<Object,Object> oldToNew,
 	Object source, Object result, boolean debug ) throws ReflectiveCopyException
     {
 	return result ;

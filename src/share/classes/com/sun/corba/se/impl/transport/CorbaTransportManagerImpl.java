@@ -129,7 +129,7 @@ public class CorbaTransportManagerImpl
 			    new CorbaOutboundConnectionCacheImpl(orb,
 								 contactInfo);
 
-                        // XXX We need to clean up the multi-cache support:
+                        // We need to clean up the multi-cache support:
                         // this really only works with a single cache.
                         orb.mom().register( this, connectionCache ) ;
                         StatsProviderManager.register( "orb", PluginPoint.SERVER,
@@ -314,18 +314,15 @@ public class CorbaTransportManagerImpl
 	    if (msg.getGIOPVersion().equals( GIOPVersion.V1_2 ))
 		((Message_1_2)msg).unmarshalRequestID( msg.getByteBuffer() ) ; 
 	    
-	    // XXX Check that moreFragments == (ctr < messages.length)
+	    // Check that moreFragments == (ctr < messages.length)?
 
 	    if (ctr==0) {
-		// XXX Check that we have a request or reply
-		// only if Message_1_2: requestID = msg.getRequestID() ;
 		firstMessage = msg ;
 		inobj = new CDRInputObject( orb, connection,
 		    msg.getByteBuffer(), msg ) ;
 		buffman = inobj.getBufferManager() ;
 		inobj.performORBVersionSpecificInit() ;
 	    } else {
-		// XXX Check that the request ID is as expected
 		buffman.processFragment( msg.getByteBuffer(), (FragmentMessage)msg ) ;
 	    }
 	}

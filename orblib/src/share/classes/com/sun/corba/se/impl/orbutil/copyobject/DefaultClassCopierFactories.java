@@ -69,7 +69,7 @@ public abstract class DefaultClassCopierFactories
 	return new ClassCopierFactoryArrayImpl( ccf ) ;
     }
 
-    private static final Class[] SAFE_TO_COPY = new Class[] {
+    private static final Class<?>[] SAFE_TO_COPY = new Class<?>[] {
 	java.util.TimeZone.class,
 	java.lang.Throwable.class,
 	java.lang.reflect.Proxy.class
@@ -80,7 +80,7 @@ public abstract class DefaultClassCopierFactories
     {
 	return new ClassCopierFactory() 
 	{
-	    public ClassCopier getClassCopier( Class cls ) throws ReflectiveCopyException
+	    public ClassCopier getClassCopier( Class<?> cls ) throws ReflectiveCopyException
 	    {
 		if (notCopyable( cls )) {
 		    return DefaultClassCopiers.getErrorClassCopier() ;
@@ -114,8 +114,9 @@ public abstract class DefaultClassCopierFactories
 	    private boolean notCopyable( Class<?> cls ) {
 		Class<?> current = cls ;
 		while (current != Object.class) {
-		    if (safe(current))
-			return false ;
+		    if (safe(current)) {
+                        return false;
+                    }
 
 		    for (Method m : current.getDeclaredMethods() ) {
 			if ((m.getName().equals( "finalize" )) ||
@@ -137,18 +138,19 @@ public abstract class DefaultClassCopierFactories
 	return new CachingClassCopierFactory() 
 	{
 	    // private Map cache = new WeakHashMap() ;
-	    private Map cache = USE_FAST_CACHE ? 
-		new FastCache( new WeakHashMap() ) :
-		new WeakHashMap() ;
+	    private Map<Class<?>,ClassCopier> cache = USE_FAST_CACHE ?
+		new FastCache<Class<?>,ClassCopier>(
+                    new WeakHashMap<Class<?>,ClassCopier>() ) :
+		new WeakHashMap<Class<?>,ClassCopier>() ;
 
-	    public void put( Class cls, ClassCopier copier ) 
+	    public void put( Class<?> cls, ClassCopier copier )
 	    {
 		cache.put( cls, copier ) ;
 	    }
 
-	    public ClassCopier getClassCopier( Class cls )
+	    public ClassCopier getClassCopier( Class<?> cls )
 	    {
-		return (ClassCopier)cache.get( cls ) ;
+		return cache.get(cls) ;
 	    }
 	};
     }

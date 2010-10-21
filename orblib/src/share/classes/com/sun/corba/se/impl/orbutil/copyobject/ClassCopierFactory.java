@@ -51,5 +51,5 @@ public interface ClassCopierFactory {
      * Note that it is an error to pass an interface for cls, as interfaces
      * have no state and no constructors, and hence cannot be copied.
      */
-    ClassCopier getClassCopier( Class cls ) throws ReflectiveCopyException ;
+    ClassCopier getClassCopier( Class<?> cls ) throws ReflectiveCopyException ;
 }

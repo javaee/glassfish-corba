@@ -367,7 +367,8 @@ public class CorbaContactInfoListIteratorImpl
 
         // Ugly hack for Argela: avoid rotating the iterator in this case,
         // or we rotate the iterator twice on every request.
-        // XXX remove this hack once we figure out why we get all of the
+        //
+        // Remove this hack once we figure out why we get all of the
         // membership changes when the cluster shape does not change.
         CorbaContactInfoListImpl.setSkipRotate() ;
 

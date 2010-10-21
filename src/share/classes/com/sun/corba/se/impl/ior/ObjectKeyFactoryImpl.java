@@ -103,7 +103,7 @@ public class ObjectKeyFactoryImpl implements ObjectKeyFactory
 	this.orb = orb ;
     }
    
-    // XXX The handlers still need to be made pluggable.
+    // The handlers still need to be made pluggable.
     //
     // I think this can be done as follows:
     // 1. Move the Handler interface into the SPI as ObjectKeyHandler.

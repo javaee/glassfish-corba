@@ -86,7 +86,8 @@ public class WorkspaceRename {
     } ;
 
     private static final String[] IGNORE_SUFFIXES = {
-	"swo", "swp", "class", "o", "gz"
+	"swo", "swp", "class", "o", "gz", "odt", "pdf", "sxw", "png", "gif", "jpg", "odp", "sxi",
+	"fm", "doc", "zargo"
     } ;
 
     private static final String[] IGNORE_NAMES = {

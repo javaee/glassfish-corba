@@ -293,7 +293,7 @@
 
     <target name="generate-orb-resources"
      depends="init, orb-library, compile">
-	<java classname="com.sun.corba.se.spi.orbutil.logex.ExceptionResourceGenerator"
+	<java classname="com.sun.corba.se.spi.orbutil.file.ExceptionResourceGenerator"
             fork="true"
             classpathref="classpath.master"
 	    dir="${root.dir}">

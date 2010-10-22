@@ -46,7 +46,7 @@ import com.sun.corba.se.spi.orbutil.logex.Log;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel;
 import com.sun.corba.se.spi.orbutil.logex.Message;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
-import com.sun.corba.se.spi.orbutil.logex.corba.StandardLogger;
+import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
 
 /** Exception wrapper class.  The logex WrapperGenerator uses this interface
  * to generate an implementation which returns the appropriate exception, and

@@ -84,13 +84,12 @@ import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.Bounds;
 import org.omg.CORBA.UNKNOWN;
 import org.omg.CORBA.portable.RemarshalException;
-import org.osgi.framework.Bundle;
 
 @ExceptionWrapper( idPrefix="IOP" )
 @ORBException( omgException=false, group=CorbaExtension.ORBUtilGroup )
 public interface ORBUtilSystemException {
-    ORBUtilSystemException self = WrapperGenerator.makeWrapper( 
-        ORBUtilSystemException.class, CorbaExtension.self ) ;
+    ORBUtilSystemException self = WrapperGenerator.makeWrapper(
+        ORBUtilSystemException.class,  CorbaExtension.self ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Adapter ID not available" )
@@ -324,16 +323,16 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=61 )
     @Message( "Bundle not found for class {0}" )
-    BAD_OPERATION classNotFoundInBundle( Object arg0 ) ;
+    BAD_OPERATION classNotFoundInBundle( String cname ) ;
     
     @Log( level=LogLevel.FINE, id=62 )
     @Message( "Class {0} found in bundle {1}" )
-    BAD_OPERATION foundClassInBundle( String arg0, Bundle arg1 ) ;
+    BAD_OPERATION foundClassInBundle( String cname, String bname ) ;
     
     @Log( level=LogLevel.FINE, id=63 )
     @Message( "Class {0} could not be loaded by bundle {1}" )
     BAD_OPERATION bundleCouldNotLoadClass( @Chain Exception exc,
-        String arg0, Bundle arg1 ) ;
+        String arg0, String arg1 ) ;
     
     @Log( level=LogLevel.FINE, id=64 )
     @Message( "Class {0} found in bundle {1} with version {2}" )

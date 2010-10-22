@@ -472,87 +472,97 @@ public class WrapperGenerator {
     public static <T> T makeWrapper( final Class<T> cls,
         final Extension extension ) {
 
-        // Must have an interface to use a Proxy.
-        if (!cls.isInterface()) {
-            throw new IllegalArgumentException( "Class " + cls +
-                "is not an interface" ) ;
-        }
+        try {
+            // Must have an interface to use a Proxy.
+            if (!cls.isInterface()) {
+                throw new IllegalArgumentException( "Class " + cls +
+                    "is not an interface" ) ;
+            }
 
-        final ExceptionWrapper ew = cls.getAnnotation( ExceptionWrapper.class ) ;
-        final String idPrefix = ew.idPrefix() ;
-        final String name = extension.getLoggerName( cls );
+            final ExceptionWrapper ew = cls.getAnnotation( ExceptionWrapper.class ) ;
+            final String idPrefix = ew.idPrefix() ;
+            final String name = extension.getLoggerName( cls );
 
-        InvocationHandler inh = new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args)
-                throws Throwable {
+            InvocationHandler inh = new InvocationHandler() {
+                public Object invoke(Object proxy, Method method, Object[] args)
+                    throws Throwable {
 
-                final Annotation[][] pannos = method.getParameterAnnotations() ;
-                final int chainIndex = findAnnotatedParameter( pannos,
-                    Chain.class ) ;
-                Throwable cause = null ;
-                final Object[] messageParams = getWithSkip( args, chainIndex ) ;
-                if (chainIndex >= 0) {
-                    cause = (Throwable)args[chainIndex] ;
-                }
-
-                // Get the logger with the resource bundle if it is available,
-                // otherwise without it.  This is needed because sometimes
-                // when we load a class to generate a .properties file, the
-                // ResourceBundle is (obviously!) not availabe, and a static
-                // initializer must initialize a log wrapper WITHOUT a
-                // ResourceBundle, in order to generate a properties file which
-                // implements the ResourceBundle.
-                Logger logger = null ;
-                try {
-                    logger = Logger.getLogger( name, name ) ;
-                } catch (MissingResourceException exc) {
-                    logger = Logger.getLogger( name ) ;
-                }
-
-                final Class<?> rtype = method.getReturnType() ;
-                final Log log = method.getAnnotation( Log.class ) ;
-
-                if (log == null) {
-                    if (!rtype.equals( String.class ) ) {
-                        throw new IllegalArgumentException(
-                            "No @Log annotation present on "
-                            + cls.getName() + "." + method.getName() ) ;
+                    final Annotation[][] pannos = method.getParameterAnnotations() ;
+                    final int chainIndex = findAnnotatedParameter( pannos,
+                        Chain.class ) ;
+                    Throwable cause = null ;
+                    final Object[] messageParams = getWithSkip( args, chainIndex ) ;
+                    if (chainIndex >= 0) {
+                        cause = (Throwable)args[chainIndex] ;
                     }
 
-                    return handleMessageOnly( method, extension, logger,
-                        messageParams ) ;
-                } else {
-                    return handleFullLogging( log, method, logger, idPrefix,
-                        messageParams, cause, extension ) ;
-                }
-            }
-        } ;
+                    // Get the logger with the resource bundle if it is available,
+                    // otherwise without it.  This is needed because sometimes
+                    // when we load a class to generate a .properties file, the
+                    // ResourceBundle is (obviously!) not availabe, and a static
+                    // initializer must initialize a log wrapper WITHOUT a
+                    // ResourceBundle, in order to generate a properties file which
+                    // implements the ResourceBundle.
+                    Logger logger = null ;
+                    try {
+                        logger = Logger.getLogger( name, name ) ;
+                    } catch (MissingResourceException exc) {
+                        logger = Logger.getLogger( name ) ;
+                    }
 
-        InvocationHandler inhmi = new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args)
-                throws Throwable {
+                    final Class<?> rtype = method.getReturnType() ;
+                    final Log log = method.getAnnotation( Log.class ) ;
 
-                if (method.getName().equals( "getMessageInfo")) {
-                    return getMessageMap( cls, extension ) ;
-                }
+                    if (log == null) {
+                        if (!rtype.equals( String.class ) ) {
+                            throw new IllegalArgumentException(
+                                "No @Log annotation present on "
+                                + cls.getName() + "." + method.getName() ) ;
+                        }
 
-                throw new RuntimeException( "Unexpected method " + method ) ;
-            }
-        } ;
-
-        final CompositeInvocationHandler cih =
-            new CompositeInvocationHandlerImpl() {
-                public String toString() {
-                    return "ExceptionWrapper[" + cls.getName() + "]" ;
+                        return handleMessageOnly( method, extension, logger,
+                            messageParams ) ;
+                    } else {
+                        return handleFullLogging( log, method, logger, idPrefix,
+                            messageParams, cause, extension ) ;
+                    }
                 }
             } ;
 
-        cih.addInvocationHandler( cls, inh ) ;
-        cih.addInvocationHandler( MessageInfo.class, inhmi) ;
+            InvocationHandler inhmi = new InvocationHandler() {
+                public Object invoke(Object proxy, Method method, Object[] args)
+                    throws Throwable {
 
-        // Load the Proxy using the same ClassLoader that loaded the interface
-        ClassLoader loader = cls.getClassLoader() ;
-        Class<?>[] classes = { cls, MessageInfo.class } ;
-        return (T)Proxy.newProxyInstance(loader, classes, cih ) ;
+                    if (method.getName().equals( "getMessageInfo")) {
+                        return getMessageMap( cls, extension ) ;
+                    }
+
+                    throw new RuntimeException( "Unexpected method " + method ) ;
+                }
+            } ;
+
+            final CompositeInvocationHandler cih =
+                new CompositeInvocationHandlerImpl() {
+                    public String toString() {
+                        return "ExceptionWrapper[" + cls.getName() + "]" ;
+                    }
+                } ;
+
+            cih.addInvocationHandler( cls, inh ) ;
+            cih.addInvocationHandler( MessageInfo.class, inhmi) ;
+
+            // Load the Proxy using the same ClassLoader that loaded the interface
+            ClassLoader loader = cls.getClassLoader() ;
+            Class<?>[] classes = { cls, MessageInfo.class } ;
+            return (T)Proxy.newProxyInstance(loader, classes, cih ) ;
+        } catch (Throwable thr) {
+            // This method must NEVER throw an exception, because it is usually
+            // called from a static initializer, and uncaught exception in static
+            // initializers are VERY hard to debug.
+            Logger.getLogger( WrapperGenerator.class.getName()).log(Level.SEVERE, 
+                "Error in makeWrapper for " + cls, thr );
+
+            return null ;
+        }
     }
 }

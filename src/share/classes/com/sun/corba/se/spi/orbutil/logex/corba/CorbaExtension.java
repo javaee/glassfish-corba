@@ -40,6 +40,7 @@
 
 package com.sun.corba.se.spi.orbutil.logex.corba ;
 
+import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
 import com.sun.corba.se.org.omg.CORBA.SUNVMCID;
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
 import com.sun.corba.se.spi.orbutil.logex.Log;

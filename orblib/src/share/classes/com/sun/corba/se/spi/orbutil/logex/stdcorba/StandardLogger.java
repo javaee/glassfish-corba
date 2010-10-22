@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.corba.se.spi.orbutil.logex.corba;
+package com.sun.corba.se.spi.orbutil.logex.stdcorba;
 
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;

@@ -148,13 +148,14 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                 wrapper.classNotFoundInBundle( arg ) ;
                 return null ;
             } else {
-                wrapper.foundClassInBundle( arg, bundle ) ;
+                wrapper.foundClassInBundle( arg, bundle.getSymbolicName() ) ;
             }
 
             try {
                 return bundle.loadClass(arg);
             } catch (ClassNotFoundException ex) {
-                throw wrapper.bundleCouldNotLoadClass( ex, arg, bundle ) ;
+                throw wrapper.bundleCouldNotLoadClass( ex, arg, 
+                    bundle.getSymbolicName() ) ;
             }
         }
 
@@ -185,7 +186,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
             Bundle bundle = pkgAdmin.getBundle( cls ) ;
             if (bundle == null) {
-                wrapper.classNotFoundInBundle( cls ) ;
+                wrapper.classNotFoundInBundle( cls.getName() ) ;
                 return null ;
             }
             

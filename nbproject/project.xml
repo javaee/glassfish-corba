@@ -298,7 +298,9 @@
             </compilation-unit>
         </java-data>
         <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
-            <module name="org-netbeans-modules-editor-indent"/>
+            <module name="org-nbheaven-sqe-codedefects-core">
+                <property name="run-provider-checkstyle" value="false"/>
+            </module>
         </preferences>
     </configuration>
 </project>

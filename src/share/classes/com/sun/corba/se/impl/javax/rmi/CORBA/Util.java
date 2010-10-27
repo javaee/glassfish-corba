@@ -53,7 +53,6 @@ import java.rmi.UnexpectedException;
 
 import java.rmi.server.RMIClassLoader;
 
-import java.util.Enumeration;
 import java.util.WeakHashMap;
 
 import java.io.Serializable;
@@ -128,7 +127,7 @@ import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Provides utility methods that can be used by stubs and ties to
@@ -140,7 +139,8 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     private static KeepAlive keepAlive = null;
 
     // Maps targets to ties.
-    private static final IdentityHashMap exportedServants = new IdentityHashMap();
+    private static final IdentityHashMap<Remote,Tie> exportedServants =
+        new IdentityHashMap<Remote,Tie>();
 
     private static ValueHandler valueHandlerSingleton;          
 
@@ -191,10 +191,13 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     // particular ORB.  This happens during ORB shutdown.
     public void unregisterTargetsForORB(org.omg.CORBA.ORB orb) 
     {
-        for (Iterator e = exportedServants.keySet().iterator(); e.hasNext(); )
-	{
-            java.lang.Object key = e.next();
-            Remote target = (Remote)(key instanceof Tie ? ((Tie)key).getTarget() : key);
+        // Copy exportedServants set we don't get a 
+        // ConcurrentModificationException.
+        Map<Remote,Tie> copy =
+            new IdentityHashMap<Remote,Tie>( exportedServants ) ;
+
+        for (Remote key : copy.keySet() ) {
+            Remote target = key instanceof Tie ? ((Tie)key).getTarget() : key ;
 
             // Bug 4476347: BAD_OPERATION is thrown if the ties delegate isn't set.
             // We can ignore this because it means the tie is not connected to an ORB.
@@ -511,7 +514,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
                     // Yes. Instantiate our keep-alive thread and start
                     // it up...
                     keepAlive = (KeepAlive)AccessController.doPrivileged(
-			new PrivilegedAction() {
+			new PrivilegedAction<Object>() {
 			    public java.lang.Object run() {
 				return new KeepAlive();
 			    }
@@ -579,7 +582,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
      */
     private static Tie lookupTie (Remote target) 
     {
-        Tie result = (Tie)exportedServants.get(target);
+        Tie result = exportedServants.get(target);
         if (result == null && target instanceof Tie) {
             if (exportedServants.containsKey(target)) {
                 result = (Tie)target;
@@ -726,7 +729,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
             throw new NullPointerException();
         }
 
-	Class compType = obj.getClass().getComponentType() ;
+	Class<?> compType = obj.getClass().getComponentType() ;
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( compType ) ;
 	if (cinfo.isARemote(compType) && cinfo.isInterface()) {
 	    // obj is an array of remote impl types.  This

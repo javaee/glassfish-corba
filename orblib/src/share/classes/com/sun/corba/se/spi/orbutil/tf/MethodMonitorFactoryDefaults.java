@@ -83,7 +83,7 @@ public class MethodMonitorFactoryDefaults {
             str = pkg + '.' ;
         }
 
-        prefixTable.put( pkg, symbol ) ;
+        prefixTable.put( str, symbol ) ;
     }
 
     private static String compressClassName( String name ) {

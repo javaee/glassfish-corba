@@ -78,7 +78,7 @@ public class ReferenceManagerConfigurator implements ORBConfigurator {
     private static final POASystemException wrapper =
         POASystemException.self ;
 
-    private class RMIORInterceptor 
+    private static class RMIORInterceptor
 	extends LocalObject 
 	implements IORInterceptor_3_0 
     {
@@ -123,7 +123,7 @@ public class ReferenceManagerConfigurator implements ORBConfigurator {
 	}
     }
 
-    private class RMORBInitializer 
+    private static class RMORBInitializer
 	extends LocalObject 
 	implements ORBInitializer 
     {

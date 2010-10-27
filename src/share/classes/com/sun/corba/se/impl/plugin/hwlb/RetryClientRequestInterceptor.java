@@ -80,7 +80,7 @@ public class RetryClientRequestInterceptor
 
     private static boolean debug = true;
 
-    class BackoffAndStartTime {
+    private static class BackoffAndStartTime {
 	public long startTime;
 	public long backoff;
 	BackoffAndStartTime() {

@@ -1359,11 +1359,6 @@ public class CorbaMessageMediatorImpl
 	}
     }
     
-    private void throwNotImplemented() {
-	isThreadDone = false;
-	throwNotImplemented("");
-    }
-
     private void throwNotImplemented(String msg) {
 	throw new RuntimeException(
             "CorbaMessageMediatorImpl: not implemented " + msg);

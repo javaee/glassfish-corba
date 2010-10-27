@@ -327,7 +327,7 @@ public class Client
 			"corbaloc:iiop:1.2@pico:4444/NameService");
 	IOR ior1 = orb.getIOR(ref,false);
 
-	addr = IIOPFactories.makeIIOPAddress( orb, "pico", 4444);
+	addr = IIOPFactories.makeIIOPAddress( "pico", 4444);
 	IIOPProfileTemplate profileTemplate_1_2 = 
 	    IIOPFactories.makeIIOPProfileTemplate(orb, GIOPVersion.V1_2, addr);
 
@@ -359,35 +359,35 @@ public class Client
 			"corbaloc:iiop:1.2@pico:4444,:1.1@femto:5555,:1.0@tera:6666,:1.0@tera:6667,:1.2@pico:4445,:1.1@femto:5556,:1.2@pico:4446/NameService");
 	ior1 = orb.getIOR(ref,false);
 
-	addr = IIOPFactories.makeIIOPAddress( orb, "pico", 4444);
+	addr = IIOPFactories.makeIIOPAddress( "pico", 4444);
 	profileTemplate_1_2 = 
 	    IIOPFactories.makeIIOPProfileTemplate(orb, GIOPVersion.V1_2, addr);
-	addr = IIOPFactories.makeIIOPAddress( orb, "pico", 4445);
+	addr = IIOPFactories.makeIIOPAddress( "pico", 4445);
 	iiopAddressComponent = IIOPFactories.makeAlternateIIOPAddressComponent(addr);
 	profileTemplate_1_2.add(iiopAddressComponent);
-	addr = IIOPFactories.makeIIOPAddress( orb, "pico", 4446);
+	addr = IIOPFactories.makeIIOPAddress( "pico", 4446);
 	iiopAddressComponent = IIOPFactories.makeAlternateIIOPAddressComponent(addr);
 	profileTemplate_1_2.add(iiopAddressComponent);
 
 	/*
-	addr = IIOPFactories.makeIIOPAddress( orb, "mega", 7777);
+	addr = IIOPFactories.makeIIOPAddress( "mega", 7777);
 	IIOPProfileTemplate profileTemplate_2_9 =
 	    IIOPFactories.makeIIOPProfileTemplate(orb, new GIOPVersion(2,9), addr);
 	*/
 
-	addr = IIOPFactories.makeIIOPAddress( orb, "femto", 5555);
+	addr = IIOPFactories.makeIIOPAddress( "femto", 5555);
 	IIOPProfileTemplate profileTemplate_1_1 =
 	    IIOPFactories.makeIIOPProfileTemplate(orb, GIOPVersion.V1_1, addr);
-	addr = IIOPFactories.makeIIOPAddress( orb, "femto", 5556);
+	addr = IIOPFactories.makeIIOPAddress( "femto", 5556);
 	iiopAddressComponent = IIOPFactories.makeAlternateIIOPAddressComponent(addr);
 	profileTemplate_1_1.add(iiopAddressComponent);
 
 	List profileList_1_0 = new ArrayList();
-	addr = IIOPFactories.makeIIOPAddress( orb, "tera", 6666);
+	addr = IIOPFactories.makeIIOPAddress( "tera", 6666);
 	IIOPProfileTemplate profileTemplate_1_0 =
 	    IIOPFactories.makeIIOPProfileTemplate(orb, GIOPVersion.V1_0, addr);
 	profileList_1_0.add(profileTemplate_1_0);
-	addr = IIOPFactories.makeIIOPAddress( orb, "tera", 6667);
+	addr = IIOPFactories.makeIIOPAddress( "tera", 6667);
 	profileTemplate_1_0 =
 	    IIOPFactories.makeIIOPProfileTemplate(orb, GIOPVersion.V1_0, addr);
 	profileList_1_0.add(profileTemplate_1_0);
@@ -568,8 +568,8 @@ public class Client
 	finder.registerFactory( IIOPFactories.makeMaxStreamFormatVersionComponentFactory() ) ;
 	finder.registerFactory( IIOPFactories.makeAlternateIIOPAddressComponentFactory() ) ;
 
-	IIOPAddress addr1 = IIOPFactories.makeIIOPAddress( orb, "FOO", 32000 ) ;
-	IIOPAddress addr2 = IIOPFactories.makeIIOPAddress( orb, "BAR", 42000 ) ;
+	IIOPAddress addr1 = IIOPFactories.makeIIOPAddress( "FOO", 32000 ) ;
+	IIOPAddress addr2 = IIOPFactories.makeIIOPAddress( "BAR", 42000 ) ;
 	byte[] data = { 23, 34, 41, 0, 7, 9, 123, 111, 97, 64 } ;
 
 	TaggedComponent[] comps = {
@@ -646,7 +646,7 @@ public class Client
 	// Construct and verify
 	String host = "foo" ;
 	int port = 1234 ;
-	IIOPAddress addr = IIOPFactories.makeIIOPAddress( orb, host, port ) ;
+	IIOPAddress addr = IIOPFactories.makeIIOPAddress( host, port ) ;
 
 	if (!host.equals(addr.getHost()))
 	    error( "incorrect host" ) ;
@@ -659,14 +659,14 @@ public class Client
 	if (addr.equals( obj ))
 	    error( "IIOPAddress equal to object" ) ;
 
-	IIOPAddress addr2 = IIOPFactories.makeIIOPAddress( orb, host, port ) ;
+	IIOPAddress addr2 = IIOPFactories.makeIIOPAddress( host, port ) ;
 	if (!addr.equals( addr2 ))
 	    error( "IIOPAddress equals check failed" ) ;
 
 	// Test for range checking on constructor
 	boolean exceptionOK = false ;
 	try {
-	    IIOPFactories.makeIIOPAddress( orb, "FOO", -2 ) ;
+	    IIOPFactories.makeIIOPAddress( "FOO", -2 ) ;
 	} catch (BAD_PARAM exc) {
 	    exceptionOK = true ;
 	} catch (Throwable thr) {
@@ -677,7 +677,7 @@ public class Client
 
 	exceptionOK = false ;
 	try {
-	    IIOPFactories.makeIIOPAddress( orb, "FOO", 65536 ) ;
+	    IIOPFactories.makeIIOPAddress( "FOO", 65536 ) ;
 	} catch (BAD_PARAM exc) {
 	    exceptionOK = true ;
 	} catch (Throwable thr) {
@@ -688,7 +688,7 @@ public class Client
 
 	exceptionOK = false ;
 	try {
-	    IIOPFactories.makeIIOPAddress( orb, "FOO", 130232 ) ;
+	    IIOPFactories.makeIIOPAddress( "FOO", 130232 ) ;
 	} catch (BAD_PARAM exc ) {
 	    exceptionOK = true ;
 	} catch (Throwable thr) {
@@ -699,10 +699,10 @@ public class Client
 
 	// read/write test, with port <32768 and >= 32768
 	IIOPAddress[] addrs = {
-	    IIOPFactories.makeIIOPAddress( orb, "FOO.SUN.COM", 23 ) ,
-	    IIOPFactories.makeIIOPAddress( orb, "FOO.SUN.COM", 32768 ) ,
-	    IIOPFactories.makeIIOPAddress( orb, "FOO.SUN.COM", 40151 ) ,
-	    IIOPFactories.makeIIOPAddress( orb, "FOO.SUN.COM", 65535 ) 
+	    IIOPFactories.makeIIOPAddress( "FOO.SUN.COM", 23 ) ,
+	    IIOPFactories.makeIIOPAddress( "FOO.SUN.COM", 32768 ) ,
+	    IIOPFactories.makeIIOPAddress( "FOO.SUN.COM", 40151 ) ,
+	    IIOPFactories.makeIIOPAddress( "FOO.SUN.COM", 65535 ) 
 	} ;
 
 	OutputStream os = newOutputStream() ;
@@ -738,7 +738,7 @@ public class Client
 	GIOPVersion gversion = GIOPVersion.V1_2 ;
 	String host = "FOO" ;
 	int port = 34567 ;
-	IIOPAddress primary = IIOPFactories.makeIIOPAddress( orb, host, port ) ;
+	IIOPAddress primary = IIOPFactories.makeIIOPAddress( host, port ) ;
 	
 	IIOPProfileTemplate ptemp = IIOPFactories.makeIIOPProfileTemplate( orb, 
 	    gversion, primary ) ;
@@ -853,7 +853,7 @@ public class Client
     public IIOPProfileTemplate makeIIOPProfileTemplate( int port )
     {
 	String host = "FOO" ;
-	IIOPAddress primary = IIOPFactories.makeIIOPAddress( orb, host, port ) ;
+	IIOPAddress primary = IIOPFactories.makeIIOPAddress( host, port ) ;
 	
 	IIOPProfileTemplate ptemp = IIOPFactories.makeIIOPProfileTemplate( orb,
 	    GIOPVersion.V1_2, primary ) ;
@@ -885,7 +885,7 @@ public class Client
 	    IIOPFactories.makeJavaCodebaseComponent( URL ) ;
 	ORBTypeComponent comp1 = IIOPFactories.makeORBTypeComponent( 
 	    0x34567ABF ) ;
-	IIOPAddress addr = IIOPFactories.makeIIOPAddress( orb, "FOO", 32451 ) ;
+	IIOPAddress addr = IIOPFactories.makeIIOPAddress( "FOO", 32451 ) ;
 	AlternateIIOPAddressComponent comp2 = 
 	    IIOPFactories.makeAlternateIIOPAddressComponent( addr ) ;
 
@@ -1864,7 +1864,7 @@ public class Client
 
 	String host = "FOO" ;
 	int port = 34567 ;
-	IIOPAddress primary = IIOPFactories.makeIIOPAddress( orb, host, port ) ;
+	IIOPAddress primary = IIOPFactories.makeIIOPAddress( host, port ) ;
 	
 	IIOPProfileTemplate ptemp = IIOPFactories.makeIIOPProfileTemplate( orb,
 	    GIOPVersion.V1_2, primary ) ;
@@ -1958,7 +1958,7 @@ public class Client
     {
 	out.println( "\tAlternateIIOPAddressComponent" ) ;
 
-	IIOPAddress addr = IIOPFactories.makeIIOPAddress( orb, "FOO", 34 ) ;
+	IIOPAddress addr = IIOPFactories.makeIIOPAddress( "FOO", 34 ) ;
 	AlternateIIOPAddressComponent comp = 
 	    IIOPFactories.makeAlternateIIOPAddressComponent( addr ) ;
 	if (!addr.equals( comp.getAddress() ))
@@ -2119,7 +2119,7 @@ public class Client
 
 	String host = "FOO" ;
 	int port = 34567 ;
-	IIOPAddress primary = IIOPFactories.makeIIOPAddress( orb, host, port ) ;
+	IIOPAddress primary = IIOPFactories.makeIIOPAddress( host, port ) ;
 	
 	IIOPProfileTemplate ptemp = IIOPFactories.makeIIOPProfileTemplate( orb,
 	    GIOPVersion.V1_2, primary ) ;

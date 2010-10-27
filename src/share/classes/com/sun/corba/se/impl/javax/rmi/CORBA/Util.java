@@ -121,12 +121,14 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.logging.OMGSystemException;
 import com.sun.corba.se.impl.util.Utility;
-import com.sun.corba.se.impl.util.IdentityHashtable;
 import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.spi.logging.UtilSystemException;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Provides utility methods that can be used by stubs and ties to
@@ -138,7 +140,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     private static KeepAlive keepAlive = null;
 
     // Maps targets to ties.
-    private static final IdentityHashtable exportedServants = new IdentityHashtable();
+    private static final IdentityHashMap exportedServants = new IdentityHashMap();
 
     private static ValueHandler valueHandlerSingleton;          
 
@@ -189,9 +191,9 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     // particular ORB.  This happens during ORB shutdown.
     public void unregisterTargetsForORB(org.omg.CORBA.ORB orb) 
     {
-        for (Enumeration e = exportedServants.keys(); e.hasMoreElements(); ) 
+        for (Iterator e = exportedServants.keySet().iterator(); e.hasNext(); )
 	{
-            java.lang.Object key = e.nextElement();
+            java.lang.Object key = e.next();
             Remote target = (Remote)(key instanceof Tie ? ((Tie)key).getTarget() : key);
 
             // Bug 4476347: BAD_OPERATION is thrown if the ties delegate isn't set.
@@ -579,7 +581,7 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
     {
         Tie result = (Tie)exportedServants.get(target);
         if (result == null && target instanceof Tie) {
-            if (exportedServants.contains(target)) {
+            if (exportedServants.containsKey(target)) {
                 result = (Tie)target;
             }
         }
@@ -665,11 +667,9 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 		// For the Sun ORB
 		CorbaClientDelegate cdel = (CorbaClientDelegate)delegate ;
 		CorbaContactInfoList cil = cdel.getContactInfoList() ;
-		if (cil instanceof CorbaContactInfoList) {
-		    LocalClientRequestDispatcher lcs =
-                        cil.getLocalClientRequestDispatcher() ;
-		    result = lcs.useLocalInvocation( null ) ;
-		}
+                LocalClientRequestDispatcher lcs =
+                    cil.getLocalClientRequestDispatcher() ;
+                result = lcs.useLocalInvocation( null ) ;
 	    } else {
 		// For a non-Sun ORB
 		result = delegate.is_local( stub ) ;

@@ -149,7 +149,7 @@ public class ORBDBadServerIdHandler
 		IIOPFactories.makeIIOPProfileTemplate(
 	            (com.sun.corba.se.spi.orb.ORB)orb,
 		    GIOPVersion.V1_2,
-		    IIOPFactories.makeIIOPAddress( orb, location.hostname, clearPort));
+		    IIOPFactories.makeIIOPAddress( location.hostname, clearPort));
 	    sipt.add(new ORBDListenPortsComponent(componentData));
 	    IORTemplate iortemp = IORFactories.makeIORTemplate( poktemp ) ;
 	    iortemp.add( sipt ) ;

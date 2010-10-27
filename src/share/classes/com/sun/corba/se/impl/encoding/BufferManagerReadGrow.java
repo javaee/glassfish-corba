@@ -49,19 +49,8 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 public class BufferManagerReadGrow
     implements BufferManagerRead, MarkAndResetHandler
 {
-    // REVISIT - This should go in an abstract class called
-    //           BufferManagerReadBase which should implement
-    //           BufferManagerRead. Then, this class should extend
-    //           BufferManagerReadBase.
-    private ORB orb ;
-
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
-
-    BufferManagerReadGrow( ORB orb ) 
-    {
-	this.orb = orb ;
-    }
 
     public void processFragment (ByteBuffer byteBuffer, FragmentMessage header)
     {

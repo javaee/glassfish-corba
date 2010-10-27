@@ -48,7 +48,6 @@ import java.util.Collections;
 
 import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
 
-import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
 import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
@@ -57,7 +56,6 @@ import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.spi.orbutil.misc.DenseIntMapImpl ;
 
 /**
@@ -66,8 +64,6 @@ import com.sun.corba.se.spi.orbutil.misc.DenseIntMapImpl ;
  * ObjectAdapterFactory. 
  */
 public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry {
-    private ORB orb;
-
     protected int defaultId; // The default subcontract ID to use if there is no more specific ID available.  
                              // This happens when invoking a foreign IOR.
 
@@ -79,9 +75,8 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
     private Set<ObjectAdapterFactory> objectAdapterFactoriesView ;	// Read-only view of oaf instances
     private Map<String,CorbaServerRequestDispatcher> stringToServerSubcontract ;	
 
-    public RequestDispatcherRegistryImpl(ORB orb, int defaultId ) 
+    public RequestDispatcherRegistryImpl(int defaultId ) 
     {
-	this.orb = orb;
         this.defaultId = defaultId;
         SDRegistry = new DenseIntMapImpl<CorbaServerRequestDispatcher>() ;
         CSRegistry = new DenseIntMapImpl<CorbaClientRequestDispatcher>() ;

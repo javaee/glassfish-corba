@@ -222,7 +222,7 @@ public class ParserTable {
 		"Foo", "Foo" ),
 	    ParserDataFactory.make( ORBConstants.INITIAL_PORT_PROPERTY, 
 		OperationFactory.integerAction(), 
-		"ORBInitialPort", new Integer( ORBConstants.DEFAULT_INITIAL_PORT ),
+		"ORBInitialPort", Integer.valueOf( ORBConstants.DEFAULT_INITIAL_PORT ),
 		Integer.valueOf( 27314 ), "27314" ),
 	    // Where did this come from?
 	    //ParserDataFactory.make( ORBConstants.INITIAL_PORT_PROPERTY, 
@@ -547,8 +547,9 @@ public class ParserTable {
 	parserData = pd ;
     } 
 
-    public final class TestBadServerIdHandler implements BadServerIdHandler
+    public static final class TestBadServerIdHandler implements BadServerIdHandler
     {
+        @Override
 	public boolean equals( Object other ) 
 	{
 	    return other instanceof TestBadServerIdHandler ;
@@ -557,6 +558,12 @@ public class ParserTable {
 	public void handle( ObjectKey objectKey ) 
 	{
 	}
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            return hash;
+        }
     }
 
     private Operation makeUSLOperation() 

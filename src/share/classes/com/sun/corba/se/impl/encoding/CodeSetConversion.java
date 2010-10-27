@@ -837,9 +837,6 @@ public class CodeSetConversion
 	return CodeSetConversionHolder.csc ;
     }
 
-    // Singleton instance
-    private static CodeSetConversion implementation;
-
     // Number used internally to indicate the fallback code
     // set.
     private static final int FALLBACK_CODESET = 0;

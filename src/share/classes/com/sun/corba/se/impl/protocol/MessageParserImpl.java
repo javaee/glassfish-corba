@@ -107,9 +107,6 @@ public class MessageParserImpl implements MessageParser {
     private void display( String msg ) { }
 
     @InfoMethod
-    private void display( String msg, boolean flag ) { }
-
-    @InfoMethod
     private void display( String msg, int value ) { }
 
     @InfoMethod

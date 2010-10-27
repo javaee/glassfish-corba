@@ -81,13 +81,13 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
      * arbitrary data members in objects.  
      * This is very fast, and completely ignores access
      * protections including final on fields.
-     * NOTE WELL: Unsafe is capabile of causing severe damage to the
+     * NOTE WELL: Unsafe is capable of causing severe damage to the
      * VM, including causing the VM to dump core.  get and put calls
      * must only be made with offsets obtained from objectFieldOffset
      * calls.  Because of the dangerous nature of Unsafe, its use 
      * must be carefully protected.
      */
-    private static final Bridge bridge = AccessController.doPrivileged(
+    private static final Bridge BRIDGE_REF = AccessController.doPrivileged(
         new PrivilegedAction<Bridge>() {
             public Bridge run() {
                 return Bridge.get() ;
@@ -230,7 +230,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		{
 		    return null;
 		}
-		cons = bridge.newConstructorForSerialization(cl, cons);
+		cons = BRIDGE_REF.newConstructorForSerialization(cl, cons);
 		cons.setAccessible(true);
 		return cons;
 	    } catch (NoSuchMethodException ex) {
@@ -265,7 +265,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    if (defCl == cl) {
                 result = cons;
             } else {
-                result = bridge.newConstructorForSerialization(cl, cons);
+                result = BRIDGE_REF.newConstructorForSerialization(cl, cons);
             }
 
 	    result.setAccessible(true) ;
@@ -471,7 +471,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	// but we can't expose an instance of Bridge, so we'll only pay for 
 	// access to bridge while constructing copiers, instead of while running them.
 	private abstract static class UnsafeFieldCopier {
-	    private Bridge bridge ;
+	    protected Bridge bridge ;
 
 	    public UnsafeFieldCopier( Bridge bridge ) {
 		this.bridge = bridge ;
@@ -484,7 +484,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
 	// All of the XXXInitializer instances simply set the field to 0 or null
 	private static UnsafeFieldCopier byteUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -498,7 +498,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier charUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -512,7 +512,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier shortUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -526,7 +526,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier intUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -540,7 +540,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier longUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -554,7 +554,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier booleanUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -568,7 +568,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier floatUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -582,7 +582,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier doubleUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -622,7 +622,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	// The YYYUnsafeFieldCopier instances copy a field from source
 	// to destination
 	private static UnsafeFieldCopier byteUnsafeFieldCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -637,7 +637,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier charUnsafeFieldCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -652,7 +652,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier shortUnsafeFieldCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -667,7 +667,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier intUnsafeFieldCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -682,7 +682,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier longUnsafeFieldCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -697,7 +697,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier booleanUnsafeFieldCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -712,7 +712,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier floatUnsafeFieldCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -727,7 +727,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier doubleUnsafeFieldCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -774,7 +774,8 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	//
 	// The objectUnsafeFieldCopier is not stateless, as it requires access to the
 	// ClassCopierFactory, so it cannot be static.
-	private UnsafeFieldCopier objectUnsafeFieldCopier = new UnsafeFieldCopier( bridge ) {
+	private UnsafeFieldCopier objectUnsafeFieldCopier =
+            new UnsafeFieldCopier( BRIDGE_REF ) {
 	    /*
 	    private void debugCopy( Map oldToNew, long offset, Object src, 
 		Object dest ) throws ReflectiveCopyException
@@ -849,7 +850,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	}  ;
 
 	private static UnsafeFieldCopier objectUnsafeFieldInitializer = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -863,7 +864,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier objectUnsafeFieldSourceCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -877,7 +878,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier objectUnsafeFieldResultCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -891,7 +892,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	} ;
 
 	private static UnsafeFieldCopier objectUnsafeFieldIdentityCopier = 
-	    new UnsafeFieldCopier( bridge ) {
+	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
 	    public void copy( Map oldToNew, long offset, Object src, 
 		Object dest, boolean debug ) {
@@ -997,7 +998,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    for (int ctr=0; ctr<fields.length; ctr++) {
 		Field fld = fields[ctr] ;
 		if (fieldIsCopyable( fld )) {
-		    fieldOffsets[pos] = bridge.objectFieldOffset( fld ) ;
+		    fieldOffsets[pos] = BRIDGE_REF.objectFieldOffset( fld ) ;
 		    fieldCopiers[pos] = getUnsafeFieldCopier( fld ) ;
 		    pos++ ;
 		}

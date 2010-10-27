@@ -72,13 +72,13 @@ public class BufferManagerFactory
         // they're using, then use that ourselves?
 
 	if (encodingVersion != ORBConstants.CDR_ENC_VERSION) {
-	    return new BufferManagerReadGrow(orb);
+	    return new BufferManagerReadGrow();
 	}
 
         switch (version.intValue()) 
         {
             case GIOPVersion.VERSION_1_0:
-                return new BufferManagerReadGrow(orb);
+                return new BufferManagerReadGrow();
             case GIOPVersion.VERSION_1_1:
             case GIOPVersion.VERSION_1_2:
                 // The stream reader can handle fragmented and
@@ -98,11 +98,11 @@ public class BufferManagerFactory
 	    if (strategy != BufferManagerFactory.GROW) {
 		throw wrapper.invalidBuffMgrStrategy("newBufferManagerRead");
 	    }
-	    return new BufferManagerReadGrow(orb);
+	    return new BufferManagerReadGrow();
 	}
         switch (strategy) {
             case BufferManagerFactory.GROW:
-                return new BufferManagerReadGrow(orb);
+                return new BufferManagerReadGrow();
             case BufferManagerFactory.COLLECT:
                 throw new INTERNAL("Collect strategy invalid for reading");
             case BufferManagerFactory.STREAM:
@@ -145,6 +145,6 @@ public class BufferManagerFactory
     }
 
     public static BufferManagerRead defaultBufferManagerRead(ORB orb) {
-        return new BufferManagerReadGrow(orb);
+        return new BufferManagerReadGrow();
     }
 }

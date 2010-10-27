@@ -76,6 +76,7 @@ import com.sun.corba.se.spi.logging.OMGSystemException ;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
+import java.util.IdentityHashMap;
 
 
 /**
@@ -88,9 +89,9 @@ public final class Utility {
     public static final String DYNAMIC_STUB_SUFFIX = "_DynamicStub" ;
     public static final String IDL_STUB_SUFFIX = "Stub";
     public static final String TIE_SUFIX = "_Tie";
-    private static final IdentityHashtable tieCache = new IdentityHashtable();
-    private static final IdentityHashtable tieToStubCache = new IdentityHashtable();
-    private static final IdentityHashtable stubToTieCache = new IdentityHashtable();
+    private static final IdentityHashMap tieCache = new IdentityHashMap();
+    private static final IdentityHashMap tieToStubCache = new IdentityHashMap();
+    private static final IdentityHashMap stubToTieCache = new IdentityHashMap();
     private static final Object CACHE_MISS = new Object();
     private static final UtilSystemException wrapper =
         UtilSystemException.self ;

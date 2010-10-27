@@ -164,7 +164,7 @@ public class VirtualAddressAgentImpl
 	// host/port information from the data collector
 	final AddressParser parser = new AddressParser() ;
 	parser.init( dc ) ;
-	addr = IIOPFactories.makeIIOPAddress( orb, host, port ) ;	
+	addr = IIOPFactories.makeIIOPAddress( host, port ) ;	
         agentAddress(addr);
 
 	// Register the special IIOPProfile in the TaggedProfileFactoryFinder.

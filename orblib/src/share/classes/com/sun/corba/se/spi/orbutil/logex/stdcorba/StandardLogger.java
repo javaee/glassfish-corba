@@ -48,7 +48,7 @@ import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
  * @author ken_admin
  */
 public class StandardLogger extends WrapperGenerator.ExtensionBase {
-    public static StandardLogger self = new StandardLogger() ;
+    public static final StandardLogger self = new StandardLogger() ;
 
     private static final String SPI_PREFIX = "com.sun.corba.se.spi" ;
     private static final String IMPL_PREFIX = "com.sun.corba.se.impl" ;

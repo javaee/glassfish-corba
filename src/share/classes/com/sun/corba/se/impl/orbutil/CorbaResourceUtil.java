@@ -67,15 +67,24 @@ public class CorbaResourceUtil {
     public static String getText(String key, Object... args )
     {
 	String format = getString(key);
+
 	if (format == null) {
-	    format = "no text found: key = \"" + key + "\", " +
-		"arguments = " ;
+            StringBuilder sb = new StringBuilder(
+                "no text found: key = \"" ) ;
+            sb.append( key ) ;
+            sb.append( "\", arguments = " ) ;
 	    
 	    for (int ctr=0; ctr<args.length; ctr++) {
-		if (ctr != 0)
-		    format += ", " ;
-		format += "\"{" + ctr + "}\"" ;
+		if (ctr != 0) {
+                    sb.append( ", " ) ;
+                }
+
+		sb.append( "\"{" ) ;
+                sb.append( ctr ) ;
+                sb.append( "}\"" ) ;
 	    }
+
+            format = sb.toString() ;
 	}
 
 	return java.text.MessageFormat.format(format, args);

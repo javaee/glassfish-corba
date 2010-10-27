@@ -193,7 +193,7 @@ public class PIHandlerImpl implements PIHandler
     // maintenance.
     //
     // RequestInfoStack is used quite frequently.
-    private final class RequestInfoStack<C extends RequestInfoImpl> extends Stack<C> {
+    private static final class RequestInfoStack<C extends RequestInfoImpl> extends Stack<C> {
         // Number of times a request has been made to disable interceptors.
         // When this reaches 0, interception hooks are disabled.  Any higher
         // value indicates they are enabled.

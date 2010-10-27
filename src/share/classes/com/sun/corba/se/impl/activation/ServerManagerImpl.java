@@ -143,7 +143,7 @@ public class ServerManagerImpl extends _ServerManagerImplBase
             }
         }
 
-        Class cls = orb.getORBData( ).getBadServerIdHandler();
+        Class<?> cls = orb.getORBData( ).getBadServerIdHandler();
         if( cls == null ) {
             orb.setBadServerIdHandler( this );
         } else {
@@ -572,7 +572,7 @@ public class ServerManagerImpl extends _ServerManagerImplBase
 
 	    // create a new IOR with the correct port and correct tagged
             // components
-	    IIOPAddress addr = IIOPFactories.makeIIOPAddress( orb, 
+	    IIOPAddress addr = IIOPFactories.makeIIOPAddress( 
 		location.hostname, clearPort ) ;
 	    IIOPProfileTemplate iptemp = 
 		IIOPFactories.makeIIOPProfileTemplate(

@@ -140,7 +140,7 @@ public class InitialGroupInfoService {
 	}
     }
 
-    public class InitialGISServantLocator extends LocalObject
+    public static class InitialGISServantLocator extends LocalObject
 	implements ServantLocator {
 	private Servant servant ;
 	private InitialGISImpl impl = null; 

@@ -225,7 +225,7 @@ class idlPOAServant
     public IIOPProfileTemplate makeIIOPProfileTemplate( int port )
     {
 	String host = "FOO" ;
-	IIOPAddress primary = IIOPFactories.makeIIOPAddress( orb, host, port ) ;
+	IIOPAddress primary = IIOPFactories.makeIIOPAddress( host, port ) ;
 	
 	IIOPProfileTemplate ptemp = IIOPFactories.makeIIOPProfileTemplate( orb,
 	    GIOPVersion.V1_2, primary ) ;

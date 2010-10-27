@@ -1457,7 +1457,6 @@ public class ObjectStreamClass implements java.io.Serializable {
 	    //super(c);
 	    this.c = c;
 	}
-	ObjectStreamClassEntry next;
 
 	public Object get()
 	{

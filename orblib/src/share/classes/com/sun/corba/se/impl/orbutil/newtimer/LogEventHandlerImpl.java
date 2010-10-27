@@ -118,7 +118,7 @@ public class LogEventHandlerImpl extends NamedBase implements LogEventHandler {
 
     // Class used to maintain a variable-length indent.
     // Useful for displaying hierarchies.
-    private class Indent {
+    private static class Indent {
 	private final int width ;
 	private int level ;
 	private String rep ;

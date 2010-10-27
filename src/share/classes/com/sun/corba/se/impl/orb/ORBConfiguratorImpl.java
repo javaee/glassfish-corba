@@ -364,8 +364,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    orb.getORBData().getORBInitialHost(),
 	    orb.getORBData().getORBInitialPort() ) ;
 
-	Operation urlOperation = ResolverDefault.makeINSURLOperation( orb,
-	    bootResolver ) ;
+	Operation urlOperation = ResolverDefault.makeINSURLOperation( orb ) ;
 	orb.setURLOperation( urlOperation ) ;
 
 	Resolver irResolver = ResolverDefault.makeORBInitRefResolver( urlOperation,

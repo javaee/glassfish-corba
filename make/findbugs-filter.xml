@@ -1,5 +1,48 @@
 <FindBugsFilter>
     <Match>
+        <!-- The ORB shutdown method is doing what it needs to do,
+             so we can ignore this warning. -->
+        <Class name="com.sun.corba.se.impl.orb.ORBImpl"/>
+        <Method name="shutdown"/>
+        <Bug code="TLW"/>
+    </Match>
+    <Match>
+        <!-- CachedData by design is supposed to acquire a lock in its
+             get method and release the lock in the release method.
+             Users of this class should call CachedData.release in a 
+             finally block. -->
+        <Class name="com.sun.corba.se.spi.orbutil.generic.CachedData"/>
+        <Bug code="UL"/>
+    </Match>
+    <Match>
+        <!-- This is needed because the calls to new String("") are ESSENTAL
+             to the correct functioning of IIOP: different instances of a
+             String must unmarshal to different instances! -->
+        <Or>
+            <Class name="com.sun.corba.se.impl.encoding.CDRInputStream_1_0"/>
+            <Class name="com.sun.corba.se.impl.encoding.CDRInputStream_1_1"/>
+            <Class name="com.sun.corba.se.impl.encoding.CDRInputStream_1_2"/>
+        </Or>
+        <Bug code="Dm"/>
+    </Match>
+    <Match>
+        <!-- This one is strange: wrapper IS used, and not set to null.
+             Excluding because the FindBugs results seems to be in error. -->
+        <Class name="com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage_1_1"/>
+        <Bug code="UwF"/>
+    </Match>
+    <Match>
+        <!-- Excluding this because TransientNameServer is not used in GF,
+             and this error is complaining about catching Exception, which 
+             also catches RuntimeException.  But this is the main method in 
+             the standalone tnameserver class, which should catch Exceptions
+             and report the error, rather than just dumping a stack trace. -->
+        <Class name="com.sun.corba.se.impl.naming.cosnaming.TransientNameServer"/>
+        <Bug code="REC"/>
+    </Match>
+    <Match>
+        <!-- Excluded because read_value and read_Value MUST both be included,
+             as unfortunately they are defined in CORBA standards. -->
         <Or>
             <Class name="com.sun.corba.se.impl.encoding.CDRInputObject"/>
             <Class name="com.sun.corba.se.impl.encoding.CDROutputObject"/>
@@ -7,6 +50,15 @@
         </Or>
         <Bug code="Nm"/>
     </Match>
+    <Match>
+        <!-- This is an error in findbugs: the classCopierFactory field is clearly
+             used. -->
+        <Class name="com.sun.corba.se.impl.orbutil.copyobject.ClassCopierOrdinaryImpl"/>
+        <Bug code="UrF"/>
+    </Match>
+
+    <!-- Exclude IDLJ generated code, IDLJ, third party code, and 
+         code that is not part of the ORB as packaged for GlassFish. -->
     <Match>
         <Package name="~org.glassfish.*"/>
     </Match>

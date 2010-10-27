@@ -58,6 +58,8 @@ import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Logger ;
+import java.util.logging.LogManager ;
 
 /** A factory used for creating ClassCopier instances.
  * An instance of this factory can be created and customized to
@@ -116,7 +118,9 @@ public class ClassCopierFactoryPipelineImpl implements
 	Long.class,
 	Double.class,
 	Float.class,
-	Boolean.class 
+	Boolean.class,
+        Logger.class,
+        LogManager.class
     } ;
 
     private static final Class<?>[] mapClasses = {

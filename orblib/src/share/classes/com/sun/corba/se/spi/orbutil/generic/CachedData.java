@@ -85,9 +85,12 @@ public abstract class CachedData<T> {
      */
     public void flush() {
 	rwl.writeLock().lock() ;
-	data = null ;
-	cacheValid = false ;
-	rwl.writeLock().unlock() ;
+        try {
+            data = null ;
+            cacheValid = false ;
+        } finally {
+            rwl.writeLock().unlock() ;
+        }
     }
 
     /** Get a copy of the data.  If the data is cached,

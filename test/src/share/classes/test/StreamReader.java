@@ -40,9 +40,11 @@
 package test;
 
 import java.io.*;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A thread which pipes everything from an input stream
@@ -78,8 +80,7 @@ public class StreamReader extends Thread
     // Prevent garbage collection so someone can run Processes
     // without keeping references to their StreamReaders or
     // ProcessMonitors, and still not have the program hang.
-    private static java.util.Dictionary selfReferences
-        = new com.sun.corba.se.impl.util.IdentityHashtable(11);
+    private static Map selfReferences = new IdentityHashMap(11);
 
     public StreamReader(OutputStream output,
                         InputStream input) {

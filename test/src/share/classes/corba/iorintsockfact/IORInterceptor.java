@@ -101,7 +101,7 @@ public class IORInterceptor
 		String address = allAddresses[0].getHostAddress();
 
 		IIOPAddress iiopAddress = 
-		    IIOPFactories.makeIIOPAddress(orb, address, port);
+		    IIOPFactories.makeIIOPAddress(address, port);
 		AlternateIIOPAddressComponent iiopAddressComponent =
 		    IIOPFactories.makeAlternateIIOPAddressComponent(iiopAddress);
 		Iterator iterator = adapter.getIORTemplate().iteratorById(

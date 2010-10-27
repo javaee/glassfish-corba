@@ -58,18 +58,12 @@ public class CorbaInvocationInfo implements ClientInvocationInfo
 
     private boolean isRetryInvocation;
     private int entryCount;
-    private ORB orb;
     private Iterator contactInfoListIterator;
     private CorbaClientRequestDispatcher clientRequestDispatcher;
     private CorbaMessageMediator messageMediator;
     
-    private CorbaInvocationInfo() 
+    public CorbaInvocationInfo() 
     {
-    }
-
-    public CorbaInvocationInfo(ORB orb) 
-    {
-	this.orb = orb;
 	isRetryInvocation = false;
 	entryCount = 0;
     }

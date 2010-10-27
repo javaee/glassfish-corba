@@ -99,10 +99,9 @@ public class ResolverDefault {
 	return new CompositeResolverImpl( first, second ) ;
     }
 
-    public static Operation makeINSURLOperation( ORB orb, Resolver bootstrapResolver )
+    public static Operation makeINSURLOperation( ORB orb )
     {
-	return new INSURLOperationImpl( 
-	    (com.sun.corba.se.spi.orb.ORB)orb, bootstrapResolver ) ;
+	return new INSURLOperationImpl( orb ) ;
     }
 
     public static LocalResolver makeSplitLocalResolver( Resolver resolver,

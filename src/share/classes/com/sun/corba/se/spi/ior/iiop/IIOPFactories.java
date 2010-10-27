@@ -288,9 +288,9 @@ public abstract class IIOPFactories {
 	return new IIOPProfileTemplateImpl( orb, version, primary ) ;
     }
 
-    public static IIOPAddress makeIIOPAddress( ORB orb, String host, int port ) 
+    public static IIOPAddress makeIIOPAddress( String host, int port ) 
     {
-	return new IIOPAddressImpl( orb, host, port ) ;
+	return new IIOPAddressImpl( host, port ) ;
     }
 
     public static IIOPAddress makeIIOPAddress( InputStream is ) 

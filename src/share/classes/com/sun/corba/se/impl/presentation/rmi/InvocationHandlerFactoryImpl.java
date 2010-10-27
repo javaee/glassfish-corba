@@ -42,14 +42,11 @@ package com.sun.corba.se.impl.presentation.rmi ;
 
 import java.lang.reflect.InvocationHandler ;
 import java.lang.reflect.Proxy ;
-import java.lang.reflect.Method ;
 
-import org.omg.CORBA.portable.ObjectImpl ;
 
 import java.io.ObjectStreamException ;
 import java.io.Serializable ;
 
-import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicStub ;
 
@@ -63,7 +60,7 @@ public class InvocationHandlerFactoryImpl implements InvocationHandlerFactory
 {
     private final PresentationManager.ClassData classData ;
     private final PresentationManager pm ;
-    private Class[] proxyInterfaces ;
+    private Class<?>[] proxyInterfaces ;
 
     public InvocationHandlerFactoryImpl( PresentationManager pm,
 	PresentationManager.ClassData classData ) 
@@ -80,7 +77,7 @@ public class InvocationHandlerFactoryImpl implements InvocationHandlerFactory
 	proxyInterfaces[remoteInterfaces.length] = DynamicStub.class ;
     }
 
-    private class CustomCompositeInvocationHandlerImpl extends
+    private static class CustomCompositeInvocationHandlerImpl extends
 	CompositeInvocationHandlerImpl implements LinkedInvocationHandler, 
 	Serializable
     {
@@ -107,7 +104,7 @@ public class InvocationHandlerFactoryImpl implements InvocationHandlerFactory
 	}
 
 	/** Return the stub, which will actually be written to the stream.
-	 * It will be custom marshalled, with the actual writing done in
+	 * It will be custom marshaled, with the actual writing done in
 	 * StubIORImpl.  There is a corresponding readResolve method on
 	 * DynamicStubImpl which will re-create the full invocation
 	 * handler on read, and return the invocation handler on the 

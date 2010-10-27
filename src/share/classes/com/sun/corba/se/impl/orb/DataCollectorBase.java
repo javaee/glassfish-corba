@@ -43,12 +43,10 @@ package com.sun.corba.se.impl.orb ;
 import com.sun.corba.se.org.omg.CORBA.GetPropertyAction ;
 
 import java.security.PrivilegedAction ;
-import java.security.AccessController ;
 
 import java.applet.Applet ;
 
 import java.util.Properties ;
-import java.util.Vector ;
 import java.util.Set ;
 import java.util.HashSet ;
 import java.util.Enumeration ;
@@ -66,13 +64,11 @@ import com.sun.corba.se.spi.orb.DataCollector ;
 import com.sun.corba.se.spi.orb.PropertyParser ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
 
 public abstract class DataCollectorBase implements DataCollector {
-    private PropertyParser parser ;
-    private Set propertyNames ;
-    private Set propertyPrefixes ;
-    private Set URLPropertyNames ;
+    private Set<String> propertyNames ;
+    private Set<String> propertyPrefixes ;
+    private Set<String> URLPropertyNames ;
     protected String localHostName ;
     protected String configurationHostName ;
     private boolean setParserCalled ;
@@ -82,17 +78,17 @@ public abstract class DataCollectorBase implements DataCollector {
     public DataCollectorBase( Properties props, String localHostName,
 	String configurationHostName )
     {
-	URLPropertyNames = new HashSet() ;
+	URLPropertyNames = new HashSet<String>() ;
 	URLPropertyNames.add( ORBConstants.INITIAL_SERVICES_PROPERTY ) ;
 
-	propertyNames = new HashSet() ;
+	propertyNames = new HashSet<String>() ;
 
 	// Make sure that we are ready to handle -ORBInitRef.  This is special
 	// due to the need to handle multiple -ORBInitRef args as prefix
 	// parsing.
 	propertyNames.add( ORBConstants.ORB_INIT_REF_PROPERTY ) ;
 
-	propertyPrefixes = new HashSet() ;
+	propertyPrefixes = new HashSet<String>() ;
 
 	this.originalProps = props ;
 	this.localHostName = localHostName ;
@@ -114,13 +110,14 @@ public abstract class DataCollectorBase implements DataCollector {
 
     public void setParser( PropertyParser parser )
     {
-	Iterator iter = parser.iterator() ;
+	Iterator<ParserAction> iter = parser.iterator() ;
 	while (iter.hasNext()) {
-	    ParserAction pa = (ParserAction)(iter.next()) ;
-	    if (pa.isPrefix())
-		propertyPrefixes.add( pa.getPropertyName() ) ;
-	    else
-		propertyNames.add( pa.getPropertyName() ) ;
+	    ParserAction pa = iter.next() ;
+	    if (pa.isPrefix()) {
+                propertyPrefixes.add(pa.getPropertyName());
+            } else {
+                propertyNames.add(pa.getPropertyName());
+            }
 	}
 
 	collect() ;
@@ -155,15 +152,17 @@ public abstract class DataCollectorBase implements DataCollector {
         String host =
             resultProps.getProperty( ORBConstants.INITIAL_HOST_PROPERTY ) ;
 
-        if ((host == null) || (host.equals(""))) 
-            setProperty( ORBConstants.INITIAL_HOST_PROPERTY, 
-		configurationHostName );
+        if ((host == null) || (host.equals(""))) {
+            setProperty(ORBConstants.INITIAL_HOST_PROPERTY,
+                configurationHostName);
+        }
     }
 
     protected void findPropertiesFromArgs( String[] params )
     {
-        if (params == null)
+        if (params == null) {
             return;
+        }
 
         // All command-line args are of the form "-ORBkey value".
         // The key is mapped to <prefix>.ORBkey.
@@ -179,10 +178,11 @@ public abstract class DataCollectorBase implements DataCollector {
                 String argName = params[i].substring( 1 ) ;
                 name = findMatchingPropertyName( propertyNames, argName ) ;
 
-                if (name != null)
-                    if ( i+1 < params.length && params[i+1] != null ) {
+                if (name != null) {
+                    if (i + 1 < params.length && params[i + 1] != null) {
                         value = params[++i];
                     }
+                }
             }
 
             if (value != null) {
@@ -195,8 +195,9 @@ public abstract class DataCollectorBase implements DataCollector {
     {
         // Cannot use propertyPrefixes here, since there is no
 	// way to fetch properties by prefix from an Applet.
-        if (app == null)
+        if (app == null) {
             return;
+        }
 
         PropertyCallback callback = new PropertyCallback() {
 	    public String get(String name) {
@@ -215,8 +216,9 @@ public abstract class DataCollectorBase implements DataCollector {
 	PropertyCallback URLCallback = new PropertyCallback() {
 	    public String get( String name ) {
 		String value = resultProps.getProperty(name);
-		if (value == null)
-		    return null ;
+		if (value == null) {
+                    return null;
+                }
 
 		try {
 		    URL url = new URL( app.getDocumentBase(), value ) ;
@@ -250,16 +252,18 @@ public abstract class DataCollectorBase implements DataCollector {
     protected void findPropertiesFromFile()
     {
         final Properties fileProps = getFileProperties() ;
-        if (fileProps==null)
-            return ;
+        if (fileProps==null) {
+            return;
+        }
 
 	doProperties( fileProps ) ;
     }
 
     protected void findPropertiesFromProperties()
     {
-        if (originalProps == null)
+        if (originalProps == null) {
             return;
+        }
 
 	doProperties( originalProps ) ;
     }
@@ -273,8 +277,8 @@ public abstract class DataCollectorBase implements DataCollector {
     // system properties that should impose a restriction.
     protected void findPropertiesFromSystem()
     {
-	Set normalNames = getCORBAPrefixes( propertyNames ) ;
-	Set prefixNames = getCORBAPrefixes( propertyPrefixes ) ;
+	Set<String> normalNames = getCORBAPrefixes( propertyNames ) ;
+	Set<String> prefixNames = getCORBAPrefixes( propertyPrefixes ) ;
 
 	PropertyCallback callback = new PropertyCallback() {
 	    public String get(String name) {
@@ -300,8 +304,9 @@ public abstract class DataCollectorBase implements DataCollector {
 	if( name.equals( ORBConstants.ORB_INIT_REF_PROPERTY ) ) {
 	    // Value is <name>=<URL>
 	    StringTokenizer st = new StringTokenizer( value, "=" ) ;
-	    if (st.countTokens() != 2)
-		throw new IllegalArgumentException() ;
+	    if (st.countTokens() != 2) {
+                throw new IllegalArgumentException();
+            }
 
 	    String refName = st.nextToken() ;
 	    String refValue = st.nextToken() ;
@@ -314,21 +319,22 @@ public abstract class DataCollectorBase implements DataCollector {
 
     private void checkSetParserCalled()
     {
-	if (!setParserCalled)
-	    throw new IllegalStateException( "setParser not called." ) ;
+	if (!setParserCalled) {
+            throw new IllegalStateException("setParser not called.");
+        }
     }
 
     // For each prefix in prefixes, For each name in propertyNames,
     // if (prefix is a prefix of name) get value from getProperties and
     // setProperty (name, value).
-    private void findPropertiesByPrefix( Set prefixes, 
-	Iterator propertyNames, PropertyCallback getProperty )
+    private void findPropertiesByPrefix( Set<String> prefixes,
+	Iterator<String> propertyNames, PropertyCallback getProperty )
     {
 	while (propertyNames.hasNext()) {
-	    String name = (String)(propertyNames.next()) ;
-	    Iterator iter = prefixes.iterator() ;
+	    String name = propertyNames.next() ;
+	    Iterator<String> iter = prefixes.iterator() ;
 	    while (iter.hasNext()) {
-		String prefix = (String)(iter.next()) ;
+		String prefix = iter.next() ;
 		if (name.startsWith( prefix )) {
 		    String value = getProperty.get( name ) ;
 
@@ -343,17 +349,19 @@ public abstract class DataCollectorBase implements DataCollector {
     // For each prefix in names, get the corresponding property
     // value from the callback, and store the name/value pair in
     // the result.
-    private void findPropertiesByName( Iterator names, 
+    private void findPropertiesByName( Iterator<String> names,
 	PropertyCallback getProperty )
     {
 	while (names.hasNext()) {
-	    String name = (String)(names.next()) ;
+	    String name = names.next() ;
 	    String value = getProperty.get( name ) ;
-	    if (value != null)
-		setProperty( name, value ) ;
+	    if (value != null) {
+                setProperty(name, value);
+            }
 	}
     }
 
+    @SuppressWarnings("unchecked")
     private static String getSystemProperty(final String name)
     {
         return (String)AccessController.doPrivileged(
@@ -362,36 +370,39 @@ public abstract class DataCollectorBase implements DataCollector {
 
     // Map command-line arguments to ORB properties.
     //
-    private String findMatchingPropertyName( Set names,
+    private String findMatchingPropertyName( Set<String> names,
 	String suffix ) 
     {
-	Iterator iter = names.iterator() ;
+	Iterator<String> iter = names.iterator() ;
 	while (iter.hasNext()) {
-	    String name = (String)(iter.next()) ;
-	    if (name.endsWith( suffix ))
-		return name ;
+	    String name = iter.next() ;
+	    if (name.endsWith( suffix )) {
+                return name;
+            }
 	}
 
 	return null ;
     }
 
-    private static Iterator makeIterator( final Enumeration enumeration )
+    private static Iterator<String> makeIterator(
+        final Enumeration<?> enumeration )
     {
-	return new Iterator() {
+	return new Iterator<String>() {
 	    public boolean hasNext() { return enumeration.hasMoreElements() ; }
-	    public Object next() { return enumeration.nextElement() ; }
+	    public String next() { return (String)enumeration.nextElement() ; }
 	    public void remove() { throw new UnsupportedOperationException() ; }
 	} ;
     }
 
-    private static Iterator getSystemPropertyNames()
+    private static Iterator<String> getSystemPropertyNames()
     {
         // This will not throw a SecurityException because this
         // class was loaded from rt.jar using the bootstrap classloader.
-        Enumeration enumeration = (Enumeration)
-            AccessController.doPrivileged(
-                new PrivilegedAction() {
-                      public java.lang.Object run() {
+        @SuppressWarnings("unchecked")
+        Enumeration<String> enumeration =
+            (Enumeration<String>)AccessController.doPrivileged(
+                new PrivilegedAction<Enumeration<?>>() {
+                      public Enumeration<?> run() {
                           return System.getProperties().propertyNames();
                       }
                 }
@@ -404,8 +415,9 @@ public abstract class DataCollectorBase implements DataCollector {
     {
         try {
 	    File file = new File( fileName ) ;
-	    if (!file.exists())
-		return ;
+	    if (!file.exists()) {
+                return;
+            }
 
             FileInputStream in = new FileInputStream( file ) ;
 	    
@@ -448,14 +460,15 @@ public abstract class DataCollectorBase implements DataCollector {
 
     // Return only those element of prefixes for which hasCORBAPrefix 
     // is true.  
-    private Set getCORBAPrefixes( final Set prefixes )
+    private Set<String> getCORBAPrefixes( final Set<String> prefixes )
     {
-	Set result = new HashSet() ;
-	Iterator iter = prefixes.iterator() ;
+	Set<String> result = new HashSet<String>() ;
+	Iterator<String> iter = prefixes.iterator() ;
 	while (iter.hasNext()) {
-	    String element = (String)(iter.next()) ;
-	    if (hasCORBAPrefix( element )) 
-		result.add( element ) ;
+	    String element = iter.next() ;
+	    if (hasCORBAPrefix( element )) {
+                result.add(element);
+            }
 	}
 
 	return result ;

@@ -43,7 +43,6 @@ package com.sun.corba.se.impl.orb ;
 import java.net.URL ;
 import java.net.InetAddress;
 
-import org.omg.CORBA.CompletionStatus ;
 import org.omg.PortableInterceptor.ORBInitializer ;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
@@ -68,7 +67,6 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
-    private ORB orb ;
     private String ORBInitialHost ; 
     private int ORBInitialPort ; 
     private String ORBServerHost ; 
@@ -80,8 +78,6 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private IORToSocketInfo iorToSocketInfo;
     private IIOPPrimaryToContactInfo iiopPrimaryToContactInfo;
     private String orbId ; 
-    private URL servicesURL ;
-    private String propertyInitRef ;
     private boolean allowLocalOptimization ; 
     private GIOPVersion giopVersion ; 
     private int highWaterMark ; 
@@ -339,7 +335,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 	return serverIsORBActivated ; 
     }
 
-    public Class getBadServerIdHandler()
+    public Class<?> getBadServerIdHandler()
     {
 	return badServerIdHandlerClass ;
     }
@@ -361,9 +357,7 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public void addORBInitializer( ORBInitializer initializer ) 
     {
 	ORBInitializer[] arr = new ORBInitializer[orbInitializers.length+1] ;
-	for (int ctr=0; ctr<orbInitializers.length; ctr++) {
-	    arr[ctr] = orbInitializers[ctr] ;
-	}
+        System.arraycopy(orbInitializers, 0, arr, 0, orbInitializers.length);
 	arr[orbInitializers.length] = initializer ;
 	orbInitializers = arr ;
     }
@@ -495,11 +489,11 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     public ORBDataParserImpl( ORB orb, DataCollector coll )
     {
 	super( ParserTable.get( 
-            orb.defaultClassNameResolver() ).getParserData() ) ;
-	this.orb = orb ;
+            ORB.defaultClassNameResolver() ).getParserData() ) ;
 	init( coll ) ;
     }
 
+    @Override
     public void complete() 
     {
         codesets = new CodeSetComponentInfo(charData, wcharData);

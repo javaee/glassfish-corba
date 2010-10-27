@@ -93,7 +93,6 @@ public class INSURLOperationImpl implements Operation
         ORBUtilSystemException.self ;
     private static final OMGSystemException omgWrapper =
         OMGSystemException.self ;
-    private Resolver bootstrapResolver ;
 
     // Root Naming Context for default resolution of names.
     private NamingContextExt rootNamingContextExt;
@@ -102,10 +101,9 @@ public class INSURLOperationImpl implements Operation
     // The URLHandler to parse INS URL's
     private INSURLHandler insURLHandler = INSURLHandler.getINSURLHandler() ;
 
-    public INSURLOperationImpl( ORB orb, Resolver bootstrapResolver )
+    public INSURLOperationImpl( ORB orb )
     {
 	this.orb = orb ;
-	this.bootstrapResolver = bootstrapResolver ;
     }
 
     private static final int NIBBLES_PER_BYTE = 2 ;
@@ -169,10 +167,9 @@ public class INSURLOperationImpl implements Operation
     {
         org.omg.CORBA.Object result = null;
         // If RIR flag is true use the Bootstrap protocol
-	// Bug 6678177 noticed that this is incorrect: rir means use resolve_initial_references
-	// on the local ORB!
+	// Bug 6678177 noticed that this is incorrect: rir means use 
+        // resolve_initial_references on the local ORB!
         if( theCorbaLocObject.getRIRFlag( ) )  {
-            // result = bootstrapResolver.resolve(theCorbaLocObject.getKeyString());
 	    String keyString = theCorbaLocObject.getKeyString() ;
 	    if (keyString.equals( "" )) {
                 keyString = "NameService";
@@ -259,7 +256,7 @@ public class INSURLOperationImpl implements Operation
         while( iterator.hasNext( ) ) {
 	    IIOPEndpointInfo element = 
                 (IIOPEndpointInfo) iterator.next( );
-            IIOPAddress addr = IIOPFactories.makeIIOPAddress( orb, element.getHost(), 
+            IIOPAddress addr = IIOPFactories.makeIIOPAddress( element.getHost(), 
                 element.getPort() );
 	    GIOPVersion giopVersion = GIOPVersion.getInstance( (byte)element.getMajor(), 
 					     (byte)element.getMinor());

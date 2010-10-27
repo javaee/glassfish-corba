@@ -119,8 +119,8 @@ public class SelectorImpl
 	selector = null;
 	selectorStarted = false;
 	timeout = 60000;
-	deferredRegistrations = new ArrayList();
-	interestOpsList = new ArrayList();
+	deferredRegistrations = new ArrayList<EventHandler>();
+	interestOpsList = new ArrayList<SelectionKeyAndOp>();
 	listenerThreads = new HashMap<EventHandler,ListenerThread>();
 	readerThreads = new HashMap<EventHandler,ReaderThread>();
 	closed = false;
@@ -140,9 +140,6 @@ public class SelectorImpl
 
     @InfoMethod
     private void display( String msg, Object value ) { }
-
-    @InfoMethod
-    private void display( String msg ) { }
 
     @InfoMethod
     private void closedEventHandler() { }
@@ -180,9 +177,7 @@ public class SelectorImpl
 	    synchronized (deferredRegistrations) {
 		deferredRegistrations.add(eventHandler);
 	    }
-	    if (! selectorStarted) {
-		startSelector();
-	    }
+            startSelector();
 	    selector.wakeup();
 	    return;
 	}
@@ -290,7 +285,7 @@ public class SelectorImpl
     @Override
     public void run() {
         java.security.AccessController.doPrivileged(
-            new java.security.PrivilegedAction() {
+            new java.security.PrivilegedAction<Object>() {
                 public Object run() {
                     setName("SelectorThread");
                     return null;
@@ -373,20 +368,27 @@ public class SelectorImpl
 	this.closed = closed;
     }
 
+    @InfoMethod
+    private void selectorStarted() {}
+
     @Transport
-    private void startSelector() {
-	try {
-	    selector = Selector.open();
-	} catch (IOException e) {
-	    // REVISIT - better handling/reporting
-	    RuntimeException rte =
-		new RuntimeException(".startSelector: Selector.open exception");
-	    rte.initCause(e);
-	    throw rte;
-	}
-	setDaemon(true);
-	start();
-	selectorStarted = true;
+    private synchronized void startSelector() {
+        // Make sure this is only called once, or setDaemon will
+        // throw an IllegalStateException since the Selector will already
+        // be running.  Note this must be synchronized to protect against
+        // concurrent startups of the Selector.
+        if (!selectorStarted) {
+            selectorStarted() ;
+            try {
+                selector = Selector.open();
+            } catch (IOException e) {
+                throw new RuntimeException(
+                    ".startSelector: Selector.open exception", e);
+            }
+            setDaemon(true);
+            start();
+            selectorStarted = true;
+        }
     }
 
     @InfoMethod
@@ -462,7 +464,7 @@ public class SelectorImpl
 
     @Transport
     private void createListenerThread(EventHandler eventHandler) {
-	CorbaAcceptor acceptor = (CorbaAcceptor)eventHandler.getAcceptor();
+	CorbaAcceptor acceptor = eventHandler.getAcceptor();
 	ListenerThread listenerThread =
 	    new ListenerThreadImpl(orb, acceptor);
         synchronized (this) {
@@ -478,9 +480,7 @@ public class SelectorImpl
 	    throwable = e;
 	}
 	if (throwable != null) {
-	    RuntimeException rte = new RuntimeException(throwable.toString());
-	    rte.initCause(throwable);
-	    throw rte;
+	    throw new RuntimeException(throwable);
 	}
     }
 
@@ -520,9 +520,7 @@ public class SelectorImpl
 	    throwable = e;
 	}
 	if (throwable != null) {
-	    RuntimeException rte = new RuntimeException(throwable.toString());
-	    rte.initCause(throwable);
-	    throw rte;
+	    throw new RuntimeException(throwable);
 	}
     }
 

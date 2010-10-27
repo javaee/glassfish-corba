@@ -423,7 +423,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	};
 
 	requestDispatcherRegistry = new RequestDispatcherRegistryImpl( 
-	    this, ORBConstants.DEFAULT_SCID);
+	    ORBConstants.DEFAULT_SCID);
 	copierManager = new CopierManagerImpl() ;
 
 	taggedComponentFactoryFinder = 
@@ -1871,7 +1871,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             (!clientInvocationInfo.isRetryInvocation()))
         {
             // This is a new call - not a retry.
-            clientInvocationInfo = new CorbaInvocationInfo(this);
+            clientInvocationInfo = new CorbaInvocationInfo();
             invocationInfoStack.push(clientInvocationInfo);
             invocationInfoChange( "new call" ) ;
         } else {

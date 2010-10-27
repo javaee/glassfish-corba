@@ -118,12 +118,9 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
 	if (delegate instanceof CorbaClientDelegate) {
 	    CorbaClientDelegate cdel = (CorbaClientDelegate)delegate ;
 	    CorbaContactInfoList cil = cdel.getContactInfoList() ;
-	    if (cil instanceof CorbaContactInfoList) {
-		CorbaContactInfoList ccil = (CorbaContactInfoList)cil ;
-		LocalClientRequestDispatcher lcrd = 
-		    ccil.getLocalClientRequestDispatcher() ;
-		result = lcrd.useLocalInvocation( null ) ;
-	    }
+            LocalClientRequestDispatcher lcrd =
+                cil.getLocalClientRequestDispatcher() ;
+            result = lcrd.useLocalInvocation( null ) ;
 	}
 	 
 	return result ;

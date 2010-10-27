@@ -64,7 +64,6 @@ public final class Util {
     public static void close( Node node ) {
 	TreeWalkerContext context = new TreeWalkerContext() ;
 	Visitor visitor = new TreeWalker( context ) {
-	    private Variable savedVariable = null ;
 
 	    @Override
 	    public void blockStatementBeforeBodyStatement( BlockStatement arg, 

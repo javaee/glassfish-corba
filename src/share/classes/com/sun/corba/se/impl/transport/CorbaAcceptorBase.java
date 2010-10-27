@@ -168,7 +168,7 @@ public abstract class CorbaAcceptorBase
         Iterator iterator = iorTemplate.iteratorById(TAG_INTERNET_IOP.value);
         String hname = orb.getORBData().getORBServerHost();
         if (iterator.hasNext()) {
-            IIOPAddress iiopAddress = IIOPFactories.makeIIOPAddress(orb, hname, port);
+            IIOPAddress iiopAddress = IIOPFactories.makeIIOPAddress(hname, port);
             AlternateIIOPAddressComponent iiopAddressComponent = 
                 IIOPFactories.makeAlternateIIOPAddressComponent(iiopAddress);
             while (iterator.hasNext()) {
@@ -194,7 +194,7 @@ public abstract class CorbaAcceptorBase
             templatePort = orb.getLegacyServerSocketManager()
                 .legacyGetPersistentServerPort(SocketInfo.IIOP_CLEAR_TEXT);
         }
-        IIOPAddress addr = IIOPFactories.makeIIOPAddress(orb, hostname, 
+        IIOPAddress addr = IIOPFactories.makeIIOPAddress(hostname, 
             templatePort);
         IIOPProfileTemplate iiopProfile = IIOPFactories.makeIIOPProfileTemplate(orb, 
             version, addr);

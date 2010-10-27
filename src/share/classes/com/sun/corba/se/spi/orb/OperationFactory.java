@@ -394,7 +394,7 @@ public abstract class OperationFactory {
 	{
 	    int result = Integer.parseInt( getString( value ) ) ;
 	    if ((result >= min) && (result <= max)) {
-                return new Integer(result);
+                return Integer.valueOf(result);
             } else {
                 throw wrapper.valueNotInRange(result, min, max);
             }
@@ -597,7 +597,7 @@ public abstract class OperationFactory {
 	public Object operate( Object value )
 	{
 	    Integer val = (Integer)value ;
-	    return new Short( val.shortValue() ) ;
+	    return Short.valueOf( val.shortValue() ) ;
 	}
 
 	public String toString() {

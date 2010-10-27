@@ -54,14 +54,11 @@ public final class IIOPAddressImpl extends IIOPAddressBase
     private static final IORSystemException wrapper =
         IORSystemException.self ;
 
-    private ORB orb ;
     private String host;
     private int port;
     
-    public IIOPAddressImpl( ORB orb, String host, int port ) 
+    public IIOPAddressImpl( String host, int port ) 
     {
-	this.orb = orb ;
-
 	if ((port < 0) || (port > 65535)) {
             throw wrapper.badIiopAddressPort(port);
         }

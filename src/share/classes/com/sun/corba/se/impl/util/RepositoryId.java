@@ -687,10 +687,6 @@ public class RepositoryId {
 	}
     }
 
-    private static String createHashString(java.io.Serializable ser) {
-	return createHashString(ser.getClass());
-    }
-
     private static String createHashString(java.lang.Class clazz) {
 
 	ClassInfoCache.ClassInfo cinfo = ClassInfoCache.get( clazz ) ;
@@ -1063,7 +1059,7 @@ public class RepositoryId {
 	    {
 		String left = target.substring(0, i);
 		String right = target.substring(i+arg.length());
-		target = new String(left+source+right);
+		target = left+source+right;
 		i = target.indexOf(arg);
 	    }
         return target;

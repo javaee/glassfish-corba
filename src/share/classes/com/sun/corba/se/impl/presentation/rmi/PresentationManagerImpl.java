@@ -137,7 +137,6 @@ public final class PresentationManagerImpl implements PresentationManager
 	private Class<?> cls ;
 	private IDLNameTranslator nameTranslator ;
 	private String[] typeIds ;
-	private PresentationManager.StubFactory sfactory ;
 	private InvocationHandlerFactory ihfactory ;
 	private Map<String,Object> dictionary ;
 

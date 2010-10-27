@@ -129,7 +129,7 @@ public class TransientNameServer
 		    throw wrapper.transientNameServerBadHost() ;
                 }
 	    } catch (java.lang.NumberFormatException e) {
-		// do nothing
+                // XXX log this
 	    }
 
 	    // Let arguments override

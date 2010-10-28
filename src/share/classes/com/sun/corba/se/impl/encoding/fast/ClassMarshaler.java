@@ -45,9 +45,7 @@ import java.io.ObjectOutputStream ;
 
 import java.lang.reflect.Field ;
 
-import java.util.List ;
 import java.util.LinkedList ;
-import java.util.ArrayList ;
 
 import java.security.PrivilegedAction ;
 import java.security.AccessController ;
@@ -55,7 +53,6 @@ import java.security.AccessController ;
 import sun.corba.Bridge ;
 
 import com.sun.corba.se.spi.orbutil.generic.Holder ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
 
 import com.sun.corba.se.impl.io.ObjectStreamField ;
 
@@ -67,7 +64,7 @@ import com.sun.corba.se.impl.io.ObjectStreamField ;
 
 /** Reads and writes an instance of a Class.
  */
-public class ClassMarshaler {
+public class ClassMarshaler<T> {
 
     /** Bridge is used to access unsafe methods used to read and write 
      * arbitrary data members in objects.  
@@ -79,18 +76,17 @@ public class ClassMarshaler {
      * calls.  Because of the dangerous nature of Unsafe, its use 
      * must be carefully protected.
      */
-    private static final Bridge bridge = 
-	(Bridge)AccessController.doPrivileged(
-	    new PrivilegedAction() {
-		public Object run() {
-		    return Bridge.get() ;
-		}
-	    } 
-	) ;
+    private static final Bridge bridge = AccessController.doPrivileged(
+        new PrivilegedAction<Bridge>() {
+            public Bridge run() {
+                return Bridge.get();
+            }
+        }
+    ) ;
 
     private char[] typeName ;
     // List of ClassMarshalers from first serializable superclass to this class
-    private LinkedList<ClassMarshaler> cmChain ;
+    private LinkedList<ClassMarshaler<?>> cmChain ;
 
     private interface ObjectWriter {
 	public void write( Object obj, 
@@ -98,16 +94,16 @@ public class ClassMarshaler {
     }
 
     private ObjectWriter writer ;
-    private ClassAnalyzer classAnalyzer ;
+    private ClassAnalyzer<T> classAnalyzer ;
 
-    public ClassMarshaler( ClassAnalyzer ca ) {
+    public ClassMarshaler( ClassAnalyzer<T> ca ) {
 	typeName = ca.getName().toCharArray() ;
     
-	cmChain = new LinkedList<ClassMarshaler>() ;
+	cmChain = new LinkedList<ClassMarshaler<?>>() ;
         classAnalyzer = ca ;
-	ClassAnalyzer current = ca ;
+	ClassAnalyzer<?> current = ca ;
 	do {
-	    ClassMarshaler cm = ClassMarshalerFactory.getClassMarshaler( 
+	    ClassMarshaler<?> cm = ClassMarshalerFactory.getClassMarshaler(
 		current.getClass() ) ;
 	    cmChain.addFirst( cm ) ;
 	    current = current.getSuperClassAnalyzer() ;
@@ -115,8 +111,9 @@ public class ClassMarshaler {
 
 	// Make sure an ObjectWriter is created if one is needed for writeObject 
 	// and defaultWriteObject.
-	if (ca.isSerializable() && !ca.hasWriteObjectMethod())
-	    writer = makeObjectWriter( ca.forClass(), ca.getFields() ) ;
+	if (ca.isSerializable() && !ca.hasWriteObjectMethod()) {
+            writer = makeObjectWriter(ca.forClass(), ca.getFields());
+        }
     }
 
     public boolean isImmutable() {
@@ -132,7 +129,7 @@ public class ClassMarshaler {
 	return cmChain.get(0).getClassAnalyzer().getNameAsCharArray() ;
     }
 
-    public ClassAnalyzer getClassAnalyzer() {
+    public ClassAnalyzer<T> getClassAnalyzer() {
 	return classAnalyzer ;
     }
 
@@ -237,14 +234,15 @@ public class ClassMarshaler {
     */
 
     public Object handleReplace( Object obj, 
-        Holder<ClassMarshaler> cmHolder ) throws IOException {
+        Holder<ClassMarshaler<?>> cmHolder ) throws IOException {
 
-	ClassAnalyzer currentCa = cmHolder.content().getClassAnalyzer() ;
+	ClassAnalyzer<?> currentCa = cmHolder.content().getClassAnalyzer() ;
 	Object replacement = obj ;
 	while (true) {
 	    // Check for further replacement
-	    if (!currentCa.hasWriteReplaceMethod())
-		break ;
+	    if (!currentCa.hasWriteReplaceMethod()) {
+                break;
+            }
 
 	    Object newReplacement = currentCa.invokeWriteReplace( replacement ) ;
 	    if (newReplacement == null) {
@@ -253,10 +251,11 @@ public class ClassMarshaler {
 		break ;
 	    }
 
-	    if (newReplacement == replacement) 
-		break ;
+	    if (newReplacement == replacement) {
+                break;
+            }
 
-	    ClassMarshaler cm = ClassMarshalerFactory.getClassMarshaler(
+	    ClassMarshaler<?> cm = ClassMarshalerFactory.getClassMarshaler(
 		newReplacement.getClass() ) ;
             cmHolder.content( cm ) ;
 	    currentCa = cm.getClassAnalyzer() ;
@@ -268,12 +267,12 @@ public class ClassMarshaler {
 
     public void writeObject( Object obj, OutputStream os ) throws IOException {
 	os.startValue( obj, cmChain.size() ) ;
-        ClassAnalyzer ca = cmChain.get(0).getClassAnalyzer() ;
-	if (ca.isExternalizable())
-	    writeExternalData( obj, os ) ;
-	else if (ca.isSerializable())
-	    writeSerialData( obj, os ) ;
-	// XXX else
+        ClassAnalyzer<?> ca = cmChain.get(0).getClassAnalyzer() ;
+	if (ca.isExternalizable()) {
+            writeExternalData(obj, os);
+        } else if (ca.isSerializable()) {
+            writeSerialData(obj, os);
+        } // XXX else
 	    // ERROR
     }
 	   
@@ -357,7 +356,7 @@ public class ClassMarshaler {
 	}
     } ;
 
-    private FieldWriter getFieldWriter( Class fldType ) {
+    private FieldWriter getFieldWriter( Class<?> fldType ) {
 	if (fldType.isPrimitive()) {
 	    if (fldType == byte.class) {
 		return byteWriter ;
@@ -383,7 +382,7 @@ public class ClassMarshaler {
 	}
     }
 
-    private ObjectWriter makeObjectWriter( final Class cls, 
+    private ObjectWriter makeObjectWriter( final Class<?> cls,
         // was: final List<Pair<String,Class>> info ) {
         final ObjectStreamField[] info ) {
 
@@ -395,7 +394,7 @@ public class ClassMarshaler {
 	    int ctr = 0 ;
 	    for (ObjectStreamField osf : info) {
 		String fieldName = osf.getName() ;
-		Class fieldType = osf.getClazz() ;
+		Class<?> fieldType = osf.getClazz() ;
 		Field fld = cls.getDeclaredField( fieldName ) ;
 		if (fld.getType() != fieldType) {
 		    // ERROR
@@ -433,8 +432,8 @@ public class ClassMarshaler {
 
     private void writeSerialData( Object obj, OutputStream os ) throws IOException {
 	for (int ctr = cmChain.size(); ctr >= 0; ctr-- ) {
-	    ClassMarshaler cm = cmChain.get(ctr) ;
-	    ClassAnalyzer ca = cm.getClassAnalyzer() ;
+	    ClassMarshaler<?> cm = cmChain.get(ctr) ;
+	    ClassAnalyzer<?> ca = cm.getClassAnalyzer() ;
 	    char[] typeName = ca.getNameAsCharArray() ;
 
 	    os.startClass( ca.hasWriteObjectMethod(), typeName, ca.getFields().length ) ;
@@ -454,8 +453,8 @@ public class ClassMarshaler {
      */
     public Object create() {
         try {
-            ClassMarshaler cm = cmChain.get(0) ;
-            ClassAnalyzer ca = cm.getClassAnalyzer() ;
+            ClassMarshaler<?> cm = cmChain.get(0) ;
+            ClassAnalyzer<?> ca = cm.getClassAnalyzer() ;
             if (!ca.isInstantiable())
                 ; // ERROR
 

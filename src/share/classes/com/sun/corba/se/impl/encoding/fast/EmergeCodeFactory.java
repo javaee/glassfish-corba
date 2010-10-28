@@ -242,6 +242,7 @@ public final class EmergeCodeFactory {
 	private Object value ;
         private CodeClass cc ;
 
+        @Override
         public String toString() {
             return "EmergeCode[" + code + " (" + kind + ")" 
                 + ((value == null) ? 
@@ -283,10 +284,11 @@ public final class EmergeCodeFactory {
 	}
 
 	public byte byteCode() {
-	    if (code < 128)
-		return (byte)code ;
-	    else
-		return (byte)(code-256) ;
+	    if (code < 128) {
+                return (byte) code;
+            } else {
+                return (byte) (code-256);
+            }
 	}
 
 	public EmergeCode.EmergeKind getKind() {
@@ -313,18 +315,22 @@ public final class EmergeCodeFactory {
             return cc == CodeClass.SIMPLE_MESSAGE ;
         }
 
+        @Override
 	public boolean equals( Object obj ) {
-	    if (obj == this)
-		return true ;
+	    if (obj == this) {
+                return true;
+            }
 
-	    if (!(obj instanceof EmergeCodeBase))
-		return false ;
+	    if (!(obj instanceof EmergeCodeBase)) {
+                return false;
+            }
 
 	    EmergeCodeBase other = (EmergeCodeBase)obj ;
 
 	    return other.code == code ;
 	}
 
+        @Override
 	public int hashCode() {
 	    return code ;
 	}
@@ -339,30 +345,37 @@ public final class EmergeCodeFactory {
 	    throw new IllegalArgumentException( code() + " is not a valid Emerge code" ) ;
 	}
 
+        @Override
 	public EmergeCode.EmergeKind getKind() {
 	    throw new IllegalArgumentException( code() + " is not a valid Emerge code" ) ;
 	}
 
+        @Override
 	public <T> T getValue( Class<T> cls ) {
 	    throw new IllegalArgumentException( code() + " is not a valid Emerge code" ) ;
 	}
 
+        @Override
 	public boolean hasEncodedValue() {
 	    throw new IllegalArgumentException( code() + " is not a valid Emerge code" ) ;
 	}
 
+        @Override
 	public boolean isValidEmergeCode() {
 	    return false ;
 	}
 
+        @Override
         public boolean isPrimitive() {
 	    throw new IllegalArgumentException( code() + " is not a valid Emerge code" ) ;
         }
 
+        @Override
         public boolean isArray() {
 	    throw new IllegalArgumentException( code() + " is not a valid Emerge code" ) ;
         }
 
+        @Override
         public boolean isSimpleMessage() {
 	    throw new IllegalArgumentException( code() + " is not a valid Emerge code" ) ;
         }
@@ -387,8 +400,9 @@ public final class EmergeCodeFactory {
             CodeClass cc ) {
 	    super( code, kind, value, cc ) ;
             
-	    if (value == null)
-		throw new IllegalArgumentException( "value cannot be null" ) ;
+	    if (value == null) {
+                throw new IllegalArgumentException("value cannot be null");
+            }
         }
             
 	EmergeCodeEncodedImpl( int code, EmergeCode.EmergeKind kind, Object value ) {
@@ -490,13 +504,13 @@ public final class EmergeCodeFactory {
         start = EmergeCode.EmergeKind.DOUBLE.ordinal() << NUM_VALUE_BITS ;
         emergeCodes[start + 0] = new EmergeCodeOptionalValueImpl(
             start + 0, EmergeCode.EmergeKind.DOUBLE,
-            Double.valueOf( (double)-1.0 ) ) ;
+            Double.valueOf( -1.0) ) ;
         emergeCodes[start + 1] = new EmergeCodeOptionalValueImpl(
             start + 1, EmergeCode.EmergeKind.DOUBLE,
-            Double.valueOf( (double)0.0 ) ) ;
+            Double.valueOf( 0.0) ) ;
         emergeCodes[start + 2] = new EmergeCodeOptionalValueImpl(
             start + 2, EmergeCode.EmergeKind.DOUBLE,
-            Double.valueOf( (double)1.0 ) ) ;
+            Double.valueOf( 1.0) ) ;
         for (int ctr=3; ctr<NO_ENCODED_VALUE; ctr++ ) {
             emergeCodes[start + ctr] = new EmergeCodeInvalidImpl(
                 start + ctr ) ;
@@ -590,9 +604,10 @@ public final class EmergeCodeFactory {
 
     private static void initializeInvalid( EmergeCode.EmergeKind kind ) {
 	int cv = getCodeValue(kind) ;
-	for (int ctr=0; ctr<=NO_ENCODED_VALUE; ctr++)
-	    emergeCodes[ cv + ctr ] =
-		new EmergeCodeInvalidImpl( cv + ctr ) ;
+	for (int ctr=0; ctr<=NO_ENCODED_VALUE; ctr++) {
+            emergeCodes[cv + ctr] =
+                new EmergeCodeInvalidImpl(cv + ctr);
+        }
     }
 
     private static void initializeSimple( EmergeCode.EmergeKind kind,
@@ -600,15 +615,16 @@ public final class EmergeCodeFactory {
 	int code = kind.ordinal() << NUM_VALUE_BITS ;
 	emergeCodes[ code ] = new EmergeCodeSimpleImpl( code, kind, cc ) ;
 
-	for (int ctr=1; ctr<=NO_ENCODED_VALUE; ctr++)
-	    emergeCodes[ code + ctr ] =
-		new EmergeCodeInvalidImpl( code + ctr ) ;
+	for (int ctr=1; ctr<=NO_ENCODED_VALUE; ctr++) {
+            emergeCodes[code + ctr] =
+                new EmergeCodeInvalidImpl(code + ctr);
+        }
     }
 
     // The cast is correct here because boolean does not set the upper bit.
     private static final byte BOOL_CODE = (byte)getCodeValue( EmergeCode.EmergeKind.BOOL ) ;
     static final byte BOOL_TRUE = (byte)(BOOL_CODE & 1) ;
-    static final byte BOOL_FALSE = (byte)(BOOL_CODE & 0) ;
+    static final byte BOOL_FALSE = BOOL_CODE ;
 
 // Factory methods
     /** Obtain the correct EmergeCode based on the encoded value.
@@ -638,9 +654,9 @@ public final class EmergeCodeFactory {
 	switch (kind) {
 	    // OPTIONAL_VALUE section
 	    case CHAR:		    
-		if (value != null)
-		    throw new IllegalArgumentException(
-			"CHAR cannot encode a value" ) ;
+		if (value != null) {
+                    throw new IllegalArgumentException("CHAR cannot encode a value");
+                }
 		return emergeCodes[(kind.ordinal() << NUM_VALUE_BITS) 
                        + NO_ENCODED_VALUE] ;
 
@@ -677,12 +693,13 @@ public final class EmergeCodeFactory {
                     }
 
                     float floatValue = ((Number)value).floatValue() ;
-                    if (floatValue == -1.0)
-                        offset = 0 ;
-                    else if (floatValue == 0.0)
-                        offset = 1 ;
-                    else if (floatValue == 1.0)
-                        offset = 2 ;
+                    if (floatValue == -1.0) {
+                        offset = 0;
+                    } else if (floatValue == 0.0) {
+                        offset = 1;
+                    } else if (floatValue == 1.0) {
+                        offset = 2;
+                    }
                 }
 
 		return emergeCodes[(kind.ordinal() << NUM_VALUE_BITS) + offset ] ;

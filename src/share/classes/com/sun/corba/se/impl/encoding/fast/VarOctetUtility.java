@@ -70,8 +70,9 @@ public class VarOctetUtility {
             long next = data >> EmergeCodeFactory.NUM_BITS_PER_VAR_OCTET ;
             long current = data & EmergeCodeFactory.VAR_OCTET_MASK ;
 
-            if (next != 0)
-                putPositiveVarOctet( writer, next ) ;
+            if (next != 0) {
+                putPositiveVarOctet(writer, next);
+            }
 
             writer.putByte( (byte)(current - 128) ) ;
         } finally {

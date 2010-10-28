@@ -50,7 +50,6 @@ import java.io.ObjectStreamException ;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
@@ -58,8 +57,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -85,7 +82,7 @@ import sun.corba.Bridge ;
  * @author	Roger Riggs
  * @version 1.98 02/02/00
  */
-public class ClassAnalyzerImpl implements ClassAnalyzer {
+public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
     private static final Bridge bridge = 
 	AccessController.doPrivileged(
 	    new PrivilegedAction<Bridge>() {
@@ -99,11 +96,8 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
     public static final ObjectStreamField[] NO_FIELDS = 
 	new ObjectStreamField[0];
     
-    private static final ObjectStreamField[] serialPersistentFields =
-	NO_FIELDS;
-    
     /** class associated with this descriptor (if any) */
-    private Class cl;
+    private Class<T> cl;
     /** name of class represented by this descriptor */
     private String name;
     private char[] nameChar;
@@ -117,15 +111,15 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
     /** true if represents enum type */
     private boolean isEnum;
     /** true if represented class implements Serializable */
-    private boolean serializable;
+    private boolean isSerializable;
     /** true if represented class implements Externalizable */
-    private boolean externalizable;
+    private boolean isExternalizable ;
 
     /** serializable fields */
     private ObjectStreamField[] fields;
 
     /** serialization-appropriate constructor, or null if none */
-    private Constructor cons;
+    private Constructor<T> cons;
     /** class-defined writeObject method, or null if none */
     private Method writeObjectMethod;
     /** class-defined readObject method, or null if none */
@@ -138,7 +132,7 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
     private Method readResolveMethod;
 
     /** superclass descriptor appearing in stream */
-    private ClassAnalyzer superDesc;
+    private ClassAnalyzer<?> superClassAnalyzer;
     
     public String getName() {
 	return name;
@@ -154,7 +148,7 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      *
      * @return	the <code>Class</code> instance that this descriptor represents
      */
-    public Class<?> forClass() {
+    public Class<T> forClass() {
 	return cl;
     }
     
@@ -184,36 +178,37 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
     /**
      * Return a string describing this ClassAnalyzer.
      */
+    @Override
     public String toString() {
 	return name ;
     }
 
-    public ClassAnalyzer getSuperClassAnalyzer() {
-	return superDesc ;
+    public ClassAnalyzer<?> getSuperClassAnalyzer() {
+	return superClassAnalyzer ;
     }
 
     /**
      * Creates local class descriptor representing given class.
      */
-    public ClassAnalyzerImpl(final LookupTable<Class,ClassMarshaler> lt, 
-	final Class cl) {
+    public ClassAnalyzerImpl(final LookupTable<Class<?>,ClassMarshaler<?>> lt,
+	final Class<T> cl) {
 
 	this.cl = cl;
 	name = cl.getName();
 	nameChar = name.toCharArray();
 	isProxy = Proxy.isProxyClass(cl);
 	isEnum = Enum.class.isAssignableFrom(cl);
-	serializable = Serializable.class.isAssignableFrom(cl);
-	externalizable = Externalizable.class.isAssignableFrom(cl);
+	isSerializable = Serializable.class.isAssignableFrom(cl);
+	isExternalizable  = Externalizable.class.isAssignableFrom(cl);
 
-	Class superCl = cl.getSuperclass();
+	Class<?> superCl = cl.getSuperclass();
 
 	if ((superCl != null) && (superCl.isAssignableFrom( Serializable.class ))) {
-	    superDesc = lt.lookup(null, superCl).getClassAnalyzer() ;
+	    superClassAnalyzer = lt.lookup(null, superCl).getClassAnalyzer() ;
 	}
 
-	if (serializable) {
-	    AccessController.doPrivileged(new PrivilegedAction() {
+	if (isSerializable) {
+	    AccessController.doPrivileged(new PrivilegedAction<Object>() {
 		public Object run() {
 		    if (isEnum) {
 			suid = new Long(0);
@@ -228,7 +223,7 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
 			// XXX log this
 		    }
 		    
-		    if (externalizable) {
+		    if (isExternalizable ) {
 			cons = getExternalizableConstructor(cl);
 		    } else {
 			cons = getSerializableConstructor(cl);
@@ -262,7 +257,7 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * returned.
      */
     ObjectStreamField[] getFields(boolean copy) {
-	return copy ? (ObjectStreamField[]) fields.clone() : fields;
+	return copy ? fields.clone() : fields;
     }
     
     /**
@@ -271,7 +266,7 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * non-primitive types, and any other non-null type matches assignable
      * types only.  Returns matching field, or null if no match found.
      */
-    ObjectStreamField getField(String name, Class type) {
+    ObjectStreamField getField(String name, Class<?> type) {
 	for (int i = 0; i < fields.length; i++) {
 	    ObjectStreamField f = fields[i];
 	    if (f.getName().equals(name)) {
@@ -280,7 +275,8 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
 		{
 		    return f;
 		}
-		Class ftype = f.getType();
+
+		Class<?> ftype = f.getType();
 		if (ftype != null && type.isAssignableFrom(ftype)) {
 		    return f;
 		}
@@ -298,11 +294,11 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
     }
     
     public boolean isExternalizable() {
-	return externalizable;
+	return isExternalizable ;
     }
     
     public boolean isSerializable() {
-	return serializable;
+	return isSerializable;
     }
 
     /**
@@ -534,13 +530,14 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * Access checks are disabled on the returned constructor (if any), since
      * the defining class may still be non-public.
      */
-    private static Constructor getExternalizableConstructor(Class cl) {
+    private Constructor<T> getExternalizableConstructor(Class<T> cl) {
 	try {
-	    Constructor cons = cl.getDeclaredConstructor(new Class[0]);
-	    cons.setAccessible(true);
-	    return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ? 
-		cons : null;
+	    Constructor<T> lcons = cl.getDeclaredConstructor();
+	    lcons.setAccessible(true);
+	    return ((lcons.getModifiers() & Modifier.PUBLIC) != 0) ?
+		lcons : null;
 	} catch (NoSuchMethodException ex) {
+            // XXX log
 	    return null;
 	}
     }
@@ -550,25 +547,26 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * superclass, or null if none found.  Access checks are disabled on the
      * returned constructor (if any).
      */
-    private static Constructor getSerializableConstructor(Class cl) {
-	Class initCl = cl;
+    private Constructor<T> getSerializableConstructor(Class<T> cl) {
+	Class<?> initCl = cl;
 	while (Serializable.class.isAssignableFrom(initCl)) {
 	    if ((initCl = initCl.getSuperclass()) == null) {
 		return null;
 	    }
 	}
 	try {
-	    Constructor cons = initCl.getDeclaredConstructor(new Class[0]);
-	    int mods = cons.getModifiers();
+	    final Constructor<?> lcons = initCl.getDeclaredConstructor();
+	    final int mods = lcons.getModifiers();
 	    if ((mods & Modifier.PRIVATE) != 0 ||
 		((mods & (Modifier.PUBLIC | Modifier.PROTECTED)) == 0 &&
 		 !packageEquals(cl, initCl)))
 	    {
 		return null;
 	    }
-	    cons = bridge.newConstructorForSerialization(cl, cons) ;
-	    cons.setAccessible(true);
-	    return cons;
+	    final Constructor<T> result =
+                bridge.newConstructorForSerialization(cl, lcons) ;
+	    result.setAccessible(true);
+	    return result;
 	} catch (NoSuchMethodException ex) {
 	    return null;
 	}
@@ -580,12 +578,12 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * null if no match found.  Access checks are disabled on the returned
      * method (if any).
      */
-    private static Method getInheritableMethod(Class cl, String name,
-					       Class[] argTypes,
-					       Class returnType)
+    private Method getInheritableMethod(Class<?> cl, String name,
+					       Class<?>[] argTypes,
+					       Class<?> returnType)
     {
 	Method meth = null;
-	Class defCl = cl;
+	Class<?> defCl = cl;
 	while (defCl != null) {
 	    try {
 		meth = defCl.getDeclaredMethod(name, argTypes);
@@ -616,9 +614,9 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * class, or null if none found.  Access checks are disabled on the
      * returned method (if any).
      */
-    private static Method getPrivateMethod(Class cl, String name, 
-					   Class[] argTypes,
-					   Class returnType)
+    private Method getPrivateMethod(Class<?> cl, String name,
+					   Class<?>[] argTypes,
+					   Class<?> returnType)
     {
 	try {
 	    Method meth = cl.getDeclaredMethod(name, argTypes);
@@ -636,7 +634,7 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * Returns true if classes are defined in the same runtime package, false
      * otherwise.
      */
-    private static boolean packageEquals(Class cl1, Class cl2) {
+    private boolean packageEquals(Class<?> cl1, Class<?> cl2) {
 	return (cl1.getClassLoader() == cl2.getClassLoader() &&
 		getPackageName(cl1).equals(getPackageName(cl2)));
     }
@@ -644,7 +642,7 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
     /**
      * Returns package name of given class.
      */
-    private static String getPackageName(Class cl) {
+    private String getPackageName(Class<?> cl) {
 	String s = cl.getName();
 	int i = s.lastIndexOf('[');
 	if (i >= 0) {
@@ -658,10 +656,10 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * Compares class names for equality, ignoring package names.  Returns true
      * if class names equal, false otherwise.
      */
-    private static boolean classNamesEqual(String name1, String name2) {
-	name1 = name1.substring(name1.lastIndexOf('.') + 1);
-	name2 = name2.substring(name2.lastIndexOf('.') + 1);
-	return name1.equals(name2);
+    private boolean classNamesEqual(String name1, String name2) {
+	final String n1 = name1.substring(name1.lastIndexOf('.') + 1);
+	final String n2 = name2.substring(name2.lastIndexOf('.') + 1);
+	return n1.equals(n2);
     }
     
     /**
@@ -669,15 +667,13 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * RuntimeException, Error, or of some unexpected type (in which case it is
      * wrapped inside an IOException).
      */
-    private static void throwMiscException(Throwable th) throws IOException {
+    private void throwMiscException(Throwable th) throws IOException {
 	if (th instanceof RuntimeException) {
 	    throw (RuntimeException) th;
 	} else if (th instanceof Error) {
 	    throw (Error) th;
 	} else {
-	    IOException ex = new IOException("unexpected exception type");
-	    ex.initCause(th);
-	    throw ex;
+	    throw new IOException("unexpected exception type", th);
 	}
     }
 
@@ -688,23 +684,23 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * Field objects.  Throws InvalidClassException if the (explicitly
      * declared) serializable fields are invalid.
      */
-    private static ObjectStreamField[] getSerialFields(Class cl) 
+    private ObjectStreamField[] getSerialFields(Class<?> cl)
 	throws InvalidClassException
     {
-	ObjectStreamField[] fields;
+	ObjectStreamField[] lfields;
 	if (Serializable.class.isAssignableFrom(cl) &&
 	    !Externalizable.class.isAssignableFrom(cl) &&
 	    !Proxy.isProxyClass(cl) &&
 	    !cl.isInterface())
 	{
-	    if ((fields = getDeclaredSerialFields(cl)) == null) {
-		fields = getDefaultSerialFields(cl);
+	    if ((lfields = getDeclaredSerialFields(cl)) == null) {
+		lfields = getDefaultSerialFields(cl);
 	    }
-	    Arrays.sort(fields);
+	    Arrays.sort(lfields);
 	} else {
-	    fields = NO_FIELDS;
+	    lfields = NO_FIELDS;
 	}
-	return fields;
+	return lfields;
     }
     
     /**
@@ -718,7 +714,7 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * InvalidClassException if the declared serializable fields are
      * invalid--e.g., if multiple fields share the same name.
      */
-    private static ObjectStreamField[] getDeclaredSerialFields(Class cl) 
+    private ObjectStreamField[] getDeclaredSerialFields(Class<?> cl)
 	throws InvalidClassException
     {
 	ObjectStreamField[] serialPersistentFields = null;
@@ -729,7 +725,8 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
 		f.setAccessible(true);
 		java.io.ObjectStreamField[] javaSPF = 
 		    (java.io.ObjectStreamField[])f.get(null) ;
-		serialPersistentFields = ObjectStreamClass.translateFields( javaSPF ) ;
+		serialPersistentFields =
+                    ObjectStreamClass.translateFields( javaSPF ) ;
 	    }
 	} catch (Exception ex) {
 	    // XXX log exception
@@ -743,7 +740,8 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
 	
 	ObjectStreamField[] boundFields = 
 	    new ObjectStreamField[serialPersistentFields.length];
-	Set fieldNames = new HashSet(serialPersistentFields.length);
+	Set<String> fieldNames = new HashSet<String>(
+            serialPersistentFields.length);
 
 	for (int i = 0; i < serialPersistentFields.length; i++) {
 	    ObjectStreamField spf = serialPersistentFields[i];
@@ -781,9 +779,9 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
      * contains a Field object for the field it represents.  If no default
      * serializable fields exist, NO_FIELDS is returned.
      */
-    private static ObjectStreamField[] getDefaultSerialFields(Class cl) {
+    private ObjectStreamField[] getDefaultSerialFields(Class<?> cl) {
 	Field[] clFields = cl.getDeclaredFields();
-	ArrayList list = new ArrayList();
+	ArrayList<ObjectStreamField> list = new ArrayList<ObjectStreamField>();
 	int mask = Modifier.STATIC | Modifier.TRANSIENT;
 
 	for (int i = 0; i < clFields.length; i++) {
@@ -793,6 +791,6 @@ public class ClassAnalyzerImpl implements ClassAnalyzer {
 	}
 	int size = list.size();
 	return (size == 0) ? NO_FIELDS :
-	    (ObjectStreamField[]) list.toArray(new ObjectStreamField[size]);
+	    list.toArray(new ObjectStreamField[size]);
     }
 }

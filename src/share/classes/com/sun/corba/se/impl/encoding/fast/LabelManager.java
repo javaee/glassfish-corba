@@ -110,12 +110,13 @@ public class LabelManager {
     public Label lookup( Holder<Boolean> firstTime, Object data ) {
 	long contextId = getContextId( data ) ;
         Label label ;
-	if (contextId == 0)
+	if (contextId == 0) {
 	    label = msgTable.lookup( firstTime, data ) ;
-	else
+        }  else {
 	    // XXX assume for now that this case must do another 
 	    // getContextId call.  How can we improve this?
 	    label = extTable.lookup( firstTime, data ) ;
+        }
         return label ;
     }
 }

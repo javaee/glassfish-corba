@@ -55,7 +55,6 @@
         <property name="experimentaltest.src.dir"	value="experimental/test/src/share/classes"/>
         <property name="experimentalclasses.dir"	value="experimental/build/classes"/>
         <property name="experimentaltestclasses.dir"	value="experimental/test/build/classes"/>
-
         <!-- Emma related -->
 	<property name="emma.dir"                       value="build/coverage"/>
 	<property name="emma.classes.dir"               location="${emma.dir}/classes"/>
@@ -262,6 +261,58 @@
 	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
 	</javac>
     </target>
+
+    <!-- ========================= crap4j integration =============== 
+
+    Note: This turns out not to be useful, because crap4j is only useful with coverage
+    analysis.  As near as I can tell, the emma-based coverage analysis in the ORB 
+    cannot be integrated with the crap4j tool.  I also cannot simply let crap4j executre
+    all of the ORB tests, because crap4j assumes that it can
+    run all of your tests as JUnit tests.
+
+    <property environment="env"/>
+
+    <taskdef name="crap4j" classname="org.crap4j.anttask.Crap4jAntTask">
+        <classpath>
+	    <fileset dir="${env.CRAP4J_HOME}/lib">
+		<include name="**/*.jar"/>
+	    </fileset>
+	</classpath>
+    </taskdef>
+
+    <target name="run-crap4j" depends="init">
+	<crap4j projectdir="${basedir}" outputdir="crap4j" dontTest="false" debug="false">
+	    <classes>
+		<fileset dir="build/classes">
+		    <include name="**/*.class"/>
+		    <exclude name="com/sun/tools/corba/se/idl/**/*.class"/>
+		    <exclude name="com/sun/corba/se/org/**/*.class"/>
+		    <exclude name="com/sun/corba/se/internal/**/*.class"/>
+		    <exclude name="sun/rmi/**/*.class"/>
+		    <exclude name="org/**/*.class"/>
+		    <exclude name="javax/**/*.class"/>
+		</fileset>
+
+		<fileset dir="orblib/build/classes">
+		    <include name="**/*.class"/>
+		    <exclude name="org/**/*.class"/>
+		</fileset>
+	    </classes>
+
+	    <srces>
+		<pathElement location="src/share/classes"/>
+		<pathElement location="optional/src/share/classes"/>
+	    </srces>
+
+	    <libClasspath>
+		<fileset dir="build/libcache">
+		    <include name="**/*.jar"/>
+		</fileset>
+	    </libClasspath>
+	</crap4j>
+    </target>
+
+    -->
 
     <!-- ======================== findbugs integration ========= 
 

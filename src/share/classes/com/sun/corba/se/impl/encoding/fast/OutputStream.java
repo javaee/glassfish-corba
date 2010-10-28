@@ -49,7 +49,6 @@ import java.util.IdentityHashMap ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.orbutil.generic.Holder ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
 
 import com.sun.corba.se.impl.encoding.fast.bytebuffer.Writer ;
 
@@ -152,8 +151,8 @@ public class OutputStream extends ObjectOutputStream {
     private final Holder<Boolean> firstTime = 
 	new Holder<Boolean>() ;
 
-    private final Holder<ClassMarshaler> cmHolder = 
-	new Holder<ClassMarshaler>() ;
+    private final Holder<ClassMarshaler<?>> cmHolder =
+	new Holder<ClassMarshaler<?>>() ;
 
     // Set to true if we are writing the body of a reference or a tuple.
     private boolean insideBody = true ;
@@ -163,7 +162,7 @@ public class OutputStream extends ObjectOutputStream {
     // the fields for the exact class in the superclass chain that is being
     // marshaled in the call to defaultWriteObject.
     private Object currentObject ; 
-    private ClassMarshaler currentClassMarshaler ; 
+    private ClassMarshaler<?> currentClassMarshaler ;
 
     // Used in the ClassMarshaler, which must set and unset this
     // around marshaling the fields of an object.
@@ -213,7 +212,7 @@ public class OutputStream extends ObjectOutputStream {
 	VarOctetUtility.put( writer, numFields ) ;   // length
     }
 
-    void startCustomPart( Object obj, ClassMarshaler cm ) {
+    void startCustomPart( Object obj, ClassMarshaler<?> cm ) {
 	tupleStart() ;
 	currentObject = obj ;
 	currentClassMarshaler = cm ;
@@ -305,9 +304,9 @@ public class OutputStream extends ObjectOutputStream {
 	}
     } ;
 
-    private ReferenceWriter getReferenceWriter( Class cls ) {
+    private ReferenceWriter getReferenceWriter( Class<?> cls ) {
 	if (cls.isArray()) {
-	    Class compType = cls.getComponentType() ;
+	    Class<?> compType = cls.getComponentType() ;
 	    if (compType.isPrimitive()) {
 		if (compType == Character.TYPE) {
 		    return charArrayWriter ;
@@ -342,6 +341,7 @@ public class OutputStream extends ObjectOutputStream {
      * the flush call.
      * XXX This is not how the MT-hot case works.
      */
+    @Override
     public void flush() throws IOException {
 	writer.putByte( (byte)TUPLE_END_CODE.code() ) ;
 	setInsideBody( false ) ;
@@ -354,6 +354,7 @@ public class OutputStream extends ObjectOutputStream {
 	writer.flush() ;
     }
 
+    @Override
     public void close() {
 	// XXX What else is needed here?
         try {
@@ -363,6 +364,7 @@ public class OutputStream extends ObjectOutputStream {
         }
     }
 
+    @Override
     public void writeBoolean( boolean data ) throws IOException {
 	if (data) {
 	    writer.putByte( EmergeCodeFactory.BOOL_TRUE ) ;
@@ -395,6 +397,7 @@ public class OutputStream extends ObjectOutputStream {
 	}
     }
 
+    @Override
     public void writeInt( int data ) throws IOException {
 	EmergeCode code = EmergeCodeFactory.getCode( 
 	    EmergeCode.EmergeKind.INT, data ) ;
@@ -404,6 +407,7 @@ public class OutputStream extends ObjectOutputStream {
 	}
     }
 
+    @Override
     public void writeLong( long data ) throws IOException {
 	EmergeCode code = EmergeCodeFactory.getCode( 
 	    EmergeCode.EmergeKind.LONG, data ) ;
@@ -413,6 +417,7 @@ public class OutputStream extends ObjectOutputStream {
 	}
     }
 
+    @Override
     public void writeFloat( float data ) throws IOException {
 	EmergeCode code = EmergeCodeFactory.getCode( 
 	    EmergeCode.EmergeKind.FLOAT, data ) ;
@@ -422,6 +427,7 @@ public class OutputStream extends ObjectOutputStream {
 	}
     }
 
+    @Override
     public void writeDouble( double data ) throws IOException {
 	EmergeCode code = EmergeCodeFactory.getCode( 
 	    EmergeCode.EmergeKind.DOUBLE, data ) ;
@@ -440,8 +446,9 @@ public class OutputStream extends ObjectOutputStream {
 	// this Object, add it to the workQ, because we have not
 	// yet marshaled its contents.
 	if (firstTime.content()) {
-	    if (rw == null)
-		rw = getReferenceWriter( data.getClass() ) ;
+	    if (rw == null) {
+                rw = getReferenceWriter(data.getClass());
+            }
 
 	    workQ.offer( new Pair<Object,ReferenceWriter>( data, rw ) ) ;
 	}
@@ -639,16 +646,17 @@ public class OutputStream extends ObjectOutputStream {
      * which indicates to the reader that all occurrences of object-label
      * should be replaced by replacement-label.
      */
+    @Override
     public void writeObjectOverride( Object obj ) throws IOException {
 	if (obj == null) {
 	    writer.putByte( (byte)NULL_CODE.code() ) ;
 	    return ;
 	}
 
-	ClassMarshaler cm = ClassMarshalerFactory.getClassMarshaler( 
+	ClassMarshaler<?> cm = ClassMarshalerFactory.getClassMarshaler(
 	    obj.getClass() ) ;
 
-        Holder<ClassMarshaler> cmHolder = new Holder<ClassMarshaler>( cm ) ;
+        Holder<ClassMarshaler<?>> cmHolder = new Holder<ClassMarshaler<?>>( cm ) ;
 
 	Object replacement = replacements.get( obj ) ;
 	if (replacement == obj) {
@@ -676,7 +684,7 @@ public class OutputStream extends ObjectOutputStream {
 	LabelManager.Label label = handleIndir( replacement, objectWriter ) ;
 
 	if (!insideBody) {
-	    Class type = obj.getClass() ;
+	    Class<?> type = obj.getClass() ;
 
 	    setInsideBody( true ) ;
 	    try {
@@ -694,9 +702,9 @@ public class OutputStream extends ObjectOutputStream {
 
     void writeValueArray( Object[] data ) {
 	LabelManager.Label label = handleIndir( data, objectArrayWriter ) ;
-	Class dataType = data.getClass() ;
-	Class compType = data.getClass().getComponentType() ;
-	ClassMarshaler cm = ClassMarshalerFactory.getClassMarshaler( compType ) ;
+	Class<?> dataType = data.getClass() ;
+	Class<?> compType = data.getClass().getComponentType() ;
+	ClassMarshaler<?> cm = ClassMarshalerFactory.getClassMarshaler( compType ) ;
 	char[] selfType = cm.getTypeName() ;
 	LabelManager.Label typeLabel = getLabel( selfType, objectArrayWriter ) ;
 
@@ -720,12 +728,13 @@ public class OutputStream extends ObjectOutputStream {
     // ObjectOutputStream methods (other than basic write<> primitives)
     //
 
+    @Override
     public void defaultWriteObject() throws IOException {
 	// this does the work of writing the object if called after
 	// writeObjectOverride sets up the current object.
-	if ((currentObject == null) || (currentClassMarshaler == null))
-	    throw new IOException( 
-		"Cannot call defaultWriteObject outside of a writeObject method" ) ;
+	if ((currentObject == null) || (currentClassMarshaler == null)) {
+            throw new IOException("Cannot call defaultWriteObject outside of a writeObject method");
+        }
 
 	currentClassMarshaler.writeClassFields( currentObject, this ) ;
     }
@@ -734,10 +743,12 @@ public class OutputStream extends ObjectOutputStream {
     // writeObjectOverride here, so we need to save the object being written.
     // Because we NEVER recurse from one object to another, there is no need
     // to stack the current object or current PutField.
+    @Override
     public ObjectOutputStream.PutField putFields() throws IOException {
 	throw new IOException( "putFields not yet supported" ) ;
     }
 
+    @Override
     public void reset() throws IOException {
 	// XXX CORBA: reset classDescStack?
 	// Should discard state (JRMP writes a TC_RESET to the stream and forgets
@@ -746,29 +757,35 @@ public class OutputStream extends ObjectOutputStream {
     }
 
     // CORBA: write( xxx ) methods just write bytes as appropriate
+    @Override
     public void write( int val )  throws IOException {
 	// XXX implement me
     }
 
+    @Override
     public void write( byte[] buf ) throws IOException {
 	// XXX implement me
     }
 
+    @Override
     public void write( byte[] buf, int off, int len )  throws IOException {
 	// XXX implement me
     }
 
+    @Override
     public void writeBytes( String val )  throws IOException {
 	// CORBA: convert string to byte[] (code has BUG: should specify char set)
 	// and then write_octet_array
 	// XXX implement me
     }
 
+    @Override
     public void writeChars( String val )  throws IOException {
 	// CORBA: convert to char[], then write_wchar_array
 	// XXX implement me
     }
 
+    @Override
     public void writeUTF( String val )  throws IOException {
 	// CORBA: we just call CDR write_wstring for this
 	// XXX implement me

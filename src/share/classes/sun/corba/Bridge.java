@@ -101,6 +101,7 @@ public final class Bridge
     private Method getLatestUserDefinedLoaderMethod() {
         return AccessController.doPrivileged(
 	    new PrivilegedAction<Method>() {
+            @SuppressWarnings("unchecked")
 		public Method run() {
 		    Method result = null;
 
@@ -110,10 +111,8 @@ public final class Bridge
 			    "latestUserDefinedLoader");
 			result.setAccessible(true);
 		    } catch (NoSuchMethodException nsme) {
-			Error err = new Error( "java.io.ObjectInputStream" + 
-			    " latestUserDefinedLoader " + nsme );
-			err.initCause(nsme) ;
-			throw err ;
+			throw new Error("java.io.ObjectInputStream" +
+                        " latestUserDefinedLoader " + nsme, nsme) ;
 		    }
 
 		    return result;
@@ -132,38 +131,36 @@ public final class Bridge
 			fld.setAccessible( true ) ;
 			return fld ;
 		    } catch (NoSuchFieldException exc) {
-			Error err = new Error( "Could not access Unsafe" ) ;
-			err.initCause( exc ) ;
-			throw err ;
+			throw new Error("Could not access Unsafe", exc) ;
 		    }
 		}
 	    } 
 	) ;
 
-	Unsafe unsafe = null;
+	Unsafe theUnsafe = null;
 
 	try {
-	    unsafe = Unsafe.class.cast( fld.get( null ) ) ;
+	    theUnsafe = Unsafe.class.cast( fld.get( null ) ) ;
 	} catch (Throwable t) {
-	    Error err = new Error( "Could not access Unsafe" ) ;
-	    err.initCause( t ) ;
-	    throw err ;
+	    throw new Error("Could not access Unsafe", t) ;
 	}
 
-	return unsafe ;
+	return theUnsafe ;
     }
 
 
+    @SuppressWarnings("unchecked")
     private Bridge() {
 	latestUserDefinedLoaderMethod = getLatestUserDefinedLoaderMethod();
 	unsafe = getUnsafe() ;
 	reflectionFactory = AccessController.doPrivileged(
-	    // This generates a warning because GetReflectionFactoryAction
-	    // does not have the correct type: I can't fix that.
-	    // Because the required type is a generic, I can't fix the
-	    // warning either (with Class.cast).
-	    (PrivilegedAction<ReflectionFactory>)
-		new ReflectionFactory.GetReflectionFactoryAction()) ;
+
+        // This generates a warning because GetReflectionFactoryAction
+        // does not have the correct type: I can't fix that.
+        // Because the required type is a generic, I can't fix the
+        // warning either (with Class.cast).
+        (PrivilegedAction<ReflectionFactory>)
+            new ReflectionFactory.GetReflectionFactoryAction()) ;
     }
 
     /** Fetch the Bridge singleton.  This requires the following
@@ -177,11 +174,12 @@ public final class Bridge
      * @throws SecurityException if the caller does not have the 
      * required permissions and the caller has a non-null security manager.
      */
-    public static final synchronized Bridge get()
+    public static synchronized Bridge get()
     {
 	SecurityManager sman = System.getSecurityManager() ;
-	if (sman != null)
-	    sman.checkPermission( getBridgePermission ) ;
+	if (sman != null) {
+            sman.checkPermission(getBridgePermission);
+        }
 
 	if (bridge == null) {
 	    bridge = new Bridge() ;
@@ -199,15 +197,11 @@ public final class Bridge
             // Invoke the ObjectInputStream.latestUserDefinedLoader method
             return (ClassLoader)latestUserDefinedLoaderMethod.invoke(null);
         } catch (InvocationTargetException ite) {
-            Error err = new Error(
-		"sun.corba.Bridge.latestUserDefinedLoader: " + ite ) ;
-	    err.initCause( ite ) ;
-	    throw err ;
+	    throw new Error("sun.corba.Bridge.latestUserDefinedLoader: " + ite,
+                ite) ;
         } catch (IllegalAccessException iae) {
-            Error err = new Error(
-		"sun.corba.Bridge.latestUserDefinedLoader: " + iae ) ;
-	    err.initCause( iae ) ;
-	    throw err ;
+	    throw new Error("sun.corba.Bridge.latestUserDefinedLoader: " + iae,
+                iae) ;
         }
     }
 
@@ -370,8 +364,9 @@ public final class Bridge
      * no args constructor of the first non-Serializable superclass
      * of the Serializable class.
      */
-    public final Constructor newConstructorForSerialization( Class cl, 
-	Constructor cons )
+    @SuppressWarnings("unchecked")
+    public final <T> Constructor<T> newConstructorForSerialization( Class<T> cl,
+	Constructor<?> cons )
     {
 	return reflectionFactory.newConstructorForSerialization( cl, cons ) ;
     }

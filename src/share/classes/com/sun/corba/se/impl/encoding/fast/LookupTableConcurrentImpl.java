@@ -69,8 +69,8 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
     private final ReferenceQueue<K> localDescsQueue = 
 	new ReferenceQueue<K>();
 
-    private final UnaryFunction<K,V> factory ;
-    private final Class<V> token ;
+    private final UnaryFunction<? super K,? extends V> factory ;
+    private final Class<?> token ;
 
     /** Create a lookup table.
      * @param factory The factory used to create a value for the key if
@@ -78,8 +78,8 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
      * @param token A class type token for the type of value stored in the
      * table.
      */
-    public LookupTableConcurrentImpl( UnaryFunction<K,V> factory, 
-	Class<V> token ) {
+    public LookupTableConcurrentImpl( UnaryFunction<? super K,? extends V> factory,
+	Class<?> token ) {
 
 	this.factory = factory ;
 	this.token = token ;
@@ -128,7 +128,7 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
 	    }
 	    if (interrupted) {
 		AccessController.doPrivileged(
-		    new PrivilegedAction() {
+		    new PrivilegedAction<Object>() {
 			public Object run() {
 			    Thread.currentThread().interrupt();
 			    return null;
@@ -180,6 +180,7 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
 	/**
 	 * Returns the identity hash code of the original referent.
 	 */
+        @Override
 	public int hashCode() {
 	    return hash;
 	}
@@ -190,6 +191,8 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
 	 * been cleared, if the given object is another WeakKey<K> 
 	 * instance with the identical non-null referent as this one.
 	 */
+        @Override
+        @SuppressWarnings("unchecked")
 	public boolean equals(Object obj) {
 	    if (obj == this) {
 		return true;
@@ -205,6 +208,7 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
 	}
     }
 
+    @SuppressWarnings({"unchecked", "unchecked", "unchecked"})
     public V lookup(Holder<Boolean> firstTime, K k) {
 	if (firstTime != null) {
 	    firstTime.content( false ) ;
@@ -219,10 +223,10 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
 	    entry = ref.get();
 	}
 
-	EntryFuture future = null;
+	EntryFuture<?> future = null;
 	if (entry == null) {
-	    EntryFuture newEntry = new EntryFuture();
-	    Reference<?> newRef = new SoftReference<EntryFuture>(newEntry);
+	    EntryFuture<?> newEntry = new EntryFuture();
+	    Reference<?> newRef = new SoftReference<EntryFuture<?>>(newEntry);
 	    do {
 		if (ref != null) {
 		    localDescs.remove(key, ref);
@@ -240,11 +244,11 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
 	}
 	
 	if (token.isInstance( entry ) ) {  // check common case first
-	    return token.cast( entry ) ;
+	    return (V)entry ;
 	}
 
 	if (entry instanceof EntryFuture) {
-	    future = (EntryFuture) entry;
+	    future = (EntryFuture<?>) entry;
 	    if (future.getOwner() == Thread.currentThread()) {
 		/*
 		 * Handle nested call situation described by 4803747: waiting
@@ -261,8 +265,9 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
 	if (entry == null) {
 	    try {
 		entry = factory.evaluate( k ) ;
-		if (firstTime != null)
-		    firstTime.content( true ) ;
+		if (firstTime != null) {
+                    firstTime.content(true);
+                }
 	    } catch (Throwable th) {
 		entry = th;
 	    }
@@ -275,7 +280,7 @@ public class LookupTableConcurrentImpl<K,V> implements LookupTable<K,V> {
 	}
 	
 	if (token.isInstance( entry )) {
-	    return token.cast( entry ) ;
+	    return (V)entry ;
 	} else if (entry instanceof RuntimeException) {
 	    throw (RuntimeException) entry;
 	} else if (entry instanceof Error) {

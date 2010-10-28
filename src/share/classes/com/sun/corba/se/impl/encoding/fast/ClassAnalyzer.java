@@ -45,8 +45,6 @@ import java.io.ObjectInputStream ;
 import java.io.ObjectOutputStream ;
 import java.io.IOException ;
 
-import java.util.List ;
-
 import com.sun.corba.se.impl.io.ObjectStreamField ;
 
 /** Analyze a class to determine its structure for serialization.
@@ -65,7 +63,7 @@ import com.sun.corba.se.impl.io.ObjectStreamField ;
  * XXX Making a lot of these methods public is a security risk.  We will need
  * to control access to the ClassAnalyzer using a Permission.
  */
-public interface ClassAnalyzer {
+public interface ClassAnalyzer<T> {
     // XXX we probably also need/want both the Java serialVersionUID and the RMI-IIOP
     // structuralUID available here.
 
@@ -92,7 +90,7 @@ public interface ClassAnalyzer {
      *
      * @return	the <code>Class</code> instance that this descriptor represents
      */
-    public Class<?> forClass() ;
+    public Class<T> forClass() ;
     
     /** Return field information, ordered correctly for serialization.
      * Of course, the caller is free to use whatever order is desired, but here
@@ -112,9 +110,10 @@ public interface ClassAnalyzer {
     /**
      * Return a string describing this ClassAnalyzer.
      */
+    @Override
     public String toString() ;
 
-    public ClassAnalyzer getSuperClassAnalyzer() ;
+    public ClassAnalyzer<?> getSuperClassAnalyzer() ;
 
     public boolean isProxy() ;
     

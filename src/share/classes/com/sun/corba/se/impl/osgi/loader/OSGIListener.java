@@ -75,6 +75,8 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
  * @author ken
  */
 public class OSGIListener implements BundleActivator, SynchronousBundleListener {
+    private static final boolean FINE_DEBUG = false ;
+
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
@@ -145,10 +147,14 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         public Class<?> evaluate(String arg) {
             Bundle bundle = getBundleForClass( arg ) ;
             if (bundle == null) {
-                wrapper.classNotFoundInBundle( arg ) ;
+                if (FINE_DEBUG) {
+                    wrapper.classNotFoundInBundle( arg ) ;
+                }
                 return null ;
             } else {
-                wrapper.foundClassInBundle( arg, bundle.getSymbolicName() ) ;
+                if (FINE_DEBUG) {
+                    wrapper.foundClassInBundle( arg, bundle.getSymbolicName() ) ;
+                }
             }
 
             try {
@@ -186,7 +192,9 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
             Bundle bundle = pkgAdmin.getBundle( cls ) ;
             if (bundle == null) {
-                wrapper.classNotFoundInBundle( cls.getName() ) ;
+                if (FINE_DEBUG) {
+                    wrapper.classNotFoundInBundle( cls.getName() ) ;
+                }
                 return null ;
             }
             
@@ -201,7 +209,9 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                 }
             }
 
-            wrapper.foundClassInBundleVersion( cls, name, version ) ;
+            if (FINE_DEBUG) {
+                wrapper.foundClassInBundleVersion( cls, name, version ) ;
+            }
 
             return PREFIX + name + "/" + version ;
         }
@@ -213,8 +223,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                     try {
                         return bundle.loadClass( className ) ;
                     } catch (ClassNotFoundException exc) {
-                        wrapper.couldNotLoadClassInBundle( exc, className, 
-                            bundle.getSymbolicName() ) ;
+                        if (FINE_DEBUG) {
+                            wrapper.couldNotLoadClassInBundle( exc, className,
+                                bundle.getSymbolicName() ) ;
+                        }
                         return null ;
                     }
                 } else {
@@ -235,12 +247,16 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                         if (defBundles != null) {
                             // I think this is the highest available version
                             try {
-                                wrapper.foundClassInBundleVersion( className,
-                                    name, version ) ;
+                                if (FINE_DEBUG) {
+                                    wrapper.foundClassInBundleVersion( className,
+                                        name, version ) ;
+                                }
                                 return defBundles[0].loadClass( className ) ;
                             } catch (ClassNotFoundException cnfe) {
-                                wrapper.classNotFoundInBundleVersion( className,
-                                    name, version ) ;
+                                if (FINE_DEBUG) {
+                                    wrapper.classNotFoundInBundleVersion( className,
+                                        name, version ) ;
+                                }
                                 // fall through to return null
                             }
                         }

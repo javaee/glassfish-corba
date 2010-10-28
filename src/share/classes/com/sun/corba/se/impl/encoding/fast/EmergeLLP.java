@@ -90,40 +90,41 @@ public class EmergeLLP {
 		switch (ec.getKind()) {
 		    case TUPLE :
 			EmergeCode.TupleCode tc = ec.getValue( EmergeCode.TupleCode.class ) ;	
-			if (tc == EmergeCode.TupleCode.TUPLE_START)
-			    inputs[ctr] = TUPLE_START ;
-			else if (tc == EmergeCode.TupleCode.TUPLE_END)
-			    inputs[ctr] = TUPLE_END ;
-			else 
+			if (tc == EmergeCode.TupleCode.TUPLE_START) {
+                            inputs[ctr] = TUPLE_START;
+                        } else if (tc == EmergeCode.TupleCode.TUPLE_END) {
+                            inputs[ctr] = TUPLE_END;
+                        } else
 			    ; // ERROR
 			break ;
 
 		    case PART :
 			EmergeCode.PartCode pc = ec.getValue( EmergeCode.PartCode.class ) ;	
-			if (pc == EmergeCode.PartCode.NO_CUSTOM)
-			    inputs[ctr] = PART_SIMPLE ;
-			else if (pc == EmergeCode.PartCode.HAS_CUSTOM)
-			    inputs[ctr] = PART_CUSTOM ;
-			else 
+			if (pc == EmergeCode.PartCode.NO_CUSTOM) {
+                            inputs[ctr] = PART_SIMPLE;
+                        } else if (pc == EmergeCode.PartCode.HAS_CUSTOM) {
+                            inputs[ctr] = PART_CUSTOM;
+                        } else
 			    ; // ERROR
 			break ;
 
 		    case MSG :
 			EmergeCode.MsgCode mc = ec.getValue( EmergeCode.MsgCode.class ) ;	
-			if (mc == EmergeCode.MsgCode.MSG_START)
-			    inputs[ctr] = MSG_START ;
-			else if (mc == EmergeCode.MsgCode.MSG_END)
-			    inputs[ctr] = MSG_END ;
-			else 
+			if (mc == EmergeCode.MsgCode.MSG_START) {
+                            inputs[ctr] = MSG_START;
+                        } else if (mc == EmergeCode.MsgCode.MSG_END) {
+                            inputs[ctr] = MSG_END;
+                        } else
 			    ; // ERROR
 			break ;
 
 		    case LABEL_MSG :
 			EmergeCode.LabelMsg lmc = ec.getValue( EmergeCode.LabelMsg.class ) ;	
-			if (lmc == EmergeCode.LabelMsg.REPLY_GOOD)
-			    inputs[ctr] = LABEL_MSG_REPLY_GOOD ;
-			else
-			    inputs[ctr] = SIMPLE_MESSAGE ;
+			if (lmc == EmergeCode.LabelMsg.REPLY_GOOD) {
+                            inputs[ctr] = LABEL_MSG_REPLY_GOOD;
+                        } else {
+                            inputs[ctr] = SIMPLE_MESSAGE;
+                        }
 			break ;
 
 		    case FLIST :
@@ -143,6 +144,7 @@ public class EmergeLLP {
     
     // State common to both FSMs
     private static final State ERROR = new State( "Error", State.Kind.FINAL ) {
+        @Override
 	public FSM preAction( FSM fsm ) {
 	    // XXX clean this up: needs better message
 	    throw new IllegalStateException( "Illegal state" ) ;
@@ -176,21 +178,25 @@ public class EmergeLLP {
 	
 	// REFERENCE states transition into a new FSM in state Value
 	private final State OTHER_VALUE = new State( "OtherValue", State.Kind.REFERENCE ) {
+            @Override
 	    public FSM preAction( FSM fsm ) {
 		return valueFSM ;
 	    }
 
+            @Override
 	    public State returnAction( FSM fsm, FSM nestedFSM ) {
-		if (fsm.getState() == OTHER_VALUE)
-		    return START ;
-		else if (fsm.getState() == MESSAGE_VALUE)
-		    return END ;
-		else
-                    throw new IllegalStateException( "Bad state" ) ;
+		if (fsm.getState() == OTHER_VALUE) {
+                    return START;
+                } else if (fsm.getState() == MESSAGE_VALUE) {
+                    return END;
+                } else {
+                    throw new IllegalStateException("Bad state");
+                }
 	    }
 	} ;
 
 	private final State MESSAGE_VALUE = new State( "MessageValue", State.Kind.REFERENCE ) {
+            @Override
 	    public FSM preAction( FSM fsm ) {
 		return valueFSM ;
 	    }
@@ -205,8 +211,9 @@ public class EmergeLLP {
             setState( START ) ;
             engine = getStateEngine() ;
 
-	    for (State state : states) 
-		engine.setDefault( state, ERROR ) ;
+	    for (State state : states) {
+                engine.setDefault(state, ERROR);
+            }
 
 	    //	    State,		Input,		    Guard,		Action,	    new State
 	    engine.add( START,		PRIMITIVE,				null,	    START ) ;
@@ -286,8 +293,9 @@ public class EmergeLLP {
             setState( VALUE ) ;
             engine = getStateEngine() ;
 
-	    for (State state : states) 
-		engine.setDefault( state, ERROR ) ;
+	    for (State state : states) {
+                engine.setDefault(state, ERROR);
+            }
 
 	    //	    State,		    Input,	    Guard,		Action,	    new State
 	    engine.add( VALUE,		    PART_SIMPLE,			null,	    SIMPLE_PART ) ;

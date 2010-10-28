@@ -468,7 +468,7 @@ public class WrapperGenerator {
      * behavior.
      * @return An instance of the interface.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unchecked"})
     public static <T> T makeWrapper( final Class<T> cls,
         final Extension extension ) {
 
@@ -483,6 +483,25 @@ public class WrapperGenerator {
             final String idPrefix = ew.idPrefix() ;
             final String name = extension.getLoggerName( cls );
 
+            // Get the logger with the resource bundle if it is available,
+            // otherwise without it.  This is needed because sometimes
+            // when we load a class to generate a .properties file, the
+            // ResourceBundle is (obviously!) not availabe, and a static
+            // initializer must initialize a log wrapper WITHOUT a
+            // ResourceBundle, in order to generate a properties file which
+            // implements the ResourceBundle.
+            //
+            // Issue 14269: Do this outside of the construction of the
+            // InvocationHandler, because Logger.getLogger is an expensive
+            // synchronized call.
+            Logger lg = null ;
+            try {
+                lg = Logger.getLogger( name, name ) ;
+            } catch (MissingResourceException exc) {
+                lg = Logger.getLogger( name ) ;
+            }
+            final Logger logger = lg ;
+
             InvocationHandler inh = new InvocationHandler() {
                 public Object invoke(Object proxy, Method method, Object[] args)
                     throws Throwable {
@@ -494,20 +513,6 @@ public class WrapperGenerator {
                     final Object[] messageParams = getWithSkip( args, chainIndex ) ;
                     if (chainIndex >= 0) {
                         cause = (Throwable)args[chainIndex] ;
-                    }
-
-                    // Get the logger with the resource bundle if it is available,
-                    // otherwise without it.  This is needed because sometimes
-                    // when we load a class to generate a .properties file, the
-                    // ResourceBundle is (obviously!) not availabe, and a static
-                    // initializer must initialize a log wrapper WITHOUT a
-                    // ResourceBundle, in order to generate a properties file which
-                    // implements the ResourceBundle.
-                    Logger logger = null ;
-                    try {
-                        logger = Logger.getLogger( name, name ) ;
-                    } catch (MissingResourceException exc) {
-                        logger = Logger.getLogger( name ) ;
                     }
 
                     final Class<?> rtype = method.getReturnType() ;
@@ -543,6 +548,7 @@ public class WrapperGenerator {
 
             final CompositeInvocationHandler cih =
                 new CompositeInvocationHandlerImpl() {
+                    @Override
                     public String toString() {
                         return "ExceptionWrapper[" + cls.getName() + "]" ;
                     }

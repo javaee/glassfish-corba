@@ -42,45 +42,49 @@ package com.sun.corba.se.impl.encoding.fast ;
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
 
 public final class ClassMarshalerFactory {
-    private static final UnaryFunction<Class,ClassAnalyzer> caLookupFunc ;
-    private static final LookupTable<Class,ClassAnalyzer> caTable ; 
-    private static final UnaryFunction<Class,ClassMarshaler> cmLookupFunc ;
-    private static final LookupTable<Class,ClassMarshaler> cmTable ; 
+    private ClassMarshalerFactory() {}
+
+    private static final UnaryFunction<Class<?>,ClassAnalyzer<?>> caLookupFunc ;
+    private static final LookupTable<Class<?>,ClassAnalyzer<?>> caTable ;
+    private static final UnaryFunction<Class<?>,ClassMarshaler<?>> cmLookupFunc ;
+    private static final LookupTable<Class<?>,ClassMarshaler<?>> cmTable ;
 
     static {
         caLookupFunc =
-            new UnaryFunction<Class,ClassAnalyzer>() {
-                public ClassAnalyzer evaluate ( Class arg ) { 
-                    return new ClassAnalyzerImpl( cmTable, arg ) ;
+            new UnaryFunction<Class<?>,ClassAnalyzer<?>>() {
+            @SuppressWarnings("unchecked")
+                public ClassAnalyzer<?> evaluate ( Class<?> arg ) {
+                    return new ClassAnalyzerImpl( caTable, arg ) ;
                 } 
             };
 
         cmLookupFunc =
-            new UnaryFunction<Class,ClassMarshaler>() {
-                public ClassMarshaler evaluate ( Class arg ) { 
-                    return new ClassMarshaler( 
+            new UnaryFunction<Class<?>,ClassMarshaler<?>>() {
+            @SuppressWarnings("unchecked")
+                public ClassMarshaler<?> evaluate ( Class<?> arg ) {
+                    return new ClassMarshaler(
                         new ClassAnalyzerImpl( cmTable, arg ) ) ;
                 } 
             };
 
         caTable = 
-            new LookupTableConcurrentImpl<Class,ClassAnalyzer>(
+            new LookupTableConcurrentImpl<Class<?>,ClassAnalyzer<?>>(
                 caLookupFunc, ClassAnalyzer.class) ;
 
         cmTable = 
-            new LookupTableConcurrentImpl<Class,ClassMarshaler>(
+            new LookupTableConcurrentImpl<Class<?>,ClassMarshaler<?>>(
                 cmLookupFunc, ClassMarshaler.class) ;
     }
 
-    public static ClassMarshaler getClassMarshaler( Class cls ) {
+    public static ClassMarshaler<?> getClassMarshaler( Class<?> cls ) {
 	return cmTable.lookup( null, cls ) ;
     }
 
-    public static ClassAnalyzer getClassAnalyzer( Class cls ) {
+    public static ClassAnalyzer<?> getClassAnalyzer( Class<?> cls ) {
 	return caTable.lookup( null, cls ) ;
     }
 
-    public static ClassMarshaler getClassMarshaler( char[] typeLabel ) {
+    public static ClassMarshaler<?> getClassMarshaler( char[] typeLabel ) {
 	// XXX for now, we will just treat typeLabel as the name
 	// of the class and load it.  A full implementation should
 	// use a repository ID, which contains the serialization and

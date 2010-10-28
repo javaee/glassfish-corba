@@ -155,7 +155,7 @@ public class CopyrightProcessor {
     private static final String[] BINARY_LIKE_SUFFIXES = {
 	"bnd", "sxc", "sxi", "sxw", "odp", "gif", "png", "jar", "zip", "jpg", "pom",
 	"pdf", "doc", "mif", "fm", "book", "zargo", "zuml", "cvsignore", 
-	"hgignore", "list", "old", "orig", "rej", "swp", "swo", "class", "o",
+	"hgignore", "list", "odt", "old", "orig", "rej", "swp", "swo", "class", "o",
 	"javaref", "idlref", "css", "bin", "settings" } ;
 
     // Special file names to ignore

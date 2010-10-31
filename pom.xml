@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sun.corba</groupId>
+  <artifactId>glassfish-corba</artifactId>
+  <name>GlassFish Corba</name>
+  <version>3.1.0</version>
+  <build>
+        <sourceDirectory>src/share/classes</sourceDirectory>
+        <outputDirectory>build/classes</outputDirectory>
+        <plugins>
+           <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <source>1.5</source>
+                  <target>1.5</target>
+                  <excludes>
+                      <exclude>**/*.*</exclude>
+                  </excludes>
+              </configuration>
+           </plugin>
+           <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>build-helper-maven-plugin</artifactId>
+              <version>1.1</version>
+              <executions>
+                <execution>
+                  <id>add-source</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                      <goal>add-source</goal>
+                  </goals>
+                  <configuration>
+                      <sources>
+                          <source>orblib/src/share/classes</source>
+                      </sources>
+                  </configuration>
+                </execution>
+              </executions>
+           </plugin>
+	
+        </plugins>
+  </build>
+  <properties>
+  	<sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
+  </properties>
+  <dependencies>
+  <!--
+    <dependency>   
+      <groupId>deps</groupId>
+      <artifactId>dep1</artifactId>
+      <version>0.1</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/build/libcache/management-api.jar:${basedir}/build/libcache/gmbal.jar:${basedir}/build/libcache/org.osgi.core.jar</systemPath>
+    </dependency>
+  -->
+  </dependencies>
+</project>
+

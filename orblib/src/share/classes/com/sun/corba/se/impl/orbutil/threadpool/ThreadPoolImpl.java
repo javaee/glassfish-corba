@@ -505,6 +505,11 @@ public class ThreadPoolImpl implements ThreadPool
         @Override
         public void run() {
             try  {
+                // Issue 13266: Make sure that the ClassLoader is set the FIRST time
+                // the worker thread runs.  resetClassLoader below takes care of the
+                // other cases.
+                setClassLoader() ;
+
                 while (!closeCalled) {
                     try {
                         currentWork = ((WorkQueueImpl)workQueue).requestWork(

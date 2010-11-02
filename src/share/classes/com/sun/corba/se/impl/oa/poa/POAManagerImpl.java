@@ -280,10 +280,10 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
     }
 
     @InfoMethod
-    // Note: caller MUST hold write lock
     private void nWaiters( int value ) { }
 
     @Poa
+    // Note: caller MUST hold write lock
     private void notifyWaiters() 
     {
         int num = nWaiters.get() ;
@@ -687,14 +687,24 @@ public class POAManagerImpl extends org.omg.CORBA.LocalObject implements
 	    removingThreadFromActiveManagers( this ) ;
 	} finally {
 	    if ( nInvocations.decrementAndGet() == 0 ) {
-                stateLock.writeLock().lock();
+                // Note: this is essentially notifyWaiters, but
+                // we cannot afford to acquire the writeLock unless
+                // there actually are waiters on the lock (GF issue 14348).
+                // Note that a spurious wakeup is possible here, if
+                // an invocation comes in between nInvocation and nWaiters 
+                // reads, but that's OK, because the looped condition checks
+                // around countedWait will simply wait again.
+                final int num = nWaiters.get() ;
+                nWaiters( num ) ;
 
-                try {
-                    // This notifies any threads that were in the
-                    // wait_for_completion loop in hold/discard/deactivate().
-                    notifyWaiters();
-                } finally {
-                    stateLock.writeLock().unlock();
+                if (num >0) {
+                    stateLock.writeLock().lock();
+
+                    try {
+                        stateCV.signalAll() ;
+                    } finally {
+                        stateLock.writeLock().unlock();
+                    }
                 }
 	    }
 	}

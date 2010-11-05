@@ -165,6 +165,10 @@ import org.glassfish.gmbal.NameValue ;
 public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     implements TypeCodeFactory
 {   
+    static {
+        MethodMonitorFactoryDefaults.addPrefix( "com.sun.corba.se", "ORB" ) ;
+    }
+
     // As much as possible, this class should be stateless.  However,
     // there are a few reasons why it is not:
     //

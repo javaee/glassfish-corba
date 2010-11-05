@@ -40,6 +40,8 @@
 
 package corba.misc ;
 
+import java.lang.annotation.Annotation ;
+
 import java.util.Properties ;
 import java.util.Random ;
 import java.util.Date ;
@@ -128,6 +130,17 @@ import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
+
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactory ;
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorFactoryDefaults ;
+import com.sun.corba.se.spi.orbutil.tf.MethodMonitorRegistry ;
+
+import com.sun.corba.se.spi.trace.CdrRead ;
+import com.sun.corba.se.spi.trace.CdrWrite ;
+import com.sun.corba.se.spi.trace.PrimitiveRead ;
+import com.sun.corba.se.spi.trace.PrimitiveWrite ;
+import com.sun.corba.se.spi.trace.ValueHandlerRead ;
+import com.sun.corba.se.spi.trace.ValueHandlerWrite ;
 
 import corba.folb_8_1.IIOPPrimaryToContactInfoImpl ;
 
@@ -522,6 +535,23 @@ public class Client extends TestCase
     // Various tests for enum marshaling
     //
 
+    public enum TestEnum {
+        HELLO() {
+            @Override
+            public String message() {
+                return "hello";
+            }
+
+        },
+        BYE() {
+            @Override
+            public String message() {
+                return "bye";
+            }
+        };
+        abstract String message();
+    }
+
     public enum Color { RED, BLUE, GREEN } ;
 
     public enum Coin {
@@ -551,63 +581,125 @@ public class Client extends TestCase
 	new SPair<SPair<Color,Color>,Color>(
 	    new SPair<Color,Color>( Color.RED, Color.BLUE ), Color.RED ) ;
     
+    private ORB makeORBForEnumTest( boolean useEnumDesc ) {
+        String[] args = new String[0] ;
+        Properties props = new Properties() ;
+        props.setProperty( ORBConstants.USE_ENUM_DESC, 
+            Boolean.toString( useEnumDesc ) ) ;
+        ORB orb = ORB.class.cast( ORB.init( args, props ) ) ;
+        return orb ;
+    }
+
+    public void testEnumMarshalingUseEnumDesc() {
+        ORB orb = makeORBForEnumTest( true ) ;
+        enumMarshalingTest( orb ) ;
+    }
+
+    private static final List<Class<? extends Annotation>> ioannos = 
+        new ArrayList<Class<? extends Annotation>>() ;
+
+    static {
+        ioannos.add( CdrRead.class ) ;
+        ioannos.add( CdrWrite.class ) ;
+        ioannos.add( PrimitiveRead.class ) ;
+        ioannos.add( PrimitiveWrite.class ) ;
+        ioannos.add( ValueHandlerRead.class ) ;
+        ioannos.add( ValueHandlerWrite.class ) ;
+    }
+
+    private void traceOn() {
+        MethodMonitorFactory mmf = MethodMonitorFactoryDefaults.dprint() ;
+        for (Class<? extends Annotation> cls : ioannos) {
+            MethodMonitorRegistry.register( cls, mmf ) ;
+        }
+    }
+
+    private void traceOff() {
+        for (Class<? extends Annotation> cls : ioannos) {
+            MethodMonitorRegistry.register( cls, null ) ;
+        }
+    }
+
     public void testEnumMarshaling() {
-	ORB orb = null ;
+        ORB orb = makeORBForEnumTest( false ) ;
+        // traceOn() ;
+        try {
+            enumMarshalingTest( orb ) ;
+        } finally {
+            // traceOff() ;
+        }
+    }
 
+    private static final boolean SIMPLE = false ;
+
+    public void enumMarshalingTest( ORB orb ) {
 	try {
-	    String[] args = new String[0] ;
-	    Properties props = new Properties() ;
-	    orb = ORB.class.cast( ORB.init( args, props ) ) ;
-
 	    OutputStream os = OutputStream.class.cast( orb.create_output_stream() ) ;
-	    os.write_value( pair ) ;
-	    os.write_value( colors ) ;
-	    os.write_value( Color.BLUE ) ;
-	    os.write_value( Coin.NICKEL ) ;
-	    os.write_value( colors ) ;
+
+
+            if (SIMPLE) {
+                os.write_value( Color.BLUE ) ;
+            } else {
+                os.write_value( pair ) ;
+                os.write_value( colors ) ;
+                os.write_value( Color.BLUE ) ;
+                os.write_value( Coin.NICKEL ) ;
+                os.write_value( colors ) ;
+                os.write_value( TestEnum.HELLO ) ;
+            }
 
 	    InputStream is = InputStream.class.cast( os.create_input_stream() ) ;
 
-            System.out.println( "Testing pair" ) ;
-	    SPair<SPair<Color,Color>,Color> shouldBePair = 
-		(SPair<SPair<Color,Color>,Color>)(is.read_value()) ;
+            if (SIMPLE) {
+                System.out.println( "Testing BLUE" ) ;
+                Color shouldBeBlue = Color.class.cast( is.read_value() ) ;
+                assertSame( "Result of read_value is not the expected value",
+                    shouldBeBlue, Color.BLUE ) ;
+            } else {
+                System.out.println( "Testing pair" ) ;
+                SPair<SPair<Color,Color>,Color> shouldBePair = 
+                    (SPair<SPair<Color,Color>,Color>)(is.read_value()) ;
 
-	    assertSame( "pair.first().first()", shouldBePair.first().first(),
-		pair.first().first() ) ;
+                assertSame( "pair.first().first()", shouldBePair.first().first(),
+                    pair.first().first() ) ;
 
-	    assertSame( "pair.first().second()", shouldBePair.first().second(),
-		pair.first().second() ) ;
+                assertSame( "pair.first().second()", shouldBePair.first().second(),
+                    pair.first().second() ) ;
 
-	    assertSame( "pair.second()", shouldBePair.second(),
-		pair.second() ) ;
+                assertSame( "pair.second()", shouldBePair.second(),
+                    pair.second() ) ;
 
-            System.out.println( "Testing colors" ) ;
-	    Color[] shouldBeColors = (Color[])is.read_value() ;
-	    for (int ctr=0; ctr<colors.length; ctr++) {
-		assertSame( "Result[" + ctr + "] is not the expected value",
-		    shouldBeColors[ctr], colors[ctr] ) ;
-	    }
+                System.out.println( "Testing colors" ) ;
+                Color[] shouldBeColors = (Color[])is.read_value() ;
+                for (int ctr=0; ctr<colors.length; ctr++) {
+                    assertSame( "Result[" + ctr + "] is not the expected value",
+                        shouldBeColors[ctr], colors[ctr] ) ;
+                }
 
-            System.out.println( "Testing BLUE" ) ;
-	    Color shouldBeBlue = Color.class.cast( is.read_value() ) ;
-	    assertSame( "Result of read_value is not the expected value",
-		shouldBeBlue, Color.BLUE ) ;
+                System.out.println( "Testing BLUE" ) ;
+                Color shouldBeBlue = Color.class.cast( is.read_value() ) ;
+                assertSame( "Result of read_value is not the expected value",
+                    shouldBeBlue, Color.BLUE ) ;
 
-            System.out.println( "Testing NICKEL" ) ;
-	    Coin shouldBeNickel = Coin.class.cast( is.read_value() ) ;
-	    assertSame( "Result of read_value is not the expected value",
-		shouldBeNickel, Coin.NICKEL ) ;
+                System.out.println( "Testing NICKEL" ) ;
+                Coin shouldBeNickel = Coin.class.cast( is.read_value() ) ;
+                assertSame( "Result of read_value is not the expected value",
+                    shouldBeNickel, Coin.NICKEL ) ;
 
-            System.out.println( "Testing colors" ) ;
-	    shouldBeColors = (Color[])is.read_value() ;
-	    for (int ctr=0; ctr<colors.length; ctr++) {
-		assertSame( "Result[" + ctr + "] is not the expected value",
-		    shouldBeColors[ctr], colors[ctr] ) ;
-	    }
-	} finally {
-	    if (orb != null) {
-                orb.destroy();
+                System.out.println( "Testing colors" ) ;
+                shouldBeColors = (Color[])is.read_value() ;
+                for (int ctr=0; ctr<colors.length; ctr++) {
+                    assertSame( "Result[" + ctr + "] is not the expected value",
+                        shouldBeColors[ctr], colors[ctr] ) ;
+                }
+
+                System.out.println( "Testing TestEnum" ) ;
+                TestEnum shouldBeTestEnum = (TestEnum)is.read_value() ;
+                assertSame( "Result of read_value is not the expected value",
+                    shouldBeTestEnum, TestEnum.HELLO ) ;
             }
+	} finally {
+            orb.destroy();
 	}
     }
 

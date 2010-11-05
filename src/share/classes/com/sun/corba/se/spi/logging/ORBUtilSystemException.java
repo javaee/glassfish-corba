@@ -41,27 +41,37 @@
 package com.sun.corba.se.spi.logging ;
 
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
+
 import com.sun.corba.se.impl.ior.iiop.JavaSerializationComponent;
+
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
+
 import com.sun.corba.se.spi.orbutil.logex.Chain;
 import com.sun.corba.se.spi.orbutil.logex.Log ;
 import com.sun.corba.se.spi.orbutil.logex.Message ;
 import com.sun.corba.se.spi.orbutil.logex.LogLevel ;
 import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper ;
 import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator ;
+
 import com.sun.corba.se.spi.orbutil.logex.corba.CS;
 import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
-
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
+
 import com.sun.corba.se.spi.transport.CorbaConnection;
 import com.sun.corba.se.spi.transport.EventHandler;
+
 import java.io.IOException;
+import java.io.Serializable;
+
 import java.net.MalformedURLException;
+
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.charset.MalformedInputException;
+
 import java.rmi.RemoteException;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -83,6 +93,7 @@ import org.omg.CORBA.TRANSIENT;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.Bounds;
 import org.omg.CORBA.UNKNOWN;
+
 import org.omg.CORBA.portable.RemarshalException;
 
 @ExceptionWrapper( idPrefix="IOP" )
@@ -1837,6 +1848,14 @@ public interface ORBUtilSystemException {
     @Message( "An instance of class {0} could not be marshalled: the class is "
         + "not an instance of java.io.Serializable" )
     MARSHAL objectNotSerializable( String arg0 ) ;
+
+    @Log( level=LogLevel.WARNING, id=68 ) 
+    @Message( "Could not unmarshal enum with cls {0}, value {1} using EnumDesc" )
+    MARSHAL couldNotUnmarshalEnum( String cls, Serializable value ) ;
+    
+    @Log( level=LogLevel.WARNING, id=69 ) 
+    @Message( "Expected String value for enum class {0}, but got value {1}" )
+    MARSHAL enumValueNotString( Class cls, Serializable value ) ;
     
     @Log( level=LogLevel.FINE, id=1 )
     @Message( "feature not implemented" )

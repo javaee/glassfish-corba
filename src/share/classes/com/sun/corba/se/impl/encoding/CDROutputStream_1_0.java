@@ -502,7 +502,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 
     public void write_string(String value)
     {
-      writeString(value);
+        writeString(value);
     }
 
     @PrimitiveWrite
@@ -840,6 +840,9 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
     @CdrWrite
     private void callWriteValue( org.omg.CORBA.portable.OutputStream parent, 
         java.io.Serializable object, byte streamFormatVersion ) {
+        if (valueHandler == null) {
+            valueHandler = ORBUtility.createValueHandler(orb);
+        }
 
 	boolean currentMustChunk = mustChunk ;
 	startValueChunk(currentMustChunk) ;
@@ -898,18 +901,20 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
             if (orb.getORBData().useEnumDesc()) {
                 EnumDesc desc = getEnumDesc( clazz.getName(), enumValue ) ;
                 write_value( desc, (String)null ) ;
-                return ;
             } else {
                 // Write value_tag
-                int indirection = writeValueTag(false, true, getCodebase(clazz));
-                updateIndirectionTable(indirection, object);
+                mustChunk = false ;
+                int indirection = writeValueTag(mustChunk, true, getCodebase(clazz));
                                         
                 // Write rep. id
                 write_repositoryId(repIdStrs.createForJavaType(clazz, cinfo ));
+                updateIndirectionTable(indirection, object);
 				
                 // Just write the enum member name
-                write_value( enumValue ) ;
+                writeString( enumValue ) ;
             }
+
+            return ;
         }
 
 	if (cinfo.isProxyClass()) {

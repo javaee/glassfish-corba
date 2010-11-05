@@ -1084,7 +1084,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 repIdStrs.getClassDescValueRepId())) {
                 value = readClass();
             } else {
-                Class<?> valueClass = expectedType;
+                Class valueClass = expectedType;
 
                 // By this point, either the expectedType or repositoryIDString
                 // is guaranteed to be non-null.
@@ -1094,6 +1094,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
                     valueClass = getClassFromString(repositoryIDString,
                         codebase_URL, expectedType);
+                    cinfo = ClassInfoCache.get( valueClass ) ;
                 }
 
                 valueClass( valueClass ) ;
@@ -1110,11 +1111,12 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                         repositoryID.getClassName()) ;
                 }
 
-                if (cinfo == null) {
-                    cinfo = ClassInfoCache.get(valueClass);
-                }
-
-                if (valueClass != null && cinfo.isAIDLEntity(valueClass)) {
+                if (cinfo.isEnum()) {
+                    final Class enumClass = ClassInfoCache.getEnumClass( cinfo, 
+                        valueClass ) ;
+                    String enumValue = read_string() ;
+                    value = Enum.valueOf( enumClass, enumValue ) ;
+                } else if (valueClass != null && cinfo.isAIDLEntity(valueClass)) {
                     value = readIDLValue(indirection, repositoryIDString,
                         valueClass, cinfo, codebase_URL);
                 } else {
@@ -1161,7 +1163,21 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
                 throw wrapper.enumClassNotFound( cnfe, desc.className ) ;
             }
 
-            value = Enum.valueOf( cls, desc.value ) ;
+            // Issue 11681: deal with enum with abstract methods.
+            Class current = cls ;
+            while (current != null) {
+                if (current.isEnum()) {
+                    break ;
+                }
+                current = current.getSuperclass() ;
+            }
+
+            if (current != null) {
+                value = Enum.valueOf( current, desc.value ) ;
+            } else {
+                throw wrapper.couldNotUnmarshalEnum( desc.className,
+                    desc.value ) ;
+            }
         }
 
         // Convert ProxyDesc into the proxy instance it represents
@@ -1224,13 +1240,11 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             return null;
         } else if (vType == 0xffffffff) { // Indirection tag
             int indirection = read_long() + get_offset() - 4;
-            if (valueCache != null && valueCache.containsVal(indirection))
-		{
-		    java.io.Serializable cachedValue = 
-                           (java.io.Serializable)valueCache.getKey(indirection);
-		    return cachedValue;
-		}
-            else {
+            if (valueCache != null && valueCache.containsVal(indirection)) {
+                Serializable cachedValue = 
+                       (Serializable)valueCache.getKey(indirection);
+                return cachedValue;
+            } else {
 		throw new IndirectionException(indirection);
 	    }
 	} else {

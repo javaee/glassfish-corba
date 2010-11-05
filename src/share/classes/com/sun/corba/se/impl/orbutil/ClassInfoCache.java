@@ -79,24 +79,33 @@ import com.sun.corba.se.spi.orb.ORB ;
  * but then we would in some case be doing multiple lookups for a class to get
  * class information, which would slow things down significantly (the get call
  * is a significant cost in the benchmarks).
+ * <P>
+ * XXX There is a better solution: add MORE information to the cache.  In
+ * particular, use a ClassAnalyzer to construct the linearized inheritance
+ * chain (order doesn't matter in this case, but we already have the implementation)
+ * and implement all of the isA methods by a simple check on whether the class
+ * is in the chain (or perhaps convert to Set).  We can statically fill the cache
+ * with all of the basic objects (e.g. Streamable, Serializable, etc.) needs
+ * in a static initializer.
  */
+
 public class ClassInfoCache {
     // Do NOT put a strong reference to the Class in ClassInfo: we don't want to
     // pin ClassLoaders in memory!
     public static class ClassInfo {
 
 	public static class LazyWrapper {
-	    Class isAClass ;
+	    Class<?> isAClass ;
 	    boolean initialized ;
 	    boolean value ;
 
-	    public LazyWrapper( Class isAClass ) {
+	    public LazyWrapper( Class<?> isAClass ) {
 		this.isAClass = isAClass ;
 		this.initialized = false ;
 		this.value = false ;
 	    }
 
-	    synchronized boolean get( Class cls ) {
+	    synchronized boolean get( Class<?> cls ) {
 		if (!initialized) {
 		    initialized = true ;
 		    value = isAClass.isAssignableFrom( cls ) ;
@@ -141,18 +150,41 @@ public class ClassInfoCache {
 	private boolean isEnum ;
 	private boolean isInterface ;
 	private boolean isProxyClass ;
+        private ClassInfo superInfo ;
 
-	ClassInfo( Class cls ) {
+	ClassInfo( Class<?> cls ) {
 	    isArray = cls.isArray() ;
-	    isEnum = cls.isEnum() ;
+	    isEnum = checkForEnum( cls ) ;
 	    isInterface = cls.isInterface() ;
 	    isProxyClass = Proxy.isProxyClass( cls ) ;
 
 	    isAValueBase = ValueBase.class.isAssignableFrom( cls ) ;
 	    isAString = String.class.isAssignableFrom( cls ) ;
 	    isAIDLEntity = IDLEntity.class.isAssignableFrom( cls ) ;
+
+            Class<?> superClass = cls.getSuperclass() ;
+            if (superClass != null) {
+                superInfo = ClassInfoCache.get( superClass ) ;
+            }
 	}
 
+        private final boolean checkForEnum(Class<?> cls) {
+            // Issue 11681
+            // This ugly method is needed because isEnum returns FALSE
+            // on enum.getClass().isEnum() if enum has an abstract method,
+            // which results in another subclass.  So for us, a class is an
+            // enum if any superclass is java.lang.Enum.
+            Class<?> current = cls ;
+            while (current != null) {
+                if (current.equals( Enum.class )) {
+                    return true ;
+                }
+                current = current.getSuperclass() ;
+            }
+
+            return false ;
+        }
+        
 	public synchronized String getRepositoryId() {
 	    return repositoryId ;
 	}
@@ -161,49 +193,49 @@ public class ClassInfoCache {
 	    this.repositoryId = repositoryId ;
 	}
 
-	public boolean isARemote( Class cls ) { 
+	public boolean isARemote( Class<?> cls ) { 
 	    return isARemote.get(cls) ; 
 	}
-	public boolean isARemoteException( Class cls ) { 
+	public boolean isARemoteException( Class<?> cls ) { 
 	    return isARemoteException.get(cls) ; 
 	}
-	public boolean isAUserException( Class cls ) { 
+	public boolean isAUserException( Class<?> cls ) { 
 	    return isAUserException.get(cls) ; 
 	}
-	public boolean isAObjectImpl( Class cls ) { 
+	public boolean isAObjectImpl( Class<?> cls ) { 
 	    return isAObjectImpl.get(cls) ; 
 	}
-	public boolean isAORB( Class cls ) { 
+	public boolean isAORB( Class<?> cls ) { 
 	    return isAORB.get(cls) ; 
 	}
-	public boolean isAIDLEntity( Class cls ) { 
+	public boolean isAIDLEntity( Class<?> cls ) { 
 	    return isAIDLEntity ; 
 	}
-	public boolean isAStreamable( Class cls ) { 
+	public boolean isAStreamable( Class<?> cls ) { 
 	    return isAStreamable.get(cls) ; 
 	}
-	public boolean isAStreamableValue( Class cls ) { 
+	public boolean isAStreamableValue( Class<?> cls ) { 
 	    return isAStreamableValue.get(cls) ; 
 	}
-	public boolean isACustomValue( Class cls ) { 
+	public boolean isACustomValue( Class<?> cls ) { 
 	    return isACustomValue.get(cls) ; 
 	}
-	public boolean isAValueBase( Class cls ) { 
+	public boolean isAValueBase( Class<?> cls ) { 
 	    return isAValueBase ; 
 	}
-	public boolean isACORBAObject( Class cls ) { 
+	public boolean isACORBAObject( Class<?> cls ) { 
 	    return isACORBAObject.get(cls) ; 
 	}
-	public boolean isASerializable( Class cls ) { 
+	public boolean isASerializable( Class<?> cls ) { 
 	    return isASerializable.get(cls) ; 
 	}
-	public boolean isAExternalizable( Class cls ) { 
+	public boolean isAExternalizable( Class<?> cls ) { 
 	    return isAExternalizable.get(cls) ; 
 	}
-	public boolean isAString( Class cls ) { 
+	public boolean isAString( Class<?> cls ) { 
 	    return isAString ; 
 	}
-	public boolean isAClass( Class cls ) { 
+	public boolean isAClass( Class<?> cls ) { 
 	    return isAClass.get(cls) ; 
 	}
 
@@ -211,6 +243,7 @@ public class ClassInfoCache {
 	public boolean isEnum() { return isEnum ; }
 	public boolean isInterface() { return isInterface ; }
 	public boolean isProxyClass() { return isProxyClass ; }
+        public ClassInfo getSuper() { return superInfo ; }
     }
 
     // This shows up as a locking hotspot in heavy marshaling tests.
@@ -242,7 +275,7 @@ public class ClassInfoCache {
 
     private static Map<Class,ClassInfo> classData = new WeakHashMap<Class,ClassInfo>() ;
 
-    public static synchronized ClassInfo get( Class cls ) {
+    public static synchronized ClassInfo get( Class<?> cls ) {
 	ClassInfo result = classData.get( cls ) ;
 	if (result == null) {
 	    result = new ClassInfo( cls ) ;
@@ -250,5 +283,27 @@ public class ClassInfoCache {
 	}
 
 	return result ;
+    }
+
+    /** Find the class that is an enum in the superclass chain starting at cls.
+     * cinfo MUST be the ClassInfo for cls.
+     * @param cinfo ClassInfo for cls
+     * @param cls Class which may have java.lang.Enum in its superclass chain.
+     * @return A class for which isEnum() is true, or null if no such class
+     * exists in the superclass chain of cls.
+     */
+    public static Class getEnumClass( ClassInfo cinfo, Class cls ) {
+        ClassInfo currInfo = cinfo ;
+        Class currClass = cls ;
+        while (currClass != null) { 
+            if (currClass.isEnum()) {
+                break ;
+            }
+
+            currClass = currClass.getSuperclass() ;
+            currInfo = currInfo.getSuper() ;
+        }
+
+        return currClass ;
     }
 }

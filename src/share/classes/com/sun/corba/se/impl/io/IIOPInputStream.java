@@ -988,8 +988,24 @@ public class IIOPInputStream
         }
     }
 
-    @InfoMethod
-    private void readingEnum() { } 
+    @ValueHandlerRead
+    private Object handleEnum( Class clz, 
+        ClassInfoCache.ClassInfo cinfo ) throws IOException {
+        
+        // Only for backwards compatibility with JDK:
+        // int ordinal = orbStream.read_long() ;
+        String value = (String)orbStream.read_value( String.class ) ;
+
+        // Issue 11681: find the real enum class.
+        final Class enumClass = ClassInfoCache.getEnumClass( cinfo, clz ) ;
+        if (enumClass == null) {
+            throw Exceptions.self.couldNotUnmarshalEnum( clz.getName(), value ) ;
+        } else {
+            // Need to skip any other data marshaled from the enum,
+            // if the enum type has non-static non-transient state.
+            return Enum.valueOf( enumClass, value );
+        }
+    }
 
     @InfoMethod
     private void readingExternalizable() { }
@@ -1039,14 +1055,7 @@ public class IIOPInputStream
             
             // KMC start of enum receiver-makes-right changes
             if (cinfo.isEnum()) {
-                readingEnum() ;
-
-                // Only for backwards compatibility with JDK: 
-                // int ordinal = orbStream.read_long() ;
-                String value = (String)orbStream.read_value( String.class ) ;
-                // Need to skip any other data marshaled from the enum, 
-                // if the enum type has non-static non-transient state.
-                return Enum.valueOf( clz, value );
+                return handleEnum( clz, cinfo ) ;
             } else if (currentClassDesc.isExternalizable()) {
                 readingExternalizable();
 
@@ -1461,14 +1470,7 @@ public class IIOPInputStream
 
             // KMC start of enum receiver-makes-right changes
             if (cinfo.isEnum()) {
-                readingEnum() ;
-
-                // Only for backwards compatibility with JDK:
-                // int ordinal = orbStream.read_long() ;
-                String value = (String)orbStream.read_value( String.class ) ;
-                // Need to skip any other data marshaled from the enum,
-                // if the enum type has non-static non-transient state.
-                return Enum.valueOf( clz, value );
+                return handleEnum( clz, cinfo ) ;
             } else if (currentClassDesc.isExternalizable()) {
                 readingExternalizable();
 

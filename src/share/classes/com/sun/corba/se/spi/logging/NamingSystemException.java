@@ -170,4 +170,8 @@ public interface NamingSystemException {
     @Log( level=LogLevel.WARNING, id=108 )
     @Message( "Malformed URL in -ORBInitDef" )
     INTERNAL insOther(  ) ;
+
+    @Log( level=LogLevel.WARNING, id=109 )
+    @Message( "Initial port value {0} is not a valid number" )
+    INTERNAL badInitialPortValue(String ips, @Chain NumberFormatException e);
 }

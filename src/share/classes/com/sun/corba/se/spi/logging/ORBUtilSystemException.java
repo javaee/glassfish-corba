@@ -88,6 +88,7 @@ import org.omg.CORBA.MARSHAL;
 import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 import org.omg.CORBA.OBJ_ADAPTER;
+import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CORBA.TIMEOUT;
 import org.omg.CORBA.TRANSIENT;
 import org.omg.CORBA.TypeCodePackage.BadKind;
@@ -2015,4 +2016,12 @@ public interface ORBUtilSystemException {
     @Message( "Could not initialize initial GIS")
     @Log( level=LogLevel.FINE, id=18 )
     UNKNOWN couldNotInitializeInitialGIS(@Chain Exception exc);
+
+    @Log( level=LogLevel.FINE, id=19 )
+    @Message( "No CSIv2TaggedComponentHandler available from initial references")
+    UNKNOWN noCSIV2Handler(@Chain InvalidName e);
+
+    @Log( level=LogLevel.FINE, id=20 )
+    @Message( "Error in ServerGroupManager")
+    UNKNOWN serverGroupManagerException(@Chain Exception e);
 }

@@ -111,8 +111,9 @@ public class TransientNameServer
             props.put( "org.omg.CORBA.ORBClass", 
                 "com.sun.corba.se.impl.orb.ORBImpl" );
 
+            String ips = null ;
 	    try {
-		String ips = System.getProperty( ORBConstants.INITIAL_PORT_PROPERTY ) ;
+		ips = System.getProperty( ORBConstants.INITIAL_PORT_PROPERTY ) ;
 		if (ips != null && ips.length() > 0 ) {
 		    initialPort = java.lang.Integer.parseInt(ips);
                     if( initialPort == 0 ) {
@@ -129,7 +130,7 @@ public class TransientNameServer
 		    throw wrapper.transientNameServerBadHost() ;
                 }
 	    } catch (java.lang.NumberFormatException e) {
-                // XXX log this
+                wrapper.badInitialPortValue( ips, e ) ;
 	    }
 
 	    // Let arguments override

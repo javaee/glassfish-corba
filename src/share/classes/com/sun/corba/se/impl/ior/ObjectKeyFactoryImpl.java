@@ -215,8 +215,7 @@ public class ObjectKeyFactoryImpl implements ObjectKeyFactory
 		oktemp = handler.handle( magic, scid, is, osh ) ;
 	    }
 	} catch (MARSHAL mexc) {
-	    // XXX log this error
-	    // ignore this: error handled below because oktemp == null
+            wrapper.createMarshalError( mexc ) ;
 	}
 
 	return oktemp ;

@@ -44,6 +44,7 @@
 
 package com.sun.corba.se.impl.folb;
 
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.server.UID;
@@ -104,23 +105,28 @@ public class ServerGroupManager
 	ORBInitializer,
 	ServerRequestInterceptor
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private static final String baseMsg = ServerGroupManager.class.getName();
     private static final long serialVersionUID = -3197578705750630503L;
 
-    private ORB orb;
-    private GroupInfoService gis;
-    private CSIv2SSLTaggedComponentHandler csiv2SSLTaggedComponentHandler;
+    private transient ORB orb;
+    private transient GroupInfoService gis;
+    private transient CSIv2SSLTaggedComponentHandler
+        csiv2SSLTaggedComponentHandler;
     private String membershipLabel;
+
     private enum MembershipChangeState { IDLE, DOING_WORK, RETRY_REQUIRED };
     private MembershipChangeState membershipChangeState =
 	MembershipChangeState.IDLE;
+
     private ReferenceFactoryManager referenceFactoryManager;
     private Codec codec;
     private boolean initialized = false;
 
     // REVISIT - the app server identifies socket "types" with
     // these strings.  Should be an official API.
-    private static final String ORB_LISTENER = "orb-listener";
     private static final String SSL = "SSL";
 
     @InfoMethod
@@ -165,12 +171,12 @@ public class ServerGroupManager
                         ORBConstants.CSI_V2_SSL_TAGGED_COMPONENT_HANDLER);
 	    } catch (InvalidName e) {
 		csiv2SSLTaggedComponentHandler = null;
-                // XXX log
+                wrapper.noCSIV2Handler( e ) ;
 	    }
 	} catch (InvalidName e) {
-            // XXX log
+            wrapper.serverGroupManagerException( e ) ;
 	} catch (UnknownEncoding e) {
-            // XXX log
+            wrapper.serverGroupManagerException( e ) ;
 	}
     }
 
@@ -284,7 +290,6 @@ public class ServerGroupManager
 
 	    // Handle membership label.
 	    if (gis.shouldAddMembershipLabel(adapterName)) {
-		// XXX "internationalize" getBytes
 		TaggedComponent tc = new TaggedComponent(
                     ORBConstants.FOLB_MEMBERSHIP_LABEL_TAGGED_COMPONENT_ID,
 		    membershipLabel.getBytes());
@@ -295,7 +300,7 @@ public class ServerGroupManager
                 notAddingMembershipLabel();
 	    }
 	} catch (RuntimeException e) {
-            // XXX log me
+            wrapper.serverGroupManagerException(e);
 	}
     }
 
@@ -360,7 +365,7 @@ public class ServerGroupManager
 	    } while (loop);
 	    
 	} catch (RuntimeException e) {
-            // XXX log
+            wrapper.serverGroupManagerException(e);
 
 	    // If we get an exception we need to ensure that we do not
 	    // lock out further changes.
@@ -448,7 +453,7 @@ public class ServerGroupManager
 	    try { 
 		worker.join(); 
 	    } catch (InterruptedException e) { 
-		Thread.currentThread().interrupted() ; 
+		Thread.interrupted() ; 
 		tryAgain = true; 
 	    }
 	} while (tryAgain);
@@ -469,7 +474,7 @@ public class ServerGroupManager
 	    membershipLabel = hostAddress + ":::" + uid;
             newMembershipLabel( membershipLabel );
 	} catch (UnknownHostException e) {
-            // XXX log
+            wrapper.serverGroupManagerException(e);
 	}
     }
 
@@ -590,15 +595,13 @@ public class ServerGroupManager
 	    try {
 		data = codec.encode_value(any);
 	    } catch (InvalidTypeForEncoding e) {
-                // XXX log me
+                wrapper.serverGroupManagerException(e);
 	    }
 	    ServiceContext sc = new ServiceContext(
                 ORBConstants.FOLB_IOR_UPDATE_SERVICE_CONTEXT_ID, data);
 	    ri.add_reply_service_context(sc, false);
 	} catch (RuntimeException e) {
-            // XXX log
-	} finally {
-            // XXX log
+            wrapper.serverGroupManagerException(e);
 	}
     }
 
@@ -617,7 +620,7 @@ public class ServerGroupManager
 	    info.add_ior_interceptor(this);
 	    info.add_server_request_interceptor(this);
 	} catch (Exception e) {
-            // XXX log
+            wrapper.serverGroupManagerException(e);
 	}
     }
 

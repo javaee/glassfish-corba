@@ -56,6 +56,8 @@ import org.omg.CORBA.BAD_OPERATION;
 import org.omg.CORBA.BAD_PARAM;
 import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.INV_OBJREF;
+import org.omg.CORBA.MARSHAL;
+import org.omg.CORBA.UNKNOWN;
 
 @ExceptionWrapper( idPrefix="IOP" )
 @ORBException( omgException=false, group=CorbaExtension.IORGroup )
@@ -130,4 +132,9 @@ public interface IORSystemException {
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "IOR must have at least one IIOP profile" )
     INV_OBJREF iorMustHaveIiopProfile(  ) ;
+
+    @Log( level=LogLevel.FINE, id=1 )
+    @Message( "MARSHAL error while attempting to create an ObjectKeyTemplate "
+        + "from an input stream")
+    UNKNOWN createMarshalError(@Chain MARSHAL mexc);
 }

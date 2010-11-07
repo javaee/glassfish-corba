@@ -47,6 +47,7 @@ import java.util.Map ;
 import java.util.WeakHashMap ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
+import com.sun.corba.se.spi.orbutil.misc.WeakHashMap ;
 
 public abstract class DefaultClassCopierFactories
 {

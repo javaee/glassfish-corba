@@ -58,6 +58,7 @@ import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger ;
 import java.util.logging.LogManager ;
 
@@ -163,8 +164,8 @@ public class ClassCopierFactoryPipelineImpl implements
 	ClassCopier mapCopier = 
 	    DefaultClassCopiers.makeMapClassCopier( this ) ;
 	
-	// Note that the identity hash map can never be copied by reflection, due
-	// to the identity equality semantics required by NULL_KEY.
+	// Note that the identity hash map can never be copied by reflection, 
+        // due to the identity equality semantics required by NULL_KEY.
 	// This also means that no subclass can ever be copied by
 	// reflection.  
         // 
@@ -221,49 +222,71 @@ public class ClassCopierFactoryPipelineImpl implements
 	specialFactory = ccf ;
     }
 
+    public ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock() ;
+
+
      /** Analyze cls to determine the appropriate ClassCopier
      * and return the ClassCopier instance.  Will only create
      * a ClassCopier for a given Class once.
      */
-    public synchronized ClassCopier getClassCopier( 
+    public ClassCopier getClassCopier( 
 	// TIME enter_getClassCopier
 	Class<?> cls ) throws ReflectiveCopyException {
 	if (cls.isInterface()) {
             // XXX use Exceptions class here
-            throw new IllegalArgumentException("Cannot create a ClassCopier for an interface.");
+            throw new IllegalArgumentException(
+                "Cannot create a ClassCopier for an interface.");
         }
 
-	ClassCopier result = cacheFactory.getClassCopier( cls ) ;
-	if (result == null) {
-	    // New for Java SE 5.0: all Enums are immutable.
-	    // We'll figure that out here and cache the result.
-	    if (Enum.class.isAssignableFrom(cls)) {
-                result = DefaultClassCopiers.getIdentityClassCopier();
-            }
-	    if (result == null) {
-                result = specialFactory.getClassCopier(cls);
-            }
-	    if (result == null) {
-                result = arrayFactory.getClassCopier(cls);
-            }
-	    if (result == null) {
-                result = ordinaryFactory.getClassCopier(cls);
-            }
-	    if (result == null) {
-                // XXX use Exceptions
-                throw new IllegalStateException("Could not find ClassCopier for " + cls.getClass());
+        rwlock.readLock().lock() ;
+        boolean readLocked = true ;
+        try {
+            ClassCopier result = cacheFactory.getClassCopier( cls ) ;
+            if (result == null) {
+                // New for Java SE 5.0: all Enums are immutable.
+                // We'll figure that out here and cache the result.
+                if (Enum.class.isAssignableFrom(cls)) {
+                    result = DefaultClassCopiers.getIdentityClassCopier();
+                }
+                if (result == null) {
+                    result = specialFactory.getClassCopier(cls);
+                }
+                if (result == null) {
+                    result = arrayFactory.getClassCopier(cls);
+                }
+                if (result == null) {
+                    result = ordinaryFactory.getClassCopier(cls);
+                }
+                if (result == null) {
+                    // XXX use Exceptions
+                    throw new IllegalStateException(
+                        "Could not find ClassCopier for " + cls.getClass());
+                }
+
+                // Result was not cached, so update the cache
+                rwlock.readLock().unlock() ;
+                readLocked = false ;
+                rwlock.writeLock().lock() ;
+                try {
+                    if (cacheFactory.getClassCopier(cls) == null) {
+                        cacheFactory.put( cls, result ) ;
+                    }
+                } finally {
+                    rwlock.writeLock().unlock() ;
+                }
             }
 
-	    // Result was not cached, so update the cache
-	    cacheFactory.put( cls, result ) ;
-	}
+            if (result == errorCopier) {
+                // Throw the exception early, since there is
+                throw new ReflectiveCopyException( "Cannot copy class " + cls ) ;
+            }
 
-	if (result == errorCopier) {
-	    // Throw the exception early, since there is 
-	    throw new ReflectiveCopyException( "Cannot copy class " + cls ) ;
-	}
-
-	// TIME exit_getClassCopier
-	return result ;
+            // TIME exit_getClassCopier
+            return result ;
+        } finally {
+            if (readLocked) {
+                rwlock.readLock().unlock() ;
+            }
+        }
     }
 }

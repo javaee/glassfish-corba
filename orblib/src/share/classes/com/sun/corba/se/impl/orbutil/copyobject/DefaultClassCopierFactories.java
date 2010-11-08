@@ -44,10 +44,9 @@ import java.lang.reflect.Method ;
 import java.lang.reflect.Modifier ;
 
 import java.util.Map ;
-import java.util.WeakHashMap ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
-import com.sun.corba.se.spi.orbutil.misc.WeakHashMap ;
+import com.sun.corba.se.spi.orbutil.misc.WeakHashMapSafeReadLock ;
 
 public abstract class DefaultClassCopierFactories
 {
@@ -138,11 +137,10 @@ public abstract class DefaultClassCopierFactories
     {
 	return new CachingClassCopierFactory() 
 	{
-	    // private Map cache = new WeakHashMap() ;
 	    private Map<Class<?>,ClassCopier> cache = USE_FAST_CACHE ?
 		new FastCache<Class<?>,ClassCopier>(
-                    new WeakHashMap<Class<?>,ClassCopier>() ) :
-		new WeakHashMap<Class<?>,ClassCopier>() ;
+                    new WeakHashMapSafeReadLock<Class<?>,ClassCopier>() ) :
+		new WeakHashMapSafeReadLock<Class<?>,ClassCopier>() ;
 
 	    public void put( Class<?> cls, ClassCopier copier )
 	    {

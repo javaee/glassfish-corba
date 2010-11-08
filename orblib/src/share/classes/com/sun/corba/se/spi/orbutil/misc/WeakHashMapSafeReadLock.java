@@ -9,6 +9,18 @@ package com.sun.corba.se.spi.orbutil.misc ;
 
 import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
+import java.util.AbstractCollection;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 
 /**
@@ -179,7 +191,7 @@ public class WeakHashMapSafeReadLock<K,V>
      * @throws IllegalArgumentException if the initial capacity is negative,
      *         or if the load factor is nonpositive.
      */
-    public WeakHashMap(int initialCapacity, float loadFactor) {
+    public WeakHashMapSafeReadLock(int initialCapacity, float loadFactor) {
         if (initialCapacity < 0)
             throw new IllegalArgumentException("Illegal Initial Capacity: "+
                                                initialCapacity);
@@ -204,7 +216,7 @@ public class WeakHashMapSafeReadLock<K,V>
      * @param  initialCapacity The initial capacity of the <tt>WeakHashMap</tt>
      * @throws IllegalArgumentException if the initial capacity is negative
      */
-    public WeakHashMap(int initialCapacity) {
+    public WeakHashMapSafeReadLock(int initialCapacity) {
         this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
@@ -212,7 +224,7 @@ public class WeakHashMapSafeReadLock<K,V>
      * Constructs a new, empty <tt>WeakHashMap</tt> with the default initial
      * capacity (16) and load factor (0.75).
      */
-    public WeakHashMap() {
+    public WeakHashMapSafeReadLock() {
         this.loadFactor = DEFAULT_LOAD_FACTOR;
         threshold = (int)(DEFAULT_INITIAL_CAPACITY);
         table = new Entry[DEFAULT_INITIAL_CAPACITY];
@@ -228,7 +240,7 @@ public class WeakHashMapSafeReadLock<K,V>
      * @throws  NullPointerException if the specified map is null
      * @since	1.3
      */
-    public WeakHashMap(Map<? extends K, ? extends V> m) {
+    public WeakHashMapSafeReadLock(Map<? extends K, ? extends V> m) {
         this(Math.max((int) (m.size() / DEFAULT_LOAD_FACTOR) + 1, 16),
              DEFAULT_LOAD_FACTOR);
         putAll(m);
@@ -333,6 +345,10 @@ public class WeakHashMapSafeReadLock<K,V>
         return size() == 0;
     }
 
+    static int computeHash( int h ) {
+        h ^= (h >>> 20) ^ (h >>> 12) ;
+        return h ^ (h >>> 7) ^ (h >>> 4) ;
+    }
     /**
      * Returns the value to which the specified key is mapped,
      * or {@code null} if this map contains no mapping for the key.
@@ -352,7 +368,7 @@ public class WeakHashMapSafeReadLock<K,V>
      */
     public V get(Object key) {
         Object k = maskNull(key);
-        int h = HashMap.hash(k.hashCode());
+        int h = computeHash(k.hashCode());
         Entry[] tab = getTable();
         int index = indexFor(h, tab.length);
         Entry<K,V> e = tab[index];
@@ -382,7 +398,7 @@ public class WeakHashMapSafeReadLock<K,V>
      */
     Entry<K,V> getEntry(Object key) {
         Object k = maskNull(key);
-        int h = HashMap.hash(k.hashCode());
+        int h = computeHash(k.hashCode());
         Entry[] tab = getTable();
         int index = indexFor(h, tab.length);
         Entry<K,V> e = tab[index];
@@ -405,7 +421,7 @@ public class WeakHashMapSafeReadLock<K,V>
      */
     public V put(K key, V value) {
         K k = (K) maskNull(key);
-        int h = HashMap.hash(k.hashCode());
+        int h = computeHash(k.hashCode());
         Entry[] tab = getTable();
         int i = indexFor(h, tab.length);
 
@@ -547,7 +563,7 @@ public class WeakHashMapSafeReadLock<K,V>
      */
     public V remove(Object key) {
         Object k = maskNull(key);
-        int h = HashMap.hash(k.hashCode());
+        int h = computeHash(k.hashCode());
         Entry[] tab = getTable();
         int i = indexFor(h, tab.length);
         Entry<K,V> prev = tab[i];
@@ -580,7 +596,7 @@ public class WeakHashMapSafeReadLock<K,V>
         Entry[] tab = getTable();
         Map.Entry entry = (Map.Entry)o;
         Object k = maskNull(entry.getKey());
-        int h = HashMap.hash(k.hashCode());
+        int h = computeHash(k.hashCode());
         int i = indexFor(h, tab.length);
         Entry<K,V> prev = tab[i];
         Entry<K,V> e = prev;
@@ -680,7 +696,7 @@ public class WeakHashMapSafeReadLock<K,V>
         }
 
         public K getKey() {
-            return WeakHashMap.<K>unmaskNull(get());
+            return WeakHashMapSafeReadLock.<K>unmaskNull(get());
         }
 
         public V getValue() {
@@ -783,7 +799,7 @@ public class WeakHashMapSafeReadLock<K,V>
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
 
-            WeakHashMap.this.remove(currentKey);
+            WeakHashMapSafeReadLock.this.remove(currentKey);
             expectedModCount = modCount;
             lastReturned = null;
             currentKey = null;
@@ -813,6 +829,9 @@ public class WeakHashMapSafeReadLock<K,V>
 
     private transient Set<Map.Entry<K,V>> entrySet = null;
 
+    private transient volatile Set<K> myKeySet = null ;
+    private transient volatile Collection<V> myValues = null ;
+
     /**
      * Returns a {@link Set} view of the keys contained in this map.
      * The set is backed by the map, so changes to the map are
@@ -827,8 +846,8 @@ public class WeakHashMapSafeReadLock<K,V>
      * operations.
      */
     public Set<K> keySet() {
-        Set<K> ks = keySet;
-        return (ks != null ? ks : (keySet = new KeySet()));
+        Set<K> ks = myKeySet;
+        return (ks != null ? ks : (myKeySet = new KeySet()));
     }
 
     private class KeySet extends AbstractSet<K> {
@@ -837,7 +856,7 @@ public class WeakHashMapSafeReadLock<K,V>
         }
 
         public int size() {
-            return WeakHashMap.this.size();
+            return WeakHashMapSafeReadLock.this.size();
         }
 
         public boolean contains(Object o) {
@@ -846,7 +865,7 @@ public class WeakHashMapSafeReadLock<K,V>
 
         public boolean remove(Object o) {
             if (containsKey(o)) {
-                WeakHashMap.this.remove(o);
+                WeakHashMapSafeReadLock.this.remove(o);
                 return true;
             }
             else
@@ -854,7 +873,7 @@ public class WeakHashMapSafeReadLock<K,V>
         }
 
         public void clear() {
-            WeakHashMap.this.clear();
+            WeakHashMapSafeReadLock.this.clear();
         }
     }
 
@@ -872,8 +891,8 @@ public class WeakHashMapSafeReadLock<K,V>
      * support the <tt>add</tt> or <tt>addAll</tt> operations.
      */
     public Collection<V> values() {
-        Collection<V> vs = values;
-        return (vs != null ?  vs : (values = new Values()));
+        Collection<V> vs = myValues;
+        return (vs != null ?  vs : (myValues = new Values()));
     }
 
     private class Values extends AbstractCollection<V> {
@@ -882,7 +901,7 @@ public class WeakHashMapSafeReadLock<K,V>
         }
 
         public int size() {
-            return WeakHashMap.this.size();
+            return WeakHashMapSafeReadLock.this.size();
         }
 
         public boolean contains(Object o) {
@@ -890,7 +909,7 @@ public class WeakHashMapSafeReadLock<K,V>
         }
 
         public void clear() {
-            WeakHashMap.this.clear();
+            WeakHashMapSafeReadLock.this.clear();
         }
     }
 
@@ -932,11 +951,11 @@ public class WeakHashMapSafeReadLock<K,V>
         }
 
         public int size() {
-            return WeakHashMap.this.size();
+            return WeakHashMapSafeReadLock.this.size();
         }
 
         public void clear() {
-            WeakHashMap.this.clear();
+            WeakHashMapSafeReadLock.this.clear();
         }
 
 	private List<Map.Entry<K,V>> deepCopy() {

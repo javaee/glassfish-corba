@@ -59,6 +59,9 @@ import org.osgi.service.packageadmin.ExportedPackage ;
 import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /** OSGi class that monitors which bundles provide classes that the ORB
  * needs to instantiate for initialization.  This class is part of the
@@ -75,6 +78,8 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
  * @author ken
  */
 public class OSGIListener implements BundleActivator, SynchronousBundleListener {
+    private static final ReadWriteLock lock = new ReentrantReadWriteLock() ;
+
     private static final boolean FINE_DEBUG = false ;
 
     private static final ORBUtilSystemException wrapper =
@@ -91,22 +96,28 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     // Map from class name to Bundle, which identifies all known 
     // ORB-Class-Providers.
     private static Map<String,Bundle> classNameMap =
-        new HashMap<String,Bundle>() ;
+        new ConcurrentHashMap<String,Bundle>() ;
 
     // Map from package name to Bundle, which identifies all known
     // exported packages.
     private static Map<String,Bundle> packageNameMap = 
-        new HashMap<String,Bundle>() ;
+        new ConcurrentHashMap<String,Bundle>() ;
 
-    private static final boolean DEBUG = Boolean.getBoolean( ORBConstants.DEBUG_OSGI_LISTENER ) ;
+    private static final boolean DEBUG = Boolean.getBoolean(
+        ORBConstants.DEBUG_OSGI_LISTENER ) ;
 
-    private static synchronized void mapContents() {
-        if (DEBUG) {
-            msg( "Contents of classNameMap:" ) ;
+    private static void mapContents() {
+        lock.readLock().lock() ;
+        try {
+            if (DEBUG) {
+                msg( "Contents of classNameMap:" ) ;
 
-            for (Map.Entry<String,Bundle> entry : classNameMap.entrySet()) {
-                msg( entry.getKey() + "=>" + entry.getValue().getSymbolicName() ) ;
+                for (Map.Entry<String,Bundle> entry : classNameMap.entrySet()) {
+                    msg( entry.getKey() + "=>" + entry.getValue().getSymbolicName() ) ;
+                }
             }
+        } finally {
+            lock.readLock().unlock() ;
         }
     }
 
@@ -248,14 +259,14 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                             // I think this is the highest available version
                             try {
                                 if (FINE_DEBUG) {
-                                    wrapper.foundClassInBundleVersion( className,
-                                        name, version ) ;
+                                    wrapper.foundClassInBundleVersion( 
+                                        className, name, version ) ;
                                 }
                                 return defBundles[0].loadClass( className ) ;
                             } catch (ClassNotFoundException cnfe) {
                                 if (FINE_DEBUG) {
-                                    wrapper.classNotFoundInBundleVersion( className,
-                                        name, version ) ;
+                                    wrapper.classNotFoundInBundleVersion( 
+                                        className, name, version ) ;
                                 }
                                 // fall through to return null
                             }
@@ -268,85 +279,105 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
     }
 
-    private static ClassCodeBaseHandler ccbHandler = new ClassCodeBaseHandlerImpl() ;
+    private static ClassCodeBaseHandler ccbHandler =
+        new ClassCodeBaseHandlerImpl() ;
 
     public static ClassCodeBaseHandler classCodeBaseHandler() {
         return ccbHandler ;
     }
 
-    private synchronized void insertClasses( Bundle bundle ) {
-        final Dictionary dict = bundle.getHeaders() ;
-        final String name = bundle.getSymbolicName() ;
-        if (dict != null) {
-            final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
-            if (orbProvider != null) {
-                for (String str : orbProvider.split(",") ) {
-                    String className = str.trim() ;
-                    classNameMap.put( className, bundle ) ;
-                    wrapper.insertOrbProvider( className, name ) ;
+    private void insertClasses( Bundle bundle ) {
+        lock.writeLock().lock() ;
+        try {
+            final Dictionary dict = bundle.getHeaders() ;
+            final String name = bundle.getSymbolicName() ;
+            if (dict != null) {
+                final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
+                if (orbProvider != null) {
+                    for (String str : orbProvider.split(",") ) {
+                        String className = str.trim() ;
+                        classNameMap.put( className, bundle ) ;
+                        wrapper.insertOrbProvider( className, name ) ;
+                    }
                 }
             }
-        }
 
-        if (pkgAdmin != null) {
-            final ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
-            if (epkgs != null) {
-                for (ExportedPackage ep : epkgs) {
-                    final String pname = ep.getName() ;
-                    packageNameMap.put( pname, bundle ) ;
-                    wrapper.insertBundlePackage( pname, bundle.getSymbolicName() ) ;
+            if (pkgAdmin != null) {
+                final ExportedPackage[] epkgs = pkgAdmin.getExportedPackages(
+                    bundle ) ;
+                if (epkgs != null) {
+                    for (ExportedPackage ep : epkgs) {
+                        final String pname = ep.getName() ;
+                        packageNameMap.put( pname, bundle ) ;
+                        wrapper.insertBundlePackage( pname,
+                            bundle.getSymbolicName() ) ;
+                    }
                 }
             }
-        }
-    }
-
-    private synchronized void removeClasses( Bundle bundle ) {
-        final Dictionary dict = bundle.getHeaders() ;
-        final String name = bundle.getSymbolicName() ;
-        if (dict != null) {
-            final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
-            if (orbProvider != null) {
-                for (String className : orbProvider.split(",") ) {
-                    classNameMap.remove( className ) ;
-                    wrapper.removeOrbProvider( className, name ) ;
-                }
-            }
-        }
-
-        if (pkgAdmin != null) {
-            final ExportedPackage[] epkgs = pkgAdmin.getExportedPackages( bundle ) ;
-            if (epkgs != null) {
-                for (ExportedPackage ep : epkgs) {
-                    final String pname = ep.getName() ;
-                    packageNameMap.remove( pname ) ;
-                    wrapper.removeBundlePackage( pname, bundle.getSymbolicName() ) ;
-                }
-            }
+        } finally {
+            lock.writeLock().unlock() ;
         }
     }
 
-    private static synchronized Bundle getBundleForClass( String className ) {
-        Bundle result = classNameMap.get( className ) ;
-        if (result == null) {
-            wrapper.classNotFoundInClassNameMap( className ) ;
-            // Get package prefix
-            final int index = className.lastIndexOf( '.') ;
-            if (index > 0) {
-                final String packageName = className.substring( 0, index ) ;
-                result = packageNameMap.get( packageName ) ;
-                if (result == null) {
-                    wrapper.classNotFoundInPackageNameMap( className ) ;
-                } else {
-                    wrapper.classFoundInPackageNameMap( className, 
-                        result.getSymbolicName() ) ;
+    private void removeClasses( Bundle bundle ) {
+        lock.writeLock().lock() ;
+        try {
+            final Dictionary dict = bundle.getHeaders() ;
+            final String name = bundle.getSymbolicName() ;
+            if (dict != null) {
+                final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
+                if (orbProvider != null) {
+                    for (String className : orbProvider.split(",") ) {
+                        classNameMap.remove( className ) ;
+                        wrapper.removeOrbProvider( className, name ) ;
+                    }
                 }
             }
-        } else {
-            wrapper.classFoundInClassNameMap( className, 
-                result.getSymbolicName() ) ;
-        }
 
-        return result ;
+            if (pkgAdmin != null) {
+                final ExportedPackage[] epkgs = pkgAdmin.getExportedPackages(
+                    bundle ) ;
+                if (epkgs != null) {
+                    for (ExportedPackage ep : epkgs) {
+                        final String pname = ep.getName() ;
+                        packageNameMap.remove( pname ) ;
+                        wrapper.removeBundlePackage( pname,
+                            bundle.getSymbolicName() ) ;
+                    }
+                }
+            }
+        } finally {
+            lock.writeLock().unlock() ;
+        }
+    }
+
+    private static Bundle getBundleForClass( String className ) {
+        lock.readLock().lock() ;
+        try {
+            Bundle result = classNameMap.get( className ) ;
+            if (result == null) {
+                wrapper.classNotFoundInClassNameMap( className ) ;
+                // Get package prefix
+                final int index = className.lastIndexOf( '.') ;
+                if (index > 0) {
+                    final String packageName = className.substring( 0, index ) ;
+                    result = packageNameMap.get( packageName ) ;
+                    if (result == null) {
+                        wrapper.classNotFoundInPackageNameMap( className ) ;
+                    } else {
+                        wrapper.classFoundInPackageNameMap( className,
+                            result.getSymbolicName() ) ;
+                    }
+                }
+            } else {
+                wrapper.classFoundInClassNameMap( className,
+                    result.getSymbolicName() ) ;
+            }
+
+            return result ;
+        } finally {
+            lock.readLock().unlock() ;
+        }
     }
 
     public void start( BundleContext context ) {

@@ -222,6 +222,8 @@ public class ClassCopierFactoryPipelineImpl implements
 	specialFactory = ccf ;
     }
 
+    // Issue 14455: introduce read/write lock to reduce contention
+    // on getClassCopier.
     public ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock() ;
 
 

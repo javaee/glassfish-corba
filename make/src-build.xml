@@ -550,6 +550,7 @@
         <make-bundle classpath="${classes.dir}" file="orb"/>
         <make-bundle classpath="${classes.dir}" file="omgapi"/>
         <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>
+        <make-bundle classpath="${classes.dir}" file="internal-api"/>
 
         <make-bundle classpath="${orblib.classes.dir}" file="codegen"/>
         <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
@@ -1177,6 +1178,7 @@
         orbgeneric          -
         codegen             asm orbgeneric
         omgapi              -
+        internal-api        -
         csiv2-idl           omgapi
         newtimer            orbgeneric codegen 
         orb                 codegen newtimer omgapi orbgeneric
@@ -1267,13 +1269,14 @@
         <attribute name="destination"/>
         <sequential>
             <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <push-to-maven destination="@{destination}"
-             module="asm" description="ASM version used in the ORB"/>
-            <push-to-maven destination="@{destination}"
-             module="codegen" description="Dynamic code generation library"/>
-            <push-to-maven destination="@{destination}" 
-             module="csiv2-idl"
+            <push-to-maven destination="@{destination}" module="asm" 
+             description="ASM version used in the ORB"/>
+            <push-to-maven destination="@{destination}" module="codegen" 
+             description="Dynamic code generation library"/>
+            <push-to-maven destination="@{destination}" module="csiv2-idl"
              description="IDL generated definitions for CSIv2"/>
+            <push-to-maven destination="@{destination}" module="internal-api"
+             description="Non-standard ORB API classes for transactions and IIOP FOLB"/>
             <push-to-maven destination="@{destination}" module="newtimer"
              description="ORB timer library"/>
             <push-to-maven destination="@{destination}" module="omgapi"
@@ -1293,6 +1296,7 @@
             <push-to-local-maven module="asm" description="ASM version used in the ORB"/>
             <push-to-local-maven module="codegen" description="Dynamic code generation library"/>
             <push-to-local-maven module="csiv2-idl" description="IDL generated definitions for CSIv2"/>
+            <push-to-local-maven module="internal-api" description="Non-standard ORB API classes for transactions and IIOP FOLB"/>
             <push-to-local-maven module="newtimer" description="ORB timer library"/>
             <push-to-local-maven module="omgapi" description="OMG standard APIs"/>
             <push-to-local-maven module="orb" description="The ORB implementation"/>

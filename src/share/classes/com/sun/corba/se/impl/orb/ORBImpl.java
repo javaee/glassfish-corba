@@ -70,7 +70,6 @@ import org.omg.CORBA.NVList;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.NamedValue;
 import org.omg.CORBA.Request;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.StructMember;
@@ -164,6 +163,7 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
 import com.sun.corba.se.spi.orbutil.generic.ResourceFactory;
 import com.sun.corba.se.spi.orbutil.generic.NullaryFunction;
+import com.sun.corba.se.spi.orbutil.misc.WeakCache;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.OrbLifeCycle;
 import com.sun.corba.se.spi.trace.Subcontract;
@@ -182,9 +182,11 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     protected CorbaTransportManager transportManager;
     protected LegacyServerSocketManager legacyServerSocketManager;
 
-    private ThreadLocal OAInvocationInfoStack ; 
+    private ThreadLocal<StackImpl<OAInvocationInfo>>
+        OAInvocationInfoStack ;
 
-    private ThreadLocal clientInvocationInfoStack ; 
+    private ThreadLocal<StackImpl<ClientInvocationInfo>>
+        clientInvocationInfoStack ;
 
     // pure java orb, caching the servant IOR per ORB
     private CodeBase codeBase = null ; 
@@ -325,10 +327,16 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     private InvocationInterceptor invocationInterceptor ;
 
-    private WeakHashMap<ByteArrayWrapper, ObjectKeyCacheEntry> objectKeyCache = 
-                   new WeakHashMap<ByteArrayWrapper, ObjectKeyCacheEntry> ();
-
-    private final java.lang.Object objectKeyCacheLock = new java.lang.Object();
+    private WeakCache<ByteArrayWrapper, ObjectKeyCacheEntry> objectKeyCache =
+        new WeakCache<ByteArrayWrapper, ObjectKeyCacheEntry> () {
+            @Override
+            protected ObjectKeyCacheEntry lookup(ByteArrayWrapper key) {
+                ObjectKey okey = ORBImpl.this.getObjectKeyFactory().create(
+                    key.getObjKey());
+                ObjectKeyCacheEntry entry = new ObjectKeyCacheEntryImpl( okey ) ;
+                return entry ;
+            }
+        } ;
 
     public InvocationInterceptor getInvocationInterceptor() {
 	return invocationInterceptor ;
@@ -434,18 +442,18 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	    new TaggedProfileTemplateFactoryFinderImpl(this) ;
 
 	OAInvocationInfoStack = 
-	    new ThreadLocal () {
-            @Override
-		protected java.lang.Object initialValue() {
-		    return new StackImpl();
+	    new ThreadLocal<StackImpl<OAInvocationInfo>> () {
+                @Override
+		protected StackImpl<OAInvocationInfo> initialValue() {
+		    return new StackImpl<OAInvocationInfo>();
 		} 
 	    };
 
 	clientInvocationInfoStack = 
-	    new ThreadLocal() {
-            @Override
-		protected java.lang.Object initialValue() {
-		    return new StackImpl();
+	    new ThreadLocal<StackImpl<ClientInvocationInfo>>() {
+                @Override
+		protected StackImpl<ClientInvocationInfo> initialValue() {
+                    return new StackImpl<ClientInvocationInfo>();
 		}
 	    };
 
@@ -1537,7 +1545,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             taggedProfileTemplateFactoryFinder = null ;
             objectKeyFactory = null ;
             invocationInterceptor = null ;
-            objectKeyCache = null ; 
+            objectKeyCache.clear() ;
         }
 
         try {
@@ -1611,22 +1619,16 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	return factory ;
     }
 
-    public OAInvocationInfo peekInvocationInfo() 
-    {
-	StackImpl stack = (StackImpl)(OAInvocationInfoStack.get()) ;
-	return (OAInvocationInfo)(stack.peek()) ;
+    public OAInvocationInfo peekInvocationInfo() {
+	return OAInvocationInfoStack.get().peek() ;
     }
 
-    public void pushInvocationInfo( OAInvocationInfo info ) 
-    {
-	StackImpl stack = (StackImpl)(OAInvocationInfoStack.get()) ;
-	stack.push( info ) ;
+    public void pushInvocationInfo( OAInvocationInfo info ) {
+	OAInvocationInfoStack.get().push( info ) ;
     }
 
-    public OAInvocationInfo popInvocationInfo() 
-    {
-	StackImpl stack = (StackImpl)(OAInvocationInfoStack.get()) ;
-	return (OAInvocationInfo)(stack.pop()) ;
+    public OAInvocationInfo popInvocationInfo() {
+	return OAInvocationInfoStack.get().pop() ;
     }
 
     /**
@@ -1861,11 +1863,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     @Subcontract
     public ClientInvocationInfo createOrIncrementInvocationInfo() {
 	ClientInvocationInfo clientInvocationInfo = null;
-        StackImpl invocationInfoStack =
-            (StackImpl) clientInvocationInfoStack.get();
+        StackImpl<ClientInvocationInfo> invocationInfoStack =
+            clientInvocationInfoStack.get();
         if (!invocationInfoStack.empty()) {
-            clientInvocationInfo =
-                (ClientInvocationInfo) invocationInfoStack.peek();
+            clientInvocationInfo = invocationInfoStack.peek();
         }
         if ((clientInvocationInfo == null) ||
             (!clientInvocationInfo.isRetryInvocation()))
@@ -1887,11 +1888,10 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     public void releaseOrDecrementInvocationInfo() {
 	int entryCount = -1;
 	ClientInvocationInfo clientInvocationInfo = null;
-        StackImpl invocationInfoStack =
-            (StackImpl)clientInvocationInfoStack.get();
+        StackImpl<ClientInvocationInfo> invocationInfoStack =
+            clientInvocationInfoStack.get();
         if (!invocationInfoStack.empty()) {
-            clientInvocationInfo =
-                (ClientInvocationInfo)invocationInfoStack.peek();
+            clientInvocationInfo = invocationInfoStack.peek();
         } else {
             throw wrapper.invocationInfoStackEmpty() ;
         }
@@ -1908,9 +1908,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     }
     
     public ClientInvocationInfo getInvocationInfo() {
-	StackImpl invocationInfoStack =
-	    (StackImpl) clientInvocationInfoStack.get();
-	return (ClientInvocationInfo) invocationInfoStack.peek();
+	return clientInvocationInfoStack.get().peek() ;
     }
 
     ////////////////////////////////////////////////////
@@ -2112,25 +2110,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
         }
 
 	ByteArrayWrapper newObjKeyWrapper = new ByteArrayWrapper(objKey);
-	ObjectKeyCacheEntry entry = null ;
 
-	synchronized (objectKeyCacheLock) {
-	    entry = objectKeyCache.get(newObjKeyWrapper);
-	    if (entry == null) {
-		ObjectKey okey ;
-
-		try {
-		    okey = this.getObjectKeyFactory().create(objKey);
-		} catch (Exception exc) {
-		    throw wrapper.invalidObjectKey( exc );
-		}
-
-		entry = new ObjectKeyCacheEntryImpl( okey ) ;
-		objectKeyCache.put(newObjKeyWrapper, entry); 	  
-	    }
-	}	  
-
-	return entry ;
+        return objectKeyCache.get( newObjKeyWrapper ) ;
     }
 
     @Override

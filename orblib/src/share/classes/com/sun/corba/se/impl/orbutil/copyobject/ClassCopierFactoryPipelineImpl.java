@@ -138,7 +138,7 @@ public class ClassCopierFactoryPipelineImpl implements
     } ;
 
 
-    private CachingClassCopierFactory cacheFactory ;
+    private CachingClassCopierFactory factoryCache ;
     private ClassCopierFactory specialFactory ;
     private ClassCopierFactory arrayFactory ;
     private ClassCopierFactory ordinaryFactory ;
@@ -146,7 +146,7 @@ public class ClassCopierFactoryPipelineImpl implements
 
     public ClassCopierFactoryPipelineImpl() {
 	// Set up internal ClassCopierFactory instances
-	cacheFactory = 
+	factoryCache =
 	    DefaultClassCopierFactories.makeCachingClassCopierFactory() ;
 	specialFactory = 
 	    DefaultClassCopierFactories.getNullClassCopierFactory() ;
@@ -173,13 +173,13 @@ public class ClassCopierFactoryPipelineImpl implements
         // cause stack overflow if analyzed reflectively (issue 13996),
         // so make sure that LinkedHashMap is copied this way as well.
         for (Class<?> cls : mapClasses) {
-            cacheFactory.put( cls, mapCopier ) ;
+            factoryCache.put( cls, mapCopier ) ;
         }
 
 	// Make sure that all non-copyable classes have the error
 	// copier in the cache.
 	for (Class<?> cls : notCopyable) {
-            cacheFactory.put(cls, errorCopier);
+            factoryCache.put(cls, errorCopier);
         }
     }
 
@@ -200,7 +200,7 @@ public class ClassCopierFactoryPipelineImpl implements
     public ClassCopier lookupInCache( Class<?> cls ) {
 	try {
 	    // TIME enter_lookupInCache
-	    return cacheFactory.getClassCopier( cls ) ;
+	    return factoryCache.getClassCopier( cls ) ;
 	    // TIME exit_lookupInCache
 	} catch (ReflectiveCopyException exc) {
 	    // ignore this: it cannot occur on the cache class copier get.
@@ -212,7 +212,7 @@ public class ClassCopierFactoryPipelineImpl implements
      * passed by reference.
      */
     public synchronized final void registerImmutable( Class<?> cls ) {
-	cacheFactory.put( cls, DefaultClassCopiers.getIdentityClassCopier() ) ;
+	factoryCache.put( cls, DefaultClassCopiers.getIdentityClassCopier() ) ;
     }
 
     /** Set a special ClassCopierFactory to handle some application specific 
@@ -243,7 +243,7 @@ public class ClassCopierFactoryPipelineImpl implements
         rwlock.readLock().lock() ;
         boolean readLocked = true ;
         try {
-            ClassCopier result = cacheFactory.getClassCopier( cls ) ;
+            ClassCopier result = factoryCache.getClassCopier( cls ) ;
             if (result == null) {
                 // New for Java SE 5.0: all Enums are immutable.
                 // We'll figure that out here and cache the result.
@@ -270,8 +270,8 @@ public class ClassCopierFactoryPipelineImpl implements
                 readLocked = false ;
                 rwlock.writeLock().lock() ;
                 try {
-                    if (cacheFactory.getClassCopier(cls) == null) {
-                        cacheFactory.put( cls, result ) ;
+                    if (factoryCache.getClassCopier(cls) == null) {
+                        factoryCache.put( cls, result ) ;
                     }
                 } finally {
                     rwlock.writeLock().unlock() ;

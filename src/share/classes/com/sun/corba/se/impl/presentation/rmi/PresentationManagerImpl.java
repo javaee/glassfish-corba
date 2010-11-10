@@ -44,7 +44,6 @@ import java.io.PrintStream ;
 
 import java.util.Map ;
 import java.util.HashMap ;
-import java.util.WeakHashMap ;
 import java.util.Set ;
 import java.util.HashSet ;
 import java.util.List ;
@@ -68,7 +67,6 @@ import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 
-import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
@@ -80,14 +78,15 @@ import com.sun.corba.se.impl.orbutil.graph.Graph ;
 import com.sun.corba.se.impl.orbutil.graph.GraphImpl ;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.spi.orbutil.misc.WeakCache;
 
 public final class PresentationManagerImpl implements PresentationManager
 {
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
-    private Map<Class<?>,ClassData> classToClassData ;
-    private Map<Method,DynamicMethodMarshaller> methodToDMM ;
+    private WeakCache<Class<?>,ClassData> classToClassData ;
+    private WeakCache<Method,DynamicMethodMarshaller> methodToDMM ;
     private PresentationManager.StubFactoryFactory staticStubFactoryFactory ;
     private PresentationManager.StubFactoryFactory dynamicStubFactoryFactory ;
     private boolean useDynamicStubs ;
@@ -97,8 +96,20 @@ public final class PresentationManagerImpl implements PresentationManager
     public PresentationManagerImpl( boolean useDynamicStubs )
     {
 	this.useDynamicStubs = useDynamicStubs ;
-	classToClassData = new WeakHashMap<Class<?>,ClassData>() ;
-	methodToDMM = new WeakHashMap<Method,DynamicMethodMarshaller>() ;
+
+	classToClassData = new WeakCache<Class<?>,ClassData>() {
+            @Override
+            protected ClassData lookup(Class<?> key) {
+                return new ClassDataImpl( key ) ;
+            }
+        } ;
+
+	methodToDMM = new WeakCache<Method,DynamicMethodMarshaller>() {
+            @Override
+            protected DynamicMethodMarshaller lookup(Method key) {
+                return new DynamicMethodMarshallerImpl( key ) ;
+            }
+        } ;
     }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,24 +123,12 @@ public final class PresentationManagerImpl implements PresentationManager
             return null;
         }
 
-	DynamicMethodMarshaller result = methodToDMM.get(method) ;
-	if (result == null) {
-	    result = new DynamicMethodMarshallerImpl( method ) ;
-	    methodToDMM.put( method, result ) ;
-	}
-
-	return result ;
+	return methodToDMM.get(method) ;
     }
 
     public synchronized ClassData getClassData( Class<?> cls )
     {
-	ClassData result = classToClassData.get(cls) ;
-	if (result == null) {
-	    result = new ClassDataImpl( cls ) ;
-	    classToClassData.put( cls, result ) ;
-	}
-
-	return result ;
+	return classToClassData.get(cls) ;
     }
 
     private class ClassDataImpl implements PresentationManager.ClassData 

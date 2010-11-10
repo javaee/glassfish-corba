@@ -39,7 +39,7 @@
  */
 package com.sun.corba.se.spi.orbutil.copyobject ;
 
-public class ReflectiveCopyException extends Exception {
+public class ReflectiveCopyException extends RuntimeException {
     public ReflectiveCopyException()
     {
 	super() ;

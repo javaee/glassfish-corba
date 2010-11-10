@@ -46,7 +46,7 @@ import java.util.EmptyStackException ;
 // java.util.Stack is thread-safe, negatively impacting performance.
 // We use an ArrayList instead since it is not thread-safe.  
 // RequestInfoStack is used quite frequently.
-public class StackImpl {
+public class StackImpl<E> {
     // The stack for RequestInfo objects.  
     private Object[] data = new Object[3] ;
     private int top = -1 ;
@@ -58,20 +58,23 @@ public class StackImpl {
 
     // Looks at the object at the top of this stack without removing it
     // from the stack.
-    public final Object peek() {
-	if (empty()) 
-	    throw new EmptyStackException();
+    @SuppressWarnings("unchecked")
+    public final E peek() {
+	if (empty()) {
+            throw new EmptyStackException();
+        }
 
-	return data[ top ];
+	return (E)data[ top ];
     }
 
     // Removes the object at the top of this stack and returns that 
     // object as the value of this function.
-    public final Object pop() {
+    @SuppressWarnings("unchecked")
+    public final E pop() {
 	Object obj = peek() ;
 	data[top] = null ;
 	top-- ;
-	return obj;
+	return (E)obj;
     }
 
     private void ensure() 
@@ -85,7 +88,7 @@ public class StackImpl {
     }
 
     // Pushes an item onto the top of the stack
-    public final Object push( Object item ) {
+    public final Object push( E item ) {
 	ensure() ;
 	top++ ;
 	data[top] = item;

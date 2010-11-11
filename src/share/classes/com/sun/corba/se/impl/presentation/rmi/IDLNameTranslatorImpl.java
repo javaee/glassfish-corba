@@ -319,7 +319,7 @@ public class IDLNameTranslatorImpl implements IDLNameTranslator {
         // Now mangle any properties that clash with method names.
         //
         for (IDLMethodInfo outer : allMethodInfo.values()) {
-            if( outer.isProperty ) {
+            if( !outer.isProperty ) {
                 continue;
             }
             for (IDLMethodInfo inner : allMethodInfo.values()) {

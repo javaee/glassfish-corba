@@ -160,7 +160,7 @@ public class CopyrightProcessor {
 
     // Special file names to ignore
     private static final String[] IGNORE_FILE_NAMES = {
-	"NORENAME", "errorfile", "sed_pattern_file.version"
+	"NORENAME", "errorfile", "sed_pattern_file.version", "build.properties"
     } ;
 
     // Block tags

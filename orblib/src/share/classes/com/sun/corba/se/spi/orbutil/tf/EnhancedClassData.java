@@ -122,7 +122,8 @@ public interface EnhancedClassData {
      * For monitored methods, this is just the method name.
      * For info methods whose tpType is not NONE, this is specified
      * in tpName.
-     * @return
+     * @return List of timing point names, in the same order as in 
+     * getMethodTracingNames.
      */
     List<String> getTimingPointNames() ;
 
@@ -153,7 +154,7 @@ public interface EnhancedClassData {
      * InfoMethod, which can be called from any monitored method regardless of
      * the annotation on the monitored method.
      * </ul>
-     * @return
+     * @return List of annotation names for methods.
      */
     List<String> getMethodMMAnnotationName() ;
 

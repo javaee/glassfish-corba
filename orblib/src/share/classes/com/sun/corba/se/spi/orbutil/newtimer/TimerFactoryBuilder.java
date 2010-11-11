@@ -60,9 +60,9 @@ public class TimerFactoryBuilder {
 
     /** Construct the standard name for a Timer derived from a method
      * in the tracing facility.
-     * @param cls The monitored clas
+     * @param cname The name of the monitored clas
      * @param name The name of a monitored method or info method
-     * @return
+     * @return The timer name
      */
     public static String getTimerName( final String cname, final String name ) {
         return cname + "__" + name ;

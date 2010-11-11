@@ -62,7 +62,7 @@ public @interface MethodMonitorGroup {
      * Because annotations don't support circularity, the type
      * can't be MethodMonitorGroup[], so we require that all classes
      * in subgroups be annotations which are annotated with
-     * @MethodMonitorGroup.
+     * MethodMonitorGroup.
      *
      * @return List of MethodMonitorGroups that are subgroups of
      * this one.

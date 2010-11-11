@@ -100,7 +100,7 @@ public abstract class WeakCache<K,V> {
      * the cache.
      *
      * @param key
-     * @return
+     * @return Value associated with the key.
      */
     public V get( K key ) {
         lock.readLock().lock() ;

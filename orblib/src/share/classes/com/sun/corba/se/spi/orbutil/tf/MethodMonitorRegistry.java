@@ -490,8 +490,9 @@ public class MethodMonitorRegistry {
     /** Return the MethodMonitorFactory registered against the annotation, or
      * null if nothing is registered.
      *
-     * @param annot
-     * @return
+     * @param annot A class representing an annotation, which must itself
+     * have a MethodMonitorGroup meta-annotation.
+     * @return The MethodMonitorFactory for annot.
      */
     public synchronized static MethodMonitorFactory registeredFactory(
         Class<? extends Annotation> annot ) {

@@ -140,7 +140,7 @@ public class WrapperGenerator {
 
         /** Modify the default logger name if needed.
          * 
-         * @param str The standard logger name
+         * @param cls The standard logger name
          * @return A possibly updated logger name
          */
         String getLoggerName( Class<?> cls );
@@ -464,7 +464,7 @@ public class WrapperGenerator {
      *
      * @param <T> The annotated interface type.
      * @param cls The class of the annotated interface.
-     * @param extention The extension instance used to override the default
+     * @param extension The extension instance used to override the default
      * behavior.
      * @return An instance of the interface.
      */

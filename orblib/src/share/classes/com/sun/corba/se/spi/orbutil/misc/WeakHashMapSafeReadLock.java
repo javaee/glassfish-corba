@@ -73,8 +73,7 @@ import java.util.Set;
  *
  * <p> Like most collection classes, this class is not synchronized.
  * A synchronized <tt>WeakHashMap</tt> may be constructed using the
- * {@link Collections#synchronizedMap Collections.synchronizedMap}
- * method.
+ * Collections.synchronizedMap method.
  *
  * <p> This class is intended primarily for use with key objects whose
  * <tt>equals</tt> methods test for object identity using the

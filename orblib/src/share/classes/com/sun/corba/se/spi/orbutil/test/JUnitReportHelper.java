@@ -87,7 +87,7 @@ public class JUnitReportHelper {
     /** Prepare to generate a JUnitReport in the file named
      * ${junit.report.dir}/${name}.xml.  junit.report.dir is obtained from
      * the environment variable which is passed to all CTF controllers.
-     * @param name The class name of the class for this test
+     * @param cname The class name of the class for this test
      */
     public JUnitReportHelper( String cname ) {
         current = null ;
@@ -146,7 +146,7 @@ public class JUnitReportHelper {
 
     /** Start executing a test case with the given name.
      * All names MUST be unique for an instance of JUnitReportHelper.
-     * @param The name of the test case
+     * @param name The name of the test case
      */
     public void start( String name ) {
         msg( "Starting test " + name ) ;

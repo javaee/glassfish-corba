@@ -68,7 +68,7 @@ public interface MethodMonitorFactory {
 
     /** The name of this mmf.  Given any two mmf a and b, a.equals( b ) iff
      * a.name().equals( b.name() ).
-     * @return
+     * @return The name of this MethodMonitorFactory.
      */
     String name() ;
 }

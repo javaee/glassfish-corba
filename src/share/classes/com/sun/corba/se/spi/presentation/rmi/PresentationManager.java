@@ -206,7 +206,7 @@ public interface PresentationManager
      * Provided for compatibility with earlier versions of PresentationManager
      * as used in the app server.  The class argument is ignored in
      * the dynamic case, so this is safe.
-     * @return
+     * @return The static tie.
      */
     Tie getTie() ;
 

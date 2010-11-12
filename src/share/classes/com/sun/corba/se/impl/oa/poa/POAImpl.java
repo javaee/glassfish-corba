@@ -939,7 +939,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
 		// Do not hold the parent POA lock while 
 		// waiting for child to complete initialization.
-		readUnLock() ;
+		readUnlock() ;
                 readLocked = false ;
 
 		// Make sure that the child has completed its initialization,

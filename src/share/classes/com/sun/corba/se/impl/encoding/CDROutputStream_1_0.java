@@ -62,8 +62,8 @@ import java.security.PrivilegedActionException;
 import java.util.Map;
 import java.util.HashMap;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.EnumDesc;
-import com.sun.corba.se.impl.javax.rmi.CORBA.ProxyDesc;
+import javax.rmi.CORBA.EnumDesc;
+import javax.rmi.CORBA.ProxyDesc;
 import java.lang.reflect.Proxy;
 
 import javax.rmi.CORBA.ValueHandler;

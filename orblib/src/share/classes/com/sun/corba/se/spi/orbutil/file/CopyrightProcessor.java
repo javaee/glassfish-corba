@@ -47,22 +47,13 @@ import java.util.HashMap ;
 import java.io.File ;
 import java.io.IOException ;
 
-import com.sun.corba.se.spi.orbutil.file.Scanner ;
-import com.sun.corba.se.spi.orbutil.file.Recognizer ;
-import com.sun.corba.se.spi.orbutil.file.FileWrapper ;
-import com.sun.corba.se.spi.orbutil.file.ActionFactory ;
-import com.sun.corba.se.spi.orbutil.file.Block ;
-import com.sun.corba.se.spi.orbutil.file.BlockParser ;
-
 import com.sun.corba.se.spi.orbutil.argparser.ArgParser ;
 import com.sun.corba.se.spi.orbutil.argparser.Help ;
 import com.sun.corba.se.spi.orbutil.argparser.DefaultValue ;
-import com.sun.corba.se.spi.orbutil.argparser.Separator ;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class CopyrightProcessor {
@@ -96,38 +87,10 @@ public class CopyrightProcessor {
 	@DefaultValue( "1997" )
 	@Help( "Default copyright start year, if not otherwise specified" ) 
 	String startyear() ;
-
-        @DefaultValue( "false" ) 
-        @Help( "Run some simple tests" ) 
-        boolean test() ;
     }
 
     private static boolean validate ;
     private static int verbose ;
-
-    // File processing configuration:
-    // Class:
-    //  JAVA
-    //  XML
-    //  JAVA_LINE
-    //  SCHEME
-    //  SHELL
-    //  SHELL_SCRIPT
-    //  IGNORE
-    // Each class has suffixes and file names
-    // Specified in a property file:
-    // cptool.<CLASS>.suffixes is a comma separated list (no spaces) of filename suffixes
-    // cptool.<CLASS>.filenames is a comma separated list of specific filenames
-
-    String[] PROCESSING_CLASS_NAMES = {
-        "JAVA", "XML", "JAVA_LINE", "SCHEME", "SHELL", "SHELL_SCRIPT", "IGNORE" } ;
-
-    /*
-    Map<String,Scanner.Action> actionMap ;
-    Map<String,List<String>> suffixMap ;
-    Map<String,List<String>> fileNameMap ;
-    */
-
 
     private static final String[] JAVA_LIKE_SUFFIXES = {
 	"c", "h", "java", "sjava", "idl" } ;
@@ -199,209 +162,37 @@ public class CopyrightProcessor {
     }
 
     private static final String COPYRIGHT = "Copyright" ;
-/*
-    Iterable<Character> getStringIterator( final String str ) {
-        return new Iterable<Character>() {
-            Iterator<Character> iterator() {
-                return new Iterator<Character>() {
-                    int pos = 0 ;
-
-                    public boolean hasNext() {
-                        return str.length() > pos ;
-                    }
-
-                    public Character next() {
-                        return str.charAt( ++pos ) ;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException() ;
-                    }
-                } ;
-            }
-        } ;
-    }
-*/
-    private static class StringParser {
-        private String data ;
-        private int pos ;
-        private char current ;
-
-        public StringParser( String str ) {
-            if (str.length() == 0)
-                throw new RuntimeException( "Empty string not allowed" ) ;
-
-            this.data = str ;
-            this.pos = 0 ;
-            this.current = str.charAt( pos ) ;
-        }
-
-        private void setPos( int newPos ) {
-            if (newPos < data.length() ) {
-                pos = newPos ;
-                current = data.charAt( newPos ) ;
-            }
-        }
-
-        private boolean next() {
-            if (data.length() > pos) {
-                setPos( pos + 1 ) ;
-                return true ;
-            } else {
-                return false ;
-            }
-                
-        }
-
-        /** skip everything until str is found.  Returns true if found, otherwise
-         * false.
-         */
-        public boolean skipToString( String str ) {
-            int index = data.indexOf( str ) ;
-            if (index >= 0) {
-                setPos( index ) ;
-                return true ;
-            } else {
-                return false ;
-            }
-        }
-
-        /** skip over str, if str is at the current position.
-         */
-        public boolean skipString( String str ) {
-            String cstr = data.substring( pos, pos+str.length() ) ;
-            if (cstr.equals( str )) {
-                setPos( pos+str.length() ) ;
-                return true ;
-            } else {
-                return false ;
-            }
-        }
-
-        /** Skip over whitespace.  Returns true if some whitespace skipped.
-         */
-        public boolean skipWhitespace() {
-            boolean hasSkipped = false ;
-            while (Character.isWhitespace(current)) { 
-                hasSkipped = true ;
-                if (!next()) {
-                    break ;
-                }
-            }
-
-            return hasSkipped ;
-        }
-
-        /** Return int matched at current position as a string.
-         */
-        public String parseInt() {
-            int first = pos ;
-            boolean atStart = true ;
-            while ((current >= '0') && (current <= '9')) {
-                atStart = false ;
-                if (!next()) {
-                    break ;
-                }
-            }
-
-            if (atStart) {
-                return null ;
-            } else {
-                return data.substring( first, pos ) ;
-            }
-        }
-    }
 
     // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
-    private static Pair<String,String> getOracleCopyrightPair( String str ) {
+    private static Pair<String,String> getCopyrightPair( String str ) {
         StringParser sp = new StringParser( str ) ;
-        if (!sp.skipToString( COPYRIGHT )) 
-            return null ;
+        if (!sp.skipToString( COPYRIGHT )) {
+            return null;
+        }
 
-        if (!sp.skipString( COPYRIGHT ))
-            return null ;
+        if (!sp.skipString( COPYRIGHT )) {
+            return null;
+        }
 
-        if (!sp.skipWhitespace())
-            return null ;
+        if (!sp.skipWhitespace()) {
+            return null;
+        }
 
         String start = sp.parseInt() ;
-        if (start == null)
-            return null ;
+        if (start == null) {
+            return null;
+        }
 
-        if (!sp.skipString( "-" )) 
-            return null ;
+        if (!sp.skipString( "-" )) {
+            return null;
+        }
 
         String end = sp.parseInt() ;
-        if (end == null)
-            return null ;
+        if (end == null) {
+            return null;
+        }
 
         return new Pair<String,String>( start, end ) ;
-    }
-
-    public static void testGetOracleCopyrightPair() {
-        final String data = 
-            " * Copyright 1997-2007 Oracle. All rights reserved." ;
-
-        Pair<String,String> pair = getOracleCopyrightPair( data ) ;
-
-        System.out.println( pair ) ;
-    }
-
-    // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
-    private static Pair<String,String> getOracleCopyrights( String str ) {
-	int index = str.indexOf( COPYRIGHT ) ;
-	if (index == -1) 
-	    return null ;
-
-        // Iterable<Character> it = getStringIterator( str.substring( index + COPYRIGHT.length() ) ) ;
-	int pos = index + COPYRIGHT.length() ;
-	char ch = str.charAt( pos ) ;
-	while (Character.isWhitespace(ch) && (pos<str.length())) {
-	    ch = str.charAt( ++pos ) ;
-	}
-	
-        // find number
-	int start = pos ;
-	ch = str.charAt( pos ) ;
-	while (Character.isDigit(ch) && (pos<str.length())) {
-	    ch = str.charAt( ++pos ) ;
-	}
-
-        if (pos==start)
-            return null ;
-
-        String startYear = str.substring( start, pos ) ;
-
-        if (ch != '-')
-            return null ;
-
-        pos++ ;
-        ch = str.charAt( pos ) ;
-        return null ;
-    }
-
-    // Copyright year is first non-blank after COPYRIGHT
-    private static String getOracleCopyrightStart( String str ) {
-	int index = str.indexOf( COPYRIGHT ) ;
-	if (index == -1) 
-	    return null ;
-
-	int pos = index + COPYRIGHT.length() ;
-	char ch = str.charAt( pos ) ;
-	while (Character.isWhitespace(ch) && (pos<str.length())) {
-	    ch = str.charAt( ++pos ) ;
-	}
-	
-	int start = pos ;
-	ch = str.charAt( pos ) ;
-	while (Character.isDigit(ch) && (pos<str.length())) {
-	    ch = str.charAt( ++pos ) ;
-	}
-
-	if (pos==start) 
-	    return null ;
-
-	return str.substring( start, pos ) ;
     }
 
     private static final String START_YEAR = "StartYear" ;
@@ -441,6 +232,7 @@ public class CopyrightProcessor {
 	final String end ) {
 
 	return new BlockParserCall() {
+            @Override
 	    public String toString() {
 		return "BlockCommentBlockParserCall[start=," + start
 		    + ",end=" + end + "]" ;
@@ -459,6 +251,7 @@ public class CopyrightProcessor {
     private static BlockParserCall makeLineCommentParser( final String prefix ) {
 
 	return new BlockParserCall() {
+            @Override
 	    public String toString() {
 		return "LineCommentBlockParserCall[prefix=," + prefix + "]" ;
 	    }
@@ -503,6 +296,7 @@ public class CopyrightProcessor {
 	}
 
 	return new Scanner.Action() {
+            @Override
 	    public String toString() {
 		return "CopyrightBlockAction[copyrightText=" + copyrightText
 		    + ",parserCall=" + parserCall 
@@ -527,7 +321,7 @@ public class CopyrightProcessor {
 			if (str != null) {
 			    block.addTag( COPYRIGHT_BLOCK_TAG ) ;
 			    if (str.contains( "Oracle" )) {
-				Pair<String,String> scp = getOracleCopyrightPair( str ) ;
+				Pair<String,String> scp = getCopyrightPair( str ) ;
                                 if (scp != null) {
                                     years = scp ;
                                 }
@@ -673,7 +467,7 @@ public class CopyrightProcessor {
     // The difference is that the SHELL_SCRIPT always starts with #!.
     
     public static void main(String[] strs) {
-	ArgParser<Arguments> ap = new ArgParser( Arguments.class ) ;
+	ArgParser<Arguments> ap = new ArgParser<Arguments>( Arguments.class ) ;
 	Arguments args = ap.parse( strs ) ;
 
 	String startYear = args.startyear() ;
@@ -683,10 +477,6 @@ public class CopyrightProcessor {
 	if (verbose > 0) {
 	    trace( "Main: args:\n" + args ) ;
 	}
-
-        if (args.test()) {
-            testGetOracleCopyrightPair() ;
-        }
 
 	try {
 	    // Create the blocks needed for different forms of the 
@@ -802,8 +592,9 @@ public class CopyrightProcessor {
 	    }
 
 	    Scanner scanner = new Scanner( verbose, args.roots() ) ;
-	    for (String str : args.skipdirs() )
-		scanner.addDirectoryToSkip( str ) ;
+	    for (String str : args.skipdirs() ) {
+                scanner.addDirectoryToSkip(str);
+            }
 
 	    // Finally, we process all files
 	    scanner.scan( recognizer ) ;

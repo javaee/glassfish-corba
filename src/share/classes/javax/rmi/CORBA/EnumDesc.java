@@ -38,27 +38,20 @@
  * holder.
  */
 
-package com.sun.corba.se.impl.javax.rmi.CORBA;
+package javax.rmi.CORBA ;
 
-/**
- * This class is used to marshal java.lang.Proxy objects over IIOP.
+/** Class used to describe how a Java Enum is marshaled over
+ * RMI-IIOP.  This is one of the proposals for OMG issue 10336, but
+ * not the final approved version.
  */
-public class ProxyDesc implements java.io.Serializable {
-    /**
-     * @serial The class names of the interfaces that the Proxy object
-     * implements.
-     */
-    public String[] interfaces;
+public class EnumDesc implements java.io.Serializable {
+    static final long serialVersionUID = -155483178780200630L ;
 
-    /**
-     * @serial A space-separated list of codebase URLs.
+    /** Name of the enum constant.
      */
-    public String codebase;
+    public String value ;
 
-    /**
-     * @serial The Proxy's InvocationHandler instance.
+    /** Name of the enum class.
      */
-    public java.lang.reflect.InvocationHandler handler;
-
-    static final long serialVersionUID = 1234286961190911798L;
+    public String className ;
 }

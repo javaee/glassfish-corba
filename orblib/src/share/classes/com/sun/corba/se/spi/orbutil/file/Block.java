@@ -140,8 +140,9 @@ public class Block {
      */
     public boolean hasTags( final String... tags ) {
 	for (String tag : tags) {
-	    if (!hasTag( tag ))
-		return false ;
+	    if (!hasTag( tag )) {
+                return false;
+            }
 	}
 
 	return true ;

@@ -924,19 +924,23 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	POAImpl found = null ;
 	AdapterActivator act = null ;
 
-	lock() ;
+	readLock() ;
+        boolean readLocked = true ;
 
 	found = children.get(name);
 
 	if (found != null) {
+            // This is the normal case: the object exists, and we only want a read
+            // lock here to avoid another locking hot spot.
 	    foundPOA( found ) ;
 	    
 	    try {
-		found.lock() ;
+		found.readLock() ;
 
 		// Do not hold the parent POA lock while 
 		// waiting for child to complete initialization.
-		unlock() ;
+		readUnLock() ;
+                readLocked = false ;
 
 		// Make sure that the child has completed its initialization,
 		// if it was created by an AdapterActivator, otherwise throw
@@ -950,35 +954,55 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		// this point.  That's OK, since destruction could start at
 		// any time.
 	    } finally {
-		found.unlock() ;
+		found.readUnlock() ;
 	    }
 	} else {
 	    try {
 		noPOA() ;
 
 		if (activate && (activator != null)) {
-		    // Create a child, but don't initialize it.  The newly
-		    // created POA will be in state STATE_START, which will 
-		    // cause other calls to find_POA that are creating the same
-		    // POA to block on the waitUntilRunning call above.
-		    // Initialization must be completed by a call to create_POA 
-		    // inside the unknown_adapter upcall.  Note that 
-		    // this.poaMutex must be held here so that this.children 
-		    // can be safely updated.  The state is set to STATE_INIT 
-		    // so that initialize can make the correct state transition 
-		    // when create_POA is called inside the AdapterActivator.  
-		    // This avoids activating the new POA too soon 
-		    // by transitioning to STATE_RUN after unknown_adapter 
-		    // returns.
-		    found = new POAImpl( name, this, getORB(), STATE_INIT ) ;
+                    // Need to hold writeLock here (for new POAImpl call), 
+                    // so first drop the read lock.
+                    readUnlock() ;
+                    readLocked = false ;
+                    
+                    lock() ;
+                    try {
+                        // Check again, in case another thread created this child before
+                        // we acquired the write lock.
+                        found = children.get(name);
 
-		    createdPOA( found ) ;
-		    act = activator ;
-		} else {
-		    throw new AdapterNonExistent();
-		}
+                        if (found == null) {
+                            // Create a child, but don't initialize it.  The newly
+                            // created POA will be in state STATE_START, which will 
+                            // cause other calls to find_POA that are creating the same
+                            // POA to block on a waitUntilRunning.
+                            // Initialization must be completed by a call to create_POA 
+                            // inside the unknown_adapter upcall.  The state is set to STATE_INIT 
+                            // so that initialize can make the correct state transition 
+                            // when create_POA is called inside the AdapterActivator.  
+                            // This avoids activating the new POA too soon 
+                            // by transitioning to STATE_RUN after unknown_adapter 
+                            // returns.
+                            found = new POAImpl( name, this, getORB(), STATE_INIT ) ;
+                        } else {
+                            if (!found.waitUntilRunning()) {
+                                throw omgWrapper.poaDestroyed();
+                            }
+                        }
+                    } finally {
+                        unlock() ;
+                    }
+
+                    createdPOA( found ) ;
+                    act = activator ;
+                } else {
+                    throw new AdapterNonExistent();
+                }
 	    } finally {
-		unlock() ;
+                if (readLocked) {
+                    unlock() ;
+                }
 	    }
 	}
 

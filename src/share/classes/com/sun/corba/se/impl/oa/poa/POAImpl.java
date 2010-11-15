@@ -142,20 +142,36 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
     private static final long serialVersionUID = -1746388801294205323L;
 
-    /* POA creation takes place in 2 stages: first, the POAImpl constructor is 
-       called, then the initialize method is called.  This separation is 
-       needed because an AdapterActivator does not know the POAManager or 
-       the policies when 
-       the unknown_adapter method is invoked.  However, the POA must be created
-       before the unknown_adapter method is invoked, so that the parent knows
-       when concurrent attempts are made to create the same POA.
-       Calling the POAImpl constructor results in a new POA in state STATE_START.
-       Calling initialize( POAManager, Policies ) results in state STATE_RUN.
-       Calling destroy results in STATE_DESTROY, which marks the beginning of
-       POA destruction.
-    */
+    // POA Creation
+    //
+    // POA creation takes place in 2 stages: 
+    //     first, the POAImpl constructor is called 
+    //     then, the initialize method is called.  
+    // This separation is needed because an AdapterActivator does not know 
+    // the POAManager or the policies when 
+    // the unknown_adapter method is invoked.  However, the POA must be created
+    // before the unknown_adapter method is invoked, so that the parent knows
+    // when concurrent attempts are made to create the same POA.
+    //
+    // Calling the POAImpl constructor results in a new POA without initializing 
+    // the new POA.  new POAImpl is called in two places:
+    // 1. inside create_POA: state = STATE_START
+    // 2. inside find_POA: state = STATE_INIT 
+    //
+    // Calling initialize( POAManager, Policies ) results in state STATE_RUN 
+    // (if the POA create created directly in create_POA) or
+    // state STATE_INIT_DONE (if the POA was create in an AdapterActivator).
+    //
+    // Calling destroy results in STATE_DESTROYING, which marks the beginning of
+    // POA destruction.
+    //
+    // destroyIfNotInitDone completes moves the POA state from STATE_INIT_DONE
+    // to STATE_RUN.  It is called from find_POA after the unknown_adapter
+    // call returns.  Note that unknown_adapter MUST call create_POA at some
+    // point.
 
-    // Notes on concurrency.
+    // Notes on concurrency
+    //
     // The POA requires careful design for concurrency management to correctly
     // implement the specification and avoid deadlocks.  The order of acquiring
     // locks must respect the following locking hierarchy:
@@ -172,15 +188,25 @@ public class POAImpl extends ObjectAdapterBase implements POA
     // mutexes to handle the locking.  This will all be replaced by the new JSR 
     // 166 concurrency primitives in J2SE 1.5 and later once the ORB moves to 
     // J2SE 1.5.
-
+    //
+    // Recently I've modified the POA to support read/write locking.  This works
+    // well for reducing lock contention, but it can be a bit tricky.  ALl 3
+    // condition variables are creates from poaMutex.writeLock, so 
+    // poaMutex.writeLock() must be held whenever an acquire or signal method
+    // is called on one of the condition variables.  Since it is not possible
+    // to upgrade a read lock to a write lock, using a condition variable
+    // requires dropping the read lock, acquiring the write lock, and possibly
+    // then checking again to make sure that an invariant is still satisified.
+    
     // POA state constants
     //
     // Note that ordering is important here: we must have the state defined in 
     // this order so that ordered comparison is possible.
     // DO NOT CHANGE THE VALUES OF THE STATE CONSTANTS!!!  In particular, the
-    // initialization related states must be lower than STATE_RUN.
+    // initialization related states must be lower than STATE_RUN, and the 
+    // destruction related state must be higher.
     //
-    // POA is created in STATE_START
+    // A POA is created in STATE_START
     //
     // Valid state transitions:
     //
@@ -918,99 +944,87 @@ public class POAImpl extends ObjectAdapterBase implements POA
      * <b>Section 3.3.8.3</b>
      */
     @Poa
-    public POA find_POA(String name, boolean activate)
-	throws AdapterNonExistent 
-    {
-	POAImpl found = null ;
+    public POA find_POA(String name, boolean activate) throws AdapterNonExistent {
 	AdapterActivator act = null ;
 
-	readLock() ;
-        boolean readLocked = true ;
+	readLock() ; boolean readLocked = true ;
 
-	found = children.get(name);
-
-	if (found != null) {
-            // This is the normal case: the object exists, and we only want a read
-            // lock here to avoid another locking hot spot.
-	    foundPOA( found ) ;
+	POAImpl child = children.get(name);
+	if (child != null) {
+            boolean childReadLocked = false ;
+	    foundPOA( child ) ;
 	    
 	    try {
-		found.readLock() ;
+		child.readLock() ; childReadLocked = true ;
 
-		// Do not hold the parent POA lock while 
-		// waiting for child to complete initialization.
-		readUnlock() ;
-                readLocked = false ;
+		// No parent lock while waiting for child init to complete 
+		readUnlock() ; readLocked = false ;
 
-		// Make sure that the child has completed its initialization,
-		// if it was created by an AdapterActivator, otherwise throw
-		// a standard TRANSIENT exception with minor code 4 (see
-		// CORBA 3.0 11.3.9.3, in reference to unknown_adapter)
-		if (!found.waitUntilRunning()) {
-                    throw omgWrapper.poaDestroyed();
+                if (child.state != STATE_RUN) {
+                    child.readUnlock() ; childReadLocked = false ;
+
+                    // Issue 14695: waitUntilRunning requires writeLock.
+                    child.lock() ;
+                    try {
+                        // wait for child init to complete
+                        if (!child.waitUntilRunning()) {
+                            // OMG 3.0 11.3.9.3, in reference to unknown_adapter
+                            throw omgWrapper.poaDestroyed();
+                        }
+                    } finally {
+                        child.unlock() ;
+                    }
                 }
-
-		// Note that found may be in state DESTROYING or DESTROYED at
-		// this point.  That's OK, since destruction could start at
-		// any time.
+		// child may be in DESTROYING or DESTROYED at this point.  
+                // That's OK, since destruction could start at any time.
 	    } finally {
-		found.readUnlock() ;
+                if (childReadLocked) { child.readUnlock() ; }
 	    }
 	} else {
 	    try {
 		noPOA() ;
 
 		if (activate && (activator != null)) {
-                    // Need to hold writeLock here (for new POAImpl call), 
-                    // so first drop the read lock.
-                    readUnlock() ;
-                    readLocked = false ;
+                    readUnlock() ; readLocked = false ; // need writeLock: drop readLock
                     
                     lock() ;
                     try {
-                        // Check again, in case another thread created this child before
-                        // we acquired the write lock.
-                        found = children.get(name);
+                        // Check in case this child was created before we acquired the write lock.
+                        child = children.get(name);
 
-                        if (found == null) {
-                            // Create a child, but don't initialize it.  The newly
-                            // created POA will be in state STATE_START, which will 
-                            // cause other calls to find_POA that are creating the same
-                            // POA to block on a waitUntilRunning.
-                            // Initialization must be completed by a call to create_POA 
-                            // inside the unknown_adapter upcall.  The state is set to STATE_INIT 
-                            // so that initialize can make the correct state transition 
-                            // when create_POA is called inside the AdapterActivator.  
-                            // This avoids activating the new POA too soon 
-                            // by transitioning to STATE_RUN after unknown_adapter 
-                            // returns.
-                            found = new POAImpl( name, this, getORB(), STATE_INIT ) ;
+                        if (child == null) {
+                            child = new POAImpl( name, this, getORB(), STATE_INIT ) ;
                         } else {
-                            if (!found.waitUntilRunning()) {
-                                throw omgWrapper.poaDestroyed();
+                            child.lock() ;
+                            try {
+                                // Block concurrent find_POA calls until the first one completes
+                                // activation.
+                                if (!child.waitUntilRunning()) {
+                                    throw omgWrapper.poaDestroyed();
+                                }
+                            } finally {
+                                child.unlock() ;
                             }
                         }
                     } finally {
                         unlock() ;
                     }
 
-                    createdPOA( found ) ;
+                    createdPOA( child ) ;
                     act = activator ;
                 } else {
                     throw new AdapterNonExistent();
                 }
 	    } finally {
-                if (readLocked) {
-                    unlock() ;
-                }
+                if (readLocked) { unlock() ; }
 	    }
 	}
 
-	// assert (found != null) 
-	// assert not holding this.poaMutex OR found.poaMutex
+	// assert (child != null) 
+	// assert not holding this.poaMutex OR child.poaMutex
 
-	// We must not hold either this.poaMutex or found.poaMutex here while 
-	// waiting for intialization of found to complete to prevent possible 
+	// We must not hold either this.poaMutex or child.poaMutex here while 
+	// waiting for intialization of child to complete to prevent possible 
 	// deadlocks.
 	
 	if (act != null) {
@@ -1041,7 +1055,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		// destroyIfNotInitDone so that calls to enter() and create_POA()
 		// that are waiting can execute again.  Failing to do this
 		// will cause the system to hang in complex tests.
-		adapterResult = found.destroyIfNotInitDone() ;
+		adapterResult = child.destroyIfNotInitDone() ;
 	    }
 
 	    adapterActivatorResult(status);
@@ -1057,7 +1071,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    }
 	}
 
-	return found;
+	return child;
     }
 
     /**

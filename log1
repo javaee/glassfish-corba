@@ -1,0 +1,284 @@
+Application deployed with name OrbFailOver-ejb.
+Command deploy executed successfully.
+Valid test case identifiers are:
+    failover
+    loadbalance
+    14732
+Test failover: PASSED.
+    Notes:
+	result[1]= in1
+	result[2]= in1
+	result[3]= in1
+	result[4]= in1
+	result[5]= in1
+	result[6]= in1
+	result[7]= in1
+	result[8]= in1
+	result[9]= in1
+	result[10]= in1
+	result[11]= in1
+	result[12]= in1
+	result[13]= in1
+	result[14]= in1
+	result[15]= in1
+	result[16]= in1
+	result[17]= in1
+	result[18]= in1
+	result[19]= in1
+	result[20]= in1
+	result[21]= in1
+	result[22]= in1
+	result[23]= in1
+	result[24]= in1
+	result[25]= in1
+	result[26]= in1
+	result[27]= in1
+	result[28]= in1
+	result[29]= in1
+	result[30]= in1
+	result[31]= in1
+	result[32]= in1
+	result[33]= in1
+	result[34]= in1
+	result[35]= in1
+	result[36]= in1
+	result[37]= in1
+	result[38]= in1
+	result[39]= in1
+	result[40]= in1
+	result[41]= in1
+	result[42]= in1
+	result[43]= in1
+	result[44]= in1
+	result[45]= in1
+	result[46]= in1
+	result[47]= in1
+	result[48]= in1
+	result[49]= in1
+	result[50]= in1
+	Command stop-instance --force true for instance in1
+	The instance, in1, is stopped.
+	Command stop-instance executed successfully.
+	result[51]= in2
+	result[52]= in2
+	result[53]= in2
+	result[54]= in2
+	result[55]= in2
+	result[56]= in2
+	result[57]= in2
+	result[58]= in2
+	result[59]= in2
+	result[60]= in2
+	result[61]= in2
+	result[62]= in2
+	result[63]= in2
+	result[64]= in2
+	result[65]= in2
+	result[66]= in2
+	result[67]= in2
+	result[68]= in2
+	result[69]= in2
+	result[70]= in2
+	result[71]= in2
+	result[72]= in2
+	result[73]= in2
+	result[74]= in2
+	result[75]= in2
+	result[76]= in2
+	result[77]= in2
+	result[78]= in2
+	result[79]= in2
+	result[80]= in2
+	result[81]= in2
+	result[82]= in2
+	result[83]= in2
+	result[84]= in2
+	result[85]= in2
+	result[86]= in2
+	result[87]= in2
+	result[88]= in2
+	result[89]= in2
+	result[90]= in2
+	result[91]= in2
+	result[92]= in2
+	result[93]= in2
+	result[94]= in2
+	result[95]= in2
+	result[96]= in2
+	result[97]= in2
+	result[98]= in2
+	result[99]= in2
+	result[100]= in2
+	Command start-instance for instance in1
+	Waiting for in1 to start ............
+	Successfully started the instance: in1
+	instance Location: /space/work/GlassFish/v3/glassfish3/glassfish/nodes/agent1/in1
+	Log File: /space/work/GlassFish/v3/glassfish3/glassfish/nodes/agent1/in1/logs/server.log
+	Admin Port: 24848
+	Command start-local-instance executed successfully.
+	The instance, in1, was started on host minas
+	Command start-instance executed successfully.
+	result[101]= in2
+	result[102]= in2
+	result[103]= in2
+	result[104]= in2
+	result[105]= in2
+	result[106]= in2
+	result[107]= in2
+	result[108]= in2
+	result[109]= in2
+	result[110]= in2
+	result[111]= in2
+	result[112]= in2
+	result[113]= in2
+	result[114]= in2
+	result[115]= in2
+	result[116]= in2
+	result[117]= in2
+	result[118]= in2
+	result[119]= in2
+	result[120]= in2
+	result[121]= in2
+	result[122]= in2
+	result[123]= in2
+	result[124]= in2
+	result[125]= in2
+	result[126]= in2
+	result[127]= in2
+	result[128]= in2
+	result[129]= in2
+	result[130]= in2
+	result[131]= in2
+	result[132]= in2
+	result[133]= in2
+	result[134]= in2
+	result[135]= in2
+	result[136]= in2
+	result[137]= in2
+	result[138]= in2
+	result[139]= in2
+	result[140]= in2
+	result[141]= in2
+	result[142]= in2
+	result[143]= in2
+	result[144]= in2
+	result[145]= in2
+	result[146]= in2
+	result[147]= in2
+	result[148]= in2
+	result[149]= in2
+	result[150]= in2
+Test loadbalance: PASSED.
+    Notes:
+	result[1]= in3
+	result[2]= in2
+	result[3]= in3
+	result[4]= in2
+	result[5]= in3
+	result[6]= in2
+	result[7]= in2
+	result[8]= in3
+	result[9]= in2
+	result[10]= in2
+	result[11]= in2
+	result[12]= in3
+	result[13]= in3
+	result[14]= in2
+	result[15]= in3
+	result[16]= in2
+	result[17]= in3
+	result[18]= in3
+	result[19]= in3
+	result[20]= in3
+	result[21]= in3
+	result[22]= in3
+	result[23]= in3
+	result[24]= in3
+	result[25]= in2
+	result[26]= in2
+	result[27]= in3
+	result[28]= in3
+	result[29]= in3
+	result[30]= in2
+	result[31]= in3
+	result[32]= in2
+	result[33]= in2
+	result[34]= in2
+	result[35]= in2
+	result[36]= in3
+	result[37]= in2
+	result[38]= in2
+	result[39]= in2
+	result[40]= in3
+	result[41]= in3
+	result[42]= in2
+	result[43]= in3
+	result[44]= in2
+	result[45]= in2
+	result[46]= in3
+	result[47]= in3
+	result[48]= in1
+	result[49]= in2
+	result[50]= in1
+	result[51]= in3
+	result[52]= in1
+	result[53]= in1
+	result[54]= in3
+	result[55]= in2
+	result[56]= in3
+	result[57]= in2
+	result[58]= in3
+	result[59]= in2
+	result[60]= in3
+	result[61]= in2
+	result[62]= in1
+	result[63]= in3
+	result[64]= in2
+	result[65]= in2
+	result[66]= in3
+	result[67]= in3
+	result[68]= in2
+	result[69]= in1
+	result[70]= in1
+	result[71]= in1
+	result[72]= in3
+	result[73]= in3
+	result[74]= in3
+	result[75]= in1
+	result[76]= in2
+	result[77]= in1
+	result[78]= in2
+	result[79]= in2
+	result[80]= in1
+	result[81]= in2
+	result[82]= in3
+	result[83]= in3
+	result[84]= in1
+	result[85]= in1
+	result[86]= in2
+	result[87]= in3
+	result[88]= in3
+	result[89]= in1
+	result[90]= in2
+	result[91]= in1
+	result[92]= in2
+	result[93]= in1
+	result[94]= in2
+	result[95]= in2
+	result[96]= in3
+	result[97]= in3
+	result[98]= in1
+	result[99]= in2
+	result[100]= in1
+	Call distribution:
+		Name =                  in2 Count =         40
+		Name =                  in1 Count =         18
+		Name =                  in3 Count =         42
+Test 14732: FAILED.
+    Notes:
+	Command stop-instance --force true for instance 
+	Command stop-instance failed.
+	Exception java.lang.RuntimeException: Command stop-instance --force true failed for instance  with result 1 in /space/work/GlassFish/v3/glassfish3/glassfish/bin/asadmin stop-instance --force true 
+    Results:
+	Current location in2 is not the same as the running location 
+Results: 2 test(s) passed; 1 test(s) failed; 0 test(s) skipped.

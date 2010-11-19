@@ -1,0 +1,1749 @@
+Application deployed with name OrbFailOver-ejb.
+
+
+=======================================================
+Contents of AST after SetupVisitor
+
+ClassGenerator@321[public abstract interface interface com.sun.ejb.codegen.GenericEJBHome_Generated]
+..MethodGenerator@322[public abstract java.rmi.Remote create]
+....VariableImpl@324[java.lang.String generatedBusinessIntf]
+
+
+=======================================================
+MethodVisitor calls for method create(Ljava/lang/String;)Ljava/rmi/Remote;
+    MAXSTACK = 0
+    MAXLOCALS = 0
+*** Using ASM verifier ***
+create(Ljava/lang/String;)Ljava/rmi/Remote;
+
+
+=======================================================
+Contents of AST after SetupVisitor
+
+ClassGenerator@722[public abstract interface interface orb.folb._LocationBeanRemote_Remote]
+..MethodGenerator@723[public abstract java.lang.String getLocation]
+..MethodGenerator@725[public abstract java.lang.String getHostName]
+
+
+=======================================================
+MethodVisitor calls for method getLocation()Ljava/lang/String;
+    MAXSTACK = 0
+    MAXLOCALS = 0
+MethodVisitor calls for method getHostName()Ljava/lang/String;
+    MAXSTACK = 0
+    MAXLOCALS = 0
+MethodVisitor calls for method printSystemProperties()V
+    MAXSTACK = 0
+    MAXLOCALS = 0
+*** Using ASM verifier ***
+getLocation()Ljava/lang/String;
+
+getHostName()Ljava/lang/String;
+
+printSystemProperties()V
+
+
+=======================================================
+Contents of AST after SetupVisitor
+
+ClassGenerator@729[public class orb.folb._LocationBeanRemote_Wrapper]
+..FieldInfo[private orb.folb._LocationBeanRemote_Remote delegate_]
+....MethodGenerator@735[public void <init>]
+....|__:variablesInMethod:ASMUtil$VariablesInMethod=[VariableImpl@738[java.lang.String busIntf], VariableImpl@737[orb.folb._LocationBeanRemote_Remote stub]]
+....|__:returnLabel:MyLabel=ML44
+....|__:lineNumberTable:ASMUtil$LineNumberTable={}
+......VariableImpl@737[orb.folb._LocationBeanRemote_Remote stub]
+......|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+......|__:stackFrameSlot:Integer=1
+......|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+......|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+......VariableImpl@738[java.lang.String busIntf]
+......|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+......|__:stackFrameSlot:Integer=2
+......|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+......|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+......BlockStatement@736
+......|__:lastStatement:Statement=AssignmentStatement@751
+........|__:lineNumber:Integer=3
+......|__:lineNumber:Integer=4
+........SuperObjExpression@744[Signature[(Ljava/rmi/Remote;Ljava/lang/String;)V]]
+........|__:statementStartLabel:MyLabel=ML45
+........|__:lineNumber:Integer=2
+........|__:next:Node=AssignmentStatement@751
+..........|__:lineNumber:Integer=3
+..........VariableImpl@742[orb.folb._LocationBeanRemote_Remote stub]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+..........|__:stackFrameSlot:Integer=1
+..........|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..........VariableImpl@743[java.lang.String busIntf]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..........|__:stackFrameSlot:Integer=2
+..........|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+........AssignmentStatement@751
+........|__:lineNumber:Integer=3
+..........VariableImpl@750[orb.folb._LocationBeanRemote_Remote stub]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+..........|__:stackFrameSlot:Integer=1
+..........|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..........NonStaticFieldAccessExpression@749[delegate_]
+..........|__:emitter:EmitterFactory$Emitter=FieldInsnEmitter[PUTFIELD "orb/folb/_LocationBeanRemote_Wrapper" "delegate_" "Lorb/folb/_LocationBeanRemote_Remote;"]
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+............ThisExpression@748[]
+....MethodGenerator@752[public java.lang.String getLocation]
+....|__:variablesInMethod:ASMUtil$VariablesInMethod=[VariableImpl@773[java.lang.RuntimeException r], VariableImpl@819[javax.transaction.TransactionRequiredException treqex], VariableImpl@896[org.omg.CORBA.SystemException corbaSysEx], VariableImpl@885[java.rmi.RemoteException re], VariableImpl@768[javax.transaction.TransactionRolledbackException trex], VariableImpl@871[com.sun.ejb.containers.InternalEJBContainerException iejbcEx], VariableImpl@853[java.rmi.AccessException accex], VariableImpl@835[java.rmi.NoSuchObjectException nsoe]]
+....|__:returnVariable:Variable=VariableImpl@1119[java.lang.String $$_returnVariable_$$]
+......|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 13]
+......|__:stackFrameSlot:Integer=13
+......|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 13]
+....|__:returnLabel:MyLabel=ML47
+....|__:lineNumberTable:ASMUtil$LineNumberTable={}
+......BlockStatement@753
+......|__:lastStatement:Statement=TryStatement@754
+........|__:statementStartLabel:MyLabel=ML63
+........|__:lastBlock:BlockStatement=BlockStatement@895
+..........|__:throwEndLabel:MyLabel=ML62
+..........|__:statementStartLabel:MyLabel=ML61
+..........|__:lastStatement:Statement=ThrowStatement@911
+............|__:lineNumber:Integer=22
+..........|__:lineNumber:Integer=-1
+......|__:lineNumber:Integer=23
+........TryStatement@754
+........|__:statementStartLabel:MyLabel=ML63
+........|__:lastBlock:BlockStatement=BlockStatement@895
+..........|__:throwEndLabel:MyLabel=ML62
+..........|__:statementStartLabel:MyLabel=ML61
+..........|__:lastStatement:Statement=ThrowStatement@911
+............|__:lineNumber:Integer=22
+..........|__:lineNumber:Integer=-1
+..........BlockStatement@755
+..........|__:throwEndLabel:MyLabel=ML48
+..........|__:statementStartLabel:MyLabel=ML46
+..........|__:lastStatement:Statement=ReturnStatement@766
+............|__:lineNumber:Integer=5
+..........|__:lineNumber:Integer=-1
+............ReturnStatement@766
+............|__:lineNumber:Integer=5
+..............NonStaticCallExpression@765[ident=getLocation signature=Signature[()Ljava/lang/String;]]
+................NonStaticFieldAccessExpression@764[delegate_]
+................|__:emitter:EmitterFactory$Emitter=FieldInsnEmitter[GETFIELD "orb/folb/_LocationBeanRemote_Wrapper" "delegate_" "Lorb/folb/_LocationBeanRemote_Remote;"]
+................|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..................ThisExpression@763[]
+........TryStatement:catch[type=javax.transaction.TransactionRolledbackException,var=trex]
+..........VariableImpl@768[javax.transaction.TransactionRolledbackException trex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+..........|__:stackFrameSlot:Integer=1
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..........BlockStatement@767
+..........|__:throwEndLabel:MyLabel=ML50
+..........|__:statementStartLabel:MyLabel=ML49
+..........|__:lastStatement:Statement=ThrowStatement@817
+............|__:lineNumber:Integer=8
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@775
+............|__:lineNumber:Integer=6
+............|__:next:Node=NonStaticCallExpression@815[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=7
+..............|__:next:Node=ThrowStatement@817
+................|__:lineNumber:Integer=8
+..............VariableImpl@773[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............NewObjExpression@774[javax.ejb.EJBTransactionRolledbackException Signature[()V]]
+............NonStaticCallExpression@815[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=7
+............|__:next:Node=ThrowStatement@817
+..............|__:lineNumber:Integer=8
+..............VariableImpl@813[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............VariableImpl@814[javax.transaction.TransactionRolledbackException trex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+..............|__:stackFrameSlot:Integer=1
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+............ThrowStatement@817
+............|__:lineNumber:Integer=8
+..............VariableImpl@816[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+........TryStatement:catch[type=javax.transaction.TransactionRequiredException,var=treqex]
+..........VariableImpl@819[javax.transaction.TransactionRequiredException treqex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 3]
+..........|__:stackFrameSlot:Integer=3
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+..........BlockStatement@818
+..........|__:throwEndLabel:MyLabel=ML52
+..........|__:statementStartLabel:MyLabel=ML51
+..........|__:lastStatement:Statement=ThrowStatement@833
+............|__:lineNumber:Integer=11
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@824
+............|__:lineNumber:Integer=9
+............|__:next:Node=NonStaticCallExpression@831[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=10
+..............|__:next:Node=ThrowStatement@833
+................|__:lineNumber:Integer=11
+..............VariableImpl@822[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............NewObjExpression@823[javax.ejb.EJBTransactionRequiredException Signature[()V]]
+............NonStaticCallExpression@831[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=10
+............|__:next:Node=ThrowStatement@833
+..............|__:lineNumber:Integer=11
+..............VariableImpl@829[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............VariableImpl@830[javax.transaction.TransactionRequiredException treqex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 3]
+..............|__:stackFrameSlot:Integer=3
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+............ThrowStatement@833
+............|__:lineNumber:Integer=11
+..............VariableImpl@832[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+........TryStatement:catch[type=java.rmi.NoSuchObjectException,var=nsoe]
+..........VariableImpl@835[java.rmi.NoSuchObjectException nsoe]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 5]
+..........|__:stackFrameSlot:Integer=5
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+..........BlockStatement@834
+..........|__:throwEndLabel:MyLabel=ML54
+..........|__:statementStartLabel:MyLabel=ML53
+..........|__:lastStatement:Statement=ThrowStatement@851
+............|__:lineNumber:Integer=14
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@842
+............|__:lineNumber:Integer=12
+............|__:next:Node=NonStaticCallExpression@849[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=13
+..............|__:next:Node=ThrowStatement@851
+................|__:lineNumber:Integer=14
+..............VariableImpl@840[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............NewObjExpression@841[javax.ejb.NoSuchEJBException Signature[()V]]
+............NonStaticCallExpression@849[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=13
+............|__:next:Node=ThrowStatement@851
+..............|__:lineNumber:Integer=14
+..............VariableImpl@847[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............VariableImpl@848[java.rmi.NoSuchObjectException nsoe]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 5]
+..............|__:stackFrameSlot:Integer=5
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+............ThrowStatement@851
+............|__:lineNumber:Integer=14
+..............VariableImpl@850[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+........TryStatement:catch[type=java.rmi.AccessException,var=accex]
+..........VariableImpl@853[java.rmi.AccessException accex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 7]
+..........|__:stackFrameSlot:Integer=7
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+..........BlockStatement@852
+..........|__:throwEndLabel:MyLabel=ML56
+..........|__:statementStartLabel:MyLabel=ML55
+..........|__:lastStatement:Statement=ThrowStatement@869
+............|__:lineNumber:Integer=17
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@858
+............|__:lineNumber:Integer=15
+............|__:next:Node=NonStaticCallExpression@867[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=16
+..............|__:next:Node=ThrowStatement@869
+................|__:lineNumber:Integer=17
+..............VariableImpl@856[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............NewObjExpression@857[javax.ejb.EJBAccessException Signature[()V]]
+............NonStaticCallExpression@867[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=16
+............|__:next:Node=ThrowStatement@869
+..............|__:lineNumber:Integer=17
+..............VariableImpl@865[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............VariableImpl@866[java.rmi.AccessException accex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 7]
+..............|__:stackFrameSlot:Integer=7
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+............ThrowStatement@869
+............|__:lineNumber:Integer=17
+..............VariableImpl@868[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+........TryStatement:catch[type=com.sun.ejb.containers.InternalEJBContainerException,var=iejbcEx]
+..........VariableImpl@871[com.sun.ejb.containers.InternalEJBContainerException iejbcEx]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 9]
+..........|__:stackFrameSlot:Integer=9
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+..........BlockStatement@870
+..........|__:throwEndLabel:MyLabel=ML58
+..........|__:statementStartLabel:MyLabel=ML57
+..........|__:lastStatement:Statement=ThrowStatement@883
+............|__:lineNumber:Integer=18
+..........|__:lineNumber:Integer=-1
+............ThrowStatement@883
+............|__:lineNumber:Integer=18
+..............CastExpression@882[javax.ejb.EJBException]
+................NonStaticCallExpression@881[ident=getCause signature=Signature[()Ljava/lang/Throwable;]]
+..................VariableImpl@880[com.sun.ejb.containers.InternalEJBContainerException iejbcEx]
+..................|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 9]
+..................|__:stackFrameSlot:Integer=9
+..................|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+..................|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..................|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+........TryStatement:catch[type=java.rmi.RemoteException,var=re]
+..........VariableImpl@885[java.rmi.RemoteException re]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 10]
+..........|__:stackFrameSlot:Integer=10
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+..........BlockStatement@884
+..........|__:throwEndLabel:MyLabel=ML60
+..........|__:statementStartLabel:MyLabel=ML59
+..........|__:lastStatement:Statement=ThrowStatement@894
+............|__:lineNumber:Integer=19
+..........|__:lineNumber:Integer=-1
+............ThrowStatement@894
+............|__:lineNumber:Integer=19
+..............NewObjExpression@893[javax.ejb.EJBException Signature[(Ljava/lang/Exception;)V]]
+................VariableImpl@892[java.rmi.RemoteException re]
+................|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 10]
+................|__:stackFrameSlot:Integer=10
+................|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+................|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+................|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+........TryStatement:catch[type=org.omg.CORBA.SystemException,var=corbaSysEx]
+..........VariableImpl@896[org.omg.CORBA.SystemException corbaSysEx]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 11]
+..........|__:stackFrameSlot:Integer=11
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+..........BlockStatement@895
+..........|__:throwEndLabel:MyLabel=ML62
+..........|__:statementStartLabel:MyLabel=ML61
+..........|__:lastStatement:Statement=ThrowStatement@911
+............|__:lineNumber:Integer=22
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@900
+............|__:lineNumber:Integer=20
+............|__:next:Node=NonStaticCallExpression@909[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=21
+..............|__:next:Node=ThrowStatement@911
+................|__:lineNumber:Integer=22
+..............VariableImpl@898[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............NewObjExpression@899[javax.ejb.EJBException Signature[()V]]
+............NonStaticCallExpression@909[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=21
+............|__:next:Node=ThrowStatement@911
+..............|__:lineNumber:Integer=22
+..............VariableImpl@907[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............VariableImpl@908[org.omg.CORBA.SystemException corbaSysEx]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 11]
+..............|__:stackFrameSlot:Integer=11
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+............ThrowStatement@911
+............|__:lineNumber:Integer=22
+..............VariableImpl@910[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+........TryStatement:finally
+..........BlockStatement@756
+....MethodGenerator@912[public java.lang.String getHostName]
+....|__:variablesInMethod:ASMUtil$VariablesInMethod=[VariableImpl@930[java.lang.RuntimeException r], VariableImpl@942[javax.transaction.TransactionRequiredException treqex], VariableImpl@1002[org.omg.CORBA.SystemException corbaSysEx], VariableImpl@995[java.rmi.RemoteException re], VariableImpl@928[javax.transaction.TransactionRolledbackException trex], VariableImpl@984[com.sun.ejb.containers.InternalEJBContainerException iejbcEx], VariableImpl@970[java.rmi.AccessException accex], VariableImpl@956[java.rmi.NoSuchObjectException nsoe]]
+....|__:returnVariable:Variable=VariableImpl@1120[java.lang.String $$_returnVariable_$$]
+......|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 13]
+......|__:stackFrameSlot:Integer=13
+......|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 13]
+....|__:returnLabel:MyLabel=ML65
+....|__:lineNumberTable:ASMUtil$LineNumberTable={}
+......BlockStatement@913
+......|__:lastStatement:Statement=TryStatement@914
+........|__:statementStartLabel:MyLabel=ML81
+........|__:lastBlock:BlockStatement=BlockStatement@1001
+..........|__:throwEndLabel:MyLabel=ML80
+..........|__:statementStartLabel:MyLabel=ML79
+..........|__:lastStatement:Statement=ThrowStatement@1014
+............|__:lineNumber:Integer=41
+..........|__:lineNumber:Integer=-1
+......|__:lineNumber:Integer=42
+........TryStatement@914
+........|__:statementStartLabel:MyLabel=ML81
+........|__:lastBlock:BlockStatement=BlockStatement@1001
+..........|__:throwEndLabel:MyLabel=ML80
+..........|__:statementStartLabel:MyLabel=ML79
+..........|__:lastStatement:Statement=ThrowStatement@1014
+............|__:lineNumber:Integer=41
+..........|__:lineNumber:Integer=-1
+..........BlockStatement@915
+..........|__:throwEndLabel:MyLabel=ML66
+..........|__:statementStartLabel:MyLabel=ML64
+..........|__:lastStatement:Statement=ReturnStatement@926
+............|__:lineNumber:Integer=24
+..........|__:lineNumber:Integer=-1
+............ReturnStatement@926
+............|__:lineNumber:Integer=24
+..............NonStaticCallExpression@925[ident=getHostName signature=Signature[()Ljava/lang/String;]]
+................NonStaticFieldAccessExpression@924[delegate_]
+................|__:emitter:EmitterFactory$Emitter=FieldInsnEmitter[GETFIELD "orb/folb/_LocationBeanRemote_Wrapper" "delegate_" "Lorb/folb/_LocationBeanRemote_Remote;"]
+................|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..................ThisExpression@923[]
+........TryStatement:catch[type=javax.transaction.TransactionRolledbackException,var=trex]
+..........VariableImpl@928[javax.transaction.TransactionRolledbackException trex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+..........|__:stackFrameSlot:Integer=1
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..........BlockStatement@927
+..........|__:throwEndLabel:MyLabel=ML68
+..........|__:statementStartLabel:MyLabel=ML67
+..........|__:lastStatement:Statement=ThrowStatement@940
+............|__:lineNumber:Integer=27
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@932
+............|__:lineNumber:Integer=25
+............|__:next:Node=NonStaticCallExpression@938[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=26
+..............|__:next:Node=ThrowStatement@940
+................|__:lineNumber:Integer=27
+..............VariableImpl@930[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............NewObjExpression@931[javax.ejb.EJBTransactionRolledbackException Signature[()V]]
+............NonStaticCallExpression@938[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=26
+............|__:next:Node=ThrowStatement@940
+..............|__:lineNumber:Integer=27
+..............VariableImpl@936[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............VariableImpl@937[javax.transaction.TransactionRolledbackException trex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+..............|__:stackFrameSlot:Integer=1
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+............ThrowStatement@940
+............|__:lineNumber:Integer=27
+..............VariableImpl@939[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+........TryStatement:catch[type=javax.transaction.TransactionRequiredException,var=treqex]
+..........VariableImpl@942[javax.transaction.TransactionRequiredException treqex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 3]
+..........|__:stackFrameSlot:Integer=3
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+..........BlockStatement@941
+..........|__:throwEndLabel:MyLabel=ML70
+..........|__:statementStartLabel:MyLabel=ML69
+..........|__:lastStatement:Statement=ThrowStatement@954
+............|__:lineNumber:Integer=30
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@946
+............|__:lineNumber:Integer=28
+............|__:next:Node=NonStaticCallExpression@952[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=29
+..............|__:next:Node=ThrowStatement@954
+................|__:lineNumber:Integer=30
+..............VariableImpl@944[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............NewObjExpression@945[javax.ejb.EJBTransactionRequiredException Signature[()V]]
+............NonStaticCallExpression@952[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=29
+............|__:next:Node=ThrowStatement@954
+..............|__:lineNumber:Integer=30
+..............VariableImpl@950[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............VariableImpl@951[javax.transaction.TransactionRequiredException treqex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 3]
+..............|__:stackFrameSlot:Integer=3
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+............ThrowStatement@954
+............|__:lineNumber:Integer=30
+..............VariableImpl@953[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+........TryStatement:catch[type=java.rmi.NoSuchObjectException,var=nsoe]
+..........VariableImpl@956[java.rmi.NoSuchObjectException nsoe]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 5]
+..........|__:stackFrameSlot:Integer=5
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+..........BlockStatement@955
+..........|__:throwEndLabel:MyLabel=ML72
+..........|__:statementStartLabel:MyLabel=ML71
+..........|__:lastStatement:Statement=ThrowStatement@968
+............|__:lineNumber:Integer=33
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@960
+............|__:lineNumber:Integer=31
+............|__:next:Node=NonStaticCallExpression@966[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=32
+..............|__:next:Node=ThrowStatement@968
+................|__:lineNumber:Integer=33
+..............VariableImpl@958[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............NewObjExpression@959[javax.ejb.NoSuchEJBException Signature[()V]]
+............NonStaticCallExpression@966[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=32
+............|__:next:Node=ThrowStatement@968
+..............|__:lineNumber:Integer=33
+..............VariableImpl@964[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............VariableImpl@965[java.rmi.NoSuchObjectException nsoe]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 5]
+..............|__:stackFrameSlot:Integer=5
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+............ThrowStatement@968
+............|__:lineNumber:Integer=33
+..............VariableImpl@967[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+........TryStatement:catch[type=java.rmi.AccessException,var=accex]
+..........VariableImpl@970[java.rmi.AccessException accex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 7]
+..........|__:stackFrameSlot:Integer=7
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+..........BlockStatement@969
+..........|__:throwEndLabel:MyLabel=ML74
+..........|__:statementStartLabel:MyLabel=ML73
+..........|__:lastStatement:Statement=ThrowStatement@982
+............|__:lineNumber:Integer=36
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@974
+............|__:lineNumber:Integer=34
+............|__:next:Node=NonStaticCallExpression@980[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=35
+..............|__:next:Node=ThrowStatement@982
+................|__:lineNumber:Integer=36
+..............VariableImpl@972[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............NewObjExpression@973[javax.ejb.EJBAccessException Signature[()V]]
+............NonStaticCallExpression@980[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=35
+............|__:next:Node=ThrowStatement@982
+..............|__:lineNumber:Integer=36
+..............VariableImpl@978[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............VariableImpl@979[java.rmi.AccessException accex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 7]
+..............|__:stackFrameSlot:Integer=7
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+............ThrowStatement@982
+............|__:lineNumber:Integer=36
+..............VariableImpl@981[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+........TryStatement:catch[type=com.sun.ejb.containers.InternalEJBContainerException,var=iejbcEx]
+..........VariableImpl@984[com.sun.ejb.containers.InternalEJBContainerException iejbcEx]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 9]
+..........|__:stackFrameSlot:Integer=9
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+..........BlockStatement@983
+..........|__:throwEndLabel:MyLabel=ML76
+..........|__:statementStartLabel:MyLabel=ML75
+..........|__:lastStatement:Statement=ThrowStatement@993
+............|__:lineNumber:Integer=37
+..........|__:lineNumber:Integer=-1
+............ThrowStatement@993
+............|__:lineNumber:Integer=37
+..............CastExpression@992[javax.ejb.EJBException]
+................NonStaticCallExpression@991[ident=getCause signature=Signature[()Ljava/lang/Throwable;]]
+..................VariableImpl@990[com.sun.ejb.containers.InternalEJBContainerException iejbcEx]
+..................|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 9]
+..................|__:stackFrameSlot:Integer=9
+..................|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+..................|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..................|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+........TryStatement:catch[type=java.rmi.RemoteException,var=re]
+..........VariableImpl@995[java.rmi.RemoteException re]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 10]
+..........|__:stackFrameSlot:Integer=10
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+..........BlockStatement@994
+..........|__:throwEndLabel:MyLabel=ML78
+..........|__:statementStartLabel:MyLabel=ML77
+..........|__:lastStatement:Statement=ThrowStatement@1000
+............|__:lineNumber:Integer=38
+..........|__:lineNumber:Integer=-1
+............ThrowStatement@1000
+............|__:lineNumber:Integer=38
+..............NewObjExpression@999[javax.ejb.EJBException Signature[(Ljava/lang/Exception;)V]]
+................VariableImpl@998[java.rmi.RemoteException re]
+................|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 10]
+................|__:stackFrameSlot:Integer=10
+................|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+................|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+................|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+........TryStatement:catch[type=org.omg.CORBA.SystemException,var=corbaSysEx]
+..........VariableImpl@1002[org.omg.CORBA.SystemException corbaSysEx]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 11]
+..........|__:stackFrameSlot:Integer=11
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+..........BlockStatement@1001
+..........|__:throwEndLabel:MyLabel=ML80
+..........|__:statementStartLabel:MyLabel=ML79
+..........|__:lastStatement:Statement=ThrowStatement@1014
+............|__:lineNumber:Integer=41
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@1006
+............|__:lineNumber:Integer=39
+............|__:next:Node=NonStaticCallExpression@1012[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=40
+..............|__:next:Node=ThrowStatement@1014
+................|__:lineNumber:Integer=41
+..............VariableImpl@1004[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............NewObjExpression@1005[javax.ejb.EJBException Signature[()V]]
+............NonStaticCallExpression@1012[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=40
+............|__:next:Node=ThrowStatement@1014
+..............|__:lineNumber:Integer=41
+..............VariableImpl@1010[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............VariableImpl@1011[org.omg.CORBA.SystemException corbaSysEx]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 11]
+..............|__:stackFrameSlot:Integer=11
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+............ThrowStatement@1014
+............|__:lineNumber:Integer=41
+..............VariableImpl@1013[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+........TryStatement:finally
+..........BlockStatement@916
+....MethodGenerator@1015[public void printSystemProperties]
+....|__:variablesInMethod:ASMUtil$VariablesInMethod=[VariableImpl@1032[java.lang.RuntimeException r], VariableImpl@1044[javax.transaction.TransactionRequiredException treqex], VariableImpl@1104[org.omg.CORBA.SystemException corbaSysEx], VariableImpl@1097[java.rmi.RemoteException re], VariableImpl@1030[javax.transaction.TransactionRolledbackException trex], VariableImpl@1086[com.sun.ejb.containers.InternalEJBContainerException iejbcEx], VariableImpl@1072[java.rmi.AccessException accex], VariableImpl@1058[java.rmi.NoSuchObjectException nsoe]]
+....|__:returnLabel:MyLabel=ML84
+....|__:lineNumberTable:ASMUtil$LineNumberTable={}
+......BlockStatement@1016
+......|__:lastStatement:Statement=TryStatement@1017
+........|__:statementStartLabel:MyLabel=ML99
+........|__:lastBlock:BlockStatement=BlockStatement@1103
+..........|__:throwEndLabel:MyLabel=ML98
+..........|__:statementStartLabel:MyLabel=ML97
+..........|__:lastStatement:Statement=ThrowStatement@1116
+............|__:lineNumber:Integer=60
+..........|__:lineNumber:Integer=-1
+......|__:lineNumber:Integer=61
+........TryStatement@1017
+........|__:statementStartLabel:MyLabel=ML99
+........|__:lastBlock:BlockStatement=BlockStatement@1103
+..........|__:throwEndLabel:MyLabel=ML98
+..........|__:statementStartLabel:MyLabel=ML97
+..........|__:lastStatement:Statement=ThrowStatement@1116
+............|__:lineNumber:Integer=60
+..........|__:lineNumber:Integer=-1
+..........BlockStatement@1018
+..........|__:throwEndLabel:MyLabel=ML83
+..........|__:statementStartLabel:MyLabel=ML82
+..........|__:lastStatement:Statement=NonStaticCallExpression@1028[ident=printSystemProperties signature=Signature[()V]]
+............|__:lineNumber:Integer=43
+..........|__:lineNumber:Integer=-1
+............NonStaticCallExpression@1028[ident=printSystemProperties signature=Signature[()V]]
+............|__:lineNumber:Integer=43
+..............NonStaticFieldAccessExpression@1027[delegate_]
+..............|__:emitter:EmitterFactory$Emitter=FieldInsnEmitter[GETFIELD "orb/folb/_LocationBeanRemote_Wrapper" "delegate_" "Lorb/folb/_LocationBeanRemote_Remote;"]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+................ThisExpression@1026[]
+........TryStatement:catch[type=javax.transaction.TransactionRolledbackException,var=trex]
+..........VariableImpl@1030[javax.transaction.TransactionRolledbackException trex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+..........|__:stackFrameSlot:Integer=1
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..........BlockStatement@1029
+..........|__:throwEndLabel:MyLabel=ML86
+..........|__:statementStartLabel:MyLabel=ML85
+..........|__:lastStatement:Statement=ThrowStatement@1042
+............|__:lineNumber:Integer=46
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@1034
+............|__:lineNumber:Integer=44
+............|__:next:Node=NonStaticCallExpression@1040[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=45
+..............|__:next:Node=ThrowStatement@1042
+................|__:lineNumber:Integer=46
+..............VariableImpl@1032[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............NewObjExpression@1033[javax.ejb.EJBTransactionRolledbackException Signature[()V]]
+............NonStaticCallExpression@1040[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=45
+............|__:next:Node=ThrowStatement@1042
+..............|__:lineNumber:Integer=46
+..............VariableImpl@1038[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............VariableImpl@1039[javax.transaction.TransactionRolledbackException trex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 1]
+..............|__:stackFrameSlot:Integer=1
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 1]
+............ThrowStatement@1042
+............|__:lineNumber:Integer=46
+..............VariableImpl@1041[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 2]
+..............|__:stackFrameSlot:Integer=2
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 2]
+........TryStatement:catch[type=javax.transaction.TransactionRequiredException,var=treqex]
+..........VariableImpl@1044[javax.transaction.TransactionRequiredException treqex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 3]
+..........|__:stackFrameSlot:Integer=3
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+..........BlockStatement@1043
+..........|__:throwEndLabel:MyLabel=ML88
+..........|__:statementStartLabel:MyLabel=ML87
+..........|__:lastStatement:Statement=ThrowStatement@1056
+............|__:lineNumber:Integer=49
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@1048
+............|__:lineNumber:Integer=47
+............|__:next:Node=NonStaticCallExpression@1054[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=48
+..............|__:next:Node=ThrowStatement@1056
+................|__:lineNumber:Integer=49
+..............VariableImpl@1046[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............NewObjExpression@1047[javax.ejb.EJBTransactionRequiredException Signature[()V]]
+............NonStaticCallExpression@1054[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=48
+............|__:next:Node=ThrowStatement@1056
+..............|__:lineNumber:Integer=49
+..............VariableImpl@1052[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............VariableImpl@1053[javax.transaction.TransactionRequiredException treqex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 3]
+..............|__:stackFrameSlot:Integer=3
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 3]
+............ThrowStatement@1056
+............|__:lineNumber:Integer=49
+..............VariableImpl@1055[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 4]
+..............|__:stackFrameSlot:Integer=4
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 4]
+........TryStatement:catch[type=java.rmi.NoSuchObjectException,var=nsoe]
+..........VariableImpl@1058[java.rmi.NoSuchObjectException nsoe]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 5]
+..........|__:stackFrameSlot:Integer=5
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+..........BlockStatement@1057
+..........|__:throwEndLabel:MyLabel=ML90
+..........|__:statementStartLabel:MyLabel=ML89
+..........|__:lastStatement:Statement=ThrowStatement@1070
+............|__:lineNumber:Integer=52
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@1062
+............|__:lineNumber:Integer=50
+............|__:next:Node=NonStaticCallExpression@1068[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=51
+..............|__:next:Node=ThrowStatement@1070
+................|__:lineNumber:Integer=52
+..............VariableImpl@1060[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............NewObjExpression@1061[javax.ejb.NoSuchEJBException Signature[()V]]
+............NonStaticCallExpression@1068[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=51
+............|__:next:Node=ThrowStatement@1070
+..............|__:lineNumber:Integer=52
+..............VariableImpl@1066[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............VariableImpl@1067[java.rmi.NoSuchObjectException nsoe]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 5]
+..............|__:stackFrameSlot:Integer=5
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 5]
+............ThrowStatement@1070
+............|__:lineNumber:Integer=52
+..............VariableImpl@1069[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 6]
+..............|__:stackFrameSlot:Integer=6
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 6]
+........TryStatement:catch[type=java.rmi.AccessException,var=accex]
+..........VariableImpl@1072[java.rmi.AccessException accex]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 7]
+..........|__:stackFrameSlot:Integer=7
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+..........BlockStatement@1071
+..........|__:throwEndLabel:MyLabel=ML92
+..........|__:statementStartLabel:MyLabel=ML91
+..........|__:lastStatement:Statement=ThrowStatement@1084
+............|__:lineNumber:Integer=55
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@1076
+............|__:lineNumber:Integer=53
+............|__:next:Node=NonStaticCallExpression@1082[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=54
+..............|__:next:Node=ThrowStatement@1084
+................|__:lineNumber:Integer=55
+..............VariableImpl@1074[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............NewObjExpression@1075[javax.ejb.EJBAccessException Signature[()V]]
+............NonStaticCallExpression@1082[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=54
+............|__:next:Node=ThrowStatement@1084
+..............|__:lineNumber:Integer=55
+..............VariableImpl@1080[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............VariableImpl@1081[java.rmi.AccessException accex]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 7]
+..............|__:stackFrameSlot:Integer=7
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 7]
+............ThrowStatement@1084
+............|__:lineNumber:Integer=55
+..............VariableImpl@1083[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 8]
+..............|__:stackFrameSlot:Integer=8
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 8]
+........TryStatement:catch[type=com.sun.ejb.containers.InternalEJBContainerException,var=iejbcEx]
+..........VariableImpl@1086[com.sun.ejb.containers.InternalEJBContainerException iejbcEx]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 9]
+..........|__:stackFrameSlot:Integer=9
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+..........BlockStatement@1085
+..........|__:throwEndLabel:MyLabel=ML94
+..........|__:statementStartLabel:MyLabel=ML93
+..........|__:lastStatement:Statement=ThrowStatement@1095
+............|__:lineNumber:Integer=56
+..........|__:lineNumber:Integer=-1
+............ThrowStatement@1095
+............|__:lineNumber:Integer=56
+..............CastExpression@1094[javax.ejb.EJBException]
+................NonStaticCallExpression@1093[ident=getCause signature=Signature[()Ljava/lang/Throwable;]]
+..................VariableImpl@1092[com.sun.ejb.containers.InternalEJBContainerException iejbcEx]
+..................|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 9]
+..................|__:stackFrameSlot:Integer=9
+..................|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+..................|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..................|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 9]
+........TryStatement:catch[type=java.rmi.RemoteException,var=re]
+..........VariableImpl@1097[java.rmi.RemoteException re]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 10]
+..........|__:stackFrameSlot:Integer=10
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+..........BlockStatement@1096
+..........|__:throwEndLabel:MyLabel=ML96
+..........|__:statementStartLabel:MyLabel=ML95
+..........|__:lastStatement:Statement=ThrowStatement@1102
+............|__:lineNumber:Integer=57
+..........|__:lineNumber:Integer=-1
+............ThrowStatement@1102
+............|__:lineNumber:Integer=57
+..............NewObjExpression@1101[javax.ejb.EJBException Signature[(Ljava/lang/Exception;)V]]
+................VariableImpl@1100[java.rmi.RemoteException re]
+................|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 10]
+................|__:stackFrameSlot:Integer=10
+................|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+................|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+................|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 10]
+........TryStatement:catch[type=org.omg.CORBA.SystemException,var=corbaSysEx]
+..........VariableImpl@1104[org.omg.CORBA.SystemException corbaSysEx]
+..........|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 11]
+..........|__:stackFrameSlot:Integer=11
+..........|__:requiredEmitterType:ASMUtil$RequiredEmitterType=NONE
+..........|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+..........BlockStatement@1103
+..........|__:throwEndLabel:MyLabel=ML98
+..........|__:statementStartLabel:MyLabel=ML97
+..........|__:lastStatement:Statement=ThrowStatement@1116
+............|__:lineNumber:Integer=60
+..........|__:lineNumber:Integer=-1
+............DefinitionStatement@1108
+............|__:lineNumber:Integer=58
+............|__:next:Node=NonStaticCallExpression@1114[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+..............|__:lineNumber:Integer=59
+..............|__:next:Node=ThrowStatement@1116
+................|__:lineNumber:Integer=60
+..............VariableImpl@1106[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=SETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............NewObjExpression@1107[javax.ejb.EJBException Signature[()V]]
+............NonStaticCallExpression@1114[ident=initCause signature=Signature[(Ljava/lang/Throwable;)Ljava/lang/Throwable;]]
+............|__:lineNumber:Integer=59
+............|__:next:Node=ThrowStatement@1116
+..............|__:lineNumber:Integer=60
+..............VariableImpl@1112[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............VariableImpl@1113[org.omg.CORBA.SystemException corbaSysEx]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 11]
+..............|__:stackFrameSlot:Integer=11
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 11]
+............ThrowStatement@1116
+............|__:lineNumber:Integer=60
+..............VariableImpl@1115[java.lang.RuntimeException r]
+..............|__:setEmitter:EmitterFactory$Emitter=IntOperandEmitter[ASTORE 12]
+..............|__:stackFrameSlot:Integer=12
+..............|__:emitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+..............|__:requiredEmitterType:ASMUtil$RequiredEmitterType=GETTER
+..............|__:getEmitter:EmitterFactory$Emitter=IntOperandEmitter[ALOAD 12]
+........TryStatement:finally
+
+
+=======================================================
+MethodVisitor calls for method <init>(Lorb/folb/_LocationBeanRemote_Remote;Ljava/lang/String;)V
+    ALOAD 0
+   L0
+    ALOAD 1
+    ALOAD 2
+    INVOKESPECIAL com/sun/ejb/containers/RemoteBusinessWrapperBase.<init> (Ljava/rmi/Remote;Ljava/lang/String;)V
+    ALOAD 0
+    ALOAD 1
+    PUTFIELD orb/folb/_LocationBeanRemote_Wrapper.delegate_ : Lorb/folb/_LocationBeanRemote_Remote;
+   L1
+    RETURN
+    LINENUMBER 2 L0
+    LOCALVARIABLE busIntf Ljava/lang/String; L0 L1 2
+    LOCALVARIABLE stub Lorb/folb/_LocationBeanRemote_Remote; L0 L1 1
+    MAXSTACK = 0
+    MAXLOCALS = 0
+MethodVisitor calls for method getLocation()Ljava/lang/String;
+   L0
+    Already emitted label ML46    ALOAD 0
+    GETFIELD orb/folb/_LocationBeanRemote_Wrapper.delegate_ : Lorb/folb/_LocationBeanRemote_Remote;
+    INVOKEINTERFACE orb/folb/_LocationBeanRemote_Remote.getLocation ()Ljava/lang/String;
+    ASTORE 13
+    GOTO L1
+    Already emitted label ML48    GOTO L1
+    Already emitted label ML49    ASTORE 1
+    Already emitted label ML49    NEW javax/ejb/EJBTransactionRolledbackException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBTransactionRolledbackException.<init> ()V
+    ASTORE 2
+    ALOAD 2
+    ALOAD 1
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 2
+    ATHROW
+    Already emitted label ML50    GOTO L1
+    Already emitted label ML51    ASTORE 3
+    Already emitted label ML51    NEW javax/ejb/EJBTransactionRequiredException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBTransactionRequiredException.<init> ()V
+    ASTORE 4
+    ALOAD 4
+    ALOAD 3
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 4
+    ATHROW
+    Already emitted label ML52    GOTO L1
+    Already emitted label ML53    ASTORE 5
+    Already emitted label ML53    NEW javax/ejb/NoSuchEJBException
+    DUP
+    INVOKESPECIAL javax/ejb/NoSuchEJBException.<init> ()V
+    ASTORE 6
+    ALOAD 6
+    ALOAD 5
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 6
+    ATHROW
+    Already emitted label ML54    GOTO L1
+    Already emitted label ML55    ASTORE 7
+    Already emitted label ML55    NEW javax/ejb/EJBAccessException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBAccessException.<init> ()V
+    ASTORE 8
+    ALOAD 8
+    ALOAD 7
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 8
+    ATHROW
+    Already emitted label ML56    GOTO L1
+    Already emitted label ML57    ASTORE 9
+    Already emitted label ML57    ALOAD 9
+    INVOKEVIRTUAL java/lang/Throwable.getCause ()Ljava/lang/Throwable;
+    CHECKCAST javax/ejb/EJBException
+    ATHROW
+    Already emitted label ML58    GOTO L1
+    Already emitted label ML59    ASTORE 10
+    Already emitted label ML59    NEW javax/ejb/EJBException
+    DUP
+    ALOAD 10
+    INVOKESPECIAL javax/ejb/EJBException.<init> (Ljava/lang/Exception;)V
+    ATHROW
+    Already emitted label ML60    GOTO L1
+    Already emitted label ML61    ASTORE 11
+    Already emitted label ML61    NEW javax/ejb/EJBException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBException.<init> ()V
+    ASTORE 12
+    ALOAD 12
+    ALOAD 11
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 12
+    ATHROW
+    Already emitted label ML62    GOTO L1
+    TRYCATCHBLOCK L2 L3 L4 javax/transaction/TransactionRolledbackException
+    TRYCATCHBLOCK L2 L3 L5 javax/transaction/TransactionRequiredException
+    TRYCATCHBLOCK L2 L3 L6 java/rmi/NoSuchObjectException
+    TRYCATCHBLOCK L2 L3 L7 java/rmi/AccessException
+    TRYCATCHBLOCK L2 L3 L8 com/sun/ejb/containers/InternalEJBContainerException
+    TRYCATCHBLOCK L2 L3 L9 java/rmi/RemoteException
+    TRYCATCHBLOCK L2 L3 L10 org/omg/CORBA/SystemException
+   L1
+    ALOAD 13
+    ARETURN
+    LOCALVARIABLE r Ljava/lang/RuntimeException; L0 L1 2
+    LOCALVARIABLE treqex Ljavax/transaction/TransactionRequiredException; L0 L1 3
+    LOCALVARIABLE corbaSysEx Lorg/omg/CORBA/SystemException; L0 L1 11
+    LOCALVARIABLE re Ljava/rmi/RemoteException; L0 L1 10
+    LOCALVARIABLE trex Ljavax/transaction/TransactionRolledbackException; L0 L1 1
+    LOCALVARIABLE iejbcEx Lcom/sun/ejb/containers/InternalEJBContainerException; L0 L1 9
+    LOCALVARIABLE accex Ljava/rmi/AccessException; L0 L1 7
+    LOCALVARIABLE nsoe Ljava/rmi/NoSuchObjectException; L0 L1 5
+    MAXSTACK = 0
+    MAXLOCALS = 0
+MethodVisitor calls for method getHostName()Ljava/lang/String;
+   L0
+    Already emitted label ML64    ALOAD 0
+    GETFIELD orb/folb/_LocationBeanRemote_Wrapper.delegate_ : Lorb/folb/_LocationBeanRemote_Remote;
+    INVOKEINTERFACE orb/folb/_LocationBeanRemote_Remote.getHostName ()Ljava/lang/String;
+    ASTORE 13
+    GOTO L1
+    Already emitted label ML66    GOTO L1
+    Already emitted label ML67    ASTORE 1
+    Already emitted label ML67    NEW javax/ejb/EJBTransactionRolledbackException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBTransactionRolledbackException.<init> ()V
+    ASTORE 2
+    ALOAD 2
+    ALOAD 1
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 2
+    ATHROW
+    Already emitted label ML68    GOTO L1
+    Already emitted label ML69    ASTORE 3
+    Already emitted label ML69    NEW javax/ejb/EJBTransactionRequiredException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBTransactionRequiredException.<init> ()V
+    ASTORE 4
+    ALOAD 4
+    ALOAD 3
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 4
+    ATHROW
+    Already emitted label ML70    GOTO L1
+    Already emitted label ML71    ASTORE 5
+    Already emitted label ML71    NEW javax/ejb/NoSuchEJBException
+    DUP
+    INVOKESPECIAL javax/ejb/NoSuchEJBException.<init> ()V
+    ASTORE 6
+    ALOAD 6
+    ALOAD 5
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 6
+    ATHROW
+    Already emitted label ML72    GOTO L1
+    Already emitted label ML73    ASTORE 7
+    Already emitted label ML73    NEW javax/ejb/EJBAccessException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBAccessException.<init> ()V
+    ASTORE 8
+    ALOAD 8
+    ALOAD 7
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 8
+    ATHROW
+    Already emitted label ML74    GOTO L1
+    Already emitted label ML75    ASTORE 9
+    Already emitted label ML75    ALOAD 9
+    INVOKEVIRTUAL java/lang/Throwable.getCause ()Ljava/lang/Throwable;
+    CHECKCAST javax/ejb/EJBException
+    ATHROW
+    Already emitted label ML76    GOTO L1
+    Already emitted label ML77    ASTORE 10
+    Already emitted label ML77    NEW javax/ejb/EJBException
+    DUP
+    ALOAD 10
+    INVOKESPECIAL javax/ejb/EJBException.<init> (Ljava/lang/Exception;)V
+    ATHROW
+    Already emitted label ML78    GOTO L1
+    Already emitted label ML79    ASTORE 11
+    Already emitted label ML79    NEW javax/ejb/EJBException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBException.<init> ()V
+    ASTORE 12
+    ALOAD 12
+    ALOAD 11
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 12
+    ATHROW
+    Already emitted label ML80    GOTO L1
+    TRYCATCHBLOCK L2 L3 L4 javax/transaction/TransactionRolledbackException
+    TRYCATCHBLOCK L2 L3 L5 javax/transaction/TransactionRequiredException
+    TRYCATCHBLOCK L2 L3 L6 java/rmi/NoSuchObjectException
+    TRYCATCHBLOCK L2 L3 L7 java/rmi/AccessException
+    TRYCATCHBLOCK L2 L3 L8 com/sun/ejb/containers/InternalEJBContainerException
+    TRYCATCHBLOCK L2 L3 L9 java/rmi/RemoteException
+    TRYCATCHBLOCK L2 L3 L10 org/omg/CORBA/SystemException
+   L1
+    ALOAD 13
+    ARETURN
+    LOCALVARIABLE r Ljava/lang/RuntimeException; L0 L1 2
+    LOCALVARIABLE treqex Ljavax/transaction/TransactionRequiredException; L0 L1 3
+    LOCALVARIABLE corbaSysEx Lorg/omg/CORBA/SystemException; L0 L1 11
+    LOCALVARIABLE re Ljava/rmi/RemoteException; L0 L1 10
+    LOCALVARIABLE trex Ljavax/transaction/TransactionRolledbackException; L0 L1 1
+    LOCALVARIABLE iejbcEx Lcom/sun/ejb/containers/InternalEJBContainerException; L0 L1 9
+    LOCALVARIABLE accex Ljava/rmi/AccessException; L0 L1 7
+    LOCALVARIABLE nsoe Ljava/rmi/NoSuchObjectException; L0 L1 5
+    MAXSTACK = 0
+    MAXLOCALS = 0
+MethodVisitor calls for method printSystemProperties()V
+   L0
+    Already emitted label ML82    ALOAD 0
+    GETFIELD orb/folb/_LocationBeanRemote_Wrapper.delegate_ : Lorb/folb/_LocationBeanRemote_Remote;
+    INVOKEINTERFACE orb/folb/_LocationBeanRemote_Remote.printSystemProperties ()V
+    Already emitted label ML83    GOTO L1
+    Already emitted label ML85    ASTORE 1
+    Already emitted label ML85    NEW javax/ejb/EJBTransactionRolledbackException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBTransactionRolledbackException.<init> ()V
+    ASTORE 2
+    ALOAD 2
+    ALOAD 1
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 2
+    ATHROW
+    Already emitted label ML86    GOTO L1
+    Already emitted label ML87    ASTORE 3
+    Already emitted label ML87    NEW javax/ejb/EJBTransactionRequiredException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBTransactionRequiredException.<init> ()V
+    ASTORE 4
+    ALOAD 4
+    ALOAD 3
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 4
+    ATHROW
+    Already emitted label ML88    GOTO L1
+    Already emitted label ML89    ASTORE 5
+    Already emitted label ML89    NEW javax/ejb/NoSuchEJBException
+    DUP
+    INVOKESPECIAL javax/ejb/NoSuchEJBException.<init> ()V
+    ASTORE 6
+    ALOAD 6
+    ALOAD 5
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 6
+    ATHROW
+    Already emitted label ML90    GOTO L1
+    Already emitted label ML91    ASTORE 7
+    Already emitted label ML91    NEW javax/ejb/EJBAccessException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBAccessException.<init> ()V
+    ASTORE 8
+    ALOAD 8
+    ALOAD 7
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 8
+    ATHROW
+    Already emitted label ML92    GOTO L1
+    Already emitted label ML93    ASTORE 9
+    Already emitted label ML93    ALOAD 9
+    INVOKEVIRTUAL java/lang/Throwable.getCause ()Ljava/lang/Throwable;
+    CHECKCAST javax/ejb/EJBException
+    ATHROW
+    Already emitted label ML94    GOTO L1
+    Already emitted label ML95    ASTORE 10
+    Already emitted label ML95    NEW javax/ejb/EJBException
+    DUP
+    ALOAD 10
+    INVOKESPECIAL javax/ejb/EJBException.<init> (Ljava/lang/Exception;)V
+    ATHROW
+    Already emitted label ML96    GOTO L1
+    Already emitted label ML97    ASTORE 11
+    Already emitted label ML97    NEW javax/ejb/EJBException
+    DUP
+    INVOKESPECIAL javax/ejb/EJBException.<init> ()V
+    ASTORE 12
+    ALOAD 12
+    ALOAD 11
+    INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+    POP
+    ALOAD 12
+    ATHROW
+    Already emitted label ML98    GOTO L1
+    TRYCATCHBLOCK L2 L3 L4 javax/transaction/TransactionRolledbackException
+    TRYCATCHBLOCK L2 L3 L5 javax/transaction/TransactionRequiredException
+    TRYCATCHBLOCK L2 L3 L6 java/rmi/NoSuchObjectException
+    TRYCATCHBLOCK L2 L3 L7 java/rmi/AccessException
+    TRYCATCHBLOCK L2 L3 L8 com/sun/ejb/containers/InternalEJBContainerException
+    TRYCATCHBLOCK L2 L3 L9 java/rmi/RemoteException
+    TRYCATCHBLOCK L2 L3 L10 org/omg/CORBA/SystemException
+   L1
+    RETURN
+    LOCALVARIABLE r Ljava/lang/RuntimeException; L0 L1 2
+    LOCALVARIABLE treqex Ljavax/transaction/TransactionRequiredException; L0 L1 3
+    LOCALVARIABLE corbaSysEx Lorg/omg/CORBA/SystemException; L0 L1 11
+    LOCALVARIABLE re Ljava/rmi/RemoteException; L0 L1 10
+    LOCALVARIABLE trex Ljavax/transaction/TransactionRolledbackException; L0 L1 1
+    LOCALVARIABLE iejbcEx Lcom/sun/ejb/containers/InternalEJBContainerException; L0 L1 9
+    LOCALVARIABLE accex Ljava/rmi/AccessException; L0 L1 7
+    LOCALVARIABLE nsoe Ljava/rmi/NoSuchObjectException; L0 L1 5
+    MAXSTACK = 0
+    MAXLOCALS = 0
+*** Using ASM verifier ***
+com.sun.corba.ee.org.objectweb.asm.tree.analysis.AnalyzerException: Error at instruction 3: java.lang.ClassNotFoundException: orb.folb._LocationBeanRemote_Remote
+	at com.sun.corba.ee.org.objectweb.asm.tree.analysis.Analyzer.analyze(Analyzer.java:293)
+	at com.sun.corba.ee.org.objectweb.asm.util.CheckClassAdapter.verify(CheckClassAdapter.java:224)
+	at com.sun.corba.ee.org.objectweb.asm.util.CheckClassAdapter.verify(CheckClassAdapter.java:250)
+	at com.sun.corba.ee.impl.orbutil.codegen.ASMUtil.verify(ASMUtil.java:296)
+	at com.sun.corba.ee.impl.orbutil.codegen.ASMUtil.generate(ASMUtil.java:287)
+	at com.sun.corba.ee.impl.orbutil.codegen.CodeGenerator.generateBytecode(CodeGenerator.java:91)
+	at com.sun.corba.ee.spi.orbutil.codegen.Wrapper._generate(Wrapper.java:1101)
+	at com.sun.corba.ee.spi.orbutil.codegen.Wrapper._generate(Wrapper.java:1087)
+	at com.sun.ejb.EJBUtils.generateAndLoad(EJBUtils.java:590)
+	at com.sun.ejb.EJBUtils.loadGeneratedRemoteBusinessClasses(EJBUtils.java:519)
+	at com.sun.ejb.EJBUtils.loadGeneratedRemoteBusinessClasses(EJBUtils.java:466)
+	at com.sun.ejb.EJBUtils.lookupRemote30BusinessObject(EJBUtils.java:414)
+	at com.sun.ejb.containers.RemoteBusinessObjectFactory.getObjectInstance(RemoteBusinessObjectFactory.java:75)
+	at javax.naming.spi.NamingManager.getObjectInstance(NamingManager.java:304)
+	at com.sun.enterprise.naming.impl.SerialContext.getObjectInstance(SerialContext.java:576)
+	at com.sun.enterprise.naming.impl.SerialContext.lookup(SerialContext.java:540)
+	at com.sun.enterprise.naming.impl.SerialContext.lookup(SerialContext.java:474)
+	at javax.naming.InitialContext.lookup(InitialContext.java:392)
+	at orbfailover.Main.loadBalanceTest(Main.java:85)
+	at orbfailover.Main.main(Main.java:29)
+Caused by: java.lang.RuntimeException: java.lang.ClassNotFoundException: orb.folb._LocationBeanRemote_Remote
+	at com.sun.corba.ee.org.objectweb.asm.tree.analysis.SimpleVerifier.getClass(SimpleVerifier.java:299)
+	at com.sun.corba.ee.org.objectweb.asm.tree.analysis.SimpleVerifier.isAssignableFrom(SimpleVerifier.java:287)
+	at com.sun.corba.ee.org.objectweb.asm.tree.analysis.SimpleVerifier.isSubTypeOf(SimpleVerifier.java:196)
+	at com.sun.corba.ee.org.objectweb.asm.tree.analysis.BasicVerifier.naryOperation(BasicVerifier.java:400)
+	at com.sun.corba.ee.org.objectweb.asm.tree.analysis.Frame.execute(Frame.java:591)
+	at com.sun.corba.ee.org.objectweb.asm.tree.analysis.Analyzer.analyze(Analyzer.java:191)
+	... 19 more
+<init>(Lorb/folb/_LocationBeanRemote_Remote;Ljava/lang/String;)V
+00000 _LocationBeanRemote_Wrapper _LocationBeanRemote_Remote String  :  :     ALOAD 0
+00001 _LocationBeanRemote_Wrapper _LocationBeanRemote_Remote String  : _LocationBeanRemote_Wrapper  :     ALOAD 1
+00002 _LocationBeanRemote_Wrapper _LocationBeanRemote_Remote String  : _LocationBeanRemote_Wrapper _LocationBeanRemote_Remote  :     ALOAD 2
+00003 _LocationBeanRemote_Wrapper _LocationBeanRemote_Remote String  : _LocationBeanRemote_Wrapper _LocationBeanRemote_Remote String  :     INVOKESPECIAL com/sun/ejb/containers/RemoteBusinessWrapperBase.<init> (Ljava/rmi/Remote;Ljava/lang/String;)V
+00004 ?       :     ALOAD 0
+00005 ?       :     ALOAD 1
+00006 ?       :     PUTFIELD orb/folb/_LocationBeanRemote_Wrapper.delegate_ : Lorb/folb/_LocationBeanRemote_Remote;
+00007 ?       :     RETURN
+
+getLocation()Ljava/lang/String;
+00000 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  :  :    L0
+00001 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  :  :     ALOAD 0
+00002 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : _LocationBeanRemote_Wrapper  :     GETFIELD orb/folb/_LocationBeanRemote_Wrapper.delegate_ : Lorb/folb/_LocationBeanRemote_Remote;
+00003 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : _LocationBeanRemote_Remote  :     INVOKEINTERFACE orb/folb/_LocationBeanRemote_Remote.getLocation ()Ljava/lang/String;
+00004 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : String  :     ASTORE 13
+00005 _LocationBeanRemote_Wrapper . . . . . . . . . . . . String  :  :     GOTO L1
+00006 ?                  :    L2
+00007 ?                  :     GOTO L1
+00008 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : TransactionRolledbackException  :    L3
+00009 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : TransactionRolledbackException  :     ASTORE 1
+00010 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . . .  :  :     NEW javax/ejb/EJBTransactionRolledbackException
+00011 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . . .  : EJBTransactionRolledbackException  :     DUP
+00012 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . . .  : EJBTransactionRolledbackException EJBTransactionRolledbackException  :     INVOKESPECIAL javax/ejb/EJBTransactionRolledbackException.<init> ()V
+00013 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . . .  : EJBTransactionRolledbackException  :     ASTORE 2
+00014 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  :  :     ALOAD 2
+00015 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException  :     ALOAD 1
+00016 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException TransactionRolledbackException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00017 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  : Throwable  :     POP
+00018 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  :  :     ALOAD 2
+00019 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException  :     ATHROW
+00020 ?                  :     GOTO L1
+00021 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : TransactionRequiredException  :    L4
+00022 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : TransactionRequiredException  :     ASTORE 3
+00023 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . . .  :  :     NEW javax/ejb/EJBTransactionRequiredException
+00024 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . . .  : EJBTransactionRequiredException  :     DUP
+00025 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . . .  : EJBTransactionRequiredException EJBTransactionRequiredException  :     INVOKESPECIAL javax/ejb/EJBTransactionRequiredException.<init> ()V
+00026 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . . .  : EJBTransactionRequiredException  :     ASTORE 4
+00027 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  :  :     ALOAD 4
+00028 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException  :     ALOAD 3
+00029 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException TransactionRequiredException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00030 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  : Throwable  :     POP
+00031 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  :  :     ALOAD 4
+00032 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException  :     ATHROW
+00033 ?                  :     GOTO L1
+00034 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : NoSuchObjectException  :    L5
+00035 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : NoSuchObjectException  :     ASTORE 5
+00036 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . . .  :  :     NEW javax/ejb/NoSuchEJBException
+00037 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . . .  : NoSuchEJBException  :     DUP
+00038 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . . .  : NoSuchEJBException NoSuchEJBException  :     INVOKESPECIAL javax/ejb/NoSuchEJBException.<init> ()V
+00039 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . . .  : NoSuchEJBException  :     ASTORE 6
+00040 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  :  :     ALOAD 6
+00041 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  : NoSuchEJBException  :     ALOAD 5
+00042 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  : NoSuchEJBException NoSuchObjectException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00043 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  : Throwable  :     POP
+00044 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  :  :     ALOAD 6
+00045 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  : NoSuchEJBException  :     ATHROW
+00046 ?                  :     GOTO L1
+00047 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : AccessException  :    L6
+00048 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : AccessException  :     ASTORE 7
+00049 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . . .  :  :     NEW javax/ejb/EJBAccessException
+00050 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . . .  : EJBAccessException  :     DUP
+00051 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . . .  : EJBAccessException EJBAccessException  :     INVOKESPECIAL javax/ejb/EJBAccessException.<init> ()V
+00052 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . . .  : EJBAccessException  :     ASTORE 8
+00053 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  :  :     ALOAD 8
+00054 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  : EJBAccessException  :     ALOAD 7
+00055 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  : EJBAccessException AccessException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00056 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  : Throwable  :     POP
+00057 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  :  :     ALOAD 8
+00058 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  : EJBAccessException  :     ATHROW
+00059 ?                  :     GOTO L1
+00060 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : InternalEJBContainerException  :    L7
+00061 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : InternalEJBContainerException  :     ASTORE 9
+00062 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . . .  :  :     ALOAD 9
+00063 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . . .  : InternalEJBContainerException  :     INVOKEVIRTUAL java/lang/Throwable.getCause ()Ljava/lang/Throwable;
+00064 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . . .  : Throwable  :     CHECKCAST javax/ejb/EJBException
+00065 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . . .  : EJBException  :     ATHROW
+00066 ?                  :     GOTO L1
+00067 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : RemoteException  :    L8
+00068 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : RemoteException  :     ASTORE 10
+00069 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  :  :     NEW javax/ejb/EJBException
+00070 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  : EJBException  :     DUP
+00071 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  : EJBException EJBException  :     ALOAD 10
+00072 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  : EJBException EJBException RemoteException  :     INVOKESPECIAL javax/ejb/EJBException.<init> (Ljava/lang/Exception;)V
+00073 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  : EJBException  :     ATHROW
+00074 ?                  :     GOTO L1
+00075 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : SystemException  :    L9
+00076 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : SystemException  :     ASTORE 11
+00077 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException . .  :  :     NEW javax/ejb/EJBException
+00078 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException . .  : EJBException  :     DUP
+00079 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException . .  : EJBException EJBException  :     INVOKESPECIAL javax/ejb/EJBException.<init> ()V
+00080 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException . .  : EJBException  :     ASTORE 12
+00081 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  :  :     ALOAD 12
+00082 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  : EJBException  :     ALOAD 11
+00083 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  : EJBException SystemException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00084 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  : Throwable  :     POP
+00085 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  :  :     ALOAD 12
+00086 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  : EJBException  :     ATHROW
+00087 ?                  :     GOTO L1
+00088 _LocationBeanRemote_Wrapper . . . . . . . . . . . . String  :  :    L1
+00089 _LocationBeanRemote_Wrapper . . . . . . . . . . . . String  :  :     ALOAD 13
+00090 _LocationBeanRemote_Wrapper . . . . . . . . . . . . String  : String  :     ARETURN
+     TRYCATCHBLOCK L0 L2 L3 javax/transaction/TransactionRolledbackException
+     TRYCATCHBLOCK L0 L2 L4 javax/transaction/TransactionRequiredException
+     TRYCATCHBLOCK L0 L2 L5 java/rmi/NoSuchObjectException
+     TRYCATCHBLOCK L0 L2 L6 java/rmi/AccessException
+     TRYCATCHBLOCK L0 L2 L7 com/sun/ejb/containers/InternalEJBContainerException
+     TRYCATCHBLOCK L0 L2 L8 java/rmi/RemoteException
+     TRYCATCHBLOCK L0 L2 L9 org/omg/CORBA/SystemException
+
+getHostName()Ljava/lang/String;
+00000 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  :  :    L0
+00001 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  :  :     ALOAD 0
+00002 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : _LocationBeanRemote_Wrapper  :     GETFIELD orb/folb/_LocationBeanRemote_Wrapper.delegate_ : Lorb/folb/_LocationBeanRemote_Remote;
+00003 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : _LocationBeanRemote_Remote  :     INVOKEINTERFACE orb/folb/_LocationBeanRemote_Remote.getHostName ()Ljava/lang/String;
+00004 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : String  :     ASTORE 13
+00005 _LocationBeanRemote_Wrapper . . . . . . . . . . . . String  :  :     GOTO L1
+00006 ?                  :    L2
+00007 ?                  :     GOTO L1
+00008 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : TransactionRolledbackException  :    L3
+00009 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : TransactionRolledbackException  :     ASTORE 1
+00010 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . . .  :  :     NEW javax/ejb/EJBTransactionRolledbackException
+00011 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . . .  : EJBTransactionRolledbackException  :     DUP
+00012 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . . .  : EJBTransactionRolledbackException EJBTransactionRolledbackException  :     INVOKESPECIAL javax/ejb/EJBTransactionRolledbackException.<init> ()V
+00013 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . . .  : EJBTransactionRolledbackException  :     ASTORE 2
+00014 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  :  :     ALOAD 2
+00015 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException  :     ALOAD 1
+00016 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException TransactionRolledbackException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00017 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  : Throwable  :     POP
+00018 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  :  :     ALOAD 2
+00019 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException  :     ATHROW
+00020 ?                  :     GOTO L1
+00021 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : TransactionRequiredException  :    L4
+00022 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : TransactionRequiredException  :     ASTORE 3
+00023 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . . .  :  :     NEW javax/ejb/EJBTransactionRequiredException
+00024 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . . .  : EJBTransactionRequiredException  :     DUP
+00025 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . . .  : EJBTransactionRequiredException EJBTransactionRequiredException  :     INVOKESPECIAL javax/ejb/EJBTransactionRequiredException.<init> ()V
+00026 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . . .  : EJBTransactionRequiredException  :     ASTORE 4
+00027 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  :  :     ALOAD 4
+00028 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException  :     ALOAD 3
+00029 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException TransactionRequiredException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00030 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  : Throwable  :     POP
+00031 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  :  :     ALOAD 4
+00032 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException  :     ATHROW
+00033 ?                  :     GOTO L1
+00034 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : NoSuchObjectException  :    L5
+00035 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : NoSuchObjectException  :     ASTORE 5
+00036 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . . .  :  :     NEW javax/ejb/NoSuchEJBException
+00037 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . . .  : NoSuchEJBException  :     DUP
+00038 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . . .  : NoSuchEJBException NoSuchEJBException  :     INVOKESPECIAL javax/ejb/NoSuchEJBException.<init> ()V
+00039 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . . .  : NoSuchEJBException  :     ASTORE 6
+00040 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  :  :     ALOAD 6
+00041 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  : NoSuchEJBException  :     ALOAD 5
+00042 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  : NoSuchEJBException NoSuchObjectException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00043 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  : Throwable  :     POP
+00044 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  :  :     ALOAD 6
+00045 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . . .  : NoSuchEJBException  :     ATHROW
+00046 ?                  :     GOTO L1
+00047 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : AccessException  :    L6
+00048 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : AccessException  :     ASTORE 7
+00049 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . . .  :  :     NEW javax/ejb/EJBAccessException
+00050 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . . .  : EJBAccessException  :     DUP
+00051 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . . .  : EJBAccessException EJBAccessException  :     INVOKESPECIAL javax/ejb/EJBAccessException.<init> ()V
+00052 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . . .  : EJBAccessException  :     ASTORE 8
+00053 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  :  :     ALOAD 8
+00054 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  : EJBAccessException  :     ALOAD 7
+00055 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  : EJBAccessException AccessException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00056 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  : Throwable  :     POP
+00057 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  :  :     ALOAD 8
+00058 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . . .  : EJBAccessException  :     ATHROW
+00059 ?                  :     GOTO L1
+00060 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : InternalEJBContainerException  :    L7
+00061 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : InternalEJBContainerException  :     ASTORE 9
+00062 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . . .  :  :     ALOAD 9
+00063 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . . .  : InternalEJBContainerException  :     INVOKEVIRTUAL java/lang/Throwable.getCause ()Ljava/lang/Throwable;
+00064 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . . .  : Throwable  :     CHECKCAST javax/ejb/EJBException
+00065 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . . .  : EJBException  :     ATHROW
+00066 ?                  :     GOTO L1
+00067 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : RemoteException  :    L8
+00068 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : RemoteException  :     ASTORE 10
+00069 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  :  :     NEW javax/ejb/EJBException
+00070 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  : EJBException  :     DUP
+00071 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  : EJBException EJBException  :     ALOAD 10
+00072 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  : EJBException EJBException RemoteException  :     INVOKESPECIAL javax/ejb/EJBException.<init> (Ljava/lang/Exception;)V
+00073 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . . .  : EJBException  :     ATHROW
+00074 ?                  :     GOTO L1
+00075 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : SystemException  :    L9
+00076 _LocationBeanRemote_Wrapper . . . . . . . . . . . . .  : SystemException  :     ASTORE 11
+00077 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException . .  :  :     NEW javax/ejb/EJBException
+00078 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException . .  : EJBException  :     DUP
+00079 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException . .  : EJBException EJBException  :     INVOKESPECIAL javax/ejb/EJBException.<init> ()V
+00080 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException . .  : EJBException  :     ASTORE 12
+00081 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  :  :     ALOAD 12
+00082 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  : EJBException  :     ALOAD 11
+00083 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  : EJBException SystemException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00084 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  : Throwable  :     POP
+00085 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  :  :     ALOAD 12
+00086 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException .  : EJBException  :     ATHROW
+00087 ?                  :     GOTO L1
+00088 _LocationBeanRemote_Wrapper . . . . . . . . . . . . String  :  :    L1
+00089 _LocationBeanRemote_Wrapper . . . . . . . . . . . . String  :  :     ALOAD 13
+00090 _LocationBeanRemote_Wrapper . . . . . . . . . . . . String  : String  :     ARETURN
+     TRYCATCHBLOCK L0 L2 L3 javax/transaction/TransactionRolledbackException
+     TRYCATCHBLOCK L0 L2 L4 javax/transaction/TransactionRequiredException
+     TRYCATCHBLOCK L0 L2 L5 java/rmi/NoSuchObjectException
+     TRYCATCHBLOCK L0 L2 L6 java/rmi/AccessException
+     TRYCATCHBLOCK L0 L2 L7 com/sun/ejb/containers/InternalEJBContainerException
+     TRYCATCHBLOCK L0 L2 L8 java/rmi/RemoteException
+     TRYCATCHBLOCK L0 L2 L9 org/omg/CORBA/SystemException
+
+printSystemProperties()V
+00000 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  :  :    L0
+00001 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  :  :     ALOAD 0
+00002 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : _LocationBeanRemote_Wrapper  :     GETFIELD orb/folb/_LocationBeanRemote_Wrapper.delegate_ : Lorb/folb/_LocationBeanRemote_Remote;
+00003 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : _LocationBeanRemote_Remote  :     INVOKEINTERFACE orb/folb/_LocationBeanRemote_Remote.printSystemProperties ()V
+00004 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  :  :    L1
+00005 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  :  :     GOTO L2
+00006 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : TransactionRolledbackException  :    L3
+00007 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : TransactionRolledbackException  :     ASTORE 1
+00008 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . .  :  :     NEW javax/ejb/EJBTransactionRolledbackException
+00009 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException  :     DUP
+00010 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException EJBTransactionRolledbackException  :     INVOKESPECIAL javax/ejb/EJBTransactionRolledbackException.<init> ()V
+00011 _LocationBeanRemote_Wrapper TransactionRolledbackException . . . . . . . . . . .  : EJBTransactionRolledbackException  :     ASTORE 2
+00012 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . .  :  :     ALOAD 2
+00013 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . .  : EJBTransactionRolledbackException  :     ALOAD 1
+00014 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . .  : EJBTransactionRolledbackException TransactionRolledbackException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00015 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . .  : Throwable  :     POP
+00016 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . .  :  :     ALOAD 2
+00017 _LocationBeanRemote_Wrapper TransactionRolledbackException EJBTransactionRolledbackException . . . . . . . . . .  : EJBTransactionRolledbackException  :     ATHROW
+00018 ?                 :     GOTO L2
+00019 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : TransactionRequiredException  :    L4
+00020 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : TransactionRequiredException  :     ASTORE 3
+00021 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . .  :  :     NEW javax/ejb/EJBTransactionRequiredException
+00022 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException  :     DUP
+00023 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException EJBTransactionRequiredException  :     INVOKESPECIAL javax/ejb/EJBTransactionRequiredException.<init> ()V
+00024 _LocationBeanRemote_Wrapper . . TransactionRequiredException . . . . . . . . .  : EJBTransactionRequiredException  :     ASTORE 4
+00025 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . .  :  :     ALOAD 4
+00026 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . .  : EJBTransactionRequiredException  :     ALOAD 3
+00027 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . .  : EJBTransactionRequiredException TransactionRequiredException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00028 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . .  : Throwable  :     POP
+00029 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . .  :  :     ALOAD 4
+00030 _LocationBeanRemote_Wrapper . . TransactionRequiredException EJBTransactionRequiredException . . . . . . . .  : EJBTransactionRequiredException  :     ATHROW
+00031 ?                 :     GOTO L2
+00032 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : NoSuchObjectException  :    L5
+00033 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : NoSuchObjectException  :     ASTORE 5
+00034 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . .  :  :     NEW javax/ejb/NoSuchEJBException
+00035 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . .  : NoSuchEJBException  :     DUP
+00036 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . .  : NoSuchEJBException NoSuchEJBException  :     INVOKESPECIAL javax/ejb/NoSuchEJBException.<init> ()V
+00037 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException . . . . . . .  : NoSuchEJBException  :     ASTORE 6
+00038 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . .  :  :     ALOAD 6
+00039 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . .  : NoSuchEJBException  :     ALOAD 5
+00040 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . .  : NoSuchEJBException NoSuchObjectException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00041 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . .  : Throwable  :     POP
+00042 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . .  :  :     ALOAD 6
+00043 _LocationBeanRemote_Wrapper . . . . NoSuchObjectException NoSuchEJBException . . . . . .  : NoSuchEJBException  :     ATHROW
+00044 ?                 :     GOTO L2
+00045 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : AccessException  :    L6
+00046 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : AccessException  :     ASTORE 7
+00047 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . .  :  :     NEW javax/ejb/EJBAccessException
+00048 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . .  : EJBAccessException  :     DUP
+00049 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . .  : EJBAccessException EJBAccessException  :     INVOKESPECIAL javax/ejb/EJBAccessException.<init> ()V
+00050 _LocationBeanRemote_Wrapper . . . . . . AccessException . . . . .  : EJBAccessException  :     ASTORE 8
+00051 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . .  :  :     ALOAD 8
+00052 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . .  : EJBAccessException  :     ALOAD 7
+00053 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . .  : EJBAccessException AccessException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00054 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . .  : Throwable  :     POP
+00055 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . .  :  :     ALOAD 8
+00056 _LocationBeanRemote_Wrapper . . . . . . AccessException EJBAccessException . . . .  : EJBAccessException  :     ATHROW
+00057 ?                 :     GOTO L2
+00058 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : InternalEJBContainerException  :    L7
+00059 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : InternalEJBContainerException  :     ASTORE 9
+00060 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . .  :  :     ALOAD 9
+00061 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . .  : InternalEJBContainerException  :     INVOKEVIRTUAL java/lang/Throwable.getCause ()Ljava/lang/Throwable;
+00062 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . .  : Throwable  :     CHECKCAST javax/ejb/EJBException
+00063 _LocationBeanRemote_Wrapper . . . . . . . . InternalEJBContainerException . . .  : EJBException  :     ATHROW
+00064 ?                 :     GOTO L2
+00065 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : RemoteException  :    L8
+00066 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : RemoteException  :     ASTORE 10
+00067 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . .  :  :     NEW javax/ejb/EJBException
+00068 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . .  : EJBException  :     DUP
+00069 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . .  : EJBException EJBException  :     ALOAD 10
+00070 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . .  : EJBException EJBException RemoteException  :     INVOKESPECIAL javax/ejb/EJBException.<init> (Ljava/lang/Exception;)V
+00071 _LocationBeanRemote_Wrapper . . . . . . . . . RemoteException . .  : EJBException  :     ATHROW
+00072 ?                 :     GOTO L2
+00073 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : SystemException  :    L9
+00074 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  : SystemException  :     ASTORE 11
+00075 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException .  :  :     NEW javax/ejb/EJBException
+00076 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException .  : EJBException  :     DUP
+00077 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException .  : EJBException EJBException  :     INVOKESPECIAL javax/ejb/EJBException.<init> ()V
+00078 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException .  : EJBException  :     ASTORE 12
+00079 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException  :  :     ALOAD 12
+00080 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException  : EJBException  :     ALOAD 11
+00081 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException  : EJBException SystemException  :     INVOKEVIRTUAL java/lang/Throwable.initCause (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+00082 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException  : Throwable  :     POP
+00083 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException  :  :     ALOAD 12
+00084 _LocationBeanRemote_Wrapper . . . . . . . . . . SystemException EJBException  : EJBException  :     ATHROW
+00085 ?                 :     GOTO L2
+00086 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  :  :    L2
+00087 _LocationBeanRemote_Wrapper . . . . . . . . . . . .  :  :     RETURN
+     TRYCATCHBLOCK L0 L1 L3 javax/transaction/TransactionRolledbackException
+     TRYCATCHBLOCK L0 L1 L4 javax/transaction/TransactionRequiredException
+     TRYCATCHBLOCK L0 L1 L5 java/rmi/NoSuchObjectException
+     TRYCATCHBLOCK L0 L1 L6 java/rmi/AccessException
+     TRYCATCHBLOCK L0 L1 L7 com/sun/ejb/containers/InternalEJBContainerException
+     TRYCATCHBLOCK L0 L1 L8 java/rmi/RemoteException
+     TRYCATCHBLOCK L0 L1 L9 org/omg/CORBA/SystemException
+
+[loadBalanceTest] result[0]= in2
+[loadBalanceTest] result[1]= in2
+[loadBalanceTest] result[2]= in2
+[loadBalanceTest] result[3]= in2
+[loadBalanceTest] result[4]= in2
+[loadBalanceTest] result[5]= in2
+[loadBalanceTest] result[6]= in2
+[loadBalanceTest] result[7]= in2
+[loadBalanceTest] result[8]= in2
+[loadBalanceTest] result[9]= in2
+[loadBalanceTest] result[10]= in2
+[loadBalanceTest] FAIL
+[OverAll Result] FAIL
+The instance, in2, was stopped.
+

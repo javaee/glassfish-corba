@@ -133,6 +133,7 @@ import com.sun.corba.se.spi.trace.OrbLifeCycle;
 import com.sun.corba.se.spi.trace.DynamicType ;
 import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Orbd;
+import com.sun.corba.se.spi.trace.Osgi;
 import com.sun.corba.se.spi.trace.Poa;
 import com.sun.corba.se.spi.trace.PoaFSM;
 import com.sun.corba.se.spi.trace.TraceServiceContext;
@@ -206,6 +207,9 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     @Subcontract
     public boolean subcontractDebugFlag = false ;
+
+    @Osgi
+    public boolean osgiDebugFlag = false ;
 
     @Poa
     public boolean poaDebugFlag = false ;

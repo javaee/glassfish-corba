@@ -332,67 +332,12 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.FINE, id=60 )
     @Message( "Useless exception on call to Closeable.close()" )
     BAD_OPERATION ioExceptionOnClose( @Chain Exception exc ) ;
-    
-    @Log( level=LogLevel.FINE, id=61 )
-    @Message( "Bundle not found for class {0}" )
-    BAD_OPERATION classNotFoundInBundle( String cname ) ;
-    
-    @Log( level=LogLevel.FINE, id=62 )
-    @Message( "Class {0} found in bundle {1}" )
-    BAD_OPERATION foundClassInBundle( String cname, String bname ) ;
-    
+
     @Log( level=LogLevel.FINE, id=63 )
     @Message( "Class {0} could not be loaded by bundle {1}" )
     BAD_OPERATION bundleCouldNotLoadClass( @Chain Exception exc,
         String arg0, String arg1 ) ;
-    
-    @Log( level=LogLevel.FINE, id=64 )
-    @Message( "Class {0} found in bundle {1} with version {2}" )
-    BAD_OPERATION foundClassInBundleVersion( Object arg0,
-        String arg1, String arg2 ) ;
-    
-    @Log( level=LogLevel.FINE, id=65 )
-    @Message( "Class {0} not found in bundle {1} with version {2}" )
-    BAD_OPERATION classNotFoundInBundleVersion( String arg0, String arg1,
-        String arg2 ) ;
-    
-    @Log( level=LogLevel.FINE, id=66 )
-    @Message( "Inserting ORB provider class {0} from bundle {1}" )
-    BAD_OPERATION insertOrbProvider( String arg0, String arg1 ) ;
-    
-    @Log( level=LogLevel.FINE, id=67 )
-    @Message( "Inserting ORB provider class {0} from bundle {1}" )
-    BAD_OPERATION removeOrbProvider( String arg0, String arg1 ) ;
-    
-    @Log( level=LogLevel.FINE, id=68 )
-    @Message( "Received bundle event of type {0} on bundle {1}" )
-    BAD_OPERATION receivedBundleEvent( String arg0, String arg1 ) ;
-    
-    @Log( level=LogLevel.FINE, id=69 )
-    @Message( "Probing all bundles for ORB class providers" )
-    BAD_OPERATION probeBundlesForProviders(  ) ;
-    
-    @Log( level=LogLevel.FINE, id=70 )
-    @Message( "Could not find class {0} in classNameMap" )
-    BAD_OPERATION classNotFoundInClassNameMap( String arg0 ) ;
-    
-    @Log( level=LogLevel.FINE, id=71 )
-    @Message( "Could not find class {0} in packageNameMap" )
-    BAD_OPERATION classNotFoundInPackageNameMap( String arg0 ) ;
-    
-    @Log( level=LogLevel.FINE, id=72 )
-    @Message( "Found class {0} in bundle {1} using packageNameMap" )
-    BAD_OPERATION classFoundInPackageNameMap( String arg0, String arg1 ) ;
-    
-    @Log( level=LogLevel.FINE, id=73 )
-    @Message( "Found class {0} in bundle {1} using classNameMap" )
-    BAD_OPERATION classFoundInClassNameMap( String arg0, String arg1 ) ;
-    
-    @Log( level=LogLevel.WARNING, id=74 )
-    @Message( "Could not load class {0} in bundle {1}" )
-    BAD_OPERATION couldNotLoadClassInBundle( @Chain Exception exc,
-        String arg0, String arg1 ) ;
-    
+
     @Log( level=LogLevel.WARNING, id=75 )
     @Message( "Exception while handling event on {0}" )
     BAD_OPERATION exceptionInSelector( @Chain Throwable t, EventHandler arg0 ) ;
@@ -409,16 +354,6 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.WARNING, id=78 )
     @Message( "The ORBImpl.set_parameters method was called more than once" )
     BAD_OPERATION setParameterCalledAgain(  ) ;
-    
-    @Log( level=LogLevel.FINE, id=79 )
-    @Message( "Inserting exported package {0} from bundle {1} into "
-        + "packageNameMap" )
-    BAD_OPERATION insertBundlePackage( String arg0, String arg1 ) ;
-    
-    @Log( level=LogLevel.FINE, id=80 )
-    @Message( "Removing exported package {0} from bundle {1} from "
-        + "packageNameMap" )
-    BAD_OPERATION removeBundlePackage( String arg0, String arg1 ) ;
     
     @Log( level=LogLevel.WARNING, id=81 )
     @Message( "Could not make an instance of Class {0}" )

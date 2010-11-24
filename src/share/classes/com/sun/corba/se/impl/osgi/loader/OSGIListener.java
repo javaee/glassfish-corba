@@ -40,10 +40,8 @@
 package com.sun.corba.se.impl.osgi.loader ;
 
 import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.osgi.framework.Bundle ;
@@ -59,6 +57,8 @@ import org.osgi.service.packageadmin.ExportedPackage ;
 import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.spi.trace.Osgi;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -77,10 +77,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @author ken
  */
+@Osgi
 public class OSGIListener implements BundleActivator, SynchronousBundleListener {
     private static final ReadWriteLock lock = new ReentrantReadWriteLock() ;
-
-    private static final boolean FINE_DEBUG = false ;
 
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -102,29 +101,6 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     // exported packages.
     private static Map<String,Bundle> packageNameMap = 
         new ConcurrentHashMap<String,Bundle>() ;
-
-    private static final boolean DEBUG = Boolean.getBoolean(
-        ORBConstants.DEBUG_OSGI_LISTENER ) ;
-
-    private static void mapContents() {
-        lock.readLock().lock() ;
-        try {
-            if (DEBUG) {
-                msg( "Contents of classNameMap:" ) ;
-
-                for (Map.Entry<String,Bundle> entry : classNameMap.entrySet()) {
-                    msg( entry.getKey() + "=>" + entry.getValue().getSymbolicName() ) ;
-                }
-            }
-        } finally {
-            lock.readLock().unlock() ;
-        }
-    }
-
-    private static void msg( String arg ) {
-        ClassLoader cl = OSGIListener.class.getClassLoader() ;
-        System.out.println( "OSGIListener(" + cl + "): " + arg ) ;
-    }
 
     private static String getBundleEventType( int type ) {
         if (type == BundleEvent.INSTALLED) {
@@ -152,20 +128,30 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
     }
 
+    @InfoMethod
+    private void classNotFoundInBundle( String arg ) {}
+
+    @InfoMethod
+    private void foundClassInBundle( String arg, String name ) {}
+
+    @Osgi
     private static class ClassNameResolverImpl implements
         UnaryFunction<String,Class<?>> {
 
+        @InfoMethod
+        private void classNotFoundInBundle( String arg ) {}
+
+        @InfoMethod
+        private void foundClassInBundle( String arg, String name ) {}
+
+        @Osgi
         public Class<?> evaluate(String arg) {
             Bundle bundle = getBundleForClass( arg ) ;
             if (bundle == null) {
-                if (FINE_DEBUG) {
-                    wrapper.classNotFoundInBundle( arg ) ;
-                }
+                classNotFoundInBundle( arg ) ;
                 return null ;
             } else {
-                if (FINE_DEBUG) {
-                    wrapper.foundClassInBundle( arg, bundle.getSymbolicName() ) ;
-                }
+                foundClassInBundle( arg, bundle.getSymbolicName() ) ;
             }
 
             try {
@@ -185,13 +171,23 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     private static UnaryFunction<String,Class<?>> classNameResolver =
         new ClassNameResolverImpl() ;
 
+    @Osgi
     public static UnaryFunction<String,Class<?>> classNameResolver() {
         return classNameResolver ;
     }
 
+    @Osgi
     private static class ClassCodeBaseHandlerImpl implements ClassCodeBaseHandler {
         private static final String PREFIX = "osgi://" ;
 
+        @InfoMethod
+        private void classNotFoundInBundle( String name ) {}
+
+        @InfoMethod
+        private void foundClassInBundleVersion( Class<?> cls, String name,
+            String version ) {}
+
+        @Osgi
         public String getCodeBase( Class<?> cls ) {
             if (cls == null) {
                 return null ;
@@ -203,9 +199,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
             Bundle bundle = pkgAdmin.getBundle( cls ) ;
             if (bundle == null) {
-                if (FINE_DEBUG) {
-                    wrapper.classNotFoundInBundle( cls.getName() ) ;
-                }
+                classNotFoundInBundle( cls.getName() ) ;
                 return null ;
             }
             
@@ -220,13 +214,24 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                 }
             }
 
-            if (FINE_DEBUG) {
-                wrapper.foundClassInBundleVersion( cls, name, version ) ;
-            }
+            foundClassInBundleVersion( cls, name, version ) ;
 
             return PREFIX + name + "/" + version ;
         }
 
+        @InfoMethod
+        private void couldNotLoadClassInBundle( ClassNotFoundException exc,
+            String className, String bname ) {}
+
+        @InfoMethod
+        private void foundClassInBundleVersion( String cname,
+            String bname, String version ) {}
+
+        @InfoMethod
+        private void classNotFoundInBundleVersion( String cname,
+            String bname, String version ) {}
+
+        @Osgi
         public Class<?> loadClass( String codebase, String className ) {
             if (codebase == null) {
                 Bundle bundle = getBundleForClass( className ) ;
@@ -234,10 +239,8 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                     try {
                         return bundle.loadClass( className ) ;
                     } catch (ClassNotFoundException exc) {
-                        if (FINE_DEBUG) {
-                            wrapper.couldNotLoadClassInBundle( exc, className,
-                                bundle.getSymbolicName() ) ;
-                        }
+                        couldNotLoadClassInBundle( exc, className,
+                            bundle.getSymbolicName() ) ;
                         return null ;
                     }
                 } else {
@@ -258,16 +261,12 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                         if (defBundles != null) {
                             // I think this is the highest available version
                             try {
-                                if (FINE_DEBUG) {
-                                    wrapper.foundClassInBundleVersion( 
-                                        className, name, version ) ;
-                                }
+                                foundClassInBundleVersion(
+                                    className, name, version ) ;
                                 return defBundles[0].loadClass( className ) ;
                             } catch (ClassNotFoundException cnfe) {
-                                if (FINE_DEBUG) {
-                                    wrapper.classNotFoundInBundleVersion( 
-                                        className, name, version ) ;
-                                }
+                                classNotFoundInBundleVersion(
+                                    className, name, version ) ;
                                 // fall through to return null
                             }
                         }
@@ -282,10 +281,18 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     private static ClassCodeBaseHandler ccbHandler =
         new ClassCodeBaseHandlerImpl() ;
 
+    @Osgi
     public static ClassCodeBaseHandler classCodeBaseHandler() {
         return ccbHandler ;
     }
 
+    @InfoMethod
+    private void insertOrbProvider( String cname, String bname ) {}
+
+    @InfoMethod
+    private void insertBundlePackage( String pname, String bname ) {}
+
+    @Osgi
     private void insertClasses( Bundle bundle ) {
         lock.writeLock().lock() ;
         try {
@@ -297,7 +304,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                     for (String str : orbProvider.split(",") ) {
                         String className = str.trim() ;
                         classNameMap.put( className, bundle ) ;
-                        wrapper.insertOrbProvider( className, name ) ;
+                        insertOrbProvider( className, name ) ;
                     }
                 }
             }
@@ -309,7 +316,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                     for (ExportedPackage ep : epkgs) {
                         final String pname = ep.getName() ;
                         packageNameMap.put( pname, bundle ) ;
-                        wrapper.insertBundlePackage( pname,
+                        insertBundlePackage( pname,
                             bundle.getSymbolicName() ) ;
                     }
                 }
@@ -319,6 +326,13 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
     }
 
+    @InfoMethod
+    private void removeOrbProvider( String cname, String bname ) {}
+
+    @InfoMethod
+    private void removeBundlePackage( String pname, String bname ) {}
+
+    @Osgi
     private void removeClasses( Bundle bundle ) {
         lock.writeLock().lock() ;
         try {
@@ -329,7 +343,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                 if (orbProvider != null) {
                     for (String className : orbProvider.split(",") ) {
                         classNameMap.remove( className ) ;
-                        wrapper.removeOrbProvider( className, name ) ;
+                        removeOrbProvider( className, name ) ;
                     }
                 }
             }
@@ -341,7 +355,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                     for (ExportedPackage ep : epkgs) {
                         final String pname = ep.getName() ;
                         packageNameMap.remove( pname ) ;
-                        wrapper.removeBundlePackage( pname,
+                        removeBundlePackage( pname,
                             bundle.getSymbolicName() ) ;
                     }
                 }
@@ -351,27 +365,18 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
     }
 
+    @Osgi
     private static Bundle getBundleForClass( String className ) {
         lock.readLock().lock() ;
         try {
             Bundle result = classNameMap.get( className ) ;
             if (result == null) {
-                wrapper.classNotFoundInClassNameMap( className ) ;
                 // Get package prefix
                 final int index = className.lastIndexOf( '.') ;
                 if (index > 0) {
                     final String packageName = className.substring( 0, index ) ;
                     result = packageNameMap.get( packageName ) ;
-                    if (result == null) {
-                        wrapper.classNotFoundInPackageNameMap( className ) ;
-                    } else {
-                        wrapper.classFoundInPackageNameMap( className,
-                            result.getSymbolicName() ) ;
-                    }
                 }
-            } else {
-                wrapper.classFoundInClassNameMap( className,
-                    result.getSymbolicName() ) ;
             }
 
             return result ;
@@ -380,6 +385,10 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         }
     }
 
+    @InfoMethod
+    private void probeBundlesForProviders() {}
+
+    @Osgi
     public void start( BundleContext context ) {
         // Get a referece to the PackageAdmin service before we
         // do ANYTHING else.
@@ -394,31 +403,33 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
         context.addBundleListener(this);
         
         // Probe all existing bundles for ORB providers
-        wrapper.probeBundlesForProviders() ;
+        probeBundlesForProviders() ;
         for (Bundle bundle : context.getBundles()) {
             insertClasses( bundle ) ;
         }
-        mapContents() ;
     }
 
+    @Osgi
     public void stop( BundleContext context ) {
         final Bundle myBundle = context.getBundle() ;
         removeClasses( myBundle ) ;
-        mapContents() ;
     }
 
+    @InfoMethod
+    private void receivedBundleEvent( String type, String name ) {}
+
+    @Osgi
     public void bundleChanged(BundleEvent event) {
         final int type = event.getType() ;
         final Bundle bundle = event.getBundle() ;
         final String name = bundle.getSymbolicName() ;
 
-        wrapper.receivedBundleEvent( getBundleEventType( type ), name ) ;
+        receivedBundleEvent( getBundleEventType( type ), name ) ;
 
         if (type == Bundle.INSTALLED) {
             insertClasses( bundle ) ;
         } else if (type == Bundle.UNINSTALLED) {
             removeClasses( bundle ) ;
         }
-        mapContents() ;
     }
 }

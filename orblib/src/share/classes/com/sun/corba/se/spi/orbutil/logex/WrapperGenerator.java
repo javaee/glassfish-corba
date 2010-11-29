@@ -255,39 +255,6 @@ public class WrapperGenerator {
         return sb.toString() ;
     }
 
-    private static void inferCaller( LogRecord lrec ) {
-	// Private method to infer the caller's class and method names
-
-	// Get the stack trace.
-	StackTraceElement stack[] = (new Throwable()).getStackTrace();
-	StackTraceElement frame = null ;
-	String wcname = "$Proxy" ; // Is this right?  Do we always have Proxy$n here?
-	String baseName = WrapperGenerator.class.getName() ;
-	String nestedName = WrapperGenerator.class.getName() + "$1" ;
-
-	// The top of the stack should always be a method in the wrapper class,
-	// or in this base class.
-	// Search back to the first method not in the wrapper class or this class.
-	int ix = 0;
-	while (ix < stack.length) {
-	    frame = stack[ix];
-	    String cname = frame.getClassName();
-	    if (!cname.contains(wcname) && !cname.equals(baseName)
-                && !cname.equals(nestedName))  {
-		break;
-	    }
-
-	    ix++;
-	}
-
-	// Set the class and method if we are not past the end of the stack
-	// trace
-	if (ix < stack.length) {
-	    lrec.setSourceClassName(frame.getClassName());
-	    lrec.setSourceMethodName(frame.getMethodName());
-	}
-    }
-
     /** Create the standard exception for this message and method.
      * 
      * @param msg The formatted message to appear in the exception.
@@ -360,12 +327,12 @@ public class WrapperGenerator {
 
     private static ReturnType classifyReturnType( Method method ) {
         Class<?> rtype = method.getReturnType() ;
-        if (Throwable.class.isAssignableFrom(rtype)) {
-            return ReturnType.EXCEPTION ;
+        if (rtype.equals( void.class ) ) {
+            return ReturnType.NULL ;
         } else if (rtype.equals( String.class)) {
             return ReturnType.STRING ;
-        } else if (rtype.equals( void.class ) ) {
-            return ReturnType.NULL ;
+        } else if (Throwable.class.isAssignableFrom(rtype)) {
+            return ReturnType.EXCEPTION ;
         } else {
             throw new RuntimeException( "Method " + method
                 + " has an illegal return type" ) ;
@@ -381,9 +348,6 @@ public class WrapperGenerator {
 
         result.setLoggerName( logger.getName() ) ;
         result.setResourceBundle( logger.getResourceBundle() ) ;
-        if (level != Level.INFO) {
-            inferCaller( result ) ;
-        }
 
         return result ;
     }
@@ -405,12 +369,13 @@ public class WrapperGenerator {
 
     private final static ShortFormatter formatter = new ShortFormatter() ;
 
-    private static Object handleFullLogging( Log log, Method method, Logger logger,
+    private static Object handleFullLogging( Log log, Method method,
+        ReturnType rtype, Logger logger,
         String idPrefix, Object[] messageParams, Throwable cause,
         Extension extension )  {
 
         final Level level = log.level().getLevel() ;
-        final ReturnType rtype = classifyReturnType( method ) ;
+
         final String msgString = getMessage( method, idPrefix, 
 	    extension.getLogId( method )) ;
         final LogRecord lrec = makeLogRecord( level, msgString,
@@ -506,20 +471,30 @@ public class WrapperGenerator {
                 public Object invoke(Object proxy, Method method, Object[] args)
                     throws Throwable {
 
-                    final Annotation[][] pannos = method.getParameterAnnotations() ;
-                    final int chainIndex = findAnnotatedParameter( pannos,
-                        Chain.class ) ;
-                    Throwable cause = null ;
-                    final Object[] messageParams = getWithSkip( args, chainIndex ) ;
-                    if (chainIndex >= 0) {
-                        cause = (Throwable)args[chainIndex] ;
+                    final ReturnType rtype = classifyReturnType(method) ;
+                    final Log log = method.getAnnotation( Log.class ) ;
+                    // Issue 14852: If there is no message and no logging
+                    // needed, return early and avoid unneeded computation.
+                    if (rtype == ReturnType.NULL) {
+                        if (log == null)  {
+                            return null ;
+                        } else {
+                            final LogLevel level = log.level() ;
+                            if (!logger.isLoggable(level.getLevel())) {
+                                return null ;
+                            }
+                        }
                     }
 
-                    final Class<?> rtype = method.getReturnType() ;
-                    final Log log = method.getAnnotation( Log.class ) ;
+                    final Annotation[][] pannos =
+                        method.getParameterAnnotations() ;
+                    final int chainIndex = findAnnotatedParameter( pannos,
+                        Chain.class ) ;
+                    final Object[] messageParams = getWithSkip( args, 
+                         chainIndex ) ;
 
                     if (log == null) {
-                        if (!rtype.equals( String.class ) ) {
+                        if (rtype != ReturnType.STRING) {
                             throw new IllegalArgumentException(
                                 "No @Log annotation present on "
                                 + cls.getName() + "." + method.getName() ) ;
@@ -528,8 +503,13 @@ public class WrapperGenerator {
                         return handleMessageOnly( method, extension, logger,
                             messageParams ) ;
                     } else {
-                        return handleFullLogging( log, method, logger, idPrefix,
-                            messageParams, cause, extension ) ;
+                        Throwable cause = null ;
+                        if (chainIndex >= 0) {
+                            cause = (Throwable)args[chainIndex] ;
+                        }
+
+                        return handleFullLogging( log, method, rtype, logger,
+                            idPrefix, messageParams, cause, extension ) ;
                     }
                 }
             } ;
@@ -548,6 +528,9 @@ public class WrapperGenerator {
 
             final CompositeInvocationHandler cih =
                 new CompositeInvocationHandlerImpl() {
+                    private static final long serialVersionUID =
+                        3086904407674824236L;
+
                     @Override
                     public String toString() {
                         return "ExceptionWrapper[" + cls.getName() + "]" ;

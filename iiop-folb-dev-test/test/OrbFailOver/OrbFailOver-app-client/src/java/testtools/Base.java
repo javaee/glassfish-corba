@@ -39,6 +39,7 @@
  */
 package testtools;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set ;
@@ -48,6 +49,7 @@ import argparser.ArgParser ;
 import argparser.Help ;
 import argparser.DefaultValue ;
 import argparser.Separator ;
+import java.util.Collection;
 
 /** A VERY quick-and-dirty test framework.
  *
@@ -60,6 +62,8 @@ public class Base {
     private final Arguments argvals ;
     private final Set<String> includes ;
     private final Set<String> excludes ;
+    private final List<Method> preMethods ;
+    private final List<Method> postMethods ;
 
     private String current ;
     private int pass = 0 ;
@@ -86,8 +90,20 @@ public class Base {
         List<String> exclude()  ;
     }
 
+    private void execute( Collection<Method> methods )
+        throws IllegalAccessException, IllegalArgumentException,
+        InvocationTargetException {
+
+        for (Method m : methods) {
+            m.invoke( this ) ;
+        }
+    }
+
     public Base( String[] args ) {
         testMethods = new ArrayList<Method>() ;
+        preMethods = new ArrayList<Method>() ;
+        postMethods = new ArrayList<Method>() ;
+
         Class<?> cls = this.getClass() ;
         for (Method m : cls.getMethods()) {
             if (m.getDeclaringClass().equals( Base.class )
@@ -110,6 +126,16 @@ public class Base {
                     msg( "Method " + m + " is annotated @Test, "
                         + "but has parameters").nl() ;
                 }
+            }
+
+            Pre pre = m.getAnnotation( Pre.class ) ;
+            if (pre != null) {
+                preMethods.add( m ) ;
+            }
+
+            Post post = m.getAnnotation( Post.class ) ;
+            if (post != null) {
+                postMethods.add( m ) ;
             }
         }
 
@@ -186,9 +212,16 @@ public class Base {
                 msg( "Test " + current + ": " ).nl() ;
                 msg( "    Notes:" ).nl() ;
                 try {
+                    execute( preMethods ) ;
                     m.invoke( this ) ;
                 } catch (Exception exc) {
                     fail( "Caught exception : " + exc )  ;
+                } finally {
+                    try {
+                        execute(postMethods);
+                    } catch (Exception exc) {
+                        fail( "Exception in post methods : " + exc ) ;
+                    }
                 }
 
                 if (currentResults.isEmpty()) {

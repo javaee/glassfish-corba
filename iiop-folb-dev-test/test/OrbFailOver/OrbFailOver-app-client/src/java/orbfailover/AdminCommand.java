@@ -3,6 +3,8 @@ package orbfailover;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import testtools.Base;
 
 /**
@@ -10,18 +12,26 @@ import testtools.Base;
  * @author ken
  */
 public class AdminCommand {
-    private AdminCommand() {}
-
+    // Note that only one thread at a time may use an instance of AdminCommand.
     private static final String ASADMIN_CMD_PROP = "test.folb.asadmin.command" ;
+    private static final String DEFAULT_ASADMIN = System.getProperty(
+        ASADMIN_CMD_PROP ) ;
 
-    private static boolean adminCommand( Base base, String command, String instance ) {
+    private final String asadmin ;
+
+    private final List<String> commandOutput = new ArrayList<String>() ;
+
+    public AdminCommand() {
+        this( DEFAULT_ASADMIN ) ;
+    }
+
+    public AdminCommand( String asadmin ) {
+        this.asadmin = asadmin ;
+    }
+
+    private boolean adminCommand( Base base, String command, String instance ) {
+        commandOutput.clear() ;
         base.note( "Command " + command + " for instance " + instance ) ;
-        final String asadmin = System.getProperty(ASADMIN_CMD_PROP) ;
-        if (asadmin == null) {
-            base.note( "Could not find property " + ASADMIN_CMD_PROP ) ;
-            return false ;
-        }
-
         final String cmd = asadmin + " " + command + " " + instance ;
 
         try {
@@ -32,6 +42,7 @@ public class AdminCommand {
             String line = reader.readLine() ;
             while (line != null) {
                 base.note( line ) ;
+                commandOutput.add( line ) ;
                 line = reader.readLine() ;
             }
 
@@ -50,11 +61,15 @@ public class AdminCommand {
         return true ;
     }
 
-    public static boolean startInstance( Base base, String name ) {
+    public List<String> commandOutput() {
+        return commandOutput ;
+    }
+
+    public boolean startInstance( Base base, String name ) {
         return adminCommand( base, "start-instance", name) ;
     }
 
-    public static boolean stopInstance( Base base, String name ) {
+    public boolean stopInstance( Base base, String name ) {
         return adminCommand( base, "stop-instance --force true", name) ;
     }
 }

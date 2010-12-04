@@ -1,16 +1,20 @@
 package orbfailover;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import javax.naming.NamingException;
 import orb.folb.LocationBeanRemote;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.naming.InitialContext;
 
 import testtools.Test ;
 import testtools.Base ;
+import testtools.Post;
 
 /**
  * @author hv51393
@@ -19,6 +23,7 @@ import testtools.Base ;
 public class Main extends Base {
     private static final String INSTANCE_NAMES_PROP = "test.folb.instances" ;
     private static final Set<String> instanceNames ;
+    private static final AdminCommand ac = new AdminCommand() ;
 
     // @EJB
     // private static LocationBeanRemote locBean;
@@ -77,11 +82,11 @@ public class Main extends Base {
 
                 if (i == stopAt) {
                     stoppedInstance = newLocation ;
-                    AdminCommand.stopInstance( this, stoppedInstance );
+                    ac.stopInstance( this, stoppedInstance );
                 }
 
                 if (i == startAt) {
-                    AdminCommand.startInstance( this, stoppedInstance ) ;
+                    ac.startInstance( this, stoppedInstance ) ;
                     stoppedInstance = null ;
                 }
             } 
@@ -89,7 +94,7 @@ public class Main extends Base {
             fail( "caught naming exception " + exc ) ;
         } finally {
             if (stoppedInstance != null) {
-                AdminCommand.startInstance( this, stoppedInstance ) ;
+                ac.startInstance( this, stoppedInstance ) ;
             }
         }
     }
@@ -106,7 +111,7 @@ public class Main extends Base {
     }
 
     @Test( "loadbalance" )
-    public void testLoadBalance( ) {
+    public void testLoadBalance( ) throws NamingException {
         doLoadBalance( instanceNames, 100 )  ;
     }
 
@@ -128,7 +133,27 @@ public class Main extends Base {
     // 6. Kill Instance where we created ic and did lookups
     // 7. Access business methods for the ejb's (created in step 4)
     @Test( "14762" )
-    public void test14762() {
+    public void test14762() throws NamingException {
+        for (String in : instanceNames) {
+            ac.stopInstance(this, in);
+        }
+        final String firstInstance = pick( instanceNames ) ;
+        ac.startInstance(this, firstInstance) ;
+        final List<InitialContext> ics = new ArrayList<InitialContext>() ;
+        final List<LocationBeanRemote> lbs = new ArrayList<LocationBeanRemote>() ;
+        for (int ctr=0; ctr<10; ctr++) {
+            final InitialContext ic = new InitialContext() ;
+            ics.add( ic ) ;
+            final LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname) ;
+            lbs.add( lb ) ;
+        }
+        ensure() ;
+        ac.stopInstance(this, firstInstance );
+        for (LocationBeanRemote lb : lbs ) {
+            String loc = lb.getLocation() ;
+            check( !loc.equals( firstInstance ),
+                "Location returned was stopped instance " + firstInstance ) ;
+        }
     }
 
     // Test scenario for issue 14755:
@@ -144,7 +169,19 @@ public class Main extends Base {
     // 9. The request goes to firstinstance (it should go to secondinstance - since it
     //    should be sticky)
     @Test( "14755" )
-    public void test14755() {
+    public void test14755() throws NamingException {
+        InitialContext ic = new InitialContext() ;
+        LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname ) ;
+        String first = lb.getLocation() ;
+        ac.stopInstance(this, first);
+        String second = lb.getLocation() ;
+        check( !first.equals( second ),
+            "Method executed on instance that was supposed to be down " + second ) ;
+        ac.startInstance( this, first ) ;
+        String result = lb.getLocation() ;
+        check( result.equals( second ),
+            "Request did not stick to instance " + second +
+            " after original instance " + first + " restarted" ) ;
     }
 
     // Test scenario for issue 14766:
@@ -160,64 +197,80 @@ public class Main extends Base {
     // 10 do one request - ensure it works
     // 11 shutdown C
     // 12 do one request - ensure it works
-    @Test( "14766" )
-    public void test14766() {
-        try {
-            final int numCalls = 20 ;
-            Set<String> runningInstances = instanceNames ;
-            doLoadBalance( runningInstances, numCalls )  ;
+    @Test( "14766")
+    public void test14766() throws NamingException {
+        InitialContext ctx = new InitialContext();
+        LocationBeanRemote locBean = (LocationBeanRemote) ctx.lookup(
+            beanJNDIname);
 
-            final String inst1 = pick( runningInstances ) ;
-            AdminCommand.stopInstance(this, inst1) ;
-            runningInstances.remove( inst1 ) ;
-            doLoadBalance( runningInstances, numCalls )  ;
+        String loc1 = locBean.getLocation();
+        ac.stopInstance(this, loc1);
 
-            final String inst2 = pick( runningInstances ) ;
-            AdminCommand.stopInstance(this, inst2) ;
-            runningInstances.remove( inst2 ) ;
-            final String inst3 = pick( runningInstances ) ;
+        String loc2 = locBean.getLocation() ;
+        check( !loc1.equals(loc2), "Failover did not happen") ;
+        ac.stopInstance(this, loc2);
 
-            AdminCommand.startInstance(this, inst1);
-            runningInstances.add( inst1 ) ;
-            doLoadBalance( runningInstances, numCalls )  ;
+        String loc3 = locBean.getLocation() ;
+        check( !loc3.equals(loc2), "Failover did not happen") ;
+        ac.startInstance(this, loc1);
 
-            AdminCommand.stopInstance(this, inst3);
-            runningInstances.remove( inst3 ) ;
-            doLoadBalance( runningInstances, numCalls )  ;
-        } finally {
-            ensure() ;
-        }
+        String loc4 = locBean.getLocation() ;
+        check( loc4.equals(loc3), "No failover expected" ) ;
+        ac.stopInstance(this, loc3);
+
+        String loc5 = locBean.getLocation() ;
+        check( !loc5.equals(loc4), "Failover did not happen") ;
     }
 
-    public void doLoadBalance( Set<String> expected, int numCalls ) {
+    @Test( "lbfail" )
+    public void testLBFail() throws NamingException {
+        final int numCalls = 20 ;
+        Set<String> runningInstances = instanceNames ;
+        doLoadBalance( runningInstances, numCalls )  ;
+
+        final String inst1 = pick( runningInstances ) ;
+        ac.stopInstance(this, inst1) ;
+        runningInstances.remove( inst1 ) ;
+        doLoadBalance( runningInstances, numCalls )  ;
+
+        final String inst2 = pick( runningInstances ) ;
+        ac.stopInstance(this, inst2) ;
+        runningInstances.remove( inst2 ) ;
+        final String inst3 = pick( runningInstances ) ;
+
+        ac.startInstance(this, inst1);
+        runningInstances.add( inst1 ) ;
+        doLoadBalance( runningInstances, numCalls )  ;
+
+        ac.stopInstance(this, inst3);
+        runningInstances.remove( inst3 ) ;
+        doLoadBalance( runningInstances, numCalls )  ;
+    }
+
+    public void doLoadBalance( Set<String> expected, int numCalls ) 
+        throws NamingException {
         // XXX add checking for approximate distribution
         Map<String,Integer> counts =
             new HashMap<String,Integer>() ;
 
-        try {
-            String newLocation = "" ;
-            for (int i = 1; i <= numCalls ; i++) {
-                InitialContext ctx = new InitialContext();
-                LocationBeanRemote locBean =
-                        (LocationBeanRemote) ctx.lookup(beanJNDIname);
-                newLocation = locBean.getLocation();
-                note( "result[" + i + "]= " + newLocation);
-                increment( counts, newLocation ) ;
-            }
-            note( "Call distribution:" ) ;
-            int prod = 1 ;
-            for (Map.Entry<String,Integer> entry : counts.entrySet()) {
-                int count = entry.getValue().intValue() ;
-                prod *= count ;
-                note( String.format( "\tName = %20s Count = %10d",
-                    entry.getKey(), count ) ) ;
-            }
-            check( !expected.equals(counts.keySet()),
-                "Requests not loadbalanced across expected instances: "
-                + " expected " + expected + ", actual " + counts.keySet() ) ;
-        } catch (Exception e) {
-            fail( "Exception " + e ) ;
+        String newLocation = "" ;
+        for (int i = 1; i <= numCalls ; i++) {
+            InitialContext ctx = new InitialContext();
+            LocationBeanRemote locBean =
+                    (LocationBeanRemote) ctx.lookup(beanJNDIname);
+            newLocation = locBean.getLocation();
+            note( "result[" + i + "]= " + newLocation);
+            increment( counts, newLocation ) ;
         }
+        note( "Call distribution:" ) ;
+        for (Map.Entry<String,Integer> entry : counts.entrySet()) {
+            int count = entry.getValue().intValue() ;
+            note( String.format( "\tName = %20s Count = %10d",
+                entry.getKey(), count ) ) ;
+        }
+        check( !expected.equals(counts.keySet()),
+            "Requests not loadbalanced across expected instances: "
+            + " expected " + expected + ", actual " + counts.keySet() ) ;
     }
 
     // Test scenario for issue 14732:
@@ -231,7 +284,7 @@ public class Main extends Base {
     // 8. Do lookup (the expectation is it will failover to other instance)
     // 9. Call Business Method
     @Test( "14732" )
-    public void test14732() {
+    public void test14732() throws NamingException {
         // Make sure only inst is running
         boolean first = true ;
         String running = "" ;
@@ -241,50 +294,59 @@ public class Main extends Base {
                 note( "Running instance is " + inst ) ;
                 first = false ;
             } else {
-                AdminCommand.stopInstance(this, inst);
+                ac.stopInstance(this, inst);
             }
         }
 
-        try {
-            InitialContext ctx = new InitialContext();
-            note( "got new initial context") ;
+        InitialContext ctx = new InitialContext();
+        note( "got new initial context") ;
 
-            LocationBeanRemote locBean =
-                    (LocationBeanRemote) ctx.lookup(beanJNDIname);
-            note( "located EJB" ) ;
+        LocationBeanRemote locBean =
+                (LocationBeanRemote) ctx.lookup(beanJNDIname);
+        note( "located EJB" ) ;
 
-            String current = locBean.getLocation();
-            note( "EJB invocation returned " + current ) ;
-            check( current.equals( running ),
-                "Current location " + current + " is not the same as the"
-                    + " running location " + running ) ;
+        String current = locBean.getLocation();
+        note( "EJB invocation returned " + current ) ;
+        check( current.equals( running ),
+            "Current location " + current + " is not the same as the"
+                + " running location " + running ) ;
 
-            AdminCommand.stopInstance( this, running ) ;
-            for (String inst : instanceNames) {
-                if (!inst.equals(running)) {
-                    AdminCommand.startInstance( this, inst ) ;
-                }
+        ac.stopInstance( this, running ) ;
+        for (String inst : instanceNames) {
+            if (!inst.equals(running)) {
+                ac.startInstance( this, inst ) ;
             }
-
-            locBean = (LocationBeanRemote) ctx.lookup(beanJNDIname);
-            note( "Locating EJB second time") ;
-
-            current = locBean.getLocation();
-            note( "EJB invocation returned " + current ) ;
-            check( !current.equals( running ),
-                "Apparent location " + current
-                + " is the same as a stoppped instance " + running ) ;
-        } catch (Exception exc) {
-            fail( "Exception " + exc ) ;
-        } finally {
-            ensure() ;
         }
+
+        locBean = (LocationBeanRemote) ctx.lookup(beanJNDIname);
+        note( "Locating EJB second time") ;
+
+        current = locBean.getLocation();
+        note( "EJB invocation returned " + current ) ;
+        check( !current.equals( running ),
+            "Apparent location " + current
+            + " is the same as a stoppped instance " + running ) ;
+}
+
+    // Test scenario for issue 14867:
+    // 1. Deploy an application to a cluster with three instances
+    // 2. Start up one client with target-server+ specifying the three instances.
+    // 3. In a loop (100 iterations):
+    //    1. Create a new InitialContext
+    //    2. Do a lookup
+    //    3. Remember which instance the lookup went to
+    // 4. Add two new instances
+    // 5. Then do 100 new IntialContext/lookup.
+    // New instances should process some of new requests
+    @Test( "14867" )
+    public void test14867() {
     }
 
+    @Post
     private void ensure() {
         // make sure all instances are running
         for (String inst : instanceNames) {
-            AdminCommand.startInstance(this, inst);
+            ac.startInstance(this, inst);
         }
     }
 }

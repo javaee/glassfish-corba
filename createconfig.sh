@@ -3,6 +3,7 @@ S1AS_HOME="${instance1_s1as_home}/glassfish"
 ASADMIN="${S1AS_HOME}/bin/asadmin"
 set -x
 ${ASADMIN} start-domain
+${ASADMIN} enable-secure-admin
 ${ASADMIN}  --user admin create-node-ssh --nodehost ${das_node} --installdir ${instance1_s1as_home} agent1
 ${ASADMIN} create-cluster ${cluster_name}
 ${ASADMIN} --host ${das_node} --port ${das_port} create-instance --cluster ${cluster_name} --systemproperties instance_name=in1 --node agent1 in1

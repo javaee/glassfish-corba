@@ -65,11 +65,12 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 public final class ReflectiveTie extends Servant implements Tie 
 {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     private Remote target = null ;
     private PresentationManager pm ;
     private PresentationManager.ClassData classData = null ;
-    private ORBUtilSystemException wrapper =
-        ORBUtilSystemException.self ;
 
     public ReflectiveTie( PresentationManager pm )
     {
@@ -81,7 +82,6 @@ public final class ReflectiveTie extends Servant implements Tie
         }
 
 	this.pm = pm ;
-	this.wrapper = wrapper ;
     }
 
     public String[] _all_interfaces(org.omg.PortableServer.POA poa, 

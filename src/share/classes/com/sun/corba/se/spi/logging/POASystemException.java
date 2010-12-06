@@ -230,6 +230,12 @@ public interface POASystemException {
     @Log( level=LogLevel.FINE, id=30 )
     @Message( "Suspend condition wait was unexpectedly interrupted" )
     INTERNAL rfmSuspendConditionWaitInterrupted(  ) ;
+
+    @Log( level=LogLevel.SEVERE, id=31)
+    @Message( "Some locks not released in find_POA: "
+        + "readLocked={0}, writeLocked={1}, childReadLocked={2}")
+    INTERNAL findPOALocksNotReleased(boolean readLocked, boolean writeLocked,
+         boolean childReadLocked);
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Single thread policy is not supported" )

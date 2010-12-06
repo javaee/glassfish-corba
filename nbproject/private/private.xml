@@ -7,12 +7,6 @@
             <line>546</line>
         </file>
     </editor-bookmarks>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/transport/SelectorImpl.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/javax/rmi/CORBA/Util.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/org/objectweb/asm/tree/MethodNode.java</file>
-        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/impl/orbutil/codegen/ASMSetupVisitor.java</file>
-    </open-files>
 </project-private>
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.

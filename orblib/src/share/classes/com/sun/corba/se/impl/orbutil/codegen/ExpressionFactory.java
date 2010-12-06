@@ -93,10 +93,9 @@ public final class ExpressionFactory {
      */
     static List<Expression> copyExpressionList( Node newParent, List<Expression> exprs ) {
 	List<Expression> result = new ArrayList<Expression>() ;
-	for (Expression expr : exprs)
-	    result.add( ((ExpressionInternal)expr).copy(
-                (ExpressionInternal)newParent,
-                ExpressionInternal.class) ) ;
+	for (Expression expr : exprs) {
+            result.add(((ExpressionInternal) expr).copy((ExpressionInternal) newParent, ExpressionInternal.class));
+        }
 	return result ;
     }
 
@@ -125,8 +124,9 @@ public final class ExpressionFactory {
 
 	@Override
 	public <T extends Node> T copy( Node newParent, Class<T> cls ) {
-	    if (expressionFactory.unusedExpressions().containsKey( this ))
-		expressionFactory.unusedExpressions().remove( this ) ;
+	    if (expressionFactory.unusedExpressions().containsKey( this )) {
+                expressionFactory.unusedExpressions().remove(this);
+            }
 
 	    // Only copy expressions in which all local definitions 
 	    // are still in scope.
@@ -268,9 +268,9 @@ public final class ExpressionFactory {
 	    // class.  This can be determined by walking up the
 	    // parent chain until we find the class. 
 	    ClassGeneratorImpl cg = getAncestor( ClassGeneratorImpl.class ) ;
-	    if (cg == null)
-		throw new IllegalStateException(
-		    "No ClassGenerator found!" ) ;
+	    if (cg == null) {
+                throw new IllegalStateException("No ClassGenerator found!");
+            }
 	    Type cgType = Type._classGenerator( cg ) ;
 	    return cgType ;
 	}
@@ -433,9 +433,9 @@ public final class ExpressionFactory {
 	List<Expression> exprs ) {
 
 	signature.checkStaticCompatibility( target, ident, exprs ) ;
-	if (target.isPrimitive() || target.isArray())
-	    throw new IllegalArgumentException(
-		"The target for a static call must be a reference type" ) ;
+	if (target.isPrimitive() || target.isArray()) {
+            throw new IllegalArgumentException("The target for a static call must be a reference type");
+        }
 
 	return new StaticCallExpression( this, target, ident, signature, exprs ) ; 
     }
@@ -446,9 +446,9 @@ public final class ExpressionFactory {
      */
     public Expression staticCall( Type target, String ident,
 	List<Expression> exprs ) {
-	if (target.isPrimitive() || target.isArray())
-	    throw new IllegalArgumentException(
-		"The target for a static call must be a reference type" ) ;
+	if (target.isPrimitive() || target.isArray()) {
+            throw new IllegalArgumentException("The target for a static call must be a reference type");
+        }
 
 	Signature sig = Signature.fromStaticCall( target, ident, exprs ) ;
 	return new StaticCallExpression( this, target, ident, sig, exprs ) ; 
@@ -465,9 +465,9 @@ public final class ExpressionFactory {
 	NOT( "!" ) {
 	    public void checkType( Expression arg ) {
                 Type type = ((ExpressionInternal)arg).type() ;
-		if (type != Type._boolean())
-		    throw new IllegalArgumentException( 
-			"! expects a boolean type, found " + type ) ;
+		if (type != Type._boolean()) {
+                    throw new IllegalArgumentException("! expects a boolean type, found " + type);
+                }
 	    }
 	} ;
 
@@ -658,9 +658,15 @@ public final class ExpressionFactory {
 	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
-		if ((left != Type._boolean()) || (right != Type._boolean()))
-		    throw new IllegalArgumentException(
-			this.javaRepresentation() + " requires boolean expressions" ) ;
+                final Type ltype = ((ExpressionInternal)left).type() ;
+                final Type rtype = ((ExpressionInternal)right).type() ;
+
+		if (!ltype.equals(Type._boolean())
+                    || !rtype.equals(Type._boolean())) {
+                    throw new IllegalArgumentException(
+                       this.javaRepresentation()
+                       + " requires boolean expressions");
+                }
 
 		return new IfExpression( ef, left, right, ef._const( false ) ) ;
 	    }
@@ -675,9 +681,14 @@ public final class ExpressionFactory {
 	    public Expression create( ExpressionFactory ef,
 		Expression left, Expression right ) {
 
-		if ((left != Type._boolean()) || (right != Type._boolean()))
+                final Type ltype = ((ExpressionInternal)left).type() ;
+                final Type rtype = ((ExpressionInternal)right).type() ;
+
+		if (!ltype.equals(Type._boolean())
+                    || !rtype.equals(Type._boolean())) {
 		    throw new IllegalArgumentException(
 			this.javaRepresentation() + " requires boolean expressions" ) ;
+                }
 
 		return ef.ifExpression( left, ef._const( true ), right ) ;
 	    }
@@ -702,10 +713,12 @@ public final class ExpressionFactory {
             Type rtype = ((ExpressionInternal)right).type() ;
 
 	    Type ctype = ltype.binaryPromotion( rtype ) ;
-	    if (!ctype.equals( ltype ))
-		lb = ef.cast( ctype, lb ) ;
-	    if (!ctype.equals( rtype ))
-		rb = ef.cast( ctype, rb ) ;
+	    if (!ctype.equals( ltype )) {
+                lb = ef.cast(ctype, lb);
+            }
+	    if (!ctype.equals( rtype )) {
+                rb = ef.cast(ctype, rb);
+            }
 
 	    return new BinaryOperatorExpression( ef, ctype, lb, op, rb ) ;
 	}
@@ -728,10 +741,12 @@ public final class ExpressionFactory {
 		Expression rb = right ;
 
 		Type ctype = ltype.binaryPromotion( rtype ) ;
-		if (!ctype.equals( ltype ))
-		    lb = ef.cast( ctype, lb ) ;
-		if (!ctype.equals( rtype ))
-		    rb = ef.cast( ctype, rb ) ;
+		if (!ctype.equals( ltype )) {
+                    lb = ef.cast(ctype, lb);
+                }
+		if (!ctype.equals( rtype )) {
+                    rb = ef.cast(ctype, rb);
+                }
 
 		return new BinaryOperatorExpression( ef, Type._boolean(), 
 		    lb, op, rb ) ;
@@ -739,14 +754,15 @@ public final class ExpressionFactory {
 		boolean lok = !ltype.isPrimitive() || ltype.equals( Type._null() ) ;
 		boolean rok = !rtype.isPrimitive() || rtype.equals( Type._null() ) ;
 
-		if (lok && rok)
-		    return new BinaryOperatorExpression( ef, Type._boolean(), 
-			left, op, right ) ;
-		else
-		    throw new IllegalArgumentException( "Both arguments to " 
-			+ op.javaRepresentation()  
-			+ " must be of reference or null type.  left type = " 
-			+ ltype.name() + " right type = " + rtype.name() ) ;
+		if (lok && rok) {
+                    return new BinaryOperatorExpression(ef, Type._boolean(),
+                        left, op, right);
+                } else {
+                    throw new IllegalArgumentException("Both arguments to "
+                        + op.javaRepresentation()
+                        + " must be of reference or null type.  left type = "
+                        + ltype.name() + " right type = " + rtype.name());
+                }
 	    }
 	}
 
@@ -909,9 +925,11 @@ public final class ExpressionFactory {
 	    super( ef ) ;
 	    this.type = type ;
 	    this.signature = signature ;
-	    if (!signature.returnType().equals(Type._void()))
-		throw new IllegalArgumentException( 
-		    "The signature of a new call to a constructor must have a void return type" ) ;
+	    if (!signature.returnType().equals(Type._void())) {
+                throw new IllegalArgumentException(
+                    "The signature of a new call to a constructor "
+                    + "must have a void return type");
+            }
 	    this.args = copyExpressionList(this, args) ;
 	}
 
@@ -1053,9 +1071,9 @@ public final class ExpressionFactory {
 
     public Expression superCall( String ident, List<Expression> exprs ) {
 	ClassGeneratorImpl cg = efparent().getAncestor(ClassGeneratorImpl.class) ;
-	if (cg == null)
-	    throw new IllegalStateException(
-		"No ClassGenerator found!" ) ;
+	if (cg == null) {
+            throw new IllegalStateException("No ClassGenerator found!");
+        }
 	Type type = cg.superType() ;
 	Signature signature = Signature.fromCall( type, ident, exprs ) ;
 	return new SuperCallExpression( this, ident, signature, exprs ) ;
@@ -1110,9 +1128,9 @@ public final class ExpressionFactory {
      */
     public Expression superObj( List<Expression> exprs ) {
 	ClassGeneratorImpl cg = efparent().getAncestor(ClassGeneratorImpl.class) ;
-	if (cg == null)
-	    throw new IllegalStateException(
-		"No ClassGenerator found!" ) ;
+	if (cg == null) {
+            throw new IllegalStateException("No ClassGenerator found!");
+        }
 	Type type = cg.superType() ;
 	Signature signature = Signature.fromConstructor( type, exprs ) ;
 	return new SuperObjExpression( this, signature, exprs ) ;
@@ -1167,9 +1185,9 @@ public final class ExpressionFactory {
      */
     public Expression thisObj( List<Expression> exprs ) {
 	ClassGeneratorImpl cg = efparent().getAncestor(ClassGeneratorImpl.class) ;
-	if (cg == null)
-	    throw new IllegalStateException(
-		"No ClassGenerator found!" ) ;
+	if (cg == null) {
+            throw new IllegalStateException("No ClassGenerator found!");
+        }
 	Type type = cg.thisType() ;
 	Signature signature = Signature.fromConstructor( type, exprs ) ;
 	return new ThisObjExpression( this, signature, exprs ) ;
@@ -1211,19 +1229,20 @@ public final class ExpressionFactory {
 	public Type type() {
 	    ClassInfo cinfo = targetType().classInfo() ;
 	    FieldInfo fld = cinfo.findFieldInfo( fieldName) ;
-	    if (fld == null)
-		throw new IllegalStateException( 
-		    "Type " + targetType().name() + " does not contain field " +
-		    fieldName ) ;
+	    if (fld == null) {
+                throw new IllegalStateException( "Type " + targetType().name()
+                    + " does not contain field " + fieldName);
+            }
 
 	    ClassGeneratorImpl defClass = getAncestor( ClassGeneratorImpl.class ) ;
 
-	    if (fld.isAccessibleInContext( defClass, cinfo ))
-		return fld.type()  ;
-	    else 
-		throw new IllegalStateException( 
-		    "Field " + fieldName + " in type " + targetType().name() 
-		    + "is not accessible in context " + defClass.name() ) ;
+	    if (fld.isAccessibleInContext( defClass, cinfo )) {
+                return fld.type();
+            } else {
+                throw new IllegalStateException( "Field " + fieldName
+                    + " in type " + targetType().name()
+                    + "is not accessible in context " + defClass.name());
+            }
 	}
     }
 
@@ -1415,10 +1434,12 @@ public final class ExpressionFactory {
 		    type = Type._short() ;
 		} else {
 		    type = ttype.binaryPromotion( ftype ) ;
-		    if (!ttype.equals( type ))
-			this.truePart = ef.cast( type, this.truePart ) ;
-		    if (!ftype.equals( type ))
-			this.falsePart = ef.cast( type, this.falsePart ) ;
+		    if (!ttype.equals( type )) {
+                        this.truePart = ef.cast(type, this.truePart);
+                    }
+		    if (!ftype.equals( type )) {
+                        this.falsePart = ef.cast(type, this.falsePart);
+                    }
 		}
 	    } else { // handle the reference cases
 		if (ttype.equals(Type._null()) && !ftype.isPrimitive()) {
@@ -1426,10 +1447,11 @@ public final class ExpressionFactory {
 		} else if (ftype.equals(Type._null()) && !ttype.isPrimitive()) {
 		    type = ttype ;
 		} else { // both types are reference types
-		    if (ttype.isAssignmentConvertibleFrom( ftype ))
-			type = ttype ;
-		    else if (ftype.isAssignmentConvertibleFrom( ttype ))
-			type = ftype ;
+		    if (ttype.isAssignmentConvertibleFrom( ftype )) {
+                        type = ttype;
+                    } else if (ftype.isAssignmentConvertibleFrom( ttype )) {
+                        type = ftype;
+                    }
 		}
 	    }
 	}
@@ -1481,9 +1503,10 @@ public final class ExpressionFactory {
 	VariableImpl( ExpressionFactory ef, Type type, String ident ) {
 	    super( ef ) ;
 
-	    if (!Identifier.isValidIdentifier( ident ))
-		throw new IllegalArgumentException( ident + 
-		    " is not a valid Java identifier name" ) ;
+	    if (!Identifier.isValidIdentifier( ident )) {
+                throw new IllegalArgumentException(ident
+                    + " is not a valid Java identifier name");
+            }
 	    this.type = type ;
 	    this.ident = ident ;
 	}
@@ -1512,11 +1535,13 @@ public final class ExpressionFactory {
 
 	@Override
 	public boolean equals( Object obj ) {
-	    if (!(obj instanceof Variable))
-		return false ;
+	    if (!(obj instanceof Variable)) {
+                return false;
+            }
 
-	    if (obj == this) 
-		return true ;
+	    if (obj == this) {
+                return true;
+            }
 
 	    VariableInternal other = VariableInternal.class.cast( obj ) ;
 

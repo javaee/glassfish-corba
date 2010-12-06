@@ -300,6 +300,7 @@ public class TestClient {
 	}
 
 	public void run() {
+            Thread.currentThread().setName( "Client_" + threadId ) ;
 	    log( "Thread " + threadId + " started" ) ;
 
 	    while (true) {

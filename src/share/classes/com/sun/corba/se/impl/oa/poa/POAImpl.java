@@ -938,23 +938,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     @InfoMethod
     private void adapterActivatorResult( boolean result ) { }
 
-    @Poa
-    private void lockAndWaitUntilRunning() {
-        // Issue 14695: waitUntilRunning requires writeLock.
-        lock() ;
-        try {
-            // wait for child init to complete
-            if (!waitUntilRunning()) {
-                // OMG 3.0 11.3.9.3, in reference to unknown_adapter
-                throw omgWrapper.poaDestroyed();
-            }
-        } finally {
-            unlock() ;
-        }
-    }
-
-    /**
-     * <code>find_POA</code>
+    /** <code>find_POA</code>
      * <b>Section 3.3.8.3</b>
      */
     @Poa
@@ -995,15 +979,15 @@ public class POAImpl extends ObjectAdapterBase implements POA
                         
                         lock() ; writeLocked = true ;
                         try {
-                            // Check in case this child was created before we acquired the write lock.
                             child = children.get(name);
                             if (child == null) {
                                 child = new POAImpl( name, this, getORB(), STATE_INIT ) ;
                                 createdPOA( child ) ;
-                                // Issue 14917: Only set the activator if the child is NOT found
-                                act = activator ;
-                            } else {
-                                child.lockAndWaitUntilRunning() ;
+                                act = activator ; // Issue 14917: Only set if child NOT found
+                            } else { // Child created before writeLock
+                                if (!child.waitUntilRunning()) {
+                                    throw omgWrapper.poaDestroyed() ;
+                                }
                             }
                         } finally {
                             unlock() ; writeLocked = false ;
@@ -1012,75 +996,105 @@ public class POAImpl extends ObjectAdapterBase implements POA
                         throw new AdapterNonExistent();
                     }
                 } finally {
-                    // Issue 14917: must unlock readLock (code incorrectly unlocked writeLock)
-                    if (readLocked) { readUnlock() ; }
+                    if (readLocked) { readUnlock() ; } // Issue 14917: was unlock()
                 }
             }
 
-            // assert (child != null) 
-            // assert not holding locks on this or child
-            // We must not hold locks here while waiting for intialization of child 
-            // to complete to prevent possible deadlocks.
-            
+            // assert (child != null) and not holding locks on this or child (must avoid deadlock)
             if (act != null) {
-                boolean status = false ;
-                boolean adapterResult = false ;
-                callingAdapterActivator() ;
-
-                try {
-                    // Prevent more than one thread at a time from executing in act 
-                    // in case act is shared between multiple POAs.
-                    synchronized (act) {
-                        status = act.unknown_adapter(this, name);
-                    }
-                } catch (SystemException exc) {
-                    throw omgWrapper.adapterActivatorException( exc,
-                        name, poaId ) ;
-                } catch (Throwable thr) {
-                    // ignore most non-system exceptions, but log them for 
-                    // diagnostic purposes.
-                    wrapper.unexpectedException( thr, this.toString() ) ;
-
-                    if (thr instanceof ThreadDeath) {
-                        throw (ThreadDeath) thr;
-                    }
-                } finally {
-                    // At this point, we have completed adapter activation.
-                    // Whether this was successful or not, we must call 
-                    // destroyIfNotInitDone so that calls to enter() and create_POA()
-                    // that are waiting can execute again.  Failing to do this
-                    // will cause the system to hang in complex tests.
-                    adapterResult = child.destroyIfNotInitDone() ;
-                }
-
-                adapterActivatorResult(status);
-
-                if (status) {
-                    if (!adapterResult) {
-                        throw omgWrapper.adapterActivatorException(name, poaId);
-                    }
-                } else {
-                    // OMG Issue 3740 is resolved to throw AdapterNonExistent if
-                    // unknown_adapter() returns false.
-                    throw new AdapterNonExistent();
-                }
+                doActivate( child, act ) ;
             }
 
             return child;
         } finally {
-            // Log an error if we ever get here with a lock held!
-            if (readLocked || writeLocked || childReadLocked) {
-                wrapper.findPOALocksNotReleased( readLocked, writeLocked,
-                    childReadLocked ) ;
-                if (readLocked) {
-                    readUnlock() ;
-                }
-                if (writeLocked) {
-                    unlock() ;
-                }
-                if (childReadLocked && child != null) {
-                    child.readUnlock() ;
-                }
+            cleanUpLocks( child, readLocked, writeLocked, childReadLocked ) ;
+        }
+    }
+
+    @Poa
+    private void lockAndWaitUntilRunning() {
+        // Issue 14695: waitUntilRunning requires writeLock.
+        lock() ;
+        try {
+            // wait for child init to complete
+            if (!waitUntilRunning()) {
+                // OMG 3.0 11.3.9.3, in reference to unknown_adapter
+                throw omgWrapper.poaDestroyed();
+            }
+        } finally {
+            unlock() ;
+        }
+    }
+
+    @Poa
+    private void doActivate( POAImpl child,
+        AdapterActivator act ) throws AdapterNonExistent {
+
+        boolean status = false ;
+        boolean adapterResult = false ;
+        callingAdapterActivator() ;
+
+        try {
+            // Prevent more than one thread at a time from executing in act
+            // in case act is shared between multiple POAs.
+            synchronized (act) {
+                status = act.unknown_adapter(this, name);
+            }
+        } catch (SystemException exc) {
+            throw omgWrapper.adapterActivatorException( exc,
+                name, poaId ) ;
+        } catch (Throwable thr) {
+            // ignore most non-system exceptions, but log them for
+            // diagnostic purposes.
+            wrapper.unexpectedException( thr, this.toString() ) ;
+
+            if (thr instanceof ThreadDeath) {
+                throw (ThreadDeath) thr;
+            }
+        } finally {
+            // At this point, we have completed adapter activation.
+            // Whether this was successful or not, we must call
+            // destroyIfNotInitDone so that calls to enter() and create_POA()
+            // that are waiting can execute again.  Failing to do this
+            // will cause the system to hang in complex tests.
+            adapterResult = child.destroyIfNotInitDone() ;
+        }
+
+        adapterActivatorResult(status);
+
+        if (status) {
+            if (!adapterResult) {
+                throw omgWrapper.adapterActivatorException(name, poaId);
+            }
+        } else {
+            // OMG Issue 3740 is resolved to throw AdapterNonExistent if
+            // unknown_adapter() returns false.
+            throw new AdapterNonExistent();
+        }
+    }
+
+    @InfoMethod
+    private void locksWereHeld() {}
+
+    @Poa
+    private void cleanUpLocks( POAImpl child, boolean readLocked, boolean writeLocked,
+        boolean childReadLocked ) {
+        // Log an error if we ever get here with a lock held!
+        if (readLocked || writeLocked || childReadLocked) {
+            locksWereHeld();
+            wrapper.findPOALocksNotReleased( readLocked, writeLocked,
+                childReadLocked ) ;
+
+            if (readLocked) {
+                readUnlock() ;
+            }
+
+            if (writeLocked) {
+                unlock() ;
+            }
+
+            if (childReadLocked && child != null) {
+                child.readUnlock() ;
             }
         }
     }

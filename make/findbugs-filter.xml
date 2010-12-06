@@ -98,8 +98,9 @@
         <Bug code="UrF"/>
     </Match>
 
-    <!-- Exclude IDLJ generated code, IDLJ, third party code, and 
-         code that is not part of the ORB as packaged for GlassFish. -->
+    <!-- Exclude IDLJ generated code, IDLJ, third party code, tool code that is 
+         used only at build time,
+         and code that is not part of the ORB as packaged for GlassFish. -->
     <Match>
         <Package name="~org.glassfish.*"/>
     </Match>
@@ -132,6 +133,30 @@
     </Match>
     <Match>
 	<Package name="~com.sun.corba.se.spi.activation.*"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.impl.orbutil.newtimer.generated"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.impl.osgi.main"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.spi.osgi"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.impl.presentation.rmi.proxy"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.impl.txpoa"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.spi.orbutil.argparser"/>
+    </Match>
+    <Match>
+	<Package name="~com.sun.corba.se.spi.orbutil.file"/>
+    </Match>
+    <Match>
+	<Package name="~javax.rmi.*"/>
     </Match>
 </FindBugsFilter>
 <!--

@@ -401,8 +401,8 @@ public class TestClient {
 	baseProps.setProperty( ORBConstants.ALLOW_LOCAL_OPTIMIZATION,
 	    "true" ) ;
 	// For debugging only
-	// baseProps.setProperty( ORBConstants.DEBUG_PROPERTY,
-	    // "transport,subcontract" ) ;
+	baseProps.setProperty( ORBConstants.DEBUG_PROPERTY,
+	    "poa" ) ;
 	
 	Properties clientProps = new Properties( baseProps ) ;
 	clientProps.setProperty( ORBConstants.ORB_ID_PROPERTY,

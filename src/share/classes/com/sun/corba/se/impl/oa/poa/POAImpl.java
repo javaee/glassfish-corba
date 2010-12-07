@@ -257,7 +257,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     private final int numLevels;	    // counts depth of tree.  Root = 1.
     private final ObjectAdapterId poaId ; // the actual object adapter ID for this POA
 
-    private final String name;	    // the name of this POA
+    private final String poaName;	    // the name of this POA
 
     private POAManagerImpl manager; // This POA's POAManager
     private final int uniquePOAId ;	    // ID for this POA that is unique relative
@@ -419,11 +419,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
         if (parent == null) {
             newPOACreated( name, "null parent for root POA" ) ;
         } else {
-            newPOACreated( name, parent.name ) ;
+            newPOACreated( name, parent.poaName ) ;
         }
 
 	this.state     = initialState ;
-	this.name      = name ;
+	this.poaName      = name ;
 	this.parent    = parent;
 	children = new HashMap<String,POAImpl>();
 	activator = null ;
@@ -448,7 +448,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	POAImpl poaImpl = this ;
 	int ctr = numLevels - 1 ;
 	while (poaImpl != null) {
-	    names[ctr] = poaImpl.name ;
+	    names[ctr] = poaImpl.poaName ;
             ctr-- ;
 	    poaImpl = poaImpl.parent ;
 	}
@@ -816,7 +816,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
                 }
 
 		if (parent != null) {
-                    parent.children.remove(poa.name);
+                    parent.children.remove(poa.poaName);
                 }
 
 		destroyedPOATemplates.add( poa.getAdapterTemplate() ) ;
@@ -1002,7 +1002,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
             // assert (child != null) and not holding locks on this or child (must avoid deadlock)
             if (act != null) {
-                doActivate( child, act ) ;
+                doActivate( act, name, child ) ;
             }
 
             return child;
@@ -1027,8 +1027,8 @@ public class POAImpl extends ObjectAdapterBase implements POA
     }
 
     @Poa
-    private void doActivate( POAImpl child,
-        AdapterActivator act ) throws AdapterNonExistent {
+    private void doActivate( AdapterActivator act, 
+        String name, POAImpl child ) throws AdapterNonExistent {
 
         boolean status = false ;
         boolean adapterResult = false ;
@@ -1042,7 +1042,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
             }
         } catch (SystemException exc) {
             throw omgWrapper.adapterActivatorException( exc,
-                name, poaId ) ;
+                poaName, poaId ) ;
         } catch (Throwable thr) {
             // ignore most non-system exceptions, but log them for
             // diagnostic purposes.
@@ -1195,7 +1195,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	try {
 	    lock() ;
 
-	    return name;
+	    return poaName;
 	} finally {
 	    unlock() ;
 	}

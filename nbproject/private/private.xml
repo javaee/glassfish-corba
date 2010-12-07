@@ -7,6 +7,10 @@
             <line>546</line>
         </file>
     </editor-bookmarks>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/space/ws/mercurial/CORBA/corba-master/src/share/classes/com/sun/corba/se/impl/oa/poa/POAImpl.java</file>
+        <file>file:/space/ws/mercurial/CORBA/corba-master/orblib/src/share/classes/com/sun/corba/se/spi/orbutil/tf/MethodMonitorFactoryDefaults.java</file>
+    </open-files>
 </project-private>
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.

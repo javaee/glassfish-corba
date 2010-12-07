@@ -114,7 +114,9 @@ import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.glassfish.gmbal.Description;
@@ -365,11 +367,44 @@ public class POAImpl extends ObjectAdapterBase implements POA
     @InfoMethod
     private void thisPoa( POAImpl p ) { }
 
+    @InfoMethod
+    private void acquireLockWaiting( int count )  {}
+
+    @Poa
+    // Be paranoid about lost wakeup problems like 6822370
+    private void acquireLock( Lock lock ) {
+        final long timeout = 1 ; // 1 second delay
+        boolean locked = false ;
+        boolean interrupted = false ;
+        int count = 0 ;
+        int reportingThreshhold = 1 ;
+        while (!locked) {
+            if (count >= reportingThreshhold) {
+                acquireLockWaiting( count ) ;
+                if (reportingThreshhold < Integer.MAX_VALUE/2) {
+                    reportingThreshhold *= 2 ;
+                } // assume that no one will wait for 2^31 SECONDS.
+            }
+
+            try {
+                locked = lock.tryLock( timeout, TimeUnit.SECONDS ) ;
+                count++ ;
+            } catch (InterruptedException exc) {
+                interrupted = true ;
+            }
+
+            if (interrupted) {
+                // restore thread interrupted status
+                Thread.currentThread().interrupt() ;
+            }
+        }
+    }
+
     // package private so that POAPolicyMediator can access it.
     @Poa
     void lock()
     {
-	poaMutex.writeLock().lock() ;
+	acquireLock( poaMutex.writeLock() ) ;
 	thisPoa( this ) ;
     }
 
@@ -384,7 +419,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     @Poa
     void readLock()
     {
-	poaMutex.readLock().lock() ;
+	acquireLock( poaMutex.readLock() ) ;
 	thisPoa( this ) ;
     }
 

@@ -1999,9 +1999,9 @@
 	    <filter excludes="com.sun.corba.se.impl.txpoa.*"/>
 	    <filter excludes="com.sun.corba.se.impl.osgi.main.*"/>
 	    <filter excludes="com.sun.corba.se.spi.osgi.*"/>
-	    <filter excludes="com.sun.corba.se.impl.presentation.proxy.*"/>
-	    <filter excludes="com.sun.corba.se.impl.orbutil.file.*"/>
-	    <filter excludes="com.sun.corba.se.impl.orbutil.argparser.*"/>
+	    <filter excludes="com.sun.corba.se.impl.presentation.rmi.proxy.*"/>
+	    <filter excludes="com.sun.corba.se.spi.orbutil.file.*"/>
+	    <filter excludes="com.sun.corba.se.spi.orbutil.argparser.*"/>
 	    <filter excludes="javax.rmi.*"/>
 	</instr>
     </emma>

@@ -40,6 +40,7 @@
 
 package com.sun.corba.se.impl.oa.poa;
 
+import com.sun.corba.ee.spi.orbutil.generic.NullaryFunction;
 import java.util.Collection ;
 import java.util.Set ;
 import java.util.HashSet ;
@@ -447,8 +448,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
     // Note that the parent POA must be write locked when this constructor
     // is called.
-    private POAImpl( String name, POAImpl parent, ORB orb, int initialState ) 
-    {
+    private POAImpl( String name, POAImpl parent, ORB orb, int initialState ) {
 	super( orb ) ;
 
         if (parent == null) {
@@ -458,7 +458,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
         }
 
 	this.state     = initialState ;
-	this.poaName      = name ;
+	this.poaName   = name ;
 	this.parent    = parent;
 	children = new HashMap<String,POAImpl>();
 	activator = null ;
@@ -567,16 +567,19 @@ public class POAImpl extends ObjectAdapterBase implements POA
         }
     }
 
-    // The POA read lock must be held when this method is called
+    @InfoMethod
+    private void interruptedAwait( InterruptedException exc ) {}
+
+    // The POA write lock must be held when this method is called
     // The lock may be upgraded to write.
     @Poa
     private boolean waitUntilRunning() 
     {
 	while (state < STATE_RUN) {
 	    try {
-		adapterActivatorCV.await() ; 
+		adapterActivatorCV.await( 1, TimeUnit.SECONDS ) ;
 	    } catch (InterruptedException exc) {
-		// NO-OP
+                interruptedAwait( exc ) ;
 	    }
 	} 
 
@@ -595,7 +598,7 @@ public class POAImpl extends ObjectAdapterBase implements POA
     // activator, either to continue their invocations, or to return
     // errors to their client.
     //
-    // The poaMutex must NOT be held when this method is called.
+    // No POA lock may be held when this method is called.
     private boolean destroyIfNotInitDone()
     {
 	lock() ;
@@ -746,8 +749,9 @@ public class POAImpl extends ObjectAdapterBase implements POA
 		    if (wait) {
                         while (poa.state != STATE_DESTROYED) {
                             try {
-                                poa.beingDestroyedCV.await();
+                                poa.beingDestroyedCV.await( 1, TimeUnit.SECONDS );
                             } catch (InterruptedException exc) {
+                                interruptedAwait( exc ) ;
                             }
                         }
                     }
@@ -825,6 +829,9 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	@InfoMethod
 	private void noMBean( POAImpl poa ) { }
 
+        @InfoMethod
+        private void interruptedAwait( InterruptedException exc ) {}
+
 	@Poa
 	private void completeDestruction( POAImpl poa, POAImpl parent, 
 	    Set<ObjectReferenceTemplate> destroyedPOATemplates )
@@ -832,9 +839,9 @@ public class POAImpl extends ObjectAdapterBase implements POA
 	    try {
 		while (poa.invocationCount.get() != 0) {
 		    try {
-			poa.invokeCV.await() ;
-		    } catch (InterruptedException ex) { 
-			// NO-OP
+			poa.invokeCV.await( 1, TimeUnit.SECONDS ) ;
+		    } catch (InterruptedException ex) {
+                        interruptedAwait( ex ) ;
 		    } 
 		}
 
@@ -1011,7 +1018,10 @@ public class POAImpl extends ObjectAdapterBase implements POA
 
                     if (activate && (activator != null)) {
                         readUnlock() ; readLocked = false ; // need writeLock: drop readLock
-                        
+
+                        // Note that another thread could create the child here
+                        // in between the unlock and the lock.
+
                         lock() ; writeLocked = true ;
                         try {
                             child = children.get(name);
@@ -1020,12 +1030,11 @@ public class POAImpl extends ObjectAdapterBase implements POA
                                 createdPOA( child ) ;
                                 act = activator ; // Issue 14917: Only set if child NOT found
                             } else { // Child created before writeLock
-                                if (!child.waitUntilRunning()) {
-                                    throw omgWrapper.poaDestroyed() ;
-                                }
+                                unlock() ; writeLocked = false ;  // don't hold parent lock!
+                                child.lockAndWaitUntilRunning() ;
                             }
                         } finally {
-                            unlock() ; writeLocked = false ;
+                            if (writeLocked) { unlock() ; writeLocked = false ; }
                         }
                     } else {
                         throw new AdapterNonExistent();
@@ -1746,9 +1755,9 @@ public class POAImpl extends ObjectAdapterBase implements POA
             while ((state == STATE_DESTROYING) &&
                 (isDestroying.get() == Boolean.FALSE)) {
                 try {
-                    beingDestroyedCV.await();
+                    beingDestroyedCV.await( 1, TimeUnit.SECONDS );
                 } catch (InterruptedException ex) {
-                    // NO-OP
+                    interruptedAwait( ex ) ;
                 }
             }
 

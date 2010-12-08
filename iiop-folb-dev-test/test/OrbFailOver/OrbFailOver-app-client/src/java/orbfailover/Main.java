@@ -1,5 +1,6 @@
 package orbfailover;
 
+import glassfish.AdminCommand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +24,7 @@ import testtools.Post;
 public class Main extends Base {
     private static final String INSTANCE_NAMES_PROP = "test.folb.instances" ;
     private static final Set<String> instanceNames ;
-    private static final AdminCommand ac = new AdminCommand() ;
+    private final AdminCommand ac = new AdminCommand( this ) ;
 
     // @EJB
     // private static LocationBeanRemote locBean;
@@ -82,11 +83,11 @@ public class Main extends Base {
 
                 if (i == stopAt) {
                     stoppedInstance = newLocation ;
-                    ac.stopInstance( this, stoppedInstance );
+                    ac.stopInstance( stoppedInstance );
                 }
 
                 if (i == startAt) {
-                    ac.startInstance( this, stoppedInstance ) ;
+                    ac.startInstance( stoppedInstance ) ;
                     stoppedInstance = null ;
                 }
             } 
@@ -94,7 +95,7 @@ public class Main extends Base {
             fail( "caught naming exception " + exc ) ;
         } finally {
             if (stoppedInstance != null) {
-                ac.startInstance( this, stoppedInstance ) ;
+                ac.startInstance( stoppedInstance ) ;
             }
         }
     }
@@ -135,10 +136,10 @@ public class Main extends Base {
     @Test( "14762" )
     public void test14762() throws NamingException {
         for (String in : instanceNames) {
-            ac.stopInstance(this, in);
+            ac.stopInstance(in);
         }
         final String firstInstance = pick( instanceNames ) ;
-        ac.startInstance(this, firstInstance) ;
+        ac.startInstance(firstInstance) ;
         final List<InitialContext> ics = new ArrayList<InitialContext>() ;
         final List<LocationBeanRemote> lbs = new ArrayList<LocationBeanRemote>() ;
         for (int ctr=0; ctr<10; ctr++) {
@@ -148,7 +149,7 @@ public class Main extends Base {
             lbs.add( lb ) ;
         }
         ensure() ;
-        ac.stopInstance(this, firstInstance );
+        ac.stopInstance(firstInstance );
         for (LocationBeanRemote lb : lbs ) {
             String loc = lb.getLocation() ;
             check( !loc.equals( firstInstance ),
@@ -173,11 +174,11 @@ public class Main extends Base {
         InitialContext ic = new InitialContext() ;
         LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname ) ;
         String first = lb.getLocation() ;
-        ac.stopInstance(this, first);
+        ac.stopInstance(first);
         String second = lb.getLocation() ;
         check( !first.equals( second ),
             "Method executed on instance that was supposed to be down " + second ) ;
-        ac.startInstance( this, first ) ;
+        ac.startInstance( first ) ;
         String result = lb.getLocation() ;
         check( result.equals( second ),
             "Request did not stick to instance " + second +
@@ -204,19 +205,19 @@ public class Main extends Base {
             beanJNDIname);
 
         String loc1 = locBean.getLocation();
-        ac.stopInstance(this, loc1);
+        ac.stopInstance(loc1);
 
         String loc2 = locBean.getLocation() ;
         check( !loc1.equals(loc2), "Failover did not happen") ;
-        ac.stopInstance(this, loc2);
+        ac.stopInstance(loc2);
 
         String loc3 = locBean.getLocation() ;
         check( !loc3.equals(loc2), "Failover did not happen") ;
-        ac.startInstance(this, loc1);
+        ac.startInstance(loc1);
 
         String loc4 = locBean.getLocation() ;
         check( loc4.equals(loc3), "No failover expected" ) ;
-        ac.stopInstance(this, loc3);
+        ac.stopInstance(loc3);
 
         String loc5 = locBean.getLocation() ;
         check( !loc5.equals(loc4), "Failover did not happen") ;
@@ -229,20 +230,20 @@ public class Main extends Base {
         doLoadBalance( runningInstances, numCalls )  ;
 
         final String inst1 = pick( runningInstances ) ;
-        ac.stopInstance(this, inst1) ;
+        ac.stopInstance(inst1) ;
         runningInstances.remove( inst1 ) ;
         doLoadBalance( runningInstances, numCalls )  ;
 
         final String inst2 = pick( runningInstances ) ;
-        ac.stopInstance(this, inst2) ;
+        ac.stopInstance(inst2) ;
         runningInstances.remove( inst2 ) ;
         final String inst3 = pick( runningInstances ) ;
 
-        ac.startInstance(this, inst1);
+        ac.startInstance(inst1);
         runningInstances.add( inst1 ) ;
         doLoadBalance( runningInstances, numCalls )  ;
 
-        ac.stopInstance(this, inst3);
+        ac.stopInstance(inst3);
         runningInstances.remove( inst3 ) ;
         doLoadBalance( runningInstances, numCalls )  ;
     }
@@ -294,7 +295,7 @@ public class Main extends Base {
                 note( "Running instance is " + inst ) ;
                 first = false ;
             } else {
-                ac.stopInstance(this, inst);
+                ac.stopInstance(inst);
             }
         }
 
@@ -311,10 +312,10 @@ public class Main extends Base {
             "Current location " + current + " is not the same as the"
                 + " running location " + running ) ;
 
-        ac.stopInstance( this, running ) ;
+        ac.stopInstance( running ) ;
         for (String inst : instanceNames) {
             if (!inst.equals(running)) {
-                ac.startInstance( this, inst ) ;
+                ac.startInstance( inst ) ;
             }
         }
 
@@ -346,7 +347,7 @@ public class Main extends Base {
     private void ensure() {
         // make sure all instances are running
         for (String inst : instanceNames) {
-            ac.startInstance(this, inst);
+            ac.startInstance(inst);
         }
     }
 }

@@ -514,11 +514,17 @@ exists or setup the property manually. For example like this:
     <target depends="compile" name="library-inclusion-in-archive">
         <mkdir dir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${reference.OrbFailOver-ejb.dist}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${libs.javaee-api-6.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.appserv-rt.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.javaee.jar}" todir="${build.classes.dir}/META-INF/lib"/>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${reference.OrbFailOver-ejb.dist}" manifestproperty="manifest.reference.OrbFailOver-ejb.dist" todir="${dist.ear.dir}"/>
+        <copyfiles files="${libs.javaee-api-6.0.classpath}" manifestproperty="manifest.libs.javaee-api-6.0.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.appserv-rt.jar}" manifestproperty="manifest.file.reference.appserv-rt.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.javaee.jar}" manifestproperty="manifest.file.reference.javaee.jar" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.reference.OrbFailOver-ejb.dist} "/>
+            <attribute name="Class-Path" value="${manifest.reference.OrbFailOver-ejb.dist} ${manifest.libs.javaee-api-6.0.classpath} lib/${manifest.libs.javaee-api-6.0.classpath} ${manifest.file.reference.appserv-rt.jar} lib/${manifest.file.reference.appserv-rt.jar} ${manifest.file.reference.javaee.jar} lib/${manifest.file.reference.javaee.jar} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">

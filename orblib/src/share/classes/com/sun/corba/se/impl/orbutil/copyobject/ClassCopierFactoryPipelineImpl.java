@@ -124,17 +124,22 @@ public class ClassCopierFactoryPipelineImpl implements
         LogManager.class
     } ;
 
+    // Only use this for LinkedHashMap for now, to
+    // avoid possible stack overflow problems; and
+    // IdentityHashMap, to avoid the NULL_KEY problem.
+    // The others are commented out (see issue 14927)
+    // to avoid slowing down subclasses of map implementations.
     private static final Class<?>[] mapClasses = {
-        ConcurrentHashMap.class,
-        ConcurrentSkipListMap.class,
-        EnumMap.class,
-        HashMap.class,
-        Hashtable.class,
+        // ConcurrentHashMap.class,
+        // ConcurrentSkipListMap.class,
+        // EnumMap.class,
+        // HashMap.class,
+        // Hashtable.class,
         IdentityHashMap.class,
-        LinkedHashMap.class,
-        Properties.class,
-        TreeMap.class,
-        WeakHashMap.class
+        LinkedHashMap.class
+        // Properties.class,
+        // TreeMap.class,
+        // WeakHashMap.class
     } ;
 
 

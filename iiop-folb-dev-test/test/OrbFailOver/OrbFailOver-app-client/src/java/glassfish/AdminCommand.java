@@ -145,4 +145,10 @@ public class AdminCommand {
     public boolean destroyCluster(String clusterName) {
         return adminCommand( "delete-cluster " + clusterName ) ;
     }
+
+    public boolean deploy( String clusterName, String jarFile ) {
+        String cmd = String.format( "deploy --target %s --force %s",
+            clusterName, jarFile )  ;
+        return adminCommand( cmd ) ;
+    }
 }

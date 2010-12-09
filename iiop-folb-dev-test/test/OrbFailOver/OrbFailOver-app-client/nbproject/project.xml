@@ -13,8 +13,7 @@
             </test-roots>
             <included-library dirs="100">reference.OrbFailOver-ejb.dist</included-library>
             <included-library dirs="200">libs.javaee-api-6.0.classpath</included-library>
-            <included-library dirs="200">file.reference.appserv-rt.jar</included-library>
-            <included-library dirs="200">file.reference.javaee.jar</included-library>
+            <included-library dirs="200">file.reference.gf-client.jar</included-library>
         </data>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
             <reference>

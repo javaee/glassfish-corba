@@ -181,15 +181,15 @@ public class GlassFishCluster {
                 StandardPorts.class) ;
         }
 
-        String name() {
+        public String name() {
             return name ;
         }
 
-        String node() {
+        public String node() {
             return node ;
         }
 
-        Map<StandardPorts,Integer> ports() {
+        public Map<StandardPorts,Integer> ports() {
             return portMap ;
         }
 

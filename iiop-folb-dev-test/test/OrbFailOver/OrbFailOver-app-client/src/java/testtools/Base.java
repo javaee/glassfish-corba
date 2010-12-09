@@ -49,6 +49,7 @@ import argparser.ArgParser ;
 import argparser.Help ;
 import argparser.DefaultValue ;
 import argparser.Separator ;
+import java.util.Arrays;
 import java.util.Collection;
 
 /** A VERY quick-and-dirty test framework.
@@ -100,6 +101,10 @@ public class Base {
     }
 
     public Base( String[] args ) {
+        this( args, null ) ;
+    }
+
+    public Base(String[] args, Class<?> parserInterface) {
         testMethods = new ArrayList<Method>() ;
         preMethods = new ArrayList<Method>() ;
         postMethods = new ArrayList<Method>() ;
@@ -139,9 +144,13 @@ public class Base {
             }
         }
 
-        ArgParser<Arguments> parser = new ArgParser<Arguments>(
-            Arguments.class ) ;
-        argvals = parser.parse( args ) ;
+
+        Class<?>[] interfaces = (parserInterface == null)
+            ? new Class<?>[]{ Arguments.class } 
+            : new Class<?>[]{ Arguments.class, parserInterface } ;
+
+        ArgParser parser = new ArgParser( Arrays.asList(interfaces)) ;
+        argvals = (Arguments)parser.parse( args ) ;
         if (argvals.debug()) {
             msg( "Arguments are:\n" + argvals ).nl() ;
         }
@@ -167,6 +176,10 @@ public class Base {
         
         currentResults = new ArrayList<String>() ;
         // currentNotes = new ArrayList<String>() ;
+    }
+
+    public <T> T getArguments( Class<T> cls ) {
+        return cls.cast( argvals ) ;
     }
 
     private Base msg( String str ) {

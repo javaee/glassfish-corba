@@ -54,6 +54,7 @@ import java.lang.reflect.Proxy ;
 import java.lang.reflect.InvocationHandler ;
 
 import java.net.URL ;
+import java.util.Arrays;
 
 /** A general purpose argument parser that uses annotations, reflection,
  * and generics.
@@ -163,11 +164,15 @@ import java.net.URL ;
  *
  * @author Ken Cavanaugh
  */
-public class ArgParser<T> {
-    private Class<T> interfaceClass ;
-    private Map<String,String> helpText ;
-    private Map<String,Object> defaultValues ;
-    private Map<String,ElementParser> parserData ;
+public class ArgParser {
+    private final List<Class<?>> interfaceClasses =
+        new ArrayList<Class<?>>() ;
+    private final Map<String,String> helpText =
+        new HashMap<String, String>() ;
+    private final Map<String,Object> defaultValues =
+        new HashMap<String,Object>() ;
+    private final Map<String,ElementParser> parserData =
+        new HashMap<String,ElementParser>() ;
 
     /** Construct an ArgParser that parses an argument string into an instance of the 
      * Class argument.
@@ -184,38 +189,52 @@ public class ArgParser<T> {
      * </ul>
      * The name of the method is the name of the keyword.
      */
-    public ArgParser( Class<T> cls ) {
-	if (!cls.isInterface()) {
-            error(cls.getName() + " is not an interface");
-        }
-	interfaceClass = cls ;
+    public ArgParser( Class<?> cls ) {
+        init( cls ) ;
+    }
 
-	// Construct the list of ParserData entries for the methods in cls, and
-	// also a map from keyword to default value data for the @DefaultValue
-	// annotations.
-	parserData = new HashMap<String,ElementParser>() ;
-	helpText = new HashMap<String,String>() ;
-	Map<String,String> defaultValueData = new HashMap<String,String>() ;
-	for (Method m : interfaceClass.getMethods()) {
-	    String keyword = checkMethod( m ) ;
-	    ElementParser ep = ElementParser.factory.evaluate( m ) ;
-	    parserData.put( keyword, ep ) ;
-	    
-	    DefaultValue dv = m.getAnnotation( DefaultValue.class ) ;
-	    if (dv == null) {
-		error( "Method " + m.getName()
-                    + " does not have a DefaultValue annotation" ) ;
-	    } else {
-		defaultValueData.put( keyword, dv.value() ) ;
-	    }
+    public ArgParser( List<Class<?>> classes ) {
+        init(classes ) ;
+    }
 
-	    Help help = m.getAnnotation( Help.class ) ;
-	    if (help != null) {
-                helpText.put(keyword, help.value());
+    private void init( Class<?> cls ) {
+        List<Class<?>> classes = new ArrayList<Class<?>>() ;
+        classes.add( cls ) ;
+        init( classes ) ;
+    }
+
+    private void init( List<Class<?>> classes) {
+        final Map<String,String> defaultValueData = new HashMap<String,String>() ;
+        for (Class<?> cls : classes) {
+            if (!cls.isInterface()) {
+                error(cls.getName() + " is not an interface");
             }
-	}
+            interfaceClasses.add( cls ) ;
 
-	defaultValues = internalParse( defaultValueData ) ; 
+            // Construct the list of ParserData entries for the methods in cls, and
+            // also a map from keyword to default value data for the @DefaultValue
+            // annotations.
+            for (Method m : cls.getMethods()) {
+                final String keyword = checkMethod( m ) ;
+                final ElementParser ep = ElementParser.factory.evaluate( m ) ;
+                parserData.put( keyword, ep ) ;
+
+                final DefaultValue dv = m.getAnnotation( DefaultValue.class ) ;
+                if (dv == null) {
+                    error( "Method " + m.getName()
+                        + " does not have a DefaultValue annotation" ) ;
+                } else {
+                    defaultValueData.put( keyword, dv.value() ) ;
+                }
+
+                final Help help = m.getAnnotation( Help.class ) ;
+                if (help != null) {
+                    helpText.put(keyword, help.value());
+                }
+            }
+        }
+
+        internalParse( defaultValueData, defaultValues ) ;
     }
 
     private String display( Object obj ) {
@@ -292,10 +311,11 @@ public class ArgParser<T> {
 
     /** Parse the argument string into an instance of type T.
      */
-    public T parse( String[] args ) {
+    public Object parse( String[] args ) {
 	Map<String,String> data = makeMap( args ) ;
-	Map<String,Object> pdata = internalParse( data ) ;
-	T result = makeProxy( pdata, defaultValues ) ;
+	Map<String,Object> pdata = new HashMap<String,Object>() ;
+        internalParse( data, pdata ) ;
+	Object result = makeProxy( pdata ) ;
 	return result ;
     }
 
@@ -308,7 +328,12 @@ public class ArgParser<T> {
     // Check that method has no arguments 
     private String checkMethod( Method m ) {
 	if (m.getParameterTypes().length == 0) {
-            return m.getName();
+            String result = m.getName() ;
+            if (parserData.containsKey(result )) {
+                error( "Keyword " + result + " is already defined.") ;
+            } else {
+                return m.getName();
+            }
         } else {
             error("Method " + m.getName() + " must not have any parameters");
         }
@@ -316,8 +341,8 @@ public class ArgParser<T> {
 	return null ;
     }
 
-    private Map<String,Object> internalParse( Map<String,String> data ) {
-	Map<String,Object> result = new HashMap<String,Object>() ;
+    private void internalParse( Map<String,String> data,
+        Map<String,Object> result ) {
 	for (Map.Entry<String,String> entry : data.entrySet()) {
 	    String keyword = entry.getKey() ;
 	    ElementParser ep = parserData.get( keyword ) ;
@@ -327,7 +352,6 @@ public class ArgParser<T> {
 	    Object val = ep.evaluate( entry.getValue() ) ;
 	    result.put( keyword, val ) ;
 	}
-	return result ;
     }
 
     private String getKeyword( String arg ) {
@@ -360,14 +384,12 @@ public class ArgParser<T> {
     // Make a dynamic proxy of type T for the given data.
     // The keys in the data must be the same as the method names in
     // the type T.
-    private T makeProxy( final Map<String,Object> data,	    
-	final Map<String,Object> defaultData ) {
-
+    private Object makeProxy( final Map<String,Object> data ) {
 	final InvocationHandler ih = new InvocationHandler() {
 	    private Object getValue( final String keyword ) {
 		Object result = data.get( keyword ) ;
 		if (result == null) {
-                    result = defaultData.get(keyword);
+                    result = defaultValues.get(keyword);
                 }
 		return result ;
 	    }
@@ -413,18 +435,18 @@ public class ArgParser<T> {
 	    }
 	} ;
 
-	final Class<?>[] interfaces = new Class<?>[] { interfaceClass } ;
+	final Class<?>[] interfaces = interfaceClasses.toArray(
+            new Class<?>[interfaceClasses.size()] ) ;
 
         ClassLoader cl = this.getClass().getClassLoader() ;
         if (cl == null) {
-            cl = interfaceClass.getClass().getClassLoader() ;
+            cl = interfaces[0].getClass().getClassLoader() ;
         }
         if (cl == null) {
             ClassLoader.getSystemClassLoader() ;
         }
 
-	return interfaceClass.cast( 
-            Proxy.newProxyInstance( cl, interfaces, ih ) ) ;
+	return Proxy.newProxyInstance( cl, interfaces, ih ) ;
     }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -448,7 +470,7 @@ public class ArgParser<T> {
 	}
     }
 
-    private interface TestInterface {
+    private interface TestInterface1 {
 	@DefaultValue( "27" ) 
 	@Help( "An integer value" )
 	int value() ;
@@ -460,7 +482,9 @@ public class ArgParser<T> {
 	@DefaultValue( "RED" ) 
 	@Help( "Pick a color" )
 	PrimaryColor color() ;
-	
+    }
+
+    private interface TestInterface2 {
 	@DefaultValue( "http://www.sun.com" ) 
 	@Help( "your favorite URL" ) 
 	URL url() ;
@@ -481,10 +505,15 @@ public class ArgParser<T> {
     }
 
     public static void main( String[] args ) {
-	ArgParser<TestInterface> ap = new ArgParser<TestInterface>(
-            TestInterface.class ) ;
+        Class<?>[] interfaces = { TestInterface1.class, TestInterface2.class } ;
+	ArgParser ap = new ArgParser( Arrays.asList( interfaces) ) ;
 	System.out.println( "Help text for this parser:\n" + ap.getHelpText() ) ;
-	TestInterface result = ap.parse( args ) ;
+	Object result = ap.parse( args ) ;
+        if (!(result instanceof TestInterface1)
+            && !(result instanceof TestInterface2)) {
+            System.out.println( "Error: result not an instance of both test interfaces" ) ;
+        }
+
 	System.out.println( "Result is:\n" + result ) ;
     }
 }

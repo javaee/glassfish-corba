@@ -1,13 +1,17 @@
 package orbfailover;
 
+import argparser.DefaultValue;
+import argparser.Help;
+import argparser.Pair;
+import com.sun.corba.se.spi.activation.IIOP_CLEAR_TEXT;
 import glassfish.AdminCommand;
+import glassfish.GlassFishCluster;
+import glassfish.GlassFishInstallation;
+import glassfish.StandardPorts;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import javax.naming.NamingException;
 import orb.folb.LocationBeanRemote;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,26 +26,91 @@ import testtools.Post;
  * @author kcavanaugh
  */
 public class Main extends Base {
-    private static final String INSTANCE_NAMES_PROP = "test.folb.instances" ;
-    private static final Set<String> instanceNames ;
-    private final AdminCommand ac = new AdminCommand( this ) ;
+    private static final String CLUSTER_NAME = "c1" ;
+    private static final String INSTANCE_BASE_NAME = "in" ;
+    private static final int NUM_INSTANCES = 5 ;
+
+    private final GlassFishInstallation  gfInstallation ;
+    private final AdminCommand ac ;
+    private GlassFishCluster gfCluster ;
+    private Map<String,GlassFishCluster.InstanceInfo> clusterInfo ;
 
     // @EJB
     // private static LocationBeanRemote locBean;
     private static final String beanJNDIname = "orb.folb.LocationBeanRemote";
 
-
-    public Main( String[] args ) {
-        super( args ) ;
+    private static Pair<String,Integer> split(String str) {
+        int index = str.indexOf( ':' ) ;
+        final String first = str.substring( 0, index ) ;
+        final String second = str.substring( index + 1 ) ;
+        final int value = Integer.valueOf( second ) ;
+        return new Pair<String,Integer>( first, value ) ;
     }
 
-    static {
-        Set<String> temp = new HashSet<String>() ;
-        final String instances = System.getProperty( INSTANCE_NAMES_PROP ) ;
-        if (instances != null) {
-            temp.addAll(Arrays.asList(instances.split(",")));
+    private static List<Pair<String,Integer>> parseStringIntPair(
+        List<String> args ) {
+
+        List<Pair<String,Integer>> result =
+            new ArrayList<Pair<String, Integer>>() ;
+        for (String str : args) {
+            result.add( split( str ) ) ;
         }
-        instanceNames = Collections.unmodifiableSet(temp) ;
+        return result ;
+    }
+
+    private String getIIOPEndpointList() {
+        final StringBuilder sb = new StringBuilder() ;
+        boolean first = true ;
+        for (GlassFishCluster.InstanceInfo info : clusterInfo.values()) {
+            if (first) {
+                first = false ;
+            } else {
+                sb.append( ',' ) ;
+            }
+
+            sb.append( info.node() ) ;
+            sb.append( ':' ) ;
+            sb.append( info.ports().get( StandardPorts.IIOP_LISTENER_PORT )) ;
+        }
+
+        return sb.toString() ;
+    }
+
+    public interface Installation {
+        @DefaultValue("")
+        @Help("Name of directory where GlassFish is installed")
+        String installDir() ;
+
+        @DefaultValue("")
+        @Help("Name of node for GlassFish DAS")
+        String dasNode() ;
+
+        @DefaultValue("")
+        @Help("A list of available nodes for cluster setup: comma separed list of name:number")
+        List<String> availableNodes() ;
+
+        @DefaultValue("")
+        @Help("The test EJB needed for this test")
+        String testEjb() ;
+    }
+
+    public Main( String[] args ) {
+        super( args, Installation.class ) ;
+        Installation inst = getArguments( Installation.class ) ;
+        List<Pair<String,Integer>> avnodes = parseStringIntPair(
+            inst.availableNodes() ) ;
+        gfInstallation = new GlassFishInstallation( this,
+            inst.installDir(), inst.dasNode(), avnodes ) ;
+        ac = gfInstallation.ac() ;
+        ac.deploy( CLUSTER_NAME, inst.testEjb() ) ;
+
+        // Create default 3 instance cluster
+        gfCluster = new GlassFishCluster( gfInstallation, CLUSTER_NAME ) ;
+        clusterInfo = gfCluster.createInstances( INSTANCE_BASE_NAME, NUM_INSTANCES ) ;
+
+        // Hopefully this will work here to enabled load balancing
+        System.setProperty( "com.sun.appserv.iiop.endpoints",
+            getIIOPEndpointList() ) ;
     }
 
     /**
@@ -113,7 +182,7 @@ public class Main extends Base {
 
     @Test( "loadbalance" )
     public void testLoadBalance( ) throws NamingException {
-        doLoadBalance( instanceNames, 100 )  ;
+        doLoadBalance( clusterInfo.keySet(), 100 )  ;
     }
 
     private <T> T pick( Set<T> set ) {
@@ -135,10 +204,10 @@ public class Main extends Base {
     // 7. Access business methods for the ejb's (created in step 4)
     @Test( "14762" )
     public void test14762() throws NamingException {
-        for (String in : instanceNames) {
+        for (String in : clusterInfo.keySet()) {
             ac.stopInstance(in);
         }
-        final String firstInstance = pick( instanceNames ) ;
+        final String firstInstance = pick( clusterInfo.keySet() ) ;
         ac.startInstance(firstInstance) ;
         final List<InitialContext> ics = new ArrayList<InitialContext>() ;
         final List<LocationBeanRemote> lbs = new ArrayList<LocationBeanRemote>() ;
@@ -226,7 +295,7 @@ public class Main extends Base {
     @Test( "lbfail" )
     public void testLBFail() throws NamingException {
         final int numCalls = 20 ;
-        Set<String> runningInstances = instanceNames ;
+        Set<String> runningInstances = clusterInfo.keySet() ;
         doLoadBalance( runningInstances, numCalls )  ;
 
         final String inst1 = pick( runningInstances ) ;
@@ -289,7 +358,7 @@ public class Main extends Base {
         // Make sure only inst is running
         boolean first = true ;
         String running = "" ;
-        for (String inst : instanceNames) {
+        for (String inst : clusterInfo.keySet()) {
             if (first) {
                 running = inst ;
                 note( "Running instance is " + inst ) ;
@@ -313,7 +382,7 @@ public class Main extends Base {
                 + " running location " + running ) ;
 
         ac.stopInstance( running ) ;
-        for (String inst : instanceNames) {
+        for (String inst : clusterInfo.keySet()) {
             if (!inst.equals(running)) {
                 ac.startInstance( inst ) ;
             }
@@ -346,8 +415,6 @@ public class Main extends Base {
     @Post
     private void ensure() {
         // make sure all instances are running
-        for (String inst : instanceNames) {
-            ac.startInstance(inst);
-        }
+        gfCluster.startCluster();
     }
 }

@@ -13,7 +13,7 @@ public class GlassFishInstallation {
     private final Base base ;
     private final String installDir ;
     private final String dasNodeName ;
-    private final List<Pair<String,Integer>> availableNodes ;
+    private final List<? extends Pair<String,Integer>> availableNodes ;
     private final AdminCommand ac ;
     private boolean isDestroyed = false ;
 
@@ -25,7 +25,7 @@ public class GlassFishInstallation {
         return dasNodeName ;
     }
 
-    public List<Pair<String,Integer>> availableNodes() {
+    public List<? extends Pair<String,Integer>> availableNodes() {
         return availableNodes ;
     }
 
@@ -47,7 +47,7 @@ public class GlassFishInstallation {
      * available node (may include DAS node).
      */
     public GlassFishInstallation( Base base, String installDir,
-        String dasNodeName, List<Pair<String,Integer>> availableNodes,
+        String dasNodeName, List<? extends Pair<String,Integer>> availableNodes,
         boolean echoOnly ) {
         this.base = base ;
         this.installDir = installDir ;

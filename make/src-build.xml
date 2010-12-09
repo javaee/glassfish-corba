@@ -1306,7 +1306,7 @@
     </macrodef>
 
     <target name="release" depends="init, mavenize">
-        <echo message="releasiong to ${repo.url}"/>
+        <echo message="releasing to ${repo.url}"/>
         <release-to-maven destination="${repo.url}"/>
     </target>
 

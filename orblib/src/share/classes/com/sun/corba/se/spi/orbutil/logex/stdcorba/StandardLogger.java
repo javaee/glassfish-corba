@@ -50,15 +50,15 @@ import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
 public class StandardLogger extends WrapperGenerator.ExtensionBase {
     public static final StandardLogger self = new StandardLogger() ;
 
-    private static final String SPI_PREFIX = "com.sun.corba.se.spi" ;
-    private static final String IMPL_PREFIX = "com.sun.corba.se.impl" ;
+    private static final String SPI_PREFIX = "com.sun.corba.se.spi." ;
+    private static final String IMPL_PREFIX = "com.sun.corba.se.impl." ;
     public static final String CORBA_LOGGER_PREFIX =
         "javax.enterprise.resource.corba" ;
 
     @Override
     public String getLoggerName( Class<?> cls ) {
         final ExceptionWrapper ew = cls.getAnnotation( ExceptionWrapper.class ) ;
-        if (ew.loggerName() != null) {
+        if (!ew.loggerName().equals( "" ))  {
             return ew.loggerName() ;
         }
 

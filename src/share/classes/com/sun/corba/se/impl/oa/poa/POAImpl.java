@@ -40,7 +40,6 @@
 
 package com.sun.corba.se.impl.oa.poa;
 
-import com.sun.corba.ee.spi.orbutil.generic.NullaryFunction;
 import java.util.Collection ;
 import java.util.Set ;
 import java.util.HashSet ;

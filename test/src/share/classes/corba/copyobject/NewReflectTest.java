@@ -60,7 +60,7 @@ public class NewReflectTest extends Client
     private static final String[] EXPECTED_EXCEPTION_LIST = new String[] {
 	// "testLinkedHashMap",
 	// "testLinkedHashSet",    // temp. until we fix the recursive copy of linked structures
-	"testCustomMap",
+	// "testCustomMap",
 	"testTransientThread",
 	"testTransientThreadGroup",
 	"testTransientProcessBuilder" } ;

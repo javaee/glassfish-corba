@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import testtools.Base;
 
@@ -15,30 +16,83 @@ import testtools.Base;
  * @author ken
  */
 public class GlassFishCluster {
+    // This is also the definition used in the implementation of the
+    // EJB, but I don't want to import that here.  Actually, this doesn't
+    // really belong here either, but it's too important to the IIOP FOLB
+    // tests to not include, and putting it into Main doesn't work either
+    // when createInstances is used.
+    public static final String INSTANCE_NAME_PROPERTY = "instance_name" ;
+
     private final GlassFishInstallation gfInst ;
     private final String clusterName ;
     private final Map<String,InstanceInfo> instanceInfoMap ;
     private final Set<String> runningInstances ;
 
-    public GlassFishCluster( GlassFishInstallation gfInst, String clusterName ) {
+    public GlassFishCluster( GlassFishInstallation gfInst, String clusterName,
+        boolean skipSetup ) {
         this.clusterName = clusterName ;
         this.gfInst = gfInst ;
         this.instanceInfoMap = new HashMap<String,InstanceInfo>() ;
         this.runningInstances = new HashSet<String>() ;
 
-        gfInst.ac().createCluster( clusterName ) ;
-        for (Pair<String,Integer> pair : gfInst.availableNodes()) {
-            String node = pair.first() ;
-            gfInst.ac().createNodeSsh( node, gfInst.installDir(),
-                gfInst.getNAName(node) );
+        if (skipSetup) {
+            final AdminCommand ac = gfInst.ac() ;
+            ac.listInstances( clusterName ) ;
+            final Map<String,String> instances = ac.getOutputTable() ;
+            for (Map.Entry<String,String> entry : instances.entrySet()) {
+                final String inst = entry.getKey() ;
+                final String state = entry.getValue() ;
+                if (state.equals( "running" )) {
+                    runningInstances.add( inst ) ;
+                }
+                final String instDNPrefix = "servers.server." + inst ;
+                final String naDN = instDNPrefix + ".node-ref" ;
+                ac.get( naDN ) ;
+                final Map<String,String> naRef = ac.getOutputProperties() ;
+                final String na = naRef.get( naDN ) ;
+
+                final String nodeDN = "nodes.node." + na + ".node-host" ;
+                ac.get(nodeDN) ;
+                final Map<String,String> nodeRef = ac.getOutputProperties() ;
+                final String node = nodeRef.get( nodeDN ) ;
+
+                final InstanceInfo ii = new InstanceInfo( inst, node ) ;
+                final String propsDN =  instDNPrefix + ".system-property.*.value" ;
+                ac.get( propsDN ) ;
+                final Map<String,String> ports = ac.getOutputProperties() ;
+                for (Map.Entry<String,String> entry2 : ports.entrySet()) {
+                    final String prop = entry2.getKey() ;
+                    final String[] tokens = prop.split( "\\." ) ;
+                    if (tokens.length == 6) {
+                        final String key = tokens[4] ;
+                        if (key.contains( "PORT" )) {
+                            final String value = entry2.getValue() ;
+                            final StandardPorts port = StandardPorts.valueOf( key ) ;
+                            final int pnum = Integer.parseInt(value) ;
+                            ii.addPort(port, pnum);
+                        }
+                    }
+                }
+                instanceInfoMap.put( inst, ii ) ;
+            }
+        } else {
+            gfInst.ac().createCluster( clusterName ) ;
+            for (Pair<String,Integer> pair : gfInst.availableNodes()) {
+                String node = pair.first() ;
+                gfInst.ac().createNodeSsh( node, gfInst.installDir(),
+                    gfInst.getNAName(node) );
+            }
         }
     }
 
     public InstanceInfo createInstance( String instanceName, String nodeName,
         int portBase ) {
 
+        Properties props = new Properties() ;
+        props.setProperty( INSTANCE_NAME_PROPERTY, instanceName ) ;
+
         gfInst.ac().createInstance( gfInst.getNAName( nodeName ), clusterName,
-            portBase, instanceName ) ;
+            portBase, instanceName, props ) ;
         InstanceInfo info = new InstanceInfo(instanceName, nodeName) ;
         for (String str : gfInst.ac().commandOutput() ) {
             int index = str.indexOf( '=' ) ;
@@ -52,6 +106,11 @@ public class GlassFishCluster {
         }
 
         instanceInfoMap.put( instanceName, info) ;
+
+        String debugDottedName =
+            "configs.config." + clusterName + "-config.java-config.debug-enabled" ;
+        gfInst.ac().set( debugDottedName, "true" ) ;
+
         return info ;
     }
 
@@ -209,7 +268,7 @@ public class GlassFishCluster {
     }
 
     public Map<String,InstanceInfo> instanceInfo() {
-        return null ;
+        return instanceInfoMap ;
     }
 
     public static class Test extends Base {
@@ -227,12 +286,12 @@ public class GlassFishCluster {
 
         private GlassFishInstallation gfInst =
             new GlassFishInstallation( this, installDir, dasNodeName,
-                availableNodes, true ) ;
+                availableNodes, true, false ) ;
 
         private static final String clusterName = "c1" ;
 
         private GlassFishCluster gfCluster =
-            new GlassFishCluster( gfInst, clusterName ) ;
+            new GlassFishCluster( gfInst, clusterName, false ) ;
 
         @testtools.Test
         public void testCreateInstance() {

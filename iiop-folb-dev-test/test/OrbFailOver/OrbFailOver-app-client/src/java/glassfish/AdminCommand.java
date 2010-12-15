@@ -4,7 +4,12 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import testtools.Base;
 
 /**
@@ -109,15 +114,43 @@ public class AdminCommand {
     }
 
     public boolean destroyNodeSsh( String agentName ) {
-        return adminCommand( "destroy-ssh-node " + agentName ) ;
+        return adminCommand( "delete-node-ssh " + agentName ) ;
+    }
+
+    private String getPropertiesString( Properties props ) {
+        final StringBuilder sb = new StringBuilder() ;
+        final Set<String> propNames = props.stringPropertyNames() ;
+
+        boolean first = true ;
+
+        for (String pname : propNames) {
+             if (first) {
+                 first = false ;
+             } else {
+                 sb.append( ':' ) ;
+             }
+
+             sb.append( pname ) ;
+             sb.append( '=' ) ;
+             sb.append( props.getProperty(pname) ) ;
+        }
+
+        return sb.toString() ;
     }
 
     public boolean createInstance( String agentName, String clusterName, 
-        int portBase, String instanceName ) {
-        String command = String.format(
-            "create-instance --node %s --cluster %s --portbase %d --checkports=true %s",
-            agentName, clusterName, portBase, instanceName ) ;
+        int portBase, String instanceName, Properties props ) {
+        String command = (props == null) 
+            ? String.format( "create-instance --node %s "
+                + "--cluster %s --portbase %d --checkports=true %s",
+                agentName, clusterName, portBase, instanceName ) 
+            : String.format( "create-instance --node %s --systemproperties %s "
+                + "--cluster %s --portbase %d --checkports=true %s",
+                agentName, getPropertiesString( props ),
+                clusterName, portBase, instanceName ) ;
+
         boolean result = adminCommand( command ) ;
+
         if (echoOnly) {
             // for testing only
             int current = portBase ;
@@ -127,6 +160,7 @@ public class AdminCommand {
                 commandOutput.add( msg ) ;
             }
         }
+
         return result ;
     }
 
@@ -146,9 +180,61 @@ public class AdminCommand {
         return adminCommand( "delete-cluster " + clusterName ) ;
     }
 
-    public boolean deploy( String clusterName, String jarFile ) {
-        String cmd = String.format( "deploy --target %s --force %s",
-            clusterName, jarFile )  ;
+    public boolean deploy( String clusterName, String componentName,
+        String jarFile ) {
+
+        String cmd = String.format( "deploy --target %s --name %s --force %s",
+            clusterName, componentName, jarFile )  ;
+
         return adminCommand( cmd ) ;
+    }
+
+    public boolean undeploy( String clusterName, String componentName ) {
+
+        String cmd = String.format( "undeploy --target %s --name %s --force",
+            clusterName, componentName )  ;
+
+        return adminCommand( cmd ) ;
+    }
+
+    public boolean set( String dottedName, String value ) {
+        String cmd = String.format( "set %s=%s", dottedName, value ) ;
+        return adminCommand( cmd ) ;
+    }
+
+    public boolean get( String dottedName ) {
+        return adminCommand( "get " + dottedName ) ;
+    }
+
+    public Map<String,String> getOutputProperties() {
+        Map<String,String> result = new HashMap<String,String>() ;
+        for (String str : commandOutput() ) {
+            int index = str.indexOf( '=' ) ;
+            if (index > 0) {
+                final String key = str.substring( 0, index ) ;
+                final String value = str.substring( index + 1 ) ;
+                result.put( key, value ) ;
+            }
+        }
+        return result ;
+    }
+
+    public boolean listClusters() {
+        return adminCommand( "list-clusters" ) ;
+    }
+
+    public boolean listInstances( String clusterName ) {
+        return adminCommand( "list-instances " + clusterName ) ;
+    }
+
+    public Map<String,String> getOutputTable() {
+        Map<String,String> result = new HashMap<String,String>() ;
+        for (String str : commandOutput() ) {
+            String[] token = str.split( "\\s+" ) ;
+            if (token.length == 2) {
+                result.put( token[0], token[1] ) ;
+            }
+        }
+        return result ;
     }
 }

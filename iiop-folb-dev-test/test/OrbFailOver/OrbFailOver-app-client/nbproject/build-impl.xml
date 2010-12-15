@@ -495,14 +495,8 @@ exists or setup the property manually. For example like this:
             </condition>
         </fail>
     </target>
-    <target depends="init" if="no.dist.ear.dir" name="-deps-module-jar" unless="no.deps">
-        <ant antfile="${project.OrbFailOver-ejb}/build.xml" inheritall="false" target="dist"/>
-    </target>
-    <target depends="init" if="dist.ear.dir" name="-deps-ear-jar" unless="no.deps">
-        <ant antfile="${project.OrbFailOver-ejb}/build.xml" inheritall="false" target="dist-ear">
-            <property location="${build.dir}" name="dist.ear.dir"/>
-        </ant>
-    </target>
+    <target depends="init" if="no.dist.ear.dir" name="-deps-module-jar" unless="no.deps"/>
+    <target depends="init" if="dist.ear.dir" name="-deps-ear-jar" unless="no.deps"/>
     <target depends="init, -check-main-class, -deps-module-jar, -deps-ear-jar" name="deps-jar"/>
     <target depends="init,deps-jar" name="-pre-pre-compile">
         <mkdir dir="${classes.dir}"/>
@@ -513,16 +507,14 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="compile" name="library-inclusion-in-archive">
         <mkdir dir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${reference.OrbFailOver-ejb.dist}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.javaee-api-6.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${file.reference.gf-client.jar}" todir="${build.classes.dir}/META-INF/lib"/>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
-        <copyfiles files="${reference.OrbFailOver-ejb.dist}" manifestproperty="manifest.reference.OrbFailOver-ejb.dist" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.javaee-api-6.0.classpath}" manifestproperty="manifest.libs.javaee-api-6.0.classpath" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.gf-client.jar}" manifestproperty="manifest.file.reference.gf-client.jar" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.reference.OrbFailOver-ejb.dist} ${manifest.libs.javaee-api-6.0.classpath} lib/${manifest.libs.javaee-api-6.0.classpath} ${manifest.file.reference.gf-client.jar} lib/${manifest.file.reference.gf-client.jar} "/>
+            <attribute name="Class-Path" value="${manifest.libs.javaee-api-6.0.classpath} lib/${manifest.libs.javaee-api-6.0.classpath} ${manifest.file.reference.gf-client.jar} lib/${manifest.file.reference.gf-client.jar} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">
@@ -970,9 +962,7 @@ exists or setup the property manually. For example like this:
                 CLEANUP SECTION
                 ===============
             -->
-    <target depends="init" if="no.dist.ear.dir" name="deps-clean" unless="no.deps">
-        <ant antfile="${project.OrbFailOver-ejb}/build.xml" inheritall="false" target="clean"/>
-    </target>
+    <target depends="init" if="no.dist.ear.dir" name="deps-clean" unless="no.deps"/>
     <target depends="init" name="-do-clean">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>

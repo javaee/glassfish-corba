@@ -1,21 +1,30 @@
 package orbfailover;
 
-import argparser.DefaultValue;
-import argparser.Help;
-import argparser.Pair;
-import com.sun.corba.se.spi.activation.IIOP_CLEAR_TEXT;
-import glassfish.AdminCommand;
-import glassfish.GlassFishCluster;
-import glassfish.GlassFishInstallation;
-import glassfish.StandardPorts;
 import java.util.ArrayList;
-import javax.naming.NamingException;
-import orb.folb.LocationBeanRemote;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.ejb.EJB;
+
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import argparser.DefaultValue;
+import argparser.Help;
+import argparser.Pair;
+
+import glassfish.AdminCommand;
+import glassfish.GlassFishCluster;
+import glassfish.GlassFishInstallation;
+import glassfish.StandardPorts;
+import java.util.Hashtable;
+import javax.naming.Binding;
+import javax.naming.Context;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+
+import orb.folb.LocationBeanRemote;
 
 import testtools.Test ;
 import testtools.Base ;
@@ -26,17 +35,18 @@ import testtools.Post;
  * @author kcavanaugh
  */
 public class Main extends Base {
+    // @EJB
+    // private static LocationBeanRemote locationBean;
     private static final String CLUSTER_NAME = "c1" ;
+    private static final String EJB_NAME = "TestEJB" ;
     private static final String INSTANCE_BASE_NAME = "in" ;
-    private static final int NUM_INSTANCES = 5 ;
+    private static final int NUM_INSTANCES = 3 ;
 
-    private final GlassFishInstallation  gfInstallation ;
-    private final AdminCommand ac ;
+    private GlassFishInstallation  gfInstallation ;
+    private AdminCommand ac ;
     private GlassFishCluster gfCluster ;
     private Map<String,GlassFishCluster.InstanceInfo> clusterInfo ;
 
-    // @EJB
-    // private static LocationBeanRemote locBean;
     private static final String beanJNDIname = "orb.folb.LocationBeanRemote";
 
     private static Pair<String,Integer> split(String str) {
@@ -76,6 +86,13 @@ public class Main extends Base {
         return sb.toString() ;
     }
 
+    private InitialContext makeIC() throws NamingException {
+        Hashtable table = new Hashtable() ;
+        String eplist = getIIOPEndpointList() ;
+        table.put( "com.sun.appserv.iiop.endpoints", eplist ) ;
+        return new InitialContext( table ) ;
+    }
+
     public interface Installation {
         @DefaultValue("")
         @Help("Name of directory where GlassFish is installed")
@@ -92,25 +109,65 @@ public class Main extends Base {
         @DefaultValue("")
         @Help("The test EJB needed for this test")
         String testEjb() ;
+
+        @DefaultValue( "true" )
+        @Help("Set if we want to shutdown and destroy the cluster after the test")
+        boolean doCleanup() ;
+
+        @DefaultValue( "false" )
+        @Help( "Set if the cluster is already setup and running in order to avoid"
+        + "extra processing")
+        boolean skipSetup() ;
     }
+
+    private final Installation inst ;
 
     public Main( String[] args ) {
         super( args, Installation.class ) ;
-        Installation inst = getArguments( Installation.class ) ;
-        List<Pair<String,Integer>> avnodes = parseStringIntPair(
-            inst.availableNodes() ) ;
-        gfInstallation = new GlassFishInstallation( this,
-            inst.installDir(), inst.dasNode(), avnodes ) ;
-        ac = gfInstallation.ac() ;
-        ac.deploy( CLUSTER_NAME, inst.testEjb() ) ;
+        inst = getArguments( Installation.class ) ;
+        try {
+            List<Pair<String,Integer>> avnodes = parseStringIntPair(
+                inst.availableNodes() ) ;
+            gfInstallation = new GlassFishInstallation( this,
+                inst.installDir(), inst.dasNode(), avnodes, false,
+                inst.skipSetup() ) ;
+            ac = gfInstallation.ac() ;
 
-        // Create default 3 instance cluster
-        gfCluster = new GlassFishCluster( gfInstallation, CLUSTER_NAME ) ;
-        clusterInfo = gfCluster.createInstances( INSTANCE_BASE_NAME, NUM_INSTANCES ) ;
+            // Create default 3 instance cluster
+            gfCluster = new GlassFishCluster( gfInstallation, CLUSTER_NAME,
+                inst.skipSetup()) ;
+            if (!inst.skipSetup()) {
+                clusterInfo = gfCluster.createInstances( INSTANCE_BASE_NAME,
+                    NUM_INSTANCES ) ;
+                gfCluster.startCluster() ;
+                ac.deploy( CLUSTER_NAME, EJB_NAME, inst.testEjb() ) ;
+            } else {
+                clusterInfo = gfCluster.instanceInfo() ;
+            }
+        } catch (Exception exc) {
+            System.out.println( "Exception in constructor: " + exc ) ;
+            exc.printStackTrace() ;
+            cleanup() ;
+        }
+    }
 
-        // Hopefully this will work here to enabled load balancing
-        System.setProperty( "com.sun.appserv.iiop.endpoints",
-            getIIOPEndpointList() ) ;
+    private void cleanup() {
+        if (inst.doCleanup()) {
+            if (ac != null) {
+                ac.undeploy( CLUSTER_NAME, EJB_NAME ) ;
+                ac = null ;
+            }
+
+            if (gfCluster != null) {
+                gfCluster.destroyCluster() ;
+                gfCluster = null ;
+            }
+
+            if (gfInstallation != null) {
+                gfInstallation.destroy() ;
+                gfInstallation = null ;
+            }
+        }
     }
 
     /**
@@ -118,7 +175,53 @@ public class Main extends Base {
      */
     public static void main(String[] args) {
         Main m = new Main( args );
-        m.run() ;
+        int result = 1 ;
+        if (m.gfCluster != null) {
+            try {
+                result = m.run() ;
+            } finally {
+                m.cleanup() ;
+            }
+        }
+        System.exit( result ) ;
+    }
+
+    @Test( "listContextTest" )
+    public void listContextTest() throws NamingException {
+        InitialContext ic = makeIC() ;
+        listContext( ic, 0 ) ;
+    }
+
+    private String indent( String str, int size ) {
+        String fmt = String.format( "%%%d%%s", size ) ;
+        return String.format( fmt, str ) ;
+    }
+
+    private void listContext( Context ctx, int level ) throws NamingException {
+        final NamingEnumeration<NameClassPair> ne = ctx.list( "" ) ;
+        final int size = 4*level ;
+        while (ne.hasMore()) {
+             final NameClassPair pair = ne.next() ;
+             final String name = pair.getName() ;
+
+             Object val = null ;
+             try {
+                val = ctx.lookup( name ) ;
+             } catch (Exception exc) {
+                val = "*UNAVAILABLE* (" + pair.getClassName() + ")" ;
+             }
+
+             final StringBuilder sb = new StringBuilder() ;
+             if (val instanceof Context) {
+                 final Context ctx2 = (Context)val ;
+                 sb.append( name ).append( ':' ) ;
+                 note( indent( sb.toString(), size ) ) ;
+                 listContext( ctx2, level+1 ) ;
+             } else {
+                 sb.append( name ).append( "=>" ).append( val.toString() ) ;
+                 note( indent( sb.toString(), size ) ) ;
+             }
+        }
     }
 
     @Test( "failover" )
@@ -130,7 +233,7 @@ public class Main extends Base {
 
         boolean failOverDetected = false;
         try {
-            InitialContext ctx = new InitialContext();
+            InitialContext ctx = makeIC();
             LocationBeanRemote locBean =
                     (LocationBeanRemote) ctx.lookup(beanJNDIname);
             String origLocation = locBean.getLocation();
@@ -212,7 +315,7 @@ public class Main extends Base {
         final List<InitialContext> ics = new ArrayList<InitialContext>() ;
         final List<LocationBeanRemote> lbs = new ArrayList<LocationBeanRemote>() ;
         for (int ctr=0; ctr<10; ctr++) {
-            final InitialContext ic = new InitialContext() ;
+            final InitialContext ic = makeIC() ;
             ics.add( ic ) ;
             final LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname) ;
             lbs.add( lb ) ;
@@ -240,7 +343,7 @@ public class Main extends Base {
     //    should be sticky)
     @Test( "14755" )
     public void test14755() throws NamingException {
-        InitialContext ic = new InitialContext() ;
+        InitialContext ic = makeIC() ;
         LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname ) ;
         String first = lb.getLocation() ;
         ac.stopInstance(first);
@@ -269,7 +372,7 @@ public class Main extends Base {
     // 12 do one request - ensure it works
     @Test( "14766")
     public void test14766() throws NamingException {
-        InitialContext ctx = new InitialContext();
+        InitialContext ctx = makeIC() ;
         LocationBeanRemote locBean = (LocationBeanRemote) ctx.lookup(
             beanJNDIname);
 
@@ -325,7 +428,7 @@ public class Main extends Base {
 
         String newLocation = "" ;
         for (int i = 1; i <= numCalls ; i++) {
-            InitialContext ctx = new InitialContext();
+            InitialContext ctx = makeIC() ;
             LocationBeanRemote locBean =
                     (LocationBeanRemote) ctx.lookup(beanJNDIname);
             newLocation = locBean.getLocation();
@@ -368,7 +471,7 @@ public class Main extends Base {
             }
         }
 
-        InitialContext ctx = new InitialContext();
+        InitialContext ctx = makeIC() ;
         note( "got new initial context") ;
 
         LocationBeanRemote locBean =
@@ -410,6 +513,18 @@ public class Main extends Base {
     // New instances should process some of new requests
     @Test( "14867" )
     public void test14867() {
+    }
+
+    // Test scenario for issue 15100:
+    // 1. App is deployed on a 3 instance cluster
+    // 2. Send 100 New initial Contexts, approx 30 are created on instance 1
+    // 3. Bring down instance 1
+    // 4. Call business methods using the IC , the 30 requests are failed
+    //    over to only one instance
+    // 5. The expectation is, the failoved requests should be distributed
+    //    among healthy instances (15 each approx)
+    @Test( "15099")
+    public void test15100() {
     }
 
     @Post

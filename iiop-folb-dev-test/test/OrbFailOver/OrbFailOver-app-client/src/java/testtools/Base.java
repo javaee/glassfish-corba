@@ -215,7 +215,7 @@ public class Base {
         }
     }
 
-    public void run() {
+    public int run() {
         for (Method m : testMethods) {
             currentResults.clear() ;
             // currentNotes.clear() ;
@@ -229,11 +229,13 @@ public class Base {
                     m.invoke( this ) ;
                 } catch (Exception exc) {
                     fail( "Caught exception : " + exc )  ;
+                    exc.printStackTrace();
                 } finally {
                     try {
                         execute(postMethods);
                     } catch (Exception exc) {
                         fail( "Exception in post methods : " + exc ) ;
+                        exc.printStackTrace();
                     }
                 }
 
@@ -255,7 +257,7 @@ public class Base {
 
         msg( "Results: " + pass + " test(s) passed; " + fail + " test(s) failed; "
                 + skip + " test(s) skipped." ).nl() ;
-        System.exit( fail ) ;
+        return fail ;
     }
 
     public void fail( String failMessage ) {

@@ -2,6 +2,7 @@ package glassfish;
 
 import java.util.List;
 import argparser.Pair ;
+import java.io.File;
 import java.util.ArrayList;
 import testtools.Base;
 
@@ -16,6 +17,7 @@ public class GlassFishInstallation {
     private final List<? extends Pair<String,Integer>> availableNodes ;
     private final AdminCommand ac ;
     private boolean isDestroyed = false ;
+    private boolean skipSetup ;
 
     public String installDir() {
         return installDir ;
@@ -48,19 +50,23 @@ public class GlassFishInstallation {
      */
     public GlassFishInstallation( Base base, String installDir,
         String dasNodeName, List<? extends Pair<String,Integer>> availableNodes,
-        boolean echoOnly ) {
+        boolean echoOnly, boolean skipSetup ) {
         this.base = base ;
         this.installDir = installDir ;
+        if (!installDir.endsWith( File.separator )) {
+             installDir += File.separator ;
+        }
         this.dasNodeName = dasNodeName ;
         this.availableNodes = availableNodes ;
-        this.ac = new AdminCommand( base, installDir + "bin/asadmin",
+        this.ac = new AdminCommand( base, installDir + "glassfish/bin/asadmin",
             echoOnly ) ;
+        this.skipSetup = skipSetup ;
         start() ;
     }
 
     public GlassFishInstallation( Base base, String installDir,
         String dasNodeName, List<Pair<String,Integer>> availableNodes ) {
-        this( base, installDir, dasNodeName, availableNodes, false ) ;
+        this( base, installDir, dasNodeName, availableNodes, false, false ) ;
     }
 
     private void checkDestroyed() {
@@ -80,17 +86,20 @@ public class GlassFishInstallation {
      *
      */
     public final void start() {
-        checkDestroyed() ;
-        checkAdminCommand( ac.startDomain() ) ;
-        checkAdminCommand( ac.enableSecureAdmin() ) ;
+        if (!skipSetup) {
+            checkDestroyed() ;
+            checkAdminCommand( ac.startDomain() ) ;
+        }
     }
 
     /** Stop the domain
      *
      */
     public final void stop() {
-        checkDestroyed()  ;
-        checkAdminCommand( ac.stopDomain() ) ;
+        if (!skipSetup) {
+            checkDestroyed()  ;
+            checkAdminCommand( ac.stopDomain() ) ;
+        }
     }
 
     public final void destroy() {
@@ -113,7 +122,7 @@ public class GlassFishInstallation {
 
         private GlassFishInstallation gfInst = 
             new GlassFishInstallation( this, installDir, dasNodeName, 
-                availableNodes, true ) ;
+                availableNodes, true, false ) ;
 
         @testtools.Test
         public void test() {

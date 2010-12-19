@@ -90,7 +90,21 @@ public class Main extends Base {
         Hashtable table = new Hashtable() ;
         String eplist = getIIOPEndpointList() ;
         table.put( "com.sun.appserv.iiop.endpoints", eplist ) ;
-        return new InitialContext( table ) ;
+        InitialContext result = new InitialContext( table ) ;
+        note( "Created new InitialContext") ;
+        return result ;
+    }
+
+    private String invokeMethod( LocationBeanRemote locBean ) {
+        String result = locBean.getLocation() ;
+        note( "Invocation returned " + result ) ;
+        return result ;
+    }
+
+    private LocationBeanRemote lookup( InitialContext ic ) throws NamingException {
+        LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname ) ;
+        note( "Looked up bean in context") ;
+        return lb ;
     }
 
     public interface Installation {
@@ -234,16 +248,15 @@ public class Main extends Base {
         boolean failOverDetected = false;
         try {
             InitialContext ctx = makeIC();
-            LocationBeanRemote locBean =
-                    (LocationBeanRemote) ctx.lookup(beanJNDIname);
-            String origLocation = locBean.getLocation();
+            LocationBeanRemote locBean = lookup( ctx ) ;
+            String origLocation = invokeMethod( locBean );
             if (origLocation == null) {
                 fail( "couldn't get the instance name!");
             }
             for (int i = 1; i <= numCalls; i++) {
                 String newLocation = null ;
                 try {
-                    newLocation = locBean.getLocation();
+                    newLocation = invokeMethod( locBean );
                 } catch (Exception e) {
                     fail( "caught invocation exception " + e );
                 }
@@ -317,13 +330,13 @@ public class Main extends Base {
         for (int ctr=0; ctr<10; ctr++) {
             final InitialContext ic = makeIC() ;
             ics.add( ic ) ;
-            final LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname) ;
+            final LocationBeanRemote lb = lookup( ic ) ;
             lbs.add( lb ) ;
         }
         ensure() ;
         ac.stopInstance(firstInstance );
         for (LocationBeanRemote lb : lbs ) {
-            String loc = lb.getLocation() ;
+            String loc = invokeMethod( lb ) ;
             check( !loc.equals( firstInstance ),
                 "Location returned was stopped instance " + firstInstance ) ;
         }
@@ -344,14 +357,14 @@ public class Main extends Base {
     @Test( "14755" )
     public void test14755() throws NamingException {
         InitialContext ic = makeIC() ;
-        LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname ) ;
-        String first = lb.getLocation() ;
+        LocationBeanRemote lb = lookup( ic ) ;
+        String first = invokeMethod( lb ) ;
         ac.stopInstance(first);
-        String second = lb.getLocation() ;
+        String second = invokeMethod( lb ) ;
         check( !first.equals( second ),
             "Method executed on instance that was supposed to be down " + second ) ;
         ac.startInstance( first ) ;
-        String result = lb.getLocation() ;
+        String result = invokeMethod( lb ) ;
         check( result.equals( second ),
             "Request did not stick to instance " + second +
             " after original instance " + first + " restarted" ) ;
@@ -373,25 +386,24 @@ public class Main extends Base {
     @Test( "14766")
     public void test14766() throws NamingException {
         InitialContext ctx = makeIC() ;
-        LocationBeanRemote locBean = (LocationBeanRemote) ctx.lookup(
-            beanJNDIname);
+        LocationBeanRemote locBean = lookup( ctx ) ;
 
-        String loc1 = locBean.getLocation();
+        String loc1 = invokeMethod( locBean );
         ac.stopInstance(loc1);
 
-        String loc2 = locBean.getLocation() ;
+        String loc2 = invokeMethod( locBean ) ;
         check( !loc1.equals(loc2), "Failover did not happen") ;
         ac.stopInstance(loc2);
 
-        String loc3 = locBean.getLocation() ;
+        String loc3 = invokeMethod( locBean ) ;
         check( !loc3.equals(loc2), "Failover did not happen") ;
         ac.startInstance(loc1);
 
-        String loc4 = locBean.getLocation() ;
+        String loc4 = invokeMethod( locBean ) ;
         check( loc4.equals(loc3), "No failover expected" ) ;
         ac.stopInstance(loc3);
 
-        String loc5 = locBean.getLocation() ;
+        String loc5 = invokeMethod( locBean ) ;
         check( !loc5.equals(loc4), "Failover did not happen") ;
     }
 
@@ -429,9 +441,8 @@ public class Main extends Base {
         String newLocation = "" ;
         for (int i = 1; i <= numCalls ; i++) {
             InitialContext ctx = makeIC() ;
-            LocationBeanRemote locBean =
-                    (LocationBeanRemote) ctx.lookup(beanJNDIname);
-            newLocation = locBean.getLocation();
+            LocationBeanRemote locBean = lookup( ctx ) ;
+            newLocation = invokeMethod( locBean );
             note( "result[" + i + "]= " + newLocation);
             increment( counts, newLocation ) ;
         }
@@ -441,7 +452,7 @@ public class Main extends Base {
             note( String.format( "\tName = %20s Count = %10d",
                 entry.getKey(), count ) ) ;
         }
-        check( !expected.equals(counts.keySet()),
+        check( expected.equals(counts.keySet()),
             "Requests not loadbalanced across expected instances: "
             + " expected " + expected + ", actual " + counts.keySet() ) ;
     }
@@ -474,11 +485,10 @@ public class Main extends Base {
         InitialContext ctx = makeIC() ;
         note( "got new initial context") ;
 
-        LocationBeanRemote locBean =
-                (LocationBeanRemote) ctx.lookup(beanJNDIname);
+        LocationBeanRemote locBean = lookup( ctx ) ;
         note( "located EJB" ) ;
 
-        String current = locBean.getLocation();
+        String current = invokeMethod( locBean );
         note( "EJB invocation returned " + current ) ;
         check( current.equals( running ),
             "Current location " + current + " is not the same as the"
@@ -491,10 +501,10 @@ public class Main extends Base {
             }
         }
 
-        locBean = (LocationBeanRemote) ctx.lookup(beanJNDIname);
+        locBean = lookup( ctx ) ;
         note( "Locating EJB second time") ;
 
-        current = locBean.getLocation();
+        current = invokeMethod( locBean );
         note( "EJB invocation returned " + current ) ;
         check( !current.equals( running ),
             "Apparent location " + current
@@ -513,6 +523,7 @@ public class Main extends Base {
     // New instances should process some of new requests
     @Test( "14867" )
     public void test14867() {
+        fail( "Test not implemented yet" ) ;
     }
 
     // Test scenario for issue 15100:
@@ -523,8 +534,9 @@ public class Main extends Base {
     //    over to only one instance
     // 5. The expectation is, the failoved requests should be distributed
     //    among healthy instances (15 each approx)
-    @Test( "15099")
+    @Test( "15100")
     public void test15100() {
+        fail( "Test not implemented yet" ) ;
     }
 
     @Post

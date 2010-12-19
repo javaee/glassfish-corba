@@ -51,6 +51,8 @@ import argparser.DefaultValue ;
 import argparser.Separator ;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /** A VERY quick-and-dirty test framework.
  *
@@ -67,9 +69,9 @@ public class Base {
     private final List<Method> postMethods ;
 
     private String current ;
-    private int pass = 0 ;
-    private int fail = 0 ;
-    private int skip = 0 ;
+    private Set<String> pass = new HashSet<String>() ;
+    private Set<String> fail = new HashSet<String>() ;
+    private Set<String> skip = new HashSet<String>() ;
 
     private interface Arguments {
         @DefaultValue( "false" )
@@ -240,10 +242,10 @@ public class Base {
                 }
 
                 if (currentResults.isEmpty()) {
-                    pass++ ;
+                    pass.add( current ) ;
                     msg( "PASSED." ).nl() ;
                 } else {
-                    fail++ ;
+                    fail.add( current )  ;
                     msg( "FAILED." ).nl() ;
                 }
 
@@ -251,13 +253,27 @@ public class Base {
                 display( "    Results", currentResults ) ;
             } else {
                 msg( "Test " + current + " skipped" ).nl() ;
-                skip++ ;
+                skip.add( current ) ;
             }
         }
 
-        msg( "Results: " + pass + " test(s) passed; " + fail + " test(s) failed; "
-                + skip + " test(s) skipped." ).nl() ;
-        return fail ;
+        msg( "Results:" ).nl() ;
+
+        msg( "\tFAILED:").nl() ; displaySet( fail ) ;
+        msg( "\tSKIPPED:").nl() ; displaySet( skip ) ;
+        msg( "\tPASSED:").nl() ; displaySet( pass ) ;
+
+        nl() ;
+        msg( pass.size() + " test(s) passed; "
+            + fail.size() + " test(s) failed; "
+            + skip.size() + " test(s) skipped." ).nl() ;
+        return fail.size() ;
+    }
+
+    private void displaySet( Set<String> set ) {
+        for (String str : set ) {
+            msg( "\t\t" ).msg( str ).nl() ;
+        }
     }
 
     public void fail( String failMessage ) {

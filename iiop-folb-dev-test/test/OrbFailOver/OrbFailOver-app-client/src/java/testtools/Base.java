@@ -257,7 +257,9 @@ public class Base {
             }
         }
 
+        msg( "-------------------------------------------------").nl() ;
         msg( "Results:" ).nl() ;
+        msg( "-------------------------------------------------").nl() ;
 
         msg( "\tFAILED:").nl() ; displaySet( fail ) ;
         msg( "\tSKIPPED:").nl() ; displaySet( skip ) ;
@@ -267,6 +269,8 @@ public class Base {
         msg( pass.size() + " test(s) passed; "
             + fail.size() + " test(s) failed; "
             + skip.size() + " test(s) skipped." ).nl() ;
+        msg( "-------------------------------------------------").nl() ;
+
         return fail.size() ;
     }
 

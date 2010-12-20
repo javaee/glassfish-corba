@@ -13,9 +13,8 @@ DAS_HOST="minas"
 # Must be able to access the avilable nodes from the DAS using 
 # SSH without password.
 
-# Just test on minas for now until we get things working again
-# AVAILABLE_NODES="minas:3,apollo:4"
-AVAILABLE_NODES="minas:3"
+AVAILABLE_NODES="minas:2,apollo:4"
+# AVAILABLE_NODES="minas:3"
 
 ################################################################
 # Do the following to create a new cluster and new GF installation
@@ -23,14 +22,19 @@ AVAILABLE_NODES="minas:3"
 
 # assume that we are running on minas
 killgf
-# ssh apollo /volumes/home/ken/bin/killgf
+ssh apollo /volumes/home/ken/bin/killgf
 installgfv3
-date
+installgforb
+installgfnaming
 SKIP_SETUP="false"
+
+# SKIP_SETUP="true"
 
 ################################################################
 # The rest of the script is fixed
 ################################################################
+
+date
 
 APS_HOME="/space/ws/mercurial/CORBA/iiop-folb-test/test/OrbFailOver"
 APPCLIENT="${S1AS_HOME}/bin/appclient"

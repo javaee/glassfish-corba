@@ -40,7 +40,6 @@ public class Main extends Base {
     private static final String CLUSTER_NAME = "c1" ;
     private static final String EJB_NAME = "TestEJB" ;
     private static final String INSTANCE_BASE_NAME = "in" ;
-    private static final int NUM_INSTANCES = 3 ;
 
     private GlassFishInstallation  gfInstallation ;
     private AdminCommand ac ;
@@ -68,30 +67,37 @@ public class Main extends Base {
         return result ;
     }
 
+    // Returns string of <host>:<clear text port> separated by commas
+    // for all running instances.
     private String getIIOPEndpointList() {
         final StringBuilder sb = new StringBuilder() ;
         boolean first = true ;
-        for (GlassFishCluster.InstanceInfo info : clusterInfo.values()) {
+        for (String str : gfCluster.runningInstances()) {
             if (first) {
                 first = false ;
             } else {
                 sb.append( ',' ) ;
             }
 
-            sb.append( info.node() ) ;
-            sb.append( ':' ) ;
-            sb.append( info.ports().get( StandardPorts.IIOP_LISTENER_PORT )) ;
+            final GlassFishCluster.InstanceInfo info =
+                gfCluster.instanceInfo().get( str ) ;
+            final String host = info.node() ;
+            final int port = info.ports().get( StandardPorts.IIOP_LISTENER_PORT ) ;
+            sb.append( host ).append( ':' ).append( port ) ;
         }
 
         return sb.toString() ;
     }
 
     private InitialContext makeIC() throws NamingException {
-        Hashtable table = new Hashtable() ;
-        String eplist = getIIOPEndpointList() ;
+        return makeIC( getIIOPEndpointList() ) ;
+    }
+
+    private InitialContext makeIC( String eplist ) throws NamingException {
+        final Hashtable table = new Hashtable() ;
         table.put( "com.sun.appserv.iiop.endpoints", eplist ) ;
-        InitialContext result = new InitialContext( table ) ;
-        note( "Created new InitialContext") ;
+        final InitialContext result = new InitialContext( table ) ;
+        note( "Created new InitialContext with endpoints " + eplist ) ;
         return result ;
     }
 
@@ -132,6 +138,12 @@ public class Main extends Base {
         @Help( "Set if the cluster is already setup and running in order to avoid"
         + "extra processing")
         boolean skipSetup() ;
+
+        @DefaultValue( "5" )
+        @Help( "Set the number of instances to create in the cluster.  "
+            + "There must be sufficient availability declared in availableNodes "
+            + "for this many instances")
+        int numInstances() ;
     }
 
     private final Installation inst ;
@@ -152,7 +164,7 @@ public class Main extends Base {
                 inst.skipSetup()) ;
             if (!inst.skipSetup()) {
                 clusterInfo = gfCluster.createInstances( INSTANCE_BASE_NAME,
-                    NUM_INSTANCES ) ;
+                    inst.numInstances() ) ;
                 gfCluster.startCluster() ;
                 ac.deploy( CLUSTER_NAME, EJB_NAME, inst.testEjb() ) ;
             } else {
@@ -302,11 +314,21 @@ public class Main extends Base {
     }
 
     private <T> T pick( Set<T> set ) {
+        return pick( set, false ) ;
+    }
+
+    private <T> T pick( Set<T> set, boolean remove ) {
+        T result = null ;
         for (T elem : set) {
-            return elem ;
+            result = elem ;
+            break ;
         }
 
-        return null ;
+        if (remove) {
+            set.remove( result ) ;
+        }
+
+        return result ;
     }
 
     // Test scenario for issue 14762:
@@ -432,26 +454,34 @@ public class Main extends Base {
         doLoadBalance( runningInstances, numCalls )  ;
     }
 
-    public void doLoadBalance( Set<String> expected, int numCalls ) 
-        throws NamingException {
+    public void doLoadBalance( Set<String> expected,
+        int numCalls ) throws NamingException  {
+        doLoadBalance( expected, numCalls, getIIOPEndpointList() ) ;
+    }
+
+    public void doLoadBalance( Set<String> expected, int numCalls,
+        String endpoints ) throws NamingException {
         // XXX add checking for approximate distribution
+        // according to weights
         Map<String,Integer> counts =
             new HashMap<String,Integer>() ;
 
         String newLocation = "" ;
         for (int i = 1; i <= numCalls ; i++) {
-            InitialContext ctx = makeIC() ;
+            InitialContext ctx = makeIC( endpoints ) ;
             LocationBeanRemote locBean = lookup( ctx ) ;
             newLocation = invokeMethod( locBean );
             note( "result[" + i + "]= " + newLocation);
             increment( counts, newLocation ) ;
         }
+
         note( "Call distribution:" ) ;
         for (Map.Entry<String,Integer> entry : counts.entrySet()) {
             int count = entry.getValue().intValue() ;
             note( String.format( "\tName = %20s Count = %10d",
                 entry.getKey(), count ) ) ;
         }
+
         check( expected.equals(counts.keySet()),
             "Requests not loadbalanced across expected instances: "
             + " expected " + expected + ", actual " + counts.keySet() ) ;
@@ -469,6 +499,9 @@ public class Main extends Base {
     // 9. Call Business Method
     @Test( "14732" )
     public void test14732() throws NamingException {
+        // Capture full endpoint list for later use in makeIC.
+        String endpoints = getIIOPEndpointList() ;
+
         // Make sure only inst is running
         boolean first = true ;
         String running = "" ;
@@ -482,7 +515,7 @@ public class Main extends Base {
             }
         }
 
-        InitialContext ctx = makeIC() ;
+        InitialContext ctx = makeIC( endpoints ) ;
         note( "got new initial context") ;
 
         LocationBeanRemote locBean = lookup( ctx ) ;
@@ -522,9 +555,36 @@ public class Main extends Base {
     // 5. Then do 100 new IntialContext/lookup.
     // New instances should process some of new requests
     @Test( "14867" )
-    public void test14867() {
-        fail( "Test not implemented yet" ) ;
+    public void test14867() throws NamingException {
+        Set<String> instances = gfCluster.runningInstances() ;
+        note( "Running instances = " + instances ) ;
+        check( instances.size() >= 5, "Cluster must contain at least 5 instances") ;
+
+        final String gfInstance1 = pick( instances, true ) ;
+        final String gfInstance2 = pick( instances, true ) ;
+        final String gfInstance3 = pick( instances, true ) ;
+        final String gfInstance4 = pick( instances, true ) ;
+        final String gfInstance5 = pick( instances, true ) ;
+        gfCluster.stopCluster() ;
+
+        gfCluster.startInstance( gfInstance1 );
+        gfCluster.startInstance( gfInstance2 );
+        gfCluster.startInstance( gfInstance3 );
+        final String endpoints = getIIOPEndpointList() ;
+
+        final int COUNT = 100 ;
+        instances = gfCluster.runningInstances() ;
+        note( "Running instances = " + instances ) ;
+        doLoadBalance( instances, COUNT, endpoints ) ;
+
+        gfCluster.startInstance( gfInstance4 );
+        gfCluster.startInstance( gfInstance5 );
+
+        instances = gfCluster.runningInstances() ;
+        note( "Running instances = " + instances ) ;
+        doLoadBalance( instances, COUNT, endpoints ) ;
     }
+
 
     // Test scenario for issue 15100:
     // 1. App is deployed on a 3 instance cluster

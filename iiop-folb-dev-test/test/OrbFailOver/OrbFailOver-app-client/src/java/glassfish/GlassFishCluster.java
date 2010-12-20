@@ -196,7 +196,7 @@ public class GlassFishCluster {
     }
 
     public Set<String> runningInstances() {
-        return runningInstances ;
+        return new HashSet<String>( runningInstances ) ;
     }
 
     public void startCluster() {

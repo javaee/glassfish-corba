@@ -58,7 +58,10 @@ import org.glassfish.gmbal.Description ;
 /**
  * @author Harold Carr
  */
-@Transport
+// @Transport
+// XXX Temporarily removing tracing to debug an issue.
+// Why does tracing this class cause an NPE?  See issue 14704 for
+// the failure.
 @ManagedObject
 @Description( "Cache of connections originated by the ORB" ) 
 @AMXMetadata( type="corba-outbound-connection-cache-mon", group="monitoring" )
@@ -79,7 +82,7 @@ public class CorbaOutboundConnectionCacheImpl
 	this.connectionCache = new HashMap<CorbaContactInfo,CorbaConnection>();
     }
 
-    @Transport
+    // @Transport
     public CorbaConnection get(CorbaContactInfo contactInfo)
     {
 	synchronized (backingStore()) {
@@ -88,7 +91,7 @@ public class CorbaOutboundConnectionCacheImpl
 	}
     }
     
-    @Transport
+    // @Transport
     public void put(CorbaContactInfo contactInfo, CorbaConnection connection)
     {
 	synchronized (backingStore()) {
@@ -99,7 +102,7 @@ public class CorbaOutboundConnectionCacheImpl
 	}
     }
 
-    @Transport
+    // @Transport
     public void remove(CorbaContactInfo contactInfo)
     {
 	synchronized (backingStore()) {

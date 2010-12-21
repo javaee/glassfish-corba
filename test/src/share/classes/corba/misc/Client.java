@@ -1170,10 +1170,15 @@ public class Client extends TestCase
             Properties props = new Properties() ;
             orb = ORB.class.cast( ORB.init( args, props ) ) ;
 
-            // final String test = 
-                // "corbaname:iiop:1.2@192.168.178.1:3700#ejb/XXServiceBean" ;
+            final String test = 
+                "corbaname:iiop:1.2@192.168.178.1:3700#ejb/XXServiceBean" ;
 
             // orb.string_to_object( test ) ;
+
+            final String test2 = 
+                "corbaname:iiop:evolve300.evolve.local:3920#java:global/ferris-bank-business-services/account/AccountServiceBean__3_x_Internal_RemoteBusinessHome__" ;
+
+            orb.string_to_object( test2 ) ;
         } finally {
             if (orb != null)
                 orb.destroy() ;

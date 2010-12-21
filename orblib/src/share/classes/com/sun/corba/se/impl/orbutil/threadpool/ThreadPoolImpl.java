@@ -54,6 +54,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPool;
+import com.sun.corba.se.spi.orbutil.threadpool.ThreadStateValidator;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import com.sun.corba.se.spi.orbutil.threadpool.WorkQueue;
 
@@ -496,6 +497,8 @@ public class ThreadPoolImpl implements ThreadPool
                 currentWork.doWork();
             } catch (Throwable t) {
                 Exceptions.self.workerThreadDoWorkThrowable(t, this);
+            } finally {
+                ThreadStateValidator.checkValidators();
             }
             long elapsedTime = System.currentTimeMillis() - start;
             totalTimeTaken.addAndGet(elapsedTime);

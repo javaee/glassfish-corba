@@ -92,6 +92,13 @@ public abstract class GroupInfoServiceBase
         return new ArrayList( internalClusterInstanceInfo() ) ;
     }
 
+    public List<ClusterInstanceInfo> getClusterInstanceInfo(
+        String[] adapterName, List<String> endpoints ) {
+
+        // Make a copy of the internal data
+        return new ArrayList( internalClusterInstanceInfo( endpoints ) ) ;
+    }
+
     @Folb
     public boolean shouldAddAddressesToNonReferenceFactory(
         String[] adapterName) {
@@ -103,7 +110,12 @@ public abstract class GroupInfoServiceBase
         return true ;
     }
 
-    public abstract List<ClusterInstanceInfo> internalClusterInstanceInfo() ;
+    public List<ClusterInstanceInfo> internalClusterInstanceInfo() {
+        final List<String> endpoints = new ArrayList<String>() ;
+        return internalClusterInstanceInfo( endpoints ) ;
+    }
+
+    public abstract List<ClusterInstanceInfo> internalClusterInstanceInfo( List<String> endpoints ) ;
 }
 
 // End of file.

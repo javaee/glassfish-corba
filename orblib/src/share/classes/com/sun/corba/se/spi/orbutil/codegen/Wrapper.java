@@ -998,6 +998,9 @@ public final class Wrapper {
      * that use special ClassLoaders (such as the app server) should call this
      * method before starting to generate a new Class.  A good place to do this
      * is just before the _package call.
+     * <p>
+     * Applications that use this method may also need to clear the ClassLoader
+     * by calling _setClassLoader( null ).
      */
     public static void _setClassLoader( ClassLoader cl ) {
 	CurrentClassLoader.set( cl ) ;

@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,20 +11,20 @@
  * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
  * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
- * 
+ *
  * GPL Classpath Exception:
  * Oracle designates this particular file as subject to the "Classpath"
  * exception as provided by Oracle in the GPL Version 2 section of the License
  * file that accompanied this code.
- * 
+ *
  * Modifications:
  * If applicable, add the following below the License Header, with the fields
  * enclosed by brackets [] replaced by your own identifying information:
  * "Portions Copyright [year] [name of copyright owner]"
- * 
+ *
  * Contributor(s):
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
@@ -37,74 +37,60 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-//
-// Created       : 2005 Jun 13 (Mon) 11:04:09 by Harold Carr.
-// Last Modified : 2005 Aug 08 (Mon) 17:53:01 by Harold Carr.
-//
 
-package com.sun.corba.se.spi.folb;
+package com.sun.corba.se.spi.orbutil.threadpool;
 
+import com.sun.corba.se.impl.orbutil.threadpool.Exceptions ;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
-
-/**
- * @author Harold Carr
+/** Interface to support thread state validation.  The basic idea is that
+ * one or more validators can be registered with an implementation of the
+ * TSV.  The validators are executed whenever a thread is returned to the
+ * threadpool,  For example, a validator may check for unreleased locks or uncleared
+ * threadlocals.  This is intended as a last-ditch backstop for leaking resource
+ * problems.
+ *
+ * @author ken
  */
-public interface GroupInfoService
-{
-    /**
-     * Adds an observer that will receive a
-     * <code>membershipChange</code>
-     * invocation whenever the cluster membership changes.  
+public class ThreadStateValidator {
+    private static final Exceptions wrapper = Exceptions.self ;
+
+    private static final List<Runnable> validators = new ArrayList<Runnable>() ;
+
+    private ThreadStateValidator() {}
+
+    /** Register a thread validator (represented as a Runnable).
+     * A validator may check for locks that should not be held, check
+     * for threadlocals that should be cleared, or take any other action
+     * to check for resources that should not be held once the thread is no
+     * longer needed, as signaled by the thread being returned to the threadpool.
+     * <p>
+     * A validator typically may take the following actions:
+     * <ol>
+     * <li>Check whether or not a resource has been released.
+     * <li>Log any detected problems.
+     * <li>Reclaim the resource.
+     * </ol>
+     * A validator should NOT throw an exception, as all exceptions thrown
+     * from a validator will be ignored.
      *
-     * The 
-     * <code>membershipChange</code>
-     * invocation tells the observer to call
-     * <code>getClusterInstanceInfo</code>
-     * to get info.
-     *
-     * @return true if the given observer is added.  False otherwise.
+     * @param validator
      */
-    public boolean addObserver(GroupInfoServiceObserver x);
+    public static void registerValidator( Runnable validator ) {
+        validators.add( validator ) ;
+    }
 
-    /**
-     * Causes the
-     * <code>membershipChange</code> 
-     * method to be called on each registered observer.
+    /** Execute all of the validators.  Should only be called from the
+     * threadpool implementation.
      */
-    public void notifyObservers();
-
-    /**
-     * This is a separate call
-     * (rather than info being passed in <code>membershipChange</code>)
-     * so we can identifier the adapter.
-     *
-     * The adapter identification is used in testing.
-     */
-    public List<ClusterInstanceInfo> getClusterInstanceInfo(
-        String[] adapterName);
-
-    /**
-     * This is a separate call
-     * (rather than info being passed in <code>membershipChange</code>)
-     * so we can identifier the adapter.
-     *
-     * The adapter identification is used in testing.
-     */
-    public List<ClusterInstanceInfo> getClusterInstanceInfo(
-        String[] adapterName, List<String> endpoints );
-
-    /**
-     * This method only used during testing.
-     */
-    public boolean shouldAddAddressesToNonReferenceFactory(
-        String[] adapterName);
-
-    /**
-     * This method only used during testing.
-     */
-    public boolean shouldAddMembershipLabel (String[] adapterName);
+    public static void checkValidators() {
+        for (Runnable run : validators) {
+            try {
+                run.run() ;
+            } catch (Throwable thr) {
+                wrapper.threadStateValidatorException( run, thr ) ;
+            }
+        }
+    }
 }
-
-// End of file.

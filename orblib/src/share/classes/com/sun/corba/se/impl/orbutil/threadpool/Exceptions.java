@@ -155,4 +155,11 @@ public interface Exceptions {
     @Log( id = TPM_START + 4 )
     void threadGroupDestroyFailed( @Chain IllegalThreadStateException exc,
         ThreadGroup threadGroup);
+
+// ThreadStateValidator
+    static final int TSV_START = TPM_START + EXCEPTIONS_PER_CLASS ;
+
+    @Message( "Thread state validator threw an exception on validator {0}" )
+    @Log( id = TSV_START + 0 ) 
+    RuntimeException threadStateValidatorException( Runnable run, @Chain Throwable exc ) ;
 }

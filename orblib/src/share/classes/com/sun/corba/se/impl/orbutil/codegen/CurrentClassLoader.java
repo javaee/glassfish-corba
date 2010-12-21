@@ -43,6 +43,7 @@ package com.sun.corba.se.impl.orbutil.codegen;
 import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 import com.sun.corba.se.spi.orbutil.codegen.Type ;
+import com.sun.corba.se.spi.orbutil.threadpool.ThreadStateValidator;
 
 /** Class used to set and get the global class loader used
  * by the codegen library.  This is maintained in a ThreadLocal
@@ -51,7 +52,8 @@ import com.sun.corba.se.spi.orbutil.codegen.Type ;
  */
 public class CurrentClassLoader {
     private static ThreadLocal<ClassLoader> current = 
-	new ThreadLocal() {
+	new ThreadLocal<ClassLoader>() {
+        @Override
 	    protected ClassLoader initialValue() {
 		return LibraryClassLoader.getClassLoader() ;
 	    }
@@ -61,9 +63,22 @@ public class CurrentClassLoader {
 	return current.get() ;
     }
 
+    private static final Runnable validator = new Runnable() {
+        public void run() {
+            current.remove() ;
+        }
+    } ;
+
+    static {
+        // Note that this doesn't help when codegen is called from a thread
+        // not in the ORB threadpool: see issue 7075.
+        ThreadStateValidator.registerValidator(validator);
+    }
+
     public static void set( ClassLoader cl ) {
-	if (cl == null)
-	    cl = LibraryClassLoader.getClassLoader() ;
+	if (cl == null) {
+            cl = LibraryClassLoader.getClassLoader();
+        }
 	current.set( cl ) ;
 
 	// This is essential for proper operation of codegen when multiple

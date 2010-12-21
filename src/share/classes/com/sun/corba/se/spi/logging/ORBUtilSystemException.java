@@ -1959,4 +1959,8 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.FINE, id=20 )
     @Message( "Error in ServerGroupManager")
     UNKNOWN serverGroupManagerException(@Chain Exception e);
+
+    @Log( level=LogLevel.FINE, id=21 )
+    @Message( "ThreadStateValidator {0} threw an exception")
+    UNKNOWN threadStateValidatorException(Runnable run, @Chain Throwable thr);
 }

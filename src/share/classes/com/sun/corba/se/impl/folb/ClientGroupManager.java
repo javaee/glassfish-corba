@@ -500,11 +500,31 @@ public class ClientGroupManager
     //
 
     @Folb
-    public List<ClusterInstanceInfo> getInitialClusterInstanceInfo(ORB orb) {
+    public List<ClusterInstanceInfo> getInitialClusterInstanceInfo(ORB orb,
+        List<String> endpoints ) {
         try {
-	  org.omg.CORBA.Object ref = orb.resolve_initial_references(
-              "NameService");
-	  NamingContext nctx = NamingContextHelper.narrow(ref);
+          org.omg.CORBA.Object ref ;
+          if (endpoints.isEmpty()) {
+              ref = orb.resolve_initial_references( "NameService");
+          } else {
+              final StringBuilder sb = new StringBuilder() ;
+              sb.append( "corbaloc:" ) ;
+              boolean first = true ;
+              for (String str : endpoints ) {
+                  if (first) {
+                      first = false ;
+                  } else {
+                      sb.append( ',' ) ;
+                  }
+
+                  sb.append( "iiop:1.2@" ).append( str ) ;
+              }
+
+              sb.append( "/NameService" ) ;
+              ref = orb.string_to_object( sb.toString() ) ;
+          }
+
+          NamingContext nctx = NamingContextHelper.narrow(ref);
 	  NameComponent[] path =
               { new NameComponent(ORBConstants.INITIAL_GROUP_INFO_SERVICE, "") };
 	  InitialGroupInfoService.InitialGIS initGIS =
@@ -519,10 +539,10 @@ public class ClientGroupManager
 
     private class GIS extends GroupInfoServiceBase
     {
-	public List<ClusterInstanceInfo> internalClusterInstanceInfo()
+	public List<ClusterInstanceInfo> internalClusterInstanceInfo( List<String> endpoints )
 	{
 	    if (lastIOR == null) {	     
-		return getInitialClusterInstanceInfo(orb);
+		return getInitialClusterInstanceInfo(orb, endpoints );
 	    }
 
 	    IIOPProfileTemplate iiopProfileTemplate;
@@ -572,6 +592,11 @@ public class ClientGroupManager
         String[] adapterName)
     {
 	return gis.getClusterInstanceInfo(adapterName);
+    }
+    public List<ClusterInstanceInfo> getClusterInstanceInfo(
+        String[] adapterName, List<String> endpoints )
+    {
+	return gis.getClusterInstanceInfo(adapterName,endpoints);
     }
     public boolean shouldAddAddressesToNonReferenceFactory(String[] x)
     {

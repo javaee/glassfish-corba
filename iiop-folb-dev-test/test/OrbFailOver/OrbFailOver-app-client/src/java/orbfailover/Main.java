@@ -18,6 +18,7 @@ import glassfish.AdminCommand;
 import glassfish.GlassFishCluster;
 import glassfish.GlassFishInstallation;
 import glassfish.StandardPorts;
+import java.util.HashSet;
 import java.util.Hashtable;
 import javax.naming.Binding;
 import javax.naming.Context;
@@ -487,6 +488,34 @@ public class Main extends Base {
             + " expected " + expected + ", actual " + counts.keySet() ) ;
     }
 
+    public void doLoadBalance( Set<String> expected, Set<InitialContext> ics
+        ) throws NamingException {
+        // XXX add checking for approximate distribution
+        // according to weights
+        Map<String,Integer> counts =
+            new HashMap<String,Integer>() ;
+
+        String newLocation = "" ;
+        int i = 0 ;
+        for (InitialContext ctx : ics ) {
+            LocationBeanRemote locBean = lookup( ctx ) ;
+            newLocation = invokeMethod( locBean );
+            note( "result[" + (i++) + "]= " + newLocation);
+            increment( counts, newLocation ) ;
+        }
+
+        note( "Call distribution:" ) ;
+        for (Map.Entry<String,Integer> entry : counts.entrySet()) {
+            int count = entry.getValue().intValue() ;
+            note( String.format( "\tName = %20s Count = %10d",
+                entry.getKey(), count ) ) ;
+        }
+
+        check( expected.equals(counts.keySet()),
+            "Requests not loadbalanced across expected instances: "
+            + " expected " + expected + ", actual " + counts.keySet() ) ;
+    }
+
     // Test scenario for issue 14732:
     // 1. One instance of cluster is running (all remaining are stopped)
     // 2. Create Initial Context (with endpoints having all instance host and ports)
@@ -595,8 +624,30 @@ public class Main extends Base {
     // 5. The expectation is, the failoved requests should be distributed
     //    among healthy instances (15 each approx)
     @Test( "15100")
-    public void test15100() {
-        fail( "Test not implemented yet" ) ;
+    public void test15100() throws NamingException {
+        final int NUM_IC = 100 ;
+        Set<String> instances = gfCluster.runningInstances() ;
+        while (instances.size() > 3) {
+            String linst = pick( instances ) ;
+            ac.stopInstance(linst);
+            instances = gfCluster.runningInstances() ;
+        }
+
+        check( instances.size() == 3, "Not enough instances to run test" ) ;
+        String shutdownInst = pick( instances ) ;
+        Set<InitialContext> chosen = new HashSet<InitialContext>() ;
+
+        for (int ctr=0; ctr<NUM_IC; ctr++ ) {
+            InitialContext ic = new InitialContext() ;
+            LocationBeanRemote locBean = lookup(ic) ;
+            String runningInstance = invokeMethod( locBean ) ;
+            if (runningInstance.equals( shutdownInst )) {
+                chosen.add( ic ) ;
+            }
+        }
+
+        ac.stopInstance( shutdownInst ) ;
+        doLoadBalance( gfCluster.runningInstances(), chosen ) ;
     }
 
     @Post

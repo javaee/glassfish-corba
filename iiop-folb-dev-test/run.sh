@@ -17,14 +17,15 @@ AVAILABLE_NODES="minas:2,apollo:4"
 # AVAILABLE_NODES="minas:3"
 
 ################################################################
-# Do the following to create a new cluster and new GF installation
+# Do the following to create a new cluster and new GF installation,
+# or just set SKIP_SETUP=true
 ################################################################
 
 # assume that we are running on minas
 killgf
 ssh apollo /volumes/home/ken/bin/killgf
 installgfv3
-installgforb
+# installgforb
 installgfnaming
 SKIP_SETUP="false"
 

@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="Content-Type">
+  <title>The IIOP FOLB dev tests</title>
+</head>
+<body>
+<h2>Notes on the IIOP FOLB dev tests</h2>
+The project contains a very standard EJB, and a somewhat strange app
+client. The EJB is just deployed to a cluster as usual, but the app
+client is really a standalone program that starts the cluster and
+configures and controls it as needed. The project is itself a Java EE
+project, containing sub projects for the EJB and the app client.<br>
+<br>
+The EJB essentially has one method:<br>
+<br>
+<div style="margin-left: 40px;">public String getLocation() ;<br>
+</div>
+<br>
+This method just returns the instance on which the EJB runs.&nbsp; The
+EJB
+itself gets the instance from a system property, which is set up as
+part of the cluster configuration.<br>
+<br>
+<h2>Configuring and running the test</h2>
+The first step is to setup the nodes that you will use so that (at
+least) the DAS node can ssh to the other nodes (including itself)
+without userid/password.&nbsp; To do this, you basically need to create
+a public/private key pair, and publish the public key to each machine
+(see google for details).&nbsp; The most important (and most easily
+overlooked) requirement is to set the permissions correctly:<br>
+<ul>
+  <li>~/.ssh MUST have permission 700</li>
+  <li>The private key (e.g. id_rsa) MUST have permission 600</li>
+  <li>The public key (e.g. id_rsa.pub) MUST have permission 644</li>
+  <li>The authorized_keys files MUST have permission 600</li>
+  <li>The known_hosts files MUST have permission 644<br>
+  </li>
+</ul>
+The next step requires setting up some environment variables and
+configuring the run.sh script.<br>
+First, let's assume that you have unzipped glassfish.zip to the
+directory &lt;WORK&gt;.<br>
+The required environment variables are:<br>
+<ul>
+  <li>S1AS_HOME: must be set to &lt;WORK&gt;/glassfish3/glassfish</li>
+  <li>GFV3_WORK: must be set to &lt;WORK&gt;</li>
+</ul>
+The current run.sh also assumes that you have some scripts available:<br>
+<ul>
+  <li>killgf: kill all GF processes on a machine</li>
+  <li>installgfv3: installs GF 3.1 into &lt;WORK&gt;</li>
+  <li>installgforb: installs GF 3.1 orb/* modules into
+&lt;WORK&gt;/glassfish3/glassfish/modules</li>
+  <li>installgfnaming: installs GF 3.1 common/glassfish-naming module
+into &lt;WORK&gt;/glassfish3/glassfish/modules</li>
+</ul>
+A couple of things need to be set according to your environment in
+run.sh:<br>
+<ul>
+  <li>DAS_HOST: the host on which you run the DAS.</li>
+  <li>AVAILABLE_NODES: set to comma separated list &lt;host:num
+instances&gt;</li>
+  <ul>
+    <li>GF instances will be distributed across the available instances</li>
+    <li>The number of instances must be at least 5 (in order to run
+14867).&nbsp; Most test cases work well with 3 instances.</li>
+  </ul>
+</ul>
+To run the tests, just call<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; ./run.sh &lt;options&gt;<br>
+<br>
+Options will be discussed later.<br>
+<br>
+<h2>A tour through the project</h2>
+<ul>
+  <li>run.sh: the script used to run everything<br>
+  </li>
+  <li>README.html: (this file obviously)</li>
+  <li>OLD: directory containing obsolete version of test scripts</li>
+  <li>testcommands.txt: gives a typical example of the asadmin commands
+used to create a cluster</li>
+  <li>test</li>
+  <ul>
+    <li>OrbFailover</li>
+    <ul>
+      <li>nbproject (this is the level at which NetBeans starts)</li>
+      <li>OrbFailover-app-client</li>
+      <ul>
+        <li>src</li>
+        <ul>
+          <li>java</li>
+          <ul>
+            <li>argparser: an extended ORB-style ArgParser that
+supports extensions</li>
+            <li>glassfish</li>
+            <ul>
+              <li>AdminCommand: allows issuing asadmin commands by
+execing asadmin</li>
+              <li>GlassFishCluster: manages a cluster using AdminCommand</li>
+              <li>GlassFishInstallation: keeps track of the basic GF
+installation</li>
+              <li>StandardPorts: an enum for the various port types</li>
+              <li>WeightedCircularIterator: used to iterate over the
+AVAILABLE_NODES information</li>
+            </ul>
+            <li>orb/folb: a copy of LocationBeanRemote</li>
+            <li>orbfailover</li>
+            <ul>
+              <li>Main.java: the actual test program</li>
+            </ul>
+            <li>testtools</li>
+            <ul>
+              <li>Base.java: a quick-and-dirty annotation driven test
+framework similar to JUnit, TestNg</li>
+              <li>Post: annotation used on methods that are executed
+after each test method</li>
+              <li>Pre: annotation used on methods that are executed
+before each test method</li>
+              <li>Test: annotates the method with an optional testID</li>
+              <ul>
+                <li>default testID is method name <br>
+                </li>
+              </ul>
+            </ul>
+          </ul>
+        </ul>
+      </ul>
+      <li>OrbFailover-ejb</li>
+      <ul>
+        <li>src</li>
+        <ul>
+          <li>java</li>
+          <ul>
+            <li>orb</li>
+            <ul>
+              <li>folb</li>
+              <ul>
+                <li>LocationBean.java: the bean implementation<br>
+                </li>
+                <li>LocationBeanRemove.java: the remote interface <br>
+                </li>
+                <ul>
+                  <li>This is duplicated in the app client, because
+that's the only way I could get it to work!<br>
+                  </li>
+                </ul>
+              </ul>
+            </ul>
+          </ul>
+        </ul>
+      </ul>
+      <li>build.xml</li>
+      <li>src (ignore: NB/JavaEE stuff)<br>
+      </li>
+    </ul>
+  </ul>
+</ul>
+<h2>Command Options</h2>
+Command options in Base: (see Base.Arguments for details):<br>
+<ul>
+  <li>debug (true/false): controls debugging mode for test framework</li>
+  <li>cases (true/false)</li>
+  <li>include (list of String): testIDs to include in this run</li>
+  <li>exclude (list of String): testIDs to exclude in this run<br>
+  </li>
+</ul>
+<br>
+Specific command options for Main: (see Main.Installation for details):<br>
+<ul>
+  <li>installDir (String): directory where GF is installed</li>
+  <li>dasNode (String): name of the machine running the DAS</li>
+  <li>availableNodes (list of String): see AVAILABLE_NODES above</li>
+  <li>testEJB (String): path of the EJB to deploy</li>
+  <li>doCleanup (boolean): whether or not to shutdown and destroy the
+cluster at the end</li>
+  <li>skipSetup (boolean): whether or not to skip the setup of the
+cluster</li>
+  <ul>
+    <li>setting this to false is useful if you are repeatedly running
+the same test for debugging</li>
+  </ul>
+  <li>numInstances (int): number of instances to use in the cluster
+(default 5)</li>
+  <ul>
+    <li>most tests will run fine with 3 instances, 14867 needs 5<br>
+    </li>
+  </ul>
+</ul>
+<h2>Description of Test Cases</h2>
+Here are the test cases (ID after name):<br>
+<ul>
+  <li>test14732 (14732)</li>
+  <li>test14755 (14755)</li>
+  <li>test14762 (14762)</li>
+  <li>test14766 (14766)</li>
+  <li>test14867 (14867)<br>
+  </li>
+  <li>test15100 (15100)</li>
+  <li>testLBFail (lbfail): loadbalance after failure<br>
+  </li>
+  <li>testLoadBalance (loadbalance): basic loadbalance<br>
+  </li>
+  <li>failOverTest (failover): basic failover</li>
+  <li>listContextTest (listcontext): lists a naming context</li>
+  <ul>
+    <li>This doesn't work, because naming is a bit messed up in
+GF.&nbsp; Should file an issue and fix in 3.2.<br>
+    </li>
+  </ul>
+</ul>
+<br>
+</body>
+</html>

@@ -71,8 +71,16 @@ public class GroupInfoServiceImpl
 
     private class GIS extends GroupInfoServiceBase
     {
-	public List<ClusterInstanceInfo> internalClusterInstanceInfo() { 
+	public List<ClusterInstanceInfo> internalClusterInstanceInfo(
+            List<String> endpoints ) { 
             throw new RuntimeException( "Should not be called" ) ;
+        }
+
+        @Override
+	public List<ClusterInstanceInfo> getClusterInstanceInfo(
+            String[] adapterName, List<String> endpoints )
+	{
+            return getClusterInstanceInfo( adapterName ) ;
         }
 
         @Override
@@ -216,6 +224,13 @@ public class GroupInfoServiceImpl
     public void notifyObservers()
     {
 	gis.notifyObservers();
+    }
+
+    @Override
+    public List<ClusterInstanceInfo> getClusterInstanceInfo(
+        String[] adapterName, List<String> endpoints )
+    {
+	return gis.getClusterInstanceInfo(adapterName,endpoints);
     }
 
     public List<ClusterInstanceInfo> getClusterInstanceInfo(

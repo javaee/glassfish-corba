@@ -46,7 +46,7 @@ package com.sun.corba.se.spi.orbutil.generic ;
  */
 public class SynchronizedHolder<T> 
 {
-    private T _content ;
+    private /* volatile? */ T _content ;
 
     public SynchronizedHolder( T content ) 
     {
@@ -58,7 +58,25 @@ public class SynchronizedHolder<T>
 	this( null ) ;
     }
 
-    public synchronized T content()
+    /** Issue 15392: It is EXTEMELY important to make this operation 
+     * as fast as possible, because it is called a lot, even when 
+     * tracing is not enabled.  This method is called at the start
+     * of every method that has a tracing annotation.
+     * In particular, synchronized is too slow, and it is suspected that
+     * volatile may be too slow as well.
+     * <p>
+     * The consequences of not synchronizing here are that a content(T) call
+     * may NEVER become visible in some threads.  This means that turning on
+     * tracing while the system is running may not capture all methods
+     * that should be traced.
+     * <P>
+     * Note that in GF 3.1, we NORMALLY only enabled ORB tracing using
+     * -Dcom.sun.corba.ee.Debug, which only happens at GF startup time,
+     * so this is not too big a problem.  However, it is possible to change
+     * tracing flags using a ORB MBean, which could definitely cause 
+     * the problem mentioned above.
+     */
+    public T content()
     {
 	return _content ;
     }

@@ -26,7 +26,8 @@ killgf
 ssh apollo /volumes/home/ken/bin/killgf
 installgfv3
 # installgforb
-installgfnaming
+# installgfnaming
+# installorb
 SKIP_SETUP="false"
 
 # SKIP_SETUP="true"

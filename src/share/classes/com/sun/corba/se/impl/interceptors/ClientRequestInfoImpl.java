@@ -435,7 +435,16 @@ public final class ClientRequestInfoImpl
 	// As per ptc/00-08-06, section 21.3.13.6., If not found, raise
 	// BAD_PARAM with minor code INVALID_COMPONENT_ID.
 	if( (result == null) || (result.length == 0) ) {
-	    throw stdWrapper.invalidComponentId( id ) ;
+            if (!myORB.getORBData().isAppServerMode()) {
+                /** Issue 15931: the new wrapper mechanism is currently
+                 * a lot slower than the old, and this is taking too
+                 * long.  We shouldn't indicate a normal condition with
+                 * an exception in any case, but that's a flaw in the
+                 * standard.  So, if we are running in the app server,
+                 * don't do this: just return null.
+                 */
+                throw stdWrapper.invalidComponentId( id ) ;
+            }
 	}
 
 	// Good citizen: In the interest of efficiency, we will assume

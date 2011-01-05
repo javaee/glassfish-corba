@@ -95,10 +95,17 @@ public class Main extends Base {
     }
 
     private InitialContext makeIC( String eplist ) throws NamingException {
-        final Hashtable table = new Hashtable() ;
-        table.put( "com.sun.appserv.iiop.endpoints", eplist ) ;
-        final InitialContext result = new InitialContext( table ) ;
+        InitialContext result ;
+        if (eplist != null) {
+            final Hashtable table = new Hashtable() ;
+            table.put( "com.sun.appserv.iiop.endpoints", eplist ) ;
+            result = new InitialContext( table ) ;
+        } else {
+            result = new InitialContext() ;
+        }
+
         note( "Created new InitialContext with endpoints " + eplist ) ;
+
         return result ;
     }
 
@@ -260,7 +267,7 @@ public class Main extends Base {
 
         boolean failOverDetected = false;
         try {
-            InitialContext ctx = makeIC();
+            InitialContext ctx = makeIC(null);
             LocationBeanRemote locBean = lookup( ctx ) ;
             String origLocation = invokeMethod( locBean );
             if (origLocation == null) {
@@ -351,7 +358,7 @@ public class Main extends Base {
         final List<InitialContext> ics = new ArrayList<InitialContext>() ;
         final List<LocationBeanRemote> lbs = new ArrayList<LocationBeanRemote>() ;
         for (int ctr=0; ctr<10; ctr++) {
-            final InitialContext ic = makeIC() ;
+            final InitialContext ic = makeIC(null) ;
             ics.add( ic ) ;
             final LocationBeanRemote lb = lookup( ic ) ;
             lbs.add( lb ) ;
@@ -379,7 +386,7 @@ public class Main extends Base {
     //    should be sticky)
     @Test( "14755" )
     public void test14755() throws NamingException {
-        InitialContext ic = makeIC() ;
+        InitialContext ic = makeIC(null) ;
         LocationBeanRemote lb = lookup( ic ) ;
         String first = invokeMethod( lb ) ;
         ac.stopInstance(first);
@@ -408,7 +415,7 @@ public class Main extends Base {
     // 12 do one request - ensure it works
     @Test( "14766")
     public void test14766() throws NamingException {
-        InitialContext ctx = makeIC() ;
+        InitialContext ctx = makeIC(null) ;
         LocationBeanRemote locBean = lookup( ctx ) ;
 
         String loc1 = invokeMethod( locBean );
@@ -469,7 +476,12 @@ public class Main extends Base {
 
         String newLocation = "" ;
         for (int i = 1; i <= numCalls ; i++) {
-            InitialContext ctx = makeIC( endpoints ) ;
+            InitialContext ctx ;
+            if (i == 1) {
+                ctx = makeIC( endpoints ) ;
+            } else {
+                ctx = makeIC(null) ;
+            }
             LocationBeanRemote locBean = lookup( ctx ) ;
             newLocation = invokeMethod( locBean );
             note( "result[" + i + "]= " + newLocation);
@@ -625,20 +637,25 @@ public class Main extends Base {
     //    among healthy instances (15 each approx)
     @Test( "15100")
     public void test15100() throws NamingException {
+        final int CLUSTER_SIZE = 3 ;
         final int NUM_IC = 100 ;
+        Set<String> clusterInstances = new HashSet<String>() ;
         Set<String> instances = gfCluster.runningInstances() ;
-        while (instances.size() > 3) {
-            String linst = pick( instances ) ;
-            ac.stopInstance(linst);
-            instances = gfCluster.runningInstances() ;
+        for (int ctr=0; ctr<CLUSTER_SIZE; ctr++) {
+            clusterInstances.add( pick(instances, true) ) ;
+        }
+        check( clusterInstances.size() == 3, "Not enough instances to run test" ) ;
+
+        gfCluster.stopCluster() ;
+        for (String inst : clusterInstances) {
+            gfCluster.startInstance(inst);
         }
 
-        check( instances.size() == 3, "Not enough instances to run test" ) ;
-        String shutdownInst = pick( instances ) ;
+        String shutdownInst = pick( clusterInstances ) ;
         Set<InitialContext> chosen = new HashSet<InitialContext>() ;
 
         for (int ctr=0; ctr<NUM_IC; ctr++ ) {
-            InitialContext ic = new InitialContext() ;
+            InitialContext ic = makeIC(null) ;
             LocationBeanRemote locBean = lookup(ic) ;
             String runningInstance = invokeMethod( locBean ) ;
             if (runningInstance.equals( shutdownInst )) {

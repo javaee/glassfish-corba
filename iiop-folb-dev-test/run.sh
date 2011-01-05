@@ -18,15 +18,26 @@ AVAILABLE_NODES="minas:2,apollo:4"
 
 ################################################################
 # Do the following to create a new cluster and new GF installation,
-# or just set SKIP_SETUP=true
+# or just set SKIP_SETUP=true.  Different installXXX commands
+# can be used to copy updated modules into the GF image, avoiding a
+# rebuild of GF (which can take 30+ minutes)
+# 
+# Install scripts:
+#   installgfv3     install GF 3.1 image from a local build
+#   installgforb    install GF 3.1 orb glue bundles (orb/orb-iiop, etc.)
+#   installgfnaming install GF 3.1 naming code (common/glassfish-naming)
+#   installorb      install 3.1 version of ORB from a local build
 ################################################################
 
-# assume that we are running on minas
+# Clean up old instances: assuming killgf is available
+# use ssh to kill GF on remote hosts
 killgf
 ssh apollo /volumes/home/ken/bin/killgf
+
+# Do any needed installs
 installgfv3
 # installgforb
-# installgfnaming
+installgfnaming
 # installorb
 SKIP_SETUP="false"
 

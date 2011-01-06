@@ -397,9 +397,9 @@ public final class ClientRequestInfoImpl
     public TaggedComponent get_effective_component (int id){
 	checkAccess( MID_GET_EFFECTIVE_COMPONENT );
             
-	TaggedComponent[] comps = get_effective_components( id ) ;
+        TaggedComponent[] comps = get_effective_components( id ) ;
         if ((comps != null) && (comps.length > 0)) {
-            return comps[0]; 
+            return comps[0];
         } else {
             return null ;
         }

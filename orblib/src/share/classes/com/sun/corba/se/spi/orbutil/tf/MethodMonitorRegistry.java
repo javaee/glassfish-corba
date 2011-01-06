@@ -45,6 +45,8 @@ import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.security.AccessController ;
+import java.security.PrivilegedAction ;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -345,9 +347,8 @@ public class MethodMonitorRegistry {
      * @param cls
      */
     public synchronized static void registerClass( final Class<?> cls ) {
-
-	Util util = new Util( false, 0 ) ;
-	EnhancedClassData ecd = new EnhancedClassDataReflectiveImpl( 
+	final Util util = new Util( false, 0 ) ;
+	final EnhancedClassData ecd = new EnhancedClassDataReflectiveImpl( 
 	    util, cls) ;
 
         final boolean fullUpdate = scanClassAnnotations( cls ) ;
@@ -367,16 +368,25 @@ public class MethodMonitorRegistry {
 	    try {
 		final String aname = entry.getKey() ;	// annotation name
 		final String fname = entry.getValue() ;	// field name
+                final SynchronizedHolder<MethodMonitor> sh =
+                    new SynchronizedHolder<MethodMonitor>() ;
 
-		final Field fld = cls.getDeclaredField( fname ) ;
+		AccessController.doPrivileged( 
+                    new PrivilegedAction<Field>() {
+                        public Field run() {
+                            try {
+                                final Field field = cls.getDeclaredField( fname ) ;
+                                field.setAccessible(true) ;
+                                field.set( null, sh) ;
 
-                // XXX needs doPrivileged if non-null SecurityManager
-		fld.setAccessible(true) ;
-
-		final SynchronizedHolder<MethodMonitor> sh =
-		    new SynchronizedHolder<MethodMonitor>() ;
-
-	        fld.set( null, sh) ;
+                                return field ;
+                            } catch (Exception exc) {
+                                // XXX log me!
+                                return null ;
+                            }
+                        }
+                    }
+                ) ;
 
                 final String axname = getExternalName( aname ) ;
 

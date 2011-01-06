@@ -168,13 +168,16 @@ public abstract class CorbaAcceptorBase
         Iterator iterator = iorTemplate.iteratorById(TAG_INTERNET_IOP.value);
         String hname = orb.getORBData().getORBServerHost();
         if (iterator.hasNext()) {
-            IIOPAddress iiopAddress = IIOPFactories.makeIIOPAddress(hname, port);
-            AlternateIIOPAddressComponent iiopAddressComponent = 
-                IIOPFactories.makeAlternateIIOPAddressComponent(iiopAddress);
-            while (iterator.hasNext()) {
-                TaggedProfileTemplate taggedProfileTemplate = 
-                    (TaggedProfileTemplate)iterator.next();
-                taggedProfileTemplate.add(iiopAddressComponent);
+            // NEVER create an AlternateIIOPAddress for an SSL acceptor!
+            if (!type.startsWith( SocketInfo.SSL_PREFIX )) {
+                IIOPAddress iiopAddress = IIOPFactories.makeIIOPAddress(hname, port);
+                AlternateIIOPAddressComponent iiopAddressComponent = 
+                    IIOPFactories.makeAlternateIIOPAddressComponent(iiopAddress);
+                while (iterator.hasNext()) {
+                    TaggedProfileTemplate taggedProfileTemplate = 
+                        (TaggedProfileTemplate)iterator.next();
+                    taggedProfileTemplate.add(iiopAddressComponent);
+                }
             }
         } else {
             IIOPProfileTemplate iiopProfile = makeIIOPProfileTemplate(policies, codebase);

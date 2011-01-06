@@ -48,6 +48,7 @@ public interface SocketInfo
     // to avoid a compilation dependency.
 
     String IIOP_CLEAR_TEXT = "IIOP_CLEAR_TEXT";
+    String SSL_PREFIX = "SSL" ;
 
     String getType();
 

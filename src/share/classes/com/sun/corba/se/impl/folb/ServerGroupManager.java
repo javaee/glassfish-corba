@@ -127,7 +127,8 @@ public class ServerGroupManager
 
     // REVISIT - the app server identifies socket "types" with
     // these strings.  Should be an official API.
-    private static final String SSL = "SSL";
+    private static final String SSL = com.sun.corba.se.spi.transport.SocketInfo.SSL_PREFIX ;
+    private static final String CLEAR = com.sun.corba.se.spi.transport.SocketInfo.IIOP_CLEAR_TEXT ;
 
     @InfoMethod
     private void alreadyInitialized() { }
@@ -269,11 +270,12 @@ public class ServerGroupManager
                 for (SocketInfo sinfo : clusterInstanceInfo.endpoints()) {
                     if (sinfo.type().startsWith( SSL )) {
                         skippingEndpoint(sinfo);
-                        continue ;
+                    } else {
+                        includingEndpoint(sinfo);
+                        // Don't want junk like orb-listener-1 from GlassFish here
+                        final SocketInfo si = new SocketInfo( CLEAR, sinfo.host(), sinfo.port() ) ;
+                        listOfSocketInfo.add( si ) ;
                     }
-
-                    includingEndpoint(sinfo);
-                    listOfSocketInfo.add( sinfo ) ;
                 }
 
                 final ClusterInstanceInfo ninfo = new ClusterInstanceInfo(

@@ -30,6 +30,7 @@ import orb.folb.LocationBeanRemote;
 import testtools.Test ;
 import testtools.Base ;
 import testtools.Post;
+import testtools.Pre;
 
 /**
  * @author hv51393
@@ -138,7 +139,7 @@ public class Main extends Base {
         @Help("The test EJB needed for this test")
         String testEjb() ;
 
-        @DefaultValue( "true" )
+        @DefaultValue( "false" )
         @Help("Set if we want to shutdown and destroy the cluster after the test")
         boolean doCleanup() ;
 
@@ -152,6 +153,11 @@ public class Main extends Base {
             + "There must be sufficient availability declared in availableNodes "
             + "for this many instances")
         int numInstances() ;
+
+        @DefaultValue( "false" )
+        @Help( "Set this to true if you only want to set up a cluster, and do NOT"
+            + "want to run any tests")
+        boolean skipTests() ;
     }
 
     private final Installation inst ;
@@ -167,17 +173,20 @@ public class Main extends Base {
                 inst.skipSetup() ) ;
             ac = gfInstallation.ac() ;
 
-            // Create default 3 instance cluster
             gfCluster = new GlassFishCluster( gfInstallation, CLUSTER_NAME,
                 inst.skipSetup()) ;
             if (!inst.skipSetup()) {
                 clusterInfo = gfCluster.createInstances( INSTANCE_BASE_NAME,
                     inst.numInstances() ) ;
                 gfCluster.startCluster() ;
-                ac.deploy( CLUSTER_NAME, EJB_NAME, inst.testEjb() ) ;
+                if (!inst.testEjb().isEmpty()) {
+                    ac.deploy( CLUSTER_NAME, EJB_NAME, inst.testEjb() ) ;
+                }
             } else {
+                gfCluster.startCluster() ;
                 clusterInfo = gfCluster.instanceInfo() ;
             }
+
         } catch (Exception exc) {
             System.out.println( "Exception in constructor: " + exc ) ;
             exc.printStackTrace() ;
@@ -209,12 +218,15 @@ public class Main extends Base {
      */
     public static void main(String[] args) {
         Main m = new Main( args );
-        int result = 1 ;
-        if (m.gfCluster != null) {
-            try {
-                result = m.run() ;
-            } finally {
-                m.cleanup() ;
+        int result = 0 ;
+        if (!m.inst.skipTests()) {
+            result = 1 ;
+            if (m.gfCluster != null) {
+                try {
+                    result = m.run() ;
+                } finally {
+                    m.cleanup() ;
+                }
             }
         }
         System.exit( result ) ;
@@ -267,7 +279,7 @@ public class Main extends Base {
 
         boolean failOverDetected = false;
         try {
-            InitialContext ctx = makeIC(null);
+            InitialContext ctx = makeIC();
             LocationBeanRemote locBean = lookup( ctx ) ;
             String origLocation = invokeMethod( locBean );
             if (origLocation == null) {
@@ -667,8 +679,15 @@ public class Main extends Base {
         doLoadBalance( gfCluster.runningInstances(), chosen ) ;
     }
 
+    @Pre
+    public void ensureIC() throws NamingException {
+        // Make sure an initial context is created with endpoints before any
+        // test starts
+        makeIC() ;
+    }
+
     @Post
-    private void ensure() {
+    public void ensure() {
         // make sure all instances are running
         gfCluster.startCluster();
     }

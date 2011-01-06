@@ -1,0 +1,13 @@
+#! /bin/csh
+setenv BUILD ${GFV3_WS}
+if ("$1" == "") then
+    setenv RUN ${GFV3_WORK}
+else
+    setenv RUN ${GFV3_WORK}/$1
+endif
+
+rm ${RUN}/glassfish.zip
+rm -rf ${RUN}/glassfish3
+cp ${BUILD}/distributions/glassfish/target/glassfish.zip ${RUN}
+cd ${RUN}
+unzip glassfish.zip

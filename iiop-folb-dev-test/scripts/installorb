@@ -1,0 +1,12 @@
+#! /bin/csh
+setenv ORB ${CORBA_WS}/build/rename/ee/build/release/lib/bundles
+setenv DEST ${GFV3_WORK}/glassfish3/glassfish/modules
+
+cd ${ORB}
+cp glassfish-corba-asm.jar  ${DEST}
+cp glassfish-corba-codegen.jar  ${DEST}
+cp glassfish-corba-csiv2-idl.jar  ${DEST}
+cp glassfish-corba-newtimer.jar  ${DEST}
+cp glassfish-corba-omgapi.jar  ${DEST}
+cp glassfish-corba-orb.jar  ${DEST}
+cp glassfish-corba-orbgeneric.jar  ${DEST}

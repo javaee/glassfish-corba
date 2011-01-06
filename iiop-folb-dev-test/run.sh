@@ -1,8 +1,10 @@
 #! /bin/sh
 # Note that S1AS_HOME and GFV3_WORK must be defined before this script is called.
+# GFV3_WS must be set in order to use scripts/installgfv3.
+# CORBA_WS must be set in order to use scripts/installorb.
 # The script installgfv3 must be available, and must install your GF 3.1
 # into ${GFV3_WORK}.
-# The current directory must be the directory containing this script.
+# The current directory must be the directory containing this run.sh script.
 
 ################################################################
 # The following setup is environment specific:
@@ -29,18 +31,21 @@ AVAILABLE_NODES="minas:2,apollo:4"
 #   installorb      install 3.1 version of ORB from a local build
 ################################################################
 
-# Clean up old instances: assuming killgf is available
-# use ssh to kill GF on remote hosts
-killgf
-ssh apollo /volumes/home/ken/bin/killgf
+# Clean up old instances
+# ${S1AS_HOME}/bin/asadmin stop-cluster c1
+# ${S1AS_HOME}/bin/asadmin stop-domain
 
-# Do any needed installs
-installgfv3
-# installgforb
-installgfnaming
-# installorb
+# Do any needed installs.  installgfv3 MUST be first.
+# Only installgfv3 is needed for a fresh install; the others
+# are for use if some of the GF or ORB code has been modified
+# without rebuilding all of GF.
+scripts/installgfv3
+# scripts/installgforb
+# scripts/installgfnaming
+# scripts/installorb
 SKIP_SETUP="false"
 
+# Only use this if no installations (see above) is needed.
 # SKIP_SETUP="true"
 
 ################################################################

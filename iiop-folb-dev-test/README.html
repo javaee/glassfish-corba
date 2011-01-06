@@ -26,9 +26,9 @@ part of the cluster configuration.<br>
 <h2>Configuring and running the test</h2>
 The first step is to setup the nodes that you will use so that (at
 least) the DAS node can ssh to the other nodes (including itself)
-without userid/password.&nbsp; To do this, you basically need to create
+without userid/password. To do this, you basically need to create
 a public/private key pair, and publish the public key to each machine
-(see google for details).&nbsp; The most important (and most easily
+(see google for details). The most important (and most easily
 overlooked) requirement is to set the permissions correctly:<br>
 <ul>
   <li>~/.ssh MUST have permission 700</li>
@@ -46,16 +46,29 @@ The required environment variables are:<br>
 <ul>
   <li>S1AS_HOME: must be set to &lt;WORK&gt;/glassfish3/glassfish</li>
   <li>GFV3_WORK: must be set to &lt;WORK&gt;</li>
+  <li>CORBA_WS: must be set to the base of the current CORBA workspace</li>
+  <ul>
+    <li>Use mercurial to get this from https://kenai.com/hg/gf-corba-v3-mirror~staging</li>
+  </ul>
+  <li>GFV3_WS: must be set to the base of the current GlasFish workspace</li>
+  <ul>
+    <li>Use subversion to get this from https://svn.java.net/svn/glassfish~svn/trunk/v3</li>
+  </ul>
 </ul>
+Note that that installgfv3 script will install the currently build GF
+from ${GFV3_WS} to WORK.
+<p>
 The current run.sh also assumes that you have some scripts available:<br>
 <ul>
   <li>killgf: kill all GF processes on a machine</li>
+  <li>installorb: install the GF 3.1 ORB into &lt;WORK&gt;/glassfish3/glassfish/modules</li>
   <li>installgfv3: installs GF 3.1 into &lt;WORK&gt;</li>
-  <li>installgforb: installs GF 3.1 orb/* modules into
-&lt;WORK&gt;/glassfish3/glassfish/modules</li>
+  <li>installgforb: installs GF 3.1 orb/* modules into &lt;WORK&gt;/glassfish3/glassfish/modules</li>
   <li>installgfnaming: installs GF 3.1 common/glassfish-naming module
 into &lt;WORK&gt;/glassfish3/glassfish/modules</li>
 </ul>
+These scripts are in the scripts directory.
+<p>
 A couple of things need to be set according to your environment in
 run.sh:<br>
 <ul>

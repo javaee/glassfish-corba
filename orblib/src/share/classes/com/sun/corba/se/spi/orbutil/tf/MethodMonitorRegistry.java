@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -61,6 +61,8 @@ import java.util.Set;
  * @author ken
  */
 public class MethodMonitorRegistry {
+    private static final Exceptions wrapper = Exceptions.self ;
+
     private static final Set<String> mmAnnotations =
 	new HashSet<String>() ;
 
@@ -90,7 +92,7 @@ public class MethodMonitorRegistry {
 		mmAnnotations.add( obj ) ;
 	    }
 	} catch (Exception exc) {
-	    System.out.println( "Exception: " + exc ) ;
+            wrapper.exceptionInRegisterAnnotationFile( exc, fname ) ;
 	}
     }
 
@@ -340,6 +342,15 @@ public class MethodMonitorRegistry {
         }
     }
 
+    private static void initializeField( Class<?> cls, String fname, 
+        SynchronizedHolder<MethodMonitor> sh ) 
+        throws NoSuchFieldException, IllegalAccessException {
+
+        final Field field = cls.getDeclaredField( fname ) ;
+        field.setAccessible(true) ;
+        field.set( null, sh) ;
+    }
+
     /** Register a class with the tracing facility.  This form assumes that
      * all of the computation for method names and the mapping from annotation
      * name to MM holder is done at registration time, rather than in the 
@@ -371,22 +382,23 @@ public class MethodMonitorRegistry {
                 final SynchronizedHolder<MethodMonitor> sh =
                     new SynchronizedHolder<MethodMonitor>() ;
 
-		AccessController.doPrivileged( 
-                    new PrivilegedAction<Field>() {
-                        public Field run() {
-                            try {
-                                final Field field = cls.getDeclaredField( fname ) ;
-                                field.setAccessible(true) ;
-                                field.set( null, sh) ;
+                if (System.getSecurityManager() == null) {
+                    initializeField( cls, fname, sh ) ;
+                } else {
+                    AccessController.doPrivileged( 
+                        new PrivilegedAction<Field>() {
+                            public Field run() {
+                                try {
+                                    initializeField( cls, fname, sh ) ;
+                                } catch (Exception exc) {
+                                    wrapper.fieldSettingError( exc, cls, fname ) ;
+                                }
 
-                                return field ;
-                            } catch (Exception exc) {
-                                // XXX log me!
                                 return null ;
                             }
                         }
-                    }
-                ) ;
+                    ) ;
+                }
 
                 final String axname = getExternalName( aname ) ;
 
@@ -400,7 +412,7 @@ public class MethodMonitorRegistry {
 
 		annoMM.put( aclass, sh ) ;
 	    } catch (Exception exc) {
-		System.out.println( "Exceptionn MethodMonitorRegistry.registerClass: " + exc ) ;
+                wrapper.exceptionInRegisterClass( exc, cls ) ;
 	    }
 	}
 

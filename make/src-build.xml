@@ -3,7 +3,7 @@
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
-  Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
   
   The contents of this file are subject to the terms of either the GNU
   General Public License Version 2 only ("GPL") or the Common Development
@@ -176,8 +176,12 @@
         <property name="orb.version"
             value="${release.version}-${build.version}"/>
         <property name="orb.groupId"            value="com.sun.corba"/>
+        <!--
         <property name="repo.url"
             value="java-net:/maven2-repository/trunk/repository"/>
+            -->
+        <property name="repo.url"
+            value="svn:https://svn.java.net/svn/maven2-repository~svn/trunk/repository"/>
         <property name="file.url"               value="file:/tmp/maven"/>
         <property name="local.url"              value="file:${maven.repo.local}"/>
         <property name="bundle.name.prefix"     value="glassfish-corba-"/>
@@ -1251,17 +1255,18 @@
         <attribute name="description"/>
         <attribute name="destination"/>
         <sequential>
+            <mkdir dir="make/gen/pom"/>
             <echo message="Releasing module @{module} (@{description}) to @{destination}"/>
             <make-file module="@{module}" description="@{description}"/>
 
             <artifact:pom id="glassfish.corba.project"
              file="make/corba.temp.pom" />
-            <artifact:deploy
-             file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
+            <artifact:deploy file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
                 <remoteRepository url="@{destination}"/>
                 <pom refid="glassfish.corba.project"/>
             </artifact:deploy>
-            <delete file="make/corba.temp.pom" verbose="true"/>
+            <move file="make/corba.temp.pom" todir="make/gen/pom" tofile="glassfish-corba-@{module}.pom"/>
+            <!-- <delete file="make/corba.temp.pom" verbose="true"/> -->
         </sequential>
     </macrodef>
 

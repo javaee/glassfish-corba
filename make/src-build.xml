@@ -189,6 +189,7 @@
         
         <artifact:remoteRepository id="gf.repo" url="${gf.repository}"/>
         <artifact:remoteRepository id="aqute.repo" url="${aqute.repository}"/>
+        <artifact:remoteRepository id="deploy.repo" url="${repo.url}"/>
 
         <artifact:dependencies versionsId="dependency.versions"
             filesetId="dependency.fileset" pathId="dependency.classpath">
@@ -1262,10 +1263,13 @@
             <artifact:pom id="glassfish.corba.project"
              file="make/corba.temp.pom" />
             <artifact:deploy file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
-                <remoteRepository url="@{destination}"/>
+                <remoteRepository url="@{destination}">
+                    <authentication id="java.net.maven2.repository"/>
+                </remoteRepository>
                 <pom refid="glassfish.corba.project"/>
             </artifact:deploy>
-            <move file="make/corba.temp.pom" todir="make/gen/pom" tofile="glassfish-corba-@{module}.pom"/>
+            <move file="make/corba.temp.pom" todir="make/gen/pom"/>
+            <move file="make/gen/pom/corba.temp.pom" tofile="glassfish-corba-@{module}.pom"/>
             <!-- <delete file="make/corba.temp.pom" verbose="true"/> -->
         </sequential>
     </macrodef>

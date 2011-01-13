@@ -75,11 +75,16 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.util.JDKBridge;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.ior.TaggedProfile;
+import com.sun.corba.se.spi.ior.TaggedProfileTemplate;
+import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
+import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Subcontract;
+import org.omg.CORBA_2_3.portable.ObjectImpl;
 
 // implements com.sun.corba.se.impl.core.ClientRequestDispatcher
 // so RMI-IIOP Util.isLocal can call ClientRequestDispatcher.useLocalInvocation.
@@ -141,6 +146,19 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
     @InfoMethod( tpName="hasNextNext", tpType=TimingPointType.EXIT )
     private void exit_hasNextNext() { }
 
+    private IIOPAddress getPrimaryAddress( final IOR ior ) {
+        if (ior != null) {
+            for (TaggedProfile tprof : ior) {
+                final TaggedProfileTemplate tpt = tprof.getTaggedProfileTemplate() ;
+                if (tpt instanceof IIOPProfileTemplate) {
+                    final IIOPProfileTemplate ipt = (IIOPProfileTemplate)tpt ;
+                    return ipt.getPrimaryAddress() ;
+                }
+            }
+        }
+
+        return null ;
+    }
 
     @Subcontract
     @Override
@@ -148,6 +166,9 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
 				String operation, 
 				boolean responseExpected) 
     {
+        final IIOPAddress primaryAddress = getPrimaryAddress(
+            contactInfoList.getTargetIOR() ) ;
+
 	enter_totalInvocation() ;
 	try {
 	    OutputStream result = null;

@@ -48,9 +48,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock ;
 import java.util.concurrent.locks.ReadWriteLock ;
 
 import com.sun.corba.se.spi.ior.IOR ;
+import com.sun.corba.se.spi.ior.iiop.IIOPAddress ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
 import com.sun.corba.se.spi.ior.iiop.LoadBalancingComponent ;
+import com.sun.corba.se.spi.ior.TaggedProfile ;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 import com.sun.corba.se.spi.ior.TaggedComponent ;
 import com.sun.corba.se.spi.orb.ORB;
@@ -216,11 +218,35 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     {
 	return targetIOR;
     }
+    
+    private IIOPAddress getPrimaryAddress( IOR ior ) {
+        if (ior != null) {
+            for (TaggedProfile tprof : ior) {
+                TaggedProfileTemplate tpt = tprof.getTaggedProfileTemplate() ;
+                if (tpt instanceof IIOPProfileTemplate) {
+                    IIOPProfileTemplate ipt = (IIOPProfileTemplate)tpt ;
+                    return ipt.getPrimaryAddress() ;
+                }
+            }
+        }
+
+        return null ;
+    }
+
+    @InfoMethod
+    private void changingEffectiveAddress( IIOPAddress oldAddr, IIOPAddress newAddr ) { }
 
     @Transport
     public synchronized void setEffectiveTargetIOR(IOR effectiveTargetIOR)
     {
+        final IIOPAddress oldAddress = getPrimaryAddress( this.effectiveTargetIOR ) ;
+        final IIOPAddress newAddress = getPrimaryAddress( effectiveTargetIOR ) ;
+        if ((oldAddress != null) && !oldAddress.equals( newAddress )) {
+            changingEffectiveAddress( oldAddress, newAddress ) ;
+        }
+
 	this.effectiveTargetIOR = effectiveTargetIOR;
+
 	effectiveTargetIORContactInfoList = null;
 	if (primaryContactInfo != null &&
 	    orb.getORBData().getIIOPPrimaryToContactInfo() != null)

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,7 +40,7 @@
 
 package com.sun.corba.se.spi.orbutil.tf ;
 
-import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
+import com.sun.corba.se.spi.orbutil.generic.Holder;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
 import java.util.List;
@@ -56,7 +56,7 @@ public interface EnhancedClassData {
     Type OBJECT_TYPE = Type.getType( Object.class ) ;
     String OBJECT_NAME = OBJECT_TYPE.getInternalName() ;
 
-    Type SH_TYPE = Type.getType( SynchronizedHolder.class ) ;
+    Type SH_TYPE = Type.getType( Holder.class ) ;
     String SH_NAME = SH_TYPE.getInternalName() ;
 
     Type MM_TYPE = Type.getType( MethodMonitor.class ) ;
@@ -78,7 +78,7 @@ public interface EnhancedClassData {
     boolean isTracedClass() ;
 
     /** Map from MM annotation name to the name of the holder 
-     * field that contains the SynchronizedHolder for the
+     * field that contains the Holder for the
      * corresponding MethodMonitor.  The domain of this map is the set of
      * MM annotations on this class.
      *

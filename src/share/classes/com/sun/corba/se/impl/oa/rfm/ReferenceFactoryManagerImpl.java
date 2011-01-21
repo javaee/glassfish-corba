@@ -221,7 +221,7 @@ public class ReferenceFactoryManagerImpl
 	lock.lock() ;
 	try {
 	    if (isActive) {
-                throw wrapper.rfmNotActive();
+                throw wrapper.rfmAlreadyActive();
             }
 
 	    rootPOA = (POA)orb.resolve_initial_references( 

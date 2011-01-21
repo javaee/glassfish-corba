@@ -69,12 +69,17 @@ import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Transport;
 
+import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+
 /**
  * @author Harold Carr
  */
 @Transport
 @IsLocal
 public class CorbaContactInfoListImpl implements CorbaContactInfoList {
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     protected ORB orb;
     private ReadWriteLock lcrdLock = new ReentrantReadWriteLock() ;
     protected LocalClientRequestDispatcher localClientRequestDispatcher;
@@ -239,6 +244,20 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     @Transport
     public synchronized void setEffectiveTargetIOR(IOR effectiveTargetIOR)
     {
+        if (targetIOR != null) {
+            final String oldTypeId = targetIOR.getTypeId() ;
+            final String newTypeId = effectiveTargetIOR.getTypeId() ;
+            if (!oldTypeId.isEmpty() && !oldTypeId.equals( newTypeId )) {
+                // Good place for a breakpoint.  This is probably always an
+                // error, but not necessarily in the ORB.
+                wrapper.changedTypeIdOnSetEffectiveTargetIOR( oldTypeId,
+                    newTypeId ) ;
+                // temporary?  It looks like this happens due to some error
+                // in IIOP FOLB.
+                return ;
+            }
+        }
+
         final IIOPAddress oldAddress = getPrimaryAddress( this.effectiveTargetIOR ) ;
         final IIOPAddress newAddress = getPrimaryAddress( effectiveTargetIOR ) ;
         if ((oldAddress != null) && !oldAddress.equals( newAddress )) {

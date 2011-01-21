@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,7 +40,7 @@
 
 package com.sun.tools.corba.se.enhancer;
 
-import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
+import com.sun.corba.se.spi.orbutil.generic.Holder;
 import com.sun.corba.se.spi.orbutil.tf.EnhancedClassData;
 import java.util.HashSet;
 import java.util.Set;
@@ -299,7 +299,7 @@ public class ClassTracer extends TFEnhanceAdapter {
             final String fname = ecd.getHolderName( fullDesc );
 
             lmv.visitFieldInsn( Opcodes.GETSTATIC, ecd.getClassName(),
-                fname, Type.getDescriptor( SynchronizedHolder.class ));
+                fname, Type.getDescriptor( Holder.class ));
             lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
                 EnhancedClassData.SH_NAME, "content",
                 "()Ljava/lang/Object;" );

@@ -1460,6 +1460,12 @@ public interface ORBUtilSystemException {
     INTERNAL connectionNotNullInCreateMessageMediator(
         CorbaConnection connection);
 
+    @Log( level=LogLevel.FINE, id=138 )
+    @Message( "Old typeId {0} is not the same as the new typeId {1} in "
+        + "setEffectiveTargetIOR" )
+    INTERNAL changedTypeIdOnSetEffectiveTargetIOR( String oldTypeId,
+        String newTypeId );
+
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "Data read past end of chunk without closing the chunk" )
     MARSHAL chunkOverflow(  ) ;

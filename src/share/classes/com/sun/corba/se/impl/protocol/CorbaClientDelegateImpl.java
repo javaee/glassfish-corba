@@ -160,6 +160,12 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
         return null ;
     }
 
+    @InfoMethod
+    private void targetIOR( IOR ior ) {}
+
+    @InfoMethod
+    private void effectiveTargetIOR( IOR ior ) {}
+
     @Subcontract
     @Override
     public OutputStream request(org.omg.CORBA.Object self, 
@@ -169,7 +175,10 @@ public class CorbaClientDelegateImpl extends CorbaClientDelegate
         final IIOPAddress primaryAddress = getPrimaryAddress(
             contactInfoList.getTargetIOR() ) ;
 
+        targetIOR( contactInfoList.getTargetIOR() ) ;
+        effectiveTargetIOR( contactInfoList.getEffectiveTargetIOR() );
 	enter_totalInvocation() ;
+
 	try {
 	    OutputStream result = null;
 	    boolean retry;

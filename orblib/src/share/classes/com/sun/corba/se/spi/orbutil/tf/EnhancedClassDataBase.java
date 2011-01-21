@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -68,7 +68,7 @@ public abstract class EnhancedClassDataBase implements EnhancedClassData {
         new HashSet<String>() ;
 
     // Map from MM annotation internal name to
-    // SynchronizedHolder<MethodMonitor> field
+    // Holder<MethodMonitor> field
     // name.  Use something like __$mm$__nnn that is unlikely to collide with
     // another field name that is already in use.
     protected final Map<String,String> annoToHolderName =

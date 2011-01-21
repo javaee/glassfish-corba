@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -58,6 +58,30 @@ public class Holder<T>
 	this( null ) ;
     }
 
+    /** Issue 15392: It is EXTEMELY important to make this operation
+     * as fast as possible, because it is called a lot, even when
+     * tracing is not enabled.  This method is called at the start
+     * of every method that has a tracing annotation.
+     * In particular, synchronized is too slow, and it is suspected that
+     * volatile may be too slow as well.
+     * <p>
+     * The consequences of not synchronizing here are that a content(T) call
+     * may NEVER become visible in some threads.  This means that turning on
+     * tracing while the system is running may not capture all methods
+     * that should be traced.
+     * <P>
+     * Note that in GF 3.1, we NORMALLY only enabled ORB tracing using
+     * -Dcom.sun.corba.ee.Debug, which only happens at GF startup time,
+     * so this is not too big a problem.  However, it is possible to change
+     * tracing flags using a ORB MBean, which could definitely cause
+     * the problem mentioned above.
+     * <P>
+     * Another aid in fixing this is to make SynchronizedHolder subclass Holder,
+     * and then do all of the tracing facility in terms of Holder.  Then
+     * registering a class can decide which kind of Holder to use.
+     * In particular, we can make the default be unsychronized, and override
+     * this if necessary for testing.
+     */
     public T content()
     {
 	return _content ;
@@ -85,7 +109,7 @@ public class Holder<T>
 
     public String toString() 
     {
-	return "Holder[" + _content + "]" ;
+        return this.getClass().getSimpleName() + "[" + _content + "]" ;
     }
 }
 

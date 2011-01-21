@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,7 +48,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 
-import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder ;
+import com.sun.corba.se.spi.orbutil.generic.Holder ;
 import com.sun.corba.se.spi.orbutil.tf.EnhancedClassData;
 import com.sun.corba.se.spi.orbutil.tf.Util;
 import com.sun.corba.se.spi.orbutil.tf.annotation.TraceEnhanceLevel;
@@ -76,11 +76,11 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         info( 2, "visitEnd") ;
         // Add the additional fields
         final String desc = Type.getDescriptor(
-            SynchronizedHolder.class ) ;
+            Holder.class ) ;
 
         final int acc = Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC ;
 
-        // Signature is actually L../SynchronizedHolder;<L.../MethodMonitor;>
+        // Signature is actually L../Holder;<L.../MethodMonitor;>
         // where the ... are replaced with appropriate packages.  Not
         // that we actually need a signature here.
         final String sig = null ;

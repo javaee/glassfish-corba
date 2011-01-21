@@ -40,6 +40,7 @@
 
 package com.sun.corba.se.spi.orbutil.tf;
 
+import com.sun.corba.se.spi.orbutil.generic.Holder;
 import com.sun.corba.se.spi.orbutil.generic.SynchronizedHolder;
 import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 import com.sun.corba.se.spi.orbutil.newtimer.TimingPointType;
@@ -61,6 +62,13 @@ import java.util.Set;
  * @author ken
  */
 public class MethodMonitorRegistry {
+    /** Set this system property to true to use a SynchronizedHolder for 
+     * the MethodMonitor fields; otherwise an unsynchronized Holder will
+     * be used.
+     */
+    public static String USE_SYNC_HOLDER_PROPERTY =
+        "com.sun.corba.ee.tf.UseSynchronizedHolder" ;
+
     private static final Exceptions wrapper = Exceptions.self ;
 
     private static final Set<String> mmAnnotations =
@@ -117,11 +125,11 @@ public class MethodMonitorRegistry {
     // MethodMonitor.
     private static final Map<Class<?>,
         Map<Class<? extends Annotation>,
-            SynchronizedHolder<MethodMonitor>>> classToAnnoMM =
+            Holder<MethodMonitor>>> classToAnnoMM =
 
             new HashMap<Class<?>,
                 Map<Class<? extends Annotation>,
-                    SynchronizedHolder<MethodMonitor>>>() ;
+                    Holder<MethodMonitor>>>() ;
 
     // For each MM Annotation, lists all of the immediate subgroups.
     private static final Map<Class<? extends Annotation>,
@@ -159,11 +167,11 @@ public class MethodMonitorRegistry {
         new HashMap<Class<? extends Annotation>,MethodMonitorFactory>() ;
 
     private static void updateTracedClass( Class<?> cls ) {
-        Map<Class<? extends Annotation>,SynchronizedHolder<MethodMonitor>> map =
+        Map<Class<? extends Annotation>,Holder<MethodMonitor>> map =
             classToAnnoMM.get( cls ) ; 
 
         for (Map.Entry<Class<? extends Annotation>, 
-            SynchronizedHolder<MethodMonitor>> entry : map.entrySet() ) {
+            Holder<MethodMonitor>> entry : map.entrySet() ) {
 
             MethodMonitorFactory mmf =
                 annotationToMMFComposition.get( entry.getKey() ) ;
@@ -328,7 +336,7 @@ public class MethodMonitorRegistry {
     public synchronized static void registerClass( final Class<?> cls,
         final List<String> methodNames,
         final Map<Class<? extends Annotation>,
-            SynchronizedHolder<MethodMonitor>> annoMM ) {
+            Holder<MethodMonitor>> annoMM ) {
 
         final boolean fullUpdate = scanClassAnnotations( cls ) ;
 
@@ -342,8 +350,13 @@ public class MethodMonitorRegistry {
         }
     }
 
+    private static boolean isHolderSynchronized() {
+        boolean result = Boolean.getBoolean( USE_SYNC_HOLDER_PROPERTY ) ;
+        return result ;
+    }
+
     private static void initializeField( Class<?> cls, String fname, 
-        SynchronizedHolder<MethodMonitor> sh ) 
+        Holder<MethodMonitor> sh ) 
         throws NoSuchFieldException, IllegalAccessException {
 
         final Field field = cls.getDeclaredField( fname ) ;
@@ -369,9 +382,9 @@ public class MethodMonitorRegistry {
         classToTimerNames.put( cls, ecd.getTimingPointNames() ) ;
 
         final Map<Class<? extends Annotation>,
-            SynchronizedHolder<MethodMonitor>> annoMM =
+            Holder<MethodMonitor>> annoMM =
 	    new HashMap<Class<? extends Annotation>,
-	        SynchronizedHolder<MethodMonitor>>() ;
+	        Holder<MethodMonitor>>() ;
 
 	for (Map.Entry<String,String> entry :
 	    ecd.getAnnotationToHolderName().entrySet() ) {
@@ -379,7 +392,8 @@ public class MethodMonitorRegistry {
 	    try {
 		final String aname = entry.getKey() ;	// annotation name
 		final String fname = entry.getValue() ;	// field name
-                final SynchronizedHolder<MethodMonitor> sh =
+                final Holder<MethodMonitor> sh = isHolderSynchronized() ?
+                    new Holder<MethodMonitor>() :
                     new SynchronizedHolder<MethodMonitor>() ;
 
                 if (System.getSecurityManager() == null) {
@@ -540,7 +554,7 @@ public class MethodMonitorRegistry {
      */
     public synchronized static MethodMonitor getMethodMonitorForClass( final Class<?> cls,
         final Class<? extends Annotation> annot ) {
-        Map<Class<? extends Annotation>,SynchronizedHolder<MethodMonitor>> map =
+        Map<Class<? extends Annotation>,Holder<MethodMonitor>> map =
             classToAnnoMM.get( cls ) ;
 
         if (map == null) {
@@ -548,7 +562,7 @@ public class MethodMonitorRegistry {
                 + cls + " is not a traced class.") ;
         }
 
-        SynchronizedHolder<MethodMonitor> holder = map.get( annot ) ;
+        Holder<MethodMonitor> holder = map.get( annot ) ;
 
         if (holder == null) {
             throw new RuntimeException( "Annotation " + annot

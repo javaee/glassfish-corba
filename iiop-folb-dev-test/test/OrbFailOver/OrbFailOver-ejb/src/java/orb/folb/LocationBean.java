@@ -19,7 +19,7 @@ public class LocationBean implements LocationBeanRemote {
     public String getLocation() {
 
         try {
-            String instanceName = System.getProperty("instance_name");
+            String instanceName = System.getProperty("com.sun.aas.instanceName");
             return instanceName;
         } catch (Exception e) {
             return null;

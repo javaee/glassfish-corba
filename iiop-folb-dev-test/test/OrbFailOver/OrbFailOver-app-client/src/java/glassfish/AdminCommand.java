@@ -1,10 +1,48 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ *
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ *
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
 package glassfish;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +64,7 @@ public class AdminCommand {
     private final String asadmin ;
     private final boolean echoOnly ; // echo command only if true: do not exec
     private final List<String> commandOutput = new ArrayList<String>() ;
+    private final IntervalTimer timer = new IntervalTimer() ;
 
     public AdminCommand( Base base ) {
         this( base, DEFAULT_ASADMIN ) ;
@@ -40,6 +79,25 @@ public class AdminCommand {
         this.echoOnly = echoOnly ;
     }
 
+    public static class IntervalTimer {
+        long lastTime ;
+
+        public void start() {
+            lastTime = System.nanoTime() ;
+        }
+
+        /** Returns interval since last start() or interval() call in
+         * microseconds.
+         * @return Elapsed time in microseconds
+         */
+        public long interval() {
+            final long current = System.nanoTime() ;
+            final long diff = current - lastTime ;
+            start() ;
+            return diff/1000 ;
+        }
+    }
+
     private boolean adminCommand( String command ) {
         commandOutput.clear() ;
         base.note( "Command " + command ) ;
@@ -47,6 +105,7 @@ public class AdminCommand {
 
         if (!echoOnly) {
             try {
+                timer.start() ;
                 final Process proc = Runtime.getRuntime().exec( cmd ) ;
                 final InputStream is = proc.getInputStream() ;
                 final BufferedReader reader = new BufferedReader(
@@ -67,6 +126,9 @@ public class AdminCommand {
                 base.note( "Exception " + ex + " in " + cmd ) ;
                 // ex.printStackTrace();
                 return false ;
+            } finally {
+                base.note( "Command " + command + " executed in "
+                    + timer.interval() + " microseconds\n" ) ;
             }
         }
 
@@ -138,16 +200,24 @@ public class AdminCommand {
         return sb.toString() ;
     }
 
+    public boolean createSystemProperties( String instanceName, Properties props ) {
+        if (props == null) {
+            return false ;
+        }
+
+        String command = String.format(
+            "create-system-properties --target %s %s", instanceName,
+            getPropertiesString(props)) ;
+
+        boolean result = adminCommand( command ) ;
+        return result ;
+    }
+
     public boolean createInstance( String agentName, String clusterName, 
-        int portBase, String instanceName, Properties props ) {
-        String command = (props == null) 
-            ? String.format( "create-instance --node %s "
+        int portBase, String instanceName ) {
+        String command = String.format( "create-instance --node %s "
                 + "--cluster %s --portbase %d --checkports=true %s",
-                agentName, clusterName, portBase, instanceName ) 
-            : String.format( "create-instance --node %s --systemproperties %s "
-                + "--cluster %s --portbase %d --checkports=true %s",
-                agentName, getPropertiesString( props ),
-                clusterName, portBase, instanceName ) ;
+                agentName, clusterName, portBase, instanceName )  ;
 
         boolean result = adminCommand( command ) ;
 
@@ -168,12 +238,26 @@ public class AdminCommand {
         return adminCommand( "delete-instance " + instanceName ) ;
     }
 
+
+    public void sleep( int seconds ) {
+        try {
+            // delay to make sure change has actually propagated
+            Thread.sleep(seconds * 1000);
+        } catch (InterruptedException ex) {
+            // ignore this
+        }
+    }
+
     public boolean startInstance( String name ) {
-        return adminCommand( "start-instance " + name) ;
+        boolean result = adminCommand( "start-instance " + name) ;
+        // sleep(10) ;
+        return result ;
     }
 
     public boolean stopInstance( String name ) {
-        return adminCommand( "stop-instance --force true " + name) ;
+        boolean result = adminCommand( "stop-instance --force true " + name) ;
+        // sleep(10) ;
+        return result ;
     }
 
     public boolean destroyCluster(String clusterName) {

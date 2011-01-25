@@ -243,16 +243,16 @@ public class Base {
 
                 if (currentResults.isEmpty()) {
                     pass.add( current ) ;
-                    msg( "PASSED." ).nl() ;
+                    msg( "Test " + current + " PASSED." ).nl() ;
                 } else {
                     fail.add( current )  ;
-                    msg( "FAILED." ).nl() ;
+                    msg( "Test " + current + " FAILED." ).nl() ;
                 }
 
                 // display( "    Notes", currentNotes ) ;
                 display( "    Results", currentResults ) ;
             } else {
-                msg( "Test " + current + " skipped" ).nl() ;
+                msg( "Test " + current + " SKIPPED" ).nl() ;
                 skip.add( current ) ;
             }
         }

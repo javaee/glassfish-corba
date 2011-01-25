@@ -1,0 +1,13 @@
+#! /bin/csh
+setenv BUILD ${GFV3_WS}
+setenv RUN ${GFV3_WORK}
+setenv MAVEN ~/.m2/repository
+setenv GROUPID org/glassfish/security
+setenv DEST ${RUN}/glassfish3/glassfish/modules
+setenv VERSION 3.1-SNAPSHOT
+
+cd ${MAVEN}/${GROUPID}
+
+pushd ejb.security/${VERSION}
+cp ejb.security-${VERSION}.jar ${DEST}/ejb.security.jar
+

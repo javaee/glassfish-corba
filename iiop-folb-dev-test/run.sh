@@ -10,12 +10,12 @@
 # The following setup is environment specific:
 ################################################################
 
-DAS_HOST="minas"
+DAS_HOST="apollo"
 # Must allow at least 5 instances for the test
 # Must be able to access the avilable nodes from the DAS using 
 # SSH without password.
 
-AVAILABLE_NODES="minas:2,apollo:4"
+AVAILABLE_NODES="apollo:5"
 # AVAILABLE_NODES="minas:3"
 
 ################################################################
@@ -42,6 +42,7 @@ AVAILABLE_NODES="minas:2,apollo:4"
 scripts/installgfv3
 # scripts/installgforb
 # scripts/installgfnaming
+# scripts/installgfejbsec
 # scripts/installorb
 SKIP_SETUP="false"
 
@@ -57,18 +58,23 @@ date
 APS_HOME="/space/ws/mercurial/CORBA/iiop-folb-test/test/OrbFailOver"
 APPCLIENT="${S1AS_HOME}/bin/appclient"
 PROPS_FILE=${PWD}/logging.properties
+echo ${PROPS_FILE}
 
 EJB_NAME="${APS_HOME}/OrbFailOver-ejb/dist/OrbFailOver-ejb.jar"
 CLIENT_NAME="${APS_HOME}/OrbFailOver-app-client/dist/OrbFailOver-app-client.jar"
 
-DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,address=8118,server=y,suspend=y"
+DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,address=8228,server=y,suspend=y"
 SETUP_ARGS="-Djava.util.logging.config.file=${PROPS_FILE}"
-TEST_ARGS="-installDir ${GFV3_WORK}/glassfish3 -dasNode ${DAS_HOST} -availableNodes ${AVAILABLE_NODES} -testEjb ${EJB_NAME} -doCleanup false -skipSetup ${SKIP_SETUP} -exclude listContextTest"
+TEST_ARGS="-installDir ${GFV3_WORK}/glassfish3 -dasNode ${DAS_HOST} -availableNodes ${AVAILABLE_NODES} -testEjb ${EJB_NAME} -doCleanup false -skipSetup ${SKIP_SETUP}"
+CLIENT_ARGS="-client ${CLIENT_NAME} -name OrbFailOver-app-client"
 
 set -x
 
+echo ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
+
 if [ "${DEBUGGER}" = "1" ];
-then ${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} -client ${CLIENT_NAME} -name OrbFailOver-app-client ${TEST_ARGS} $@ ;
-else ${APPCLIENT} ${SETUP_ARGS} -client ${CLIENT_NAME} -name OrbFailOver-app-client ${TEST_ARGS} $@ ;
+then ${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
+else ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
 fi
+
 date

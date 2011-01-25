@@ -1,3 +1,42 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ *
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ *
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
 package glassfish;
 
 import argparser.Pair;
@@ -87,12 +126,14 @@ public class GlassFishCluster {
 
     public InstanceInfo createInstance( String instanceName, String nodeName,
         int portBase ) {
+        return createInstance( instanceName, nodeName, portBase, "" ) ;
+    }
 
-        Properties props = new Properties() ;
-        props.setProperty( INSTANCE_NAME_PROPERTY, instanceName ) ;
+    public InstanceInfo createInstance( String instanceName, String nodeName,
+        int portBase, String orbDebug ) {
 
         gfInst.ac().createInstance( gfInst.getNAName( nodeName ), clusterName,
-            portBase, instanceName, props ) ;
+            portBase, instanceName ) ;
         InstanceInfo info = new InstanceInfo(instanceName, nodeName) ;
         for (String str : gfInst.ac().commandOutput() ) {
             int index = str.indexOf( '=' ) ;
@@ -111,9 +152,18 @@ public class GlassFishCluster {
             "configs.config." + clusterName + "-config.java-config.debug-enabled" ;
         gfInst.ac().set( debugDottedName, "true" ) ;
 
+        // Note: setting properties on GF 3.1 does not work properly on
+        // a create-instance commands: see issue 15683.
+        // So we use a separate command for this.
+        Properties props = new Properties() ;
+        if ((orbDebug != null) && !orbDebug.isEmpty()) {
+            props.setProperty( "com.sun.corba.ee.ORBDebug", orbDebug ) ;
+            gfInst.ac().createSystemProperties(instanceName, props);
+        }
+
+
         return info ;
     }
-
 
     private static final int CREATE_INSTANCES_PORT_BASE = 9000 ;
     private static final int CREATE_INSTANCES_PORT_INCREMENT = 1000 ;
@@ -133,9 +183,28 @@ public class GlassFishCluster {
      *
      * @param instanceBaseName The base name to use for all instance names.
      * @param numInstances The number of instances to create.
+     * @param orbDebug comma separated list of ORBDebug flags to turn on in
+     * the created instances.
      */
     public Map<String,InstanceInfo> createInstances( String instanceBaseName,
-        int numInstances ) {
+        int numInstances, String orbDebug ) {
+        return createInstances( instanceBaseName, numInstances, orbDebug,
+            CREATE_INSTANCES_PORT_BASE ) ;
+    }
+
+    /** Create a number of instances spread across the available nodes in the
+     * cluster.  The name of each instance is instanceBaseName + number, for
+     * a number from 0 to numInstances - 1.  numInstances must not exceed
+     * the total available capacity in the GF installation as indicated by
+     * the elements of gfInst.availableNodes.
+     *
+     * @param instanceBaseName The base name to use for all instance names.
+     * @param numInstances The number of instances to create.
+     * @param orbDebug comma separated list of ORBDebug flags to turn on in
+     * the created instances.
+     */
+    public Map<String,InstanceInfo> createInstances( String instanceBaseName,
+        int numInstances, String orbDebug, int portBase ) {
 
         int numAvailable = 0 ;
         for (Pair<String,Integer> pair : gfInst.availableNodes() ) {
@@ -164,10 +233,11 @@ public class GlassFishCluster {
             new HashMap<String,InstanceInfo>() ;
         for (int index=0; index<numInstances; index++) {
             final String node = iter.next() ;
-            final int portBase = CREATE_INSTANCES_PORT_BASE
+            final int currentPortBase = portBase
                 + index * CREATE_INSTANCES_PORT_INCREMENT ;
             final String instanceName = instanceBaseName + index ;
-            InstanceInfo info = createInstance( instanceName, node, portBase ) ;
+            InstanceInfo info = createInstance( instanceName, node, 
+                currentPortBase, orbDebug) ;
             result.put( instanceName, info ) ;
         }
 
@@ -226,6 +296,10 @@ public class GlassFishCluster {
         }
 
         gfInst.ac().destroyCluster( clusterName ) ;
+    }
+
+    public void sleep(int seconds ) {
+        gfInst.ac().sleep( seconds ) ;
     }
 
     public static class InstanceInfo {
@@ -303,7 +377,7 @@ public class GlassFishCluster {
         @testtools.Test
         public void testCreateInstances() {
             Map<String,InstanceInfo> infos = gfCluster.createInstances(
-                 "in", 7 ) ;
+                 "in", 7, "" ) ;
             note( "createInstances returned " + infos ) ;
             gfCluster.destroyCluster();
         }
@@ -311,7 +385,7 @@ public class GlassFishCluster {
         @testtools.Test
         public void testStartStop() {
             Map<String,InstanceInfo> infos = gfCluster.createInstances(
-                 "in", 7 ) ;
+                 "in", 7, "" ) ;
             Set<String> instances = new HashSet<String>(
                 infos.keySet() )  ;
             gfCluster.startCluster() ;

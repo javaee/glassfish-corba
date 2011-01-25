@@ -509,12 +509,14 @@ exists or setup the property manually. For example like this:
         <mkdir dir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.javaee-api-6.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${file.reference.gf-client.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-orb.jar}" todir="${build.classes.dir}/META-INF/lib"/>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${libs.javaee-api-6.0.classpath}" manifestproperty="manifest.libs.javaee-api-6.0.classpath" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.gf-client.jar}" manifestproperty="manifest.file.reference.gf-client.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-orb.jar}" manifestproperty="manifest.file.reference.glassfish-corba-orb.jar" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.libs.javaee-api-6.0.classpath} lib/${manifest.libs.javaee-api-6.0.classpath} ${manifest.file.reference.gf-client.jar} lib/${manifest.file.reference.gf-client.jar} "/>
+            <attribute name="Class-Path" value="${manifest.libs.javaee-api-6.0.classpath} lib/${manifest.libs.javaee-api-6.0.classpath} ${manifest.file.reference.gf-client.jar} lib/${manifest.file.reference.gf-client.jar} ${manifest.file.reference.glassfish-corba-orb.jar} lib/${manifest.file.reference.glassfish-corba-orb.jar} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">

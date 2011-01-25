@@ -1,3 +1,42 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License.  You can
+ * obtain a copy of the License at
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+ * or packager/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at glassfish/bootstrap/legal/LICENSE.txt.
+ *
+ * GPL Classpath Exception:
+ * Oracle designates this particular file as subject to the "Classpath"
+ * exception as provided by Oracle in the GPL Version 2 section of the License
+ * file that accompanied this code.
+ *
+ * Modifications:
+ * If applicable, add the following below the License Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyright [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
 package orbfailover;
 
 import java.util.ArrayList;
@@ -5,6 +44,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 
 import javax.naming.InitialContext;
@@ -32,6 +73,15 @@ import testtools.Base ;
 import testtools.Post;
 import testtools.Pre;
 
+import com.sun.corba.ee.spi.orb.ORB ;
+import com.sun.corba.ee.spi.protocol.CorbaClientDelegate;
+import java.lang.reflect.Field;
+import javax.rmi.CORBA.Stub;
+
+import org.omg.CORBA.portable.ObjectImpl ;
+import org.omg.CORBA.portable.Delegate;
+
+
 /**
  * @author hv51393
  * @author kcavanaugh
@@ -42,6 +92,9 @@ public class Main extends Base {
     private static final String CLUSTER_NAME = "c1" ;
     private static final String EJB_NAME = "TestEJB" ;
     private static final String INSTANCE_BASE_NAME = "in" ;
+
+    private ORB orb = null ;
+    private String[] orbDebugFlags = null ;
 
     private GlassFishInstallation  gfInstallation ;
     private AdminCommand ac ;
@@ -97,7 +150,7 @@ public class Main extends Base {
 
     private InitialContext makeIC( String eplist ) throws NamingException {
         InitialContext result ;
-        if (eplist != null) {
+        if (eplist != null && !inst.useExternalEndpoints()) {
             final Hashtable table = new Hashtable() ;
             table.put( "com.sun.appserv.iiop.endpoints", eplist ) ;
             result = new InitialContext( table ) ;
@@ -118,8 +171,57 @@ public class Main extends Base {
 
     private LocationBeanRemote lookup( InitialContext ic ) throws NamingException {
         LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname ) ;
+        getORB( lb ) ;
         note( "Looked up bean in context") ;
         return lb ;
+    }
+
+    private Field getField( Class<?> cls, String name ) {
+        Field result = null ;
+        try {
+            result = cls.getDeclaredField(name);
+            result.setAccessible(true);
+        } catch (Exception ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return result;
+    }
+
+    private void getORB(LocationBeanRemote lb) {
+        if (orb == null) {
+            try {
+                final Class<?> lbClass = lb.getClass() ;
+                final Field delegateField = getField( lbClass, "delegate_") ;
+                final Stub stub = (Stub)delegateField.get( lb ) ;
+
+                // final Class<?> delegateClass = delegate.getClass() ;
+                // delegateSuperClass should be a CodegenStubBase
+                // final Class<?> delegateSuperClass = delegateClass.getSuperclass() ;
+                // final Field fld = getField( delegateSuperClass, "__delegate");
+                final CorbaClientDelegate cdel = 
+                    (CorbaClientDelegate)stub._get_delegate() ;
+
+                orb = cdel.getBroker();
+                if (orbDebugFlags != null)  {
+                    // setORBDebug( orbDebugFlags ) ;
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void setORBDebug( String... args ) {
+        if (orb != null) {
+            orb.setDebugFlags( args ) ;
+        } else {
+            orbDebugFlags = args ;
+        }
+    }
+
+    private void clearORBDebug( String... args ) {
+        orb.clearDebugFlags( args ) ;
     }
 
     public interface Installation {
@@ -158,6 +260,16 @@ public class Main extends Base {
         @Help( "Set this to true if you only want to set up a cluster, and do NOT"
             + "want to run any tests")
         boolean skipTests() ;
+
+        @DefaultValue( "" )
+        @Help( "Set this to the comma separated list of ORB debug flags to use"
+            + " on the app server instances")
+        String serverORBDebug() ;
+
+        @DefaultValue( "false" )
+        @Help( "Set this to true if the test uses only externally supplied IIOP"
+            + "endpoints")
+        boolean useExternalEndpoints() ;
     }
 
     private final Installation inst ;
@@ -177,7 +289,7 @@ public class Main extends Base {
                 inst.skipSetup()) ;
             if (!inst.skipSetup()) {
                 clusterInfo = gfCluster.createInstances( INSTANCE_BASE_NAME,
-                    inst.numInstances() ) ;
+                    inst.numInstances(), inst.serverORBDebug() ) ;
                 gfCluster.startCluster() ;
                 if (!inst.testEjb().isEmpty()) {
                     ac.deploy( CLUSTER_NAME, EJB_NAME, inst.testEjb() ) ;
@@ -232,7 +344,8 @@ public class Main extends Base {
         System.exit( result ) ;
     }
 
-    @Test( "listContextTest" )
+    // Not a useful test: listing of context is broken in GF 3.1.
+    // @Test( "listContextTest" )
     public void listContextTest() throws NamingException {
         InitialContext ic = makeIC() ;
         listContext( ic, 0 ) ;
@@ -330,7 +443,7 @@ public class Main extends Base {
 
     @Test( "loadbalance" )
     public void testLoadBalance( ) throws NamingException {
-        doLoadBalance( clusterInfo.keySet(), 100 )  ;
+        doLoadBalance( gfCluster.runningInstances(), 100 )  ;
     }
 
     private <T> T pick( Set<T> set ) {
@@ -356,15 +469,13 @@ public class Main extends Base {
     // 2. Bring down the cluster
     // 3. Start one instance (firstinstance)
     // 4. Create 10 new IC, and do ejb lookups (appclient is run with
-    //    endpoints having all instances host: port info)
+    //    endpoints having all instances host:port info)
     // 5. Bring up all remaining instances
     // 6. Kill Instance where we created ic and did lookups
     // 7. Access business methods for the ejb's (created in step 4)
     @Test( "14762" )
     public void test14762() throws NamingException {
-        for (String in : clusterInfo.keySet()) {
-            ac.stopInstance(in);
-        }
+        gfCluster.stopCluster();
         final String firstInstance = pick( clusterInfo.keySet() ) ;
         ac.startInstance(firstInstance) ;
         final List<InitialContext> ics = new ArrayList<InitialContext>() ;
@@ -451,27 +562,24 @@ public class Main extends Base {
 
     @Test( "lbfail" )
     public void testLBFail() throws NamingException {
-        final int numCalls = 20 ;
-        Set<String> runningInstances = clusterInfo.keySet() ;
-        doLoadBalance( runningInstances, numCalls )  ;
+        final int numCalls = 50 ;
+        doLoadBalance( gfCluster.runningInstances(), numCalls )  ;
 
-        final String inst1 = pick( runningInstances ) ;
-        ac.stopInstance(inst1) ;
-        runningInstances.remove( inst1 ) ;
-        doLoadBalance( runningInstances, numCalls )  ;
+        final String inst1 = pick( gfCluster.runningInstances() ) ;
+        gfCluster.stopInstance(inst1) ;
+        doLoadBalance( gfCluster.runningInstances(), numCalls )  ;
 
-        final String inst2 = pick( runningInstances ) ;
-        ac.stopInstance(inst2) ;
-        runningInstances.remove( inst2 ) ;
-        final String inst3 = pick( runningInstances ) ;
+        final String inst2 = pick( gfCluster.runningInstances() ) ;
+        gfCluster.stopInstance(inst2) ;
 
-        ac.startInstance(inst1);
-        runningInstances.add( inst1 ) ;
-        doLoadBalance( runningInstances, numCalls )  ;
+        final String inst3 = pick( gfCluster.runningInstances() ) ;
 
-        ac.stopInstance(inst3);
-        runningInstances.remove( inst3 ) ;
-        doLoadBalance( runningInstances, numCalls )  ;
+        gfCluster.startInstance(inst1);
+        gfCluster.sleep( 2 ) ;  // Seems to take a while to wake up?
+        doLoadBalance( gfCluster.runningInstances(), numCalls )  ;
+
+        gfCluster.stopInstance(inst3);
+        doLoadBalance( gfCluster.runningInstances(), numCalls )  ;
     }
 
     public void doLoadBalance( Set<String> expected,
@@ -479,8 +587,9 @@ public class Main extends Base {
         doLoadBalance( expected, numCalls, getIIOPEndpointList() ) ;
     }
 
-    public void doLoadBalance( Set<String> expected, int numCalls,
+    public LocationBeanRemote doLoadBalance( Set<String> expected, int numCalls,
         String endpoints ) throws NamingException {
+        LocationBeanRemote current = null ;
         // XXX add checking for approximate distribution
         // according to weights
         Map<String,Integer> counts =
@@ -494,13 +603,13 @@ public class Main extends Base {
             } else {
                 ctx = makeIC(null) ;
             }
-            LocationBeanRemote locBean = lookup( ctx ) ;
-            newLocation = invokeMethod( locBean );
+            current = lookup( ctx ) ;
+            newLocation = invokeMethod( current );
             note( "result[" + i + "]= " + newLocation);
             increment( counts, newLocation ) ;
         }
 
-        note( "Call distribution:" ) ;
+        note( "Call distribution: (expected on instances " + expected + ")" ) ;
         for (Map.Entry<String,Integer> entry : counts.entrySet()) {
             int count = entry.getValue().intValue() ;
             note( String.format( "\tName = %20s Count = %10d",
@@ -510,6 +619,8 @@ public class Main extends Base {
         check( expected.equals(counts.keySet()),
             "Requests not loadbalanced across expected instances: "
             + " expected " + expected + ", actual " + counts.keySet() ) ;
+
+        return current ;
     }
 
     public void doLoadBalance( Set<String> expected, Set<InitialContext> ics
@@ -535,9 +646,10 @@ public class Main extends Base {
                 entry.getKey(), count ) ) ;
         }
 
-        check( expected.equals(counts.keySet()),
-            "Requests not loadbalanced across expected instances: "
-            + " expected " + expected + ", actual " + counts.keySet() ) ;
+        check( (counts.keySet().size() == 1)
+            && expected.containsAll( counts.keySet() ),
+            "Request did not failover to a single instance in expected instance "
+            + expected ) ;
     }
 
     // Test scenario for issue 14732:
@@ -558,7 +670,7 @@ public class Main extends Base {
         // Make sure only inst is running
         boolean first = true ;
         String running = "" ;
-        for (String inst : clusterInfo.keySet()) {
+        for (String inst : gfCluster.runningInstances()) {
             if (first) {
                 running = inst ;
                 note( "Running instance is " + inst ) ;
@@ -604,8 +716,76 @@ public class Main extends Base {
     //    1. Create a new InitialContext
     //    2. Do a lookup
     //    3. Remember which instance the lookup went to
-    // 4. Add two new instances
+    // 4. Create and start two new instances
     // 5. Then do 100 new IntialContext/lookup.
+    // 6. Destroy new instances.
+    // New instances should process some of new requests
+    @Test( "14867c" )
+    public void test14867createInstances() throws NamingException {
+        Set<String> instances = gfCluster.runningInstances() ;
+        note( "Running instances = " + instances ) ;
+        check( instances.size() >= 3, "Cluster must contain at least 5 instances") ;
+
+        final String gfInstance1 = pick( instances, true ) ;
+        final String gfInstance2 = pick( instances, true ) ;
+        final String gfInstance3 = pick( instances, true ) ;
+        gfCluster.stopCluster() ;
+
+        gfCluster.startInstance( gfInstance1 );
+        gfCluster.startInstance( gfInstance2 );
+        gfCluster.startInstance( gfInstance3 );
+        final String endpoints = getIIOPEndpointList() ;
+
+        final int COUNT = 100 ;
+        instances = gfCluster.runningInstances() ;
+        note( "Running instances = " + instances ) ;
+        final String[] flags = { /* "subcontract", "transport", "folb" */ } ;
+        LocationBeanRemote last = null ;
+        try {
+            setORBDebug( flags ) ;
+            /* last = */ doLoadBalance( instances, COUNT, endpoints ) ;
+        } finally {
+            clearORBDebug( flags ) ;
+        }
+
+        final String testBase = "testInstance" ;
+        final int portBase = 20000 ;
+        gfCluster.createInstances( testBase, 2, "", portBase ) ;
+        gfCluster.startInstance( testBase + "0" );
+        if (last != null) {
+            invokeMethod(last) ;
+        }
+        gfCluster.startInstance( testBase + "1" );
+        if (last != null) {
+            invokeMethod(last) ;
+        }
+
+        gfCluster.sleep(10);
+
+        try {
+            setORBDebug( flags ) ;
+            instances = gfCluster.runningInstances() ;
+            note( "Running instances = " + instances ) ;
+            doLoadBalance( instances, 10*COUNT, endpoints ) ;
+        } finally {
+            clearORBDebug( flags ) ;
+            gfCluster.stopInstance( testBase + "0" ) ;
+            gfCluster.destroyInstance( testBase + "0" ) ;
+            gfCluster.stopInstance( testBase + "1" ) ;
+            gfCluster.destroyInstance( testBase + "1" ) ;
+        }
+    }
+
+    // Test scenario for issue 14867:
+    // 1. Make sure cluster has at least 5 instances.  Stop 2 instances.
+    // 2. Deploy an application to a cluster with three instances
+    // 3. Start up one client with target-server+ specifying the three instances.
+    // 4. In a loop (100 iterations):
+    //    1. Create a new InitialContext
+    //    2. Do a lookup
+    //    3. Remember which instance the lookup went to
+    // 5. Start two more instances
+    // 6. Then do 100 new IntialContext/lookup.
     // New instances should process some of new requests
     @Test( "14867" )
     public void test14867() throws NamingException {
@@ -628,18 +808,73 @@ public class Main extends Base {
         final int COUNT = 100 ;
         instances = gfCluster.runningInstances() ;
         note( "Running instances = " + instances ) ;
-        doLoadBalance( instances, COUNT, endpoints ) ;
+        final String[] flags = { /* "subcontract", "transport", "folb" */ } ;
+        LocationBeanRemote last = null ;
+        try {
+            setORBDebug( flags ) ;
+            /* last = */ doLoadBalance( instances, COUNT, endpoints ) ;
+        } finally {
+            clearORBDebug( flags ) ;
+        }
 
         gfCluster.startInstance( gfInstance4 );
+        if (last != null) {
+            invokeMethod(last) ;
+        }
         gfCluster.startInstance( gfInstance5 );
+        if (last != null) {
+            invokeMethod(last) ;
+        }
 
-        instances = gfCluster.runningInstances() ;
-        note( "Running instances = " + instances ) ;
-        doLoadBalance( instances, COUNT, endpoints ) ;
+        gfCluster.sleep(10);
+
+        try {
+            setORBDebug( flags ) ;
+            instances = gfCluster.runningInstances() ;
+            note( "Running instances = " + instances ) ;
+            doLoadBalance( instances, 10*COUNT, endpoints ) ;
+        } finally {
+            clearORBDebug( flags ) ;
+        }
     }
 
+    // Test scenario:
+    // 1. App is deployed on a 3 instance cluster
+    // 2. loop for 100 times:
+    // - ic = new InitialContext
+    // - ejb = ic.lookup
+    // - loc = ejb.getLocation
+    // - if first time, kill instance loc
+    // 3. see that LB happens on remaining cluster
+    @Test( "lbstopinstance" )
+    public void testLBStopInstance() throws Exception {
+        final int CLUSTER_SIZE = 3 ;
+        final int NUM_IC = 100 ;
+        Set<String> clusterInstances = new HashSet<String>() ;
+        Set<String> instances = gfCluster.runningInstances() ;
+        for (int ctr=0; ctr<CLUSTER_SIZE; ctr++) {
+            String inst = pick(instances,true ) ;
+            if (inst != null) {
+                clusterInstances.add( inst ) ;
+            }
+        }
+        check( clusterInstances.size() == 3, "Not enough instances to run test" ) ;
 
-    // Test scenario for issue 15100:
+        gfCluster.stopCluster() ;
+        for (String inst : clusterInstances) {
+            gfCluster.startInstance(inst);
+        }
+
+        InitialContext ic = makeIC()  ;
+        LocationBeanRemote locBean = lookup(ic) ;
+        String inst = invokeMethod( locBean ) ;
+        gfCluster.stopInstance( inst ) ;
+        instances.remove( inst ) ;
+
+        doLoadBalance( gfCluster.runningInstances(), NUM_IC-1, null ) ;
+    }
+
+    // Test scenario:
     // 1. App is deployed on a 3 instance cluster
     // 2. Send 100 New initial Contexts, approx 30 are created on instance 1
     // 3. Bring down instance 1
@@ -647,14 +882,17 @@ public class Main extends Base {
     //    over to only one instance
     // 5. The expectation is, the failoved requests should be distributed
     //    among healthy instances (15 each approx)
-    @Test( "15100")
-    public void test15100() throws NamingException {
+    @Test( "lbfail2")
+    public void testLBFail2() throws NamingException {
         final int CLUSTER_SIZE = 3 ;
         final int NUM_IC = 100 ;
         Set<String> clusterInstances = new HashSet<String>() ;
         Set<String> instances = gfCluster.runningInstances() ;
         for (int ctr=0; ctr<CLUSTER_SIZE; ctr++) {
-            clusterInstances.add( pick(instances, true) ) ;
+            String inst = pick(instances,true ) ;
+            if (inst != null) {
+                clusterInstances.add( inst ) ;
+            }
         }
         check( clusterInstances.size() == 3, "Not enough instances to run test" ) ;
 
@@ -667,7 +905,12 @@ public class Main extends Base {
         Set<InitialContext> chosen = new HashSet<InitialContext>() ;
 
         for (int ctr=0; ctr<NUM_IC; ctr++ ) {
-            InitialContext ic = makeIC(null) ;
+            InitialContext ic = null ;
+            if (ctr==0) {
+                ic = makeIC() ;
+            } else {
+                ic = makeIC(null) ;
+            }
             LocationBeanRemote locBean = lookup(ic) ;
             String runningInstance = invokeMethod( locBean ) ;
             if (runningInstance.equals( shutdownInst )) {
@@ -675,12 +918,22 @@ public class Main extends Base {
             }
         }
 
-        ac.stopInstance( shutdownInst ) ;
-        doLoadBalance( gfCluster.runningInstances(), chosen ) ;
+        gfCluster.stopInstance( shutdownInst ) ;
+        final String[] flags = { "subcontract", "transport", "folb" } ;
+        try {
+            // setORBDebug( flags ) ;
+            instances = gfCluster.runningInstances() ;
+            note( "Running instances = " + instances ) ;
+            doLoadBalance( gfCluster.runningInstances(), chosen ) ;
+        } finally {
+            // clearORBDebug( flags ) ;
+        }
     }
 
     @Pre
     public void ensureIC() throws NamingException {
+        Set<String> runningInstances = gfCluster.runningInstances() ;
+        note( "Running instances: " + runningInstances ) ;
         // Make sure an initial context is created with endpoints before any
         // test starts
         makeIC() ;

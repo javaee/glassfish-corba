@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -55,6 +55,7 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 
 import com.sun.corba.se.spi.logging.NamingSystemException;
+import com.sun.corba.se.spi.oa.ObjectAdapter;
 import com.sun.corba.se.spi.trace.Naming;
 
 /**
@@ -134,6 +135,7 @@ public class TransientNameService
                 ServantRetentionPolicyValue.RETAIN);
 
             POA nsPOA = rootPOA.create_POA( "TNameService", null, poaPolicy );
+            ObjectAdapter.class.cast( nsPOA ).setNameService(true);
             nsPOA.the_POAManager().activate();
 
             // Create an initial context

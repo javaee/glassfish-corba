@@ -67,7 +67,7 @@ public class MethodMonitorRegistry {
      * be used.
      */
     public static String USE_SYNC_HOLDER_PROPERTY =
-        "com.sun.corba.ee.tf.UseSynchronizedHolder" ;
+        "com.sun.corba.se.tf.UseSynchronizedHolder" ;
 
     private static final Exceptions wrapper = Exceptions.self ;
 

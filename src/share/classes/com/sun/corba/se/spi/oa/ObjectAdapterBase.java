@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -75,7 +75,8 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
     private IORTemplate iortemp;
     private byte[] adapterId ;
     private ObjectReferenceTemplate adapterTemplate ;
-    private ObjectReferenceFactory currentFactory ;  
+    private ObjectReferenceFactory currentFactory ;
+    private boolean isNameService = false ;
    
     public ObjectAdapterBase( ORB orb ) {
 	this.orb = orb ;
@@ -197,4 +198,12 @@ abstract public class ObjectAdapterBase extends org.omg.CORBA.LocalObject
     }
 
     abstract public String[] getInterfaces( Object servant, byte[] objectId ) ;
+
+    public boolean isNameService() {
+        return isNameService ;
+    }
+
+    public void setNameService( boolean flag ) {
+        isNameService = flag ;
+    }
 } 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -688,7 +688,8 @@ public interface ORBUtilSystemException {
         int arg2, int arg3 ) ;
     
     @Log( level=LogLevel.SEVERE, id=16 )
-    @Message( "Unable to create IIOP listener on the specified port: {0}" )
+    @Message( "Unable to create IIOP listener on the specified "
+        + "host {0} and port {1}" )
     COMM_FAILURE createListenerFailed( @Chain Throwable thr, String host, int port ) ;
     
     @Log( level=LogLevel.FINE, id=17 )

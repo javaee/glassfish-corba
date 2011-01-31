@@ -80,6 +80,7 @@ import com.sun.corba.se.spi.folb.SocketInfo;
 
 import com.sun.corba.se.spi.ior.iiop.ClusterInstanceInfoComponent ;
 import com.sun.corba.se.spi.ior.iiop.IIOPFactories ;
+import com.sun.corba.se.spi.legacy.interceptor.ServerRequestInfoExt;
 
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactory;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager;
@@ -552,7 +553,8 @@ public class ServerGroupManager
 		referenceFactoryManager.find(adapterName);
 
 	    // Only handle RefenceFactory adapters.
-	    if (referenceFactory == null) {
+	    if (referenceFactory == null && 
+                    !((ServerRequestInfoExt)ri).isNameService()) {
                 notManagedByReferenceFactory( adapterName ) ;
 		return;
 	    }

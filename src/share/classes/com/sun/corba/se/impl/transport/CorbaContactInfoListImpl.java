@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -242,11 +242,11 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
     private void changingEffectiveAddress( IIOPAddress oldAddr, IIOPAddress newAddr ) { }
 
     @Transport
-    public synchronized void setEffectiveTargetIOR(IOR effectiveTargetIOR)
+    public synchronized void setEffectiveTargetIOR(IOR newIOR)
     {
         if (targetIOR != null) {
             final String oldTypeId = targetIOR.getTypeId() ;
-            final String newTypeId = effectiveTargetIOR.getTypeId() ;
+            final String newTypeId = newIOR.getTypeId() ;
             if (!oldTypeId.isEmpty() && !oldTypeId.equals( newTypeId )) {
                 // Good place for a breakpoint.  This is probably always an
                 // error, but not necessarily in the ORB.
@@ -259,12 +259,12 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
         }
 
         final IIOPAddress oldAddress = getPrimaryAddress( this.effectiveTargetIOR ) ;
-        final IIOPAddress newAddress = getPrimaryAddress( effectiveTargetIOR ) ;
+        final IIOPAddress newAddress = getPrimaryAddress( newIOR ) ;
         if ((oldAddress != null) && !oldAddress.equals( newAddress )) {
             changingEffectiveAddress( oldAddress, newAddress ) ;
         }
 
-	this.effectiveTargetIOR = effectiveTargetIOR;
+	this.effectiveTargetIOR = newIOR;
 
 	effectiveTargetIORContactInfoList = null;
 	if (primaryContactInfo != null &&
@@ -277,7 +277,7 @@ public class CorbaContactInfoListImpl implements CorbaContactInfoList {
 	setLocalSubcontract();
 
         // Set the per request load balancing flag.
-        IIOPProfile prof = effectiveTargetIOR.getProfile() ;
+        IIOPProfile prof = newIOR.getProfile() ;
         TaggedProfileTemplate temp = prof.getTaggedProfileTemplate() ;
         Iterator<TaggedComponent> lbcomps = 
             temp.iteratorById( ORBConstants.TAG_LOAD_BALANCING_ID ) ;

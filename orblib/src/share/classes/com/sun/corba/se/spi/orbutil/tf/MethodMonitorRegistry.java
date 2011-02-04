@@ -393,8 +393,8 @@ public class MethodMonitorRegistry {
 		final String aname = entry.getKey() ;	// annotation name
 		final String fname = entry.getValue() ;	// field name
                 final Holder<MethodMonitor> sh = isHolderSynchronized() ?
-                    new Holder<MethodMonitor>() :
-                    new SynchronizedHolder<MethodMonitor>() ;
+                    new SynchronizedHolder<MethodMonitor>() :
+                    new Holder<MethodMonitor>() ;
 
                 if (System.getSecurityManager() == null) {
                     initializeField( cls, fname, sh ) ;

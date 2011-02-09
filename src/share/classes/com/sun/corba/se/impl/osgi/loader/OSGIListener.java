@@ -59,16 +59,20 @@ import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Osgi;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import java.security.PrivilegedAction ;
+import java.security.PrivilegedExceptionAction ;
+import java.security.PrivilegedActionException ;
+import java.security.AccessController ;
+
 /** OSGi class that monitors which bundles provide classes that the ORB
- * needs to instantiate for initialization.  This class is part of the
- * glassfish-corba-osgi bundle.  Note that the glassfish-corba-osgi module
- * may itself be an ORB class provider.
+ * needs to instantiate for initialization.  
  * <p>
- * Note that OSGIListener must be a Bundle-Activator in the glassfish-corba-osgi
+ * Note that OSGIListener must be a Bundle-Activator in the glassfish-corba-orb
  * bundle.
  * <p>
  * Any bundle that provides ORB classes to the ORB initialization code must
@@ -90,6 +94,40 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
 
     private static void setPackageAdmin( PackageAdmin pa ) {
         pkgAdmin = pa ;
+    }
+
+    private static Dictionary secureGetHeaders( final Bundle bundle ) {
+        if (System.getSecurityManager() == null) {
+            return bundle.getHeaders() ;
+        } else {
+            return AccessController.doPrivileged(
+                new PrivilegedAction<Dictionary>() {
+                    public Dictionary run() {
+                        return bundle.getHeaders() ;
+                    }
+                }
+            ) ;
+        }
+    }
+
+    private static Class<?> secureLoadClass( final Bundle bundle, 
+        final String className ) throws ClassNotFoundException {
+
+        if (System.getSecurityManager() == null) {
+            return bundle.loadClass( className ) ;
+        } else {
+            try {
+                return AccessController.doPrivileged(
+                    new PrivilegedExceptionAction<Class<?>>() {
+                        public Class<?> run() throws ClassNotFoundException {
+                            return bundle.loadClass( className ) ;
+                        }
+                    }
+                ) ;
+            } catch (PrivilegedActionException exc) {
+                throw (ClassNotFoundException)exc.getException() ;
+            }
+        }
     }
 
     // Map from class name to Bundle, which identifies all known 
@@ -155,7 +193,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             }
 
             try {
-                return bundle.loadClass(arg);
+                return secureLoadClass( bundle, arg );
             } catch (ClassNotFoundException ex) {
                 throw wrapper.bundleCouldNotLoadClass( ex, arg, 
                     bundle.getSymbolicName() ) ;
@@ -205,7 +243,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
             
             String name = bundle.getSymbolicName() ;
 
-            Dictionary headers = bundle.getHeaders() ;
+            Dictionary headers = secureGetHeaders( bundle ) ;
             String version = "0.0.0" ;
             if (headers != null) {
                 String hver = (String)headers.get( "Bundle-Version" ) ;
@@ -237,7 +275,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                 Bundle bundle = getBundleForClass( className ) ;
                 if (bundle != null) {
                     try {
-                        return bundle.loadClass( className ) ;
+                        return secureLoadClass( bundle, className ) ;
                     } catch (ClassNotFoundException exc) {
                         couldNotLoadClassInBundle( exc, className,
                             bundle.getSymbolicName() ) ;
@@ -263,7 +301,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
                             try {
                                 foundClassInBundleVersion(
                                     className, name, version ) ;
-                                return defBundles[0].loadClass( className ) ;
+                                return secureLoadClass( defBundles[0], className ) ;
                             } catch (ClassNotFoundException cnfe) {
                                 classNotFoundInBundleVersion(
                                     className, name, version ) ;
@@ -296,7 +334,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     private void insertClasses( Bundle bundle ) {
         lock.writeLock().lock() ;
         try {
-            final Dictionary dict = bundle.getHeaders() ;
+            final Dictionary dict = secureGetHeaders( bundle ) ;
             final String name = bundle.getSymbolicName() ;
             if (dict != null) {
                 final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;
@@ -336,7 +374,7 @@ public class OSGIListener implements BundleActivator, SynchronousBundleListener 
     private void removeClasses( Bundle bundle ) {
         lock.writeLock().lock() ;
         try {
-            final Dictionary dict = bundle.getHeaders() ;
+            final Dictionary dict = secureGetHeaders( bundle ) ;
             final String name = bundle.getSymbolicName() ;
             if (dict != null) {
                 final String orbProvider = (String)dict.get( ORB_PROVIDER_KEY ) ;

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -442,16 +442,6 @@ public class IDLNameTranslatorImpl implements IDLNameTranslator {
 
     // isIDLKeyword and mangleIDLKeywordClash are exposed here so that
     // IDLType can use them.  
-    //
-    // XXX refactoring needed:
-    // 1. Split off isIDLKeywork and mangleIDLKeywordClash (and possibly
-    //    other methods) into a utility class.
-    // 2. Move all of classToIDLType to a constructor inside IDLType.
-    //
-    // The problem appears to be that we need all of the code that
-    // performs various checks for name problems and the corresponding
-    // fixes into a utility class.  Then we need to see what other
-    // refactorings present themselves.
     
     /**
      * Checks whether a java identifier clashes with an

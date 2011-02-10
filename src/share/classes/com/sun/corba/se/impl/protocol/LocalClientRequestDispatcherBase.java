@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -78,7 +78,7 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
         ORBUtilSystemException.self ;
 
     // XXX May want to make some of this configuratble as in the remote case
-    // XXX Should this be unified?  How can we better handle this retry/backoff
+    // Should this be unified?  How can we better handle this retry/backoff
     // implementation with a single implementation?
     private static final int INITIAL_BACKOFF = 1 ;  // initially start off very small
 						    // because 1 millisecond is a long time for a local call.
@@ -223,13 +223,6 @@ public abstract class LocalClientRequestDispatcherBase implements LocalClientReq
     public ServantObject servant_preinvoke( org.omg.CORBA.Object self,
 	String operation, Class expectedType ) {
 
-        // XXX Should we consider an implementation here that is
-        // event driven instead of polled?  We could take advantage
-        // of the ORT OAManager state change notification to drive
-        // this.  This would require registering an IORInterceptor_3_0
-        // implementation that signals a condition on which thread
-        // wait in colocated invocations.  But this is probably not
-        // justified.
         long startTime = -1 ;
         long backoff = INITIAL_BACKOFF ;
         long maxWait = MAX_WAIT_TIME ;

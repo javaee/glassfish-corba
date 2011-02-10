@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -217,10 +217,11 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
 		    }
 
 		    // XXX suid = getDeclaredSUID(cl);
+
 		    try {
 			fields = getSerialFields(cl);
 		    } catch (InvalidClassException e) {
-			// XXX log this
+                        Exceptions.self.noSerialFields( cl, e ) ;
 		    }
 		    
 		    if (isExternalizable ) {
@@ -537,7 +538,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
 	    return ((lcons.getModifiers() & Modifier.PUBLIC) != 0) ?
 		lcons : null;
 	} catch (NoSuchMethodException ex) {
-            // XXX log
+            Exceptions.self.noExternalizableConstructor( cl, ex ) ;
 	    return null;
 	}
     }
@@ -729,7 +730,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
                     ObjectStreamClass.translateFields( javaSPF ) ;
 	    }
 	} catch (Exception ex) {
-	    // XXX log exception
+            Exceptions.self.noSerialPersistentFields( cl, ex ) ;
 	}
 
 	if (serialPersistentFields == null) {
@@ -753,8 +754,9 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
 	    }
 	    fieldNames.add(fname);
 
+            Field f = null ;
 	    try {
-		Field f = cl.getDeclaredField(fname);
+		f = cl.getDeclaredField(fname);
 		if ((f.getType() == spf.getType()) &&
 		    ((f.getModifiers() & Modifier.STATIC) == 0))
 		{
@@ -762,7 +764,7 @@ public class ClassAnalyzerImpl<T> implements ClassAnalyzer<T> {
 			new ObjectStreamField(f) ;
 		}
 	    } catch (NoSuchFieldException ex) {
-		// XXX log this
+                Exceptions.self.fieldNotFound( f, cl, ex ) ;
 	    }
 
 	    if (boundFields[i] == null) {

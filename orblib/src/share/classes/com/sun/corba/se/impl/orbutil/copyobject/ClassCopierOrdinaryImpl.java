@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -70,7 +70,6 @@ import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 // General Object: use proper constructor, iterate over fields,
 // get/set fields using Unsafe or reflection.  This also handles readResolve,
 // but I don't think writeReplace is needed.
-// XXX Add proper handling for custom marshalled classes.
 public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
 //******************************************************************************
@@ -199,7 +198,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		return ((cons.getModifiers() & Modifier.PUBLIC) != 0) ? 
 		    cons : null;
 	    } catch (NoSuchMethodException ex) {
-		// XXX log this!
+                Exceptions.self.noExternalizbleConstructor( cl ) ;
 		return null;
 	    }
 	}
@@ -234,7 +233,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		cons.setAccessible(true);
 		return cons;
 	    } catch (NoSuchMethodException ex) {
-		// XXX log this!
+                Exceptions.self.noSerializableConstructor( cl ) ;
 		return null;
 	    }
 	}
@@ -337,7 +336,8 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
     private static boolean useCodegenCopier()
     {
-        // XXX put this in an orblib constants class like ORBConstants
+        // I consider this to be implementation private, so I'll leave it
+        // out of the public API.
 	return Boolean.getBoolean( "com.sun.corba.se.ORBUseCodegenReflectiveCopyobject" ) ;
     }
 
@@ -482,7 +482,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
                 throws ReflectiveCopyException ;
 	}
 
-	// All of the XXXInitializer instances simply set the field to 0 or null
+	// All of the YYYInitializer instances simply set the field to 0 or null
 	private static UnsafeFieldCopier byteUnsafeFieldInitializer = 
 	    new UnsafeFieldCopier( BRIDGE_REF ) {
 
@@ -613,9 +613,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
             } else if (cls.equals( double.class )) {
                 return doubleUnsafeFieldInitializer;
             } else {
-                // XXX use Exceptions
-                throw new IllegalArgumentException(
-                    "cls must be a primitive type");
+                throw Exceptions.self.notAPrimitiveType( cls ) ;
             }
 	}
 
@@ -766,8 +764,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    if (cls.equals( double.class )) {
                 return doubleUnsafeFieldCopier;
             }
-            // XXX use Exceptions
-            throw new IllegalArgumentException("cls must be a primitive type");
+            throw Exceptions.self.notAPrimitiveType( cls ) ;
 	}
 	
 	// Various kinds of Object copiers
@@ -1104,9 +1101,8 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 		cons = copierClass.getDeclaredConstructor( 
 		    PipelineClassCopierFactory.class, ClassFieldCopier.class ) ;
 	    } catch (Exception exc) {
-                // XXX use Exceptions
-		throw new ReflectiveCopyException(
-                    "Could not access unsafe codegen copier constructor", exc) ;
+                throw Exceptions.self.noAccessCodegenCopierConstructor( cls,
+                    exc ) ;
 	    } 
 
 	    classToConstructor.put( cls, cons ) ;
@@ -1120,9 +1116,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	    Object[] args = new Object[] { classCopierFactory, superCopier } ;
 	    copier = (ClassFieldCopier)cons.newInstance( args ) ;
 	} catch (Exception exc) {
-            // XXX use Exceptions
-	    throw new ReflectiveCopyException(
-                 "Could not create unsafe codegen copier", exc) ;
+            throw Exceptions.self.couldNotCreateCodegenCopier( cls, exc ) ;
 	}
 	    
 	return copier ;
@@ -1168,9 +1162,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 	try { 
 	    return constructor.newInstance() ;
 	} catch (Exception exc) {
-	    // XXX log this
-	    throw new ReflectiveCopyException(
-		"Failure in newInstance for constructor " + constructor, exc ) ;
+            throw Exceptions.self.constructorFailed( constructor, exc ) ;
 	}
     }
 

@@ -1970,4 +1970,25 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.FINE, id=21 )
     @Message( "ThreadStateValidator {0} threw an exception")
     UNKNOWN threadStateValidatorException(Runnable run, @Chain Throwable thr);
+
+    @Log( level=LogLevel.FINE, id=22 )
+    @Message( "Bad GIOP 1.1 cancel request received")
+    UNKNOWN bad1_1CancelRequestReceived();
+
+    @Log( level=LogLevel.FINE, id=23 )
+    @Message( "Cancel request with id 0 received")
+    UNKNOWN cancelRequestWithId0();
+
+    @Log( level=LogLevel.FINE, id=24 )
+    @Message( "Bad cancel request received")
+    UNKNOWN badCancelRequest();
+
+    @Log( level=LogLevel.FINE, id=25 )
+    @Message( "Class {0} not found in remote codebase {1}")
+    UNKNOWN classNotFoundInCodebase(String className, String remoteCodebase);
+
+    @Log( level=LogLevel.FINE, id=26 )
+    @Message( "Class {0} not found in JDKClassLoader")
+    UNKNOWN classNotFoundInJDKClassLoader(String className,
+        @Chain ClassNotFoundException e);
 }

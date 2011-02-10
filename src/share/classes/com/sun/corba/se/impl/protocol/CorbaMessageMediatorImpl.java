@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1414,7 +1414,7 @@ public class CorbaMessageMediatorImpl
 	    // was the request 1.1 ?
 	    mediator = connection.serverRequest_1_1_Get();
             if (mediator == null) {
-		// XXX log this!
+                wrapper.badCancelRequest() ;
                 // either the request was 1.0
                 // or an early reply has already been sent
                 // or request processing is over
@@ -1426,12 +1426,12 @@ public class CorbaMessageMediatorImpl
 
             if (requestId != cancelReqId) {
                 // A spurious 1.1 CancelRequest has been received.
-		// XXX log this!
+                wrapper.bad1_1CancelRequestReceived() ;
                 return; // do nothing
             }
 
 	    if (requestId == 0) { // special case
-		// XXX log this
+                wrapper.cancelRequestWithId0() ;
 		// this means that
 		// 1. the 1.1 requests' requestId has not been received
 		//    i.e., a CancelRequest was received even before the

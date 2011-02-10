@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -153,7 +153,6 @@ public class ASMByteCodeVisitor extends TreeWalker {
 
     @Override
     public void classGeneratorBeforeInitializer( ClassGeneratorImpl arg ) {
-	// XXX need to setup the <clinit> method here
     }
 
     @Override
@@ -179,11 +178,9 @@ public class ASMByteCodeVisitor extends TreeWalker {
     // MethodGenerator
     @Override
     public boolean preMethodGenerator( MethodGenerator arg ) {
-	// XXX Is there anything different about handling constructors here?
-	// Every constructor must start with a call to super() or this(),
-	// but do we do this here?  I think that may be better handled
-	// at a higher layer.
-	
+        // Also handle constructors here.  May want to check at
+        // a higher level that the constructor body starts with
+        // this() or super().
 	bcu.emitMethodStart( arg ) ;
 	for (Variable var : arg.arguments())
 	    recordVariable( var ) ;

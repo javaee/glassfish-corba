@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1107,7 +1107,7 @@ public class NamingContextImpl extends NamingContextExtPOA
    @Naming
     public void destroyImpl() throws SystemException
     {
-	// XXX note that orb.disconnect is illegal here, since the
+	// Note that orb.disconnect is illegal here, since the
 	// POA is used.  However, there may be some associated state
 	// that needs to be cleaned up in ServerManagerImpl which we will
 	// look into further at another time.

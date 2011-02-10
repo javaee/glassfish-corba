@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -63,13 +63,16 @@ import java.lang.ref.SoftReference ;
 import java.lang.ref.ReferenceQueue ;
 
 import com.sun.corba.se.org.omg.CORBA.GetPropertyAction;
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 /**
  *  Utility methods for doing various method calls which are used
  *  by multiple classes
  */
 public class JDKBridge {
- 
+    private static final ORBUtilSystemException wrapper =
+        ORBUtilSystemException.self ;
+
     /**
      * Get local codebase System property (java.rmi.server.codebase).
      * May be null or a space separated array of URLS.
@@ -220,9 +223,11 @@ public class JDKBridge {
 	throws ClassNotFoundException {
         
         // XXX GFv3 Disable use of the cache for now:
+        //
         // it is caching different classes incorrectly that have
         // the same name, but different ClassLoaders.
-	Class cls = null ; // XXX LoadClassCache.get( className, remoteCodebase, loader ) ;
+	Class cls = null ; 
+        // NOCACHE LoadClassCache.get( className, remoteCodebase, loader ) ;
 	if (cls == null) {
 	    if (loader == null) {
 		cls = loadClassM(className,remoteCodebase,useCodebaseOnly);
@@ -230,11 +235,12 @@ public class JDKBridge {
 		try {
 		    cls = loadClassM(className,remoteCodebase,useCodebaseOnly);
 		} catch (ClassNotFoundException e) {
-		    // XXX log at fine
+                    wrapper.classNotFoundInCodebase( className,
+                        remoteCodebase ) ;
 		    cls = loader.loadClass(className);
 		}
 	    }
-	    // XXX LoadClassCache.put( className, remoteCodebase, loader, cls ) ;
+	    // NOCACHE LoadClassCache.put( className, remoteCodebase, loader, cls ) ;
 	}
 
 	return cls ;
@@ -308,7 +314,7 @@ public class JDKBridge {
         try {
             return JDKClassLoader.loadClass(null,className);
         } catch (ClassNotFoundException e) {
-	    // XXX log this
+            wrapper.classNotFoundInJDKClassLoader( className, e ) ;
 	}
 
         try {

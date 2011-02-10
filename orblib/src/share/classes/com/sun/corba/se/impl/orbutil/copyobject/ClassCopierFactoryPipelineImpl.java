@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -240,9 +240,7 @@ public class ClassCopierFactoryPipelineImpl implements
 	// TIME enter_getClassCopier
 	Class<?> cls ) throws ReflectiveCopyException {
 	if (cls.isInterface()) {
-            // XXX use Exceptions class here
-            throw new IllegalArgumentException(
-                "Cannot create a ClassCopier for an interface.");
+            throw Exceptions.self.cannotCreateClassCopierForInterface( cls ) ;
         }
 
         rwlock.readLock().lock() ;
@@ -265,9 +263,7 @@ public class ClassCopierFactoryPipelineImpl implements
                     result = ordinaryFactory.getClassCopier(cls);
                 }
                 if (result == null) {
-                    // XXX use Exceptions
-                    throw new IllegalStateException(
-                        "Could not find ClassCopier for " + cls.getClass());
+                    throw Exceptions.self.couldNotFindClassCopier( cls ) ;
                 }
 
                 // Result was not cached, so update the cache
@@ -284,8 +280,7 @@ public class ClassCopierFactoryPipelineImpl implements
             }
 
             if (result == errorCopier) {
-                // Throw the exception early, since there is
-                throw new ReflectiveCopyException( "Cannot copy class " + cls ) ;
+                throw Exceptions.self.cannotCopyClass( cls ) ;
             }
 
             // TIME exit_getClassCopier

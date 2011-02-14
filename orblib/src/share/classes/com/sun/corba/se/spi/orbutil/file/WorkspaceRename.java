@@ -203,8 +203,8 @@ public class WorkspaceRename {
     }
 
     public WorkspaceRename(String[] strs) {
-	ArgParser<Arguments> ap = new ArgParser( Arguments.class ) ;
-	Arguments args = ap.parse( strs ) ;
+	ArgParser ap = new ArgParser( Arguments.class ) ;
+	Arguments args = ap.parse( strs, Arguments.class ) ;
 	version = args.version() ;
 	source = args.source() ;
 	destination = args.destination() ;

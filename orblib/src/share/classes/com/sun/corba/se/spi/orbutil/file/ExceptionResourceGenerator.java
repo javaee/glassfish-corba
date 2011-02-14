@@ -65,8 +65,8 @@ public class ExceptionResourceGenerator {
     private final Arguments args ;
 
     private ExceptionResourceGenerator( String[] strs ) throws IOException {
-        ArgParser<Arguments> ap = new ArgParser<Arguments>( Arguments.class ) ;
-        args = ap.parse( strs ) ;
+        ArgParser ap = new ArgParser( Arguments.class ) ;
+        args = ap.parse( strs, Arguments.class ) ;
         args.destination().delete() ; // ignore return: just want to start
                                       // with an empty file.
     }

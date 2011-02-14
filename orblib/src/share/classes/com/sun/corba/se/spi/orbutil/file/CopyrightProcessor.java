@@ -467,8 +467,8 @@ public class CopyrightProcessor {
     // The difference is that the SHELL_SCRIPT always starts with #!.
     
     public static void main(String[] strs) {
-	ArgParser<Arguments> ap = new ArgParser<Arguments>( Arguments.class ) ;
-	Arguments args = ap.parse( strs ) ;
+	ArgParser ap = new ArgParser( Arguments.class ) ;
+	Arguments args = ap.parse( strs, Arguments.class ) ;
 
 	String startYear = args.startyear() ;
 	verbose = args.verbose() ;

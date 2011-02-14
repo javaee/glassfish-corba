@@ -222,11 +222,12 @@ public class StandardTest extends JapexDriverBase {
 
     // This is static because it is shared between the command-line instantiation
     // of StandardTest, and the instance created by Japex, when run in Japex mode.
-    private static ArgParser<ArgumentData> ap = new ArgParser<ArgumentData>(
+    private static ArgParser ap = new ArgParser(
         ArgumentData.class ) ;
 
     // set up default parameters
-    private static ArgumentData argData = ap.parse( new String[]{} ) ;
+    private static ArgumentData argData = ap.parse( new String[]{},
+        ArgumentData.class ) ;
     private static int numInstances = 0 ;
 
     static {

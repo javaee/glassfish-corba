@@ -133,7 +133,7 @@ public class OrbPing {
     }
 
     public static void main( String[] params ) {
-        args = (new ArgParser<Args>( Args.class )).parse( params ) ;
+        args = (new ArgParser( Args.class )).parse( params, Args.class ) ;
 
         try {
             timer.start() ;

@@ -237,9 +237,9 @@ public class EnhanceTool {
 
     public void run( String[] strs ) {
         try {
-            final ArgParser<Arguments> ap = new ArgParser<Arguments>(
+            final ArgParser ap = new ArgParser(
                 Arguments.class ) ;
-            args = ap.parse( strs ) ;
+            args = ap.parse( strs, Arguments.class ) ;
             util = new Util( args.debug(), args.verbose() ) ;
 
             final String tpname = args.timingPointClass() ;

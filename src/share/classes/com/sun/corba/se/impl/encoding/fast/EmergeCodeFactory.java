@@ -73,6 +73,10 @@ package com.sun.corba.se.impl.encoding.fast ;
  * final-octet	: 128...255 ;		    // (octet: encoding 0...127))
  * cont-octet	: 0...127 ;		    // (octet: encoding 0...127)
  * var-octet	: cont-octet* final-octet ; // at most 8 cont-octet
+ *
+ * note: we could modify the interpretation of var-octet so that the first
+ * octet also include the sign.  This would eliminate the need for
+ * 2-, 4-, and 8-octet terminals.
  * 
  * length	: var-octet ;
  * offset	: var-octet ;
@@ -115,6 +119,8 @@ package com.sun.corba.se.impl.encoding.fast ;
  * Note: we could consider changing the encoding slightly so
  * that SHORT-novalue, INT-novalue, and LONG-novalue encode a sign bit, 
  * and then simple use a var-octet to encode the unsigned value.
+ * But this does not help with primitive arrays, as they have no place
+ * to put the sign bit.
  * 
  * primitive-arr	: BOOL_ARR self-label offset length bool-seq
  *			| BYTE_ARR self-label offset length octet-seq
@@ -130,17 +136,18 @@ package com.sun.corba.se.impl.encoding.fast ;
  * label-seq		: label
  *			| label-seq label ;
  *
- * value		: value-header value-body-seq ;
+ * value		: value-header value-body;
  *
  * value-header		: REF self-label length ;
  *
  * XXX assume we do not support parallel marshaling of a single value-body (as its probably not
  * very useful in general).  Should we change default-part to:
  *
- * length prim-length data-seq label-seq
+ *     length prim-length data-seq label-seq
  *
  * This would avoid marshaling a bunch of INDIR bytecodes by taking advantage of the
- * primitive/non-primitive ordering in the serialization code.
+ * primitive/non-primitive ordering in the serialization code. For now at least,
+ * let's not constrain the encoding that tightly.
  *
  * value-body		: PART-custom type-label default-part custom-part
  *			| PART-simple type-label default-part ;
@@ -202,8 +209,11 @@ package com.sun.corba.se.impl.encoding.fast ;
  *
  * Notes:
  * <ul>
- * <li>Everthing is written to and read from a stream.  Writing will never fragment
- * a primitive or var-octet across buffers, but reading can.
+ * <li>Everything is written to and read from a stream.  Writing will never fragment
+ * a primitive or var-octet across buffers, but reading can. (Why do we say
+ * anything about fragmentation here?  Just write bytes and let things fall
+ * where they may, reading the stream will reconstruct).:wa
+ *
  * <li>Most var-octets will be 1 or 2 (and occasionally 3) octets long.  Anything 
  * longer should almost never occur.
  * <li>Multiple threads (referred to here as fibers) may marshal data concurrently.

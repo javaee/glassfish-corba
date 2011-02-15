@@ -59,6 +59,16 @@ public class VarOctetUtility {
             + (next + 128) ;
     }
 
+    /* extending this to signed longs:
+     * in 7 bits:
+     * high bit 0: positive 1-63
+     * high bit 1: negative 1-63
+     * 0000000: represents 0
+     * 1111111: represents Long.MIN_VALUE
+     *
+     * Not quite right.
+     */
+
     /** Write the long value in var-octet format (7 bits per octet, last octet negated).
      * @throw IllegalArgumentException if data &lt; 0.
      * @throw BufferOverflowException if there is not enough room in the buffer.

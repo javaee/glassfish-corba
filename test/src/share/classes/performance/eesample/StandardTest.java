@@ -1313,7 +1313,7 @@ public class StandardTest extends JapexDriverBase {
 
 	String[] args = { "-fragmentSize", fragmentSize, "-port", port } ;
 
-	argData = ap.parse( args ) ;
+	argData = ap.parse( args, ArgumentData.class ) ;
 
 	log( "Calling initializeDriver with fragmentSize = " + fragmentSize ) ;
 
@@ -1438,7 +1438,7 @@ public class StandardTest extends JapexDriverBase {
      */
     public static void main( String[] args ) {
 	// override default argData
-	argData = ap.parse( args ) ;
+	argData = ap.parse( args, ArgumentData.class ) ;
 	if ((argData.mode() == TestMode.SERVER) && argData.useJapex()) {
 	    throw new IllegalArgumentException( "This test does not run with Japex in server mode!" ) ;
 	}

@@ -102,26 +102,42 @@
         generate-orb-resources, enhance-orb,
         compile-timing-points, make-bundles, archive-bundles"/>
 
+    <target name="build-no-enhance" depends="init, prepare-dirs, compile, 
+        generate-orb-resources, generate-timing-points, compile-timing-points,
+        make-bundles, archive-bundles"/>
+
+    <macrodef name="run-enhance">
+        <attribute name="mode"/>
+        <sequential>
+            <java classname="com.sun.tools.corba.se.enhancer.EnhanceTool"
+                classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
+                <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar:${classes.dir}:${gmbal-jar}"/>
+                <arg value="-dir"/>
+                <arg value="com/sun/corba/se/"/>
+                <arg value="-debug"/>
+                <arg value="false"/>
+                <arg value="-verbose"/>
+                <arg value="1"/>
+                <arg value="-rf"/>
+                <arg value="com/sun/corba/se/spi/tfannotations.properties"/>
+                <arg value="-mode"/>
+                <arg value="@{mode}"/>
+                <arg value="-timingPointClass"/>
+                <arg value="com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints"/>
+                <arg value="-timingPointDir"/>
+                <arg value="${gensrc.dir}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
     <target name="enhance-orb" depends="init">
         <!-- Run the tracing enhancer on the class files for corba.tf -->
-	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool"
-            classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
-            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar:${classes.dir}:${gmbal-jar}"/>
-            <arg value="-dir"/>
-            <arg value="com/sun/corba/se/"/>
-            <arg value="-debug"/>
-            <arg value="false"/>
-            <arg value="-verbose"/>
-            <arg value="1"/>
-	    <arg value="-rf"/>
-	    <arg value="com/sun/corba/se/spi/tfannotations.properties"/>
-            <arg value="-mode"/>
-            <arg value="TraceEnhance"/>
-            <arg value="-timingPointClass"/>
-            <arg value="com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints"/>
-            <arg value="-timingPointDir"/>
-            <arg value="${gensrc.dir}"/>
-        </java>
+        <run-enhance mode="TraceEnhance"/>
+    </target>
+
+    <target name="generate-timing-points" depends="init">
+        <!-- Run the tracing enhancer on the class files for corba.tf -->
+        <run-enhance mode="TimingPoints"/>
     </target>
 
     <target name="init">
@@ -779,49 +795,19 @@
 	</condition>
     </target>
 
-    <target name="generate-timing-points" 
-        depends="init, check-timing-file-changed, orb-library"
-        if="timing-file-changed">
-	<!-- tp-src-dir contains timing.xml and timing.dtd and
-	     must be the current directory for the forked
-             TimerPointSourceGenerator.
-
-	     TPSG takes three arguments:
-		1. The input file.
-		2. The base output directory (not including the package).
-		3. A boolean debug flag.
-
-	    We should be able to debug this by adding:
-
-	    <jvmarg value="-Xdebug -Xnoagent
-             -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=12321"/>
-
-	    to the java command, but that does not work.
-	  -->
-	<property name="tp-src-dir"
-            value="${src.dir}/com/sun/tools/corba/se/timer"/>
-	<java
-            classname="com.sun.corba.se.impl.orbutil.newtimer.TimerPointSourceGenerator"
-            fork="true" dir="${tp-src-dir}">
-            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
-	    <classpath>
-		<pathelement location="${releaselib.dir}/orblib.jar"/>
-	    </classpath>
-	    <arg value="timing.xml"/>
-	    <arg value="${gensrc.dir}"/>
-	    <arg value="false"/>
-	</java>
-    </target>
-    
     <!-- ========================= CLEAN ========================= -->
 
     <target name="clean"
-        depends="init,clean-emma,clean-tests,clean-experimental">
+        depends="init,clean-cobertura,clean-emma,clean-tests,clean-experimental">
         <delete file="${bnd.properties.file}"/>
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
 	<delete dir="${test-build.dir}"/>
 	<delete dir="${javadoc.dir}"/>
+    </target>
+
+    <target name="clean-cobertura" depends="init">
+        <delete dir="${cobertura.dir}"/>
     </target>
 
     <target name="clean-emma" depends="init">

@@ -74,7 +74,8 @@ public class WorkspaceRename {
 
     private static final String[] SUBSTITUTE_NAMES = {
 	"Makefile.corba", "Makefile.example", "ExampleMakefile", "Makefile",
-        "manifest", "README", "README.SUN"
+        "manifest", "README", "README.SUN", "COPYING", "COPYRIGHT",
+        "ChangeLog"
     } ;
 
     private static final String[] COPY_SUFFIXES = {
@@ -82,7 +83,7 @@ public class WorkspaceRename {
 	"pdf", "doc", "mif", "fm", "book", "zargo", "zuml", "cvsignore", 
 	"hgignore", "list", "old", "orig", "rej", "hgtags", "xsl", "bat", "css",
         "icns", "bin", "ico", "init", "ss", "pp", "el", "mail", "lisp", "sch",
-        "tst", "xcf"
+        "tst", "xcf", "war"
     } ;
 
     private static final String[] IGNORE_SUFFIXES = {
@@ -97,7 +98,7 @@ public class WorkspaceRename {
     private static final String[] IGNORE_DIRS = {
 	".hg", ".snprj", ".cvs", "SCCS", "obj", "obj_g", "Codemgr_wsdata", 
 	"deleted_files", "build", "rename", "freezepoint", "test-output",
-	"webrev", "javadoc", "felix-cache"
+	"webrev", "javadoc", "felix-cache", "vpproject"
     } ;
 
     private static final String[][] patterns = {

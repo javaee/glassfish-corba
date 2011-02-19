@@ -404,6 +404,7 @@ public class Util {
 	"emma.coverage.out.merge",
 	"emma.rt.control",
         "junit.report.dir",
+        "net.sourceforge.cobertura.datafile", 
 
         // Test configuration properties
         ORBConstants.ORB_SERVER_ID_PROPERTY,

@@ -12,10 +12,7 @@ import javax.ejb.Remote;
  * @author hv51393
  */
 @Remote
-public interface LocationBeanRemote {
-   String INSTANCE_NAME_PROPERTY = "instance_name" ;
-
-   public String getLocation();
+public interface LocationBeanRemote extends Location {
    public String getHostName();
    public void printSystemProperties();
 

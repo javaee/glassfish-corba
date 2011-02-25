@@ -12,7 +12,7 @@
 
 DAS_HOST="apollo"
 # Must allow at least 5 instances for the test
-# Must be able to access the avilable nodes from the DAS using 
+# Must be able to access the available nodes from the DAS using 
 # SSH without password.
 
 AVAILABLE_NODES="apollo:5"
@@ -63,18 +63,27 @@ echo ${PROPS_FILE}
 EJB_NAME="${APS_HOME}/OrbFailOver-ejb/dist/OrbFailOver-ejb.jar"
 CLIENT_NAME="${APS_HOME}/OrbFailOver-app-client/dist/OrbFailOver-app-client.jar"
 
+ENDPOINTS="apollo:9037,apollo:10037,apollo:11037"
+TARGET_ARGS="-targetserver ${ENDPOINTS}"
+TARGET_DEF="-Dcom.sun.appserv.iiop.endpoints=${ENDPOINTS}"
 DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,address=8228,server=y,suspend=y"
 SETUP_ARGS="-Djava.util.logging.config.file=${PROPS_FILE}"
 TEST_ARGS="-installDir ${GFV3_WORK}/glassfish3 -dasNode ${DAS_HOST} -availableNodes ${AVAILABLE_NODES} -testEjb ${EJB_NAME} -doCleanup false -skipSetup ${SKIP_SETUP}"
-CLIENT_ARGS="-client ${CLIENT_NAME} -name OrbFailOver-app-client"
+CLIENT_ARGS="-client ${CLIENT_NAME} -name OrbFailOver-app-client -serverORBDebug folb"
 
 set -x
 
-echo ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
+# echo ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
 
 if [ "${DEBUGGER}" = "1" ];
 then ${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
 else ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
 fi
+
+# For testing with externally supplied endpoints
+# if [ "${DEBUGGER}" = "1" ];
+# then ${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} ${TARGET_DEF} ${CLIENT_ARGS} ${TEST_ARGS} -useExternalEndpoints true $@
+# else ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} -useExternalEndpoints true $@
+# fi 
 
 date

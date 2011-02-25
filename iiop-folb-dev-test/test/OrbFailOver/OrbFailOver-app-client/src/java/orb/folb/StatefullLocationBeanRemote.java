@@ -9,11 +9,8 @@ import javax.ejb.Remote;
 
 /**
  *
- * @author hv51393
+ * @author ken
  */
 @Remote
-public interface LocationBeanRemote extends Location {
-   public String getHostName();
-   public void printSystemProperties();
-
+public interface StatefullLocationBeanRemote extends Location {
 }

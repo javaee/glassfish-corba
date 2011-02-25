@@ -107,11 +107,15 @@ public class Base {
     }
 
     public Base(String[] args, Class<?> parserInterface) {
+        this( args, parserInterface, null ) ;
+    }
+
+    public Base(String[] args, Class<?> parserInterface, Class<?> testClass ) {
         testMethods = new ArrayList<Method>() ;
         preMethods = new ArrayList<Method>() ;
         postMethods = new ArrayList<Method>() ;
 
-        Class<?> cls = this.getClass() ;
+        final Class<?> cls = (testClass == null) ? this.getClass() : testClass ;
         for (Method m : cls.getMethods()) {
             if (m.getDeclaringClass().equals( Base.class )
                 && !this.getClass().equals( Base.class )) {

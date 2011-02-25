@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.EJB;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -61,7 +60,6 @@ import glassfish.GlassFishInstallation;
 import glassfish.StandardPorts;
 import java.util.HashSet;
 import java.util.Hashtable;
-import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
@@ -77,9 +75,8 @@ import com.sun.corba.ee.spi.orb.ORB ;
 import com.sun.corba.ee.spi.protocol.CorbaClientDelegate;
 import java.lang.reflect.Field;
 import javax.rmi.CORBA.Stub;
+import orb.folb.Location;
 
-import org.omg.CORBA.portable.ObjectImpl ;
-import org.omg.CORBA.portable.Delegate;
 
 
 /**
@@ -101,7 +98,10 @@ public class Main extends Base {
     private GlassFishCluster gfCluster ;
     private Map<String,GlassFishCluster.InstanceInfo> clusterInfo ;
 
-    private static final String beanJNDIname = "orb.folb.LocationBeanRemote";
+    private static final String beanJndiName =
+        "orb.folb.LocationBeanRemote";
+    private static final String statefullBeanJndiName =
+        "orb.folb.StatefullLocationBeanRemote";
 
     private static Pair<String,Integer> split(String str) {
         int index = str.indexOf( ':' ) ;
@@ -122,12 +122,11 @@ public class Main extends Base {
         return result ;
     }
 
-    // Returns string of <host>:<clear text port> separated by commas
-    // for all running instances.
-    private String getIIOPEndpointList() {
+    // Get an IIOP endpoint list from a set of instance names.
+    private String getIIOPEndpointList( Set<String> instances ) {
         final StringBuilder sb = new StringBuilder() ;
         boolean first = true ;
-        for (String str : gfCluster.runningInstances()) {
+        for (String str : instances) {
             if (first) {
                 first = false ;
             } else {
@@ -142,6 +141,12 @@ public class Main extends Base {
         }
 
         return sb.toString() ;
+    }
+
+    // Returns string of <host>:<clear text port> separated by commas
+    // for all running instances.
+    private String getIIOPEndpointList() {
+        return getIIOPEndpointList( gfCluster.runningInstances()) ;
     }
 
     private InitialContext makeIC() throws NamingException {
@@ -163,14 +168,38 @@ public class Main extends Base {
         return result ;
     }
 
-    private String invokeMethod( LocationBeanRemote locBean ) {
+    private String invokeMethod( Location locBean ) {
         String result = locBean.getLocation() ;
         note( "Invocation returned " + result ) ;
         return result ;
     }
 
-    private LocationBeanRemote lookup( InitialContext ic ) throws NamingException {
-        LocationBeanRemote lb = (LocationBeanRemote)ic.lookup( beanJNDIname ) ;
+    private enum BeanType { SFSB, SLSB }
+
+    private Location lookup( InitialContext ic )
+        throws NamingException {
+
+        return lookup( ic, BeanType.SLSB ) ;
+    }
+
+    private Location lookup( InitialContext ic, BeanType bt )
+        throws NamingException {
+
+        Location lb = (Location)ic.lookup(
+            (bt == BeanType.SLSB) ? beanJndiName : statefullBeanJndiName ) ;
+
+        getORB( lb ) ;
+        note( "Looked up bean in context") ;
+        return lb ;
+    }
+
+    private Location lookupUsingJavaCmp( InitialContext ic, BeanType bt )
+        throws NamingException {
+
+        Context ctx = (Context)ic.lookup( "java:comp/env/ejb" ) ;
+        Location lb = (Location)ctx.lookup(
+            (bt == BeanType.SLSB) ? beanJndiName : statefullBeanJndiName ) ;
+
         getORB( lb ) ;
         note( "Looked up bean in context") ;
         return lb ;
@@ -188,7 +217,7 @@ public class Main extends Base {
         return result;
     }
 
-    private void getORB(LocationBeanRemote lb) {
+    private void getORB(Location lb) {
         if (orb == null) {
             try {
                 final Class<?> lbClass = lb.getClass() ;
@@ -204,7 +233,7 @@ public class Main extends Base {
 
                 orb = cdel.getBroker();
                 if (orbDebugFlags != null)  {
-                    // setORBDebug( orbDebugFlags ) ;
+                    setORBDebug( orbDebugFlags ) ;
                 }
             } catch (Exception ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,14 +243,22 @@ public class Main extends Base {
 
     private void setORBDebug( String... args ) {
         if (orb != null) {
-            orb.setDebugFlags( args ) ;
+            if (args != null) {
+                orb.setDebugFlags( args ) ;
+            }
         } else {
             orbDebugFlags = args ;
         }
     }
 
     private void clearORBDebug( String... args ) {
-        orb.clearDebugFlags( args ) ;
+        if (orb != null) {
+            if (args != null) {
+                orb.clearDebugFlags( args ) ;
+            }
+        } else {
+            orbDebugFlags = null ;
+        }
     }
 
     public interface Installation {
@@ -393,7 +430,7 @@ public class Main extends Base {
         boolean failOverDetected = false;
         try {
             InitialContext ctx = makeIC();
-            LocationBeanRemote locBean = lookup( ctx ) ;
+            Location locBean = lookup( ctx ) ;
             String origLocation = invokeMethod( locBean );
             if (origLocation == null) {
                 fail( "couldn't get the instance name!");
@@ -446,6 +483,12 @@ public class Main extends Base {
         doLoadBalance( gfCluster.runningInstances(), 100 )  ;
     }
 
+    @Test( "15768" )
+    public void test15768( ) throws NamingException {
+        doLoadBalanceUsingJavaCmp( gfCluster.runningInstances(), 100,
+            getIIOPEndpointList() )  ;
+    }
+
     private <T> T pick( Set<T> set ) {
         return pick( set, false ) ;
     }
@@ -476,22 +519,32 @@ public class Main extends Base {
     @Test( "14762" )
     public void test14762() throws NamingException {
         gfCluster.stopCluster();
-        final String firstInstance = pick( clusterInfo.keySet() ) ;
-        ac.startInstance(firstInstance) ;
+
+        Set<String> strs = new HashSet<String>( clusterInfo.keySet() ) ;
+        final String first = pick( strs, true ) ;
+        final String second = pick( strs, true ) ;
+        ac.startInstance(first) ;
+
+        Set<String> initialInstances = new HashSet<String>() ;
+        initialInstances.add( first ) ;
+        initialInstances.add( second ) ;
+        String initial = getIIOPEndpointList( initialInstances ) ;
+
         final List<InitialContext> ics = new ArrayList<InitialContext>() ;
-        final List<LocationBeanRemote> lbs = new ArrayList<LocationBeanRemote>() ;
+        final List<Location> lbs = new ArrayList<Location>() ;
         for (int ctr=0; ctr<10; ctr++) {
-            final InitialContext ic = makeIC(null) ;
+            final String str = (ctr==0) ? initial : null ;
+            final InitialContext ic = makeIC(str) ;
             ics.add( ic ) ;
-            final LocationBeanRemote lb = lookup( ic ) ;
+            final Location lb = lookup( ic ) ;
             lbs.add( lb ) ;
         }
         ensure() ;
-        ac.stopInstance(firstInstance );
-        for (LocationBeanRemote lb : lbs ) {
+        ac.stopInstance(first);
+        for (Location lb : lbs ) {
             String loc = invokeMethod( lb ) ;
-            check( !loc.equals( firstInstance ),
-                "Location returned was stopped instance " + firstInstance ) ;
+            check( !loc.equals( first),
+                "Location returned was stopped instance " + first) ;
         }
     }
 
@@ -510,7 +563,7 @@ public class Main extends Base {
     @Test( "14755" )
     public void test14755() throws NamingException {
         InitialContext ic = makeIC(null) ;
-        LocationBeanRemote lb = lookup( ic ) ;
+        Location lb = lookup( ic ) ;
         String first = invokeMethod( lb ) ;
         ac.stopInstance(first);
         String second = invokeMethod( lb ) ;
@@ -539,7 +592,7 @@ public class Main extends Base {
     @Test( "14766")
     public void test14766() throws NamingException {
         InitialContext ctx = makeIC(null) ;
-        LocationBeanRemote locBean = lookup( ctx ) ;
+        Location locBean = lookup( ctx ) ;
 
         String loc1 = invokeMethod( locBean );
         ac.stopInstance(loc1);
@@ -587,9 +640,9 @@ public class Main extends Base {
         doLoadBalance( expected, numCalls, getIIOPEndpointList() ) ;
     }
 
-    public LocationBeanRemote doLoadBalance( Set<String> expected, int numCalls,
+    public Location doLoadBalance( Set<String> expected, int numCalls,
         String endpoints ) throws NamingException {
-        LocationBeanRemote current = null ;
+        Location current = null ;
         // XXX add checking for approximate distribution
         // according to weights
         Map<String,Integer> counts =
@@ -623,6 +676,42 @@ public class Main extends Base {
         return current ;
     }
 
+    public Location doLoadBalanceUsingJavaCmp( Set<String> expected,
+        int numCalls, String endpoints ) throws NamingException {
+        Location current = null ;
+        // XXX add checking for approximate distribution
+        // according to weights
+        Map<String,Integer> counts =
+            new HashMap<String,Integer>() ;
+
+        String newLocation = "" ;
+        for (int i = 1; i <= numCalls ; i++) {
+            InitialContext ctx ;
+            if (i == 1) {
+                ctx = makeIC( endpoints ) ;
+            } else {
+                ctx = makeIC(null) ;
+            }
+            current = lookupUsingJavaCmp( ctx, BeanType.SLSB ) ;
+            newLocation = invokeMethod( current );
+            note( "result[" + i + "]= " + newLocation);
+            increment( counts, newLocation ) ;
+        }
+
+        note( "Call distribution: (expected on instances " + expected + ")" ) ;
+        for (Map.Entry<String,Integer> entry : counts.entrySet()) {
+            int count = entry.getValue().intValue() ;
+            note( String.format( "\tName = %20s Count = %10d",
+                entry.getKey(), count ) ) ;
+        }
+
+        check( expected.equals(counts.keySet()),
+            "Requests not loadbalanced across expected instances: "
+            + " expected " + expected + ", actual " + counts.keySet() ) ;
+
+        return current ;
+    }
+
     public void doLoadBalance( Set<String> expected, Set<InitialContext> ics
         ) throws NamingException {
         // XXX add checking for approximate distribution
@@ -633,7 +722,7 @@ public class Main extends Base {
         String newLocation = "" ;
         int i = 0 ;
         for (InitialContext ctx : ics ) {
-            LocationBeanRemote locBean = lookup( ctx ) ;
+            Location locBean = lookup( ctx ) ;
             newLocation = invokeMethod( locBean );
             note( "result[" + (i++) + "]= " + newLocation);
             increment( counts, newLocation ) ;
@@ -683,7 +772,7 @@ public class Main extends Base {
         InitialContext ctx = makeIC( endpoints ) ;
         note( "got new initial context") ;
 
-        LocationBeanRemote locBean = lookup( ctx ) ;
+        Location locBean = lookup( ctx ) ;
         note( "located EJB" ) ;
 
         String current = invokeMethod( locBean );
@@ -740,7 +829,7 @@ public class Main extends Base {
         instances = gfCluster.runningInstances() ;
         note( "Running instances = " + instances ) ;
         final String[] flags = { /* "subcontract", "transport", "folb" */ } ;
-        LocationBeanRemote last = null ;
+        Location last = null ;
         try {
             setORBDebug( flags ) ;
             /* last = */ doLoadBalance( instances, COUNT, endpoints ) ;
@@ -809,7 +898,7 @@ public class Main extends Base {
         instances = gfCluster.runningInstances() ;
         note( "Running instances = " + instances ) ;
         final String[] flags = { /* "subcontract", "transport", "folb" */ } ;
-        LocationBeanRemote last = null ;
+        Location last = null ;
         try {
             setORBDebug( flags ) ;
             /* last = */ doLoadBalance( instances, COUNT, endpoints ) ;
@@ -866,12 +955,86 @@ public class Main extends Base {
         }
 
         InitialContext ic = makeIC()  ;
-        LocationBeanRemote locBean = lookup(ic) ;
+        Location locBean = lookup(ic) ;
         String inst = invokeMethod( locBean ) ;
         gfCluster.stopInstance( inst ) ;
         instances.remove( inst ) ;
 
         doLoadBalance( gfCluster.runningInstances(), NUM_IC-1, null ) ;
+    }
+
+    // Test scenario for issue 15637 (Gopal's email 1/27/11 4:46 PM)
+    // 1. Stop the cluster.
+    // 2. Start 1 instance (inst) in the cluster.
+    // 3. LB to one instance
+    // 4. Start cluster
+    // 5. Kill inst
+    // 6. LB test
+    @Test( "15637" )
+    public void test15637() throws NamingException {
+        final Set<String> instances = gfCluster.runningInstances() ;
+        final String selected = pick( instances, true ) ;
+        final String second = pick( instances, true ) ;
+        final Set<String> initialInstances = new HashSet<String>() ;
+        initialInstances.add( selected ) ;
+        initialInstances.add( second ) ;
+        final String initalEndpoints = getIIOPEndpointList(initialInstances) ;
+        gfCluster.stopCluster();
+        gfCluster.startInstance(selected) ;
+        doLoadBalance(gfCluster.runningInstances(), 10, initalEndpoints );
+        gfCluster.startCluster();
+        gfCluster.stopInstance(selected);
+        doLoadBalance(gfCluster.runningInstances(), 100, null );
+    }
+
+    // Test scenario:
+    // 1. Run a 3 instance cluster
+    // 2. Create initialContext with running instances.
+    // 3. Lookup stateful (b1) and stateless (b2) session beans.
+    // 4. inst = access b1
+    // 5. shutdown inst
+    // 6. Create and start 2 new instances in cluster
+    // 7. inst2 = access b1 (should fail over to new instance)
+    // 8. shutdown inst2
+    // 9. inst3 = access b2
+    @Test( "15746" )
+    public void test15746() throws NamingException {
+        Set<String> running = gfCluster.runningInstances() ;
+        if (running.size() < 3) {
+            fail( "Must have cluster with at least three instances") ;
+            return ;
+        }
+
+        final int numToStop = running.size() - 3 ;
+
+        for (int ctr=0; ctr < numToStop; ctr++) {
+            final String inst = pick( gfCluster.runningInstances() ) ;
+            gfCluster.stopInstance(inst );
+        }
+
+        InitialContext ic = makeIC() ;
+        Location slsb = lookup( ic, BeanType.SLSB ) ;
+        Location sfsb = lookup( ic, BeanType.SFSB ) ;
+
+        String inst = invokeMethod(slsb) ;
+        gfCluster.stopInstance(inst);
+
+        final String testBase = "testInstance" ;
+        final int portBase = 20000 ;
+        gfCluster.createInstances( testBase, 2, "", portBase ) ;
+        gfCluster.startInstance( testBase + "0" );
+        gfCluster.startInstance( testBase + "1" );
+
+        final String[] flags = { /* "subcontract", "transport", */ "folb" } ;
+        try {
+            setORBDebug(flags);
+            String inst2 = invokeMethod(slsb) ;
+            gfCluster.stopInstance(inst2);
+
+            String inst3 = invokeMethod(sfsb) ;
+        } finally {
+            clearORBDebug(flags);
+        }
     }
 
     // Test scenario:
@@ -911,7 +1074,7 @@ public class Main extends Base {
             } else {
                 ic = makeIC(null) ;
             }
-            LocationBeanRemote locBean = lookup(ic) ;
+            Location locBean = lookup(ic) ;
             String runningInstance = invokeMethod( locBean ) ;
             if (runningInstance.equals( shutdownInst )) {
                 chosen.add( ic ) ;
@@ -919,7 +1082,7 @@ public class Main extends Base {
         }
 
         gfCluster.stopInstance( shutdownInst ) ;
-        final String[] flags = { "subcontract", "transport", "folb" } ;
+        final String[] flags = { /* "subcontract", "transport", "folb" */ } ;
         try {
             // setORBDebug( flags ) ;
             instances = gfCluster.runningInstances() ;

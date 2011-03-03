@@ -126,6 +126,7 @@ import performance.eesample.wspex.components.OrderBL;
 
 import com.sun.japex.JapexDriverBase ;
 import com.sun.japex.TestCase ;
+import corba.framework.TestBase;
 
 /** Standard top-level ORB test.  Does the following:
  * <OL>
@@ -171,7 +172,7 @@ public class StandardTest extends JapexDriverBase {
     private static Field singletonORB ;
     private static boolean corbaReinit = false ;
 
-    private static boolean useSingleClassLoader = true ;
+    private static final boolean useSingleClassLoader = true ;
 
     static {
 	if (!useSingleClassLoader) {
@@ -226,6 +227,7 @@ public class StandardTest extends JapexDriverBase {
         ArgumentData.class ) ;
 
     // set up default parameters
+    private static TestBase testBase ;
     private static ArgumentData argData = ap.parse( new String[]{},
         ArgumentData.class ) ;
     private static int numInstances = 0 ;
@@ -1163,7 +1165,8 @@ public class StandardTest extends JapexDriverBase {
 	performSingleTest( st ) ;
     }
     */
-    
+
+    @corba.framework.TestCase( "null" )
     public void testNullCall() {
 	for ( Object[] data : objrefData) {
 	    String oname = (String)data[0] ;
@@ -1173,6 +1176,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
    
+    @corba.framework.TestCase( "data" )
     public void testDataCall() {
 	for ( Object[] data : objrefData) {
 	    String oname = (String)data[0] ;
@@ -1182,6 +1186,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
     
+    @corba.framework.TestCase( "data-array" )
     public void testDataArrayCall() {
 	for ( Object[] data : objrefData) {
 	    String oname = (String)data[0] ;
@@ -1191,6 +1196,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
     
+    @corba.framework.TestCase( "get-test-refs" )
     public void testGetTestRefsCall() {
 	for ( Object[] data : objrefData) {
 	    String oname = (String)data[0] ;
@@ -1221,43 +1227,17 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
 
-    private void runClientTests() throws Exception {
-        /*
-        if (argData.doCopyTests()) {
-            testNullStreamCopy() ;
-            testDataStreamCopy() ;
-        } 
-        */
-
-        if (argData.testNullCall()) {
-            testNullCall();
-        }
-        if (argData.testDataCall()) {
-            testDataCall();
-        }
-        if (argData.testDataArrayCall()) {
-            testDataArrayCall();
-        }
-        if (argData.testGetTestRefsCall()) {
-            testGetTestRefsCall();
-        }
-    }
-
-    public void doClient() {
-	try {
-	    initializeClientORB() ;
-            runClientTests() ;
-	    cleanUpClient() ;
-	    log( "Test Complete." ) ;
-	} catch (Throwable thr) {
-	    fatal( "Test FAILED: Caught throwable " + thr, thr ) ;
-	}
-    }
-
     public class ClientThread extends Thread {
         @Override
         public void run() {
-            doClient() ;
+            try {
+                initializeClientORB() ;
+                testBase.run() ;
+                cleanUpClient() ;
+                log( "Test Complete." ) ;
+            } catch (Throwable thr) {
+                fatal( "Test FAILED: Caught throwable " + thr, thr ) ;
+            }
         }
     }
 
@@ -1403,18 +1383,6 @@ public class StandardTest extends JapexDriverBase {
 	boolean doCopyTests() ;
 	*/
 
-	@DefaultValue( "true" )
-	boolean testNullCall() ;
-
-	@DefaultValue( "false" )
-	boolean testDataCall() ;
-
-	@DefaultValue( "false" )
-	boolean testDataArrayCall() ;
-
-	@DefaultValue( "false" ) 
-	boolean testGetTestRefsCall() ;
-
 	@DefaultValue( "false" ) 
 	boolean getSize() ;
 
@@ -1434,13 +1402,17 @@ public class StandardTest extends JapexDriverBase {
      * <li>-mode [local client server]: Run as a client only on the given host name.
      * which must be a name of the host running the program.
      * </ul>
-     * @param args rgs for command
+     * @param args args for command
      */
     public static void main( String[] args ) {
 	// override default argData
-	argData = ap.parse( args, ArgumentData.class ) ;
+        StandardTest st = new StandardTest()  ;
+        testBase = new TestBase(args, ArgumentData.class, st ) ;
+	argData = testBase.getArguments( ArgumentData.class ) ;
+
 	if ((argData.mode() == TestMode.SERVER) && argData.useJapex()) {
-	    throw new IllegalArgumentException( "This test does not run with Japex in server mode!" ) ;
+	    throw new IllegalArgumentException(
+                "This test does not run with Japex in server mode!" ) ;
 	}
 
 	System.out.println( "Running StandardTest with arguments" ) ;
@@ -1456,7 +1428,6 @@ public class StandardTest extends JapexDriverBase {
 	    com.sun.japex.Japex.main( jargs ) ;
 	} else {
 	    System.out.println( "Running standalone" ) ;
-	    StandardTest st = new StandardTest()  ;
 	    st.standaloneRun() ;
 	}
     }

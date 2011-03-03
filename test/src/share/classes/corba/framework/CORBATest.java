@@ -39,13 +39,31 @@
  */
 package corba.framework;
 
-import java.io.*;
-import java.util.*;
-import test.*;
-
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-
 import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import test.RemoteTest;
+import test.ServantContext;
+import test.Test;
 
 /**
  * Main CORBA Technologies test class which should be extended
@@ -138,10 +156,12 @@ public abstract class CORBATest extends test.RemoteTest
      * Subclasses shouldn't need to modify this since they can handle
      * all their settings at the beginning of doTest with Options.
      */
+    @Override
     public void setup() {
         try {
-            if (usesOldFramework())
+            if (usesOldFramework()) {
                 super.setup();
+            }
 
             Options.init(this);
 
@@ -213,6 +233,7 @@ public abstract class CORBATest extends test.RemoteTest
      *
      * This is called by the test framework and shouldn't need to be changed.
      */
+    @Override
     public void run()
     {
 	CORBAUtil.mkdir( Options.getOutputDirectory() ) ;
@@ -220,10 +241,11 @@ public abstract class CORBATest extends test.RemoteTest
         boolean errorOccured = false;
 
         try {
-            if (usesOldFramework())
+            if (usesOldFramework()) {
                 super.run();
-            else
+            } else {
                 doTest(null);
+            }
         } catch (ThreadDeath death) {
             errorOccured = true;
             throw death;
@@ -239,8 +261,9 @@ public abstract class CORBATest extends test.RemoteTest
 	    // Make sure all exit values were Controller.SUCCESS
 	    // unless there was already an error (don't want to
 	    // overwrite the more specific error message).
-            if (!errorOccured)
+            if (!errorOccured) {
                 handleExitValues();
+            }
         }
     }
 
@@ -276,8 +299,9 @@ public abstract class CORBATest extends test.RemoteTest
             String files[] = Options.getIDLFiles();
 
             // Get the absolute paths of the files
-            if (files == null)
+            if (files == null) {
                 return;
+            }
 
             String searchPath[] = new String[] { Options.getTestDirectory() };
 
@@ -303,7 +327,7 @@ public abstract class CORBATest extends test.RemoteTest
      */
     protected void compileRMICFiles() throws Exception
     {
-        if (!getArgs().containsKey(super.SKIP_RMIC_FLAG)) {
+        if (!getArgs().containsKey(RemoteTest.SKIP_RMIC_FLAG)) {
             rmic.compile(Options.getRMICClasses(),
                          Options.getRMICArgs(),
                          Options.getOutputDirectory(),
@@ -333,8 +357,9 @@ public abstract class CORBATest extends test.RemoteTest
 
         File fileArray[] = dir.listFiles(dotJavaFilter);
 
-        if (fileArray == null)
+        if (fileArray == null) {
             return;
+        }
 
 	// Recurse down through any directories, gathering absolute paths
 	// of all .java files
@@ -399,10 +424,12 @@ public abstract class CORBATest extends test.RemoteTest
      *@exception  Any error that occured during compilation (bad exit
      *            value for the process would be the most common)
      */
+    @SuppressWarnings("unchecked")
     protected void compileJavaFiles() throws Exception
     {
-        if (getArgs().containsKey(SKIP_JAVAC_FLAG))
+        if (getArgs().containsKey(SKIP_JAVAC_FLAG)) {
             return;
+        }
 
         // Get any .java files that were generated
         Vector fileVector = getGeneratedJavaFiles();
@@ -410,12 +437,13 @@ public abstract class CORBATest extends test.RemoteTest
 	// Add any subclass-specified files
         String userFiles[] = Options.getJavaFiles();
 
-        if (userFiles != null)
-            for (int i = 0; i < userFiles.length; i++)
-                fileVector.add(userFiles[i]);
+        if (userFiles != null) {
+            fileVector.addAll(Arrays.asList(userFiles));
+        }
 
-        if (fileVector.size() == 0)
+        if (fileVector.isEmpty()) {
             return;
+        }
 
         String[] files = CORBAUtil.toArray(fileVector);
 
@@ -472,10 +500,10 @@ public abstract class CORBATest extends test.RemoteTest
 
         props.setProperty( "corba.test.controller.name", name ) ;
 
-	String traceFlags = (String)traceMap.get( name ) ;
-	if (traceFlags != null)
-	    copy.setProperty( ORBConstants.DEBUG_PROPERTY,
-		traceFlags ) ;
+	String traceFlags = (String) traceMap.get(name) ;
+	if (traceFlags != null) {
+            copy.setProperty(ORBConstants.DEBUG_PROPERTY, traceFlags);
+        }
 
 	int emmaPort = EmmaControl.setCoverageProperties( copy ) ;
 
@@ -612,8 +640,9 @@ public abstract class CORBATest extends test.RemoteTest
      */
     private void cleanUpHelp(Controller process)
     {
-        if (process == null)
+        if (process == null) {
             return;
+        }
 
         String name = process.getClassName() + "." + process.getProcessName();
 
@@ -624,10 +653,11 @@ public abstract class CORBATest extends test.RemoteTest
         process.kill() ;
         int exitValue = process.exitValue() ;
         long duration = process.duration() ;
-        if (exitValue <= 0) 
-            helper.pass( duration/1000 ) ;
-        else
-            helper.fail( "Controller terminated with exit value " + exitValue, duration/1000 ) ;
+        if (exitValue <= 0) {
+            helper.pass(duration / 1000);
+        } else {
+            helper.fail("Controller terminated with exit value " + exitValue, duration / 1000);
+        }
 
         try {
             process.kill();
@@ -643,8 +673,9 @@ public abstract class CORBATest extends test.RemoteTest
         // For ExternalExec processes, the ProcessMonitors will
         // close the output streams when the process dies and
         // they finish writing all of the output.
-        if (process instanceof corba.framework.ExternalExec)
+        if (process instanceof corba.framework.ExternalExec) {
             return;
+        }
 
         if (out != null && out != System.out) {
             try {
@@ -680,8 +711,9 @@ public abstract class CORBATest extends test.RemoteTest
      */
     private void cleanUp()
     {
-        for (Controller ctrl : controllers) 
-            cleanUpHelp( ctrl ) ;
+        for (Controller ctrl : controllers) {
+            cleanUpHelp(ctrl);
+        }
 
 	EmmaControl.resetPortAllocator() ;
         helper.done() ;
@@ -697,7 +729,7 @@ public abstract class CORBATest extends test.RemoteTest
     {
         int failures = 0;
         String lineSeparator = System.getProperty("line.separator");
-        StringBuffer failedMsg = new StringBuffer("Bad exit value(s):"
+        StringBuilder failedMsg = new StringBuilder("Bad exit value(s):"
                                                   + lineSeparator);
 
         for (Controller controller : controllers) {
@@ -717,15 +749,15 @@ public abstract class CORBATest extends test.RemoteTest
 
             if (exitValue != Controller.SUCCESS &&
 		exitValue != Controller.STOPPED) {
-                failedMsg.append(controller.getProcessName()
-                                 + "[" + exitValue + "]"
-                                 + lineSeparator);
+                failedMsg.append(controller.getProcessName()).append("[")
+                    .append(exitValue).append("]").append(lineSeparator);
                 failures++;
             }
         }
 
-        if (failures != 0)
+        if (failures != 0) {
             status = new Error(failedMsg.toString());
+        }
     }
 
     /**
@@ -743,8 +775,9 @@ public abstract class CORBATest extends test.RemoteTest
 	    StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
 
 	    // Add the names
-	    while (tokenizer.hasMoreTokens())
-		debugProcessNames.add(tokenizer.nextToken());
+	    while (tokenizer.hasMoreTokens()) {
+                debugProcessNames.add(tokenizer.nextToken());
+            }
 	}
 
 	processNames = (String)getArgs().get(RDEBUG_STRATEGY_FLAG) ;
@@ -754,8 +787,9 @@ public abstract class CORBATest extends test.RemoteTest
 	    StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
 
 	    // Add the names
-	    while (tokenizer.hasMoreTokens())
-		rdebugProcessNames.add(tokenizer.nextToken());
+	    while (tokenizer.hasMoreTokens()) {
+                rdebugProcessNames.add(tokenizer.nextToken());
+            }
 	}
 
 	processNames = (String)getArgs().get(ODEBUG_STRATEGY_FLAG) ;
@@ -765,16 +799,18 @@ public abstract class CORBATest extends test.RemoteTest
 	    StringTokenizer tokenizer = new StringTokenizer(processNames, ":");
 
 	    // Add the names
-	    while (tokenizer.hasMoreTokens())
-		odebugProcessNames.add(tokenizer.nextToken());
+	    while (tokenizer.hasMoreTokens()) {
+                odebugProcessNames.add(tokenizer.nextToken());
+            }
 	}
     }
 
     private void parseTraceFlag()
     {
 	String traceData = (String)getArgs().get(TRACE_FLAG) ;
-	if (traceData == null)
-	    return ;
+	if (traceData == null) {
+            return;
+        }
 
 	// traceData should look like
 	// data == group ( ";" group ) *
@@ -785,8 +821,9 @@ public abstract class CORBATest extends test.RemoteTest
 	while (dataST.hasMoreTokens()) {
 	    String group = dataST.nextToken() ;
 	    StringTokenizer groupST = new StringTokenizer( group, ":" ) ;
-	    if (groupST.countTokens() != 2)
-		throw new IllegalArgumentException( "Bad syntax in trace command" ) ;
+	    if (groupST.countTokens() != 2) {
+                throw new IllegalArgumentException("Bad syntax in trace command");
+            }
 
 	    String name = groupST.nextToken() ;
 	    String debugArgs = groupST.nextToken() ;

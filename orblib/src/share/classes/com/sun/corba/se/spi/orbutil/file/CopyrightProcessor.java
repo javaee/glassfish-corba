@@ -315,7 +315,7 @@ public class CopyrightProcessor {
                 final String dateString = block.find( "date:" ) ;
                 // Format: date: weekday month day time year timezone
                 // we just need the year.
-                final String[] tokens = dateString.split( " " ) ;
+                final String[] tokens = dateString.split( " +" ) ;
                 return tokens[5] ;
             }
 

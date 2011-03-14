@@ -755,6 +755,9 @@
 	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor"
             fork="true"
 	    dir="${root.dir}">
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=42365"/>
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>

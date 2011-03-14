@@ -87,10 +87,15 @@ public class CopyrightProcessor {
 	@DefaultValue( "1997" )
 	@Help( "Default copyright start year, if not otherwise specified" ) 
 	String startyear() ;
+
+        @DefaultValue( "true" )
+        @Help( "If true, use the year the file was last modified, otherwise use the current year" ) 
+        boolean useFileVersion() ;
     }
 
     private static boolean validate ;
     private static int verbose ;
+    private static boolean useFileVersion ;
 
     private static final String[] JAVA_LIKE_SUFFIXES = {
 	"c", "h", "java", "sjava", "idl" } ;
@@ -304,9 +309,24 @@ public class CopyrightProcessor {
 		    + ",afterFirstBlock=" + afterFirstBlock + "]" ;
 	    }
 
+            private String getFileVersionYear( FileWrapper fw ) throws IOException {
+                final String fname = fw.getAbsoluteName() ;
+                final Block block = new Block( "hg log " + fname ) ;
+                final String dateString = block.find( "date:" ) ;
+                // Format: date: weekday month day time year timezone
+                // we just need the year.
+                final String[] tokens = dateString.split( " " ) ;
+                return tokens[5] ;
+            }
+
 	    public boolean evaluate( FileWrapper fw ) {
 		try {
-                    int cy = (new GregorianCalendar()).get( Calendar.YEAR ) ;
+                    String cy ;
+                    if (useFileVersion) {
+                        cy = getFileVersionYear( fw ) ;
+                    } else {
+                        cy = "" + (new GregorianCalendar()).get( Calendar.YEAR ) ;
+                    }
                     String currentYear = "" + cy ;
                     Pair<String,String> years = 
                         new Pair<String,String>( defaultStartYear, currentYear ) ;
@@ -473,6 +493,7 @@ public class CopyrightProcessor {
 	String startYear = args.startyear() ;
 	verbose = args.verbose() ;
 	validate = args.validate() ;
+        useFileVersion = args.useFileVersion() ;
 
 	if (verbose > 0) {
 	    trace( "Main: args:\n" + args ) ;

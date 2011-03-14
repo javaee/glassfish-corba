@@ -124,12 +124,14 @@ public class ElementParserImpl implements ElementParser {
 
 	    func = new UnaryFunction<String,Object>() {
 		public Object evaluate( String value ) {
-		    String[] elements = value.split( sep ) ;
-		    List result = new ArrayList( elements.length ) ;
-		    for (String str : elements) {
-			Object val = elementResultData.first().evaluate( str ) ;
-			result.add( val ) ;
-		    }
+                    List result = new ArrayList() ;
+                    if (!value.isEmpty()) {
+                        String[] elements = value.split( sep ) ;
+                        for (String str : elements) {
+                            Object val = elementResultData.first().evaluate( str ) ;
+                            result.add( val ) ;
+                        }
+                    }
 
 		    return result ;
 		} 

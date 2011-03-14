@@ -50,6 +50,11 @@ import java.util.StringTokenizer ;
 import java.io.IOException ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Represents a range of Strings, typically read from a file, that are in some sense
  * related and contiguous.  Blocks may also be tagged as an aid in transforming
@@ -62,6 +67,35 @@ public class Block {
     private Block( final List<String> data, final Set<String> tags ) {
 	this.data = data ;
 	this.tags = tags ;
+    }
+
+    /** Create a new Block from the output of executing a command.
+     */
+    public Block( String command ) throws IOException {
+        final List<String> output = new ArrayList<String>() ;
+        final Process proc = Runtime.getRuntime().exec( command ) ;
+        final InputStream is = proc.getInputStream() ;
+        final BufferedReader reader = new BufferedReader(
+            new InputStreamReader( is ) );
+        String line = reader.readLine() ;
+        while (line != null) {
+            output.add( line ) ;
+            line = reader.readLine() ;
+        }
+
+        int result = 0 ;
+        try {
+            result = proc.waitFor();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Block.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (result != 0) {
+            throw new RuntimeException( "Command " + command
+                + " failed with result " + result ) ;
+        }
+
+        this.data = output ;
+	this.tags = new HashSet<String>() ;
     }
 
     /** Create a new Block from a list of strings.

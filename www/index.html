@@ -127,8 +127,7 @@ The repositories are used as follows:
 <li><b><a href="http://kenai.com/hg/gf-corba-v3-mirror~master">GFv3 CORBA Master</a></b> is the main repository for the GFv3 ORB.</li>
 <li><b><a href="http://kenai.com/hg/gf-corba-v3-mirror~experimental">GFv3 CORBA Experimental</a></b> is the repository for GFv3 ORB work that is not ready for integration into the main repository.</li>
 <li><b><a href="http://kenai.com/hg/gf-corba-v3-mirror~staging">GFv3 CORBA Staging</a></b> is the repository used to stage updates to the GFv3 ORB.  These changes will be pushed to the master repository after testing using Hudson (which is partially in place, but still needs some work). This repository cannot be viewed; it is for mercurial push operations only.</li>
-<li><b><a href="http://kenai.com/hg/gf-corba-v3-mirror~gfv2-master">GlassFish v2 ORB</a></b> contains a copy of the code for the GFv2 ORB (it is not currently the main repository).</li>
-<li><b><a href="http://kenai.com/hg/gf-corba-v3-mirror~jmxannotations">JMX Annotations</a></b> is the current repository for the JMXA library that was originally part of the GDFv3 ORB.  I split this off into its own project due to widespread interest in this feature.  This will be migrating to a new Kenai project in the future.</li>
+<li><b><a href="http://kenai.com/hg/gf-corba-v3-mirror~gfv31-master">GlassFish v31 ORB</a></b> contains a copy of the code for the GFv31 ORB (it is not currently the main repository).</li>
 </ul>
 
 <p>The java.net subversion repository contains only the documents in
@@ -152,7 +151,7 @@ the master repository.
 <ol>
 
 
-  <li>Make sure you have NetBeans 6.1 or later installed.</li>
+  <li>Make sure you have NetBeans 6.9.1 or later installed.</li>
 
   <li>Select versioning-&gt;mercurial-&gt;clone other.</li>
 
@@ -180,7 +179,7 @@ the tests should not take more than around 45 minutes.</p>
 
 <h2>Obtaining ORB builds</h2>
 
-<p>For GlassFish v2, all of the ORB files are contained in the GlassFish appserv-rt.jar
+<p>For GlassFish v31, all of the ORB files are contained in the GlassFish appserv-rt.jar
 file. You can get this by installing glassfish from the GlassFish <a href="https://glassfish.dev.java.net/public/alldownloads.html">downloads</a>. 
 
 <p>The ORB packaging is completely different for GFv3.  The ORB is now delivered in several OSGi bundles:
@@ -190,26 +189,21 @@ file. You can get this by installing glassfish from the GlassFish <a href="https
 object copying library (the two have mutual dependencies).</li>
 <li><b>glassfish-corba-csiv2-idl</b> contains the idlj-generated Java classes for the CSIv2 IDL definitions.</li>
 <li><b>glassfish-corba-dynamicany</b> contains the Dynamic Any code for the ORB (which I'd like to load on demand at some point).</li>
-<li><b>glassfish-corba-naming</b> contains the ORB CosNaming code.  Again, this may be made to load only on demand at some point.</li>
+<li><b>glassfish-corba-internal-api</b> contains the ORB FOLB API code.  
 <li><b>glassfish-corba-newtimer</b> contains the ORB timer library.<li>
 <li><b>glassfish-corba-omgapi</b> contains the GlassFish-specific versions of a few org.omg.* files.</li>
 <li><b>glassfish-corba-orb</b> contains the main part of the ORB code.<li>
 <li><b>glassfish-corba-orbgeneric</b> contains the main part of the ORB library (which is independent of the rest of the ORB).</li>
 </ul>
 
-These bundles are available in the Sun Maven 2 <a href="http://download.java.net/maven/2">repository</a>, with an ArtifactId of com.sun.corba.  The current version is
-3.0.0.b002.  Note that these bundles have not been tested yet in GFv3 (we are just starting the work on integrating remote EJB support into GFv3),
-so there may be packaging/OSGi issues with them.
+These bundles are available in the Sun Maven 2 <a href="http://download.java.net/maven/2">repository</a>, with a GroupId of com.sun.corba.  The current version is
+3.1.0.b027.  
 
 <h2>Planned Work</h2>
 
-<p>There are a number of efforts underway right now to improve the ORB for GFv3:</p>
+<p>There are a number of efforts underway right now to improve the ORB following the GF 3.1 release:</p>
 <ol>
-<li>Replace the current ORB monitoring framework with JMX, and expand its coverage.
-The intent here is to make it easy to add monitoring to any interesting state in the
-ORB, and make the monitored data available to any standard MBean client like jconsole.
-We will also work to get the additional data integrated with the app server's administration
-GUI. All of this is currently happening more generally in the JMX Annotations project.</li>
+<li>Further extend the ORB monitoring Gmbal implementation.</li>
 
 <li>Replace most of the ORB transport with&nbsp;<a href="http://grizzly.dev.java.net">Grizzly</a>,
 which will include improved CSIv2 (SSL) scalability and improved ORB
@@ -218,7 +212,7 @@ already in the current ORB transport, but moving to a single transport
 has many benefits for code quality, integration, and further
 optimizations.</li>
 
-<li>The encoding performance has been improved for the GlassFish v3
+<li>The encoding performance has been improved for the GlassFish v31
 version of the ORB. This is still in progress, and more details will
 appear first in the CORBA <a href="http://blogs.sun.com/ejcorba">blog</a>.</li>
 
@@ -236,28 +230,13 @@ from a EJB 3 POJO business interface.  Planned improvements include:
         <li>Provide more extensive utilities for generating Proxy-style classes.</li>    
     </ul>
 </li>
-
-<li>FindBugs has been integrated into the workspace. The <a href="http://glassfish.dev.java.net">GlassFish</a> project runs a regular findbugs report on everything in GlassFish, which includes the ORB. The <a href="https://glassfish.dev.java.net/quality/fancyreport.html">results</a>
-show around 60 or so bugs in the com.sun.corba.* packages. Around half
-of these are in the renamed copy of BCEL, which has since been removed.</li>
-
-<li>Ant can now handle <a href="https://glassfish-corba.dev.java.net/nonav/design/orb_notes.html#htoc7">renaming</a> for the GlassFish integration of the ORB.</li>
-
-<li>Support for Java 5 enums and java.lang.reflect.Proxy has been added.</li>
 </ol>
-
 
 <p>Here are some additional items that we plan to work on (some will only take a few days,
 some may take several months):</p>
 
 
 <ol>
-<li>Integrate <a href="http://checkstyle.sourceforge.net/">CheckStyle</a> into the project and fix style problems.</li>
-    
-<li>Replace the current rmic -iiop backend with one that uses
-the <a href="http://java.sun.com/j2se/1.5.0/docs/guide/javadoc/doclet/spec/index.html">doclet</a> API and remove the current dependency on ancient JDK 1.2
-compiler internals.</li>
-
 <li>Use <a href="http://testng.org/doc/">TestNG</a> to drive the CORBA test framework, so that we can use TestNG's
 parameterization and grouping capabilities to improve our test coverage.</li>
 
@@ -265,15 +244,10 @@ parameterization and grouping capabilities to improve our test coverage.</li>
 
 <li>Improve the documentation coverage, particularly in the <a href="nonav/design/orb_notes.html">ORB Notes</a> Document.</li>
     
-<li>Develop a secure bootstrap protocol to supplement the Interoperable Name Service.</li>
-
 <li>Make more extensive use of the internal ORB timer <a href="https://glassfish-corba.dev.java.net/nonav/javadoc/com/sun/corba/se/spi/orbutil/newtimer/package-summary.html">library</a> to support ORB microbenchmarks as regression tests.</li>
     
     
-<li>As always, fix bugs (see <a href="http://bugs.sun.com/bugdatabase/search.do?process=1&amp;category=idl&amp;bugStatus=open&amp;subcategory=&amp;type=&amp;keyword=">here</a> for open JDK-related CORBA bugs; most of the GlassFish-related CORBA bugs are <a href="https://glassfish.dev.java.net/issues/buglist.cgi?Submit+query=Submit+query&amp;component=glassfish&amp;subcomponent=orb&amp;subcomponent=rmi_iiop_failover&amp;subcomponent=rmi_iiop_load_balancer&amp;issue_status=UNCONFIRMED&amp;issue_status=NEW&amp;issue_status=STARTED&amp;issue_status=REOPENED&amp;priority=P1&amp;priority=P2&amp;priority=P3&amp;priority=P4&amp;priority=P5&amp;email1=&amp;emailtype1=exact&amp;emailassigned_to1=1&amp;email2=&amp;emailtype2=exact&amp;emailreporter2=1&amp;issueidtype=include&amp;issue_id=&amp;changedin=&amp;votes=&amp;chfieldfrom=&amp;chfieldto=Now&amp;chfieldvalue=&amp;short_desc=&amp;short_desc_type=substring&amp;long_desc=&amp;long_desc_type=substring&amp;issue_file_loc=&amp;issue_file_loc_type=substring&amp;status_whiteboard=&amp;status_whiteboard_type=substring&amp;field0-0-0=noop&amp;type0-0-0=noop&amp;value0-0-0=&amp;cmdtype=doit&amp;newqueryname=&amp;order=Issue+Number">here</a>).</li>
-
-</ol>
-
+<li>As always, fix <a href="http://java.net/jira/secure/IssueNavigator.jspa?mode=hide&requestId=10222">bugs</a>.</li> </ol>
 
 </body>
 </html>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -72,9 +72,9 @@ public class CopyrightProcessor {
 	@Help( "Set to true to avoid modifying any files" ) 
 	boolean dryrun() ;
 
-	@Help( "List of directories to process" ) 
+	@Help( "Root of mercurial repository for workspace" )
 	@DefaultValue( "" ) 
-	List<File> roots() ;
+	File root() ;
 
 	@Help( "List of directory names that should be skipped" ) 
 	@DefaultValue( "" ) 
@@ -96,6 +96,7 @@ public class CopyrightProcessor {
     private static boolean validate ;
     private static int verbose ;
     private static boolean useFileVersion ;
+    private static ModificationAnalyzer modificationAnalyzer = null ;
 
     private static final String[] JAVA_LIKE_SUFFIXES = {
 	"c", "h", "java", "sjava", "idl" } ;
@@ -128,7 +129,8 @@ public class CopyrightProcessor {
 
     // Special file names to ignore
     private static final String[] IGNORE_FILE_NAMES = {
-	"NORENAME", "errorfile", "sed_pattern_file.version", "build.properties"
+	"NORENAME", "errorfile", "sed_pattern_file.version", "build.properties",
+        ".DS_Store", ".hgtags", ".hgignore"
     } ;
 
     // Block tags
@@ -271,8 +273,11 @@ public class CopyrightProcessor {
 	} ;
     }
 
-    private static void validationError( Block block, String msg, FileWrapper fw ) {
+    private static void validationError( Block block, String msg, 
+        FileWrapper fw, Pair<String,String> firstDifference ) {
 	trace( "Copyright validation error: " + msg + " for " + fw ) ;
+        trace( "\tfirst block line = " + firstDifference.first() ) ;
+        trace( "\tsecond block line = " + firstDifference.second() ) ;
 	if ((verbose > 0) && (block != null)) {
 	    trace( "Block=" + block ) ;
 	    trace( "Block contents:" ) ;
@@ -310,13 +315,21 @@ public class CopyrightProcessor {
 	    }
 
             private String getFileVersionYear( FileWrapper fw ) throws IOException {
+                /* Old, slow version
                 final String fname = fw.getAbsoluteName() ;
                 final Block block = new Block( "hg log " + fname ) ;
                 final String dateString = block.find( "date:" ) ;
                 // Format: date: weekday month day time year timezone
                 // we just need the year.
-                final String[] tokens = dateString.split( " +" ) ;
-                return tokens[5] ;
+                if (dateString != null) {
+                    final String[] tokens = dateString.split( " +" ) ;
+                    return tokens[5] ;
+                } else {
+                    return "" ;
+                }
+                */
+                final String fname = fw.getAbsoluteName() ;
+                return modificationAnalyzer.lastModification(fname) ;
             }
 
 	    public boolean evaluate( FileWrapper fw ) {
@@ -373,22 +386,34 @@ public class CopyrightProcessor {
 			    if (!afterFirstBlock && (count == 0)) {
 				if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
 				    BlockParser.COMMENT_BLOCK_TAG)) {
-				    if (!cb.equals( block )) {
-					validationError( block, "First block has incorrect copyright text", fw ) ;
+                                    Pair<String,String> fdiff =
+                                        cb.firstDifference(block) ;
+				    if (!Block.NO_DIFFERENCE.equals( fdiff )) {
+					validationError( block,
+                                            "First block has incorrect copyright text", 
+                                            fw, fdiff ) ;
 				    }
 				} else {
-				    validationError( block, "First block should be copyright but isn't", fw ) ;
+				    validationError( block,
+                                        "First block should be copyright but isn't", fw,
+                                        Block.NO_DIFFERENCE ) ;
 				}
 
 				return true ;
 			    } else if (afterFirstBlock && (count == 1)) {
 				if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
 				    BlockParser.COMMENT_BLOCK_TAG)) {
-				    if (!cb.equals( block )) {
-					validationError( block, "Second block has incorrect copyright text", fw ) ;
+                                    Pair<String,String> fdiff =
+                                        cb.firstDifference(block) ;
+				    if (!Block.NO_DIFFERENCE.equals( fdiff )) {
+					validationError( block,
+                                            "Second block has incorrect copyright text", 
+                                            fw, fdiff ) ;
 				    }
 				} else {
-				    validationError( block, "Second block should be copyright but isn't", fw ) ;
+				    validationError( block,
+                                        "Second block should be copyright but isn't", fw,
+                                        Block.NO_DIFFERENCE ) ;
 				}
 
 				return true ;
@@ -397,7 +422,9 @@ public class CopyrightProcessor {
 			    if (count > 1) {
 				// should not get here!  Return false only in this case, because this is
 				// an internal error in the validator.
-				validationError( null, "Neither first nor second block checked", fw ) ;
+				validationError( null,
+                                    "Neither first nor second block checked", 
+                                    fw, Block.NO_DIFFERENCE ) ;
 				return false ;
 			    }
 
@@ -494,6 +521,10 @@ public class CopyrightProcessor {
 	verbose = args.verbose() ;
 	validate = args.validate() ;
         useFileVersion = args.useFileVersion() ;
+        if (useFileVersion) {
+            modificationAnalyzer = new ModificationAnalyzer(
+                args.root().getAbsolutePath() ) ;
+        }
 
 	if (verbose > 0) {
 	    trace( "Main: args:\n" + args ) ;
@@ -612,7 +643,7 @@ public class CopyrightProcessor {
 		recognizer.dump() ;
 	    }
 
-	    Scanner scanner = new Scanner( verbose, args.roots() ) ;
+	    Scanner scanner = new Scanner( verbose, args.root() ) ;
 	    for (String str : args.skipdirs() ) {
                 scanner.addDirectoryToSkip(str);
             }

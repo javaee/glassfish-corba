@@ -169,8 +169,12 @@ public class CopyrightProcessor {
     }
 
     private static final String COPYRIGHT = "Copyright" ;
+    private static final String COPYRIGHT_SYMBOL = "(c)" ;
+    private static final String COPYRIGHT_SYMBOL_UC =
+        COPYRIGHT_SYMBOL.toUpperCase() ;
 
-    // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
+    // Search for COPYRIGHT or COPYRIGHT (C) followed by white space,
+    // then [0-9]*-[0-9]*
     private static Pair<String,String> getCopyrightPair( String str ) {
         StringParser sp = new StringParser( str ) ;
         if (!sp.skipToString( COPYRIGHT )) {
@@ -184,6 +188,14 @@ public class CopyrightProcessor {
         if (!sp.skipWhitespace()) {
             return null;
         }
+
+        if (!sp.skipString( COPYRIGHT_SYMBOL )) {
+            sp.skipString( COPYRIGHT_SYMBOL_UC );
+        }
+
+        if (!sp.skipWhitespace()) {
+            return null ;
+        };
 
         String start = sp.parseInt() ;
         if (start == null) {

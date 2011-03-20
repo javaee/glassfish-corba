@@ -366,7 +366,6 @@ public class CopyrightProcessor {
 		try {
                     Pair<String,String> years = null ;
                     Pair<String,String> altYears = null ;
-                    Pair<String,String> updateYears = null ;
 
                     if (useFileVersion) {
                         years = getFileVersionYear( fw ) ;
@@ -376,8 +375,10 @@ public class CopyrightProcessor {
                         final String cy = "" + (new GregorianCalendar()).get(
                             Calendar.YEAR ) ;
                         years = new Pair<String,String>( defaultStartYear, cy ) ;
-                        altYears = null ;
+                        altYears = years ;
                     }
+
+                    Pair<String,String> updateYears = years ;
 
 		    boolean hadAnOldOracleCopyright = false ;
 		    
@@ -394,8 +395,6 @@ public class CopyrightProcessor {
                                 if (scp != null) {
                                     if (scp.first().equals( defaultStartYear)) {
                                         updateYears = altYears ;
-                                    } else {
-                                        updateYears = years ;
                                     }
                                 }
 				block.addTag( ORACLE_COPYRIGHT_TAG ) ;

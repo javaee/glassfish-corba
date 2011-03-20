@@ -186,7 +186,7 @@
 	<property name="copyright.roots"
             value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/>
 	<property name="copyright.skip"
-            value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom"/>
+            value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
 
         <!-- properties needed for pushing jar to maven repository -->
         <property name="orb.version"

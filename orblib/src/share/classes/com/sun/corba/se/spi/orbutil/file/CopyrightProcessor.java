@@ -314,7 +314,7 @@ public class CopyrightProcessor {
 		    + ",afterFirstBlock=" + afterFirstBlock + "]" ;
 	    }
 
-            private String getFileVersionYear( FileWrapper fw ) throws IOException {
+            private Pair<String,String> getFileVersionYear( FileWrapper fw ) throws IOException {
                 /* Old, slow version
                 final String fname = fw.getAbsoluteName() ;
                 final Block block = new Block( "hg log " + fname ) ;
@@ -329,20 +329,56 @@ public class CopyrightProcessor {
                 }
                 */
                 final String fname = fw.getAbsoluteName() ;
-                return modificationAnalyzer.lastModification(fname) ;
+                final String first = modificationAnalyzer.firstModification(fname) ;
+                final String last = modificationAnalyzer.lastModification(fname) ;
+                return new Pair<String,String>( first, last ) ;
+            }
+
+            private Pair<String,String> doBlockDiff( Block block,
+                Block cb, Block altCb ) {
+                final Pair<String,String> cbDiff = cb.firstDifference( block )  ;
+                if ((altCb == null) || cbDiff.equals( Block.NO_DIFFERENCE )) {
+                    return cbDiff ;
+                } else {
+                    return altCb.firstDifference(block) ;
+                }
+            }
+
+            private void checkBlockCopyright( FileWrapper fw, Block block,
+                Block cb, Block altCb ) {
+                if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG,
+                    BlockParser.COMMENT_BLOCK_TAG)) {
+                    Pair<String,String> fdiff =
+                        doBlockDiff( block, cb, altCb ) ;
+                    if (!Block.NO_DIFFERENCE.equals( fdiff )) {
+                        validationError( block,
+                            "Second block has incorrect copyright text",
+                            fw, fdiff ) ;
+                    }
+                } else {
+                    validationError( block,
+                        "Second block should be copyright but isn't", fw,
+                        Block.NO_DIFFERENCE ) ;
+                }
             }
 
 	    public boolean evaluate( FileWrapper fw ) {
 		try {
-                    String cy ;
+                    Pair<String,String> years = null ;
+                    Pair<String,String> altYears = null ;
+                    Pair<String,String> updateYears = null ;
+
                     if (useFileVersion) {
-                        cy = getFileVersionYear( fw ) ;
+                        years = getFileVersionYear( fw ) ;
+                        altYears = new Pair<String,String>( defaultStartYear,
+                            years.second() ) ;
                     } else {
-                        cy = "" + (new GregorianCalendar()).get( Calendar.YEAR ) ;
+                        final String cy = "" + (new GregorianCalendar()).get(
+                            Calendar.YEAR ) ;
+                        years = new Pair<String,String>( defaultStartYear, cy ) ;
+                        altYears = null ;
                     }
-                    String currentYear = "" + cy ;
-                    Pair<String,String> years = 
-                        new Pair<String,String>( defaultStartYear, currentYear ) ;
+
 		    boolean hadAnOldOracleCopyright = false ;
 		    
 		    // Convert file into blocks
@@ -356,7 +392,11 @@ public class CopyrightProcessor {
 			    if (str.contains( "Oracle" )) {
 				Pair<String,String> scp = getCopyrightPair( str ) ;
                                 if (scp != null) {
-                                    years = scp ;
+                                    if (scp.first().equals( defaultStartYear)) {
+                                        updateYears = altYears ;
+                                    } else {
+                                        updateYears = years ;
+                                    }
                                 }
 				block.addTag( ORACLE_COPYRIGHT_TAG ) ;
 				hadAnOldOracleCopyright = true ;
@@ -374,54 +414,31 @@ public class CopyrightProcessor {
 			}
 		    }
 
-		    Block cb = makeCopyrightBlock( years, copyrightText ) ;
-
 		    if (validate) {
-			// There should be a Oracle copyright block in the first block
-			// (if afterFirstBlock is false), otherwise in the second block.
-			// It should entirely match copyrightText
+                        final Block cb = makeCopyrightBlock( years, copyrightText ) ;
+                        final Block altCb = (altYears == null)
+                            ? null : makeCopyrightBlock( altYears, copyrightText);
+
+			// There should be a Oracle copyright block in the 
+                        // first block (if afterFirstBlock is false), otherwise
+                        // in the second block.  It should entirely match
+                        // copyrightText.
 			int count = 0 ;
 			for (Block block : fileBlocks) {
-			    // Generally always return true, because we want to see ALL validation errors.
+			    // Generally always return true, because we want
+                            // to see ALL validation errors.
 			    if (!afterFirstBlock && (count == 0)) {
-				if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
-				    BlockParser.COMMENT_BLOCK_TAG)) {
-                                    Pair<String,String> fdiff =
-                                        cb.firstDifference(block) ;
-				    if (!Block.NO_DIFFERENCE.equals( fdiff )) {
-					validationError( block,
-                                            "First block has incorrect copyright text", 
-                                            fw, fdiff ) ;
-				    }
-				} else {
-				    validationError( block,
-                                        "First block should be copyright but isn't", fw,
-                                        Block.NO_DIFFERENCE ) ;
-				}
-
+                                checkBlockCopyright( fw, block, cb, altCb ) ;
 				return true ;
 			    } else if (afterFirstBlock && (count == 1)) {
-				if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
-				    BlockParser.COMMENT_BLOCK_TAG)) {
-                                    Pair<String,String> fdiff =
-                                        cb.firstDifference(block) ;
-				    if (!Block.NO_DIFFERENCE.equals( fdiff )) {
-					validationError( block,
-                                            "Second block has incorrect copyright text", 
-                                            fw, fdiff ) ;
-				    }
-				} else {
-				    validationError( block,
-                                        "Second block should be copyright but isn't", fw,
-                                        Block.NO_DIFFERENCE ) ;
-				}
-
+                                checkBlockCopyright( fw, block, cb, altCb ) ;
 				return true ;
 			    } 
 			    
 			    if (count > 1) {
-				// should not get here!  Return false only in this case, because this is
-				// an internal error in the validator.
+				// should not get here!  Return false only in 
+                                // this case, because this is an internal error
+                                // in the validator.
 				validationError( null,
                                     "Neither first nor second block checked", 
                                     fw, Block.NO_DIFFERENCE ) ;
@@ -431,14 +448,19 @@ public class CopyrightProcessor {
 			    count++ ;
 			}
 		    } else {
+                        final Block updateCb = makeCopyrightBlock( updateYears,
+                            copyrightText ) ;
+
 			// Re-write file, replacing the first block tagged
-			// ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, and commentBlock with
-			// the copyrightText block.
+			// ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, and 
+                        // commentBlock with the copyrightText block.
 			
 			if (fw.canWrite()) {
-			    trace( "Updating copyright/license header on file " + fw ) ;
+			    trace( "Updating copyright/license header on file "
+                                + fw ) ;
 
-			    // XXX this is dangerous: a crash before close will destroy the file!
+			    // XXX this is dangerous: a crash before close
+                            // will destroy the file!
 			    fw.delete() ; 
 			    fw.open( FileWrapper.OpenMode.WRITE ) ;
 
@@ -448,17 +470,18 @@ public class CopyrightProcessor {
 				if (!hadAnOldOracleCopyright && firstBlock) {
 				    if (afterFirstBlock) {
 					block.write( fw ) ;
-					cb.write( fw ) ;
+					updateCb.write( fw ) ;
 				    } else {
-					cb.write( fw ) ;
+					updateCb.write( fw ) ;
 					block.write( fw ) ;
 				    }
 				    firstBlock = false ;
-				} else if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
+				} else if (block.hasTags( ORACLE_COPYRIGHT_TAG,
+                                    COPYRIGHT_BLOCK_TAG,
 				    BlockParser.COMMENT_BLOCK_TAG) && firstMatch)  {
 				    firstMatch = false ;
 				    if (hadAnOldOracleCopyright) {
-					cb.write( fw ) ;
+					updateCb.write( fw ) ;
 				    }
 				} else {
 				    block.write( fw ) ;
@@ -466,12 +489,14 @@ public class CopyrightProcessor {
 			    }
 			} else {
 			    if (verbose > 1) {
-				trace( "Skipping file " + fw + " because is is not writable" ) ;
+				trace( "Skipping file " + fw
+                                    + " because is is not writable" ) ;
 			    }
 			}
 		    }
 		} catch (IOException exc ) {
-		    trace( "Exception while processing file " + fw + ": " + exc ) ;
+		    trace( "Exception while processing file " + fw + ": "
+                        + exc ) ;
 		    exc.printStackTrace() ;
 		    return false ;
 		} finally {

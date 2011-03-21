@@ -8,6 +8,9 @@
     <param name="japex.classPath" value="../../../../../../build/classes"/>
     <param name="japex.classPath" value="../../../../../../orblib/build/classes"/>
     <param name="japex.classPath" value="../../../../../../test/build/classes"/>
+    <param name="japex.classPath" value="../../../../../../build/libcache/gmbal.jar"/>
+    <param name="japex.classPath" value="../../../../../../build/libcache/management-api.jar"/>
+    <param name="japex.classPath" value="../../../../../../build/libcache/org.osgi.core.jar"/>
     
     <driver name="StandardTest" xmlns="http://www.sun.com/japex/testSuite">
 	<param name="japex.driverClass" value="performance.eesample.StandardTest"/>
@@ -77,7 +80,7 @@
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
-  Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+  Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
   
   The contents of this file are subject to the terms of either the GNU
   General Public License Version 2 only ("GPL") or the Common Development

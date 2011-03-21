@@ -186,7 +186,7 @@
 	<property name="copyright.roots"
             value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/>
 	<property name="copyright.skip"
-            value=".hg,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom"/>
+            value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
 
         <!-- properties needed for pushing jar to maven repository -->
         <property name="orb.version"
@@ -735,8 +735,8 @@
 	    <arg value="0"/>
 	    <arg value="-dryrun"/>
 	    <arg value="false"/>
-	    <arg value="-roots"/>
-	    <arg value="${copyright.roots}"/>
+	    <arg value="-root"/>
+	    <arg value="."/>
 	    <arg value="-skipdirs"/>
 	    <arg value="${copyright.skip}"/>
 	    <arg value="-copyright"/>
@@ -755,6 +755,11 @@
 	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor"
             fork="true"
 	    dir="${root.dir}">
+	    <!--
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=42365"/>
+	    -->
             <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
 	    <classpath>
 		<pathelement location="${releaselib.dir}/orblib.jar"/>
@@ -765,8 +770,8 @@
 	    <arg value="0"/>
 	    <arg value="-dryrun"/>
 	    <arg value="false"/>
-	    <arg value="-roots"/>
-	    <arg value="${copyright.roots}"/>
+	    <arg value="-root"/>
+	    <arg value="."/>
 	    <arg value="-skipdirs"/>
 	    <arg value="${copyright.skip}"/>
 	    <arg value="-copyright"/>

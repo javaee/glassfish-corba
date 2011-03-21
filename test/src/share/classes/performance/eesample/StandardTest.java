@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1010,8 +1010,13 @@ public class StandardTest extends JapexDriverBase {
 	    String[] myArgs = {} ;
 
 	    Properties clientProps = getClientProperties() ;
-	    clientORB = (ORB)ORB.init( myArgs, clientProps ) ;
-        	    setDebugFlags( clientORB ) ;
+            try {
+                clientORB = (ORB)ORB.init( myArgs, clientProps ) ;
+                        setDebugFlags( clientORB ) ;
+            } catch (Throwable thr) {
+                thr.printStackTrace();
+                throw new RuntimeException( "Error in ORB.init", thr ) ;
+            }
 	    if (argData.getSize()) {
                 clientORB.setDebugFlag( "giopSize" ) ;
             }
@@ -1045,7 +1050,13 @@ public class StandardTest extends JapexDriverBase {
         }
 
         Properties serverProps = getServerProperties() ;
-	serverORB = (ORB)ORB.init( myArgs, serverProps ) ;
+        try {
+            serverORB = (ORB)ORB.init( myArgs, serverProps ) ;
+        } catch (Throwable thr) {
+            thr.printStackTrace();
+            throw new RuntimeException( "Error in ORB.init", thr ) ;
+        }
+
     	setDebugFlags( serverORB ) ;
 	if (argData.getSize()) {
             serverORB.setDebugFlag( "giopSize" ) ;
@@ -1363,7 +1374,8 @@ public class StandardTest extends JapexDriverBase {
 	@DefaultValue( "3700" ) 
 	int port() ;
 
-	@DefaultValue( "localhost" ) 
+        /* Default in server is to listen for all incoming requests. */
+	@DefaultValue( "" ) 
 	String hostName() ;
 
 	@DefaultValue( "4096" ) 
@@ -1410,10 +1422,12 @@ public class StandardTest extends JapexDriverBase {
         testBase = new TestBase(args, ArgumentData.class, st ) ;
 	argData = testBase.getArguments( ArgumentData.class ) ;
 
-	if ((argData.mode() == TestMode.SERVER) && argData.useJapex()) {
-	    throw new IllegalArgumentException(
-                "This test does not run with Japex in server mode!" ) ;
-	}
+	if (argData.mode() == TestMode.SERVER) {
+            if (argData.useJapex()) {
+                throw new IllegalArgumentException(
+                    "This test does not run with Japex in server mode!" ) ;
+            }
+        }
 
 	System.out.println( "Running StandardTest with arguments" ) ;
 	System.out.println( argData ) ;

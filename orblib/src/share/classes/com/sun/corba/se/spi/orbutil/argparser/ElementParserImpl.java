@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -124,12 +124,14 @@ public class ElementParserImpl implements ElementParser {
 
 	    func = new UnaryFunction<String,Object>() {
 		public Object evaluate( String value ) {
-		    String[] elements = value.split( sep ) ;
-		    List result = new ArrayList( elements.length ) ;
-		    for (String str : elements) {
-			Object val = elementResultData.first().evaluate( str ) ;
-			result.add( val ) ;
-		    }
+                    List result = new ArrayList() ;
+                    if (!value.isEmpty()) {
+                        String[] elements = value.split( sep ) ;
+                        for (String str : elements) {
+                            Object val = elementResultData.first().evaluate( str ) ;
+                            result.add( val ) ;
+                        }
+                    }
 
 		    return result ;
 		} 

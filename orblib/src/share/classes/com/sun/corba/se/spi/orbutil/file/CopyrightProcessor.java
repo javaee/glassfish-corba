@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -72,9 +72,9 @@ public class CopyrightProcessor {
 	@Help( "Set to true to avoid modifying any files" ) 
 	boolean dryrun() ;
 
-	@Help( "List of directories to process" ) 
+	@Help( "Root of mercurial repository for workspace" )
 	@DefaultValue( "" ) 
-	List<File> roots() ;
+	File root() ;
 
 	@Help( "List of directory names that should be skipped" ) 
 	@DefaultValue( "" ) 
@@ -87,10 +87,16 @@ public class CopyrightProcessor {
 	@DefaultValue( "1997" )
 	@Help( "Default copyright start year, if not otherwise specified" ) 
 	String startyear() ;
+
+        @DefaultValue( "true" )
+        @Help( "If true, use the year the file was last modified, otherwise use the current year" ) 
+        boolean useFileVersion() ;
     }
 
     private static boolean validate ;
     private static int verbose ;
+    private static boolean useFileVersion ;
+    private static ModificationAnalyzer modificationAnalyzer = null ;
 
     private static final String[] JAVA_LIKE_SUFFIXES = {
 	"c", "h", "java", "sjava", "idl" } ;
@@ -123,7 +129,8 @@ public class CopyrightProcessor {
 
     // Special file names to ignore
     private static final String[] IGNORE_FILE_NAMES = {
-	"NORENAME", "errorfile", "sed_pattern_file.version", "build.properties"
+	"NORENAME", "errorfile", "sed_pattern_file.version", "build.properties",
+        ".DS_Store", ".hgtags", ".hgignore"
     } ;
 
     // Block tags
@@ -162,8 +169,12 @@ public class CopyrightProcessor {
     }
 
     private static final String COPYRIGHT = "Copyright" ;
+    private static final String COPYRIGHT_SYMBOL = "(c)" ;
+    private static final String COPYRIGHT_SYMBOL_UC =
+        COPYRIGHT_SYMBOL.toUpperCase() ;
 
-    // Search for COPYRIGHT followed by white space, then [0-9]*-[0-9]*
+    // Search for COPYRIGHT or COPYRIGHT (C) followed by white space,
+    // then [0-9]*-[0-9]*
     private static Pair<String,String> getCopyrightPair( String str ) {
         StringParser sp = new StringParser( str ) ;
         if (!sp.skipToString( COPYRIGHT )) {
@@ -177,6 +188,14 @@ public class CopyrightProcessor {
         if (!sp.skipWhitespace()) {
             return null;
         }
+
+        if (!sp.skipString( COPYRIGHT_SYMBOL )) {
+            sp.skipString( COPYRIGHT_SYMBOL_UC );
+        }
+
+        if (!sp.skipWhitespace()) {
+            return null ;
+        };
 
         String start = sp.parseInt() ;
         if (start == null) {
@@ -266,8 +285,11 @@ public class CopyrightProcessor {
 	} ;
     }
 
-    private static void validationError( Block block, String msg, FileWrapper fw ) {
+    private static void validationError( Block block, String msg, 
+        FileWrapper fw, Pair<String,String> firstDifference ) {
 	trace( "Copyright validation error: " + msg + " for " + fw ) ;
+        trace( "\tfirst block line = " + firstDifference.first() ) ;
+        trace( "\tsecond block line = " + firstDifference.second() ) ;
 	if ((verbose > 0) && (block != null)) {
 	    trace( "Block=" + block ) ;
 	    trace( "Block contents:" ) ;
@@ -304,12 +326,72 @@ public class CopyrightProcessor {
 		    + ",afterFirstBlock=" + afterFirstBlock + "]" ;
 	    }
 
+            private Pair<String,String> getFileVersionYear( FileWrapper fw ) throws IOException {
+                /* Old, slow version
+                final String fname = fw.getAbsoluteName() ;
+                final Block block = new Block( "hg log " + fname ) ;
+                final String dateString = block.find( "date:" ) ;
+                // Format: date: weekday month day time year timezone
+                // we just need the year.
+                if (dateString != null) {
+                    final String[] tokens = dateString.split( " +" ) ;
+                    return tokens[5] ;
+                } else {
+                    return "" ;
+                }
+                */
+                final String fname = fw.getAbsoluteName() ;
+                final String first = modificationAnalyzer.firstModification(fname) ;
+                final String last = modificationAnalyzer.lastModification(fname) ;
+                return new Pair<String,String>( first, last ) ;
+            }
+
+            private Pair<String,String> doBlockDiff( Block block,
+                Block cb, Block altCb ) {
+                final Pair<String,String> cbDiff = cb.firstDifference( block )  ;
+                if ((altCb == null) || cbDiff.equals( Block.NO_DIFFERENCE )) {
+                    return cbDiff ;
+                } else {
+                    return altCb.firstDifference(block) ;
+                }
+            }
+
+            private void checkBlockCopyright( FileWrapper fw, Block block,
+                Block cb, Block altCb ) {
+                if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG,
+                    BlockParser.COMMENT_BLOCK_TAG)) {
+                    Pair<String,String> fdiff =
+                        doBlockDiff( block, cb, altCb ) ;
+                    if (!Block.NO_DIFFERENCE.equals( fdiff )) {
+                        validationError( block,
+                            "Second block has incorrect copyright text",
+                            fw, fdiff ) ;
+                    }
+                } else {
+                    validationError( block,
+                        "Second block should be copyright but isn't", fw,
+                        Block.NO_DIFFERENCE ) ;
+                }
+            }
+
 	    public boolean evaluate( FileWrapper fw ) {
 		try {
-                    int cy = (new GregorianCalendar()).get( Calendar.YEAR ) ;
-                    String currentYear = "" + cy ;
-                    Pair<String,String> years = 
-                        new Pair<String,String>( defaultStartYear, currentYear ) ;
+                    Pair<String,String> years = null ;
+                    Pair<String,String> altYears = null ;
+
+                    if (useFileVersion) {
+                        years = getFileVersionYear( fw ) ;
+                        altYears = new Pair<String,String>( defaultStartYear,
+                            years.second() ) ;
+                    } else {
+                        final String cy = "" + (new GregorianCalendar()).get(
+                            Calendar.YEAR ) ;
+                        years = new Pair<String,String>( defaultStartYear, cy ) ;
+                        altYears = years ;
+                    }
+
+                    Pair<String,String> updateYears = years ;
+
 		    boolean hadAnOldOracleCopyright = false ;
 		    
 		    // Convert file into blocks
@@ -323,7 +405,9 @@ public class CopyrightProcessor {
 			    if (str.contains( "Oracle" )) {
 				Pair<String,String> scp = getCopyrightPair( str ) ;
                                 if (scp != null) {
-                                    years = scp ;
+                                    if (scp.first().equals( defaultStartYear)) {
+                                        updateYears = altYears ;
+                                    }
                                 }
 				block.addTag( ORACLE_COPYRIGHT_TAG ) ;
 				hadAnOldOracleCopyright = true ;
@@ -341,57 +425,53 @@ public class CopyrightProcessor {
 			}
 		    }
 
-		    Block cb = makeCopyrightBlock( years, copyrightText ) ;
-
 		    if (validate) {
-			// There should be a Oracle copyright block in the first block
-			// (if afterFirstBlock is false), otherwise in the second block.
-			// It should entirely match copyrightText
+                        final Block cb = makeCopyrightBlock( years, copyrightText ) ;
+                        final Block altCb = (altYears == null)
+                            ? null : makeCopyrightBlock( altYears, copyrightText);
+
+			// There should be a Oracle copyright block in the 
+                        // first block (if afterFirstBlock is false), otherwise
+                        // in the second block.  It should entirely match
+                        // copyrightText.
 			int count = 0 ;
 			for (Block block : fileBlocks) {
-			    // Generally always return true, because we want to see ALL validation errors.
+			    // Generally always return true, because we want
+                            // to see ALL validation errors.
 			    if (!afterFirstBlock && (count == 0)) {
-				if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
-				    BlockParser.COMMENT_BLOCK_TAG)) {
-				    if (!cb.equals( block )) {
-					validationError( block, "First block has incorrect copyright text", fw ) ;
-				    }
-				} else {
-				    validationError( block, "First block should be copyright but isn't", fw ) ;
-				}
-
+                                checkBlockCopyright( fw, block, cb, altCb ) ;
 				return true ;
 			    } else if (afterFirstBlock && (count == 1)) {
-				if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
-				    BlockParser.COMMENT_BLOCK_TAG)) {
-				    if (!cb.equals( block )) {
-					validationError( block, "Second block has incorrect copyright text", fw ) ;
-				    }
-				} else {
-				    validationError( block, "Second block should be copyright but isn't", fw ) ;
-				}
-
+                                checkBlockCopyright( fw, block, cb, altCb ) ;
 				return true ;
 			    } 
 			    
 			    if (count > 1) {
-				// should not get here!  Return false only in this case, because this is
-				// an internal error in the validator.
-				validationError( null, "Neither first nor second block checked", fw ) ;
+				// should not get here!  Return false only in 
+                                // this case, because this is an internal error
+                                // in the validator.
+				validationError( null,
+                                    "Neither first nor second block checked", 
+                                    fw, Block.NO_DIFFERENCE ) ;
 				return false ;
 			    }
 
 			    count++ ;
 			}
 		    } else {
+                        final Block updateCb = makeCopyrightBlock( updateYears,
+                            copyrightText ) ;
+
 			// Re-write file, replacing the first block tagged
-			// ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, and commentBlock with
-			// the copyrightText block.
+			// ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, and 
+                        // commentBlock with the copyrightText block.
 			
 			if (fw.canWrite()) {
-			    trace( "Updating copyright/license header on file " + fw ) ;
+			    trace( "Updating copyright/license header on file "
+                                + fw ) ;
 
-			    // XXX this is dangerous: a crash before close will destroy the file!
+			    // XXX this is dangerous: a crash before close
+                            // will destroy the file!
 			    fw.delete() ; 
 			    fw.open( FileWrapper.OpenMode.WRITE ) ;
 
@@ -401,17 +481,18 @@ public class CopyrightProcessor {
 				if (!hadAnOldOracleCopyright && firstBlock) {
 				    if (afterFirstBlock) {
 					block.write( fw ) ;
-					cb.write( fw ) ;
+					updateCb.write( fw ) ;
 				    } else {
-					cb.write( fw ) ;
+					updateCb.write( fw ) ;
 					block.write( fw ) ;
 				    }
 				    firstBlock = false ;
-				} else if (block.hasTags( ORACLE_COPYRIGHT_TAG, COPYRIGHT_BLOCK_TAG, 
+				} else if (block.hasTags( ORACLE_COPYRIGHT_TAG,
+                                    COPYRIGHT_BLOCK_TAG,
 				    BlockParser.COMMENT_BLOCK_TAG) && firstMatch)  {
 				    firstMatch = false ;
 				    if (hadAnOldOracleCopyright) {
-					cb.write( fw ) ;
+					updateCb.write( fw ) ;
 				    }
 				} else {
 				    block.write( fw ) ;
@@ -419,12 +500,14 @@ public class CopyrightProcessor {
 			    }
 			} else {
 			    if (verbose > 1) {
-				trace( "Skipping file " + fw + " because is is not writable" ) ;
+				trace( "Skipping file " + fw
+                                    + " because is is not writable" ) ;
 			    }
 			}
 		    }
 		} catch (IOException exc ) {
-		    trace( "Exception while processing file " + fw + ": " + exc ) ;
+		    trace( "Exception while processing file " + fw + ": "
+                        + exc ) ;
 		    exc.printStackTrace() ;
 		    return false ;
 		} finally {
@@ -473,6 +556,11 @@ public class CopyrightProcessor {
 	String startYear = args.startyear() ;
 	verbose = args.verbose() ;
 	validate = args.validate() ;
+        useFileVersion = args.useFileVersion() ;
+        if (useFileVersion) {
+            modificationAnalyzer = new ModificationAnalyzer(
+                args.root().getAbsolutePath() ) ;
+        }
 
 	if (verbose > 0) {
 	    trace( "Main: args:\n" + args ) ;
@@ -591,7 +679,7 @@ public class CopyrightProcessor {
 		recognizer.dump() ;
 	    }
 
-	    Scanner scanner = new Scanner( verbose, args.roots() ) ;
+	    Scanner scanner = new Scanner( verbose, args.root() ) ;
 	    for (String str : args.skipdirs() ) {
                 scanner.addDirectoryToSkip(str);
             }

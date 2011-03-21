@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -50,18 +50,52 @@ import java.util.StringTokenizer ;
 import java.io.IOException ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Represents a range of Strings, typically read from a file, that are in some sense
  * related and contiguous.  Blocks may also be tagged as an aid in transforming
  * a series of blocks.
  */
-public class Block {
+public class Block implements Iterable<String> {
     private List<String> data ;
     private final Set<String> tags ;
 
     private Block( final List<String> data, final Set<String> tags ) {
 	this.data = data ;
 	this.tags = tags ;
+    }
+
+    /** Create a new Block from the output of executing a command.
+     */
+    public Block( String command ) throws IOException {
+        final List<String> output = new ArrayList<String>() ;
+        final Process proc = Runtime.getRuntime().exec( command ) ;
+        final InputStream is = proc.getInputStream() ;
+        final BufferedReader reader = new BufferedReader(
+            new InputStreamReader( is ) );
+        String line = reader.readLine() ;
+        while (line != null) {
+            output.add( line ) ;
+            line = reader.readLine() ;
+        }
+
+        int result = 0 ;
+        try {
+            result = proc.waitFor();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Block.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (result != 0) {
+            throw new RuntimeException( "Command " + command
+                + " failed with result " + result ) ;
+        }
+
+        this.data = output ;
+	this.tags = new HashSet<String>() ;
     }
 
     /** Create a new Block from a list of strings.
@@ -108,6 +142,37 @@ public class Block {
 	}
 
 	return iter1.hasNext() == iter2.hasNext() ;
+    }
+
+    public static final Pair<String,String> NO_DIFFERENCE =
+        new Pair<String,String>( "", "" ) ;
+
+    /** Return the first pair of lines in this block and the block parameter
+     * that are not the same.
+     * @param block Block to compare
+     * @return Pair with first() from this block and second() from block
+     * parameter.  If one block is longer than the other, the shorter block
+     * result is "" and the longer is the first line after the end of the
+     * shorter.  If both blocks are identical, the result is NO_DIFFERENCE.
+     */
+    public Pair<String,String> firstDifference( Block block ) {
+        final int firstLength = data.size() ;
+        final int secondLength = block.data.size() ;
+        if (firstLength < secondLength) {
+            return new Pair<String,String>( block.data.get(firstLength), "" ) ;
+        } else if (firstLength > secondLength) {
+            return new Pair<String,String>( "", data.get(secondLength) ) ;
+        } else {
+            for (int ctr=0; ctr<firstLength; ctr++ ) {
+                final String first = data.get( ctr ) ;
+                final String second = block.data.get( ctr ) ;
+                if (!first.equals(second)) {
+                    return new Pair<String,String>( first, second ) ;
+                }
+            }
+        }
+
+        return NO_DIFFERENCE ;
     }
 
     public int hashCode() {
@@ -287,5 +352,9 @@ public class Block {
 	Pair<Block,Block> result = new Pair<Block,Block>( block1, block2 ) ;
 
 	return result ;
+    }
+
+    public Iterator<String> iterator() {
+        return data.iterator() ;
     }
 }

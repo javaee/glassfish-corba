@@ -51,7 +51,7 @@ import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
+import com.sun.corba.se.impl.protocol.MessageMediatorImpl;
 
 import java.lang.reflect.*;
 import org.omg.PortableInterceptor.*;
@@ -155,11 +155,11 @@ public class Client extends org.omg.CORBA.LocalObject
 	}
 
 	Class riClass = ri.getClass();
-	CorbaMessageMediatorImpl cri;
+	MessageMediatorImpl cri;
 	try {
 	    Field riMember = riClass.getDeclaredField("messageMediator");
 	    riMember.setAccessible(true);
-	    cri = (CorbaMessageMediatorImpl) riMember.get(ri);
+	    cri = (MessageMediatorImpl) riMember.get(ri);
 	} catch (Throwable e) { 
 	    e.printStackTrace(System.out); 
 	    throw new RuntimeException("impl class instrospection failed", e);

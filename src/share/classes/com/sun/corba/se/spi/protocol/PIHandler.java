@@ -205,7 +205,7 @@ public interface PIHandler extends Closeable {
     /** 
      * Notify PI of the MessageMediator for the request.
      */
-    void setClientPIInfo(CorbaMessageMediator messageMediator) ;
+    void setClientPIInfo(MessageMediator messageMediator) ;
 
     /*
      *****************
@@ -254,7 +254,7 @@ public interface PIHandler extends Closeable {
      * ServerRequestInfo object.  poaimpl is declared as an Object so that
      * we need not introduce a dependency on the POA package.
      */
-    void initializeServerPIInfo( CorbaMessageMediator request, 
+    void initializeServerPIInfo( MessageMediator request,
 	ObjectAdapter oa, byte[] objectId, ObjectKeyTemplate oktemp ) ;
 
     /**

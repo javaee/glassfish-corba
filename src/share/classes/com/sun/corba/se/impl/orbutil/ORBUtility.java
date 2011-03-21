@@ -78,9 +78,9 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBVersion ;
 import com.sun.corba.se.spi.orb.ORBVersionFactory ;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate ;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
+import com.sun.corba.se.spi.protocol.ClientDelegate ;
+import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.se.spi.transport.ContactInfoList ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
@@ -797,11 +797,11 @@ public final class ORBUtility {
         }
     }
 
-    public static CorbaClientDelegate makeClientDelegate( IOR ior )
+    public static ClientDelegate makeClientDelegate( IOR ior )
     {
 	ORB orb = ior.getORB() ;
-	CorbaContactInfoList ccil = orb.getCorbaContactInfoListFactory().create( ior ) ;
-	CorbaClientDelegate del = orb.getClientDelegateFactory().create(ccil);
+	ContactInfoList ccil = orb.getCorbaContactInfoListFactory().create( ior ) ;
+	ClientDelegate del = orb.getClientDelegateFactory().create(ccil);
 	return del ;
     }
 
@@ -809,7 +809,7 @@ public final class ORBUtility {
     */
     public static org.omg.CORBA.Object makeObjectReference( IOR ior )	
     {
-	CorbaClientDelegate del = makeClientDelegate( ior ) ;
+	ClientDelegate del = makeClientDelegate( ior ) ;
 	org.omg.CORBA.Object objectImpl = new CORBAObjectImpl() ;
 	StubAdapter.setDelegate( objectImpl, del ) ;
 	return objectImpl ;
@@ -834,7 +834,7 @@ public final class ORBUtility {
 	}
     }
 
-    public static String operationNameAndRequestId(CorbaMessageMediator m)
+    public static String operationNameAndRequestId(MessageMediator m)
     {
 	return "op/" + m.getOperationName() + " id/" + m.getRequestId();
     }

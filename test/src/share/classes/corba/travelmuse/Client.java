@@ -41,7 +41,7 @@
 package corba.travelmuse;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.transport.MessageData;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -94,7 +94,7 @@ public class Client {
     public void travelMuse() {
         try {
             msg( "test case travelMuse" ) ;          
-            CorbaTransportManager ctm = (CorbaTransportManager) myOrb.getCorbaTransportManager() ;
+            TransportManager ctm = (TransportManager) myOrb.getCorbaTransportManager() ;
             InputStream inputFile ;
             inputFile = new FileInputStream("../src/share/classes/corba/travelmuse/mtm.bin");
             ObjectInputStream in = new ObjectInputStream(inputFile);

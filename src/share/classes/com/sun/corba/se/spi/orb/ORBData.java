@@ -42,10 +42,10 @@ package com.sun.corba.se.spi.orb ;
 
 import org.omg.PortableInterceptor.ORBInitializer ;
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
+import com.sun.corba.se.spi.transport.ContactInfoListFactory;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.TcpTimeouts;
@@ -256,11 +256,11 @@ public interface ORBData {
 
     @ManagedAttribute
     @Description( "DESC" ) 
-    public CorbaAcceptor[] getAcceptors();
+    public Acceptor[] getAcceptors();
 
     @ManagedAttribute
     @Description( "DESC" ) 
-    public CorbaContactInfoListFactory getCorbaContactInfoListFactory();
+    public ContactInfoListFactory getCorbaContactInfoListFactory();
 
     @ManagedAttribute
     @Description( "DESC" ) 

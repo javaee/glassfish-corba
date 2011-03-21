@@ -61,7 +61,7 @@ import com.sun.corba.se.spi.oa.ObjectAdapter;
 
 
 import com.sun.corba.se.spi.protocol.PIHandler;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 
 import com.sun.corba.se.impl.corba.RequestImpl;
 
@@ -131,7 +131,7 @@ public class PINoOpHandlerImpl implements PIHandler
     public void cleanupClientPIRequest() {
     }
 
-    public void setClientPIInfo(CorbaMessageMediator messageMediator) 
+    public void setClientPIInfo(MessageMediator messageMediator)
     {
     }
 
@@ -171,7 +171,7 @@ public class PINoOpHandlerImpl implements PIHandler
     {
     }
 
-    public void initializeServerPIInfo( CorbaMessageMediator request,
+    public void initializeServerPIInfo( MessageMediator request,
 	ObjectAdapter oa, byte[] objectId, ObjectKeyTemplate oktemp ) 
     {
     }

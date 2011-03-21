@@ -46,10 +46,10 @@ import java.util.HashMap ;
 
 import org.omg.CORBA.LocalObject ;
 
-import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ClientRequestDispatcher ;
 
-import com.sun.corba.se.spi.transport.CorbaConnection ;
-import com.sun.corba.se.spi.transport.CorbaOutboundConnectionCache ;
+import com.sun.corba.se.spi.transport.Connection ;
+import com.sun.corba.se.spi.transport.OutboundConnectionCache ;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject ;
 
@@ -57,25 +57,25 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBConfigurator ;
 import com.sun.corba.se.spi.orb.DataCollector ;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory ;
+import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.ContactInfoList ;
+import com.sun.corba.se.spi.transport.ContactInfoListFactory ;
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 
 import com.sun.corba.se.spi.ior.IOR ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
-import com.sun.corba.se.impl.transport.CorbaConnectionCacheBase ;
-import com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl ;
+import com.sun.corba.se.impl.transport.ConnectionCacheBase ;
+import com.sun.corba.se.impl.transport.ConnectionImpl ;
 
 // The following 3 implementation classes are needed as base 
 // classes.  This needs some architectural changes, perhaps
 // adding a codegen-based proxy layer for dynamic inheritance.
-import com.sun.corba.se.impl.protocol.CorbaClientRequestDispatcherImpl ;
+import com.sun.corba.se.impl.protocol.ClientRequestDispatcherImpl ;
 
-import com.sun.corba.se.impl.transport.SocketOrChannelContactInfoImpl ;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl ;
+import com.sun.corba.se.impl.transport.ContactInfoImpl ;
+import com.sun.corba.se.impl.transport.ContactInfoListImpl ;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 
@@ -89,13 +89,13 @@ public class NoConnectionCacheImpl
     implements ORBConfigurator
 {
     @Transport
-    private static class NCCConnectionCacheImpl extends CorbaConnectionCacheBase
-	implements CorbaOutboundConnectionCache {
+    private static class NCCConnectionCacheImpl extends ConnectionCacheBase
+	implements OutboundConnectionCache {
 	// store is a dummy variable
 	private Map store = new HashMap() ;
 
 	// holds only one connection
-	private CorbaConnection connection = null ;
+	private Connection connection = null ;
 
 	public NCCConnectionCacheImpl( ORB orb ) {
 	    super( orb, "Dummy", "Dummy" ) ;
@@ -109,24 +109,24 @@ public class NoConnectionCacheImpl
 	    return store ;
 	}
 
-	public CorbaConnection get(CorbaContactInfo contactInfo) {
+	public Connection get(ContactInfo contactInfo) {
 	    return connection ;
 	}
 
         @Transport
-	public void put(CorbaContactInfo contactInfo, CorbaConnection conn ) {
+	public void put(ContactInfo contactInfo, Connection conn ) {
             remove( contactInfo ) ;
             connection = conn ;
 	}
 
         @InfoMethod
-        private void removeConnectionInfo( CorbaConnection conn ) { }
+        private void removeConnectionInfo( Connection conn ) { }
 
         @InfoMethod
         private void connectionIsNull() { }
 
         @Transport
-	public void remove(CorbaContactInfo contactInfo) {
+	public void remove(ContactInfo contactInfo) {
             if (connection != null) {
                 removeConnectionInfo(connection);
                 connection.close() ;
@@ -150,7 +150,7 @@ public class NoConnectionCacheImpl
     }
 
     @Transport
-    private static class NCCConnectionImpl extends SocketOrChannelConnectionImpl {
+    private static class NCCConnectionImpl extends ConnectionImpl {
 	private static int count = 0 ;
 	private int myCount ;
 
@@ -158,7 +158,7 @@ public class NoConnectionCacheImpl
         private void constructedNCCConnectionImpl( String str ) {
         }
 
-        public NCCConnectionImpl(ORB orb, CorbaContactInfo contactInfo, 
+        public NCCConnectionImpl(ORB orb, ContactInfo contactInfo,
 		String socketType, String hostname, int port) {
 
 	    super(orb,contactInfo, socketType, hostname, port);
@@ -180,9 +180,9 @@ public class NoConnectionCacheImpl
     }
 
     @Transport
-    private static class NCCContactInfoImpl extends SocketOrChannelContactInfoImpl {
+    private static class NCCContactInfoImpl extends ContactInfoImpl {
 	public NCCContactInfoImpl( ORB orb,
-	    CorbaContactInfoList contactInfoList, IOR effectiveTargetIOR,
+	    ContactInfoList contactInfoList, IOR effectiveTargetIOR,
 	    short addressingDisposition, String socketType, String hostname,
 	    int port) {
 
@@ -197,12 +197,12 @@ public class NoConnectionCacheImpl
 	}
 
         @InfoMethod
-        private void createdConnection( CorbaConnection conn ) { }
+        private void createdConnection( Connection conn ) { }
 
         @Transport
         @Override
-	public CorbaConnection createConnection() {
-            CorbaConnection connection = new NCCConnectionImpl( orb, this,
+	public Connection createConnection() {
+            Connection connection = new NCCConnectionImpl( orb, this,
                 socketType, hostname, port ) ;
             createdConnection(connection);
             NCCConnectionCacheImpl cc = NoConnectionCacheImpl.getConnectionCache( orb ) ;
@@ -213,13 +213,13 @@ public class NoConnectionCacheImpl
 	}
     }
 
-    public static class NCCContactInfoListImpl extends CorbaContactInfoListImpl {
+    public static class NCCContactInfoListImpl extends ContactInfoListImpl {
 	public NCCContactInfoListImpl( ORB orb, IOR ior ) {
 	    super( orb, ior ) ;
 	}
 
         @Override
-	public CorbaContactInfo createContactInfo( String type, String hostname, 
+	public ContactInfo createContactInfo( String type, String hostname,
 	    int port ) {
 
 	    return new NCCContactInfoImpl( orb, this, effectiveTargetIOR,
@@ -227,7 +227,7 @@ public class NoConnectionCacheImpl
 	}
     }
 
-    private static class NCCClientRequestDispatcherImpl extends CorbaClientRequestDispatcherImpl {
+    private static class NCCClientRequestDispatcherImpl extends ClientRequestDispatcherImpl {
         @Override
 	public void endRequest( ORB broker, Object self, CDRInputObject inputObject ) {
 	    super.endRequest( broker, self, inputObject) ;
@@ -236,9 +236,9 @@ public class NoConnectionCacheImpl
     }
 
     public void configure( DataCollector dc, final ORB orb ) {
-	CorbaContactInfoListFactory factory = new CorbaContactInfoListFactory() {
+	ContactInfoListFactory factory = new ContactInfoListFactory() {
 	    public void setORB(ORB orb) {} 
-	    public CorbaContactInfoList create( IOR ior ) {
+	    public ContactInfoList create( IOR ior ) {
 		return new NCCContactInfoListImpl( orb, ior ) ;
 	    }
 	} ;
@@ -255,11 +255,11 @@ public class NoConnectionCacheImpl
 
 	orb.setCorbaContactInfoListFactory( factory ) ;
 
-	CorbaClientRequestDispatcher crd = new NCCClientRequestDispatcherImpl() ;
+	ClientRequestDispatcher crd = new NCCClientRequestDispatcherImpl() ;
 	RequestDispatcherRegistry rdr = orb.getRequestDispatcherRegistry() ;
 	// Need to register crd with all scids.  Assume range is 0 to MAX_POA_SCID.
 	for (int ctr=0; ctr<ORBConstants.MAX_POA_SCID; ctr++) {
-	    CorbaClientRequestDispatcher disp = rdr.getClientRequestDispatcher( ctr ) ;
+	    ClientRequestDispatcher disp = rdr.getClientRequestDispatcher( ctr ) ;
 	    if (disp != null) {
 		rdr.registerClientRequestDispatcher( crd, ctr ) ;
 	    }

@@ -57,10 +57,10 @@ import java.util.logging.Level;
 //import com.sun.logging.LogDomains;
 
 // These are "ee" in the AS version:
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.ContactInfo;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -100,7 +100,7 @@ public class IIOPPrimaryToContactInfoImpl
 	debug = false;
     }
 
-    public synchronized void reset(CorbaContactInfo primary)
+    public synchronized void reset(ContactInfo primary)
     {
 	try {
 	    if (debug) {
@@ -118,8 +118,8 @@ public class IIOPPrimaryToContactInfoImpl
 	}
     }
 
-    public synchronized boolean hasNext(CorbaContactInfo primary,
-					CorbaContactInfo previous,
+    public synchronized boolean hasNext(ContactInfo primary,
+					ContactInfo previous,
 					List contactInfos)
     {
 	try {
@@ -180,8 +180,8 @@ public class IIOPPrimaryToContactInfoImpl
 	}
     }
 
-    public synchronized CorbaContactInfo next(CorbaContactInfo primary,
-					 CorbaContactInfo previous,
+    public synchronized ContactInfo next(ContactInfo primary,
+					 ContactInfo previous,
 					 List contactInfos)
     {
 	try {
@@ -253,7 +253,7 @@ public class IIOPPrimaryToContactInfoImpl
 	    if (debug) {
 		dprint(debugMsg + result);
 	    }
-	    return (CorbaContactInfo) result;
+	    return (ContactInfo) result;
 	} catch (Throwable t) {
             _logger.log(Level.WARNING,
 			"Problem in " + baseMsg + ".next",
@@ -265,13 +265,13 @@ public class IIOPPrimaryToContactInfoImpl
 	}
     }
 
-    private Object getKey(CorbaContactInfo contactInfo)
+    private Object getKey(ContactInfo contactInfo)
     {
 	if (((SocketInfo)contactInfo).getPort() == 0) {
 	    // When CSIv2 is used the primary will have a zero port.
 	    // Therefore type/host/port will NOT be unique.
 	    // So use the entire IOR for the key in that case.
-	    return ((CorbaContactInfoList)contactInfo.getContactInfoList())
+	    return ((ContactInfoList)contactInfo.getContactInfoList())
 		.getEffectiveTargetIOR();
 	} else {
 	    return contactInfo;
@@ -279,7 +279,7 @@ public class IIOPPrimaryToContactInfoImpl
     }
 
     private String formatKeyPreviousList(Object key,
-					 CorbaContactInfo previous, List list)
+					 ContactInfo previous, List list)
     {
 	String result =
 	      "\n  key     : " + key

@@ -59,7 +59,7 @@ import com.sun.corba.se.spi.activation.ActivatorHelper;
 import com.sun.corba.se.spi.activation.ServerAlreadyRegistered;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.legacy.connection.SocketFactoryAcceptorImpl;
@@ -67,7 +67,7 @@ import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
 import com.sun.corba.se.impl.naming.pcosnaming.NameService;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
-import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
+import com.sun.corba.se.impl.transport.AcceptorImpl;
 
 /**
  * 
@@ -84,11 +84,11 @@ public class ORBD
     	// create a bootstrap server
 	initSvcPort = orb.getORBData().getORBInitialPort();
 
-	CorbaAcceptor acceptor;
+	Acceptor acceptor;
 	// REVISIT: see ORBConfigurator. use factory in TransportDefault.
 	if (orb.getORBData().getLegacySocketFactory() == null) {
 	    acceptor = 
-		new SocketOrChannelAcceptorImpl(
+		new AcceptorImpl(
 		    orb,
 		    initSvcPort,
 		    LegacyServerSocketEndPointInfo.BOOT_NAMING,

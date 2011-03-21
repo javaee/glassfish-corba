@@ -84,7 +84,7 @@ import corba.framework.TimedTest ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.transport.CorbaTransportManager ;
+import com.sun.corba.se.spi.transport.TransportManager ;
 import com.sun.corba.se.spi.transport.MessageTraceManager ;
 import com.sun.corba.se.spi.transport.MessageData ;
 
@@ -574,7 +574,7 @@ public class Client extends TestCase
 	private byte[] data2 = new byte[ 3000 ] ;
 	private int result ;
 
-	private CorbaTransportManager ctm ;
+	private TransportManager ctm ;
 	private MessageTraceManager mtm ;
 
 	private byte[][] dataSent ;

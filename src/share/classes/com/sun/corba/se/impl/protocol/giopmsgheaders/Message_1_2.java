@@ -43,10 +43,10 @@ package com.sun.corba.se.impl.protocol.giopmsgheaders;
 import java.nio.ByteBuffer;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.protocol.CorbaRequestId;
+import com.sun.corba.se.spi.protocol.RequestId;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.protocol.CorbaRequestIdImpl;
+import com.sun.corba.se.impl.protocol.RequestIdImpl;
 
 public class Message_1_2 extends Message_1_1
 {
@@ -99,8 +99,8 @@ public class Message_1_2 extends Message_1_1
 	GIOP_version = gv; // restore
     }
 
-    public CorbaRequestId getCorbaRequestId() {
-        return new CorbaRequestIdImpl(this.request_id);
+    public RequestId getCorbaRequestId() {
+        return new RequestIdImpl(this.request_id);
     }
 }
 

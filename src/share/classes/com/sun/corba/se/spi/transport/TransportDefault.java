@@ -41,17 +41,17 @@
 
 package com.sun.corba.se.spi.transport ;
 
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate ;
+import com.sun.corba.se.spi.protocol.ClientDelegate ;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.ior.IOR ;
 
 // Internal imports, not used in the interface to this package
-import com.sun.corba.se.impl.protocol.CorbaClientDelegateImpl ;
-import com.sun.corba.se.impl.transport.CorbaAcceptorAcceptOnlyImpl;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
-import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl ;
-import com.sun.corba.se.impl.transport.CorbaAcceptorLazyImpl ;
+import com.sun.corba.se.impl.protocol.ClientDelegateImpl ;
+import com.sun.corba.se.impl.transport.AcceptorAcceptOnlyImpl;
+import com.sun.corba.se.impl.transport.ContactInfoListImpl;
+import com.sun.corba.se.impl.transport.AcceptorImpl ;
+import com.sun.corba.se.impl.transport.AcceptorLazyImpl ;
 import com.sun.corba.se.spi.orbutil.generic.UnaryVoidFunction;
 import java.net.Socket;
 
@@ -61,13 +61,13 @@ import java.net.Socket;
 public abstract class TransportDefault {
     private TransportDefault() {}
 
-    public static CorbaContactInfoListFactory makeCorbaContactInfoListFactory( 
+    public static ContactInfoListFactory makeCorbaContactInfoListFactory(
 	final ORB broker ) 
     {
-	return new CorbaContactInfoListFactory() {
+	return new ContactInfoListFactory() {
 	    public void setORB(ORB orb) { }
-	    public CorbaContactInfoList create( IOR ior ) {
-		return new CorbaContactInfoListImpl( 
+	    public ContactInfoList create( IOR ior ) {
+		return new ContactInfoListImpl(
 		    (com.sun.corba.se.spi.orb.ORB)broker, ior ) ;
 	    }
 	};
@@ -77,8 +77,8 @@ public abstract class TransportDefault {
 	final ORB broker )
     {
 	return new ClientDelegateFactory() {
-	    public CorbaClientDelegate create( CorbaContactInfoList info ) {
-		return new CorbaClientDelegateImpl( 
+	    public ClientDelegate create( ContactInfoList info ) {
+		return new ClientDelegateImpl(
 		    (com.sun.corba.se.spi.orb.ORB)broker, info ) ;
 	    }
 	};
@@ -90,23 +90,23 @@ public abstract class TransportDefault {
 	return null ;
     }
 
-    public static CorbaAcceptor makeStandardCorbaAcceptor( 
+    public static Acceptor makeStandardCorbaAcceptor(
         ORB orb, int port, String name, String type ) {
 
-        return new SocketOrChannelAcceptorImpl( orb, port, name, type ) ;
+        return new AcceptorImpl( orb, port, name, type ) ;
     }
 
-    public static CorbaAcceptor makeLazyCorbaAcceptor(
+    public static Acceptor makeLazyCorbaAcceptor(
         ORB orb, int port, String name, String type ) {
 
-        return new CorbaAcceptorLazyImpl( orb, port, name, type ) ;
+        return new AcceptorLazyImpl( orb, port, name, type ) ;
     }
 
-    public static CorbaAcceptor makeAcceptOnlyCorbaAcceptor(
+    public static Acceptor makeAcceptOnlyCorbaAcceptor(
         ORB orb, int port, String name, String type,
         UnaryVoidFunction<Socket> operation ) {
 
-        return new CorbaAcceptorAcceptOnlyImpl( orb, port, name, type,
+        return new AcceptorAcceptOnlyImpl( orb, port, name, type,
             operation ) ;
     }
 }

@@ -44,7 +44,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.protocol.CorbaRequestId;
+import com.sun.corba.se.spi.protocol.RequestId;
 
 /**
  * This is the base interface for different message type interfaces.
@@ -113,5 +113,5 @@ public interface Message {
      * a request id in the 4 bytes following the 12 byte GIOP message 
      * header shall return an undefined CorbaRequestId.
      */
-    CorbaRequestId getCorbaRequestId();
+    RequestId getCorbaRequestId();
 }

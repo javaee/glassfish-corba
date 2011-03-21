@@ -42,9 +42,9 @@ package com.sun.corba.se.impl.encoding;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator ;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.protocol.MessageMediator ;
+import com.sun.corba.se.spi.transport.TransportManager;
+import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -80,8 +80,8 @@ public class CDROutputObject
     private transient CDROutputStreamBase impl;
 
     private Message header;
-    private transient CorbaMessageMediator corbaMessageMediator;
-    private transient CorbaConnection connection;
+    private transient MessageMediator corbaMessageMediator;
+    private transient Connection connection;
 
     // This needed only to get FindBugs to shut up about transient fields.
     // Should never be called.
@@ -136,7 +136,7 @@ public class CDROutputObject
 
     private CDROutputObject( ORB orb, GIOPVersion giopVersion, 
         Message header, BufferManagerWrite manager, 
-        byte streamFormatVersion, CorbaMessageMediator mediator) 
+        byte streamFormatVersion, MessageMediator mediator)
     {
 	this(orb, giopVersion, header.getEncodingVersion(), false, manager, 
             streamFormatVersion, 
@@ -150,7 +150,7 @@ public class CDROutputObject
         getBufferManager().setOutputObject(this);
     }
 
-    public CDROutputObject(ORB orb, CorbaMessageMediator messageMediator, 
+    public CDROutputObject(ORB orb, MessageMediator messageMediator,
         Message header, byte streamFormatVersion) 
     {
         this( orb, messageMediator.getGIOPVersion(), header, 
@@ -163,7 +163,7 @@ public class CDROutputObject
     // NOTE: 
     // Used in SharedCDR (i.e., must be grow).
     // Used in msgtypes test.
-    public CDROutputObject(ORB orb, CorbaMessageMediator messageMediator,
+    public CDROutputObject(ORB orb, MessageMediator messageMediator,
 			   Message header,
 			   byte streamFormatVersion,
 			   int strategy) 
@@ -177,8 +177,8 @@ public class CDROutputObject
     // REVISIT 
     // Used on sendCancelRequest.
     // Used for needs addressing mode.
-    public CDROutputObject(ORB orb, CorbaMessageMediator mediator,
-        GIOPVersion giopVersion, CorbaConnection connection, Message header, 
+    public CDROutputObject(ORB orb, MessageMediator mediator,
+        GIOPVersion giopVersion, Connection connection, Message header,
         byte streamFormatVersion) {
 
         this( orb, giopVersion, header, 
@@ -205,7 +205,7 @@ public class CDROutputObject
      * output stream.  Has the side-effect of pushing any current
      * Message onto the Message list.
      */
-    public void writeTo(CorbaConnection connection)
+    public void writeTo(Connection connection)
 	throws java.io.IOException {
         //
         // Update the GIOP MessageHeader size field.
@@ -222,7 +222,7 @@ public class CDROutputObject
                                 bbwi.getByteBuffer(), System.out ) ;
 	    }
 	
-	    CorbaTransportManager ctm = lorb.getTransportManager() ;
+	    TransportManager ctm = lorb.getTransportManager() ;
 	    MessageTraceManagerImpl mtm = 
 		(MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
 	    if (mtm.isEnabled()) {
@@ -243,7 +243,7 @@ public class CDROutputObject
 	    //isLittleEndian(), getMessageHeader(), conn);
     }
 
-    public CorbaConnection getConnection() 
+    public Connection getConnection()
     {
 	// REVISIT - only set when doing sendCancelRequest.
 	if (connection != null) {
@@ -366,12 +366,12 @@ public class CDROutputObject
 	ORBUtility.dprint("CDROutputObject", msg);
     }
 
-    public void setMessageMediator(CorbaMessageMediator messageMediator)
+    public void setMessageMediator(MessageMediator messageMediator)
     {
         this.corbaMessageMediator = messageMediator;
     }
 
-    public CorbaMessageMediator getMessageMediator()
+    public MessageMediator getMessageMediator()
     {
         return corbaMessageMediator;
     }

@@ -94,10 +94,10 @@ import java.lang.reflect.Proxy;
 import javax.rmi.CORBA.Tie;
 import javax.rmi.CORBA.ValueHandler;
 
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 import com.sun.corba.se.spi.transport.ByteBufferPool;
 
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
+import com.sun.corba.se.spi.protocol.ClientDelegate;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactories;
@@ -888,7 +888,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
             }
 	}
 
-	CorbaClientDelegate del = ORBUtility.makeClientDelegate( ior ) ;
+	ClientDelegate del = ORBUtility.makeClientDelegate( ior ) ;
 
 	org.omg.CORBA.Object objref = null ;
 	if (stubFactory == null) {
@@ -2469,7 +2469,7 @@ public class CDRInputStream_1_0 extends CDRInputStreamBase
 
         if (bbwi != null && getByteBuffer() != null)
         {
-            CorbaMessageMediator messageMediator = parent.getMessageMediator();
+            MessageMediator messageMediator = parent.getMessageMediator();
             if (messageMediator != null)
             {
                 CDROutputObject outputObj = messageMediator.getOutputObject();

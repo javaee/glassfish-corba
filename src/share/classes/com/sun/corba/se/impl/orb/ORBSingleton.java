@@ -72,10 +72,10 @@ import org.omg.CORBA.PolicyError;
 import org.omg.CORBA.portable.OutputStream;
 
 import com.sun.corba.se.spi.protocol.ClientInvocationInfo ;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaConnectionCache;
+import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.ConnectionCache;
 import com.sun.corba.se.spi.transport.Selector ;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.TransportManager;
 
 import com.sun.corba.se.spi.orb.ORBData;
 import com.sun.corba.se.spi.orb.Operation;
@@ -85,7 +85,7 @@ import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.oa.OAInvocationInfo;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory;
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher;
 import com.sun.corba.se.spi.protocol.PIHandler;
 import com.sun.corba.se.spi.resolver.Resolver;
 import com.sun.corba.se.spi.resolver.LocalResolver;
@@ -95,8 +95,8 @@ import com.sun.corba.se.spi.ior.TaggedComponentFactoryFinder;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.sun.corba.se.spi.ior.ObjectKeyFactory;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory ;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.ContactInfoListFactory ;
+import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 import com.sun.corba.se.spi.orbutil.closure.Closure;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
@@ -438,12 +438,12 @@ public class ORBSingleton extends ORB
         throw new SecurityException("ORBSingleton: access denied");
     }
 
-    public CorbaTransportManager getTransportManager()
+    public TransportManager getTransportManager()
     {
         throw new SecurityException("ORBSingleton: access denied");
     }
 
-    public CorbaTransportManager getCorbaTransportManager()
+    public TransportManager getCorbaTransportManager()
     {
         throw new SecurityException("ORBSingleton: access denied");
     }
@@ -688,11 +688,11 @@ public class ORBSingleton extends ORB
 	return getFullORB().getClientDelegateFactory() ;
     }
 
-    public void setCorbaContactInfoListFactory( CorbaContactInfoListFactory factory ) 
+    public void setCorbaContactInfoListFactory( ContactInfoListFactory factory )
     {
     }
 
-    public CorbaContactInfoListFactory getCorbaContactInfoListFactory() 
+    public ContactInfoListFactory getCorbaContactInfoListFactory()
     {
 	return getFullORB().getCorbaContactInfoListFactory() ;
     }
@@ -702,7 +702,7 @@ public class ORBSingleton extends ORB
 	return null ;
     }
 
-    public void setINSDelegate( CorbaServerRequestDispatcher sdel )
+    public void setINSDelegate( ServerRequestDispatcher sdel )
     {
     }
 
@@ -763,7 +763,7 @@ public class ORBSingleton extends ORB
 	return null ;
     }
 
-    public CorbaConnectionCache getConnectionCache(CorbaContactInfo contactInfo)
+    public ConnectionCache getConnectionCache(ContactInfo contactInfo)
     {
 	return null;
     }

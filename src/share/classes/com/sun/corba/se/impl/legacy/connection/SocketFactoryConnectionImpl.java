@@ -45,10 +45,10 @@ package com.sun.corba.se.impl.legacy.connection;
 
 import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.ContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl;
+import com.sun.corba.se.impl.transport.ConnectionImpl;
 import com.sun.corba.se.spi.trace.Transport;
 import java.net.Socket;
 
@@ -58,14 +58,14 @@ import java.net.Socket;
 @Transport
 public class SocketFactoryConnectionImpl
     extends
-	SocketOrChannelConnectionImpl
+	ConnectionImpl
 {
     @Transport
     private void connectionCreated( Socket socket ) { }
 
     // Socket-factory client constructor.
     public SocketFactoryConnectionImpl(ORB orb,
-				       CorbaContactInfo contactInfo,
+				       ContactInfo contactInfo,
 				       boolean useSelectThreadToWait,
 				       boolean useWorkerThread)
     {

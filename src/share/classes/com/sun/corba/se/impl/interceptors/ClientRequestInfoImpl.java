@@ -73,15 +73,15 @@ import org.omg.PortableInterceptor.USER_EXCEPTION;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 // 6763340
 import com.sun.corba.se.spi.protocol.RetryType;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
+import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.ContactInfoList;
+import com.sun.corba.se.spi.transport.ContactInfoListIterator;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
+import com.sun.corba.se.impl.protocol.InvocationInfo;
 import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
 
@@ -127,7 +127,7 @@ public final class ClientRequestInfoImpl
 
     // Sources of client request information
     private boolean diiInitiate;
-    private CorbaMessageMediator messageMediator;
+    private MessageMediator messageMediator;
 
     // Cached information:
     private org.omg.CORBA.Object cachedTargetObject;
@@ -282,7 +282,7 @@ public final class ClientRequestInfoImpl
 	// access is currently valid for all states:
 	//checkAccess( MID_TARGET );
 	if (messageMediator != null && cachedTargetObject == null) {
-	    CorbaContactInfo corbaContactInfo = (CorbaContactInfo)
+	    ContactInfo corbaContactInfo = (ContactInfo)
 		messageMediator.getContactInfo();
 	    cachedTargetObject =
 		iorToObject(corbaContactInfo.getTargetIOR());
@@ -306,7 +306,7 @@ public final class ClientRequestInfoImpl
 	// ClientRequestDispatcher.createRequest, v1.32
 
 	if (messageMediator != null && cachedEffectiveTargetObject == null) {
-	    CorbaContactInfo corbaContactInfo = messageMediator.getContactInfo();
+	    ContactInfo corbaContactInfo = messageMediator.getContactInfo();
 	    // REVISIT - get through chain like getLocatedIOR helper below.
 	    cachedEffectiveTargetObject =
 		iorToObject(corbaContactInfo.getEffectiveTargetIOR());
@@ -326,7 +326,7 @@ public final class ClientRequestInfoImpl
 	//checkAccess( MID_EFFECTIVE_PROFILE );
 
 	if(messageMediator != null && cachedEffectiveProfile == null ) {
-	    CorbaContactInfo corbaContactInfo = messageMediator.getContactInfo();
+	    ContactInfo corbaContactInfo = messageMediator.getContactInfo();
 	    cachedEffectiveProfile =
 		corbaContactInfo.getEffectiveProfile().getIOPProfile();
 	}
@@ -429,7 +429,7 @@ public final class ClientRequestInfoImpl
 	    !cachedEffectiveComponents.containsKey( id ) ) )
 	{
 	    // Not in cache.  Get it from the profile:
-	    CorbaContactInfo corbaContactInfo = messageMediator.getContactInfo();
+	    ContactInfo corbaContactInfo = messageMediator.getContactInfo();
 	    IIOPProfileTemplate ptemp =
 		(IIOPProfileTemplate)corbaContactInfo.getEffectiveProfile().
 		getTaggedProfileTemplate();
@@ -747,7 +747,7 @@ public final class ClientRequestInfoImpl
     @TraceInterceptor
     private IOR getLocatedIOR() {
 	IOR ior;
-	CorbaContactInfoList contactInfoList = messageMediator.getContactInfo().
+	ContactInfoList contactInfoList = messageMediator.getContactInfo().
             getContactInfoList();
 	ior = contactInfoList.getEffectiveTargetIOR();
 	return ior;
@@ -758,8 +758,8 @@ public final class ClientRequestInfoImpl
     public void setLocatedIOR(IOR ior) {
 	ORB orb = messageMediator.getBroker();
 
-	CorbaContactInfoListIterator iterator = (CorbaContactInfoListIterator)
-	    ((CorbaInvocationInfo)orb.getInvocationInfo())
+	ContactInfoListIterator iterator = (ContactInfoListIterator)
+	    ((InvocationInfo)orb.getInvocationInfo())
 	    .getContactInfoListIterator();
 
 	// REVISIT - this most likely causes reportRedirect to happen twice.
@@ -840,7 +840,7 @@ public final class ClientRequestInfoImpl
      * Package-scope interfaces
      **********************************************************************/
 
-    protected void setInfo(CorbaMessageMediator messageMediator)
+    protected void setInfo(MessageMediator messageMediator)
     {
 	this.messageMediator = messageMediator;
 	// REVISIT - so mediator can handle DII in subcontract.

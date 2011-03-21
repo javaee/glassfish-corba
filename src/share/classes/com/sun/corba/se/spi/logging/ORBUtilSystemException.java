@@ -58,7 +58,7 @@ import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
 import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
 import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
 
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.transport.EventHandler;
 
 import java.io.IOException;
@@ -559,7 +559,7 @@ public interface ORBUtilSystemException {
     
     @Log( level=LogLevel.FINE, id=35 )
     @Message( "CodeBase unavailable on connection {0}" )
-    BAD_PARAM codeBaseUnavailable( CorbaConnection conn ) ;
+    BAD_PARAM codeBaseUnavailable( Connection conn ) ;
     
     @Log( level=LogLevel.WARNING, id=1 )
     @Message( "DSI method not called" )
@@ -667,7 +667,7 @@ public interface ORBUtilSystemException {
     @Log( level=LogLevel.FINE, id=11 )
     @Message( "IOException received when reading from connection {0}" )
     COMM_FAILURE ioexceptionWhenReadingConnection( @Chain Exception exc,
-        CorbaConnection arg0 ) ;
+        Connection arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=12 )
     @Message( "SelectionKey invalid on channel, {0}" )
@@ -718,13 +718,13 @@ public interface ORBUtilSystemException {
     @Message( "Invalid request for a temporary write selector object for use "
         + "on a blocking connection: {0}." )
     COMM_FAILURE temporaryWriteSelectorWithBlockingConnection(
-        CorbaConnection arg0 ) ;
+        Connection arg0 ) ;
     
     @Log( level=LogLevel.SEVERE, id=23 )
     @Message( "Invalid request for a temporary read selector object for use "
         + "on a blocking connection: {0}." )
     COMM_FAILURE temporaryReadSelectorWithBlockingConnection(
-        CorbaConnection arg0 ) ;
+        Connection arg0 ) ;
     
     @Log( level=LogLevel.SEVERE, id=24 )
     @Message( "TemporarySelector's Selector, {0} .select(timeout) must called "
@@ -765,12 +765,12 @@ public interface ORBUtilSystemException {
     @Message( "Exception in a blocking read on connection {0} with a "
         + "temporary selector" )
     COMM_FAILURE exceptionBlockingReadWithTemporarySelector( @Chain Exception exc,
-        CorbaConnection arg0 ) ;
+        Connection arg0 ) ;
     
     @Log( level=LogLevel.SEVERE, id=31 )
     @Message( "Invalid operation, attempting a non-blocking read on blocking "
         + "connection, {0}" )
-    COMM_FAILURE nonBlockingReadOnBlockingSocketChannel( CorbaConnection arg0 ) ;
+    COMM_FAILURE nonBlockingReadOnBlockingSocketChannel( Connection arg0 ) ;
     
     @Log( level=LogLevel.FINE, id=32 )
     @Message( "Unexpected exception when canceling SelectionKey and "
@@ -1459,7 +1459,7 @@ public interface ORBUtilSystemException {
     @Log( id=137 )
     @Message( "Connection {0} not null in createMessageMediator" )
     INTERNAL connectionNotNullInCreateMessageMediator(
-        CorbaConnection connection);
+        Connection connection);
 
     @Log( level=LogLevel.FINE, id=138 )
     @Message( "Old typeId {0} is not the same as the new typeId {1} in "

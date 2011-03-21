@@ -51,8 +51,8 @@ package com.sun.corba.se.impl.protocol;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
@@ -65,7 +65,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
  * should be fixed in Tiger.
  */ 
 public class INSServerRequestDispatcher 
-    implements CorbaServerRequestDispatcher 
+    implements ServerRequestDispatcher
 {
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -84,7 +84,7 @@ public class INSServerRequestDispatcher
         return getINSReference( insKey );
     }
 
-    public void dispatch(CorbaMessageMediator request)
+    public void dispatch(MessageMediator request)
     {
         // send a locate forward with the right IOR. If the insKey is not 
         // registered then it will throw OBJECT_NOT_EXIST Exception

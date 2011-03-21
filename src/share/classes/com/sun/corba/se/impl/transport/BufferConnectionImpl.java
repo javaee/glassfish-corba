@@ -56,15 +56,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.omg.CORBA.SystemException;
 
 import com.sun.org.omg.SendingContext.CodeBase;
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
-import com.sun.corba.se.spi.protocol.CorbaRequestId;
-import com.sun.corba.se.spi.transport.CorbaConnection;
-import com.sun.corba.se.spi.transport.CorbaResponseWaitingRoom;
+import com.sun.corba.se.spi.protocol.RequestId;
+import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.se.spi.transport.ResponseWaitingRoom;
 
 import com.sun.corba.se.impl.encoding.CachedCodeBase;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
@@ -75,9 +75,9 @@ import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaConnectionCache;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.se.spi.transport.ConnectionCache;
+import com.sun.corba.se.spi.transport.ContactInfo;
 import com.sun.corba.se.spi.transport.EventHandler;
 
 
@@ -88,7 +88,7 @@ public class BufferConnectionImpl
     extends
 	EventHandlerBase
     implements
-        CorbaConnection,
+        Connection,
 	Work
 {
     protected static final ORBUtilSystemException wrapper =
@@ -118,7 +118,7 @@ public class BufferConnectionImpl
     // Start at some value other than zero since this is a magic
     // value in some protocols.
     protected int requestId = 5;
-    protected CorbaResponseWaitingRoom responseWaitingRoom;
+    protected ResponseWaitingRoom responseWaitingRoom;
     protected int state;
     protected final java.lang.Object stateEvent = new java.lang.Object();
     protected final java.lang.Object writeEvent = new java.lang.Object();
@@ -127,11 +127,11 @@ public class BufferConnectionImpl
     
     // Server request map: used on the server side of Connection
     // Maps request ID to IIOPInputStream.
-    Map<Integer, CorbaMessageMediator> serverRequestMap = 
-                      new HashMap<Integer, CorbaMessageMediator>() ;
+    Map<Integer, MessageMediator> serverRequestMap =
+                      new HashMap<Integer, MessageMediator>() ;
 
-    ConcurrentHashMap<CorbaRequestId,Queue> fragmentMap = 
-	new ConcurrentHashMap<CorbaRequestId,Queue>();
+    ConcurrentHashMap<RequestId,Queue> fragmentMap =
+	new ConcurrentHashMap<RequestId,Queue>();
     
     // This is a flag associated per connection telling us if the
     // initial set of sending contexts were sent to the receiver
@@ -181,12 +181,12 @@ public class BufferConnectionImpl
 	return true ;
     }
 
-    protected CorbaMessageMediator readBits()
+    protected MessageMediator readBits()
     {
 	return null ;
     }
 
-    protected boolean dispatch(CorbaMessageMediator messageMediator)
+    protected boolean dispatch(MessageMediator messageMediator)
     {
 	return false ;
     }
@@ -268,12 +268,12 @@ public class BufferConnectionImpl
     {
     }
 
-    public CorbaAcceptor getAcceptor()
+    public Acceptor getAcceptor()
     {
 	return null;
     }
 
-    public CorbaContactInfo getContactInfo()
+    public ContactInfo getContactInfo()
     {
 	return null;
     }
@@ -283,7 +283,7 @@ public class BufferConnectionImpl
 	return this;
     }
 
-    public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator)
+    public CDROutputObject createOutputObject(MessageMediator messageMediator)
     {
 	// REVISIT - remove this method from Connection and all it subclasses.
 	throw new RuntimeException("*****SocketOrChannelConnectionImpl.createOutputObject - should not be called.");
@@ -337,24 +337,24 @@ public class BufferConnectionImpl
     {
     }
 
-    public void registerWaiter(CorbaMessageMediator messageMediator)
+    public void registerWaiter(MessageMediator messageMediator)
     {
     }
 
-    public void unregisterWaiter(CorbaMessageMediator messageMediator)
+    public void unregisterWaiter(MessageMediator messageMediator)
     {
     }
 
-    public CDRInputObject waitForResponse(CorbaMessageMediator messageMediator)
+    public CDRInputObject waitForResponse(MessageMediator messageMediator)
     {
 	return null ;
     }
 
-    public void setConnectionCache(CorbaConnectionCache connectionCache)
+    public void setConnectionCache(ConnectionCache connectionCache)
     {
     }
 
-    public CorbaConnectionCache getConnectionCache()
+    public ConnectionCache getConnectionCache()
     {
 	return null;	
     }
@@ -376,7 +376,7 @@ public class BufferConnectionImpl
 
     //    public Acceptor getAcceptor() - already defined above.
 
-    public CorbaConnection getConnection()
+    public Connection getConnection()
     {
 	return this;
     }
@@ -410,7 +410,7 @@ public class BufferConnectionImpl
     // spi.transport.CorbaConnection.
     //
 
-    public CorbaResponseWaitingRoom getResponseWaitingRoom()
+    public ResponseWaitingRoom getResponseWaitingRoom()
     {
 	return null ;
     }
@@ -420,12 +420,12 @@ public class BufferConnectionImpl
 
 
     public void serverRequestMapPut(int requestId, 
-				    CorbaMessageMediator messageMediator)
+				    MessageMediator messageMediator)
     {
 	serverRequestMap.put(requestId, messageMediator);
     }
 
-    public CorbaMessageMediator serverRequestMapGet(int requestId)
+    public MessageMediator serverRequestMapGet(int requestId)
     {
 	return serverRequestMap.get(requestId);
     }
@@ -435,11 +435,11 @@ public class BufferConnectionImpl
 	serverRequestMap.remove(requestId);
     }
 
-    public Queue<CorbaMessageMediator> getFragmentList(CorbaRequestId requestId) {
+    public Queue<MessageMediator> getFragmentList(RequestId requestId) {
         return fragmentMap.get(requestId);
     }
     
-    public void removeFragmentList(CorbaRequestId requestId) {
+    public void removeFragmentList(RequestId requestId) {
         fragmentMap.remove(requestId);
     }
 
@@ -516,19 +516,19 @@ public class BufferConnectionImpl
     // new fragments.  Only the ReaderThread touches the clientReplyMap,
     // so it doesn't incur synchronization overhead.
 
-    public CorbaMessageMediator clientRequestMapGet(int requestId)
+    public MessageMediator clientRequestMapGet(int requestId)
     {
 	return null ;
     }
 
-    protected CorbaMessageMediator clientReply_1_1;
+    protected MessageMediator clientReply_1_1;
 
-    public void clientReply_1_1_Put(CorbaMessageMediator x)
+    public void clientReply_1_1_Put(MessageMediator x)
     {
 	clientReply_1_1 = x;
     }
 
-    public CorbaMessageMediator clientReply_1_1_Get()
+    public MessageMediator clientReply_1_1_Get()
     {
 	return 	clientReply_1_1;
     }
@@ -538,14 +538,14 @@ public class BufferConnectionImpl
 	clientReply_1_1 = null;
     }
 
-    protected CorbaMessageMediator serverRequest_1_1;
+    protected MessageMediator serverRequest_1_1;
 
-    public void serverRequest_1_1_Put(CorbaMessageMediator x)
+    public void serverRequest_1_1_Put(MessageMediator x)
     {
 	serverRequest_1_1 = x;
     }
 
-    public CorbaMessageMediator serverRequest_1_1_Get()
+    public MessageMediator serverRequest_1_1_Get()
     {
 	return 	serverRequest_1_1;
     }

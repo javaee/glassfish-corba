@@ -109,8 +109,8 @@ import org.omg.CORBA.portable.OutputStream;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
+import com.sun.corba.se.spi.protocol.ClientDelegate;
+import com.sun.corba.se.spi.transport.ContactInfoList ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 import com.sun.corba.se.spi.copyobject.CopierManager ;
@@ -666,10 +666,10 @@ public class Util implements javax.rmi.CORBA.UtilDelegate
 
         try {
 	    org.omg.CORBA.portable.Delegate delegate = stub._get_delegate() ;
-	    if (delegate instanceof CorbaClientDelegate) {
+	    if (delegate instanceof ClientDelegate) {
 		// For the Sun ORB
-		CorbaClientDelegate cdel = (CorbaClientDelegate)delegate ;
-		CorbaContactInfoList cil = cdel.getContactInfoList() ;
+		ClientDelegate cdel = (ClientDelegate)delegate ;
+		ContactInfoList cil = cdel.getContactInfoList() ;
                 LocalClientRequestDispatcher lcs =
                     cil.getLocalClientRequestDispatcher() ;
                 result = lcs.useLocalInvocation( null ) ;

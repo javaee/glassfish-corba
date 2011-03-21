@@ -45,24 +45,24 @@ import org.omg.CORBA.SystemException;
 
 import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
+import com.sun.corba.se.impl.transport.ContactInfoListIteratorImpl;
 import com.sun.corba.se.impl.transport.SharedCDRContactInfoImpl;
 import com.sun.corba.se.spi.trace.IsLocal;
 
 @IsLocal
 public class SocketFactoryContactInfoListIteratorImpl
-    extends CorbaContactInfoListIteratorImpl
+    extends ContactInfoListIteratorImpl
 {
     private SocketInfo socketInfoCookie;
 
     public SocketFactoryContactInfoListIteratorImpl(
         ORB orb,
-	CorbaContactInfoList corbaContactInfoList)
+	ContactInfoList corbaContactInfoList)
     {
 	super(orb, corbaContactInfoList, null, null, false);
     }
@@ -81,7 +81,7 @@ public class SocketFactoryContactInfoListIteratorImpl
 
     @Override
     @IsLocal
-    public CorbaContactInfo next()
+    public ContactInfo next()
     {
 	if (contactInfoList.getEffectiveTargetIOR().getProfile().isLocal()){
 	    return new SharedCDRContactInfoImpl(
@@ -100,7 +100,7 @@ public class SocketFactoryContactInfoListIteratorImpl
     }
 
     @Override
-    public boolean reportException(CorbaContactInfo contactInfo,
+    public boolean reportException(ContactInfo contactInfo,
 				   RuntimeException ex)
     {
 	this.failureException = ex;

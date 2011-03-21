@@ -48,9 +48,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
-import com.sun.corba.se.spi.transport.CorbaConnectionCache;
+import com.sun.corba.se.spi.transport.Acceptor;
+import com.sun.corba.se.spi.transport.TransportManager;
+import com.sun.corba.se.spi.transport.ConnectionCache;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
 import corba.hcks.U;
@@ -62,7 +62,7 @@ import org.glassfish.gmbal.ManagedObjectManager ;
 public class ConnectionStatistics
 {
     private final ORB orb ;
-    private final CorbaTransportManager ctm ;
+    private final TransportManager ctm ;
 
     public ConnectionStatistics( ORB orb ) {
         this.orb = orb ;
@@ -85,7 +85,7 @@ public class ConnectionStatistics
     }
 
     private void handleConnectionCache( StringBuffer result,
-        CorbaConnectionCache connectionCache ) {
+        ConnectionCache connectionCache ) {
 
         pac(result, connectionCache.getMonitoringName());
 
@@ -109,7 +109,7 @@ public class ConnectionStatistics
 	pac(result, "==================================================");
 	pac(result, msg + " OUTBOUND:");
 
-        for (CorbaConnectionCache cache : ctm.getOutboundConnectionCaches() ) {
+        for (ConnectionCache cache : ctm.getOutboundConnectionCaches() ) {
             handleConnectionCache( result, cache ) ;
         }
 
@@ -123,7 +123,7 @@ public class ConnectionStatistics
 	pac(result, "==================================================");
 	pac(result, msg + " INBOUND:");
 
-        for (CorbaConnectionCache cache : ctm.getInboundConnectionCaches() ) {
+        for (ConnectionCache cache : ctm.getInboundConnectionCaches() ) {
             handleConnectionCache( result, cache ) ;
         }
 

@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBData ;
 import com.sun.corba.se.spi.orb.ParserImplTableBase ;
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
+import com.sun.corba.se.spi.transport.ContactInfoListFactory;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.TcpTimeouts;
@@ -59,7 +59,7 @@ import com.sun.corba.se.spi.transport.TcpTimeouts;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 import com.sun.corba.se.impl.legacy.connection.USLPort;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 
 
 public class ORBDataParserImpl extends ParserImplTableBase implements ORBData 
@@ -104,8 +104,8 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
     private Pair<String,String>[] orbInitialReferences ; 
     private String defaultInitRef ;
     private String[] debugFlags ;
-    private CorbaAcceptor[] acceptors;
-    private CorbaContactInfoListFactory corbaContactInfoListFactory;
+    private Acceptor[] acceptors;
+    private ContactInfoListFactory corbaContactInfoListFactory;
     private String acceptorSocketType;
     private boolean acceptorSocketUseSelectThreadToWait;
     private boolean acceptorSocketUseWorkerThreadForEvent;
@@ -377,12 +377,12 @@ public class ORBDataParserImpl extends ParserImplTableBase implements ORBData
 	return debugFlags ;
     }
 
-    public CorbaAcceptor[] getAcceptors()
+    public Acceptor[] getAcceptors()
     {
 	return acceptors;
     }
 
-    public CorbaContactInfoListFactory getCorbaContactInfoListFactory()
+    public ContactInfoListFactory getCorbaContactInfoListFactory()
     {
 	return corbaContactInfoListFactory;
     }

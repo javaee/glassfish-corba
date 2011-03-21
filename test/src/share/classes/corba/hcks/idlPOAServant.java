@@ -74,7 +74,7 @@ import com.sun.corba.se.spi.ior.ObjectKeyFactory ;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 
 import com.sun.corba.se.spi.ior.iiop.ORBTypeComponent ;
 

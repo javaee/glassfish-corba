@@ -48,7 +48,7 @@ import java.net.ServerSocket;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.ServerSocketChannel;
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.ORBSocketFactory;
@@ -104,7 +104,7 @@ public class DefaultSocketFactoryImpl
 	return socket;
     }
 
-    public void setAcceptedSocketOptions(CorbaAcceptor acceptor,
+    public void setAcceptedSocketOptions(Acceptor acceptor,
 					 ServerSocket serverSocket,
 					 Socket socket)
 	throws SocketException

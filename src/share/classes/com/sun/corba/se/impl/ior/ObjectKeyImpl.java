@@ -42,7 +42,7 @@ package com.sun.corba.se.impl.ior;
 
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -128,7 +128,7 @@ public class ObjectKeyImpl implements ObjectKey
 	return array.clone() ;
     }
 
-    public CorbaServerRequestDispatcher getServerRequestDispatcher() 
+    public ServerRequestDispatcher getServerRequestDispatcher()
     {
 	return oktemp.getServerRequestDispatcher( id ) ;
     }

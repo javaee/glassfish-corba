@@ -64,7 +64,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.spi.logging.ActivationSystemException;
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 
 /**
  * 
@@ -167,7 +167,7 @@ public class RepositoryImpl extends _RepositoryImplBase
 	LegacyServerSocketEndPointInfo endpoint =
 	    orb.getLegacyServerSocketManager()
  	        .legacyGetEndpoint(LegacyServerSocketEndPointInfo.BOOT_NAMING);
-	int initSvcPort = ((CorbaAcceptor)endpoint)
+	int initSvcPort = ((Acceptor)endpoint)
 	    .getServerSocket().getLocalPort();
 	ServerTableEntry entry = new ServerTableEntry( wrapper,
 	    illegalServerId, serverDef, (int) initSvcPort, "", true, debug );

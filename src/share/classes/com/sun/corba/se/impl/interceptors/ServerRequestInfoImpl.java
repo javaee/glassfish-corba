@@ -72,7 +72,7 @@ import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
 import com.sun.corba.se.spi.ior.ObjectAdapterId ;
 import com.sun.corba.se.spi.legacy.interceptor.ServerRequestInfoExt;
 
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 
 import java.util.*;
 
@@ -108,7 +108,7 @@ public final class ServerRequestInfoImpl
     private boolean forwardRequestRaisedInEnding;
 
     // Sources of server request information:
-    private CorbaMessageMediator request;
+    private MessageMediator request;
     private java.lang.Object servant;
     private byte[] objectId;
     private ObjectKeyTemplate oktemp ;
@@ -757,7 +757,7 @@ public final class ServerRequestInfoImpl
     /** 
      * Stores the various sources of information used for this info object.
      */
-    protected synchronized void setInfo( CorbaMessageMediator request, ObjectAdapter oa,
+    protected synchronized void setInfo( MessageMediator request, ObjectAdapter oa,
 	byte[] objectId, ObjectKeyTemplate oktemp ) 
     {
         this.request = request;

@@ -45,8 +45,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.CorbaRequestId;
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.protocol.RequestId;
+import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.protocol.MessageParser;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -81,7 +81,7 @@ public class MessageParserImpl implements MessageParser {
      * We are using a List here rather than a Set since the size of the
      * List is expected to be rather small, (i.e. less than size 10).
      */
-    private List<CorbaRequestId> fragmentList;
+    private List<RequestId> fragmentList;
     
     /** Creates a new instance of MessageParserImpl */
     public MessageParserImpl(ORB orb) {
@@ -89,7 +89,7 @@ public class MessageParserImpl implements MessageParser {
         this.expectingMoreData = false;
         this.moreBytesToParse = false;
         this.nextMsgStartPos = 0;
-        this.fragmentList = new LinkedList<CorbaRequestId>();
+        this.fragmentList = new LinkedList<RequestId>();
         this.sizeNeeded = orb.getORBData().getReadByteBufferSize();
     }
     
@@ -195,7 +195,7 @@ public class MessageParserImpl implements MessageParser {
             // For debugging purposes, create view buffer
             ByteBuffer viewBuf = msgByteBuffer.asReadOnlyBuffer();
             viewBuf.position(viewBuf.limit());
-            CorbaRequestId requestId = 
+            RequestId requestId =
                       MessageBase.getRequestIdFromMessageBytes(message);
             display( "Message Type", message.getType() ) ;
             display( "Request Id", requestId.toString() ) ;
@@ -207,7 +207,7 @@ public class MessageParserImpl implements MessageParser {
     }
 
     @Transport
-    public Message parseBytes(ByteBuffer byteBuffer, CorbaConnection connection) {
+    public Message parseBytes(ByteBuffer byteBuffer, Connection connection) {
         Message message = null;
         int bytesInBuffer = byteBuffer.limit() - nextMsgStartPos;
         // is there enough bytes available for a message header?
@@ -234,7 +234,7 @@ public class MessageParserImpl implements MessageParser {
                     // are there more fragments to follow?
                     if (message.moreFragmentsToFollow()) {
                         // Add to fragmentList if not already there
-                        CorbaRequestId requestId =
+                        RequestId requestId =
                               MessageBase.getRequestIdFromMessageBytes(message);
                         if (!fragmentList.contains(requestId)) {
                             fragmentList.add(requestId);
@@ -248,7 +248,7 @@ public class MessageParserImpl implements MessageParser {
                         if (message.getType() == MessageBase.GIOPFragment ||
                             message.getType() == MessageBase.GIOPCancelRequest) {
                             // remove request id from fragmentList
-                            CorbaRequestId requestId =
+                            RequestId requestId =
                                 MessageBase.getRequestIdFromMessageBytes(message);
                             if (fragmentList.size() > 0 &&
                                 fragmentList.remove(requestId)) {

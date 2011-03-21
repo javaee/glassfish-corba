@@ -45,7 +45,7 @@ import org.omg.CORBA_2_3.portable.OutputStream ;
 import com.sun.corba.se.spi.orb.ORBVersion ;
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -102,5 +102,5 @@ public interface ObjectKeyTemplate extends Writeable
 
     public void write(ObjectId objectId, OutputStream os);
     
-    public CorbaServerRequestDispatcher getServerRequestDispatcher( ObjectId id ) ;
+    public ServerRequestDispatcher getServerRequestDispatcher( ObjectId id ) ;
 }

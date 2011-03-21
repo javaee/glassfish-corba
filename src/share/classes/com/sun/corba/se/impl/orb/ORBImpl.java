@@ -108,12 +108,12 @@ import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory;
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry;
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher;
 import com.sun.corba.se.spi.protocol.PIHandler;
 import com.sun.corba.se.spi.resolver.Resolver;
 import com.sun.corba.se.spi.resolver.LocalResolver;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.ContactInfoListFactory;
+import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor ;
@@ -153,8 +153,8 @@ import com.sun.corba.se.impl.oa.poa.POAFactory;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolManagerImpl;
 import com.sun.corba.se.impl.protocol.RequestDispatcherRegistryImpl;
-import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
-import com.sun.corba.se.impl.transport.CorbaTransportManagerImpl;
+import com.sun.corba.se.impl.protocol.InvocationInfo;
+import com.sun.corba.se.impl.transport.TransportManagerImpl;
 import com.sun.corba.se.impl.legacy.connection.LegacyServerSocketManagerImpl;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
@@ -179,7 +179,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 {
     private boolean set_parameters_called = false ;
 
-    protected CorbaTransportManager transportManager;
+    protected TransportManager transportManager;
     protected LegacyServerSocketManager legacyServerSocketManager;
 
     private ThreadLocal<StackImpl<OAInvocationInfo>>
@@ -278,7 +278,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
     private ClientDelegateFactory clientDelegateFactory ;
 
-    private CorbaContactInfoListFactory corbaContactInfoListFactory ;
+    private ContactInfoListFactory corbaContactInfoListFactory ;
 
     // All access to resolver, localResolver, and urlOperation must be protected using
     // the appropriate locks.  Do not hold the ORBImpl lock while accessing
@@ -298,7 +298,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private LocalResolver localResolver ;
 
     // ServerRequestDispatcher used for all INS object references.
-    private CorbaServerRequestDispatcher insNamingDelegate ;
+    private ServerRequestDispatcher insNamingDelegate ;
 
     // resolverLock must be used for all access to either resolver or
     // localResolver, since it is possible for the resolver to indirectly
@@ -592,7 +592,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 
 	// REVISIT: this should go away after more transport init cleanup
 	// and going to ORT based ORBD.  
-	transportManager = new CorbaTransportManagerImpl(this);
+	transportManager = new TransportManagerImpl(this);
 	getLegacyServerSocketManager();
 
         transportInitializationComplete( getORBData().getORBId() ) ;
@@ -1275,7 +1275,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     @Override
     public void register_initial_reference(
         String id, org.omg.CORBA.Object obj ) throws InvalidName {
-	CorbaServerRequestDispatcher insnd ;
+	ServerRequestDispatcher insnd ;
 
         if ((id == null) || (id.length() == 0)) {
             throw new InvalidName("Null or empty id string");
@@ -1872,7 +1872,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
             (!clientInvocationInfo.isRetryInvocation()))
         {
             // This is a new call - not a retry.
-            clientInvocationInfo = new CorbaInvocationInfo();
+            clientInvocationInfo = new InvocationInfo();
             invocationInfoStack.push(clientInvocationInfo);
             invocationInfoChange( "new call" ) ;
         } else {
@@ -1939,7 +1939,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
     private Lock corbaContactInfoListFactoryWriteLock = 
                               corbaContactInfoListFactoryAccessLock.writeLock();
     
-    public void setCorbaContactInfoListFactory( CorbaContactInfoListFactory factory ) 
+    public void setCorbaContactInfoListFactory( ContactInfoListFactory factory )
     {
 	corbaContactInfoListFactoryWriteLock.lock() ;
         try {
@@ -1949,7 +1949,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
     }
 
-    public CorbaContactInfoListFactory getCorbaContactInfoListFactory() 
+    public ContactInfoListFactory getCorbaContactInfoListFactory()
     {
         corbaContactInfoListFactoryReadLock.lock() ;
         try {
@@ -1995,7 +1995,7 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
     }
 
-    public void setINSDelegate( CorbaServerRequestDispatcher sdel ) {
+    public void setINSDelegate( ServerRequestDispatcher sdel ) {
 	synchronized (resolverLock) {
 	    insNamingDelegate = sdel ;
 	}
@@ -2031,12 +2031,12 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
 	}
     }
 
-    public CorbaTransportManager getTransportManager()
+    public TransportManager getTransportManager()
     {
 	return transportManager;
     }
 
-    public CorbaTransportManager getCorbaTransportManager()
+    public TransportManager getCorbaTransportManager()
     {
 	return getTransportManager();
     }

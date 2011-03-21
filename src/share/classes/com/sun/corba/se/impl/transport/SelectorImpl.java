@@ -51,8 +51,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Acceptor;
+import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.transport.EventHandler;
 import com.sun.corba.se.spi.transport.ListenerThread;
 import com.sun.corba.se.spi.transport.ReaderThread;
@@ -464,7 +464,7 @@ public class SelectorImpl
 
     @Transport
     private void createListenerThread(EventHandler eventHandler) {
-	CorbaAcceptor acceptor = eventHandler.getAcceptor();
+	Acceptor acceptor = eventHandler.getAcceptor();
 	ListenerThread listenerThread =
 	    new ListenerThreadImpl(orb, acceptor);
         synchronized (this) {
@@ -504,7 +504,7 @@ public class SelectorImpl
 
     @Transport
     private void createReaderThread(EventHandler eventHandler) {
-	CorbaConnection connection = eventHandler.getConnection();
+	Connection connection = eventHandler.getConnection();
 	ReaderThread readerThread = 
 	    new ReaderThreadImpl(orb, connection );
         synchronized (this) {

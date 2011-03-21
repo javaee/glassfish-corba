@@ -63,7 +63,7 @@ public interface ORBSocketFactory
 			       InetSocketAddress inetSocketAddress)
         throws IOException;
 
-    public void setAcceptedSocketOptions(CorbaAcceptor acceptor,
+    public void setAcceptedSocketOptions(Acceptor acceptor,
 					 ServerSocket serverSocket,
 					 Socket socket)
 	throws SocketException;

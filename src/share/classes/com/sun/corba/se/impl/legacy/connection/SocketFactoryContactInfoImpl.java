@@ -40,15 +40,15 @@
 
 package com.sun.corba.se.impl.legacy.connection;
 
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Connection;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.transport.SocketOrChannelContactInfoImpl;
+import com.sun.corba.se.impl.transport.ContactInfoImpl;
 
 
 /**
@@ -56,7 +56,7 @@ import com.sun.corba.se.impl.transport.SocketOrChannelContactInfoImpl;
  */
 public class SocketFactoryContactInfoImpl 
     extends
-	SocketOrChannelContactInfoImpl
+	ContactInfoImpl
 {
     protected static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
@@ -72,7 +72,7 @@ public class SocketFactoryContactInfoImpl
 
     public SocketFactoryContactInfoImpl(
         ORB orb,
-	CorbaContactInfoList contactInfoList,
+	ContactInfoList contactInfoList,
 	IOR effectiveTargetIOR,
 	short addressingDisposition,
 	SocketInfo cookie)
@@ -91,9 +91,9 @@ public class SocketFactoryContactInfoImpl
     }
 
     @Override
-    public CorbaConnection createConnection()
+    public Connection createConnection()
     {
-	CorbaConnection connection =
+	Connection connection =
 	    new SocketFactoryConnectionImpl(
                 orb, this,
 		orb.getORBData().connectionSocketUseSelectThreadToWait(),

@@ -166,25 +166,25 @@ public class Client {
 	
 	controller.enter( top ) ;
 
-	controller.enter( tp.CorbaClientDelegateImpl__hasNextNext() );
+	controller.enter( tp.ClientDelegateImpl__hasNextNext() );
 	sleep( 1 ) ;
-	controller.exit( tp.CorbaClientDelegateImpl__hasNextNext() );
+	controller.exit( tp.ClientDelegateImpl__hasNextNext() );
 
-        controller.enter( tp.CorbaClientRequestDispatcherImpl__connectionSetup() ) ;
+        controller.enter( tp.ClientRequestDispatcherImpl__connectionSetup() ) ;
 	sleep( 4 ) ;
-        controller.exit( tp.CorbaClientRequestDispatcherImpl__connectionSetup() ) ;
+        controller.exit( tp.ClientRequestDispatcherImpl__connectionSetup() ) ;
 
-        controller.enter( tp.CorbaClientRequestDispatcherImpl__clientEncoding() ) ;
+        controller.enter( tp.ClientRequestDispatcherImpl__clientEncoding() ) ;
 	sleep( 100 ) ;
-        controller.exit( tp.CorbaClientRequestDispatcherImpl__clientEncoding() ) ;
+        controller.exit( tp.ClientRequestDispatcherImpl__clientEncoding() ) ;
 
-        controller.enter( tp.CorbaClientRequestDispatcherImpl__clientTransportAndWait() ) ;
+        controller.enter( tp.ClientRequestDispatcherImpl__clientTransportAndWait() ) ;
 	sleep( transportDelay ) ;
-        controller.exit( tp.CorbaClientRequestDispatcherImpl__clientTransportAndWait() ) ;
+        controller.exit( tp.ClientRequestDispatcherImpl__clientTransportAndWait() ) ;
 
-        controller.enter( tp.CorbaClientRequestDispatcherImpl__clientDecoding() ) ;
+        controller.enter( tp.ClientRequestDispatcherImpl__clientDecoding() ) ;
 	sleep( 40 ) ;
-        controller.exit( tp.CorbaClientRequestDispatcherImpl__clientDecoding() ) ;
+        controller.exit( tp.ClientRequestDispatcherImpl__clientDecoding() ) ;
 
 	controller.exit( top ) ;
     }

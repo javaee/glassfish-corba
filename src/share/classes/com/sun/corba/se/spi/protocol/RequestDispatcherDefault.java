@@ -41,15 +41,15 @@ package com.sun.corba.se.spi.protocol ;
 
 
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
 // Used only in the implementation: no client of this class ever needs these
 import com.sun.corba.se.spi.ior.IOR ;
 
-import com.sun.corba.se.impl.protocol.CorbaClientRequestDispatcherImpl ;
-import com.sun.corba.se.impl.protocol.CorbaServerRequestDispatcherImpl ;
+import com.sun.corba.se.impl.protocol.ClientRequestDispatcherImpl ;
+import com.sun.corba.se.impl.protocol.ServerRequestDispatcherImpl ;
 import com.sun.corba.se.impl.protocol.MinimalServantCacheLocalCRDImpl ;
 import com.sun.corba.se.impl.protocol.InfoOnlyServantCacheLocalCRDImpl ;
 import com.sun.corba.se.impl.protocol.FullServantCacheLocalCRDImpl ;
@@ -61,22 +61,22 @@ import com.sun.corba.se.impl.protocol.BootstrapServerRequestDispatcher ;
 public final class RequestDispatcherDefault {
     private RequestDispatcherDefault() {}
 
-    public static CorbaClientRequestDispatcher makeClientRequestDispatcher()
+    public static ClientRequestDispatcher makeClientRequestDispatcher()
     {
-	return new CorbaClientRequestDispatcherImpl() ;
+	return new ClientRequestDispatcherImpl() ;
     }
 
-    public static CorbaServerRequestDispatcher makeServerRequestDispatcher( ORB orb ) 
+    public static ServerRequestDispatcher makeServerRequestDispatcher( ORB orb )
     {
-	return new CorbaServerRequestDispatcherImpl( (com.sun.corba.se.spi.orb.ORB)orb ) ;
+	return new ServerRequestDispatcherImpl( (com.sun.corba.se.spi.orb.ORB)orb ) ;
     }
 
-    public static CorbaServerRequestDispatcher makeBootstrapServerRequestDispatcher( ORB orb ) 
+    public static ServerRequestDispatcher makeBootstrapServerRequestDispatcher( ORB orb )
     {
 	return new BootstrapServerRequestDispatcher( orb ) ;
     }
 
-    public static CorbaServerRequestDispatcher makeINSServerRequestDispatcher( ORB orb ) 
+    public static ServerRequestDispatcher makeINSServerRequestDispatcher( ORB orb )
     {
 	return new INSServerRequestDispatcher( orb ) ;
     }

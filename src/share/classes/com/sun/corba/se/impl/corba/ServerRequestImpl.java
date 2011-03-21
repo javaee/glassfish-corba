@@ -60,7 +60,7 @@ import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
@@ -85,7 +85,7 @@ public class ServerRequestImpl extends ServerRequest {
     private Any			_exception      = null;
 
 
-    public ServerRequestImpl (CorbaMessageMediator req, ORB orb) {
+    public ServerRequestImpl (MessageMediator req, ORB orb) {
         _opName	= req.getOperationName(); 
         _ins	= (InputStream)req.getInputObject();
         _ctx 	= null; 	// if we support contexts, this would

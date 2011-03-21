@@ -47,7 +47,7 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.oa.poa.Policies;
-import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
+import com.sun.corba.se.impl.transport.AcceptorImpl;
 import com.sun.corba.se.spi.trace.Transport;
 
 /**
@@ -56,7 +56,7 @@ import com.sun.corba.se.spi.trace.Transport;
 @Transport
 public class SocketFactoryAcceptorImpl
     extends
-	SocketOrChannelAcceptorImpl
+	AcceptorImpl
 {
     public SocketFactoryAcceptorImpl(ORB orb, int port, 
 				     String name, String type)

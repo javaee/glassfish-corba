@@ -42,7 +42,7 @@ package com.sun.corba.se.spi.protocol;
 
 import java.nio.ByteBuffer;
 
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Connection;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
@@ -94,7 +94,7 @@ public interface MessageParser {
     // REVISIT - This interface should be declared without a CorbaConnection.
     //           As a result, this interface will likely be deprecated in a
     //           future release in favor of Message parseBytes(ByteBuffer byteBuffer)
-    Message parseBytes(ByteBuffer byteBuffer, CorbaConnection connection);
+    Message parseBytes(ByteBuffer byteBuffer, Connection connection);
 
     /**
      * Are there more bytes to be parsed in the <code>ByteBuffer</code> given

@@ -59,17 +59,17 @@ import com.sun.corba.se.spi.ior.iiop.RequestPartitioningComponent;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
 import com.sun.corba.se.spi.orbutil.ORBClassLoader;
-import com.sun.corba.se.spi.protocol.CorbaRequestId;
+import com.sun.corba.se.spi.protocol.RequestId;
 import com.sun.corba.se.spi.servicecontext.ServiceContexts;
-import com.sun.corba.se.spi.transport.CorbaConnection;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.se.spi.transport.TransportManager;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.orb.ObjectKeyCacheEntryNoObjectAdapterImpl;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.AddressingDispositionException;
-import com.sun.corba.se.impl.protocol.CorbaRequestIdImpl;
+import com.sun.corba.se.impl.protocol.RequestIdImpl;
 import com.sun.corba.se.impl.transport.MessageTraceManagerImpl;
 import com.sun.corba.se.spi.trace.Giop;
 
@@ -122,7 +122,7 @@ public abstract class MessageBase implements Message{
 	return result;
     }
 
-    public static MessageBase readGIOPMessage(ORB orb, CorbaConnection connection)
+    public static MessageBase readGIOPMessage(ORB orb, Connection connection)
     {
 	MessageBase msg = readGIOPHeader( orb, connection ) ;
 	msg = (MessageBase)readGIOPBody( orb, connection, (Message)msg ) ;
@@ -131,7 +131,7 @@ public abstract class MessageBase implements Message{
 
     // NOTE: This method is used only when the ORB is configured with
     //       "useNIOSelectToWait=false", aka use blocking Sockets/SocketChannels
-    public static MessageBase readGIOPHeader( ORB orb, CorbaConnection connection )
+    public static MessageBase readGIOPHeader( ORB orb, Connection connection )
     {
 	ByteBuffer buf = null;
 
@@ -148,11 +148,11 @@ public abstract class MessageBase implements Message{
     }
 
     public static MessageBase parseGiopHeader(ORB orb, 
-                                              CorbaConnection connection,
+                                              Connection connection,
                                               ByteBuffer buf,
                                               int startPosition) {
         
-        CorbaTransportManager ctm = orb.getTransportManager() ;
+        TransportManager ctm = orb.getTransportManager() ;
 	MessageTraceManagerImpl mtm = 
 	    (MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
 	if (mtm.isEnabled()) {
@@ -464,10 +464,10 @@ public abstract class MessageBase implements Message{
     }
 
     public static Message readGIOPBody(ORB orb,
-			               CorbaConnection connection,
+			               Connection connection,
 				       Message msg)
     {
-	CorbaTransportManager ctm = orb.getTransportManager() ;
+	TransportManager ctm = orb.getTransportManager() ;
 	MessageTraceManagerImpl mtm = 
 	    (MessageTraceManagerImpl)ctm.getMessageTraceManager() ;
 
@@ -943,8 +943,8 @@ public abstract class MessageBase implements Message{
      * NOTE: This method should be overridden for messages that support
      *       a 4 byte request id following the 12 byte GIOP message header.
      */
-    public CorbaRequestId getCorbaRequestId() {
-        return CorbaRequestIdImpl.UNKNOWN_CORBA_REQUEST_ID;
+    public RequestId getCorbaRequestId() {
+        return RequestIdImpl.UNKNOWN_CORBA_REQUEST_ID;
     }
 
     /**
@@ -1001,19 +1001,19 @@ public abstract class MessageBase implements Message{
      *        + 4 byte GIOP header. Otherwise returns a CorbaRequestId with an
      *        undefined request id.
      */
-    public static CorbaRequestId getRequestIdFromMessageBytes(Message message) {
+    public static RequestId getRequestIdFromMessageBytes(Message message) {
         ByteBuffer byteBuffer = message.getByteBuffer();
         byte major = byteBuffer.get(4);
         byte minor = byteBuffer.get(5);
         if (major == 0x01 && minor == 0x02 &&
                 message.getSize() >= (Message.GIOPMessageHeaderLength + 4)) {
-            CorbaRequestId requestId = new
-                    CorbaRequestIdImpl(unmarshalRequestHeaderRequestId(message));
+            RequestId requestId = new
+                    RequestIdImpl(unmarshalRequestHeaderRequestId(message));
             return requestId;
         } else {
             // Its a Request / Reply 1.1 type of message for which the request id
             // is not found in the 4 bytes following the 12 GIOP message header.
-            return CorbaRequestIdImpl.UNKNOWN_CORBA_REQUEST_ID;
+            return RequestIdImpl.UNKNOWN_CORBA_REQUEST_ID;
         }
     }
 

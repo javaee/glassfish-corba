@@ -73,8 +73,8 @@ public interface EventHandler
     public Work getWork();
 
     // REVISIT: need base class with two derived.
-    public CorbaAcceptor getAcceptor();
-    public CorbaConnection getConnection();
+    public Acceptor getAcceptor();
+    public Connection getConnection();
 
 }
 

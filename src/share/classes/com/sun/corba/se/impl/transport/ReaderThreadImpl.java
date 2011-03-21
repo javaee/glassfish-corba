@@ -39,7 +39,7 @@
  */
 package com.sun.corba.se.impl.transport;
 
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.transport.ReaderThread;
 
 import com.sun.corba.se.spi.orb.ORB;
@@ -52,13 +52,13 @@ import com.sun.corba.se.spi.trace.Transport;
 @Transport
 public class ReaderThreadImpl implements ReaderThread, Work {
     private ORB orb;
-    private CorbaConnection connection;
+    private Connection connection;
     private boolean keepRunning;
     private long enqueueTime;
     private static final ORBUtilSystemException wrapper =
         ORBUtilSystemException.self ;
 
-    public ReaderThreadImpl(ORB orb, CorbaConnection connection)
+    public ReaderThreadImpl(ORB orb, Connection connection)
     {
 	this.orb = orb;
 	this.connection = connection;
@@ -70,7 +70,7 @@ public class ReaderThreadImpl implements ReaderThread, Work {
     // ReaderThread methods.
     //
 
-    public CorbaConnection getConnection() {
+    public Connection getConnection() {
 	return connection;
     }
 

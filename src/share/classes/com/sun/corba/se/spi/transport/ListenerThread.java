@@ -44,7 +44,7 @@ package com.sun.corba.se.spi.transport;
  */
 public interface ListenerThread 
 {
-    public CorbaAcceptor getAcceptor();
+    public Acceptor getAcceptor();
     public void close();
 }
 

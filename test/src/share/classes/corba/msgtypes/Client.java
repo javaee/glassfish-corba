@@ -45,7 +45,7 @@ import javax.rmi.PortableRemoteObject;
 import org.omg.CORBA.INTERNAL ;
 import org.omg.CORBA.LocalObject ;
 
-import com.sun.corba.se.spi.transport.CorbaConnectionCache;
+import com.sun.corba.se.spi.transport.ConnectionCache;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.IORFactories;
@@ -58,11 +58,11 @@ import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.ior.iiop.IIOPFactories;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
-import com.sun.corba.se.spi.transport.CorbaConnection;
-import com.sun.corba.se.spi.transport.CorbaContactInfo ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
+import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.se.spi.protocol.ClientDelegate;
+import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.se.spi.transport.ContactInfo ;
+import com.sun.corba.se.spi.transport.ContactInfoList ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
 
@@ -73,9 +73,9 @@ import com.sun.corba.se.impl.ior.POAObjectKeyTemplate;
 import com.sun.corba.se.impl.ior.OldPOAObjectKeyTemplate;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.protocol.CorbaClientDelegateImpl;
+import com.sun.corba.se.impl.protocol.ClientDelegateImpl;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.*;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
+import com.sun.corba.se.impl.transport.ContactInfoListImpl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
@@ -156,7 +156,7 @@ public class Client extends LocalObject
 	byte[] objectKey = getObjectKey(orb, ior);
 	modifyObjectKey(objectKey);
         LocateRequestMessage msg = getLocateRequestMessage(orb, ior);
-	CorbaMessageMediator messageMediator = 
+	MessageMediator messageMediator =
 	    beginRequest(orb, fragTestStub, msg);
 	org.omg.CORBA.portable.OutputStream os = 
 	    (org.omg.CORBA.portable.OutputStream)
@@ -208,9 +208,9 @@ public class Client extends LocalObject
 	
 	// IOR -> CorbaContactInfoList ->ClientDelegateImpl, then set
 	// new Delegate in the stub.
-	CorbaContactInfoList ccil =
-	    new CorbaContactInfoListImpl(orb, newIor);
-	CorbaClientDelegate cdel = new CorbaClientDelegateImpl( orb, ccil ) ;
+	ContactInfoList ccil =
+	    new ContactInfoListImpl(orb, newIor);
+	ClientDelegate cdel = new ClientDelegateImpl( orb, ccil ) ;
 	StubAdapter.setDelegate( fragTestStub, cdel ) ;
 
         // invoke on target
@@ -234,12 +234,12 @@ public class Client extends LocalObject
         org.omg.CORBA.Object fragTestStub = getStub(orb);
 	IOR ior = orb.getIOR( fragTestStub, false ) ;
         LocateRequestMessage msg = getLocateRequestMessage(orb, ior);
-	CorbaMessageMediator messageMediator = 
+	MessageMediator messageMediator =
 	    beginRequest(orb, fragTestStub, msg);
         GIOPVersion requestVersion =
             GIOPVersion.chooseRequestVersion(orb, ior);
         try {
-            ((CorbaConnection) messageMediator.getConnection())
+            ((Connection) messageMediator.getConnection())
 		.sendCancelRequest(requestVersion, REQUEST_ID);
         } catch (IOException e) {}
         System.out.println("SimpleCancelRequestMsg sent successfully");
@@ -254,7 +254,7 @@ public class Client extends LocalObject
 	modifyObjectKey(objectKey);
 
         LocateRequestMessage msg = getLocateRequestMessage(orb, ior);
-	CorbaMessageMediator messageMediator =
+	MessageMediator messageMediator =
 	    beginRequest(orb, fragTestStub, msg);
 	CDROutputObject os = (CDROutputObject)
 	    messageMediator.getOutputObject();
@@ -276,7 +276,7 @@ public class Client extends LocalObject
 
         // send cancel request
         try {
-            ((CorbaConnection) messageMediator.getConnection())
+            ((Connection) messageMediator.getConnection())
 		.sendCancelRequest(requestVersion, REQUEST_ID);
         } catch (IOException e) {}
         System.out.println("AbortiveCancelRequestMsg sent successfully");
@@ -297,7 +297,7 @@ public class Client extends LocalObject
 		REQUEST_ID, true, ior, 
 		KeyAddr.value, "verifyTransmission", 
 		ServiceContextDefaults.makeServiceContexts( orb ), null);
-	CorbaMessageMediator messageMediator =
+	MessageMediator messageMediator =
 	    beginRequest(orb, fragTestStub, msg);
 	CDROutputObject os = (CDROutputObject)
 	    messageMediator.getOutputObject();
@@ -312,7 +312,7 @@ public class Client extends LocalObject
 
         // send cancel request
         try {
-            ((CorbaConnection) messageMediator.getConnection())
+            ((Connection) messageMediator.getConnection())
 		.sendCancelRequest(requestVersion, REQUEST_ID);
         } catch (IOException e) {}
 
@@ -363,12 +363,12 @@ public class Client extends LocalObject
         org.omg.CORBA.Object fragTestStub = getStub(orb);
 	IOR ior = orb.getIOR( fragTestStub, false ) ;
         LocateRequestMessage msg = getLocateRequestMessage(orb, ior);
-	CorbaMessageMediator messageMediator = 
+	MessageMediator messageMediator =
 	    beginRequest(orb, fragTestStub, msg);
         GIOPVersion requestVersion =
             GIOPVersion.chooseRequestVersion(orb, ior);
         try {
-            ((CorbaConnection) messageMediator.getConnection())
+            ((Connection) messageMediator.getConnection())
 		.sendCloseConnection(requestVersion);
         } catch (IOException e) {}
         System.out.println("CloseConnectionMsg sent successfully");
@@ -435,12 +435,12 @@ public class Client extends LocalObject
         org.omg.CORBA.Object fragTestStub = getStub(orb);
 	IOR ior = orb.getIOR( fragTestStub, false ) ;
         LocateRequestMessage msg = getLocateRequestMessage(orb, ior);
-	CorbaMessageMediator messageMediator = 
+	MessageMediator messageMediator =
 	    beginRequest(orb, fragTestStub, msg);
         GIOPVersion requestVersion =
             GIOPVersion.chooseRequestVersion(orb, ior);
         try {
-            ((CorbaConnection) messageMediator.getConnection())
+            ((Connection) messageMediator.getConnection())
 		.sendMessageError(requestVersion);
         } catch (IOException e) {}
         System.out.println("MessageError sent successfully");
@@ -493,7 +493,7 @@ public class Client extends LocalObject
 
 
 	    int strategy = requestVersion.lessThan(GIOPVersion.V1_2) ? 0 : 1;
-	    CorbaMessageMediator messageMediator = 
+	    MessageMediator messageMediator =
 		beginRequest(orb, fragTestStub, msg, strategy);
 
 	    org.omg.CORBA.portable.OutputStream os = 
@@ -598,31 +598,31 @@ public class Client extends LocalObject
 			      SCID_OFFSET);
     }
 
-    static CorbaMessageMediator beginRequest(ORB orb, 
+    static MessageMediator beginRequest(ORB orb,
 	org.omg.CORBA.Object stub, Message msg)
     {
 	return beginRequest(orb, stub, msg, -1);
     }
 
-    static CorbaMessageMediator beginRequest(ORB orb, 
+    static MessageMediator beginRequest(ORB orb,
 	org.omg.CORBA.Object stub, Message msg, int strategy)
     {
-	CorbaClientDelegate delegate = (CorbaClientDelegate)
+	ClientDelegate delegate = (ClientDelegate)
 	    StubAdapter.getDelegate(stub) ;
 	Iterator iterator = delegate.getContactInfoList().iterator();
-	CorbaContactInfo contactInfo;
+	ContactInfo contactInfo;
 	if (iterator.hasNext()) {
-	    contactInfo = (CorbaContactInfo) iterator.next();
+	    contactInfo = (ContactInfo) iterator.next();
 	} else {
 	    throw new RuntimeException("no next");
 	}
-	CorbaConnection connection = (CorbaConnection)
+	Connection connection = (Connection)
 	    contactInfo.createConnection();
 	connection.setConnectionCache(new DummyConnectionCache());
 	orb.getTransportManager().getSelector(0)
 	    .registerForEvent(connection.getEventHandler());
 	connection.setState("ESTABLISHED");
-	CorbaMessageMediator messageMediator = (CorbaMessageMediator)
+	MessageMediator messageMediator = (MessageMediator)
 	    contactInfo.createMessageMediator(
                 orb, contactInfo, connection, "locate message", false);
 	CDROutputObject outputObject = null;
@@ -782,10 +782,10 @@ public class Client extends LocalObject
 }
 
 class DummyConnectionCache
-    implements CorbaConnectionCache
+    implements ConnectionCache
 {
     public String getCacheType() { return null; }
-    public void stampTime(CorbaConnection connection) {}
+    public void stampTime(Connection connection) {}
     public long numberOfConnections() { return 0; }
     public long numberOfIdleConnections() { return 0; }
     public long numberOfBusyConnections() { return 0; }

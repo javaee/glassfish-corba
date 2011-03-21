@@ -50,10 +50,10 @@ import java.util.Properties;
 import javax.naming.InitialContext;
 import org.omg.PortableServer.POA;
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.Acceptor;
+import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
+import com.sun.corba.se.impl.transport.AcceptorImpl;
 
 
 import corba.framework.Controller;
@@ -69,8 +69,8 @@ public class Server
     public static final String idlIPOA  = "idlIPOA";
 
     public static ORB orb;
-    public static CorbaTransportManager transportManager;
-    public static CorbaAcceptor acceptor;
+    public static TransportManager transportManager;
+    public static Acceptor acceptor;
     public static POA rootPOA;
 
     public static void main(String[] av)
@@ -84,9 +84,9 @@ public class Server
 	    orb = (ORB) ORB.init(av, props);
 
 	    transportManager = orb.getCorbaTransportManager();
-	    acceptor = new SocketOrChannelAcceptorImpl(orb, 4444);
+	    acceptor = new AcceptorImpl(orb, 4444);
 	    transportManager.registerAcceptor(acceptor);
-	    acceptor = new SocketOrChannelAcceptorImpl(orb, 5555);
+	    acceptor = new AcceptorImpl(orb, 5555);
 	    transportManager.registerAcceptor(acceptor);
 
 	    rootPOA = U.getRootPOA(orb);

@@ -48,16 +48,16 @@ import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.RemarshalException;
 
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Connection;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListIterator;
+import com.sun.corba.se.spi.transport.ContactInfoListIterator;
 
 import com.sun.corba.se.impl.encoding.BufferManagerWrite;
 import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.protocol.CorbaInvocationInfo;
+import com.sun.corba.se.impl.protocol.InvocationInfo;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
@@ -98,7 +98,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 	    // REVISIT: this part similar to 
 	    // CorbaClientRequestDispatchImpl.beginRequest() 
 	    // and CorbaClientRequestDelegate.request()
-	    CorbaContactInfoListIterator itr;
+	    ContactInfoListIterator itr;
 	    try {
 		itr = getContactInfoListIterator();
 	    } catch (EmptyStackException ese) {
@@ -140,7 +140,7 @@ public class BufferManagerWriteStream extends BufferManagerWrite
 
     private void sendFragment(boolean isLastFragment)
     {
-        CorbaConnection conn = ((CDROutputObject)outputObject).getMessageMediator().getConnection();
+        Connection conn = ((CDROutputObject)outputObject).getMessageMediator().getConnection();
 
 	// REVISIT: need an ORB
 	//System.out.println("sendFragment: last?: " + isLastFragment);
@@ -179,10 +179,10 @@ public class BufferManagerWriteStream extends BufferManagerWrite
      * 
      * NOTE: Requires this.orb
      */
-    protected CorbaContactInfoListIterator getContactInfoListIterator()
+    protected ContactInfoListIterator getContactInfoListIterator()
     {
-	return (CorbaContactInfoListIterator)
-	    ((CorbaInvocationInfo)this.orb.getInvocationInfo())
+	return (ContactInfoListIterator)
+	    ((InvocationInfo)this.orb.getInvocationInfo())
 	        .getContactInfoListIterator();
     }
 }

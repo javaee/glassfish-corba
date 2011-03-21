@@ -48,7 +48,7 @@ import com.sun.org.omg.SendingContext._CodeBaseImplBase;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Connection;
 
 import com.sun.corba.se.spi.ior.IOR ;
 
@@ -83,7 +83,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
     private Hashtable<String,String[]> bases ;
 
     private volatile CodeBase delegate;
-    private CorbaConnection conn;
+    private Connection conn;
 
     private static Object iorMapLock = new Object() ; 
     private static Hashtable<IOR,CodeBase> iorMap = 
@@ -99,7 +99,7 @@ public class CachedCodeBase extends _CodeBaseImplBase
         }
     }
 
-    public CachedCodeBase(CorbaConnection connection) {
+    public CachedCodeBase(Connection connection) {
         conn = connection;
     }
 

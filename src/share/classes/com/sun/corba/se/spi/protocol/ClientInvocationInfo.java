@@ -61,13 +61,13 @@ public interface ClientInvocationInfo
     
     public void decrementEntryCount();
 
-    public void setClientRequestDispatcher(CorbaClientRequestDispatcher clientRequestDispatcher);
+    public void setClientRequestDispatcher(ClientRequestDispatcher clientRequestDispatcher);
 
-    public CorbaClientRequestDispatcher getClientRequestDispatcher();
+    public ClientRequestDispatcher getClientRequestDispatcher();
 
-    public void setMessageMediator(CorbaMessageMediator messageMediator);
+    public void setMessageMediator(MessageMediator messageMediator);
 
-    public CorbaMessageMediator getMessageMediator();
+    public MessageMediator getMessageMediator();
 }
 
 // End of file.

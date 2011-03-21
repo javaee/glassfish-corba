@@ -47,7 +47,7 @@ import com.sun.corba.se.spi.resolver.Resolver ;
  * to implement bootstrapping of initial object references.
  */
 public interface InitialServerRequestDispatcher 
-    extends CorbaServerRequestDispatcher 
+    extends ServerRequestDispatcher
 {
     /** Plug in the resolver that this InitialServerRequestDispatcher should
      * use in order to lookup or list initial name to object reference

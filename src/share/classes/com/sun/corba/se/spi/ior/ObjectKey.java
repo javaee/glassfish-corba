@@ -40,7 +40,7 @@
 
 package com.sun.corba.se.spi.ior;
 
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 
 /** The full object key, which is contained in an IIOPProfile.
 * The object identifier corresponds to the information passed into
@@ -61,5 +61,5 @@ public interface ObjectKey extends Writeable
 
     byte[] getBytes( org.omg.CORBA.ORB orb ) ;
     
-    CorbaServerRequestDispatcher getServerRequestDispatcher() ;
+    ServerRequestDispatcher getServerRequestDispatcher() ;
 }

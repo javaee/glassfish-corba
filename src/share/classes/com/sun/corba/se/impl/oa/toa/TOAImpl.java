@@ -44,8 +44,6 @@ import org.omg.CORBA.Policy ;
 import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ACTIVE;
 
-import com.sun.corba.se.spi.protocol.ClientDelegate ;
-
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
@@ -55,13 +53,14 @@ import com.sun.corba.se.spi.oa.ObjectAdapterBase ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
+import com.sun.corba.se.spi.transport.ContactInfoList ;
 
 import com.sun.corba.se.impl.ior.JIDLObjectKeyTemplate ;
 import com.sun.corba.se.impl.oa.NullServantImpl;
 import com.sun.corba.se.impl.oa.poa.Policies;
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
 import com.sun.corba.se.impl.protocol.JIDLLocalCRDImpl ;
+import com.sun.corba.se.spi.protocol.ClientDelegate;
 import java.util.concurrent.atomic.AtomicLong;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
@@ -221,7 +220,7 @@ public class TOAImpl extends ObjectAdapterBase implements TOA
 	// Copy the delegate from the new objref to the argument
 	org.omg.CORBA.portable.Delegate delegate = StubAdapter.getDelegate( 
 	    obj ) ;
-	CorbaContactInfoList ccil = ((ClientDelegate) delegate).getContactInfoList() ;
+	ContactInfoList ccil = ((ClientDelegate) delegate).getContactInfoList() ;
 	LocalClientRequestDispatcher lcs = 
 	    ccil.getLocalClientRequestDispatcher() ;
 
@@ -241,7 +240,7 @@ public class TOAImpl extends ObjectAdapterBase implements TOA
         // Get the delegate, then ior, then transientKey, then delete servant
         org.omg.CORBA.portable.Delegate del = StubAdapter.getDelegate( 
 	    objref ) ; 
-	CorbaContactInfoList ccil = ((ClientDelegate) del).getContactInfoList() ;
+	ContactInfoList ccil = ((ClientDelegate) del).getContactInfoList() ;
 	LocalClientRequestDispatcher lcs = 
 	    ccil.getLocalClientRequestDispatcher() ;
 

@@ -82,7 +82,7 @@ import org.omg.CORBA.portable.CustomValue;
 import org.omg.CORBA.portable.StreamableValue;
 import org.omg.CORBA.portable.BoxedValueHelper;
 
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 import com.sun.corba.se.spi.transport.ByteBufferPool;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
@@ -1901,7 +1901,7 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
         // one of those ByteBuffers are released to the ByteBufferPool.
 
         if (getByteBufferWithInfo() != null && getByteBuffer() != null) {
-            CorbaMessageMediator messageMediator = parent.getMessageMediator();
+            MessageMediator messageMediator = parent.getMessageMediator();
             if (messageMediator != null) {
                 CDRInputObject inputObj = messageMediator.getInputObject();
                 if (inputObj != null) {

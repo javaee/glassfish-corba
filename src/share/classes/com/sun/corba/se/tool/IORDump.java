@@ -42,8 +42,8 @@ package com.sun.corba.se.tool ;
 import org.omg.CORBA.portable.ObjectImpl ;
 
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
+import com.sun.corba.se.spi.protocol.ClientDelegate ;
+import com.sun.corba.se.spi.transport.ContactInfoList ;
 
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.impl.ior.GenericIdentifiable ;
@@ -146,8 +146,8 @@ public class IORDump {
                 ORB orb = (ORB)ORB.init( initArgs, null ) ;
                 org.omg.CORBA.Object obj = orb.string_to_object( iorString ) ;
                 ObjectImpl oimpl = (ObjectImpl)obj ;
-                CorbaClientDelegate delegate = (CorbaClientDelegate)(oimpl._get_delegate()) ;
-                CorbaContactInfoList cilist = (CorbaContactInfoList)(delegate.getContactInfoList()) ;
+                ClientDelegate delegate = (ClientDelegate)(oimpl._get_delegate()) ;
+                ContactInfoList cilist = (ContactInfoList)(delegate.getContactInfoList()) ;
                 IOR ior = cilist.getTargetIOR() ;
                 dumpIOR( ior ) ;
             } catch (Exception exc) {

@@ -47,7 +47,7 @@ import java.rmi.RemoteException ;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.spi.orbutil.generic.UnaryVoidFunction;
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 import com.sun.corba.se.spi.transport.TransportDefault;
 
 import org.testng.Assert ;
@@ -68,7 +68,7 @@ public class NewAcceptorClient extends Framework {
     // configured before it is used.
     @Override
     protected void updateORB( ORB orb, boolean isServer ) {
-        final CorbaAcceptor listener = TransportDefault.makeLazyCorbaAcceptor(orb,
+        final Acceptor listener = TransportDefault.makeLazyCorbaAcceptor(orb,
             SERVER_PORT, "localhost", "IIOP_CLEAR_TEXT" ) ;
 
         UnaryVoidFunction<Socket> func = new UnaryVoidFunction<Socket>() {
@@ -78,7 +78,7 @@ public class NewAcceptorClient extends Framework {
             }
         } ;
 
-        final CorbaAcceptor processor = TransportDefault.makeAcceptOnlyCorbaAcceptor(
+        final Acceptor processor = TransportDefault.makeAcceptOnlyCorbaAcceptor(
             orb, SERVER_PORT, "localhost", "IIOP_CLEAR_TEXT", func ) ;
 
         orb.getTransportManager().registerAcceptor( listener ) ;

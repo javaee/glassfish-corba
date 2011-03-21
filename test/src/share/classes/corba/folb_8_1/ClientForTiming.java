@@ -48,8 +48,8 @@ import java.io.File;
 import java.util.Properties;
 
 
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.TransportManager;
+import com.sun.corba.se.spi.transport.ContactInfo;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.transport.SocketInfo;
@@ -61,9 +61,9 @@ import com.sun.corba.se.spi.orbutil.newtimer.LogEventHandler;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
-import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
+import com.sun.corba.se.impl.transport.ContactInfoListImpl;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
+import com.sun.corba.se.spi.protocol.ClientDelegate;
 import org.omg.CORBA_2_3.portable.ObjectImpl;
 
 // import corba.framework.TimerUtils ;
@@ -93,8 +93,8 @@ public class ClientForTiming
     public static Timer clientInvoke ;
 
     public static IIOPPrimaryToContactInfoImpl primaryToContactInfo;
-    public static CorbaContactInfo serverPrimaryContactInfo;
-    public static CorbaContactInfo serverClearTextEntry;
+    public static ContactInfo serverPrimaryContactInfo;
+    public static ContactInfo serverClearTextEntry;
 
     // These are used as self-documenting values below.
     public static final boolean FAILOVER_SUPPORT = true;
@@ -230,8 +230,8 @@ public class ClientForTiming
 	i2Ref.foo(1);
 
 	serverPrimaryContactInfo =
-            ((CorbaContactInfoListImpl)
-	     ((CorbaClientDelegate)
+            ((ContactInfoListImpl)
+	     ((ClientDelegate)
               ((_I2Stub)i2Ref)._get_delegate())
               .getContactInfoList()).getPrimaryContactInfo();
 	
@@ -246,7 +246,7 @@ public class ClientForTiming
 	    dprint("finding entry for key: " + serverPrimaryContactInfo);
 	    dprint("in map: " + primaryToContactInfo.map);
 
-	    serverClearTextEntry = (CorbaContactInfo)
+	    serverClearTextEntry = (ContactInfo)
 		primaryToContactInfo.map.get(serverClearTextEntry);
 
 	    dprint("found entry: " + serverClearTextEntry);
@@ -296,7 +296,7 @@ public class ClientForTiming
     public static void killFailedOverToConnection()
 	throws Exception
     {
-	CorbaTransportManager transportManager = orb.getTransportManager();
+	TransportManager transportManager = orb.getTransportManager();
 
 	dprint();
 	dprint("killFailedOverToConnection");

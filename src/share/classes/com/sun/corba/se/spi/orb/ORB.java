@@ -60,12 +60,12 @@ import com.sun.corba.se.spi.transport.ByteBufferPool;
 
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 import com.sun.corba.se.spi.protocol.ClientDelegateFactory ;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ClientDelegate;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.PIHandler ;
 import com.sun.corba.se.spi.resolver.LocalResolver ;
 import com.sun.corba.se.spi.resolver.Resolver ;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory ;
+import com.sun.corba.se.spi.transport.ContactInfoListFactory ;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 
 import com.sun.corba.se.spi.ior.IdentifiableFactoryFinder ;
@@ -80,7 +80,7 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.TransportManager;
 
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 
@@ -92,7 +92,7 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.transport.ContactInfoList;
 
 // import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 // import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
@@ -389,7 +389,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     @ManagedAttribute
     @Description( "The ORB's transport manager" ) 
-    public abstract CorbaTransportManager getCorbaTransportManager();
+    public abstract TransportManager getCorbaTransportManager();
 
     public abstract LegacyServerSocketManager getLegacyServerSocketManager();
 
@@ -617,12 +617,12 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     @Description( "The ClientDelegateFactory, which is used to create the ClientDelegate that represents an IOR" )
     public abstract ClientDelegateFactory getClientDelegateFactory() ;
 
-    public abstract void setCorbaContactInfoListFactory( CorbaContactInfoListFactory factory ) ;
+    public abstract void setCorbaContactInfoListFactory( ContactInfoListFactory factory ) ;
 
     @ManagedAttribute
     @Description( "The CorbaContactInfoListFactory, which creates the contact info list that represents "
         + "possible endpoints in an IOR" ) 
-    public abstract CorbaContactInfoListFactory getCorbaContactInfoListFactory() ;
+    public abstract ContactInfoListFactory getCorbaContactInfoListFactory() ;
 
     /** Set the resolver used in this ORB.  This resolver will be used for list_initial_services
      * and resolve_initial_references.
@@ -660,7 +660,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 
     /** Set the ServerRequestDispatcher that should be used for handling INS requests.
      */
-    public abstract void setINSDelegate( CorbaServerRequestDispatcher insDelegate ) ;
+    public abstract void setINSDelegate( ServerRequestDispatcher insDelegate ) ;
 
     /** Factory finders for the various parts of the IOR: tagged components, tagged
      * profiles, and tagged profile templates.
@@ -809,9 +809,9 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
 	    org.omg.CORBA.portable.Delegate del = StubAdapter.getDelegate( 
 		obj ) ;
 
-	    if (del instanceof CorbaClientDelegate) {
-		CorbaClientDelegate cdel = (CorbaClientDelegate)del ;
-		CorbaContactInfoList ccil = cdel.getContactInfoList() ;
+	    if (del instanceof ClientDelegate) {
+		ClientDelegate cdel = (ClientDelegate)del ;
+		ContactInfoList ccil = cdel.getContactInfoList() ;
                 ior = ccil.getTargetIOR() ;
                 if (ior == null)
                     throw wrapper.nullIor() ;
@@ -938,7 +938,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
     public abstract ClientInvocationInfo getInvocationInfo();
     public abstract void releaseOrDecrementInvocationInfo();
 
-    public abstract CorbaTransportManager getTransportManager();
+    public abstract TransportManager getTransportManager();
 
     
 }

@@ -59,9 +59,9 @@ import org.omg.CORBA.SystemException ;
 import com.sun.corba.se.spi.orb.ORB ;
 
 
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
+import com.sun.corba.se.spi.transport.ContactInfoList ;
 
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate ;
+import com.sun.corba.se.spi.protocol.ClientDelegate ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 
 import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor ;
@@ -115,9 +115,9 @@ public final class StubInvocationHandlerImpl implements LinkedInvocationHandler
     private boolean isLocal(Delegate delegate)
     {
 	boolean result = false ;
-	if (delegate instanceof CorbaClientDelegate) {
-	    CorbaClientDelegate cdel = (CorbaClientDelegate)delegate ;
-	    CorbaContactInfoList cil = cdel.getContactInfoList() ;
+	if (delegate instanceof ClientDelegate) {
+	    ClientDelegate cdel = (ClientDelegate)delegate ;
+	    ContactInfoList cil = cdel.getContactInfoList() ;
             LocalClientRequestDispatcher lcrd =
                 cil.getLocalClientRequestDispatcher() ;
             result = lcrd.useLocalInvocation( null ) ;

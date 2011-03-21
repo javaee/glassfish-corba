@@ -46,7 +46,7 @@ import com.sun.org.omg.SendingContext.CodeBase;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Connection;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
@@ -57,7 +57,7 @@ import com.sun.corba.se.spi.logging.OMGSystemException;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 import com.sun.corba.se.spi.trace.Transport;
 import com.sun.corba.se.spi.trace.MonitorRead ;
 import java.io.IOException;
@@ -83,9 +83,9 @@ public class CDRInputObject
 
     private transient ORB orb ;
     private transient CDRInputStreamBase impl;
-    private transient CorbaConnection corbaConnection;
+    private transient Connection corbaConnection;
     private transient Message header;
-    protected transient CorbaMessageMediator messageMediator;
+    protected transient MessageMediator messageMediator;
 
     // Present only to suppress FindBugs errors
     private void readObject( ObjectInputStream is ) throws IOException,
@@ -171,7 +171,7 @@ public class CDRInputObject
 	     bufMgr, true);
     }
 
-    public CDRInputObject(ORB orb, CorbaConnection corbaConnection, 
+    public CDRInputObject(ORB orb, Connection corbaConnection,
         ByteBuffer byteBuffer, Message header)
     {
         this(orb, byteBuffer, header.getSize(), header.isLittleEndian(),
@@ -193,7 +193,7 @@ public class CDRInputObject
     // This connection normally is accessed from the message mediator.
     // However, giop input needs to get code set info from the connetion
     // *before* the message mediator is available.
-    public final CorbaConnection getConnection() 
+    public final Connection getConnection()
     {
         return corbaConnection;
     }
@@ -797,12 +797,12 @@ public class CDRInputObject
         impl.resetCodeSetConverters();
     }
 
-    public void setMessageMediator(CorbaMessageMediator messageMediator)
+    public void setMessageMediator(MessageMediator messageMediator)
     {
         this.messageMediator = messageMediator;
     }
 
-    public CorbaMessageMediator getMessageMediator()
+    public MessageMediator getMessageMediator()
     {
         return messageMediator;
     }

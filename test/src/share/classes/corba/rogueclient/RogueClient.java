@@ -47,8 +47,8 @@ import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.protocol.ClientDelegate;
+import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
@@ -191,10 +191,10 @@ public class RogueClient extends Thread
     {
 	// Get the host and port number of server
 	U.sop("RogueClient.getHostnameAndPort()");
-	CorbaClientDelegate delegate = 
-	    (CorbaClientDelegate)StubAdapter.getDelegate(tester);
-	CorbaContactInfoList ccil = 
-	    (CorbaContactInfoList)delegate.getContactInfoList();
+	ClientDelegate delegate =
+	    (ClientDelegate)StubAdapter.getDelegate(tester);
+	ContactInfoList ccil =
+	    (ContactInfoList)delegate.getContactInfoList();
 	IOR effectiveTargetIOR = ccil.getEffectiveTargetIOR();
 	IIOPProfile iiopProfile = effectiveTargetIOR.getProfile();
         IIOPProfileTemplate iiopProfileTemplate =

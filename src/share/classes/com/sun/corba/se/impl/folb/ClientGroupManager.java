@@ -76,7 +76,7 @@ import com.sun.corba.se.spi.orb.ORBConfigurator ;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
+import com.sun.corba.se.spi.transport.ContactInfo;
 
 import com.sun.corba.se.impl.interceptors.ClientRequestInfoImpl;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
@@ -349,7 +349,7 @@ public class ClientGroupManager
     private Map map = new HashMap();
 
     @Folb
-    public synchronized void reset(CorbaContactInfo primary)
+    public synchronized void reset(ContactInfo primary)
     {
 	initialize();
 	try {
@@ -363,8 +363,8 @@ public class ClientGroupManager
     private void hasNextInfo( int previousIndex, int contactInfoSize ) { }
 
     @Folb
-    public synchronized boolean hasNext(CorbaContactInfo primary,
-					CorbaContactInfo previous,
+    public synchronized boolean hasNext(ContactInfo primary,
+					ContactInfo previous,
 					List contactInfos)
     {
 	initialize();
@@ -422,8 +422,8 @@ public class ClientGroupManager
     private void mappedResultWithUpdate( Object obj, int prevIndex, int size ) { }
 
     @Folb
-    public synchronized CorbaContactInfo next(CorbaContactInfo primary,
-					 CorbaContactInfo previous,
+    public synchronized ContactInfo next(ContactInfo primary,
+					 ContactInfo previous,
 					 List contactInfos)
     {
 	initialize();
@@ -474,14 +474,14 @@ public class ClientGroupManager
                         contactInfos.size() );
                 }
 	    }
-	    return (CorbaContactInfo) result;
+	    return (ContactInfo) result;
 	} catch (Throwable t) {
             throw wrapper.exceptionInNext( t ) ;
 	}
     }
 
     @Folb
-    private Object getKey(CorbaContactInfo contactInfo)
+    private Object getKey(ContactInfo contactInfo)
     {
 	if (((SocketInfo)contactInfo).getPort() == 0) {
 	    // When CSIv2 is used the primary will have a zero port.

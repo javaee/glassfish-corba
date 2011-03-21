@@ -60,16 +60,16 @@ import org.omg.CORBA.ContextList ;
 
 import org.omg.CORBA_2_3.portable.Delegate ;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfoList ;
+import com.sun.corba.se.spi.transport.ContactInfoList ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.CorbaClientDelegate ;
+import com.sun.corba.se.spi.protocol.ClientDelegate ;
 
 import corba.dynamicrmiiiop.testclasses.TieTestImpl ;
 
-public class TestClientDelegate extends CorbaClientDelegate 
+public class TestClientDelegate extends ClientDelegate
 {
     private final TestTransport transport ;
     private final TieTestImpl impl ;
@@ -265,9 +265,9 @@ public class TestClientDelegate extends CorbaClientDelegate
 	return null ;
     }
 
-    public CorbaContactInfoList getContactInfoList()
+    public ContactInfoList getContactInfoList()
     {
-	return new CorbaContactInfoList() {
+	return new ContactInfoList() {
 	    public Iterator iterator()
 	    {
 		return null ;

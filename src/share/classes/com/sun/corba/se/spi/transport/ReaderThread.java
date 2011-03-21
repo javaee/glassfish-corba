@@ -43,7 +43,7 @@ package com.sun.corba.se.spi.transport;
  * @author Harold Carr
  */
 public interface ReaderThread {
-    public CorbaConnection getConnection();
+    public Connection getConnection();
     public void close();
 }
 

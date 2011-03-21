@@ -46,8 +46,8 @@ import org.omg.CORBA.SystemException ;
 import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.ior.ObjectKey ;
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 
 import com.sun.corba.se.impl.encoding.MarshalInputStream ;
 import com.sun.corba.se.impl.encoding.MarshalOutputStream ;
@@ -68,7 +68,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
  * The BootstrapServerRequestDispatcher handles one request at a time.
  */
 public class BootstrapServerRequestDispatcher 
-    implements CorbaServerRequestDispatcher
+    implements ServerRequestDispatcher
 {
     private ORB orb;
 
@@ -86,10 +86,10 @@ public class BootstrapServerRequestDispatcher
      * Dispatch is called by the ORB and will serve get(key) and list()
      * invocations on the initial object key.
      */
-    public void dispatch(CorbaMessageMediator messageMediator)
+    public void dispatch(MessageMediator messageMediator)
     {
-	CorbaMessageMediator request = (CorbaMessageMediator) messageMediator;
-	CorbaMessageMediator response = null;
+	MessageMediator request = (MessageMediator) messageMediator;
+	MessageMediator response = null;
 
 	try {
 	    MarshalInputStream is = (MarshalInputStream) 

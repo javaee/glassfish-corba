@@ -46,7 +46,7 @@ import org.omg.CORBA.portable.OutputStream;
 
 import com.sun.corba.se.spi.oa.ObjectAdapter;
 
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
@@ -58,8 +58,8 @@ public abstract class SpecialMethod {
 
     public abstract boolean isNonExistentMethod() ;
     public abstract String getName();
-    public abstract CorbaMessageMediator invoke(java.lang.Object servant,
-						CorbaMessageMediator request,
+    public abstract MessageMediator invoke(java.lang.Object servant,
+						MessageMediator request,
 						byte[] objectId,
 						ObjectAdapter objectAdapter);
 
@@ -90,13 +90,13 @@ class NonExistent extends SpecialMethod {
 	return "_non_existent";
     }
 
-    public CorbaMessageMediator invoke(java.lang.Object servant,
-				       CorbaMessageMediator request,
+    public MessageMediator invoke(java.lang.Object servant,
+				       MessageMediator request,
 				       byte[] objectId,
 				       ObjectAdapter objectAdapter)
     {
 	boolean result = (servant == null) || (servant instanceof NullServant) ;
-	CorbaMessageMediator response =
+	MessageMediator response =
 	    request.getProtocolHandler().createResponse(request, null);
 	((OutputStream)response.getOutputObject()).write_boolean(result);
 	return response;
@@ -119,8 +119,8 @@ class IsA extends SpecialMethod  {	// _is_a
     public String getName() {
 	return "_is_a";
     }
-    public CorbaMessageMediator invoke(java.lang.Object servant,
-				       CorbaMessageMediator request,
+    public MessageMediator invoke(java.lang.Object servant,
+				       MessageMediator request,
 				       byte[] objectId,
 				       ObjectAdapter objectAdapter)
     {
@@ -140,7 +140,7 @@ class IsA extends SpecialMethod  {	// _is_a
             }
         }
 	    
-	CorbaMessageMediator response =
+	MessageMediator response =
 	    request.getProtocolHandler().createResponse(request, null);
 	((OutputStream)response.getOutputObject()).write_boolean(answer);
 	return response;
@@ -156,8 +156,8 @@ class GetInterface extends SpecialMethod  {	// _get_interface
     public String getName() {
 	return "_interface";
     }
-    public CorbaMessageMediator invoke(java.lang.Object servant,
-				       CorbaMessageMediator request,
+    public MessageMediator invoke(java.lang.Object servant,
+				       MessageMediator request,
 				       byte[] objectId,
 				       ObjectAdapter objectAdapter)
     {

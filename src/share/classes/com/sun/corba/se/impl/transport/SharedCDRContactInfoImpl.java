@@ -40,26 +40,26 @@
 
 package com.sun.corba.se.impl.transport;
 
-import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher;
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.protocol.ClientRequestDispatcher;
+import com.sun.corba.se.spi.transport.Connection;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
-import com.sun.corba.se.spi.transport.CorbaContactInfo;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.protocol.MessageMediator;
+import com.sun.corba.se.spi.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.encoding.BufferManagerFactory;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl;
+import com.sun.corba.se.impl.protocol.MessageMediatorImpl;
 import com.sun.corba.se.impl.protocol.SharedCDRClientRequestDispatcherImpl;
 
 public class SharedCDRContactInfoImpl
     extends 
-	CorbaContactInfoBase
+	ContactInfoBase
 {
     // This is only necessary for the pi.clientrequestinfo test.
     // It tests that request ids are different.
@@ -71,7 +71,7 @@ public class SharedCDRContactInfoImpl
 
     public SharedCDRContactInfoImpl(
         ORB orb,
-	CorbaContactInfoList contactInfoList,
+	ContactInfoList contactInfoList,
 	IOR effectiveTargetIOR,
 	short addressingDisposition)
     {
@@ -96,7 +96,7 @@ public class SharedCDRContactInfoImpl
 	throw wrapper.undefinedSocketinfoOperation() ;
     }
 
-    public CorbaClientRequestDispatcher getClientRequestDispatcher()
+    public ClientRequestDispatcher getClientRequestDispatcher()
     {
 	// REVISIT - use registry
 	return new SharedCDRClientRequestDispatcherImpl();
@@ -117,16 +117,16 @@ public class SharedCDRContactInfoImpl
 	throw wrapper.methodShouldNotBeCalled();
     }
     
-    public CorbaConnection createConnection()
+    public Connection createConnection()
     {
 	throw wrapper.methodShouldNotBeCalled();
     }
 
     // Called when client making an invocation.    
     @Override
-    public CorbaMessageMediator createMessageMediator(ORB broker,
-						 CorbaContactInfo contactInfo,
-						 CorbaConnection connection,
+    public MessageMediator createMessageMediator(ORB broker,
+						 ContactInfo contactInfo,
+						 Connection connection,
 						 String methodName,
 						 boolean isOneWay)
     {
@@ -134,10 +134,10 @@ public class SharedCDRContactInfoImpl
             throw wrapper.connectionNotNullInCreateMessageMediator( connection ) ;
 	}
 
-	CorbaMessageMediator messageMediator =
- 	    new CorbaMessageMediatorImpl(
+	MessageMediator messageMediator =
+ 	    new MessageMediatorImpl(
 	        (ORB) broker,
-		(CorbaContactInfo)contactInfo,
+		(ContactInfo)contactInfo,
  		null, // Connection;
  		GIOPVersion.chooseRequestVersion( (ORB)broker,
 		     effectiveTargetIOR),
@@ -150,9 +150,9 @@ public class SharedCDRContactInfoImpl
 	return messageMediator;
     }
 
-    public CDROutputObject createOutputObject(CorbaMessageMediator messageMediator)
+    public CDROutputObject createOutputObject(MessageMediator messageMediator)
     {
-	CorbaMessageMediator corbaMessageMediator = (CorbaMessageMediator)
+	MessageMediator corbaMessageMediator = (MessageMediator)
 	    messageMediator;
 	// NOTE: GROW.
 	CDROutputObject outputObject =

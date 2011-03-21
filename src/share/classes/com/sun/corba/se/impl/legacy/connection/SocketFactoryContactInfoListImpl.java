@@ -44,15 +44,15 @@ import java.util.Iterator;
 
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListImpl;
-import com.sun.corba.se.impl.transport.CorbaContactInfoListIteratorImpl;
+import com.sun.corba.se.impl.transport.ContactInfoListImpl;
+import com.sun.corba.se.impl.transport.ContactInfoListIteratorImpl;
 
 /**
  * @author Harold Carr
  */
 public class SocketFactoryContactInfoListImpl 
     extends
-	CorbaContactInfoListImpl
+	ContactInfoListImpl
 {
     // XREVISIT - is this used?
     public SocketFactoryContactInfoListImpl(ORB orb)

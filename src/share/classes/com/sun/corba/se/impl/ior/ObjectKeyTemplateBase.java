@@ -44,7 +44,7 @@ package com.sun.corba.se.impl.ior;
 import org.omg.CORBA_2_3.portable.InputStream ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
 
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 
 import com.sun.corba.se.spi.ior.ObjectId ;
 import com.sun.corba.se.spi.ior.ObjectAdapterId ;
@@ -205,7 +205,7 @@ public abstract class ObjectKeyTemplateBase implements ObjectKeyTemplate
         return result ;
     }
 
-    public CorbaServerRequestDispatcher getServerRequestDispatcher(
+    public ServerRequestDispatcher getServerRequestDispatcher(
         ObjectId id ) {
 
         return orb.getRequestDispatcherRegistry().getServerRequestDispatcher(

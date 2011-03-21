@@ -37,34 +37,28 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.corba.se.spi.protocol;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
+import com.sun.corba.se.spi.transport.ContactInfoList;
 
-/**
- * <p>The presentation block interacts with the PEPt architecture
- * via the <code>ClientDelegate</code>.</p>
- *
- * @author Harold Carr
- */
-public interface ClientDelegate 
+public abstract class ClientDelegate
+    extends org.omg.CORBA_2_3.portable.Delegate 
 {
     /**
      * The ORB associated * with an invocation.
      *
      * @return ORB
      */
-    public ORB getBroker();
+    public abstract ORB getBroker();
 
     /**
-     * Get the CorbaContactInfoList which represents they encoding/protocol/transport 
+     * Get the CorbaContactInfoList which represents they encoding/protocol/transport
      * combinations that may be used to contact the service.
      *
      * @return CorbaContactInfoList
      */
-    public CorbaContactInfoList getContactInfoList();
+    public abstract ContactInfoList getContactInfoList();
 }
 
 // End of file.

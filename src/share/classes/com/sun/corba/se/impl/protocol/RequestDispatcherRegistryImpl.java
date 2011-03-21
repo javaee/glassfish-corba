@@ -46,10 +46,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 
-import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ClientRequestDispatcher ;
 
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 
 import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
@@ -67,28 +67,28 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
     protected int defaultId; // The default subcontract ID to use if there is no more specific ID available.  
                              // This happens when invoking a foreign IOR.
 
-    private DenseIntMapImpl<CorbaServerRequestDispatcher> SDRegistry ;
-    private DenseIntMapImpl<CorbaClientRequestDispatcher> CSRegistry ;
+    private DenseIntMapImpl<ServerRequestDispatcher> SDRegistry ;
+    private DenseIntMapImpl<ClientRequestDispatcher> CSRegistry ;
     private DenseIntMapImpl<ObjectAdapterFactory> OAFRegistry ;	
     private DenseIntMapImpl<LocalClientRequestDispatcherFactory> LCSFRegistry ;	
     private Set<ObjectAdapterFactory> objectAdapterFactories ;	
     private Set<ObjectAdapterFactory> objectAdapterFactoriesView ;	// Read-only view of oaf instances
-    private Map<String,CorbaServerRequestDispatcher> stringToServerSubcontract ;	
+    private Map<String,ServerRequestDispatcher> stringToServerSubcontract ;
 
     public RequestDispatcherRegistryImpl(int defaultId ) 
     {
         this.defaultId = defaultId;
-        SDRegistry = new DenseIntMapImpl<CorbaServerRequestDispatcher>() ;
-        CSRegistry = new DenseIntMapImpl<CorbaClientRequestDispatcher>() ;
+        SDRegistry = new DenseIntMapImpl<ServerRequestDispatcher>() ;
+        CSRegistry = new DenseIntMapImpl<ClientRequestDispatcher>() ;
 	OAFRegistry = new DenseIntMapImpl<ObjectAdapterFactory>() ;
 	LCSFRegistry = new DenseIntMapImpl<LocalClientRequestDispatcherFactory>() ;
 	objectAdapterFactories = new HashSet<ObjectAdapterFactory>() ;
 	objectAdapterFactoriesView = Collections.unmodifiableSet( objectAdapterFactories ) ;
-	stringToServerSubcontract = new HashMap<String,CorbaServerRequestDispatcher>() ;
+	stringToServerSubcontract = new HashMap<String,ServerRequestDispatcher>() ;
     }
 
     public synchronized void registerClientRequestDispatcher( 
-	CorbaClientRequestDispatcher csc, int scid)
+	ClientRequestDispatcher csc, int scid)
     {
 	CSRegistry.set( scid, csc ) ;
     }
@@ -100,13 +100,13 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
     }
 
     public synchronized void registerServerRequestDispatcher( 
-	CorbaServerRequestDispatcher ssc, int scid)
+	ServerRequestDispatcher ssc, int scid)
     {
 	SDRegistry.set( scid, ssc ) ;
     }
 
     public synchronized void registerServerRequestDispatcher(
-	CorbaServerRequestDispatcher scc, String name )
+	ServerRequestDispatcher scc, String name )
     {
 	stringToServerSubcontract.put( name, scc ) ;
     }
@@ -130,18 +130,18 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
     // which must return a valid ServerRequestDispatcher.  A bad subcontract ID
     // will similarly need to return the default ServerRequestDispatcher.
     
-    public CorbaServerRequestDispatcher getServerRequestDispatcher(int scid)
+    public ServerRequestDispatcher getServerRequestDispatcher(int scid)
     {
-	CorbaServerRequestDispatcher sdel = SDRegistry.get(scid) ;
+	ServerRequestDispatcher sdel = SDRegistry.get(scid) ;
 	if ( sdel == null )
             sdel = SDRegistry.get(defaultId) ;
 
 	return sdel;
     }
 
-    public CorbaServerRequestDispatcher getServerRequestDispatcher( String name ) 
+    public ServerRequestDispatcher getServerRequestDispatcher( String name )
     {
-	CorbaServerRequestDispatcher sdel = stringToServerSubcontract.get( name ) ;
+	ServerRequestDispatcher sdel = stringToServerSubcontract.get( name ) ;
 
 	if ( sdel == null )
             sdel = SDRegistry.get(defaultId) ;
@@ -160,9 +160,9 @@ public class RequestDispatcherRegistryImpl implements RequestDispatcherRegistry 
 	return factory ;
     }
 
-    public CorbaClientRequestDispatcher getClientRequestDispatcher( int scid )
+    public ClientRequestDispatcher getClientRequestDispatcher( int scid )
     {
-	CorbaClientRequestDispatcher subcontract = CSRegistry.get(scid) ;
+	ClientRequestDispatcher subcontract = CSRegistry.get(scid) ;
 	if (subcontract == null) {
 	    subcontract = CSRegistry.get(defaultId) ;
 	}

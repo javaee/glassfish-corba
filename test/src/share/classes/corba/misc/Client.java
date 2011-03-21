@@ -814,7 +814,7 @@ public class Client extends TestCase
 	final TimerManager<TimingPoints> tm = orb.makeTimerManager(
             TimingPoints.class ) ;
 	final TimingPoints tp = tm.points() ;
-	final Timer nextTime = tp.CorbaContactInfoListIteratorImpl__next() ;
+	final Timer nextTime = tp.ContactInfoListIteratorImpl__next() ;
 
 	// per-event data (all events)
 	boolean firstEvent = true ;
@@ -902,13 +902,13 @@ public class Client extends TestCase
 	tm.controller().register( leh ) ;
         TimingPoints tp = tm.points() ;
 	TimerGroup cili = tm.factory().makeTimerGroup( "cili", 
-            "TimerGroup for CorbaContactInfoListIteratorImpl" ) ;
-        cili.add( tp.CorbaContactInfoListIteratorImpl__hasNext() ) ;
-        cili.add( tp.CorbaContactInfoListIteratorImpl__next() ) ;
-        cili.add( tp.CorbaContactInfoListIteratorImpl__reportException() ) ;
-        cili.add( tp.CorbaContactInfoListIteratorImpl__reportAddrDispositionRetry() ) ;
-        cili.add( tp.CorbaContactInfoListIteratorImpl__reportRedirect() ) ;
-        cili.add( tp.CorbaContactInfoListIteratorImpl__reportSuccess() ) ;
+            "TimerGroup for ContactInfoListIteratorImpl" ) ;
+        cili.add( tp.ContactInfoListIteratorImpl__hasNext() ) ;
+        cili.add( tp.ContactInfoListIteratorImpl__next() ) ;
+        cili.add( tp.ContactInfoListIteratorImpl__reportException() ) ;
+        cili.add( tp.ContactInfoListIteratorImpl__reportAddrDispositionRetry() ) ;
+        cili.add( tp.ContactInfoListIteratorImpl__reportRedirect() ) ;
+        cili.add( tp.ContactInfoListIteratorImpl__reportSuccess() ) ;
 
 	try {
 	    cili.enable() ;

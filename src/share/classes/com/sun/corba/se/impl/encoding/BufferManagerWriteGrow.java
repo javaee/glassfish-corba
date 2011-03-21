@@ -41,7 +41,7 @@
 package com.sun.corba.se.impl.encoding;
 
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.transport.CorbaConnection;
+import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.orb.ORB;
 
 public class BufferManagerWriteGrow extends BufferManagerWrite
@@ -77,7 +77,7 @@ public class BufferManagerWriteGrow extends BufferManagerWrite
 
     public void sendMessage ()
     {
-        CorbaConnection conn =
+        Connection conn =
               ((CDROutputObject)outputObject).getMessageMediator().getConnection();
 
         conn.writeLock();

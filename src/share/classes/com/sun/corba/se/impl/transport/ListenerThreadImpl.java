@@ -40,7 +40,7 @@
 package com.sun.corba.se.impl.transport;
 
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 import com.sun.corba.se.spi.transport.ListenerThread;
 
 import com.sun.corba.se.spi.orb.ORB;
@@ -60,11 +60,11 @@ public class ListenerThreadImpl
         ORBUtilSystemException.self ;
 
     private ORB orb;
-    private CorbaAcceptor acceptor;
+    private Acceptor acceptor;
     private boolean keepRunning;
     private long enqueueTime;
 
-    public ListenerThreadImpl(ORB orb, CorbaAcceptor acceptor)
+    public ListenerThreadImpl(ORB orb, Acceptor acceptor)
     {
 	this.orb = orb;
 	this.acceptor = acceptor;
@@ -76,7 +76,7 @@ public class ListenerThreadImpl
     // ListenerThread methods.
     //
 
-    public CorbaAcceptor getAcceptor()
+    public Acceptor getAcceptor()
     {
 	return acceptor;
     }

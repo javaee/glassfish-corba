@@ -41,8 +41,8 @@
 package com.sun.corba.se.impl.protocol.giopmsgheaders;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.spi.protocol.CorbaRequestId;
-import com.sun.corba.se.impl.protocol.CorbaRequestIdImpl;
+import com.sun.corba.se.spi.protocol.RequestId;
+import com.sun.corba.se.impl.protocol.RequestIdImpl;
 
 /**
  * This implements the GIOP 1.2 CancelRequest header.
@@ -74,8 +74,8 @@ public final class CancelRequestMessage_1_2 extends Message_1_1
         return this.request_id;
     }
 
-    public CorbaRequestId getCorbaRequestId() {
-        return new CorbaRequestIdImpl(getRequestId());
+    public RequestId getCorbaRequestId() {
+        return new RequestIdImpl(getRequestId());
     }
 
     // IO methods

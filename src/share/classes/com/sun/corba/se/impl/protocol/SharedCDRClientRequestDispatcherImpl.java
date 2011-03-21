@@ -54,7 +54,7 @@ import java.io.IOException;
 import org.omg.CORBA.portable.ApplicationException;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 
 import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
@@ -70,7 +70,7 @@ import com.sun.corba.se.spi.trace.Subcontract;
 @Subcontract
 public class SharedCDRClientRequestDispatcherImpl
     extends
-	CorbaClientRequestDispatcherImpl
+	ClientRequestDispatcherImpl
 {
 
     @InfoMethod
@@ -93,8 +93,8 @@ public class SharedCDRClientRequestDispatcherImpl
 	    org.omg.CORBA.portable.RemarshalException
     {
         ORB orb = null;
-        CorbaMessageMediator messageMediator = null;
-	messageMediator = (CorbaMessageMediator)
+        MessageMediator messageMediator = null;
+	messageMediator = (MessageMediator)
 	    outputObject.getMessageMediator();
         operationAndId( messageMediator.getOperationName(),
             messageMediator.getRequestId() ) ;
@@ -123,7 +123,7 @@ public class SharedCDRClientRequestDispatcherImpl
 	//
 
 	// REVISIT: Impl cast.
-	((CorbaMessageMediatorImpl)messageMediator).handleRequestRequest(
+	((MessageMediatorImpl)messageMediator).handleRequestRequest(
             messageMediator);
 
         // InputStream must be closed on the InputObject so that its

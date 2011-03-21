@@ -85,12 +85,12 @@ import org.omg.PortableServer.ServantRetentionPolicyValue;
 
 //import org.omg.PortableServer.CurrentHelper; REVISIT
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
-import com.sun.corba.se.spi.transport.CorbaConnection;
-import com.sun.corba.se.spi.transport.CorbaTransportManager;
+import com.sun.corba.se.spi.transport.Acceptor;
+import com.sun.corba.se.spi.transport.Connection;
+import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
+import com.sun.corba.se.impl.transport.AcceptorImpl;
 
 import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
@@ -572,11 +572,11 @@ public class U
     public static boolean unregisterAcceptorAndCloseConnections(
         String socketType, com.sun.corba.se.spi.orb.ORB orb)
     {
-	CorbaTransportManager transportManager =orb.getCorbaTransportManager();
+	TransportManager transportManager =orb.getCorbaTransportManager();
 	Collection acceptors = transportManager.getAcceptors();
 	Iterator i = acceptors.iterator();
 	while (i.hasNext()) {
-	    CorbaAcceptor acceptor = (CorbaAcceptor) i.next();
+	    Acceptor acceptor = (Acceptor) i.next();
 	    if (acceptor instanceof SocketInfo) {
 		SocketInfo socketInfo = (SocketInfo) acceptor;
 		if (socketInfo.getType().equals(socketType)) {
@@ -588,10 +588,10 @@ public class U
 
 		    // Close the connection
 		    Collection connections = 
-			((com.sun.corba.se.impl.transport.CorbaConnectionCacheBase)transportManager.getInboundConnectionCache(acceptor)).values();
+			((com.sun.corba.se.impl.transport.ConnectionCacheBase)transportManager.getInboundConnectionCache(acceptor)).values();
 		    i = connections.iterator();
 		    while (i.hasNext()) {
-			CorbaConnection connection = (CorbaConnection) i.next();
+			Connection connection = (Connection) i.next();
 			CloseThread closeThread = new CloseThread(connection);
 			closeThread.start();
 		    }
@@ -606,8 +606,8 @@ public class U
 					   int port,
 					   com.sun.corba.se.spi.orb.ORB orb)
     {
-	CorbaAcceptor acceptor =
-	    new SocketOrChannelAcceptorImpl(
+	Acceptor acceptor =
+	    new AcceptorImpl(
                 orb,
 		port,
 		"Test",
@@ -826,8 +826,8 @@ public class U
 
 class CloseThread extends Thread
 {
-    CorbaConnection connection;
-    CloseThread(CorbaConnection connection)
+    Connection connection;
+    CloseThread(Connection connection)
     {
 	this.connection = connection;
     }

@@ -45,7 +45,7 @@ import java.lang.reflect.Method;
 import java.security.PrivilegedExceptionAction ;
 import java.security.AccessController ;
 
-import com.sun.corba.se.spi.protocol.CorbaClientRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ClientRequestDispatcher ;
 
 import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.copyobject.CopyobjectDefaults ;
@@ -75,7 +75,7 @@ import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.orbutil.closure.ClosureFactory ;
 
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
-import com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher ;
+import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.RequestDispatcherDefault ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory ;
 
@@ -83,8 +83,8 @@ import com.sun.corba.se.spi.resolver.LocalResolver ;
 import com.sun.corba.se.spi.resolver.Resolver ;
 import com.sun.corba.se.spi.resolver.ResolverDefault ;
 
-import com.sun.corba.se.spi.transport.CorbaContactInfoList;
-import com.sun.corba.se.spi.transport.CorbaContactInfoListFactory;
+import com.sun.corba.se.spi.transport.ContactInfoList;
+import com.sun.corba.se.spi.transport.ContactInfoListFactory;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.TransportDefault ;
 
@@ -94,7 +94,7 @@ import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.transport.SocketOrChannelAcceptorImpl;
+import com.sun.corba.se.impl.transport.AcceptorImpl;
 
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.impl.legacy.connection.SocketFactoryAcceptorImpl;
@@ -104,7 +104,7 @@ import com.sun.corba.se.impl.legacy.connection.USLPort;
 import com.sun.corba.se.impl.dynamicany.DynAnyFactoryImpl ;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
-import com.sun.corba.se.spi.transport.CorbaAcceptor;
+import com.sun.corba.se.spi.transport.Acceptor;
 
 public class ORBConfiguratorImpl implements ORBConfigurator {
     private static final ORBUtilSystemException wrapper =
@@ -200,9 +200,9 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
     {
 	ORBData od = orb.getORBData();
 
-	CorbaContactInfoListFactory contactInfoListFactory =
+	ContactInfoListFactory contactInfoListFactory =
 	    od.getCorbaContactInfoListFactory();
-	CorbaAcceptor[] acceptors = od.getAcceptors();
+	Acceptor[] acceptors = od.getAcceptors();
 
 	// BEGIN Legacy
 	ORBSocketFactory legacySocketFactory = od.getLegacySocketFactory();
@@ -228,9 +228,9 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    // Since the user specified a legacy socket factory we need to
 	    // use a ContactInfoList that will use the legacy socket factory.
 	    contactInfoListFactory =
-		new CorbaContactInfoListFactory() {
+		new ContactInfoListFactory() {
 			public void setORB(ORB orb) { }
-			public CorbaContactInfoList create( IOR ior ) {
+			public ContactInfoList create( IOR ior ) {
 			    return new SocketFactoryContactInfoListImpl( 
                                 orb, ior);
 			}
@@ -304,10 +304,10 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 					   ORBSocketFactory legacySocketFactory,
 					   int port, String name, String type)
     {
-	CorbaAcceptor acceptor;
+	Acceptor acceptor;
 	if (legacySocketFactory == null) {
 	    acceptor =
-		new SocketOrChannelAcceptorImpl(orb, port, name, type);
+		new AcceptorImpl(orb, port, name, type);
 	} else {
 	    acceptor =
 		new SocketFactoryAcceptorImpl(orb, port, name, type);
@@ -469,7 +469,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	RequestDispatcherRegistry scr = orb.getRequestDispatcherRegistry() ;
 
 	// register client subcontracts
-	CorbaClientRequestDispatcher csub =
+	ClientRequestDispatcher csub =
 	    RequestDispatcherDefault.makeClientRequestDispatcher() ;
 	scr.registerClientRequestDispatcher( csub, 
 	    ORBConstants.TOA_SCID ) ;
@@ -491,7 +491,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	    ORBConstants.MINSC_PERSISTENT_SCID ) ;
 	
 	// register server delegates
-	CorbaServerRequestDispatcher sd = 
+	ServerRequestDispatcher sd =
 	    RequestDispatcherDefault.makeServerRequestDispatcher( orb );
 	scr.registerServerRequestDispatcher( sd, 
 	    ORBConstants.TOA_SCID ) ;
@@ -555,7 +555,7 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
 	 * naming protocol.  This takes an object key of either "INIT" or 
 	 * "TINI" to allow for big or little endian implementations.
 	 */
-	CorbaServerRequestDispatcher bootsd = 
+	ServerRequestDispatcher bootsd =
 	    RequestDispatcherDefault.makeBootstrapServerRequestDispatcher( 
 		orb ) ;
 	scr.registerServerRequestDispatcher( bootsd, "INIT" ) ;

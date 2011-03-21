@@ -70,7 +70,7 @@ import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
 import com.sun.corba.se.spi.oa.ObjectAdapter;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
-import com.sun.corba.se.spi.protocol.CorbaMessageMediator;
+import com.sun.corba.se.spi.protocol.MessageMediator;
 import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.protocol.PIHandler;
 import com.sun.corba.se.spi.protocol.RetryType ;
@@ -572,7 +572,7 @@ public class PIHandlerImpl implements PIHandler
     }
 
     @TraceInterceptor
-    public void setClientPIInfo(CorbaMessageMediator messageMediator)
+    public void setClientPIInfo(MessageMediator messageMediator)
     {
 	if( !hasClientInterceptors ) return;
 	if( !isClientPIEnabledForThisThread() ) return;
@@ -737,7 +737,7 @@ public class PIHandlerImpl implements PIHandler
     private void serverInfoStackWasPopped() { }
 
     @TraceInterceptor
-    public void initializeServerPIInfo( CorbaMessageMediator request,
+    public void initializeServerPIInfo( MessageMediator request,
 	ObjectAdapter oa, byte[] objectId, ObjectKeyTemplate oktemp ) {
 
 	if( !hasServerInterceptors ) return;

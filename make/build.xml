@@ -79,6 +79,11 @@
 	<property name="test-values2.dir"               location="${test-build.dir}/values2/classes"/>
 	<property name="test-gensrc.dir"                location="${test-classes.dir}/gensrc"/>
 
+	<mkdir dir="${test-classes.dir}"/>
+	<mkdir dir="${test-values1.dir}"/>
+	<mkdir dir="${test-values2.dir}"/>
+	<mkdir dir="${test-gensrc.dir}"/>
+
         <!-- Findbugs related -->
         <property name="findbugs.dir"                   location="build/findbugs"/>
         <property name="findbugs.home"		        value="${root.dir}/lib/findbugs-1.3.9"/>
@@ -129,22 +134,13 @@
 	</pathconvert>
     </target>
 
-    <!-- ========================= PREPARE-DIRS ========================= -->
-
-    <target name="prepare-dirs" depends="corba-src.prepare-dirs">
-	<mkdir dir="${test-classes.dir}"/>
-	<mkdir dir="${test-values1.dir}"/>
-	<mkdir dir="${test-values2.dir}"/>
-	<mkdir dir="${test-gensrc.dir}"/>
-    </target>
-
     <!-- ========================= COMPILE-TESTS ========================= -->
     <!-- This target compiles all the ORB unit tests -->
-    <target name="build-tests" depends="init, prepare-dirs, run-all-test-idl, run-all-test-rmic, compile-tests"/>
+    <target name="build-tests" depends="init, run-all-test-idl, run-all-test-rmic, compile-tests"/>
 
-    <target name="compile-tests" depends="init, prepare-dirs, compile-tests-main, enhance-tests, compile-tests-values"/>
+    <target name="compile-tests" depends="init, compile-tests-main, enhance-tests, compile-tests-values"/>
 
-    <target name="compile-tests-main" depends="init, prepare-dirs">
+    <target name="compile-tests-main" depends="init">
 	<echo message="Compiling all tests"/>
 	<javac destdir="${test-classes.dir}" 
 		classpathref="test-classpath.master"
@@ -213,7 +209,7 @@
         </java>
     </target>
 
-    <target name="compile-tests-experimental" depends="init, prepare-dirs">
+    <target name="compile-tests-experimental" depends="init">
 	<mkdir dir="${experimentaltestclasses.dir}"/>
 	<javac destdir="${experimentaltestclasses.dir}" 
 		classpathref="test-classpath.master"
@@ -227,7 +223,7 @@
 	</javac>
     </target>
 
-    <target name="compile-tests-values" depends="init, prepare-dirs">
+    <target name="compile-tests-values" depends="init">
 	<!-- Compile the values classes separately so that we can
 	     control how and if they are in the classpath.
 	     values1 and values2 contain different versions of the

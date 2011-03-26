@@ -81,28 +81,264 @@
             - felix
 -->
 
-<project name="corba-src" default="all" basedir=".."
-    xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="corba-src" default="all" basedir="..">
     <description>
 	This is the Ant file that builds the GlassFish ORB.
     </description>
 
+    <import file="modules.xml"/>
+
+    <property file="make/build.properties"/>
+    <echo message="Version is ${release.version}-${build.version}"/>
+
     <property name="root.dir"			value="${basedir}"/>
 
-    <!-- ========================= set up for the maven ant tasks ========= -->
+    <target name="init" depends="modules.init">
+        <property name="gmbal-jar"              location="${libcache.dir}/gmbal.jar"/>
+        <property name="management-api-jar"     location="${libcache.dir}/management-api.jar"/>
 
-    <property name="maven.ant.file"         value="maven-ant-tasks-2.0.10.jar"/>
-    <path id="maven-ant-tasks.classpath" path="${root.dir}/lib/${maven.ant.file}"/>
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" 
-        uri="antlib:org.apache.maven.artifact.ant" 
-        classpathref="maven-ant-tasks.classpath">
-    </typedef>
+        <!-- environmental dependencies -->
+        <property environment="env"/>
+        <property name="java.home"              value="${env.JAVA_HOME}"/>
+        <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
 
-    <target name="build" depends="init, prepare-dirs, compile, 
+        <!-- Required JAR files -->
+        <property name="tools-jar"		value="${java.home}/../lib/tools.jar"/>
+        <property name="emma-jar"		value="${root.dir}/lib/emma.jar"/>
+
+        <!-- Places where the build puts things -->
+        <property name="build.dir"              location="build"/>
+        <property name="lib.dir"                location="${build.dir}/lib"/>
+	<property name="gensrc.dir"             location="${build.dir}/gensrc"/>
+	<property name="classes.dir"            location="${build.dir}/classes"/>
+	<property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
+
+        <!-- ORB library build directories -->
+	<property name="orblib.src.dir"         location="orblib/src/share/classes"/>
+	<property name="orblib.build.dir"       location="orblib/build"/>
+	<property name="orblib.classes.dir"     location="${orblib.build.dir}/classes"/>
+
+        <!-- Main ORB build directories -->
+        <property name="src.dir"		value="src/share/classes"/>
+        <property name="javadoc.dir"		value="www/javadoc"/>
+        <property name="build.sysclasspath"	value="ignore"/>
+
+        <!-- javac flags -->
+        <property name="deprecation"            value="off"/>
+        <property name="javac.optimize"		value="true"/>
+        <property name="javac.debug"		value="true"/>
+
+	<mkdir dir="${build.dir}"/>
+	<mkdir dir="${orblib.classes.dir}"/>
+	<mkdir dir="${lib.dir}"/>
+	<mkdir dir="${gensrc.dir}"/>
+	<mkdir dir="${classes.dir}"/>
+	<mkdir dir="${releaselib.dir}"/>
+	<mkdir dir="${releaselib.dir}/bundles"/>
+
+	<!-- properties needed for updating and validating copyright headers -->
+	<property name="copyright.file"
+            value="${root.dir}/make/copyright-information/copyright.txt"/>
+	<property name="copyright.roots"
+            value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/>
+	<property name="copyright.skip"
+            value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
+
+        <property name="libcache.dir"           location="${build.dir}/libcache"/>
+        
+        <get-and-copy-dependencies name="dependency" 
+            repository="http://download.java.net/maven/2"
+            destDir="${libcache.dir}">
+            <dependency-list>
+                <dependency groupId="org.glassfish.gmbal" 
+                    artifactId="gmbal"
+                    version="3.1.0-b001" scope="runtime"/>
+                <dependency groupId="org.glassfish.external" 
+                    artifactId="management-api"
+                    version="3.1.0-b001" scope="runtime"/>
+                <dependency groupId="org.apache.felix" 
+                    artifactId="org.osgi.core"
+                    version="1.2.0" scope="runtime"/>
+            </dependency-list>
+        </get-and-copy-dependencies>
+
+	<path id="classpath.master">
+            <path refid="dependency.classpath"/>
+
+	    <pathelement location="${orblib.classes.dir}"/>
+	    <pathelement location="${classes.dir}"/>
+	    <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
+	</path>
+    </target>
+
+    <!-- experimental definitions of java packaging -->
+
+    <patternset id="asm.export">
+        <include name="org/objectweb/asm"/>
+    </patternset>
+
+    <patternset id="codegen.export">
+        <include name="com/sun/corba/se/spi/orbutil/copyobject"/>
+        <include name="com/sun/corba/se/impl/orbutil/copyobject"/>
+        <include name="com/sun/corba/se/spi/orbutil/codegen"/>
+        <include name="com/sun/corba/se/impl/orbutil/codegen"/>
+    </patternset>
+
+    <patternset id="csiv2-idl.export">
+        <include name="com/sun/corba/se/org/omg/GSSUP"/>
+        <include name="com/sun/corba/se/org/omg/CSIIOP"/>
+        <include name="com/sun/corba/se/org/omg/CSI"/>
+    </patternset>
+
+    <patternset id="internal-api.export">
+        <include name="com/sun/corba/se/impl/txpoa"/>
+        <include name="com/sun/corba/se/spi/costransactions"/>
+        <include name="com/sun/corba/se/spi/folb"/>
+    </patternset>
+
+    <patternset id="newtimer.export">
+        <include name="com/sun/corba/se/spi/orbutil/newtimer"/>
+        <include name="com/sun/corba/se/spi/orbutil/tf"/>
+        <include name="com/sun/corba/se/impl/orbutil/newtimer"/>
+    </patternset>
+
+    <patternset id="omgapi.export">
+        <include name="org/omg/CosTransactions"/>
+        <include name="org/omg/stub/java/rmi"/>
+        <include name="org/omg/DynamicAny"/>
+        <include name="org/omg/DynamicAny/DynamicAnyPackage"/>
+        <include name="org/omg/DynamicAny/DynamicAnyFactoryPackage"/>
+        <include name="org/omg/CosTSPortability"/>
+        <include name="org/omg/CORBA_2_3"/>
+        <include name="org/omg/CORBA_2_3/portable"/>
+        <include name="org/omg/CosTSInteroperation"/>
+        <include name="org/omg/Dynamic"/>
+        <include name="org/omg/SendingContext"/>
+        <include name="org/omg/IOP"/>
+        <include name="org/omg/IOP/CodecPackage"/>
+        <include name="org/omg/IOP/CodecFactoryPackage"/>
+        <include name="org/omg/PortableServer"/>
+        <include name="org/omg/PortableServer/POAPackage"/>
+        <include name="org/omg/PortableServer/CurrentPackage"/>
+        <include name="org/omg/PortableServer/POAManagerPackage"/>
+        <include name="org/omg/CosNaming"/>
+        <include name="org/omg/CosNaming/NamingContextPackage"/>
+        <include name="org/omg/CosNaming/NamingContextExtPackage"/>
+        <include name="org/omg/Messaging"/>
+        <include name="org/omg/PortableInterceptor"/>
+        <include name="org/omg/PortableInterceptor/ORBInitInfoPackage"/>
+        <include name="org/omg/CORBA"/>
+        <include name="org/omg/CORBA/ORBPackage"/>
+        <include name="org/omg/CORBA/DynAnyPackage"/>
+        <include name="org/omg/CORBA/TypeCodePackage"/>
+        <include name="org/omg/CORBA/portable"/>
+        <include name="org/omg/CORBA/TSIdentificationPackage"/>
+        <include name="com/sun/corba/se/org/omg/CORBA"/>
+        <include name="javax/rmi/CORBA"/>
+    </patternset>
+
+    <patternset id="orb.export">
+        <include name="com/sun/corba/se/spi/copyobject"/>
+        <include name="com/sun/corba/se/spi/extension"/>
+        <include name="com/sun/corba/se/spi/ior"/>
+        <include name="com/sun/corba/se/spi/ior/iiop"/>
+        <include name="com/sun/corba/se/spi/legacy"/>
+        <include name="com/sun/corba/se/spi/legacy/connection"/>
+        <include name="com/sun/corba/se/spi/legacy/interceptor"/>
+        <include name="com/sun/corba/se/spi/oa"/>
+        <include name="com/sun/corba/se/spi/oa/rfm"/>
+        <include name="com/sun/corba/se/spi/orb"/>
+        <include name="com/sun/corba/se/spi/orbutil"/>
+        <include name="com/sun/corba/se/spi/orbutil/logex/corba"/>
+        <include name="com/sun/corba/se/spi/presentation/rmi"/>
+        <include name="com/sun/corba/se/spi/protocol"/>
+        <include name="com/sun/corba/se/spi/resolver"/>
+        <include name="com/sun/corba/se/spi/servicecontext"/>
+        <include name="com/sun/corba/se/spi/transport"/>
+        <include name="com/sun/corba/se/spi/logging"/>
+        <include name="com/sun/corba/se/spi/trace"/>
+        <include name="com/sun/corba/se/spi/osgi"/>
+        <include name="com/sun/org/omg/CORBA"/>
+        <include name="com/sun/org/omg/CORBA/ValueDefPackage"/>
+        <include name="com/sun/org/omg/CORBA/portable"/>
+        <include name="com/sun/org/omg/SendingContext/CodeBase"/>
+        <include name="com/sun/org/omg/SendingContext/CodeBasePackage"/>
+        <include name="com/sun/corba/se/impl/orbutil"/>
+        <include name="com/sun/corba/se/impl/naming/cosnaming"/>
+        <include name="com/sun/corba/se/impl/presentation/rmi/codegen"/>
+        <include name="com/sun/corba/se/impl/orb"/>
+        <include name="com/sun/corba/se/impl/javax"/>
+        <include name="com/sun/corba/se/impl/javax/rmi"/>
+        <include name="com/sun/corba/se/impl/javax/rmi/CORBA"/>
+        <include name="com/sun/corba/se/impl/encoding"/>
+        <include name="com/sun/corba/se/impl/folb"/>
+    </patternset>
+
+    <patternset id="orb.private">
+        <include name="com/sun/corba/se/impl/interceptors"/>
+        <include name="com/sun/corba/se/impl/io"/>
+        <include name="com/sun/corba/se/impl/ior"/>
+        <include name="com/sun/corba/se/impl/ior/iiop"/>
+        <include name="com/sun/corba/se/impl/legacy"/>
+        <include name="com/sun/corba/se/impl/legacy/connection"/>
+        <include name="com/sun/corba/se/impl/oa"/>
+        <include name="com/sun/corba/se/impl/oa/poa"/>
+        <include name="com/sun/corba/se/impl/oa/toa"/>
+        <include name="com/sun/corba/se/impl/oa/rfm"/>
+        <include name="com/sun/corba/se/impl/plugin"/>
+        <include name="com/sun/corba/se/impl/plugin/hwlb"/>
+        <include name="com/sun/corba/se/impl/protocol/"/>
+        <include name="com/sun/corba/se/impl/protocol/giopmsgheaders"/>
+        <include name="com/sun/corba/se/impl/resolver"/>
+        <include name="com/sun/corba/se/impl/servicecontext"/>
+        <include name="com/sun/corba/se/impl/transport"/>
+        <include name="com/sun/corba/se/impl/util"/>
+        <include name="com/sun/corba/se/impl/osgi/loader"/>
+        <include name="com/sun/corba/se/impl/corba"/>
+        <include name="com/sun/corba/se/impl/dynamicany"/>
+        <include name="com/sun/corba/se/impl/naming/namingutil"/>
+        <include name="com/sun/corba/se/impl/presentation/rmi"/>
+    </patternset>
+
+    <patternset id="orbgeneric.export">
+        <include name="com/sun/corba/se/spi/orbutil/generic"/>
+        <include name="com/sun/corba/se/spi/orbutil/closure"/>
+        <include name="com/sun/corba/se/spi/orbutil/proxy"/>
+        <include name="com/sun/corba/se/impl/orbutil/graph"/>
+        <include name="com/sun/corba/se/spi/orbutil/fsm"/>
+        <include name="com/sun/corba/se/spi/orbutil/misc"/>
+        <include name="com/sun/corba/se/spi/orbutil/logex"/>
+        <include name="com/sun/corba/se/spi/orbutil/logex/stdcorba"/>
+        <include name="com/sun/corba/se/spi/orbutil/threadpool"/>
+        <include name="com/sun/corba/se/impl/orbutil/threadpool"/>
+    </patternset>
+
+    <patternset id="orbgeneric.private">
+        <include name="com/sun/corba/se/impl/orbutil/closure"/>
+    </patternset>
+
+    <patternset id="osgi-test.private">
+        <include name="com/sun/corba/se/impl/osgi/main"/>
+    </patternset>
+
+    <patternset id="orb.testable.source">
+        <patternset refid="codegen.export"/>
+        <patternset refid="internal-api.export"/>
+        <patternset refid="newtimer.export"/>
+        <patternset refid="codegen.export"/>
+        <patternset refid="orbgeneric.private"/>
+        <patternset refid="orbgeneric.export"/>
+        <patternset refid="orb.private"/>
+        <patternset refid="orb.export"/>
+    </patternset>
+
+    <!-- standard build targets -->
+
+    <target name="build" depends="init, compile, 
         generate-orb-resources, enhance-orb,
         compile-timing-points, make-bundles, archive-bundles"/>
 
-    <target name="build-no-enhance" depends="init, prepare-dirs, compile, 
+    <target name="build-no-enhance" depends="init, compile, 
         generate-orb-resources, generate-timing-points, compile-timing-points,
         make-bundles, archive-bundles"/>
 
@@ -140,123 +376,6 @@
         <run-enhance mode="TimingPoints"/>
     </target>
 
-    <target name="init">
-        <property file="make/build.properties"/>
-        <echo message="Version is ${release.version}-${build.version}"/>
-
-        <!-- environmental dependencies -->
-        <property environment="env"/>
-        <property name="java.home"              value="${env.JAVA_HOME}"/>
-        <echo message="java.home=${java.home}"/> <!-- Why does this end in jre? -->
-        <property name="maven.repo.local"       value="${env.HOME}/.m2"/>
-        <echo message="maven.repo.local=${maven.repo.local}"/> 
-
-        <!-- Required JAR files -->
-        <property name="tools-jar"		value="${java.home}/../lib/tools.jar"/>
-        <property name="emma-jar"		value="${root.dir}/lib/emma.jar"/>
-
-        <!-- Places where the build puts things -->
-        <property name="build.dir"              location="build"/>
-        <property name="lib.dir"                location="${build.dir}/lib"/>
-        <property name="libcache.dir"           location="${build.dir}/libcache"/>
-        <property name="gmbal-jar"              location="${libcache.dir}/gmbal.jar"/>
-        <property name="management-api-jar"     location="${libcache.dir}/management-api.jar"/>
-	<property name="gensrc.dir"             location="${build.dir}/gensrc"/>
-	<property name="classes.dir"            location="${build.dir}/classes"/>
-	<property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
-
-        <!-- ORB library build directories -->
-	<property name="orblib.src.dir"         location="orblib/src/share/classes"/>
-	<property name="orblib.build.dir"       location="orblib/build"/>
-	<property name="orblib.classes.dir"     location="${orblib.build.dir}/classes"/>
-
-        <!-- Main ORB build directories -->
-        <property name="src.dir"		value="src/share/classes"/>
-        <property name="javadoc.dir"		value="www/javadoc"/>
-        <property name="build.sysclasspath"	value="ignore"/>
-
-        <!-- javac flags -->
-        <property name="deprecation"            value="off"/>
-        <property name="javac.optimize"		value="true"/>
-        <property name="javac.debug"		value="true"/>
-
-	<!-- properties needed for updating and validating copyright headers -->
-	<property name="copyright.file"
-            value="${root.dir}/make/copyright-information/copyright.txt"/>
-	<property name="copyright.roots"
-            value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/>
-	<property name="copyright.skip"
-            value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
-
-        <!-- properties needed for pushing jar to maven repository -->
-        <property name="orb.version"
-            value="${release.version}-${build.version}"/>
-        <property name="orb.groupId"            value="com.sun.corba"/>
-        <!--
-        <property name="repo.url"
-            value="java-net:/maven2-repository/trunk/repository"/>
-            -->
-        <property name="repo.url"
-            value="svn:https://svn.java.net/svn/maven2-repository~svn/trunk/repository"/>
-        <property name="file.url"               value="file:/tmp/maven"/>
-        <property name="local.url"              value="file:${maven.repo.local}"/>
-        <property name="bundle.name.prefix"     value="glassfish-corba-"/>
-        <property name="bnd.properties.file"    value="make/bnd/bnd.properties"/>
-        
-        <artifact:remoteRepository id="gf.repo" url="${gf.repository}"/>
-        <artifact:remoteRepository id="aqute.repo" url="${aqute.repository}"/>
-        <artifact:remoteRepository id="deploy.repo" url="${repo.url}"/>
-
-        <artifact:dependencies versionsId="dependency.versions"
-            filesetId="dependency.fileset" pathId="dependency.classpath">
-            <remoteRepository refid="gf.repo"/>
-            <dependency groupId="${gmbal.groupid}" 
-                artifactId="${gmbal.artifactid}"
-                version="${gmbal.version}" scope="runtime"/>
-            <dependency groupId="${management-api.groupid}" 
-                artifactId="${management-api.artifactid}"
-                version="${management-api.version}" scope="runtime"/>
-            <dependency groupId="${felix.groupid}" 
-                artifactId="${felix.artifactid}"
-                version="${felix.version}" scope="runtime"/>
-        </artifact:dependencies>
-
-        <artifact:dependencies pathId="bnd.classpath">
-            <remoteRepository refid="aqute.repo"/>
-            <dependency groupId="${bnd.groupid}" 
-                artifactId="${bnd.artifactid}"
-                version="${bnd.version}" scope="compile"/>
-        </artifact:dependencies>
-
-	<path id="classpath.master">
-            <path refid="dependency.classpath"/>
-
-	    <pathelement location="${orblib.classes.dir}"/>
-	    <pathelement location="${classes.dir}"/>
-	    <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
-	</path>
-    </target>
-
-    <target name="get-dependencies" depends="init">
-            <mkdir dir="${libcache.dir}"/>
-            <copy todir="${libcache.dir}">
-                <fileset refid="dependency.fileset"/>
-                <mapper classpathref="maven-ant-tasks.classpath" 
-                    classname="org.apache.maven.artifact.ant.VersionMapper"
-                    from="${dependency.versions}" to="flatten"/>
-            </copy>
-    </target>
-
-    <target name="prepare-dirs" depends="init">
-	<mkdir dir="${build.dir}"/>
-	<mkdir dir="${orblib.classes.dir}"/>
-	<mkdir dir="${lib.dir}"/>
-	<mkdir dir="${gensrc.dir}"/>
-	<mkdir dir="${classes.dir}"/>
-	<mkdir dir="${releaselib.dir}"/>
-	<mkdir dir="${releaselib.dir}/bundles"/>
-    </target>
-
     <!-- ========================= COMPILE ========================= -->
 
     <target name="compile-timing-points" depends="init">
@@ -276,9 +395,8 @@
 	</javac>
     </target>
 
-    <target name="compile" depends="init, prepare-dirs, get-dependencies, 
-        orb-library, compile-enhancer, compile-idl-compiler, run-all-idl,
-        delete-java-sources, copy-resources">
+    <target name="compile" depends="init, orb-library, compile-enhancer, 
+        compile-idl-compiler, run-all-idl, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
 		classpathref="classpath.master"
@@ -528,79 +646,6 @@
 	</copy>
     </target>
 
-    <!-- ================== OSGi bundles for the ORB ======================= -->
-
-    <macrodef name="make-bundle">
-        <attribute name="classpath"/>
-        <attribute name="file"/>
-            <sequential>
-                <java classpathref="bnd.classpath" 
-                    classname="aQute.bnd.main.bnd" fork="true"
-                    failonerror="true">
-                    <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
-                    <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
-                    <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
-                    <jvmarg value="-Dcorba.build.identifier=${corba.build.identifier}"/>
-                    <arg value="build"/>
-                    <arg value="-classpath"/>
-                    <arg value="@{classpath}"/>
-                    <arg value="-output"/>
-                    <arg value="${releaselib.dir}/bundles/${bundle.name.prefix}@{file}.jar"/>
-                    <arg value="make/bnd/glassfish-corba-@{file}.bnd"/>
-                </java>
-            </sequential>
-    </macrodef>
-
-    <target name="make-src-bundle" depends="init">
-        <jar jarfile="${releaselib.dir}/bundles/glassfish-corba-source.jar"
-            duplicate="fail">
-            <fileset dir="${src.dir}">
-                <include name="**/*.java"/>
-            </fileset>
-            <fileset dir="${gensrc.dir}">
-                <include name="**/*.java"/>
-            </fileset>
-            <fileset dir="${orblib.src.dir}">
-                <include name="**/*.java"/>
-            </fileset>
-        </jar>
-    </target>
-
-    <target name="make-bundles"
-        depends="init,generate-bnd-properties,make-src-bundle">
-        <make-bundle classpath="${classes.dir}" file="orb"/>
-        <make-bundle classpath="${classes.dir}" file="omgapi"/>
-        <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>
-        <make-bundle classpath="${classes.dir}" file="internal-api"/>
-
-        <make-bundle classpath="${orblib.classes.dir}" file="codegen"/>
-        <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
-        <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
-        <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
-        <make-bundle classpath="${classes.dir}" file="osgi-test"/>
-    </target>
-
-    <target name="archive-bundles" depends="init">
-        <mkdir dir="${releaselib.dir}/glassfish/modules"/>
-        <copy todir="${releaselib.dir}/glassfish/modules">
-            <fileset dir="${releaselib.dir}/bundles">
-                <include name="glassfish-corba-*.jar"/>
-                <exclude name="glassfish-corba-source.jar"/>
-                <exclude name="glassfish-corba-osgi-test.jar"/> 
-            </fileset>
-        </copy>
-        <zip destfile="${releaselib.dir}/bundles-archive.zip" compress="false"
-            basedir="${releaselib.dir}"
-            includes="glassfish/modules/*"/>
-        <delete dir="${releaselib.dir}/glassfish/modules"/>
-    </target>
-
-    <target name="archive-workspace" depends="init">
-        <delete file="${releaselib.dir}/ws.zip"/>
-        <zip destfile="${root.dir}/ws.zip" basedir="${root.dir}" level="9"
-         includes="build/**,lib/**,make/**,orblib/**,src/**,test/**"/>
-        <move file="${root.dir}/ws.zip" todir="${releaselib.dir}"/>
-    </target>
 
     <!-- ========================= Build the ORB library ====================  
 	The ORB library is a collection of all the reuseable, ORB-independent
@@ -618,7 +663,7 @@
      -->
 
     <target name="orb-library" 
-     depends="init, get-dependencies, compile-orb-library, generate-orb-lib-resources">
+     depends="init, compile-orb-library, generate-orb-lib-resources">
 	<jar jarfile="${releaselib.dir}/orblib.jar"
 		    duplicate="fail">
 	    <fileset dir="${orblib.classes.dir}">
@@ -650,7 +695,7 @@
 	</java>
     </target>
    
-    <target name="compile-orb-library" depends="init, prepare-dirs">
+    <target name="compile-orb-library" depends="init">
 	<echo message="Compiling ORB library"/>
 	<javac destdir="${orblib.classes.dir}" 
 		classpathref="classpath.master"
@@ -888,13 +933,7 @@
 	</java>
     </target>
 
-    <target name="generate-bnd-properties" depends="init">
-        <propertyfile file="${bnd.properties.file}">
-            <entry key="Bundle-Version"
-             value="${release.version}-${build.version}"/>
-        </propertyfile>
-    </target> 
-
+    
     <!-- Checks to see if the destination directory for the IDL invocation exists
          and if it does exist then has the idl file been changed in reference to 
          the generated files  -->
@@ -1147,171 +1186,35 @@
         </antcall>
     </target>
 
-    <target name="mavenize" depends="init" description="initialize maven ">
-        <!-- Download the SVN provider-->
-        <artifact:install-provider artifactId="wagon-svn"
-         groupId="org.jvnet.wagon-svn" version="1.7">
-            <artifact:remoteRepository id="java.net.maven2.repository"
-             url="http://download.java.net/maven/2/" />
-            <!-- store the provider in temp local repository-->
-        </artifact:install-provider>
-    </target>
-
-    <!--
-    Variables in templates:
-        groupId         always com.sun.corba
-        jarName         the name of the jar file (glassfish-corba-<module>)
-        version         the current CORBA version
-        jarDescription  a brief description of the jar contents
-        HEADER-@{module} the expanded version of make/pom/header.xml inserted 
-                        into the pom file. Note that all properties must have
-                        unique names.  Ant is COMPLETELY
-                        braindead: see Greenberg's 10th law.
-
-    naming conventions:
-    The modules             (and their dependencies):
-        asm                 -
-        orbgeneric          -
-        codegen             asm orbgeneric
-        omgapi              -
-        internal-api        -
-        csiv2-idl           omgapi
-        newtimer            orbgeneric codegen 
-        orb                 codegen newtimer omgapi orbgeneric
-
-        for each module m:
-            bnd file:           ${root.dir}/make/bnd/gflassfish-corba-${m}.bnd
-            pom template:       ${root.dir}/make/pom/${m}.template.pom
-            resulting jar:      ${releaselib.dir}/bundles/glassfish-corba-${m}.jar
-    -->
-
-    <macrodef name="make-file">
-        <attribute name="module"/>
-        <attribute name="description"/>
-        <sequential>
-            <loadfile property="HEADER-@{module}"
-             srcFile="make/pom/header.xml">
-                <filterchain>
-                    <replacetokens>
-                        <token key="artifactId"
-                         value="glassfish-corba-@{module}"/>
-                        <token key="version" value="${orb.version}"/>
-                        <token key="jarDescription" value="@{description}"/>
-                        <token key="groupId" value="${orb.groupId}"/>
-                        <token key="repositoryUrl" value="${repo.url}"/>
-                    </replacetokens>
-                </filterchain>
-            </loadfile>
-            <copy file="make/pom/@{module}.template.xml"
-             tofile="make/corba.temp.pom" overwrite="true">
-                <filterset>
-                  <filter token="HEADER" value="${HEADER-@{module}}"/>
-                  <filter token="version" value="${orb.version}"/>
-                  <filter token="groupId" value="${orb.groupId}"/>
-                </filterset>
-            </copy>
-        </sequential>
-    </macrodef>
-
-    <!--  
-    Note that we use a temporary file to store the pom because maven is based 
-    on 'single project produces single jar file'. But, we are producing 9 jars
-    from a single project. Hence, we need a template to for each pom that
-    generates the POM we use each time we publish.
-
-    Refer: http://maven.apache.org/guides/mini/guide-using-one-source-directory.html
-    Section: Producing Multiple JARs from a single POM (maven limitations)
-
-    For some reason, artifact:deploy stopped working to deploy to ~/.m2/repository.
-    Once again, ant reveals its weakness, and I can't find a way to avoid the code
-    duplication below.
-    -->
-
-    <macrodef name="push-to-local-maven">
-        <attribute name="module"/>
-        <attribute name="description"/>
-        <sequential>
-            <echo message="Releasing module @{module} (@{description}) to @{destination}"/>
-            <make-file module="@{module}" description="@{description}"/>
-
-            <artifact:pom id="glassfish.corba.project" file="make/corba.temp.pom" />
-            <artifact:install file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
-                <pom refid="glassfish.corba.project"/>
-            </artifact:install>
-            <delete file="make/corba.temp.pom" verbose="true"/>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="push-to-maven">
-        <attribute name="module"/>
-        <attribute name="description"/>
-        <attribute name="destination"/>
-        <sequential>
-            <mkdir dir="make/gen/pom"/>
-            <echo message="Releasing module @{module} (@{description}) to @{destination}"/>
-            <make-file module="@{module}" description="@{description}"/>
-
-            <artifact:pom id="glassfish.corba.project"
-             file="make/corba.temp.pom" />
-            <artifact:deploy file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
-                <remoteRepository url="@{destination}">
-                    <authentication id="java.net.maven2.repository"/>
-                </remoteRepository>
-                <pom refid="glassfish.corba.project"/>
-            </artifact:deploy>
-            <move file="make/corba.temp.pom" todir="make/gen/pom"/>
-            <move file="make/gen/pom/corba.temp.pom" tofile="glassfish-corba-@{module}.pom"/>
-            <!-- <delete file="make/corba.temp.pom" verbose="true"/> -->
-        </sequential>
-    </macrodef>
-
-    <macrodef name="release-to-maven">
-        <attribute name="destination"/>
-        <sequential>
-            <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <push-to-maven destination="@{destination}" module="asm" 
-             description="ASM version used in the ORB"/>
-            <push-to-maven destination="@{destination}" module="codegen" 
-             description="Dynamic code generation library"/>
-            <push-to-maven destination="@{destination}" module="csiv2-idl"
-             description="IDL generated definitions for CSIv2"/>
-            <push-to-maven destination="@{destination}" module="internal-api"
-             description="Non-standard ORB API classes for transactions and IIOP FOLB"/>
-            <push-to-maven destination="@{destination}" module="newtimer"
-             description="ORB timer library"/>
-            <push-to-maven destination="@{destination}" module="omgapi"
-             description="OMG standard APIs"/>
-            <push-to-maven destination="@{destination}" module="orb"
-             description="The ORB implementation"/>
-            <push-to-maven destination="@{destination}" module="orbgeneric"
-             description="Generic libraries"/>
-            <push-to-maven destination="@{destination}" module="source"
-             description="ORB source code"/>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="release-to-local-maven">
-        <sequential>
-            <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <push-to-local-maven module="asm" description="ASM version used in the ORB"/>
-            <push-to-local-maven module="codegen" description="Dynamic code generation library"/>
-            <push-to-local-maven module="csiv2-idl" description="IDL generated definitions for CSIv2"/>
-            <push-to-local-maven module="internal-api" description="Non-standard ORB API classes for transactions and IIOP FOLB"/>
-            <push-to-local-maven module="newtimer" description="ORB timer library"/>
-            <push-to-local-maven module="omgapi" description="OMG standard APIs"/>
-            <push-to-local-maven module="orb" description="The ORB implementation"/>
-            <push-to-local-maven module="orbgeneric" description="Generic libraries"/>
-            <push-to-local-maven module="source" description="ORB source code"/>
-        </sequential>
-    </macrodef>
-
-    <target name="release" depends="init, mavenize">
+    <target name="release" depends="init">
         <echo message="releasing to ${repo.url}"/>
         <release-to-maven destination="${repo.url}"/>
     </target>
 
-    <target name="release-local" depends="init, mavenize">
-        <echo message="releasiong to ${local.url}"/>
+    <target name="release-local" depends="init">
+        <echo message="releasiong to local repository"/>
         <release-to-local-maven/>
+    </target>
+
+    <target name="archive-bundles" depends="init">
+        <mkdir dir="${releaselib.dir}/glassfish/modules"/>
+        <copy todir="${releaselib.dir}/glassfish/modules">
+            <fileset dir="${releaselib.dir}/bundles">
+                <include name="glassfish-corba-*.jar"/>
+                <exclude name="glassfish-corba-source.jar"/>
+                <exclude name="glassfish-corba-osgi-test.jar"/> 
+            </fileset>
+        </copy>
+        <zip destfile="${releaselib.dir}/bundles-archive.zip" compress="false"
+            basedir="${releaselib.dir}"
+            includes="glassfish/modules/*"/>
+        <delete dir="${releaselib.dir}/glassfish/modules"/>
+    </target>
+
+    <target name="archive-workspace" depends="init">
+        <delete file="${releaselib.dir}/ws.zip"/>
+        <zip destfile="${root.dir}/ws.zip" basedir="${root.dir}" level="9"
+         includes="build/**,lib/**,make/**,orblib/**,src/**,test/**"/>
+        <move file="${root.dir}/ws.zip" todir="${releaselib.dir}"/>
     </target>
 </project>

@@ -217,6 +217,29 @@
         </sequential>
     </macrodef>
 
+    <!--
+    Script for generating an OSGi bundle using bnd
+    Basic idea:
+    - pass arguments for contents of bnd file and directives to bnd
+    - convert arguments as needed
+    - write out bnd file
+    - run bnd to generate bundle
+    - cleanup temp file
+
+    Arguments:
+        version: string
+        classpath: path
+        outDir: string
+        outFile: string
+        exportPackages: a refid to a patternSet
+        privatePackages: a refid to a patternSet
+        bundleActivator: string (classname)
+        dynamicImportPackage: string (classname)
+        Others: (name, value pairs)
+            Probe-Provider-Class
+            ORB-Class-Provider
+    -->
+
     <!--  
     Note that we use a temporary file to store the pom because maven is based 
     on 'single project produces single jar file'. But, we are producing 9 jars

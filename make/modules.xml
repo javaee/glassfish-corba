@@ -63,18 +63,8 @@
              url="http://www.aqute.biz/repo"/>
             <dependency groupId="biz.aQute" 
                 artifactId="bnd"
-                version="0.0.373" scope="compile"/>
+                version="0.0.401" scope="compile"/>
         </artifact:dependencies>
-
-        <!-- properties needed for pushing jar to maven repository -->
-        <property name="orb.version"
-            value="${release.version}-${build.version}"/>
-        <property name="orb.groupId"            value="com.sun.corba"/>
-        <property name="repo.url"
-            value="svn:https://svn.java.net/svn/maven2-repository~svn/trunk/repository"/>
-        <property name="file.url"               value="file:/tmp/maven"/>
-        <property name="bundle.name.prefix"     value="glassfish-corba-"/>
-        <property name="bnd.properties.file"    value="make/bnd/bnd.properties"/>
     </target>
 
     <macrodef name="get-and-copy-dependencies">
@@ -100,65 +90,114 @@
         </sequential>
     </macrodef>
 
-    <!-- ================== OSGi bundles for the ORB ======================= -->
+    <!-- ================== OSGi bundle support ======================= -->
 
-    <target name="generate-bnd-properties" depends="init">
-        <propertyfile file="${bnd.properties.file}">
-            <entry key="Bundle-Version"
-             value="${release.version}-${build.version}"/>
-        </propertyfile>
-    </target> 
+
+    <scriptdef name="make-bundle-file" language="javascript">
+	<attribute name="version"/>
+	<attribute name="outfile"/>
+	<element name="directive" classname="org.apache.tools.ant.types.Parameter"/>
+	<![CDATA[
+	    function openFile( name ) {
+		var fos = new java.io.FileOutputStream( name ) ;
+		var osw = new java.io.OutputStreamWriter( fos ) ;
+		var writer = new java.io.BufferedWriter( osw ) ;
+		return writer ;
+	    }
+
+	    function writeString( file, str ) {
+	        file.write( str, 0, str.length ) ;
+		file.newLine() ;
+	    }
+
+	    function convert( object ) {
+		if (object==null) {
+		    return null ;
+		}
+
+		var res = object.toString() ;
+		if (res.startsWith( "[" )) {
+		    var flag = true ;
+		    res = "" ;
+		    for (var ctr=0; ctr<object.length; ctr++) {
+		        if (flag) {
+			    flag = false ;
+			} else {
+			    res += ", " ;
+			}
+			res += convert( object[ctr] ) ;
+		    }
+		} 
+		return res ;
+	    }
+
+	    var version = attributes.get("version") ; 
+	    var outfile = attributes.get("outfile") ; 
+
+	    // Write out the bnd control file
+
+	    var file = openFile( outfile ) ;
+
+	    try {
+		writeString( file, "Bundle-Version=" + version ) ;
+		var directives = elements.get("directive") ;
+		for (var ctr = 0; ctr<directives.size(); ctr++) {
+		    var directive = directives.get(ctr) ;
+		    var type = directive.getType() ;
+		    var name = directive.getName() ;
+		    var value = directive.getValue() ;
+		    // self.log( "directives[" + ctr + "]:" ) ;
+		    // self.log( "\ttype=" + directive.getType() ) ;
+		    // self.log( "\tname=" + directive.getName() ) ;
+		    // self.log( "\tvalue=" + convert( directive.getValue() ) ) ;
+		    var content = null ;
+		    if (name==null) {
+			content = value ;
+		    } else {
+			content = project.references.get( name ) ;
+			if (content == null) {
+			    throw new Error( "Content for type " + type + " is null" ) ; 
+			} else {
+			    content = content.getIncludePatterns( project ) ;
+			}
+		    }
+		    // self.log( "\tcontent=" + convert( content ) ) ;
+		    writeString( file, type + ": " + convert( content ) ) ;
+		}
+	    } finally {
+		file.close() ;
+	    }
+	]]>
+    </scriptdef>
 
     <macrodef name="make-bundle">
-        <attribute name="classpath"/>
-        <attribute name="file"/>
-            <sequential>
-                <java classpathref="bnd.classpath" 
-                    classname="aQute.bnd.main.bnd" fork="true"
-                    failonerror="true">
-                    <jvmarg value="-Dcorba.major.version=${corba.major.version}"/>
-                    <jvmarg value="-Dcorba.minor.version=${corba.minor.version}"/>
-                    <jvmarg value="-Dcorba.update.version=${corba.update.version}"/>
-                    <jvmarg value="-Dcorba.build.identifier=${corba.build.identifier}"/>
-                    <arg value="build"/>
-                    <arg value="-classpath"/>
-                    <arg value="@{classpath}"/>
-                    <arg value="-output"/>
-                    <arg value="${releaselib.dir}/bundles/${bundle.name.prefix}@{file}.jar"/>
-                    <arg value="make/bnd/glassfish-corba-@{file}.bnd"/>
-                </java>
-            </sequential>
-    </macrodef>
+	<attribute name="version"/>
+	<attribute name="classpath"/>
+	<attribute name="outDir"/>
+	<attribute name="outFile"/>
+	<element name="directive-list"/>
+	<sequential>
+	    <make-bundle-file version="@{version}" outfile="bndfile.temp">
+		<directive-list/>
+	    </make-bundle-file>
+	
+	    <!-- Use bnd to generate the bundle jar file. -->
 
-    <target name="make-src-bundle" depends="init">
-        <jar jarfile="${releaselib.dir}/bundles/glassfish-corba-source.jar"
-            duplicate="fail">
-            <fileset dir="${src.dir}">
-                <include name="**/*.java"/>
-            </fileset>
-            <fileset dir="${gensrc.dir}">
-                <include name="**/*.java"/>
-            </fileset>
-            <fileset dir="${orblib.src.dir}">
-                <include name="**/*.java"/>
-            </fileset>
-        </jar>
-    </target>
+	    <java classpathref="bnd.classpath" classname="aQute.bnd.main.bnd" 
+		fork="true" failonerror="true">
 
-    <target name="make-bundles"
-        depends="init,generate-bnd-properties,make-src-bundle">
-        <make-bundle classpath="${classes.dir}" file="orb"/>
-        <make-bundle classpath="${classes.dir}" file="omgapi"/>
-        <make-bundle classpath="${classes.dir}" file="csiv2-idl"/>
-        <make-bundle classpath="${classes.dir}" file="internal-api"/>
+		<arg value="build"/>
+		<arg value="-noeclipse"/>
+		<arg value="-classpath"/>
+		<arg value="@{classpath}"/>
+		<arg value="-output"/>
+		<arg value="@{outDir}/@{outFile}.jar"/>
+		<arg value="make/bndfile.temp"/>
+	    </java>
 
-        <make-bundle classpath="${orblib.classes.dir}" file="codegen"/>
-        <make-bundle classpath="${orblib.classes.dir}" file="newtimer"/>
-        <make-bundle classpath="${orblib.classes.dir}" file="orbgeneric"/>
-        <make-bundle classpath="${orblib.classes.dir}" file="asm"/>
-        <make-bundle classpath="${classes.dir}" file="osgi-test"/>
-    </target>
-
+	    <delete file="bndfile.temp"/>
+	</sequential>
+    </macrodef>	
 
     <!-- Pushing artifacts to maven
 
@@ -216,29 +255,6 @@
             </copy>
         </sequential>
     </macrodef>
-
-    <!--
-    Script for generating an OSGi bundle using bnd
-    Basic idea:
-    - pass arguments for contents of bnd file and directives to bnd
-    - convert arguments as needed
-    - write out bnd file
-    - run bnd to generate bundle
-    - cleanup temp file
-
-    Arguments:
-        version: string
-        classpath: path
-        outDir: string
-        outFile: string
-        exportPackages: a refid to a patternSet
-        privatePackages: a refid to a patternSet
-        bundleActivator: string (classname)
-        dynamicImportPackage: string (classname)
-        Others: (name, value pairs)
-            Probe-Provider-Class
-            ORB-Class-Provider
-    -->
 
     <!--  
     Note that we use a temporary file to store the pom because maven is based 

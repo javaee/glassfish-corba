@@ -399,7 +399,7 @@
         </propertyfile>
     </target>
 
-    <target name="update-build" depends="increment-build-version,generate-bnd-properties"/>
+    <target name="update-build" depends="increment-build-version"/>
   
     <taskdef name="java2html"
         classname="de.java2html.anttasks.Java2HtmlTask"

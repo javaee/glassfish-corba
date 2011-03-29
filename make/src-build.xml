@@ -41,29 +41,27 @@
 -->
 
 <!--
-    The source code is divided into 3 areas:
-        orb-library:
+    The source code is divided into 2 areas:
+        orb-library (orblib/src, orblib/build):
             Contents: Contains libraries that can be used independently of the 
                 ORB.  This includes the codegen library, the timing facility, an
                 FSM library, and a number of generic utilities.  This also 
                 includes a copy of the ASM library from ObjectWeb.
-            Dependencies: May not depend on classes from any other area.  
+            Dependencies: May not depend on classes from the main src branch.  
             Delivery: as OSGi bundles:
                 glassfish-corba-codegen
                 glassfish-corba-newtimer
                 glassfish-corba-orbgeneric
                 glassfish-corba-asm
-        main:
+        main (src dir, build dir):
             Contents: The core of the ORB.
             Dependencies: Depends only on orb-library.
             Delivery: as OSGi bundles:
                 glassfish-corba-orb
                 glassfish-corba-omgapi
                 glassfish-corba-csiv2-idl
-        experimental:
-            Contents: experimental code not fully finished or delivered.
-            Depencies: Depends only on orb-library at present.
-            Delivery: not delivered
+		glassfish-corba-internal-api
+		glassfish-osgi-test (testing osgi only; not delivered)
 
     Dependencies:
         Standard for source build:
@@ -71,13 +69,12 @@
             - ant 1.7.1 or later
         Non-standard (must be available in source build environment)
             - hg
-            - bnd
-            - maven-ant-tasks-2.0.10
-        Other Sun projects (from local maven repo in source build)
+        Other maven projects (from local maven repo in source build):
             - gmbal
             - management-api
             - wagon-svn
-        Non-sun projects (also from local maven repo)
+	    - bnd
+	    - maven-ant-tasks
             - felix
 -->
 
@@ -88,14 +85,16 @@
 
     <import file="modules.xml"/>
 
+    <property name="root.dir"			value="${basedir}"/>
     <property file="make/build.properties"/>
+    <property name="orb.version"		value="${release.version}-${build.version}"/>
     <echo message="Version is ${release.version}-${build.version}"/>
 
-    <property name="root.dir"			value="${basedir}"/>
-
     <target name="init" depends="modules.init">
-        <property name="gmbal-jar"              location="${libcache.dir}/gmbal.jar"/>
-        <property name="management-api-jar"     location="${libcache.dir}/management-api.jar"/>
+        <property name="orb.groupId"            value="com.sun.corba"/>
+        <property name="repo.url"
+            value="svn:https://svn.java.net/svn/maven2-repository~svn/trunk/repository"/>
+        <property name="file.url"               value="file:/tmp/maven"/>
 
         <!-- environmental dependencies -->
         <property environment="env"/>
@@ -112,6 +111,7 @@
 	<property name="gensrc.dir"             location="${build.dir}/gensrc"/>
 	<property name="classes.dir"            location="${build.dir}/classes"/>
 	<property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
+        <property name="libcache.dir"           location="${build.dir}/libcache"/>
 
         <!-- ORB library build directories -->
 	<property name="orblib.src.dir"         location="orblib/src/share/classes"/>
@@ -144,7 +144,8 @@
 	<property name="copyright.skip"
             value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
 
-        <property name="libcache.dir"           location="${build.dir}/libcache"/>
+        <property name="gmbal-jar"              location="${libcache.dir}/gmbal.jar"/>
+        <property name="management-api-jar"     location="${libcache.dir}/management-api.jar"/>
         
         <get-and-copy-dependencies name="dependency" 
             repository="http://download.java.net/maven/2"
@@ -169,178 +170,292 @@
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
 	</path>
+
+	<!-- Definitions for java packaging -->
+
+	<patternset id="asm.export">
+	    <include name="org.objectweb.asm"/>
+	</patternset>
+
+	<patternset id="codegen.export">
+	    <include name="com.sun.corba.se.spi.orbutil.copyobject"/>
+	    <include name="com.sun.corba.se.impl.orbutil.copyobject"/>
+	    <include name="com.sun.corba.se.spi.orbutil.codegen"/>
+	    <include name="com.sun.corba.se.impl.orbutil.codegen"/>
+	</patternset>
+
+	<patternset id="csiv2-idl.export">
+	    <include name="com.sun.corba.se.org.omg.GSSUP"/>
+	    <include name="com.sun.corba.se.org.omg.CSIIOP"/>
+	    <include name="com.sun.corba.se.org.omg.CSI"/>
+	</patternset>
+
+	<patternset id="internal-api.export">
+	    <include name="com.sun.corba.se.impl.txpoa"/>
+	    <include name="com.sun.corba.se.spi.costransactions"/>
+	    <include name="com.sun.corba.se.spi.folb"/>
+	</patternset>
+
+	<patternset id="newtimer.export">
+	    <include name="com.sun.corba.se.spi.orbutil.newtimer"/>
+	    <include name="com.sun.corba.se.spi.orbutil.tf"/>
+	    <include name="com.sun.corba.se.impl.orbutil.newtimer"/>
+	</patternset>
+
+	<patternset id="omgapi.export">
+	    <include name="org.omg.CosTransactions"/>
+	    <include name="org.omg.stub.java.rmi"/>
+	    <include name="org.omg.DynamicAny"/>
+	    <include name="org.omg.DynamicAny.DynAnyPackage"/>
+	    <include name="org.omg.DynamicAny.DynAnyFactoryPackage"/>
+	    <include name="org.omg.CosTSPortability"/>
+	    <include name="org.omg.CORBA_2_3"/>
+	    <include name="org.omg.CORBA_2_3.portable"/>
+	    <include name="org.omg.CosTSInteroperation"/>
+	    <include name="org.omg.Dynamic"/>
+	    <include name="org.omg.SendingContext"/>
+	    <include name="org.omg.IOP"/>
+	    <include name="org.omg.IOP.CodecPackage"/>
+	    <include name="org.omg.IOP.CodecFactoryPackage"/>
+	    <include name="org.omg.PortableServer"/>
+	    <include name="org.omg.PortableServer.POAPackage"/>
+	    <include name="org.omg.PortableServer.CurrentPackage"/>
+	    <include name="org.omg.PortableServer.POAManagerPackage"/>
+	    <include name="org.omg.CosNaming"/>
+	    <include name="org.omg.CosNaming.NamingContextPackage"/>
+	    <include name="org.omg.CosNaming.NamingContextExtPackage"/>
+	    <include name="org.omg.Messaging"/>
+	    <include name="org.omg.PortableInterceptor"/>
+	    <include name="org.omg.PortableInterceptor.ORBInitInfoPackage"/>
+	    <include name="org.omg.CORBA"/>
+	    <include name="org.omg.CORBA.ORBPackage"/>
+	    <include name="org.omg.CORBA.DynAnyPackage"/>
+	    <include name="org.omg.CORBA.TypeCodePackage"/>
+	    <include name="org.omg.CORBA.portable"/>
+	    <include name="org.omg.CORBA.TSIdentificationPackage"/>
+	    <include name="com.sun.corba.se.org.omg.CORBA"/>
+	    <include name="javax.rmi.CORBA"/>
+	</patternset>
+
+	<patternset id="orb.export">
+	    <include name="com.sun.corba.se.spi.copyobject"/>
+	    <include name="com.sun.corba.se.spi.extension"/>
+	    <include name="com.sun.corba.se.spi.ior"/>
+	    <include name="com.sun.corba.se.spi.ior.iiop"/>
+	    <include name="com.sun.corba.se.spi.legacy.connection"/>
+	    <include name="com.sun.corba.se.spi.legacy.interceptor"/>
+	    <include name="com.sun.corba.se.spi.oa"/>
+	    <include name="com.sun.corba.se.spi.oa.rfm"/>
+	    <include name="com.sun.corba.se.spi.orb"/>
+	    <include name="com.sun.corba.se.spi.orbutil"/>
+	    <include name="com.sun.corba.se.spi.orbutil.logex.corba"/>
+	    <include name="com.sun.corba.se.spi.presentation.rmi"/>
+	    <include name="com.sun.corba.se.spi.protocol"/>
+	    <include name="com.sun.corba.se.spi.resolver"/>
+	    <include name="com.sun.corba.se.spi.servicecontext"/>
+	    <include name="com.sun.corba.se.spi.transport"/>
+	    <include name="com.sun.corba.se.spi.logging"/>
+	    <include name="com.sun.corba.se.spi.trace"/>
+	    <include name="com.sun.corba.se.spi.osgi"/>
+	    <include name="com.sun.org.omg.CORBA"/>
+	    <include name="com.sun.org.omg.CORBA.ValueDefPackage"/>
+	    <include name="com.sun.org.omg.CORBA.portable"/>
+	    <include name="com.sun.org.omg.SendingContext"/>
+	    <include name="com.sun.org.omg.SendingContext.CodeBasePackage"/>
+	    <include name="com.sun.corba.se.impl.orbutil"/>
+	    <include name="com.sun.corba.se.impl.naming.cosnaming"/>
+	    <include name="com.sun.corba.se.impl.presentation.rmi.codegen"/>
+	    <include name="com.sun.corba.se.impl.orb"/>
+	    <include name="com.sun.corba.se.impl.javax.rmi"/>
+	    <include name="com.sun.corba.se.impl.javax.rmi.CORBA"/>
+	    <include name="com.sun.corba.se.impl.encoding"/>
+	    <include name="com.sun.corba.se.impl.folb"/>
+	</patternset>
+
+	<patternset id="orb.private">
+	    <include name="com.sun.corba.se.impl.interceptors"/>
+	    <include name="com.sun.corba.se.impl.io"/>
+	    <include name="com.sun.corba.se.impl.ior"/>
+	    <include name="com.sun.corba.se.impl.ior.iiop"/>
+	    <include name="com.sun.corba.se.impl.legacy.connection"/>
+	    <include name="com.sun.corba.se.impl.oa"/>
+	    <include name="com.sun.corba.se.impl.oa.poa"/>
+	    <include name="com.sun.corba.se.impl.oa.toa"/>
+	    <include name="com.sun.corba.se.impl.oa.rfm"/>
+	    <include name="com.sun.corba.se.impl.plugin.hwlb"/>
+	    <include name="com.sun.corba.se.impl.protocol"/>
+	    <include name="com.sun.corba.se.impl.protocol.giopmsgheaders"/>
+	    <include name="com.sun.corba.se.impl.resolver"/>
+	    <include name="com.sun.corba.se.impl.servicecontext"/>
+	    <include name="com.sun.corba.se.impl.transport"/>
+	    <include name="com.sun.corba.se.impl.util"/>
+	    <include name="com.sun.corba.se.impl.osgi.loader"/>
+	    <include name="com.sun.corba.se.impl.corba"/>
+	    <include name="com.sun.corba.se.impl.dynamicany"/>
+	    <include name="com.sun.corba.se.impl.naming.namingutil"/>
+	    <include name="com.sun.corba.se.impl.presentation.rmi"/>
+	</patternset>
+
+	<patternset id="orb.orb-class-provider">
+	    <include name="com.sun.corba.se.impl.oa.rfm.ReferenceManagerConfigurator"/>
+	    <include name="com.sun.corba.se.impl.folb.ClientGroupManager"/>
+	    <include name="com.sun.corba.se.impl.folb.ServerGroupManager"/>
+	    <include name="com.sun.corba.se.impl.plugin.hwlb.VirtualAddressAgentImpl"/>
+	    <include name="com.sun.corba.se.impl.plugin.hwlb.NoConnectionCacheImpl"/>
+	</patternset>
+
+	<patternset id="orb.probe-provider-class-names">
+	    <include name="com.sun.corba.se.impl.transport.CorbaInboundConnectionCacheProbeProvider"/>
+	    <include name="com.sun.corba.se.impl.transport.CorbaOutboundConnectionCacheProbeProvider"/>
+	</patternset>
+
+	<patternset id="orbgeneric.export">
+	    <include name="com.sun.corba.se.spi.orbutil.generic"/>
+	    <include name="com.sun.corba.se.spi.orbutil.closure"/>
+	    <include name="com.sun.corba.se.spi.orbutil.proxy"/>
+	    <include name="com.sun.corba.se.impl.orbutil.graph"/>
+	    <include name="com.sun.corba.se.spi.orbutil.fsm"/>
+	    <include name="com.sun.corba.se.spi.orbutil.misc"/>
+	    <include name="com.sun.corba.se.spi.orbutil.logex"/>
+	    <include name="com.sun.corba.se.spi.orbutil.logex.stdcorba"/>
+	    <include name="com.sun.corba.se.spi.orbutil.threadpool"/>
+	    <include name="com.sun.corba.se.impl.orbutil.threadpool"/>
+	</patternset>
+
+	<patternset id="orbgeneric.private">
+	    <include name="com.sun.corba.se.impl.orbutil.closure"/>
+	</patternset>
+
+	<patternset id="osgi-test.private">
+	    <include name="com.sun.corba.se.impl.osgi.main"/>
+	</patternset>
+
+	<patternset id="orb.testable.source">
+	    <patternset refid="internal-api.export"/>
+	    <patternset refid="orb.private"/>
+	    <patternset refid="orb.export"/>
+	</patternset>
+
+	<patternset id="orblib.testable.source">
+	    <patternset refid="codegen.export"/>
+	    <patternset refid="newtimer.export"/>
+	    <patternset refid="codegen.export"/>
+	    <patternset refid="orbgeneric.private"/>
+	    <patternset refid="orbgeneric.export"/>
+	</patternset>
     </target>
 
-    <!-- experimental definitions of java packaging -->
+    <!-- OSGi bundle construction -->
 
-    <patternset id="asm.export">
-        <include name="org/objectweb/asm"/>
-    </patternset>
+    <target name="make-src-bundle" depends="init">
+        <jar jarfile="${releaselib.dir}/bundles/glassfish-corba-source.jar"
+            duplicate="fail">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${gensrc.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <fileset dir="${orblib.src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </jar>
+    </target>
 
-    <patternset id="codegen.export">
-        <include name="com/sun/corba/se/spi/orbutil/copyobject"/>
-        <include name="com/sun/corba/se/impl/orbutil/copyobject"/>
-        <include name="com/sun/corba/se/spi/orbutil/codegen"/>
-        <include name="com/sun/corba/se/impl/orbutil/codegen"/>
-    </patternset>
+    <target name="make-bundles" depends="init, make-src-bundle">
+	<make-bundle 
+	    classpath="${classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-orb.jar">
+	    <directive-list>
+		<directive type="Export-Package" name="orb.export"/>
+		<directive type="Private-Package" name="orb.private"/>
+		<directive type="ORB-Class-Provider" name="orb.orb-class-provider"/>
+		<directive type="Bundle-Activator" value="com.sun.corba.se.impl.osgi.loader.OSGIListener"/>
+		<directive type="DynamicImport-Package" value="org.glassfish.flashlight.provider"/>
+		<directive type="Probe-Provider-Class-Names" name="orb.probe-provider-class-names"/>
+	    </directive-list>
+	</make-bundle>
+	<make-bundle 
+	    classpath="${classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-omgapi.jar">
+	    <directive-list>
+		<directive type="Export-Package" name="omgapi.export"/>
+		<directive type="Import-Package" value="!*"/>
+		<directive type="Fragment-Host" value="system.bundle; extension:=framework"/>
+	    </directive-list>
+	</make-bundle>
+	<make-bundle 
+	    classpath="${classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-csiv2-idl.jar">
+	    <directive-list>
+		<directive type="Export-Package" name="csiv2-idl.export"/>
+	    </directive-list>
+	</make-bundle>
+	<make-bundle 
+	    classpath="${classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-internal-api.jar">
+	    <directive-list>
+		<directive type="Export-Package" name="internal-api.export"/>
+	    </directive-list>
+	</make-bundle>
+	<make-bundle 
+	    classpath="${classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-osgi-test.jar">
+	    <directive-list>
+		<directive type="Private-Package" name="osgi-test.private"/>
+		<directive type="Bundle-Activator" value="com.sun.corba.se.impl.osgi.main"/>
+	    </directive-list>
+	</make-bundle>
 
-    <patternset id="csiv2-idl.export">
-        <include name="com/sun/corba/se/org/omg/GSSUP"/>
-        <include name="com/sun/corba/se/org/omg/CSIIOP"/>
-        <include name="com/sun/corba/se/org/omg/CSI"/>
-    </patternset>
-
-    <patternset id="internal-api.export">
-        <include name="com/sun/corba/se/impl/txpoa"/>
-        <include name="com/sun/corba/se/spi/costransactions"/>
-        <include name="com/sun/corba/se/spi/folb"/>
-    </patternset>
-
-    <patternset id="newtimer.export">
-        <include name="com/sun/corba/se/spi/orbutil/newtimer"/>
-        <include name="com/sun/corba/se/spi/orbutil/tf"/>
-        <include name="com/sun/corba/se/impl/orbutil/newtimer"/>
-    </patternset>
-
-    <patternset id="omgapi.export">
-        <include name="org/omg/CosTransactions"/>
-        <include name="org/omg/stub/java/rmi"/>
-        <include name="org/omg/DynamicAny"/>
-        <include name="org/omg/DynamicAny/DynamicAnyPackage"/>
-        <include name="org/omg/DynamicAny/DynamicAnyFactoryPackage"/>
-        <include name="org/omg/CosTSPortability"/>
-        <include name="org/omg/CORBA_2_3"/>
-        <include name="org/omg/CORBA_2_3/portable"/>
-        <include name="org/omg/CosTSInteroperation"/>
-        <include name="org/omg/Dynamic"/>
-        <include name="org/omg/SendingContext"/>
-        <include name="org/omg/IOP"/>
-        <include name="org/omg/IOP/CodecPackage"/>
-        <include name="org/omg/IOP/CodecFactoryPackage"/>
-        <include name="org/omg/PortableServer"/>
-        <include name="org/omg/PortableServer/POAPackage"/>
-        <include name="org/omg/PortableServer/CurrentPackage"/>
-        <include name="org/omg/PortableServer/POAManagerPackage"/>
-        <include name="org/omg/CosNaming"/>
-        <include name="org/omg/CosNaming/NamingContextPackage"/>
-        <include name="org/omg/CosNaming/NamingContextExtPackage"/>
-        <include name="org/omg/Messaging"/>
-        <include name="org/omg/PortableInterceptor"/>
-        <include name="org/omg/PortableInterceptor/ORBInitInfoPackage"/>
-        <include name="org/omg/CORBA"/>
-        <include name="org/omg/CORBA/ORBPackage"/>
-        <include name="org/omg/CORBA/DynAnyPackage"/>
-        <include name="org/omg/CORBA/TypeCodePackage"/>
-        <include name="org/omg/CORBA/portable"/>
-        <include name="org/omg/CORBA/TSIdentificationPackage"/>
-        <include name="com/sun/corba/se/org/omg/CORBA"/>
-        <include name="javax/rmi/CORBA"/>
-    </patternset>
-
-    <patternset id="orb.export">
-        <include name="com/sun/corba/se/spi/copyobject"/>
-        <include name="com/sun/corba/se/spi/extension"/>
-        <include name="com/sun/corba/se/spi/ior"/>
-        <include name="com/sun/corba/se/spi/ior/iiop"/>
-        <include name="com/sun/corba/se/spi/legacy"/>
-        <include name="com/sun/corba/se/spi/legacy/connection"/>
-        <include name="com/sun/corba/se/spi/legacy/interceptor"/>
-        <include name="com/sun/corba/se/spi/oa"/>
-        <include name="com/sun/corba/se/spi/oa/rfm"/>
-        <include name="com/sun/corba/se/spi/orb"/>
-        <include name="com/sun/corba/se/spi/orbutil"/>
-        <include name="com/sun/corba/se/spi/orbutil/logex/corba"/>
-        <include name="com/sun/corba/se/spi/presentation/rmi"/>
-        <include name="com/sun/corba/se/spi/protocol"/>
-        <include name="com/sun/corba/se/spi/resolver"/>
-        <include name="com/sun/corba/se/spi/servicecontext"/>
-        <include name="com/sun/corba/se/spi/transport"/>
-        <include name="com/sun/corba/se/spi/logging"/>
-        <include name="com/sun/corba/se/spi/trace"/>
-        <include name="com/sun/corba/se/spi/osgi"/>
-        <include name="com/sun/org/omg/CORBA"/>
-        <include name="com/sun/org/omg/CORBA/ValueDefPackage"/>
-        <include name="com/sun/org/omg/CORBA/portable"/>
-        <include name="com/sun/org/omg/SendingContext/CodeBase"/>
-        <include name="com/sun/org/omg/SendingContext/CodeBasePackage"/>
-        <include name="com/sun/corba/se/impl/orbutil"/>
-        <include name="com/sun/corba/se/impl/naming/cosnaming"/>
-        <include name="com/sun/corba/se/impl/presentation/rmi/codegen"/>
-        <include name="com/sun/corba/se/impl/orb"/>
-        <include name="com/sun/corba/se/impl/javax"/>
-        <include name="com/sun/corba/se/impl/javax/rmi"/>
-        <include name="com/sun/corba/se/impl/javax/rmi/CORBA"/>
-        <include name="com/sun/corba/se/impl/encoding"/>
-        <include name="com/sun/corba/se/impl/folb"/>
-    </patternset>
-
-    <patternset id="orb.private">
-        <include name="com/sun/corba/se/impl/interceptors"/>
-        <include name="com/sun/corba/se/impl/io"/>
-        <include name="com/sun/corba/se/impl/ior"/>
-        <include name="com/sun/corba/se/impl/ior/iiop"/>
-        <include name="com/sun/corba/se/impl/legacy"/>
-        <include name="com/sun/corba/se/impl/legacy/connection"/>
-        <include name="com/sun/corba/se/impl/oa"/>
-        <include name="com/sun/corba/se/impl/oa/poa"/>
-        <include name="com/sun/corba/se/impl/oa/toa"/>
-        <include name="com/sun/corba/se/impl/oa/rfm"/>
-        <include name="com/sun/corba/se/impl/plugin"/>
-        <include name="com/sun/corba/se/impl/plugin/hwlb"/>
-        <include name="com/sun/corba/se/impl/protocol/"/>
-        <include name="com/sun/corba/se/impl/protocol/giopmsgheaders"/>
-        <include name="com/sun/corba/se/impl/resolver"/>
-        <include name="com/sun/corba/se/impl/servicecontext"/>
-        <include name="com/sun/corba/se/impl/transport"/>
-        <include name="com/sun/corba/se/impl/util"/>
-        <include name="com/sun/corba/se/impl/osgi/loader"/>
-        <include name="com/sun/corba/se/impl/corba"/>
-        <include name="com/sun/corba/se/impl/dynamicany"/>
-        <include name="com/sun/corba/se/impl/naming/namingutil"/>
-        <include name="com/sun/corba/se/impl/presentation/rmi"/>
-    </patternset>
-
-    <patternset id="orbgeneric.export">
-        <include name="com/sun/corba/se/spi/orbutil/generic"/>
-        <include name="com/sun/corba/se/spi/orbutil/closure"/>
-        <include name="com/sun/corba/se/spi/orbutil/proxy"/>
-        <include name="com/sun/corba/se/impl/orbutil/graph"/>
-        <include name="com/sun/corba/se/spi/orbutil/fsm"/>
-        <include name="com/sun/corba/se/spi/orbutil/misc"/>
-        <include name="com/sun/corba/se/spi/orbutil/logex"/>
-        <include name="com/sun/corba/se/spi/orbutil/logex/stdcorba"/>
-        <include name="com/sun/corba/se/spi/orbutil/threadpool"/>
-        <include name="com/sun/corba/se/impl/orbutil/threadpool"/>
-    </patternset>
-
-    <patternset id="orbgeneric.private">
-        <include name="com/sun/corba/se/impl/orbutil/closure"/>
-    </patternset>
-
-    <patternset id="osgi-test.private">
-        <include name="com/sun/corba/se/impl/osgi/main"/>
-    </patternset>
-
-    <patternset id="orb.testable.source">
-        <patternset refid="codegen.export"/>
-        <patternset refid="internal-api.export"/>
-        <patternset refid="newtimer.export"/>
-        <patternset refid="codegen.export"/>
-        <patternset refid="orbgeneric.private"/>
-        <patternset refid="orbgeneric.export"/>
-        <patternset refid="orb.private"/>
-        <patternset refid="orb.export"/>
-    </patternset>
-
-    <!-- standard build targets -->
-
-    <target name="build" depends="init, compile, 
-        generate-orb-resources, enhance-orb,
-        compile-timing-points, make-bundles, archive-bundles"/>
-
-    <target name="build-no-enhance" depends="init, compile, 
-        generate-orb-resources, generate-timing-points, compile-timing-points,
-        make-bundles, archive-bundles"/>
+	<make-bundle 
+	    classpath="${orblib.classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-codegen.jar">
+	    <directive-list>
+		<directive type="Export-Package" name="codegen.export"/>
+	    </directive-list>
+	</make-bundle>
+	<make-bundle 
+	    classpath="${orblib.classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-newtimer.jar">
+	    <directive-list>
+		<directive type="Export-Package" name="newtimer.export"/>
+		<directive type="Agent-Class" value="com.sun.corba.se.spi.orbutil.tf.InstrumentationAgent"/>
+	    </directive-list>
+	</make-bundle>
+	<make-bundle 
+	    classpath="${orblib.classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-orbgeneric.jar">
+	    <directive-list>
+		<directive type="Export-Package" name="orbgeneric.export"/>
+		<directive type="Private-Package" name="orbgeneric.private"/>
+	    </directive-list>
+	</make-bundle>
+	<make-bundle 
+	    classpath="${orblib.classes.dir}" 
+	    version="${orb.version}"
+	    outDir="${releaselib.dir}/bundles"
+	    outFile="glassfish-corba-asm.jar">
+	    <directive-list>
+		<directive type="Export-Package" name="asm.export"/>
+	    </directive-list>
+	</make-bundle>
+    </target>
 
     <macrodef name="run-enhance">
         <attribute name="mode"/>
@@ -377,23 +492,6 @@
     </target>
 
     <!-- ========================= COMPILE ========================= -->
-
-    <target name="compile-timing-points" depends="init">
-	<echo message="Compiling TimingPoints class"/>
-	<javac destdir="${classes.dir}" 
-		classpathref="classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-	       	failonerror="true"
-		fork="true"
-		memoryMaximumSize="512m"> 
-	    <src path="${gensrc.dir}"/>
-            <include name="com/sun/corba/se/impl/orbutil/newtimer/generated/*"/>
-	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
-	</javac>
-    </target>
 
     <target name="compile" depends="init, orb-library, compile-enhancer, 
         compile-idl-compiler, run-all-idl, delete-java-sources, copy-resources">
@@ -648,11 +746,6 @@
 
 
     <!-- ========================= Build the ORB library ====================  
-	The ORB library is a collection of all the reuseable, ORB-independent
-	modules that the ORB uses.  This is currently used in the build to 
-        generate the timing points file, and to handle copyright processing
-        and renaming.
-
 	Note that this must work either renamed or not renamed, so both 
 	the relocated directory and the non-relocated directory for
 	ASM are included here.
@@ -843,6 +936,23 @@
 		</not>
 	    </or>
 	</condition>
+    </target>
+
+    <target name="compile-timing-points" depends="init">
+	<echo message="Compiling TimingPoints class"/>
+	<javac destdir="${classes.dir}" 
+		classpathref="classpath.master"
+		deprecation="${deprecation}"
+		debug="${javac.debug}" 
+		optimize="${javac.optimize}"
+	       	failonerror="true"
+		fork="true"
+		memoryMaximumSize="512m"> 
+	    <src path="${gensrc.dir}"/>
+            <include name="com/sun/corba/se/impl/orbutil/newtimer/generated/*"/>
+	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+	</javac>
     </target>
 
     <!-- ========================= CLEAN ========================= -->
@@ -1185,6 +1295,18 @@
             <param name="generated-files" value="**/*.java"/>
         </antcall>
     </target>
+
+    <!-- main targets -->
+
+    <target name="build" depends="init, compile, 
+        generate-orb-resources, enhance-orb,
+        compile-timing-points, make-bundles, archive-bundles"/>
+
+    <!-- no-enhance is used for Cobertura coverage, which fails miserable with enhanced classes -->
+
+    <target name="build-no-enhance" depends="init, compile, 
+        generate-orb-resources, generate-timing-points, compile-timing-points,
+        make-bundles, archive-bundles"/>
 
     <target name="release" depends="init">
         <echo message="releasing to ${repo.url}"/>

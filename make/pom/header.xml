@@ -2,7 +2,7 @@
 <!--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
-  Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+  Copyright 1997-2011 Sun Microsystems, Inc. All rights reserved.
  
   The contents of this file are subject to the terms of either the GNU
   General Public License Version 2 only ("GPL") or the Common Development
@@ -42,22 +42,22 @@
     <version>@version@</version>
     <name>@artifactId@</name>
     <description>@jarDescription@</description>
-    <url>http://kenai.com/hg/gf-corba-v3-mirror~master</url>
+    <url>http://kenai.com/hg/gf-corba-v3-mirror~staging</url>
     <developers>
         <developer>
             <id>kcavanaugh</id>
             <name>Ken Cavanaugh</name>
-            <email>ken.cavanaugh@sun.com</email>
+            <email>ken.cavanaugh@oracle.com</email>
         </developer>
     </developers>
     <organization>
-        <name>Sun Microsystems</name>
-        <url>http://www.sun.com</url>
+        <name>Oracle</name>
+        <url>http://www.oracle.com</url>
     </organization>
     <licenses>
         <license>
             <name>CDDL+GPL</name>
-            <url>https://glassfish.dev.java.net/public/CDDL+GPL.html</url>
+            <url>https://glassfish.java.net/public/CDDL+GPL.html</url>
         </license>
     </licenses>
     <issueManagement>

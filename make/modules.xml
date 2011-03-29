@@ -40,10 +40,16 @@
   holder.
 -->
 
-<project name="modules" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant"> <!-- What should basedir be? -->
+<project name="modules" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant"> 
+
+    <!-- An importer of modules.xml MUST make sure that the init target is called. 
+	 The importer must also have a copy maven-ant-tasks-2.1.1.jar available.
+	 TODO: where should we put maven-ant-tasks?
+	 -->
+
     <target name="init">
         <!-- set up the maven ant tasks -->
-        <property name="maven.ant.file"         value="maven-ant-tasks-2.0.10.jar"/>
+        <property name="maven.ant.file"         value="maven-ant-tasks-2.1.1.jar"/>
         <path id="maven-ant-tasks.classpath" path="${root.dir}/lib/${maven.ant.file}"/>
         <typedef resource="org/apache/maven/artifact/ant/antlib.xml" 
             uri="antlib:org.apache.maven.artifact.ant" 
@@ -66,6 +72,11 @@
                 version="0.0.401" scope="compile"/>
         </artifact:dependencies>
     </target>
+
+    <!-- Useful for getting dependencies placed into a directory.
+	 Also creates @{name}.classpath, which can be used to reference
+	 the dependency. 
+    -->
 
     <macrodef name="get-and-copy-dependencies">
         <attribute name="name" default=""/>
@@ -92,6 +103,7 @@
 
     <!-- ================== OSGi bundle support ======================= -->
 
+    <!-- internal use only -->
 
     <scriptdef name="make-bundle-file" language="javascript">
 	<attribute name="version"/>
@@ -170,6 +182,14 @@
 	]]>
     </scriptdef>
 
+    <!-- Macro to use for generating OSGi bundles.
+	 <directive-list must contain <directive> elements, where each
+	 <directive> element has the following attributes:
+	     type: the name (like Export-Package) that is used in the bnd file
+	     name: A reference to the value (a patternset)
+	     value: the actual string value
+    -->
+
     <macrodef name="make-bundle">
 	<attribute name="version"/>
 	<attribute name="classpath"/>
@@ -191,7 +211,7 @@
 		<arg value="-classpath"/>
 		<arg value="@{classpath}"/>
 		<arg value="-output"/>
-		<arg value="@{outDir}/@{outFile}.jar"/>
+		<arg value="@{outDir}/@{outFile}"/>
 		<arg value="make/bndfile.temp"/>
 	    </java>
 
@@ -199,152 +219,67 @@
 	</sequential>
     </macrodef>	
 
-    <!-- Pushing artifacts to maven
+    <!-- Making poms and pushing artifacts to maven 
+	 Several names are built from the artifactId:
+	 @{artifactId}.pom: the internal reference to the (in memory) POM file.
+	 @{artifactId}.pom.xml: the name of the POM file written to an output directory.
+	 @{artifactId}.jar: the name of the jar file for the artifact.
+     -->
 
-    Variables in templates:
-        groupId         always com.sun.corba
-        jarName         the name of the jar file (glassfish-corba-<module>)
-        version         the current CORBA version
-        jarDescription  a brief description of the jar contents
-        HEADER-@{module} the expanded version of make/pom/header.xml inserted 
-                        into the pom file. Note that all properties must have
-                        unique names.  Ant is COMPLETELY
-                        braindead: see Greenberg's 10th law.
+    <macrodef name="make-pom">
+	<attribute name="outdir"/>
+	<attribute name="groupId"/>
+	<attribute name="artifactId"/>
+	<attribute name="version"/>
+	<attribute name="description"/>
+	<attribute name="url"/>
 
-    naming conventions:
-    The modules             (and their dependencies):
-        asm                 -
-        orbgeneric          -
-        codegen             asm orbgeneric
-        omgapi              -
-        internal-api        -
-        csiv2-idl           omgapi
-        newtimer            orbgeneric codegen 
-        orb                 codegen newtimer omgapi orbgeneric
+	<element name="element-list" optional="true"/>
 
-        for each module m:
-            bnd file:           ${root.dir}/make/bnd/gflassfish-corba-${m}.bnd
-            pom template:       ${root.dir}/make/pom/${m}.template.pom
-            resulting jar:      ${releaselib.dir}/bundles/glassfish-corba-${m}.jar
-    -->
-
-    <macrodef name="make-file">
-        <attribute name="module"/>
-        <attribute name="description"/>
-        <sequential>
-            <loadfile property="HEADER-@{module}"
-             srcFile="make/pom/header.xml">
-                <filterchain>
-                    <replacetokens>
-                        <token key="artifactId"
-                         value="glassfish-corba-@{module}"/>
-                        <token key="version" value="${orb.version}"/>
-                        <token key="jarDescription" value="@{description}"/>
-                        <token key="groupId" value="${orb.groupId}"/>
-                        <token key="repositoryUrl" value="${repo.url}"/>
-                    </replacetokens>
-                </filterchain>
-            </loadfile>
-            <copy file="make/pom/@{module}.template.xml"
-             tofile="make/corba.temp.pom" overwrite="true">
-                <filterset>
-                  <filter token="HEADER" value="${HEADER-@{module}}"/>
-                  <filter token="version" value="${orb.version}"/>
-                  <filter token="groupId" value="${orb.groupId}"/>
-                </filterset>
-            </copy>
-        </sequential>
+	<sequential>
+	    <artifact:pom 
+		id="@{artifactId}.pom" 
+		groupId="@{groupId}"
+		artifactId="@{artifactId}" 
+		version="@{version}">
+		<organization
+		    name="Oracle"
+		    url="http://www.oracle.com"/>
+		<element-list/>
+	    </artifact:pom>
+	    <artifact:writepom pomRefId="@{artifactId}.pom"
+		file="@{outdir}/@{artifactId}.pom.xml"
+		trim="false"/>
+	</sequential>
     </macrodef>
 
-    <!--  
-    Note that we use a temporary file to store the pom because maven is based 
-    on 'single project produces single jar file'. But, we are producing 9 jars
-    from a single project. Hence, we need a template to for each pom that
-    generates the POM we use each time we publish.
-
-    Refer: http://maven.apache.org/guides/mini/guide-using-one-source-directory.html
-    Section: Producing Multiple JARs from a single POM (maven limitations)
-
-    For some reason, artifact:deploy stopped working to deploy to ~/.m2/repository.
-    Once again, ant reveals its weakness, and I can't find a way to avoid the code
-    duplication below.
-    -->
-
     <macrodef name="push-to-local-maven">
+	<attribute name="outdir"/>
         <attribute name="module"/>
-        <attribute name="description"/>
         <sequential>
-            <echo message="Releasing module @{module} (@{description}) to @{destination}"/>
-            <make-file module="@{module}" description="@{description}"/>
+            <echo message="Releasing module @{module} to local repository"/>
 
-            <artifact:pom id="glassfish.corba.project" file="make/corba.temp.pom" />
-            <artifact:install file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
-                <pom refid="glassfish.corba.project"/>
+	    <artifact:pom id="@{module}.pom" file="@{outdir}/@{module}.pom.xml"/>
+            <artifact:install file="@{outdir}/@{module}.jar">
+                <pom refid="@{module}.pom"/>
             </artifact:install>
-            <delete file="make/corba.temp.pom" verbose="true"/>
         </sequential>
     </macrodef>
 
     <macrodef name="push-to-maven">
+	<attribute name="outdir"/>
         <attribute name="module"/>
-        <attribute name="description"/>
         <attribute name="destination"/>
         <sequential>
-            <mkdir dir="make/gen/pom"/>
-            <echo message="Releasing module @{module} (@{description}) to @{destination}"/>
-            <make-file module="@{module}" description="@{description}"/>
+            <echo message="Releasing module @{module} to @{destination}"/>
 
-            <artifact:pom id="glassfish.corba.project"
-             file="make/corba.temp.pom" />
-            <artifact:deploy file="${releaselib.dir}/bundles/glassfish-corba-@{module}.jar">
+	    <artifact:pom id="@{module}.pom" file="@{outdir}/@{module}.pom.xml"/>
+            <artifact:deploy file="${releaselib.dir}/bundles/@{module}.jar">
                 <remoteRepository url="@{destination}">
-                    <authentication id="java.net.maven2.repository"/>
+                    <authentication id="java.net.maven2.repository"/> <!-- this is java.net specific -->
                 </remoteRepository>
-                <pom refid="glassfish.corba.project"/>
+                <pom refid="@{module}.pom"/>
             </artifact:deploy>
-            <move file="make/corba.temp.pom" todir="make/gen/pom"/>
-            <move file="make/gen/pom/corba.temp.pom" tofile="glassfish-corba-@{module}.pom"/>
-            <!-- <delete file="make/corba.temp.pom" verbose="true"/> -->
-        </sequential>
-    </macrodef>
-
-    <macrodef name="release-to-maven">
-        <attribute name="destination"/>
-        <sequential>
-            <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <push-to-maven destination="@{destination}" module="asm" 
-             description="ASM version used in the ORB"/>
-            <push-to-maven destination="@{destination}" module="codegen" 
-             description="Dynamic code generation library"/>
-            <push-to-maven destination="@{destination}" module="csiv2-idl"
-             description="IDL generated definitions for CSIv2"/>
-            <push-to-maven destination="@{destination}" module="internal-api"
-             description="Non-standard ORB API classes for transactions and IIOP FOLB"/>
-            <push-to-maven destination="@{destination}" module="newtimer"
-             description="ORB timer library"/>
-            <push-to-maven destination="@{destination}" module="omgapi"
-             description="OMG standard APIs"/>
-            <push-to-maven destination="@{destination}" module="orb"
-             description="The ORB implementation"/>
-            <push-to-maven destination="@{destination}" module="orbgeneric"
-             description="Generic libraries"/>
-            <push-to-maven destination="@{destination}" module="source"
-             description="ORB source code"/>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="release-to-local-maven">
-        <sequential>
-            <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <push-to-local-maven module="asm" description="ASM version used in the ORB"/>
-            <push-to-local-maven module="codegen" description="Dynamic code generation library"/>
-            <push-to-local-maven module="csiv2-idl" description="IDL generated definitions for CSIv2"/>
-            <push-to-local-maven module="internal-api" description="Non-standard ORB API classes for transactions and IIOP FOLB"/>
-            <push-to-local-maven module="newtimer" description="ORB timer library"/>
-            <push-to-local-maven module="omgapi" description="OMG standard APIs"/>
-            <push-to-local-maven module="orb" description="The ORB implementation"/>
-            <push-to-local-maven module="orbgeneric" description="Generic libraries"/>
-            <push-to-local-maven module="source" description="ORB source code"/>
         </sequential>
     </macrodef>
 

@@ -63,7 +63,7 @@
 		glassfish-corba-internal-api
 		glassfish-osgi-test (testing osgi only; not delivered)
 
-    Dependencies:
+    Runtime dependencies:
         Standard for source build:
             - JDK 5 or later
             - ant 1.7.1 or later
@@ -139,7 +139,7 @@
 	<property name="copyright.file"
             value="${root.dir}/make/copyright-information/copyright.txt"/>
 	<property name="copyright.roots"
-            value="experimental,lib,make,nbproject,orblib,src,test,tools,www"/>
+            value="lib,make,nbproject,orblib,src,test,tools,www"/>
 	<property name="copyright.skip"
             value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
 
@@ -1007,7 +1007,7 @@
 		    -verbose: normally set to false, except when debugging this
 		    -dryrun: normally set to false, except when debugging this
 		    -root: set to the root directories to process: 
-			experimental, make, nbproject, src, test, tools, www
+			make, nbproject, src, test, tools, www
 		    -skipdirs: set to the directories to skip:
 			.hg, Codemgr_wsdata, deleted_files, headers, freezepoint
 		    -copyright: this is set to the copyright template, currently
@@ -1118,8 +1118,7 @@
     <!-- ========================= CLEAN ========================= -->
 
     <target name="clean"
-        depends="init,clean-cobertura,clean-emma,clean-tests,clean-experimental">
-        <delete file="${bnd.properties.file}"/>
+        depends="init,clean-cobertura,clean-emma,clean-tests">
 	<delete dir="${build.dir}"/>
 	<delete dir="${orblib.build.dir}"/>
 	<delete dir="${test-build.dir}"/>
@@ -1136,11 +1135,6 @@
 
     <target name="clean-tests" depends="init">
 	<delete dir="${test.run.base}"/>
-        <delete dir="${experimentaltestclasses.dir}"/>
-    </target>
-
-    <target name="clean-experimental">
-        <delete dir="experimental/build"/>
     </target>
 
     <!-- ========================= JAVADOC ========================= -->

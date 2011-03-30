@@ -183,10 +183,17 @@
     </scriptdef>
 
     <!-- Macro to use for generating OSGi bundles.
+         version: A string giving a standard OSGi version.
+         classpath: The actual value of the classpath
+         outDir: The name of the directory that should contain the generated bundle
+         outFile: The name of the generated bundle WITHOUT the .jar suffix
+
 	 <directive-list must contain <directive> elements, where each
 	 <directive> element has the following attributes:
-	     type: the name (like Export-Package) that is used in the bnd file
-	     name: A reference to the value (a patternset)
+	     type: the name (like Export-Package) that is used in the bnd file (REQUIRED)
+             One of name and value is required:
+	     name: A reference to the value, which must be a 
+                patternset of java package names.
 	     value: the actual string value
     -->
 
@@ -282,5 +289,4 @@
             </artifact:deploy>
         </sequential>
     </macrodef>
-
 </project>

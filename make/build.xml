@@ -39,7 +39,7 @@
   only if the new code is made subject to such option by the copyright
   holder.
 -->
-<project name="corba-main" default="all" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="corba-main" default="all" basedir="..">
     <description>
 	This is the Ant file that builds the GlassFish ORB.
     </description>
@@ -48,13 +48,6 @@
 
     <target name="init" depends="corba-src.init">
         <property name="test.src.dir"	    	        value="test/src/share/classes"/>
-
-        <!-- experimental files -->
-        <property name="experimentalsrc.dir"		value="experimental/src/share/classes"/>
-        <property name="experimentalgensrc.dir"		value="experimental/build/gensrc"/>
-        <property name="experimentaltest.src.dir"	value="experimental/test/src/share/classes"/>
-        <property name="experimentalclasses.dir"	value="experimental/build/classes"/>
-        <property name="experimentaltestclasses.dir"	value="experimental/test/build/classes"/>
 
         <!-- cobertura related -->
         <property name="cobertura.dir"                  value="build/cobertura"/>
@@ -119,8 +112,6 @@
 	    <pathelement location="${test.output}"/>
 	    <pathelement location="${test-values1.dir}"/>
 	    <pathelement location="${test.src.dir}"/>
-	    <pathelement location="${experimentalclasses.dir}"/>
-	    <pathelement location="${experimentaltestclasses.dir}"/>
 
             <path refid="cobertura.classpath"/>
 	</path>
@@ -209,20 +200,6 @@
         </java>
     </target>
 
-    <target name="compile-tests-experimental" depends="init">
-	<mkdir dir="${experimentaltestclasses.dir}"/>
-	<javac destdir="${experimentaltestclasses.dir}" 
-		classpathref="test-classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-		failonerror="true">
-	    <src path="${experimentaltest.src.dir}"/>
-	    <include name="**"/>
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
-	</javac>
-    </target>
-
     <target name="compile-tests-values" depends="init">
 	<!-- Compile the values classes separately so that we can
 	     control how and if they are in the classpath.
@@ -250,77 +227,6 @@
 	    <include name="**"/>
 	</javac>
     </target>
-
-    <!-- ========================= EXPERIMENTAL ========================= -->
-    <target name="compile-experimental" depends="init">
-	<echo message="Compiling experimental ORB components"/>
-	<mkdir dir="${experimentalclasses.dir}"/>
-	<javac destdir="${experimentalclasses.dir}" 
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-		failonerror="true">
-	    <classpath>
-		<path refid="classpath.master"/>
-		<pathelement location="${experimentalclasses.dir}"/>
-	    </classpath>
-	    <src path="${experimentalsrc.dir}"/>
-	    <include name="**"/> 
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
-	</javac>
-    </target>
-
-    <!-- ========================= crap4j integration =============== 
-
-    Note: This turns out not to be useful, because crap4j is only useful with coverage
-    analysis.  As near as I can tell, the emma-based coverage analysis in the ORB 
-    cannot be integrated with the crap4j tool.  I also cannot simply let crap4j executre
-    all of the ORB tests, because crap4j assumes that it can
-    run all of your tests as JUnit tests.
-
-    <property environment="env"/>
-
-    <taskdef name="crap4j" classname="org.crap4j.anttask.Crap4jAntTask">
-        <classpath>
-	    <fileset dir="${env.CRAP4J_HOME}/lib">
-		<include name="**/*.jar"/>
-	    </fileset>
-	</classpath>
-    </taskdef>
-
-    <target name="run-crap4j" depends="init">
-	<crap4j projectdir="${basedir}" outputdir="crap4j" dontTest="false" debug="false">
-	    <classes>
-		<fileset dir="build/classes">
-		    <include name="**/*.class"/>
-		    <exclude name="com/sun/tools/corba/se/idl/**/*.class"/>
-		    <exclude name="com/sun/corba/se/org/**/*.class"/>
-		    <exclude name="com/sun/corba/se/internal/**/*.class"/>
-		    <exclude name="sun/rmi/**/*.class"/>
-		    <exclude name="org/**/*.class"/>
-		    <exclude name="javax/**/*.class"/>
-		</fileset>
-
-		<fileset dir="orblib/build/classes">
-		    <include name="**/*.class"/>
-		    <exclude name="org/**/*.class"/>
-		</fileset>
-	    </classes>
-
-	    <srces>
-		<pathElement location="src/share/classes"/>
-		<pathElement location="optional/src/share/classes"/>
-	    </srces>
-
-	    <libClasspath>
-		<fileset dir="build/libcache">
-		    <include name="**/*.jar"/>
-		</fileset>
-	    </libClasspath>
-	</crap4j>
-    </target>
-
-    -->
 
     <!-- ======================== findbugs integration ========= 
 
@@ -1717,7 +1623,7 @@
                 <jvmarg value="-Djavax.rmi.CORBA.PortableRemoteObjectClass=com.sun.corba.se.impl.javax.rmi.PortableRemoteObject"/>
 
                 <!--
-                <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${gmbal-jar}:${management-api-jar}"/>
+                <jvmarg value="-Dcorba.test.orb.classpath=${classes.dir}:${orblib.classes.dir}:${gmbal-jar}:${management-api-jar}"/>
                 -->
                 <jvmarg value="-Dcorba.test.orb.classpath=${toString:test-classpath.master}"/>
 
@@ -1746,7 +1652,7 @@
                 <jvmarg value="-Dnet.sourceforge.cobertura.datafile=../../${cobertura.datafile}"/>
 
                 <!--
-                <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${experimentalclasses.dir}:${tools-jar}:${emma-jar}:${gmbal-jar}:${management-api-jar}"/>
+                <jvmarg value="-Xbootclasspath/p:${emma.classes.dir}:${classes.dir}:${orblib.classes.dir}:${tools-jar}:${emma-jar}:${gmbal-jar}:${management-api-jar}"/>
                 <jvmarg value="-Xbootclasspath/p:${toString:test-classpath.master}"/>
                 -->
 
@@ -1891,10 +1797,6 @@
         <run-test args="-file ../src/share/classes/test/AllTests.tdesc -verbose"/>
     </target>
 
-    <target name="test-experimental" depends="test-init">
-        <run-test args="-file ../../experimental/test/src/share/classes/corba/ExperimentalTests.tdesc -verbose"/>
-    </target>
-
     <target name="test-corba" depends="test-init,test-corba-junit">
         <run-test args="-file ../src/share/classes/corba/CORBATests.tdesc -verbose"/>
     </target>
@@ -1955,6 +1857,10 @@
     </path>
 
     <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+
+    <!-- TODO: derive these from the ORB patternsets in src-build.xml.
+         This will require more fun with JavaScript.
+    -->
 
     <patternset id="gf.orb.classes">
         <include name="com/sun/corba/se/spi/**/*.class"/>
@@ -2049,6 +1955,11 @@
         </cobertura-report>
     </target>
 
+    <!-- TODO: Should we switch from Emma to Cobertura for coverage analysis?
+         +: Having one is easier to maintain
+         +: GlassFish now uses Cobertura
+         -: Cobertura requires the noenhance build (bug in Cobertura)
+    -->
 
     <!-- 
     Running emma on the ORB
@@ -2075,6 +1986,9 @@
 
     <target name="emma" depends="init,clean-emma,emma-instr,test,emma-report">
     </target>
+
+    <!-- TODO: If we keep emma, we should derive the includes from the patternsets in src-build.
+    -->
 
     <target name="emma-instr" depends="init">
     <mkdir dir="${emma.classes.dir}"/>

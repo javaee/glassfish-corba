@@ -262,6 +262,7 @@
             <arg file="${gmbal-jar}"/>
             <arg file="${libcache.dir}/org.osgi.core.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-interal-api.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>
@@ -287,6 +288,7 @@
             <arg file="${gmbal-jar}"/>
             <arg file="${libcache.dir}/org.osgi.core.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-asm.jar"/>
+	    <arg file="${releaselib.dir}/bundles/glassfish-corba-internal-api.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-omgapi.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-codegen.jar"/>
 	    <arg file="${releaselib.dir}/bundles/glassfish-corba-newtimer.jar"/>

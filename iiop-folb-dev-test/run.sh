@@ -9,14 +9,13 @@
 ################################################################
 # The following setup is environment specific:
 ################################################################
-
-DAS_HOST="apollo"
+# Use 'localhost' for single node setup. See issue GLASSFISH-15863
+DAS_HOST="localhost"
 # Must allow at least 5 instances for the test
 # Must be able to access the available nodes from the DAS using 
 # SSH without password.
 
-AVAILABLE_NODES="apollo:5"
-# AVAILABLE_NODES="minas:3"
+AVAILABLE_NODES="localhost:5"
 
 ################################################################
 # Do the following to create a new cluster and new GF installation,
@@ -55,7 +54,7 @@ SKIP_SETUP="false"
 
 date
 
-APS_HOME="/space/ws/mercurial/CORBA/iiop-folb-test/test/OrbFailOver"
+APS_HOME="`pwd`/test/OrbFailOver"
 APPCLIENT="${S1AS_HOME}/bin/appclient"
 PROPS_FILE=${PWD}/logging.properties
 echo ${PROPS_FILE}
@@ -63,7 +62,7 @@ echo ${PROPS_FILE}
 EJB_NAME="${APS_HOME}/OrbFailOver-ejb/dist/OrbFailOver-ejb.jar"
 CLIENT_NAME="${APS_HOME}/OrbFailOver-app-client/dist/OrbFailOver-app-client.jar"
 
-ENDPOINTS="apollo:9037,apollo:10037,apollo:11037"
+ENDPOINTS="localhost:9037,localhost:10037,localhost:11037"
 TARGET_ARGS="-targetserver ${ENDPOINTS}"
 TARGET_DEF="-Dcom.sun.appserv.iiop.endpoints=${ENDPOINTS}"
 DEBUG_ARGS="-agentlib:jdwp=transport=dt_socket,address=8228,server=y,suspend=y"
@@ -80,6 +79,8 @@ then ${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
 else ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
 fi
 
+exitStatus=$?
+
 # For testing with externally supplied endpoints
 # if [ "${DEBUGGER}" = "1" ];
 # then ${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} ${TARGET_DEF} ${CLIENT_ARGS} ${TEST_ARGS} -useExternalEndpoints true $@
@@ -87,3 +88,5 @@ fi
 # fi 
 
 date
+exit $exitStatus
+

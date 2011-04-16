@@ -1,4 +1,4 @@
-#! /bin/csh
+#! /bin/csh -x
 setenv BUILD ${GFV3_WS}
 if ("$1" == "") then
     setenv RUN ${GFV3_WORK}

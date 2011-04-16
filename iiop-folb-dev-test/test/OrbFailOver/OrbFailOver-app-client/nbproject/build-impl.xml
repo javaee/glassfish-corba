@@ -508,15 +508,29 @@ exists or setup the property manually. For example like this:
     <target depends="compile" name="library-inclusion-in-archive">
         <mkdir dir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.javaee-api-6.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.gf-client.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-asm.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-codegen.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-internal-api.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-newtimer.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-omgapi.jar}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-orb.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-orbgeneric.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.management-api.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${file.reference.gmbal.jar}" todir="${build.classes.dir}/META-INF/lib"/>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${libs.javaee-api-6.0.classpath}" manifestproperty="manifest.libs.javaee-api-6.0.classpath" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.gf-client.jar}" manifestproperty="manifest.file.reference.gf-client.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-asm.jar}" manifestproperty="manifest.file.reference.glassfish-corba-asm.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-codegen.jar}" manifestproperty="manifest.file.reference.glassfish-corba-codegen.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-internal-api.jar}" manifestproperty="manifest.file.reference.glassfish-corba-internal-api.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-newtimer.jar}" manifestproperty="manifest.file.reference.glassfish-corba-newtimer.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-omgapi.jar}" manifestproperty="manifest.file.reference.glassfish-corba-omgapi.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-orb.jar}" manifestproperty="manifest.file.reference.glassfish-corba-orb.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-orbgeneric.jar}" manifestproperty="manifest.file.reference.glassfish-corba-orbgeneric.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.management-api.jar}" manifestproperty="manifest.file.reference.management-api.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.gmbal.jar}" manifestproperty="manifest.file.reference.gmbal.jar" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.libs.javaee-api-6.0.classpath} lib/${manifest.libs.javaee-api-6.0.classpath} ${manifest.file.reference.gf-client.jar} lib/${manifest.file.reference.gf-client.jar} ${manifest.file.reference.glassfish-corba-orb.jar} lib/${manifest.file.reference.glassfish-corba-orb.jar} "/>
+            <attribute name="Class-Path" value="${manifest.libs.javaee-api-6.0.classpath} lib/${manifest.libs.javaee-api-6.0.classpath} ${manifest.file.reference.glassfish-corba-asm.jar} lib/${manifest.file.reference.glassfish-corba-asm.jar} ${manifest.file.reference.glassfish-corba-codegen.jar} lib/${manifest.file.reference.glassfish-corba-codegen.jar} ${manifest.file.reference.glassfish-corba-internal-api.jar} lib/${manifest.file.reference.glassfish-corba-internal-api.jar} ${manifest.file.reference.glassfish-corba-newtimer.jar} lib/${manifest.file.reference.glassfish-corba-newtimer.jar} ${manifest.file.reference.glassfish-corba-omgapi.jar} lib/${manifest.file.reference.glassfish-corba-omgapi.jar} ${manifest.file.reference.glassfish-corba-orb.jar} lib/${manifest.file.reference.glassfish-corba-orb.jar} ${manifest.file.reference.glassfish-corba-orbgeneric.jar} lib/${manifest.file.reference.glassfish-corba-orbgeneric.jar} ${manifest.file.reference.management-api.jar} lib/${manifest.file.reference.management-api.jar} ${manifest.file.reference.gmbal.jar} lib/${manifest.file.reference.gmbal.jar} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">

@@ -1,4 +1,4 @@
-#! /bin/csh
+#! /bin/csh -x
 setenv ORB ${CORBA_WS}/build/rename/ee/build/release/lib/bundles
 setenv DEST ${GFV3_WORK}/glassfish3/glassfish/modules
 

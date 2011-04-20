@@ -40,7 +40,8 @@
 
 package com.sun.corba.se.impl.copyobject ;
 
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
+
 
 public class ReferenceObjectCopierImpl implements ObjectCopier
 {

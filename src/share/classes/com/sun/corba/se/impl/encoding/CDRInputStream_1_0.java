@@ -72,7 +72,6 @@ import java.security.PrivilegedActionException;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.Any;
-import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.CustomMarshal;
@@ -134,9 +133,9 @@ import com.sun.corba.se.impl.orbutil.CacheTable;
 import com.sun.org.omg.SendingContext.CodeBase;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 
 import com.sun.corba.se.spi.trace.* ;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @CdrRead
 @PrimitiveRead

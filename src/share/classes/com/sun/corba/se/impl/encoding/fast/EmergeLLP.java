@@ -42,17 +42,13 @@ package com.sun.corba.se.impl.encoding.fast ;
 import java.util.Set ;
 import java.util.HashSet ;
 
-import com.sun.corba.se.spi.orbutil.fsm.Action ;
-import com.sun.corba.se.spi.orbutil.fsm.Guard ;
-import com.sun.corba.se.spi.orbutil.fsm.State ;
-import com.sun.corba.se.spi.orbutil.fsm.Input ;
-import com.sun.corba.se.spi.orbutil.fsm.FSM ;
-import com.sun.corba.se.spi.orbutil.fsm.FSMImpl ;
-import com.sun.corba.se.spi.orbutil.fsm.Runner ;
-import com.sun.corba.se.spi.orbutil.fsm.StateEngine ;
-
-import static com.sun.corba.se.spi.orbutil.fsm.Guard.Base.* ;
-import static com.sun.corba.se.spi.orbutil.fsm.Action.Base.* ;
+import org.glassfish.pfl.basic.fsm.Input ;
+import org.glassfish.pfl.basic.fsm.Action ;
+import org.glassfish.pfl.basic.fsm.Guard ;
+import org.glassfish.pfl.basic.fsm.State ;
+import org.glassfish.pfl.basic.fsm.FSM ;
+import org.glassfish.pfl.basic.fsm.FSMImpl ;
+import org.glassfish.pfl.basic.fsm.StateEngine ;
 
 public class EmergeLLP {
     // Inputs: common to both FSMs

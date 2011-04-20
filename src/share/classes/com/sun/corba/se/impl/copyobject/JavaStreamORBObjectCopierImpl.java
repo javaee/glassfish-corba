@@ -44,8 +44,6 @@ import java.rmi.Remote;
 
 import org.omg.CORBA.ORB ;
 
-import com.sun.corba.se.impl.orbutil.copyobject.JavaStreamObjectCopierImpl ;
-
 import com.sun.corba.se.impl.util.Utility;
 
 public class JavaStreamORBObjectCopierImpl extends JavaStreamObjectCopierImpl {
@@ -57,6 +55,7 @@ public class JavaStreamORBObjectCopierImpl extends JavaStreamObjectCopierImpl {
 	return copy( obj ) ;
     }
 
+    @Override
     public Object copy(Object obj) {
 	if (obj instanceof Remote) {
             // Yes, so make sure it is connected and converted

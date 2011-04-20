@@ -46,9 +46,9 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.RequestCanceledException;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 import java.util.LinkedList;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Transport
 public class BufferManagerReadStream

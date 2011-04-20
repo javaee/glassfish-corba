@@ -104,9 +104,9 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 
 import com.sun.corba.se.spi.trace.* ;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @CdrWrite
 @PrimitiveWrite

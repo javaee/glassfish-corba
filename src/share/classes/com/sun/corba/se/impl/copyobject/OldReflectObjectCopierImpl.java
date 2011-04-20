@@ -74,17 +74,14 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import sun.corba.Bridge; 
 
 import com.sun.corba.se.impl.util.Utility;
 
 import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier;
-import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /**
  * Provides the functionality of copying objects using reflection.

@@ -44,15 +44,11 @@
     The source code is divided into 2 areas:
         orb-library (orblib/src, orblib/build):
             Contents: Contains libraries that can be used independently of the 
-                ORB.  This includes the codegen library, the timing facility, an
-                FSM library, and a number of generic utilities.  This also 
-                includes a copy of the ASM library from ObjectWeb.
+                ORB.  This includes some ORB-specific classes that are not general
+		enough to put into PFL.  These classes may be moved at some point.
             Dependencies: May not depend on classes from the main src branch.  
             Delivery: as OSGi bundles:
-                glassfish-corba-codegen
-                glassfish-corba-newtimer
-                glassfish-corba-orbgeneric
-                glassfish-corba-asm
+		???
         main (src dir, build dir):
             Contents: The core of the ORB.
             Dependencies: Depends only on orb-library.
@@ -76,6 +72,7 @@
 	    - bnd
 	    - maven-ant-tasks
             - felix
+	    - the PFL bundles
 -->
 
 <project name="corba-src" default="all" basedir="..">
@@ -152,13 +149,34 @@
             <dependency-list>
                 <dependency groupId="org.glassfish.gmbal" 
                     artifactId="gmbal"
-                    version="3.1.0-b001" scope="runtime"/>
+                    version="3.2.0-b001" scope="runtime"/>
                 <dependency groupId="org.glassfish.external" 
                     artifactId="management-api"
                     version="3.1.0-b001" scope="runtime"/>
                 <dependency groupId="org.apache.felix" 
                     artifactId="org.osgi.core"
                     version="1.2.0" scope="runtime"/>
+                <dependency groupId="org.glassfish.pfl" 
+                    artifactId="pfl-asm"
+                    version="1.0.0-b001" scope="runtime"/>
+                <dependency groupId="org.glassfish.pfl" 
+                    artifactId="pfl-basic"
+                    version="1.0.0-b001" scope="runtime"/>
+                <dependency groupId="org.glassfish.pfl" 
+                    artifactId="pfl-basic-tools"
+                    version="1.0.0-b001" scope="runtime"/>
+                <dependency groupId="org.glassfish.pfl" 
+                    artifactId="pfl-dynamic"
+                    version="1.0.0-b001" scope="runtime"/>
+                <dependency groupId="org.glassfish.pfl" 
+                    artifactId="pfl-tf"
+                    version="1.0.0-b001" scope="runtime"/>
+                <dependency groupId="org.glassfish.pfl" 
+                    artifactId="pfl-tf-tools"
+                    version="1.0.0-b001" scope="runtime"/>
+                <dependency groupId="org.glassfish.pfl" 
+                    artifactId="pfl-test"
+                    version="1.0.0-b001" scope="runtime"/>
             </dependency-list>
         </get-and-copy-dependencies>
 
@@ -635,7 +653,7 @@
         <sequential>
             <java classname="com.sun.tools.corba.se.enhancer.EnhanceTool"
                 classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
-                <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar:${classes.dir}:${gmbal-jar}"/>
+		<jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
                 <arg value="-dir"/>
                 <arg value="com/sun/corba/se/"/>
                 <arg value="-debug"/>
@@ -666,7 +684,7 @@
 
     <!-- ========================= COMPILE ========================= -->
 
-    <target name="compile" depends="init, orb-library, compile-enhancer, 
+    <target name="compile" depends="init, compile-enhancer, 
         compile-idl-compiler, run-all-idl, delete-java-sources, copy-resources">
 	<echo message="Compiling ORB sources"/>
 	<javac destdir="${classes.dir}" 
@@ -697,12 +715,12 @@
 	    <compilerarg
                 value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
 	    <compilerarg
-                value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+		value="-Xbootclasspath/p:${toString:classpath.master}"/>
 	</javac>
     </target>
 
     <target name="generate-orb-resources"
-     depends="init, orb-library, compile">
+     depends="init, compile">
 	<java classname="com.sun.corba.se.spi.orbutil.file.ExceptionResourceGenerator"
             fork="true"
             classpathref="classpath.master"
@@ -915,22 +933,12 @@
         OSGi bundles for GFv3.
      -->
 
-    <target name="orb-library" 
-     depends="init, compile-orb-library, generate-orb-lib-resources">
-	<jar jarfile="${releaselib.dir}/orblib.jar"
-		    duplicate="fail">
-	    <fileset dir="${orblib.classes.dir}">
-		<include name="**"/>
-	    </fileset>
-	</jar>
-    </target>
-
     <target name="generate-orb-lib-resources"
      depends="init, compile-orb-library">
 	<java classname="com.sun.corba.se.spi.orbutil.file.ExceptionResourceGenerator"
             fork="true"
 	    dir="${root.dir}">
-            <jvmarg value="-Xbootclasspath/p:${orblib.classes.dir}:${gmbal-jar}:${mnagement-api-jar}"/>
+	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
             <!--
 	    <jvmarg value="-Xdebug"/>
 	    <jvmarg value="-Xnoagent"/>
@@ -962,13 +970,13 @@
 	    <include name="**"/>
 	    <compilerarg
                 value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${orblib.classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
 	</javac>
     </target>
 
     <!-- =================== Copyright header mainenance ================== -->
 
-    <target name="update-copyright-headers" depends="init, orb-library">
+    <target name="update-copyright-headers" depends="init">
 	<!--
 		This target is used when it is necessary to update the 
                 copyright headers.  See
@@ -1023,10 +1031,8 @@
 	<java classname="com.sun.corba.se.spi.orbutil.file.CopyrightProcessor"
             fork="true"
 	    dir="${root.dir}">
-            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
-	    <classpath>
-		<pathelement location="${releaselib.dir}/orblib.jar"/>
-	    </classpath>
+	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+	    <classpathref refid="classpath.master"/>
 	    <arg value="-validate"/>
 	    <arg value="false"/>
 	    <arg value="-verbose"/>
@@ -1044,7 +1050,7 @@
 	</java>
     </target>
 
-    <target name="validate-copyright-headers" depends="init, orb-library">
+    <target name="validate-copyright-headers" depends="init">
 	<!--
 	    This target is similar to update-copyright-headers,
 	    but instead it validates that all files have the correct headers.
@@ -1058,10 +1064,8 @@
             <jvmarg value="-Xnoagent"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=42365"/>
 	    -->
-            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
-	    <classpath>
-		<pathelement location="${releaselib.dir}/orblib.jar"/>
-	    </classpath>
+	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+	    <classpathref refid="classpath.master"/>
 	    <arg value="-validate"/>
 	    <arg value="true"/>
 	    <arg value="-verbose"/>
@@ -1111,7 +1115,7 @@
 	    <src path="${gensrc.dir}"/>
             <include name="com/sun/corba/se/impl/orbutil/newtimer/generated/*"/>
 	    <compilerarg value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+	    <compilerarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
 	</javac>
     </target>
 
@@ -1153,17 +1157,13 @@
 
     <!-- ========================= Renaming ========================= -->
 
-    <!-- also depends on orb-library, but we need to prevent the recompilation
-     -->
     <target name="rename" depends="init">
 	<mkdir dir="build/rename/ee"/>
 	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename"
          fork="true"
 	    dir="${root.dir}" failonerror="true">
-            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
-	    <classpath>
-		<pathelement location="${releaselib.dir}/orblib.jar"/>
-	    </classpath>
+	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+	    <classpathref refid="classpath.master"/>
 	    <arg value="-verbose"/>
 	    <arg value="1"/>
 	    <arg value="-dryrun"/>
@@ -1182,10 +1182,8 @@
 	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename"
          fork="true"
 	    dir="${root.dir}" failonerror="true">
-            <jvmarg value="-Xbootclasspath/p:${releaselib.dir}/orblib.jar"/>
-	    <classpath>
-		<pathelement location="${releaselib.dir}/orblib.jar"/>
-	    </classpath>
+	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
+	    <classpathref refid="classpath.master"/>
 	    <arg value="-verbose"/>
 	    <arg value="0"/>
 	    <arg value="-dryrun"/>

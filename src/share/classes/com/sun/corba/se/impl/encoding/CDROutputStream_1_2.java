@@ -41,8 +41,8 @@ package com.sun.corba.se.impl.encoding;
 
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.CdrWrite;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @CdrWrite
 public class CDROutputStream_1_2 extends CDROutputStream_1_1

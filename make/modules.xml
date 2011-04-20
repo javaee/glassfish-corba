@@ -88,6 +88,7 @@
             <artifact:dependencies versionsId="@{name}.versions"
                 filesetId="@{name}.fileset" pathId="@{name}.classpath">
                <remoteRepository id="@{name}.repid" url="@{repository}"/>
+	       <localRepository path="${env.HOME}/.m2/repository"/>
                <dependency-list/>
             </artifact:dependencies>
 

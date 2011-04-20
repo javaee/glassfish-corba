@@ -41,8 +41,6 @@ package com.sun.corba.se.impl.encoding.fast ;
 
 import java.io.PrintStream ;
 
-import com.sun.corba.se.spi.orbutil.misc.Printer ;
-
 import com.sun.corba.se.impl.encoding.fast.bytebuffer.Reader ;
 
 /** This class provides a means of decoding the data in an emerge stream, 

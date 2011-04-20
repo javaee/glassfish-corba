@@ -39,7 +39,8 @@
  */
 package com.sun.corba.se.impl.encoding.fast ;
 
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
+import org.glassfish.pfl.basic.func.UnaryFunction;
+
 
 public final class ClassMarshalerFactory {
     private ClassMarshalerFactory() {}

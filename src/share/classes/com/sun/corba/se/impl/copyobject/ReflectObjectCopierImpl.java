@@ -47,23 +47,20 @@ import java.util.Map ;
 import org.omg.CORBA.portable.ObjectImpl ;
 import org.omg.CORBA.portable.Delegate ;
 
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
-import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
-
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.orbutil.copyobject.DefaultClassCopiers ;
-import com.sun.corba.se.impl.orbutil.copyobject.DefaultClassCopierFactories ;
-import com.sun.corba.se.impl.orbutil.copyobject.FastCache ;
-import com.sun.corba.se.impl.orbutil.copyobject.ClassCopierBase ;
-import com.sun.corba.se.impl.orbutil.copyobject.ClassCopier ;
-import com.sun.corba.se.impl.orbutil.copyobject.ClassCopierFactory ;
-import com.sun.corba.se.impl.orbutil.copyobject.PipelineClassCopierFactory ;
-
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
-import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 
 import com.sun.corba.se.impl.util.Utility ;
+import org.glassfish.pfl.basic.logex.OperationTracer;
+import org.glassfish.pfl.dynamic.copyobject.impl.ClassCopier;
+import org.glassfish.pfl.dynamic.copyobject.impl.ClassCopierBase;
+import org.glassfish.pfl.dynamic.copyobject.impl.ClassCopierFactory;
+import org.glassfish.pfl.dynamic.copyobject.impl.DefaultClassCopierFactories;
+import org.glassfish.pfl.dynamic.copyobject.impl.FastCache;
+import org.glassfish.pfl.dynamic.copyobject.impl.PipelineClassCopierFactory;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** Class used to deep copy arbitrary data.  A single 
  * ReflectObjectCopierImpl
@@ -93,7 +90,7 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
     // which requires an orb.
     private static ClassCopier remoteClassCopier =
 	new ClassCopierBase( "remote" ) {
-	    public Object createCopy( Object source, boolean debug ) 
+	    public Object createCopy( Object source )
 	    {
 		ORB orb = (ORB)localORB.get() ;
 		return Utility.autoConnect( source, orb, true ) ;
@@ -104,7 +101,7 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
     // is mostly immutable.
     private static ClassCopier corbaClassCopier = 
 	new ClassCopierBase( "corba" ) {
-	    public Object createCopy( Object source, boolean debug ) 
+	    public Object createCopy( Object source) 
 	    {
 		ObjectImpl oi = (ObjectImpl)source ;
 		Delegate del = oi._get_delegate() ;
@@ -195,6 +192,6 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
         OperationTracer.begin( "ReflectObjectCopierImpl" ) ;
 	Class<?> cls = obj.getClass() ;
 	ClassCopier copier = ccf.getClassCopier( cls ) ;
-	return copier.copy( oldToNew, obj, debug ) ;
+	return copier.copy( oldToNew, obj) ;
     }
 }

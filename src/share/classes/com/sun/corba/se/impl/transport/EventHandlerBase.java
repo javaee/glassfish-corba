@@ -49,8 +49,8 @@ import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;
 import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Transport
 public abstract class EventHandlerBase

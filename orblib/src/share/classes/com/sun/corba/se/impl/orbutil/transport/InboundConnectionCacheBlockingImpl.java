@@ -51,19 +51,17 @@ import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.InboundConnectionCache ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory;
+import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** Manage connections that are initiated from another VM. 
  *
  * @author Ken Cavanaugh
  */
+@Transport
 public final class InboundConnectionCacheBlockingImpl<C extends Connection> 
     extends ConnectionCacheBlockingBase<C> 
     implements InboundConnectionCache<C> {
-
-    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil(
-        InboundConnectionCacheBlockingImpl.class ) ;
 
     private final Map<C,ConnectionState<C>> connectionMap ;
 
@@ -96,137 +94,120 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
     public InboundConnectionCacheBlockingImpl( final String cacheType, 
 	final int highWaterMark, final int numberToReclaim, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
+	super( cacheType, highWaterMark, numberToReclaim, ttl ) ;
 
 	this.connectionMap = new HashMap<C,ConnectionState<C>>() ;
     }
 
     // We do not need to define equals or hashCode for this class.
 
+    @InfoMethod
+    private void display( String msg, Object value ) {}
+
+    @InfoMethod
+    private void msg( String msg ) {}
+
+    @Transport
     public synchronized void requestReceived( final C conn ) {
-        mm.enter( debug(), "requestReceived", conn ) ;
+        ConnectionState<C> cs = getConnectionState( conn ) ;
 
-	try {
-	    ConnectionState<C> cs = getConnectionState( conn ) ;
+        final int totalConnections = totalBusy + totalIdle ;
+        if (totalConnections > highWaterMark())
+            reclaim() ;
 
-	    final int totalConnections = totalBusy + totalIdle ;
-	    if (totalConnections > highWaterMark())
-		reclaim() ;
+        ConcurrentQueue.Handle<C> reclaimHandle = cs.reclaimableHandle ;
+        if (reclaimHandle != null) {
+            reclaimHandle.remove() ;
+            display( "removed from reclaimableQueue", conn ) ;
+        }
 
-	    ConcurrentQueue.Handle<C> reclaimHandle = cs.reclaimableHandle ;
-	    if (reclaimHandle != null) {
-		reclaimHandle.remove() ;
-                mm.info( debug(), "removed from reclaimableQueue", conn ) ;
-	    }
+        int count = cs.busyCount++ ;
+        if (count == 0) {
+            display( "moved from idle to busy", conn ) ;
 
-	    int count = cs.busyCount++ ;
-	    if (count == 0) {
-                mm.info(debug(), "moved from idle to busy", conn ) ;
-
-		totalIdle-- ;
-		totalBusy++ ;
-	    }
-	} finally {
-            mm.exit( debug()) ;
-	}
+            totalIdle-- ;
+            totalBusy++ ;
+        }
     }
 
     public synchronized void requestProcessed( final C conn, 
 	final int numResponsesExpected ) {
+        final ConnectionState<C> cs = connectionMap.get( conn ) ;
 
-        mm.enter( debug(), "requestProcessed", conn, numResponsesExpected ) ;
-	try {
-	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
+        if (cs == null) {
+            msg( "connection was closed") ;
+            return ;
+        } else {
+            cs.expectedResponseCount += numResponsesExpected ;
+            int numResp = cs.expectedResponseCount ;
+            int numBusy = --cs.busyCount ;
 
-	    if (cs == null) {
-                mm.info( debug(), "connection was closed") ;
-		return ; 
-	    } else {
-		cs.expectedResponseCount += numResponsesExpected ;
-		int numResp = cs.expectedResponseCount ;
-		int numBusy = --cs.busyCount ;
+            display( "responses expected", numResp ) ;
+            display( "connection busy count", numBusy ) ;
 
-                mm.info( debug(), "responses expected", numResp,
-                    "connection busy count", numBusy ) ;
+            if (numBusy == 0) {
+                totalBusy-- ;
+                totalIdle++ ;
 
-		if (numBusy == 0) {
-		    totalBusy-- ;
-		    totalIdle++ ;
+                if (numResp == 0) {
+                    display( "queuing reclaimable connection", conn ) ;
 
-		    if (numResp == 0) {
-			mm.info( debug(), "queuing reclaimable connection", conn ) ;
-
-			if ((totalBusy+totalIdle) > highWaterMark()) {
-			    close( conn ) ;
-			} else {
-			    cs.reclaimableHandle = 
-				reclaimableConnections.offer( conn ) ;
-			}
-		    }
-		}
-	    }
-	} finally {
-           mm.exit( debug() ) ;
-	}
+                    if ((totalBusy+totalIdle) > highWaterMark()) {
+                        close( conn ) ;
+                    } else {
+                        cs.reclaimableHandle =
+                            reclaimableConnections.offer( conn ) ;
+                    }
+                }
+            }
+        }
     }
 
     /** Decrement the number of expected responses.  When a connection is idle 
      * and has no expected responses, it can be reclaimed.
      */
     public synchronized void responseSent( final C conn ) {
-        mm.enter( debug(), "responseSent", conn ) ;
+        final ConnectionState<C> cs = connectionMap.get( conn ) ;
+        final int waitCount = --cs.expectedResponseCount ;
+        if (waitCount == 0) {
+            display( "reclaimable connection", conn ) ;
 
-	try {
-	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
-	    final int waitCount = --cs.expectedResponseCount ;
-	    if (waitCount == 0) {
-                mm.info( debug(), "reclaimable connection", conn ) ;
-
-		if ((totalBusy+totalIdle) > highWaterMark()) {
-		    close( conn ) ;
-		} else {
-		    cs.reclaimableHandle = 
-			reclaimableConnections.offer( conn ) ;
-		}
-	    } else {
-                mm.info( debug(), "wait count", waitCount ) ;
-	    }
-	} finally {
-            mm.exit( debug() ) ;
-	}
+            if ((totalBusy+totalIdle) > highWaterMark()) {
+                close( conn ) ;
+            } else {
+                cs.reclaimableHandle =
+                    reclaimableConnections.offer( conn ) ;
+            }
+        } else {
+            display( "wait count", waitCount ) ;
+        }
     }
 
     /** Close a connection, regardless of whether the connection is busy
      * or not.
      */
     public synchronized void close( final C conn ) {
-        mm.enter( debug(), "close", conn ) ;
-	
-	try {
-	    final ConnectionState<C> cs = connectionMap.remove( conn ) ;
-            mm.info( debug(), "connection state", cs ) ;
+        final ConnectionState<C> cs = connectionMap.remove( conn ) ;
+        display( "connection state", cs ) ;
 
-	    int count = cs.busyCount ;
+        int count = cs.busyCount ;
 
-	    if (count == 0)
-		totalIdle-- ;
-	    else
-		totalBusy-- ;
+        if (count == 0)
+            totalIdle-- ;
+        else
+            totalBusy-- ;
 
-	    final ConcurrentQueue.Handle rh = cs.reclaimableHandle ;
-	    if (rh != null) {
-                mm.info( debug(), "connection was reclaimable") ;
-		rh.remove() ;
-	    }
+        final ConcurrentQueue.Handle rh = cs.reclaimableHandle ;
+        if (rh != null) {
+            msg( "connection was reclaimable") ;
+            rh.remove() ;
+        }
 
-	    try {
-		conn.close() ;
-	    } catch (IOException exc) {
-                mm.info( debug(), "close threw", exc ) ;
-	    }
-	} finally {
-            mm.exit( debug() ) ;
-	}
+        try {
+            conn.close() ;
+        } catch (IOException exc) {
+            display( "close threw", exc ) ;
+        }
     }
 
     // Atomically either get the ConnectionState for conn OR 

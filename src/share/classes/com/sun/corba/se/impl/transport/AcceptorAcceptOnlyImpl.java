@@ -49,7 +49,7 @@ import com.sun.corba.se.spi.ior.IORTemplate;
 import java.net.Socket;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orbutil.generic.UnaryVoidFunction ;
+import org.glassfish.pfl.basic.func.UnaryVoidFunction ;
 
 /** This version of an acceptor is the other half of CorbaAcceptorLazyImpl.
  * The idea is that AcceptOnly will NOT contribute to an IORTemplate, and will

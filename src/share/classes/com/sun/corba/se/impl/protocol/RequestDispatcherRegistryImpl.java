@@ -53,10 +53,7 @@ import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 
 import com.sun.corba.se.spi.oa.ObjectAdapterFactory ;
-
-import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.spi.orbutil.misc.DenseIntMapImpl ;
+import org.glassfish.pfl.basic.contain.DenseIntMapImpl;
 
 /**
  * This is a registry of all subcontract ID dependent objects.  This includes:

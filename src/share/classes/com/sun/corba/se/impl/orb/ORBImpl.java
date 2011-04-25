@@ -126,9 +126,6 @@ import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 
 import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
 
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility;
-import com.sun.corba.se.spi.orbutil.misc.StackImpl;
-
 // import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants ;
@@ -161,14 +158,14 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.copyobject.CopierManagerImpl;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
-import com.sun.corba.se.spi.orbutil.generic.ResourceFactory;
-import com.sun.corba.se.spi.orbutil.generic.NullaryFunction;
-import com.sun.corba.se.spi.orbutil.misc.WeakCache;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.OrbLifeCycle;
 import com.sun.corba.se.spi.trace.Subcontract;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
+import org.glassfish.pfl.basic.algorithm.ObjectUtility;
+import org.glassfish.pfl.basic.concurrent.WeakCache;
+import org.glassfish.pfl.basic.func.NullaryFunction;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
          
 /**
  * The JavaIDL ORB implementation.

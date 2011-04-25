@@ -50,12 +50,11 @@ import java.util.List;
 
 import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
 
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod ;
-
 import com.sun.corba.se.spi.trace.Folb ;
 
 import com.sun.corba.se.spi.folb.GroupInfoService;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * @author Harold Carr

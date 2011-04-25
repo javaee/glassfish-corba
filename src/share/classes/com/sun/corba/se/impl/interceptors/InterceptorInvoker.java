@@ -52,11 +52,11 @@ import org.omg.PortableInterceptor.ObjectReferenceTemplate;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.oa.ObjectAdapter;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
         
 import com.sun.corba.se.spi.logging.InterceptorsSystemException;
 import java.util.Arrays;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** 
  * Handles invocation of interceptors.  Has specific knowledge of how to

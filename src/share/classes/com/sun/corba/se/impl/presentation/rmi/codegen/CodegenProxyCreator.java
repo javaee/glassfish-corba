@@ -40,6 +40,13 @@
 
 package com.sun.corba.se.impl.presentation.rmi.codegen;
 
+import org.glassfish.pfl.dynamic.codegen.spi.Primitives;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
+import org.glassfish.pfl.dynamic.codegen.spi.Expression;
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.dynamic.codegen.spi.Utility;
+import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
 import java.io.PrintStream ;
 
 import java.lang.reflect.Method ;
@@ -50,19 +57,9 @@ import java.util.Properties ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-
-import com.sun.corba.se.spi.orbutil.codegen.Utility ;
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Expression;
-import com.sun.corba.se.spi.orbutil.codegen.Primitives ;
-import com.sun.corba.se.spi.orbutil.codegen.MethodInfo ;
-import com.sun.corba.se.spi.orbutil.codegen.Variable ;
-
 import static java.lang.reflect.Modifier.* ;
 
-
-import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.* ;
 
 /** Generate a proxy with a specified base class.  
  */

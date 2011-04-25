@@ -61,15 +61,15 @@ import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcherFactory;
 import com.sun.corba.se.spi.transport.ContactInfoList ;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.ContactInfo;
-import com.sun.corba.se.spi.orbutil.generic.UnaryBooleanFunction ;
 
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.protocol.NotLocalLocalCRDImpl;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Transport;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import org.glassfish.pfl.basic.func.UnaryPredicate;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * @author Harold Carr
@@ -91,14 +91,14 @@ public class ContactInfoListImpl implements ContactInfoList {
 
     private int startCount = 0 ;
 
-    private UnaryBooleanFunction<ContactInfo> testPred =
-        new UnaryBooleanFunction<ContactInfo>() {
+    private UnaryPredicate<ContactInfo> testPred =
+        new UnaryPredicate<ContactInfo>() {
             public boolean evaluate( ContactInfo arg ) {
                 return !arg.getType().equals( SocketInfo.IIOP_CLEAR_TEXT ) ;
             }
         } ;
 
-    private <T> List<T> filter( List<T> arg, UnaryBooleanFunction<T> pred ) {
+    private <T> List<T> filter( List<T> arg, UnaryPredicate<T> pred ) {
         List<T> result = new ArrayList<T>() ;
         for (T elem : arg ) {
             if (pred.evaluate( elem )) {

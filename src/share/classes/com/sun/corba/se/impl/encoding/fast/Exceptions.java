@@ -40,15 +40,15 @@
 
 package com.sun.corba.se.impl.encoding.fast;
 
-import com.sun.corba.se.spi.orbutil.logex.Chain;
-import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
-import com.sun.corba.se.spi.orbutil.logex.Log;
-import com.sun.corba.se.spi.orbutil.logex.LogLevel;
-import com.sun.corba.se.spi.orbutil.logex.Message;
-import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
 import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
 import java.io.InvalidClassException;
 import java.lang.reflect.Field;
+import org.glassfish.pfl.basic.logex.Chain;
+import org.glassfish.pfl.basic.logex.ExceptionWrapper;
+import org.glassfish.pfl.basic.logex.Log;
+import org.glassfish.pfl.basic.logex.LogLevel;
+import org.glassfish.pfl.basic.logex.Message;
+import org.glassfish.pfl.basic.logex.WrapperGenerator;
 
 /** Exception wrapper class.  The logex WrapperGenerator uses this interface
  * to generate an implementation which returns the appropriate exception, and

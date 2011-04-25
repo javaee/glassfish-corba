@@ -50,10 +50,9 @@ import java.lang.reflect.Array ;
 import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.spi.orb.Operation ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
+import org.glassfish.pfl.basic.contain.Pair;
 
 public class PrefixParserAction extends ParserActionBase {
     private static final ORBUtilSystemException wrapper =

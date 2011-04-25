@@ -101,7 +101,6 @@ import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 import com.sun.corba.se.spi.orbutil.closure.Closure;
 import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
 import com.sun.corba.se.spi.copyobject.CopierManager;
-import com.sun.corba.se.spi.orbutil.newtimer.TimerManager;
 import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults;

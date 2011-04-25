@@ -42,13 +42,13 @@ package com.sun.corba.se.spi.orbutil.logex.corba ;
 
 import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
 import com.sun.corba.se.org.omg.CORBA.SUNVMCID;
-import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
-import com.sun.corba.se.spi.orbutil.logex.Log;
 import java.lang.reflect.Constructor;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import org.glassfish.pfl.basic.logex.ExceptionWrapper;
+import org.glassfish.pfl.basic.logex.Log;
 
 import org.omg.CORBA.ACTIVITY_COMPLETED;
 import org.omg.CORBA.ACTIVITY_REQUIRED;

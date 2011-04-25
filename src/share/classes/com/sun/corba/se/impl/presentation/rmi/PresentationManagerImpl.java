@@ -67,18 +67,15 @@ import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 
-
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-
 
 import com.sun.corba.se.impl.util.RepositoryId ;
 
 import com.sun.corba.se.impl.orbutil.graph.Node ;
-import com.sun.corba.se.impl.orbutil.graph.Graph ;
-import com.sun.corba.se.impl.orbutil.graph.GraphImpl ;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
-import com.sun.corba.se.spi.orbutil.misc.WeakCache;
+import org.glassfish.pfl.basic.concurrent.WeakCache;
+import org.glassfish.pfl.basic.algorithm.Graph ;
 
 public final class PresentationManagerImpl implements PresentationManager
 {

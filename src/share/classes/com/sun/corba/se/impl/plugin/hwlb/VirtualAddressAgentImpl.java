@@ -100,8 +100,8 @@ import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
 
 import com.sun.corba.se.impl.interceptors.IORInfoImpl ;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Subcontract
 public class VirtualAddressAgentImpl 

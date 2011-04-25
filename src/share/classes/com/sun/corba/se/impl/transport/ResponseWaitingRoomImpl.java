@@ -61,8 +61,8 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.LocateReplyOrReplyMessage;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * @author Harold Carr

@@ -40,17 +40,17 @@
 
 package com.sun.corba.se.impl.io;
 
-import com.sun.corba.se.spi.orbutil.logex.Chain;
-import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
-import com.sun.corba.se.spi.orbutil.logex.Log;
-import com.sun.corba.se.spi.orbutil.logex.LogLevel;
-import com.sun.corba.se.spi.orbutil.logex.Message;
-import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
 import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
+import org.glassfish.pfl.basic.logex.Chain;
+import org.glassfish.pfl.basic.logex.ExceptionWrapper;
+import org.glassfish.pfl.basic.logex.Log;
+import org.glassfish.pfl.basic.logex.LogLevel;
+import org.glassfish.pfl.basic.logex.Message;
+import org.glassfish.pfl.basic.logex.WrapperGenerator;
 
 /** Logging and Exception handling for the io package.
  *

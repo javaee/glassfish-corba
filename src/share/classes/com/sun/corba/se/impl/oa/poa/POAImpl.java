@@ -91,7 +91,6 @@ import org.omg.PortableInterceptor.ObjectReferenceTemplate ;
 import org.omg.PortableInterceptor.NON_EXISTENT ;
 
 import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.oa.OADestroyed ;
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.spi.oa.ObjectAdapterBase ;
@@ -110,7 +109,6 @@ import com.sun.corba.se.impl.ior.ObjectAdapterIdArray ;
 import com.sun.corba.se.spi.logging.OMGSystemException;
 import com.sun.corba.se.spi.logging.POASystemException;
 import com.sun.corba.se.spi.orbutil.ORBConstants; 
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,6 +121,8 @@ import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.NameValue;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * POAImpl is the implementation of the Portable Object Adapter. It 

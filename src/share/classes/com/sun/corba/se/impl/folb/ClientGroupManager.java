@@ -94,7 +94,6 @@ import java.util.ArrayList;
 import com.sun.corba.se.spi.ior.iiop.AlternateIIOPAddressComponent;
 import com.sun.corba.se.spi.ior.iiop.ClusterInstanceInfoComponent;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Folb;
 
 import org.omg.CosNaming.NamingContext ;
@@ -102,6 +101,7 @@ import org.omg.CosNaming.NamingContextHelper ;
 import org.omg.CosNaming.NameComponent ;
 
 import javax.rmi.PortableRemoteObject ;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
 // END import for IORToSocketInfo

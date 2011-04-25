@@ -41,7 +41,7 @@ package com.sun.corba.se.spi.orb ;
 
 import com.sun.corba.se.impl.orb.NormalParserData ;
 import com.sun.corba.se.impl.orb.PrefixParserData ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import org.glassfish.pfl.basic.contain.Pair;
 
 public class ParserDataFactory {
     public static ParserData make( String  propertyName,

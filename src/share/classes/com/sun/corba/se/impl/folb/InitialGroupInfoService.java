@@ -76,8 +76,8 @@ import javax.rmi.CORBA.Tie;
 
 import org.omg.PortableServer.RequestProcessingPolicyValue ;
 import org.omg.PortableServer.ServantRetentionPolicyValue ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Folb;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
 /**

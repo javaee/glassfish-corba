@@ -95,11 +95,11 @@ import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.logging.POASystemException;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
+import org.glassfish.pfl.basic.logex.OperationTracer;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Subcontract
 public class ServerRequestDispatcherImpl

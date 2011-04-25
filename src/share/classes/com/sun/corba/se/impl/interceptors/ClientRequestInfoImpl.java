@@ -82,8 +82,8 @@ import com.sun.corba.se.spi.transport.ContactInfoListIterator;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
 import com.sun.corba.se.impl.protocol.InvocationInfo;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * Implementation of the ClientRequestInfo interface as specified in

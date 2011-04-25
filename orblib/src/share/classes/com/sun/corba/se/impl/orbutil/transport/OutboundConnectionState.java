@@ -42,25 +42,20 @@ package com.sun.corba.se.impl.orbutil.transport;
 
 import java.io.IOException ;
 
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitor ;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory ;
-
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue ;
+import com.sun.corba.se.spi.trace.Transport;
 import org.glassfish.gmbal.Description;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
+@Transport
 @ManagedData
 public class OutboundConnectionState<C extends Connection> {
-    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil( 
-        OutboundConnectionState.class ) ;
-
-    private boolean debug() { return false ; }
-
 // The real state of the connection
     private enum ConnectionStateValue { NEW, BUSY, IDLE }
 
@@ -148,24 +143,20 @@ public class OutboundConnectionState<C extends Connection> {
 
     // Mark this connection as being busy, and increment 
     // busyCount.
+    @Transport
     public synchronized void acquire() { 
-        mm.enter( debug(), "reclaim" ) ;
-        try {
-            if (busyCount == 0) {
-                entry.idleConnections.remove( connection ) ;
-                removeFromReclaim() ;
-                csv = ConnectionStateValue.BUSY ; 
-            } else {
-                // Remove from busy queue so we can add it 
-                // back to LRU end later.
-                entry.busyConnections.remove( connection ) ;
-            }
-
-            busyCount++ ;
-            entry.busyConnections.offer( connection ) ;
-        } finally {
-            mm.exit( debug() ) ;
+        if (busyCount == 0) {
+            entry.idleConnections.remove( connection ) ;
+            removeFromReclaim() ;
+            csv = ConnectionStateValue.BUSY ;
+        } else {
+            // Remove from busy queue so we can add it
+            // back to LRU end later.
+            entry.busyConnections.remove( connection ) ;
         }
+
+        busyCount++ ;
+        entry.busyConnections.offer( connection ) ;
     }
 
     public synchronized void setReclaimableHandle( 
@@ -173,92 +164,77 @@ public class OutboundConnectionState<C extends Connection> {
         reclaimableHandle = handle ;
     }
 
+    @InfoMethod
+    private void msg( String m ) {}
+
+    @InfoMethod
+    private void display( String m, Object value ) {}
+
     // Decrement busyCount, and move to IDLE if busyCount is 0.
     // Returns total number of expected responses
+    @Transport
     public synchronized int release( int numResponsesExpected ) {
-        mm.enter( debug(), "release", numResponsesExpected ) ;
-        try {
-            expectedResponseCount += numResponsesExpected ;
-            busyCount-- ;
-            if (busyCount < 0) {
-                mm.info( debug(), "ERROR: numBusy is <0!" ) ;
-            } 
-
-            if (busyCount == 0) {
-                csv = ConnectionStateValue.IDLE ;
-                boolean wasOnBusy = entry.busyConnections.remove( connection ) ;
-                if (!wasOnBusy) {
-                    mm.info( debug(), 
-                        "connection not on busy queue, should have been" ) ;
-                }
-                entry.idleConnections.offer( connection ) ;
-            }
-
-            mm.info( debug(), "expectedResponseCount", expectedResponseCount,
-                "busyCount", busyCount ) ;
-        } finally {
-            mm.exit( debug() ) ;
+        expectedResponseCount += numResponsesExpected ;
+        busyCount-- ;
+        if (busyCount < 0) {
+            msg( "ERROR: numBusy is <0!" ) ;
         }
+
+        if (busyCount == 0) {
+            csv = ConnectionStateValue.IDLE ;
+            boolean wasOnBusy = entry.busyConnections.remove( connection ) ;
+            if (!wasOnBusy) {
+               msg( "connection not on busy queue, should have been" ) ;
+            }
+            entry.idleConnections.offer( connection ) ;
+        }
+
+        display( "expectedResponseCount", expectedResponseCount ) ;
+        display( "busyCount", busyCount ) ;
 
         return expectedResponseCount ;
     }
 
     // Returns true iff the connection is idle and reclaimable
+    @Transport
     public synchronized boolean responseReceived() {
-        mm.enter( debug(), "responseReceived" ) ;
         boolean result = false ;
-        try {
-            --expectedResponseCount ;
-            mm.info( debug(), "expectedResponseCount", expectedResponseCount ) ;
+        --expectedResponseCount ;
+        display( "expectedResponseCount", expectedResponseCount ) ;
 
-            if (expectedResponseCount < 0) {
-                mm.info( debug(), "ERROR: expectedResponseCount<0!" ) ;
-                expectedResponseCount = 0 ;
-            }
-
-            result = (expectedResponseCount == 0) && (busyCount == 0) ;
-        } finally {
-            mm.exit( debug(), result ) ;
+        if (expectedResponseCount < 0) {
+            msg( "ERROR: expectedResponseCount<0!" ) ;
+            expectedResponseCount = 0 ;
         }
+
+        result = (expectedResponseCount == 0) && (busyCount == 0) ;
 
         return result ;
     }
 
-    public synchronized void close() {
-        mm.enter( debug(), "close" ) ;
-        try {
-            removeFromReclaim() ;
+    @Transport
+    public synchronized void close() throws IOException {
+        removeFromReclaim() ;
 
-            if (csv == ConnectionStateValue.IDLE) {
-                entry.idleConnections.remove( connection ) ;
-            } else if (csv == ConnectionStateValue.BUSY) {
-                entry.busyConnections.remove( connection ) ;
-            }
-
-            csv = ConnectionStateValue.NEW ;
-            busyCount = 0 ;
-            expectedResponseCount = 0  ;
-
-            connection.close() ;
-        } catch (IOException exc) {
-            mm.info( debug(), "caught IO exception on close", exc ) ;
-        } finally {
-            mm.exit( debug() ) ;
+        if (csv == ConnectionStateValue.IDLE) {
+            entry.idleConnections.remove( connection ) ;
+        } else if (csv == ConnectionStateValue.BUSY) {
+            entry.busyConnections.remove( connection ) ;
         }
+
+        csv = ConnectionStateValue.NEW ;
+        busyCount = 0 ;
+        expectedResponseCount = 0  ;
+
+        connection.close() ;
     }
 
     private void removeFromReclaim() {
-        mm.enter( debug(), "removeFromReclaim" ) ;
-        try {
-            if (reclaimableHandle != null) {
-                if (!reclaimableHandle.remove()) {
-                    mm.info( debug(), cinfo, 
-                        "result was not on reclaimable Q" ) ;
-                }   	
-                reclaimableHandle = null ;
+        if (reclaimableHandle != null) {
+            if (!reclaimableHandle.remove()) {
+                display( "result was not on reclaimable Q", cinfo ) ;
             }
-        } finally {
-            mm.exit( debug() ) ;
+            reclaimableHandle = null ;
         }
     }
 }

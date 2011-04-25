@@ -43,7 +43,6 @@ package com.sun.corba.se.impl.oa.poa;
 import java.util.Set;
 import java.util.HashSet;
 
-import org.omg.CORBA.CompletionStatus ;
 
 import org.omg.PortableServer.POAManager;
 import org.omg.PortableServer.POAManagerPackage.State;
@@ -56,11 +55,8 @@ import org.omg.PortableInterceptor.NON_EXISTENT ;
 
 import com.sun.corba.se.spi.protocol.PIHandler ;
 
-import com.sun.corba.se.spi.orbutil.generic.MultiSet ;
-
 import com.sun.corba.se.spi.logging.POASystemException ;
 
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,6 +69,7 @@ import org.glassfish.gmbal.ManagedOperation ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.ParameterNames ;
 import org.glassfish.gmbal.NameValue ;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** POAManagerImpl is the implementation of the POAManager interface.
  *  Its public methods are activate(), hold_requests(), discard_requests()

@@ -39,23 +39,23 @@
  */
 package com.sun.corba.se.impl.oa.poa ;
 
+import org.glassfish.pfl.basic.fsm.StateEngine;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.glassfish.pfl.basic.fsm.Guard;
+import org.glassfish.pfl.basic.fsm.Action;
+import org.glassfish.pfl.basic.fsm.Input;
+import org.glassfish.pfl.basic.fsm.FSM;
+import org.glassfish.pfl.basic.fsm.State;
+import org.glassfish.pfl.basic.fsm.Runner;
+import org.glassfish.pfl.basic.fsm.FSMImpl;
 import java.util.concurrent.locks.Condition ;
 
-import com.sun.corba.se.spi.orbutil.fsm.Action ;
-import com.sun.corba.se.spi.orbutil.fsm.Guard ;
-import com.sun.corba.se.spi.orbutil.fsm.State ;
-import com.sun.corba.se.spi.orbutil.fsm.Input ;
-import com.sun.corba.se.spi.orbutil.fsm.FSM ;
-import com.sun.corba.se.spi.orbutil.fsm.FSMImpl ;
-import com.sun.corba.se.spi.orbutil.fsm.Runner ;
-import com.sun.corba.se.spi.orbutil.fsm.StateEngine ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.PoaFSM;
 import com.sun.corba.se.spi.logging.POASystemException ;
 
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 
-import static com.sun.corba.se.spi.orbutil.fsm.Guard.Base.* ;
+import static org.glassfish.pfl.basic.fsm.Guard.Base.* ;
 
 /** AOMEntry represents a Servant or potential Servant in the ActiveObjectMap.
 * It may be in several states to allow for long incarnate or etherealize 
@@ -173,8 +173,8 @@ public class AOMEntry extends FSMImpl {
     } ;
 
     private static final IntFunc counterFunc =
-	new IntFunc( "counterFunc" ) {
-	    public int evaluate( FSM fsm, Input in ) {
+	new Guard.Base.IntFunc( "counterFunc" ) {
+	    public Integer evaluate( FSM fsm, Input in ) {
 		AOMEntry entry = (AOMEntry)fsm ;
 		return entry.counter[0] ;
 	    }

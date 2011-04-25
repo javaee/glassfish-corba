@@ -58,8 +58,6 @@ import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 
-import com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission ;
-
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 

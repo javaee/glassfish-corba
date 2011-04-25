@@ -64,9 +64,9 @@ import com.sun.corba.se.spi.ior.ObjectId;
 import com.sun.corba.se.spi.logging.POASystemException;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Subcontract;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Subcontract
 @IsLocal

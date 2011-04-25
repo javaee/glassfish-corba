@@ -45,7 +45,6 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 import org.omg.PortableInterceptor.ACTIVE;
 
 import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.spi.oa.OADestroyed ;
@@ -66,6 +65,7 @@ import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.NameValue;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
 
 /** The Transient Object Adapter (TOA) represents the OA for purely transient
 * objects.  It is used for standard RMI-IIOP as well as backwards compatible

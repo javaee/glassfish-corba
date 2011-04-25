@@ -44,7 +44,6 @@ package com.sun.corba.se.impl.orbutil.transport;
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
 
 abstract class ConnectionCacheBlockingBase<C extends Connection> 
     extends ConnectionCacheBase<C> {
@@ -53,9 +52,9 @@ abstract class ConnectionCacheBlockingBase<C extends Connection>
     protected int totalIdle ;	// Number of idle connections
 
     ConnectionCacheBlockingBase( String cacheType, int highWaterMark,
-	int numberToReclaim, MethodMonitor mm, long ttl ) {
+	int numberToReclaim, long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, mm ) ;
+	super( cacheType, highWaterMark, numberToReclaim) ;
 
 	this.totalBusy = 0 ;
 	this.totalIdle = 0 ;

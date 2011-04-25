@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicInteger ;
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory ;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
 
 abstract class ConnectionCacheNonBlockingBase<C extends Connection> 
     extends ConnectionCacheBase<C> {
@@ -55,9 +54,9 @@ abstract class ConnectionCacheNonBlockingBase<C extends Connection>
     protected final AtomicInteger totalIdle ;	// Number of idle connections
 
     ConnectionCacheNonBlockingBase( String cacheType, int highWaterMark,
-	int numberToReclaim, MethodMonitor mm, long ttl ) {
+	int numberToReclaim, long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, mm ) ;
+	super( cacheType, highWaterMark, numberToReclaim) ;
 
 	this.totalBusy = new AtomicInteger() ;
 	this.totalIdle = new AtomicInteger() ;

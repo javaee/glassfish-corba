@@ -51,8 +51,8 @@ import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.InboundConnectionCache ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory;
+import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** Manage connections that are initiated from another VM. 
  * Connections are reclaimed when 
@@ -69,9 +69,6 @@ public final class InboundConnectionCacheImpl<C extends Connection>
     extends ConnectionCacheNonBlockingBase<C> 
     implements InboundConnectionCache<C> {
 
-    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil(
-        InboundConnectionCacheImpl.class ) ;
-    
     private final ConcurrentMap<C,ConnectionState<C>> connectionMap ;
 
     protected String thisClassName() {
@@ -108,7 +105,7 @@ public final class InboundConnectionCacheImpl<C extends Connection>
     public InboundConnectionCacheImpl( final String cacheType, 
 	final int highWaterMark, final int numberToReclaim, long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
+	super( cacheType, highWaterMark, numberToReclaim, ttl ) ;
 
 	this.connectionMap = 
 	    new ConcurrentHashMap<C,ConnectionState<C>>() ;
@@ -134,40 +131,40 @@ public final class InboundConnectionCacheImpl<C extends Connection>
 	}
     }
 
+    @InfoMethod
+    private void msg( String m ) {}
+
+    @InfoMethod
+    private void display( String m, Object value ) {}
+
+    @Transport
     public void requestProcessed( final C conn, 
 	final int numResponsesExpected ) {
 
-        mm.enter( debug(), "requestProcessed", conn, numResponsesExpected ) ;
+    final ConnectionState<C> cs = connectionMap.get( conn ) ;
 
-	try {
-	    final ConnectionState<C> cs = connectionMap.get( conn ) ;
+    if (cs == null) {
+	msg( "connection was closed");
+	return ;
+    } else {
+	int numResp = cs.expectedResponseCount.addAndGet(
+	    numResponsesExpected ) ;
+	int numBusy = cs.busyCount.decrementAndGet() ;
 
-	    if (cs == null) {
-                mm.info( debug(), "connection was closed" ) ;
-		return ; 
-	    } else {
-		int numResp = cs.expectedResponseCount.addAndGet( 
-		    numResponsesExpected ) ;
-		int numBusy = cs.busyCount.decrementAndGet() ;
+	display( "numResp", numResp ) ;
+	display( "numBusy", numBusy ) ;
 
-                mm.info( debug(), "numResp", numResp, "numBusy", numBusy ) ;
+	if (numBusy == 0) {
+	    totalBusy.decrementAndGet() ;
+	    totalIdle.incrementAndGet() ;
 
-		if (numBusy == 0) {
-		    totalBusy.decrementAndGet() ;
-		    totalIdle.incrementAndGet() ;
-
-		    if (numResp == 0) {
-                        mm.info( debug(), "queuing reclaimable connection", 
-                            conn ) ;
-
-			cs.reclaimableHandle = 
-			    reclaimableConnections.offer( conn ) ;
-		    }
-		}
+	    if (numResp == 0) {
+		display( "queing reclaimalbe connection", conn ) ;
+		cs.reclaimableHandle =
+		    reclaimableConnections.offer( conn ) ;
 	    }
-	} finally {
-            mm.exit( debug() ) ;
 	}
+    }
     }
 
     /** Decrement the number of expected responses.  When a connection is idle 

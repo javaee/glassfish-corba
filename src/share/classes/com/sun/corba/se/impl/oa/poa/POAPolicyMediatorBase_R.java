@@ -48,8 +48,8 @@ import org.omg.PortableServer.POAPackage.ServantAlreadyActive ;
 import org.omg.PortableServer.POAPackage.ObjectNotActive ;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive ;
 
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Poa
 public abstract class POAPolicyMediatorBase_R extends POAPolicyMediatorBase {

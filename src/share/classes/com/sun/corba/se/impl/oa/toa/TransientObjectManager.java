@@ -50,10 +50,10 @@ package com.sun.corba.se.impl.oa.toa;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility ;
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedData;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @com.sun.corba.se.spi.trace.TransientObjectManager
 @ManagedData

@@ -61,8 +61,8 @@ import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.protocol.InvocationInfo;
 
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 // REVISIT: create a unit test for this class.
 

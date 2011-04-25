@@ -125,9 +125,9 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage_1_0 ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage_1_1 ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage_1_2 ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
 import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * @author Harold Carr

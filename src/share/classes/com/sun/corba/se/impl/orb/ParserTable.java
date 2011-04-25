@@ -75,7 +75,6 @@ import com.sun.corba.se.spi.orb.OperationFactory ;
 import com.sun.corba.se.spi.orb.OperationFactoryExt ;
 import com.sun.corba.se.spi.orb.ParserData ;
 import com.sun.corba.se.spi.orb.ParserDataFactory ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.transport.Acceptor;
 import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.ContactInfoListFactory;
@@ -97,8 +96,9 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.ReferenceAddr ;
 import com.sun.corba.se.impl.transport.DefaultIORToSocketInfoImpl;
 import com.sun.corba.se.impl.transport.DefaultSocketFactoryImpl;
 import com.sun.corba.se.impl.transport.TcpTimeoutsImpl;
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
 import com.sun.corba.se.spi.transport.InboundConnectionCache;
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.basic.func.UnaryFunction;
 
 /** Initialize the parser data for the standard ORB parser.  This is used both
  * to implement ORBDataParserImpl and to provide the basic testing framework

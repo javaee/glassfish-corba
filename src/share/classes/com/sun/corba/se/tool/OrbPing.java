@@ -39,9 +39,9 @@
  */
 package com.sun.corba.se.tool;
 
-import com.sun.corba.se.spi.orbutil.argparser.DefaultValue;
-import com.sun.corba.se.spi.orbutil.argparser.Help;
-import com.sun.corba.se.spi.orbutil.argparser.ArgParser;
+import org.glassfish.pfl.basic.tools.argparser.ArgParser;
+import org.glassfish.pfl.basic.tools.argparser.DefaultValue;
+import org.glassfish.pfl.basic.tools.argparser.Help;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContext;
 import org.omg.CosNaming.NamingContextHelper;

@@ -46,7 +46,12 @@ import org.omg.CORBA.ORB ;
 
 import com.sun.corba.se.impl.util.Utility;
 
+import org.glassfish.pfl.dynamic.copyobject.impl.JavaStreamObjectCopierImpl ;
+
+
 public class JavaStreamORBObjectCopierImpl extends JavaStreamObjectCopierImpl {
+    private ORB orb ;
+
     public JavaStreamORBObjectCopierImpl( ORB orb ) {
 	this.orb = orb ;
     }
@@ -65,6 +70,4 @@ public class JavaStreamORBObjectCopierImpl extends JavaStreamObjectCopierImpl {
 
 	return super.copy( obj ) ;
     }
-
-    private ORB orb;
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -47,8 +47,6 @@ import java.util.concurrent.ConcurrentHashMap ;
 
 import java.util.concurrent.atomic.AtomicInteger ;
 
-import java.util.logging.Logger ;
-
 import com.sun.corba.se.spi.orbutil.transport.Connection ;
 import com.sun.corba.se.spi.orbutil.transport.ConnectionFinder ;
 import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
@@ -56,8 +54,6 @@ import com.sun.corba.se.spi.orbutil.transport.OutboundConnectionCache ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueueFactory;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitorFactory;
 
 /** Manage connections that are initiated from this VM. Connections are managed 
  * by a get/release mechanism and cached by the ContactInfo used to create them.
@@ -89,9 +85,6 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
     extends ConnectionCacheNonBlockingBase<C> 
     implements OutboundConnectionCache<C> {
 
-    private static MethodMonitor mm = MethodMonitorFactory.dprintUtil(
-        OutboundConnectionCacheImpl.class ) ;
-    
     private final int maxParallelConnections ;	// Maximum number of connections 
 						// we will open to the same 
 						// endpoint
@@ -168,7 +161,7 @@ public final class OutboundConnectionCacheImpl<C extends Connection>
 	final int highWaterMark, final int numberToReclaim, 
 	final int maxParallelConnections, final long ttl ) {
 
-	super( cacheType, highWaterMark, numberToReclaim, mm, ttl ) ;
+	super( cacheType, highWaterMark, numberToReclaim, ttl ) ;
 	this.maxParallelConnections = maxParallelConnections ;
 
 	this.entryMap = 

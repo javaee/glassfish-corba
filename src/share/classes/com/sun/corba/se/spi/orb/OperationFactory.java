@@ -40,19 +40,16 @@
 package com.sun.corba.se.spi.orb ;
 
 
+import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import java.util.StringTokenizer ;
 
 import java.lang.reflect.Array ;
 
 import java.net.URL ;
 import java.net.MalformedURLException ;
-
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
-
-import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
+import org.glassfish.pfl.basic.algorithm.ObjectUtility;
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.basic.func.UnaryFunction;
 
 /** This is a static factory class for commonly used operations
 * for property parsing.  The following operations are supported:

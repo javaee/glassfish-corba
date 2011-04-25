@@ -83,6 +83,4 @@ public interface ConnectionCache<C extends Connection> {
      * that require closing the connection.
      */
     void close( final C conn ) ;
-
-    void debug( final boolean flag ) ;
 }

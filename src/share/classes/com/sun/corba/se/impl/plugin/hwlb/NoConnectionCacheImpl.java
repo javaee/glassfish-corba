@@ -76,8 +76,8 @@ import com.sun.corba.se.impl.protocol.ClientRequestDispatcherImpl ;
 
 import com.sun.corba.se.impl.transport.ContactInfoImpl ;
 import com.sun.corba.se.impl.transport.ContactInfoListImpl ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
 /** Install this in an ORB using the property 

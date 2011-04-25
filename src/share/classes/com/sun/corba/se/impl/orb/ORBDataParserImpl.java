@@ -40,7 +40,6 @@
 
 package com.sun.corba.se.impl.orb ;
 
-import java.net.URL ;
 import java.net.InetAddress;
 
 import org.omg.PortableInterceptor.ORBInitializer ;
@@ -50,7 +49,6 @@ import com.sun.corba.se.spi.orb.DataCollector ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBData ;
 import com.sun.corba.se.spi.orb.ParserImplTableBase ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.transport.ContactInfoListFactory;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
@@ -60,6 +58,7 @@ import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;
 import com.sun.corba.se.impl.legacy.connection.USLPort;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.transport.Acceptor;
+import org.glassfish.pfl.basic.contain.Pair;
 
 
 public class ORBDataParserImpl extends ParserImplTableBase implements ORBData 

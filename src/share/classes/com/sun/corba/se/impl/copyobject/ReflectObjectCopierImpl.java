@@ -59,6 +59,7 @@ import org.glassfish.pfl.dynamic.copyobject.impl.ClassCopierFactory;
 import org.glassfish.pfl.dynamic.copyobject.impl.DefaultClassCopierFactories;
 import org.glassfish.pfl.dynamic.copyobject.impl.FastCache;
 import org.glassfish.pfl.dynamic.copyobject.impl.PipelineClassCopierFactory;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyobjectDefaults;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
 import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
@@ -139,7 +140,7 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 
 		// Need this case to handle TypeCode.
 		if (cinfo.isAORB(cls)) {
-                    return DefaultClassCopiers.getIdentityClassCopier();
+                    return CopyobjectDefaults.();
                 }
 
 		return null ;

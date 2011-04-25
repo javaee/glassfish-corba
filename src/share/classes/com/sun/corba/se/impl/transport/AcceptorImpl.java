@@ -56,8 +56,8 @@ import com.sun.corba.se.spi.transport.Selector;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * @author Harold Carr

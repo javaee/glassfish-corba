@@ -40,8 +40,8 @@
 
 package com.sun.corba.se.spi.orbutil.logex.stdcorba;
 
-import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
-import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
+import org.glassfish.pfl.basic.logex.ExceptionWrapper;
+import org.glassfish.pfl.basic.logex.WrapperGenerator;
 
 /**
  *

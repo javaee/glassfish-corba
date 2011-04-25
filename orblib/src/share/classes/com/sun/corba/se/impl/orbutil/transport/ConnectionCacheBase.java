@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2011 Oracle and/or its affiliates. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -46,7 +46,8 @@ import com.sun.corba.se.spi.orbutil.transport.ConnectionCache ;
 
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue ;
 import com.sun.corba.se.spi.orbutil.concurrent.ConcurrentQueue.Handle;
-import com.sun.corba.se.spi.orbutil.misc.MethodMonitor;
+import com.sun.corba.se.spi.trace.Transport;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 public abstract class ConnectionCacheBase<C extends Connection> 
     implements ConnectionCache<C> {
@@ -55,8 +56,6 @@ public abstract class ConnectionCacheBase<C extends Connection>
 
     // A name for this instance, provided for convenience.
     private final String cacheType ;
-
-    private final MethodMonitor mm ;
 
     // Configuration data
     // XXX we may want this data to be dynamically re-configurable
@@ -68,14 +67,6 @@ public abstract class ConnectionCacheBase<C extends Connection>
 
     // MUST be initialized in a subclass
     protected ConcurrentQueue<C> reclaimableConnections = null ;
-
-    public boolean debug() {
-        return flag ;
-    }
-
-    public void debug( final boolean flag ) {
-        this.flag = flag ;
-    }
 
     public final String getCacheType() {
 	return cacheType ;
@@ -95,8 +86,7 @@ public abstract class ConnectionCacheBase<C extends Connection>
     protected abstract String thisClassName() ;
 
     ConnectionCacheBase( final String cacheType, 
-	final int highWaterMark, final int numberToReclaim, 
-	final MethodMonitor mm ) {
+	final int highWaterMark, final int numberToReclaim ) {
 
 	if (cacheType == null)
 	    throw new IllegalArgumentException( 
@@ -111,7 +101,6 @@ public abstract class ConnectionCacheBase<C extends Connection>
                 "numberToReclaim must be at least 1" ) ;
 
 	this.cacheType = cacheType ;
-	this.mm = mm ;
 	this.highWaterMark = highWaterMark ;
 	this.numberToReclaim = numberToReclaim ;
     }
@@ -121,36 +110,35 @@ public abstract class ConnectionCacheBase<C extends Connection>
 	return thisClassName() + "[" 
 	    + getCacheType() + "]";
     }
-     
+
+    @InfoMethod
+    private void display( String msg, Object value ) {}
+
     /** Reclaim some idle cached connections.  Will never 
      * close a connection that is busy.
      */
+    @Transport
     protected boolean reclaim() {
-        mm.enter( debug(), "reclaim" );
-        try {
-            int ctr = 0 ;
-            while (ctr < numberToReclaim()) {
-                Handle<C> candidate = reclaimableConnections.poll() ;
-                if (candidate == null)
-                    // If we have closed all idle connections, we must stop
-                    // reclaiming.
-                    break ;
+        int ctr = 0 ;
+        while (ctr < numberToReclaim()) {
+            Handle<C> candidate = reclaimableConnections.poll() ;
+            if (candidate == null)
+                // If we have closed all idle connections, we must stop
+                // reclaiming.
+                break ;
 
-                try {
-                    mm.info( debug(), "closing connection", candidate) ;
-                    close( candidate.value() ) ;
-                } catch (RuntimeException exc) {
-                    mm.info( debug(), "exception on close", exc ) ;
-                    throw exc ;
-                }
-
-                ctr++ ;
+            try {
+                display("closing connection", candidate) ;
+                close( candidate.value() ) ;
+            } catch (RuntimeException exc) {
+                display( "exception on close", exc ) ;
+                throw exc ;
             }
 
-            mm.info( debug(), "number of connections reclaimed", ctr ) ;
-            return ctr > 0 ;
-        } finally {
-            mm.exit( debug() ) ;
+            ctr++ ;
         }
+
+        display( "number of connections reclaimed", ctr ) ;
+        return ctr > 0 ;
     }
 }

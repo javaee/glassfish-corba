@@ -45,8 +45,8 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.spi.oa.OADestroyed;
 import com.sun.corba.se.spi.ior.IOR;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @Subcontract
 public class FullServantCacheLocalCRDImpl extends ServantCacheLocalCRDBase

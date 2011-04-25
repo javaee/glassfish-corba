@@ -48,7 +48,6 @@ import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.transport.ConnectionCache;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 
 import org.glassfish.gmbal.ManagedAttribute ;
@@ -57,6 +56,7 @@ import org.glassfish.gmbal.NameValue ;
 
 import org.glassfish.external.statistics.CountStatistic ;
 import org.glassfish.external.statistics.impl.CountStatisticImpl ;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 
     ////////////////////////////////////////////////////

@@ -41,10 +41,8 @@ package com.sun.corba.se.impl.resolver ;
 
 import com.sun.corba.se.spi.resolver.Resolver ;
 
-import com.sun.corba.se.spi.orb.ORB ;
-
 import com.sun.corba.se.spi.orb.Operation ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import org.glassfish.pfl.basic.contain.Pair;
 
 public class ORBInitRefResolverImpl implements Resolver {
     Operation urlHandler ;

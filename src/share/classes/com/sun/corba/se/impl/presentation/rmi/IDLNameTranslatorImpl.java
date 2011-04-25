@@ -48,15 +48,12 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
-
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
-import com.sun.corba.se.spi.orbutil.proxy.DynamicAccessPermission ;
+import org.glassfish.pfl.basic.algorithm.ObjectUtility;
 
 /**
  * Bidirectional translator between RMI-IIOP interface methods and

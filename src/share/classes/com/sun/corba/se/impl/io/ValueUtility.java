@@ -55,20 +55,17 @@ import com.sun.org.omg.CORBA.Initializer;
 import com.sun.org.omg.CORBA._IDLTypeStub;
 
 import com.sun.corba.se.impl.util.RepositoryId;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-
 import org.omg.CORBA.ValueMember;
-import org.omg.CORBA.IDLType;
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.TypeCodePackage.*;
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.TCKind;
 
-import java.lang.reflect.*;
-import java.util.*;
 import javax.rmi.CORBA.ValueHandler;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import java.lang.reflect.Modifier;
+import java.util.Stack;
+import org.glassfish.pfl.basic.contain.Pair;
 
 /**
  * Holds utility methods for converting from ObjectStreamClass to

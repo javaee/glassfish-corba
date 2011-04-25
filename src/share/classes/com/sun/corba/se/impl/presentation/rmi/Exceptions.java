@@ -40,14 +40,14 @@
 
 package com.sun.corba.se.impl.presentation.rmi;
 
-import com.sun.corba.se.spi.orbutil.logex.Chain;
-import com.sun.corba.se.spi.orbutil.logex.ExceptionWrapper;
-import com.sun.corba.se.spi.orbutil.logex.Log;
-import com.sun.corba.se.spi.orbutil.logex.LogLevel;
-import com.sun.corba.se.spi.orbutil.logex.Message;
-import com.sun.corba.se.spi.orbutil.logex.WrapperGenerator;
 import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
 import javax.naming.Context;
+import org.glassfish.pfl.basic.logex.Chain;
+import org.glassfish.pfl.basic.logex.ExceptionWrapper;
+import org.glassfish.pfl.basic.logex.Log;
+import org.glassfish.pfl.basic.logex.LogLevel;
+import org.glassfish.pfl.basic.logex.Message;
+import org.glassfish.pfl.basic.logex.WrapperGenerator;
 
 /**
  *

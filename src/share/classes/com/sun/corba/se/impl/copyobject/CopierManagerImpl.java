@@ -40,8 +40,8 @@
 
 package com.sun.corba.se.impl.copyobject ;
 
-import com.sun.corba.se.impl.orbutil.DenseIntMapImpl;
-import com.sun.corba.se.spi.copyobject.CopierManager ;
+import com.sun.corba.se.spi.copyobject.CopierManager;
+import org.glassfish.pfl.basic.contain.DenseIntMapImpl;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
 
 public class CopierManagerImpl implements CopierManager

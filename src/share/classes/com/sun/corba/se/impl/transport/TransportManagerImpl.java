@@ -72,7 +72,6 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message_1_2;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Transport;
 
 import com.sun.corba.se.spi.transport.ContactInfo;
@@ -81,6 +80,7 @@ import com.sun.corba.se.spi.transport.OutboundConnectionCache;
 
 import org.glassfish.external.probe.provider.StatsProviderManager ;
 import org.glassfish.external.probe.provider.PluginPoint ;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * @author Harold Carr

@@ -43,6 +43,8 @@ import java.io.PrintStream ;
 
 import com.sun.corba.se.impl.encoding.fast.bytebuffer.Reader ;
 
+import org.glassfish.pfl.basic.algorithm.Printer ;
+
 /** This class provides a means of decoding the data in an emerge stream, 
  * and validating whether it is correctly encoded.  It does NOT deserialize,
  * as that is the job of the InputStream.  This is intended for debugging

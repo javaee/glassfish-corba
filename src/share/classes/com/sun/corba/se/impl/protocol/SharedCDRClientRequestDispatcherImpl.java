@@ -59,8 +59,8 @@ import com.sun.corba.se.spi.protocol.MessageMediator;
 import com.sun.corba.se.impl.encoding.ByteBufferWithInfo;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Subcontract;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * ClientDelegate is the RMI client-side subcontract or representation

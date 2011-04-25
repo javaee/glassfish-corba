@@ -112,9 +112,7 @@ import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.protocol.ClientDelegate;
 import com.sun.corba.se.spi.transport.ContactInfoList ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
-import com.sun.corba.se.spi.orbutil.copyobject.ReflectiveCopyException ;
 import com.sun.corba.se.spi.copyobject.CopierManager ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopier ;
 import com.sun.corba.se.impl.io.ValueHandlerImpl;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 import com.sun.corba.se.impl.orbutil.ORBUtility;
@@ -124,10 +122,11 @@ import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.spi.logging.UtilSystemException;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
-import com.sun.corba.se.spi.orbutil.misc.OperationTracer;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.Map;
+import org.glassfish.pfl.basic.logex.OperationTracer;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /**
  * Provides utility methods that can be used by stubs and ties to

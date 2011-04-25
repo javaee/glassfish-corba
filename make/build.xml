@@ -2087,7 +2087,7 @@
     </emma>
     </target>
 
-    <target name="do-rename" depends="clean, orb-library, rename"/>
+    <target name="do-rename" depends="clean, rename"/>
 
     <target name="do-release" depends="clean, build, make-bundles, release-local"/>
 

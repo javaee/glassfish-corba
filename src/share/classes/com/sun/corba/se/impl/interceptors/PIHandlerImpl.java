@@ -83,8 +83,8 @@ import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.spi.orbutil.ORBConstants;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** 
  * Provides portable interceptor functionality.  

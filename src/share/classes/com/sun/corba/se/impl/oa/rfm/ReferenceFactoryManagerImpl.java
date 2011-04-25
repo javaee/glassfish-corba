@@ -64,8 +64,6 @@ import org.omg.PortableServer.POAManagerPackage.AdapterInactive ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-
 import com.sun.corba.se.spi.oa.ObjectAdapter ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
@@ -77,6 +75,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedObject;
+import org.glassfish.pfl.basic.contain.Pair;
 
 @Poa
 @ManagedObject

@@ -48,7 +48,6 @@
 
 package com.sun.corba.se.impl.util;
 
-import java.util.StringTokenizer;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.Hashtable;
@@ -58,15 +57,13 @@ import java.lang.reflect.Method;
 
 // Imports for using codebase URL to load class
 import java.net.MalformedURLException;
-import org.omg.CORBA.portable.ValueBase;
-import org.omg.CORBA.portable.IDLEntity;
 
 import com.sun.corba.se.impl.io.ObjectStreamClass;
-import com.sun.corba.se.spi.orbutil.misc.SoftCache;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import org.glassfish.pfl.basic.concurrent.SoftCache;
 
 public class RepositoryId {
 	

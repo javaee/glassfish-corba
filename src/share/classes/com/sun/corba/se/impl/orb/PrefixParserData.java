@@ -42,9 +42,9 @@ package com.sun.corba.se.impl.orb ;
 
 import java.util.Properties ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.orb.Operation ;
 import com.sun.corba.se.spi.orb.PropertyParser ;
+import org.glassfish.pfl.basic.contain.Pair;
 
 public class PrefixParserData extends ParserDataBase {
 

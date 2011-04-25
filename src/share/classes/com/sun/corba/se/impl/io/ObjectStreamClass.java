@@ -74,7 +74,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sun.corba.se.impl.util.RepositoryId;
-import com.sun.corba.se.spi.orbutil.misc.SoftCache;
 
 import org.omg.CORBA.ValueMember;
 
@@ -82,6 +81,7 @@ import sun.corba.Bridge;
 
 import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
 import com.sun.corba.se.spi.trace.TraceValueHandler;
+import org.glassfish.pfl.basic.concurrent.SoftCache;
 
 /**
  * A ObjectStreamClass describes a class that can be serialized to a stream

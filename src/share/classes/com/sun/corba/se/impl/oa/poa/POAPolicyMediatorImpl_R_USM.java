@@ -56,8 +56,8 @@ import com.sun.corba.se.impl.oa.NullServantImpl ;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.spi.oa.NullServant ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Poa;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** Implementation of POARequesHandler that provides policy specific
  * operations on the POA.

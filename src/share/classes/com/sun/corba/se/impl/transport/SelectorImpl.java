@@ -58,9 +58,9 @@ import com.sun.corba.se.spi.transport.ListenerThread;
 import com.sun.corba.se.spi.transport.ReaderThread;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orbutil.threadpool.Work;
-import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;
-import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
+import com.sun.corba.se.spi.threadpool.Work;
+import com.sun.corba.se.spi.threadpool.NoSuchThreadPoolException;
+import com.sun.corba.se.spi.threadpool.NoSuchWorkQueueException;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.trace.Transport;

@@ -66,7 +66,7 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import sun.rmi.rmic.Main;
 import com.sun.corba.se.impl.util.JDKBridge;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import java.net.InetAddress;
 
 public class Util {

@@ -49,12 +49,11 @@ import java.io.Serializable ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicStub ;
-
-import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler ;
-import com.sun.corba.se.spi.orbutil.proxy.InvocationHandlerFactory ;
-import com.sun.corba.se.spi.orbutil.proxy.DelegateInvocationHandlerImpl ;
-import com.sun.corba.se.spi.orbutil.proxy.CompositeInvocationHandler ;
-import com.sun.corba.se.spi.orbutil.proxy.CompositeInvocationHandlerImpl ;
+import org.glassfish.pfl.basic.proxy.CompositeInvocationHandler;
+import org.glassfish.pfl.basic.proxy.CompositeInvocationHandlerImpl;
+import org.glassfish.pfl.basic.proxy.DelegateInvocationHandlerImpl;
+import org.glassfish.pfl.basic.proxy.InvocationHandlerFactory;
+import org.glassfish.pfl.basic.proxy.LinkedInvocationHandler;
 
 public class InvocationHandlerFactoryImpl implements InvocationHandlerFactory 
 {

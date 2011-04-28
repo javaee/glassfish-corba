@@ -65,8 +65,8 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.impl.legacy.connection.SocketFactoryAcceptorImpl;
 import com.sun.corba.se.impl.naming.cosnaming.TransientNameService;
 import com.sun.corba.se.impl.naming.pcosnaming.NameService;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.CorbaResourceUtil;
 import com.sun.corba.se.impl.transport.AcceptorImpl;
 
 /**

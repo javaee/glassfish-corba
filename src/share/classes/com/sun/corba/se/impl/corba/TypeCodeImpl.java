@@ -64,13 +64,12 @@ import com.sun.corba.se.impl.encoding.WrapperInputStream;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
-import com.sun.corba.se.spi.orbutil.copyobject.Copy;
-import com.sun.corba.se.spi.orbutil.copyobject.CopyType;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import com.sun.corba.se.spi.trace.DynamicType ;
+import org.glassfish.pfl.dynamic.copyobject.spi.Copy;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyType;
 
 // no chance of subclasses, so no problems with runtime helper lookup
 @DynamicType

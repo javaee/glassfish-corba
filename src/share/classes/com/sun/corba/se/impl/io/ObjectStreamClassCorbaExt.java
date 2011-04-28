@@ -51,9 +51,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.impl.misc.ORBUtility ;
 
 // This file contains some utility methods that
 // originally were in the OSC in the RMI-IIOP

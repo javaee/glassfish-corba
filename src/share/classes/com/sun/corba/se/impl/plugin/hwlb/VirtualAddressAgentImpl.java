@@ -90,7 +90,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileImpl ;
 import com.sun.corba.se.impl.ior.iiop.IIOPProfileTemplateImpl ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import com.sun.corba.se.impl.orb.ORBDataParserImpl ;
 

@@ -62,7 +62,7 @@ import org.omg.CORBA.TCKind;
 
 import javax.rmi.CORBA.ValueHandler;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 import java.lang.reflect.Modifier;
 import java.util.Stack;
 import org.glassfish.pfl.basic.contain.Pair;

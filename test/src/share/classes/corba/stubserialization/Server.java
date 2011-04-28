@@ -54,7 +54,7 @@ import org.omg.PortableServer.*;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
                                                                                 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 
 /**

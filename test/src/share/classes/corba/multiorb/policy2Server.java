@@ -58,7 +58,7 @@ import org.omg.CORBA.Policy;
 import org.omg.PortableServer.Servant;
 import examples.*;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 class policy2_servantA extends policy_2POA
 {

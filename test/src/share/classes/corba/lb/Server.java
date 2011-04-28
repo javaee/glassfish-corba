@@ -64,7 +64,7 @@ import org.omg.PortableServer.ImplicitActivationPolicyValue;
 import org.omg.PortableServer.ServantRetentionPolicyValue;
 import org.omg.PortableServer.RequestProcessingPolicyValue;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 /**
  * @author Harold Carr

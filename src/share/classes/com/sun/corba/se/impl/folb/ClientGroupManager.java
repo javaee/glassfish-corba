@@ -80,7 +80,7 @@ import com.sun.corba.se.spi.transport.ContactInfo;
 
 import com.sun.corba.se.impl.interceptors.ClientRequestInfoImpl;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 // BEGIN imports for IIOPPrimaryToContactInfo
 import java.util.HashMap;

@@ -47,7 +47,7 @@ package mantis.m4764130;
 import java.util.Properties;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.*;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 public class Client 
 {

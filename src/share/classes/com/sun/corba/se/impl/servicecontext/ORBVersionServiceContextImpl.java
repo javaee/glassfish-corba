@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.servicecontext.ServiceContextBase ;
 import com.sun.corba.se.spi.servicecontext.ORBVersionServiceContext ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 public class ORBVersionServiceContextImpl extends ServiceContextBase
     implements ORBVersionServiceContext 

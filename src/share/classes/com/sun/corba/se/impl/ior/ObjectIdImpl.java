@@ -43,7 +43,7 @@ package com.sun.corba.se.impl.ior;
 import java.util.Arrays ;
 import com.sun.corba.se.spi.ior.ObjectId ;
 import org.omg.CORBA_2_3.portable.OutputStream ;
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.impl.misc.ORBUtility ;
 
 /**
  * @author Ken Cavanaugh

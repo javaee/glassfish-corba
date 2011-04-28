@@ -48,7 +48,7 @@ import org.omg.PortableServer.ServantLocatorPackage.*;
 import org.omg.PortableInterceptor.*;
 import com.sun.corba.se.impl.interceptors.*;
 import corba.framework.*;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import java.util.*;
 import java.io.*;

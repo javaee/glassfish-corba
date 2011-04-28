@@ -41,8 +41,8 @@ package com.sun.corba.se.impl.ior.iiop;
 
 import org.omg.CORBA_2_3.portable.OutputStream;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.ior.TaggedComponentBase;

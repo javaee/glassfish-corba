@@ -70,10 +70,9 @@ import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
-import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler ;
-
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 import com.sun.corba.se.spi.trace.IsLocal;
+import org.glassfish.pfl.basic.proxy.LinkedInvocationHandler;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 @IsLocal

@@ -69,7 +69,6 @@ import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate;
 import com.sun.corba.se.spi.oa.ObjectAdapter;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
 import com.sun.corba.se.spi.protocol.MessageMediator;
 import com.sun.corba.se.spi.protocol.ForwardException;
 import com.sun.corba.se.spi.protocol.PIHandler;
@@ -80,10 +79,11 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.logging.OMGSystemException;
 import com.sun.corba.se.impl.corba.RequestImpl;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import com.sun.corba.se.impl.protocol.giopmsgheaders.ReplyMessage;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
+import org.glassfish.pfl.basic.func.NullaryFunction;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** 
@@ -236,9 +236,11 @@ public class PIHandlerImpl implements PIHandler
 
 	// Register the PI current and Codec factory objects
 	orb.getLocalResolver().register( ORBConstants.PI_CURRENT_NAME,
-	    ClosureFactory.makeConstant( current ) ) ;
+            NullaryFunction.Factory.makeConstant( 
+                (org.omg.CORBA.Object)current ) ) ;
 	orb.getLocalResolver().register( ORBConstants.CODEC_FACTORY_NAME,
-	    ClosureFactory.makeConstant( codecFactory ) ) ;
+	    NullaryFunction.Factory.makeConstant(
+                (org.omg.CORBA.Object)codecFactory ) ) ;
 	hasClientInterceptors = true ;  // Issue 11033: with the other changes,
 					// make sure this is true in case
 					// initialize gets called between

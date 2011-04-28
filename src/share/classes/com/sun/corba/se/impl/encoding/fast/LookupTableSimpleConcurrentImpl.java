@@ -44,9 +44,8 @@ import java.util.concurrent.Future ;
 import java.util.concurrent.FutureTask ;
 import java.util.concurrent.ConcurrentMap ;
 import java.util.concurrent.ConcurrentHashMap ;
-
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
-import com.sun.corba.se.spi.orbutil.generic.Holder ;
+import org.glassfish.pfl.basic.contain.Holder;
+import org.glassfish.pfl.basic.func.UnaryFunction;
 
 public class LookupTableSimpleConcurrentImpl<K,V> implements LookupTable<K,V> {
     ConcurrentMap<K,Object> map = new ConcurrentHashMap<K,Object>() ;

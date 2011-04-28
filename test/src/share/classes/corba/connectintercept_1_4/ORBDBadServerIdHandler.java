@@ -64,8 +64,8 @@ import com.sun.corba.se.spi.protocol.ForwardException;
 
 import com.sun.corba.se.spi.orb.ORB; 
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import com.sun.corba.se.impl.ior.IORImpl;
 import com.sun.corba.se.impl.ior.POAObjectKeyTemplate ;

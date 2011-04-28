@@ -61,7 +61,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 import org.glassfish.pfl.basic.logex.OperationTracer;
 
 public class DynamicMethodMarshallerImpl implements DynamicMethodMarshaller 

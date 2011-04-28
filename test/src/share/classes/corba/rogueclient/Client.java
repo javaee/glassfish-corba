@@ -46,7 +46,7 @@ import java.util.Properties;
 import javax.rmi.PortableRemoteObject;
 import javax.naming.InitialContext;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import corba.hcks.U;
 
 public class Client extends Thread

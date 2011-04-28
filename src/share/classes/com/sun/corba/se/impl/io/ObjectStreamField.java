@@ -57,7 +57,7 @@ import sun.corba.Bridge ;
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 
 /**
  * A description of a field in a serializable class.

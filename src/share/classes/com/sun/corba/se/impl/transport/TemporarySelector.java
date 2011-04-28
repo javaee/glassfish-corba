@@ -47,7 +47,7 @@ import java.nio.channels.Selector;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.TemporarySelectorState;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 /**
  *

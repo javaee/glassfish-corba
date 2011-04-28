@@ -58,7 +58,8 @@ import com.sun.corba.se.spi.resolver.Resolver ;
 import com.sun.corba.se.impl.ior.ObjectIdImpl;
 import com.sun.corba.se.impl.ior.ObjectKeyImpl;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.impl.misc.ORBUtility ;
+import java.util.Set;
 
 public class BootstrapResolverImpl implements Resolver {
     private org.omg.CORBA.portable.Delegate bootstrapDelegate ;
@@ -154,7 +155,7 @@ public class BootstrapResolverImpl implements Resolver {
 	return result ;
     }
 
-    public java.util.Set list()
+    public Set<String> list()
     {
 	InputStream inStream = null ;
 	java.util.Set result = new java.util.HashSet() ;

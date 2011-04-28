@@ -55,7 +55,7 @@ import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import org.omg.CORBA.*;
 import org.omg.PortableInterceptor.*;

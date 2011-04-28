@@ -40,8 +40,6 @@
 
 package com.sun.corba.se.impl.resolver ;
 
-import org.omg.CORBA.ORBPackage.InvalidName;
-
 import com.sun.corba.se.spi.resolver.Resolver ;
 
 import java.util.Enumeration;
@@ -54,7 +52,7 @@ import java.io.FileInputStream;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.orbutil.CorbaResourceUtil ;
+import com.sun.corba.se.impl.misc.CorbaResourceUtil ;
 
 public class FileResolverImpl implements Resolver
 {
@@ -80,7 +78,7 @@ public class FileResolverImpl implements Resolver
 	return orb.string_to_object( stringifiedObject ) ;
     }
 
-    public java.util.Set list() 
+    public Set<String> list()
     {
 	check() ;
 
@@ -101,8 +99,9 @@ public class FileResolverImpl implements Resolver
     */
     private void check() 
     {
-	if (file == null)
+	if (file == null) {
 	    return;
+        }
 
 	long lastMod = file.lastModified();
 	if (lastMod > fileModified) {

@@ -57,7 +57,7 @@ import com.sun.corba.se.spi.transport.ContactInfoList ;
 import com.sun.corba.se.impl.ior.JIDLObjectKeyTemplate ;
 import com.sun.corba.se.impl.oa.NullServantImpl;
 import com.sun.corba.se.impl.oa.poa.Policies;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 import com.sun.corba.se.impl.protocol.JIDLLocalCRDImpl ;
 import com.sun.corba.se.spi.protocol.ClientDelegate;
 import java.util.concurrent.atomic.AtomicLong;

@@ -44,7 +44,7 @@ import org.omg.CORBA.Policy ;
 import org.omg.CORBA.LocalObject ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 /** Policy used to support the request partitioning feature and to
  *  specify the partition to use.

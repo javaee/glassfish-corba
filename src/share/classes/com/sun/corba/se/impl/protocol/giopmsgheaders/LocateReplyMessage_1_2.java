@@ -52,7 +52,7 @@ import com.sun.corba.se.spi.ior.IORFactories;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 

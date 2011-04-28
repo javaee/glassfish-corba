@@ -45,7 +45,7 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import java.util.HashMap;
 import java.util.Map;

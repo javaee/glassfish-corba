@@ -42,7 +42,7 @@ package com.sun.corba.se.spi.transport;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 
-import com.sun.corba.se.spi.orbutil.threadpool.Work;
+import com.sun.corba.se.spi.threadpool.Work;
 
 /**
  * @author Harold Carr

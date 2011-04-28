@@ -47,7 +47,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.*;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 public class Utility {
     private ORB orb;

@@ -68,13 +68,13 @@ import com.sun.corba.se.spi.protocol.ClientDelegate ;
 import com.sun.corba.se.spi.transport.ContactInfo;
 import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.ContactInfoListIterator;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import com.sun.corba.se.impl.corba.RequestImpl;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.util.JDKBridge;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.ior.TaggedProfile;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress;

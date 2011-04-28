@@ -43,7 +43,7 @@ import test.Test;
 import corba.framework.*;
 import java.util.*;
 import java.io.*;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 // Tests basic class evolution
 public class EvolveTest extends CORBATest

@@ -40,7 +40,7 @@
 
 package com.sun.corba.se.impl.naming.namingutil;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 /** 
  *  EndpointInfo is used internally by CorbaLoc object to store the

@@ -51,7 +51,7 @@ import org.omg.PortableServer.ServantRetentionPolicyValue;
 // Get org.omg.CosNaming types
 
 // Import transient naming context
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 
 import com.sun.corba.se.spi.logging.NamingSystemException;

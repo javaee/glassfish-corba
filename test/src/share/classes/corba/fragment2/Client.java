@@ -45,7 +45,7 @@ import org.omg.CORBA.*;
 import java.util.* ;
 import java.rmi.RemoteException;
 import java.io.*;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 class Tester extends Thread{
     FragmentTester tester;

@@ -76,7 +76,7 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 
 import java.security.AccessController;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 
 /**
  * Server implementation objects may either inherit from

@@ -46,8 +46,8 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ORBVersion;
 import com.sun.corba.se.spi.orb.ORBVersionFactory;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import org.glassfish.gmbal.ManagedData ;
 import org.glassfish.gmbal.ManagedAttribute ;

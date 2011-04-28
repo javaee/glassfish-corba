@@ -53,10 +53,10 @@ import org.glassfish.pfl.basic.logex.LogLevel;
 import org.glassfish.pfl.basic.logex.Message;
 import org.glassfish.pfl.basic.logex.WrapperGenerator;
 
-import com.sun.corba.se.spi.orbutil.logex.corba.CS;
-import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
-import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
-import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
+import com.sun.corba.se.spi.logex.corba.CS;
+import com.sun.corba.se.spi.logex.corba.CSValue;
+import com.sun.corba.se.spi.logex.corba.ORBException ;
+import com.sun.corba.se.spi.logex.corba.CorbaExtension ;
 
 import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.transport.EventHandler;

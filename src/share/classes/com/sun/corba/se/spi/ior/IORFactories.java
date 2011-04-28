@@ -60,7 +60,7 @@ import com.sun.corba.se.impl.ior.ObjectReferenceFactoryImpl ;
 import com.sun.corba.se.impl.ior.ObjectReferenceTemplateImpl ;
 import com.sun.corba.se.impl.ior.ObjectKeyFactoryImpl ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.impl.misc.ORBUtility ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 

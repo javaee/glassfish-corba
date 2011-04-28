@@ -64,7 +64,6 @@ import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext ;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.EncapsInputStream ;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.TraceServiceContext;
 
 @TraceServiceContext

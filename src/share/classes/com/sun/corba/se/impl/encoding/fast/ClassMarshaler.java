@@ -52,8 +52,6 @@ import java.security.AccessController ;
 
 import sun.corba.Bridge ;
 
-import com.sun.corba.se.spi.orbutil.generic.Holder ;
-
 import com.sun.corba.se.impl.io.ObjectStreamField ;
 
 // An implementation of this class will probably use the ClassAnalyzer, probably

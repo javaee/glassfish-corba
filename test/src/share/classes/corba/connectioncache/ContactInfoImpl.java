@@ -40,7 +40,7 @@
 
 package corba.connectioncache ;
 
-import com.sun.corba.se.spi.orbutil.transport.ContactInfo;
+import com.sun.corba.se.spi.transport.connection.ContactInfo;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

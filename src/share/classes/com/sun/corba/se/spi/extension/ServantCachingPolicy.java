@@ -42,7 +42,7 @@ package com.sun.corba.se.spi.extension ;
 
 import org.omg.CORBA.Policy ;
 import org.omg.CORBA.LocalObject ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 /** Policy used to implement servant caching optimization in the POA.
 * Creating a POA with an instance pol of this policy where 

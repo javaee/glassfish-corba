@@ -39,8 +39,6 @@
  */
 package com.sun.corba.se.impl.encoding.fast ;
 
-import com.sun.corba.se.spi.orbutil.fsm.Input ;
-
 /** Emerge is the encoding we are using for the fast parallel encoding experiment.
  */
 public interface EmergeCode extends Input {

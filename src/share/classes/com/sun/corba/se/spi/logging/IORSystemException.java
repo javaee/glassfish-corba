@@ -48,8 +48,8 @@ import org.glassfish.pfl.basic.logex.LogLevel;
 import org.glassfish.pfl.basic.logex.Message;
 import org.glassfish.pfl.basic.logex.WrapperGenerator;
 
-import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
-import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
+import com.sun.corba.se.spi.logex.corba.ORBException ;
+import com.sun.corba.se.spi.logex.corba.CorbaExtension ;
 import java.io.IOException;
 
 import org.omg.CORBA.BAD_OPERATION;

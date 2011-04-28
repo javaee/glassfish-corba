@@ -44,7 +44,7 @@ import java.util.Map ;
 import java.util.HashMap ;
 import java.util.BitSet ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 import com.sun.corba.se.spi.extension.ZeroPortPolicy ;
 import com.sun.corba.se.spi.extension.CopyObjectPolicy ;

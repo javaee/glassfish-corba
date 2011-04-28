@@ -55,7 +55,7 @@ import com.sun.corba.se.impl.folb.GroupInfoServiceBase;
 import com.sun.corba.se.spi.folb.GroupInfoServiceObserver;
 import com.sun.corba.se.spi.folb.SocketInfo;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import java.util.ArrayList;
 
 /**

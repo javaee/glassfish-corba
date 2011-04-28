@@ -40,7 +40,7 @@
 
 package com.sun.corba.se.impl.presentation.rmi;
 
-import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
+import com.sun.corba.se.spi.logex.stdcorba.StandardLogger;
 import javax.naming.Context;
 import org.glassfish.pfl.basic.logex.Chain;
 import org.glassfish.pfl.basic.logex.ExceptionWrapper;

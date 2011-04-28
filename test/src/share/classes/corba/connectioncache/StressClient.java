@@ -55,11 +55,11 @@ import java.io.IOException ;
 import org.testng.Assert ;
 import org.testng.annotations.Test ;
 
-import com.sun.corba.se.spi.orbutil.transport.ConnectionCache ;
-import com.sun.corba.se.spi.orbutil.transport.ContactInfo ;
-import com.sun.corba.se.spi.orbutil.transport.InboundConnectionCache ;
-import com.sun.corba.se.spi.orbutil.transport.OutboundConnectionCache ;
-import com.sun.corba.se.spi.orbutil.transport.ConnectionCacheFactory ;
+import com.sun.corba.se.spi.transport.connection.ConnectionCache ;
+import com.sun.corba.se.spi.transport.connection.ContactInfo ;
+import com.sun.corba.se.spi.transport.connection.InboundConnectionCache ;
+import com.sun.corba.se.spi.transport.connection.OutboundConnectionCache ;
+import com.sun.corba.se.spi.transport.connection.ConnectionCacheFactory ;
 
 import corba.framework.TestngRunner ;
 import java.util.Random;

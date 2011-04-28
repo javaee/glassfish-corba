@@ -40,7 +40,7 @@
 
 package com.sun.corba.se.impl.io;
 
-import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
+import com.sun.corba.se.spi.logex.stdcorba.StandardLogger;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.NotSerializableException;

@@ -61,7 +61,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.impl.orb.ORBConfiguratorImpl;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 public class ORBConfiguratorPersistentImpl extends ORBConfiguratorImpl {
     private ORBUtilSystemException wrapper = ORBUtilSystemException.self ;

@@ -42,6 +42,7 @@ package com.sun.corba.se.impl.resolver ;
 import com.sun.corba.se.spi.resolver.Resolver ;
 
 import com.sun.corba.se.spi.orb.Operation ;
+import java.util.Set;
 import org.glassfish.pfl.basic.contain.Pair;
 
 public class ORBInitRefResolverImpl implements Resolver {
@@ -70,7 +71,7 @@ public class ORBInitRefResolverImpl implements Resolver {
 	return result ;
     }
 
-    public java.util.Set list()
+    public Set<String> list()
     {
 	return orbInitRefTable.keySet() ;
     }

@@ -47,7 +47,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
 import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.CDROutputObject;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import com.sun.corba.se.spi.trace.Transport ;
 

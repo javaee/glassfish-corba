@@ -44,7 +44,7 @@ import org.omg.CORBA.*;
 import com.sun.corba.se.impl.interceptors.*;
 import org.omg.PortableInterceptor.*;
 import org.omg.Messaging.*;
-import com.sun.corba.se.impl.orbutil.HexOutputStream;
+import com.sun.corba.se.impl.misc.HexOutputStream;
 
 import java.util.*;
 import java.io.*;

@@ -40,7 +40,7 @@
 
 package com.sun.corba.se.impl.encoding.fast;
 
-import com.sun.corba.se.spi.orbutil.logex.stdcorba.StandardLogger;
+import com.sun.corba.se.spi.logex.stdcorba.StandardLogger;
 import java.io.InvalidClassException;
 import java.lang.reflect.Field;
 import org.glassfish.pfl.basic.logex.Chain;

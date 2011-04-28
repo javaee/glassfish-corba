@@ -47,7 +47,7 @@ import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
 import com.sun.corba.se.impl.util.PackagePrefixChecker;
 import com.sun.corba.se.impl.util.Utility;
 
-import com.sun.corba.se.spi.orbutil.ORBClassLoader;
+import com.sun.corba.se.spi.misc.ORBClassLoader;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 

@@ -48,9 +48,6 @@ import java.lang.reflect.Method ;
 
 import javax.rmi.CORBA.Tie ;
 
-import com.sun.corba.se.spi.orbutil.proxy.InvocationHandlerFactory ;
-
-
 /** Provides access to RMI-IIOP stubs and ties.  
  * Any style of stub and tie generation may be used.  
  * This includes compiler generated stubs and runtime generated stubs 

@@ -53,7 +53,7 @@ import java.util.Properties ;
 
 import com.sun.corba.se.spi.osgi.ORBFactory ;
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 
 public class ORBFactoryTest implements BundleActivator, SynchronousBundleListener {

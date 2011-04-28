@@ -42,8 +42,8 @@ package com.sun.corba.se.impl.naming.pcosnaming;
 
 import java.io.File;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.CorbaResourceUtil;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.activation.InitialNameService;
 import com.sun.corba.se.spi.activation.InitialNameServiceHelper;

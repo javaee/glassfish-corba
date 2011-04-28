@@ -44,8 +44,8 @@ import java.util.Properties;
 
 import org.omg.CORBA.ORB;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.CorbaResourceUtil;
 import com.sun.corba.se.spi.logging.NamingSystemException;
 import com.sun.corba.se.spi.trace.Naming;
 

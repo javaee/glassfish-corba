@@ -45,7 +45,7 @@ import java.nio.ByteBuffer;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.protocol.RequestId;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.impl.protocol.RequestIdImpl;
 
 public class Message_1_2 extends Message_1_1

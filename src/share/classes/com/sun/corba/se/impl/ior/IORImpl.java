@@ -69,8 +69,8 @@ import com.sun.corba.se.impl.encoding.MarshalOutputStream;
 
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 
-import com.sun.corba.se.impl.orbutil.HexOutputStream;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.impl.misc.HexOutputStream;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import com.sun.corba.se.spi.logging.IORSystemException ;
 

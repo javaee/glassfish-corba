@@ -45,7 +45,7 @@ import corba.framework.*;
 import java.util.*;
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 public class MessageTraceTest extends CORBATest
 {

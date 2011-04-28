@@ -57,7 +57,7 @@ import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 /**
  * @author Harold Carr

@@ -48,7 +48,7 @@ import org.omg.CORBA.*;
 import org.omg.CORBA.portable.UnknownException;
 import org.omg.PortableServer.*;
 import java.util.Properties;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 class idlDynInvokeHelper 
 {

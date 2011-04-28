@@ -80,7 +80,7 @@ import com.sun.corba.se.spi.transport.ContactInfo;
 import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.ContactInfoListIterator;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.impl.protocol.InvocationInfo;
 import com.sun.corba.se.spi.trace.TraceInterceptor;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;

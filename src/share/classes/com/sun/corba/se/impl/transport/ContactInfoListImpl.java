@@ -62,7 +62,7 @@ import com.sun.corba.se.spi.transport.ContactInfoList ;
 import com.sun.corba.se.spi.transport.SocketInfo;
 import com.sun.corba.se.spi.transport.ContactInfo;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.impl.protocol.NotLocalLocalCRDImpl;
 import com.sun.corba.se.spi.trace.IsLocal;
 import com.sun.corba.se.spi.trace.Transport;

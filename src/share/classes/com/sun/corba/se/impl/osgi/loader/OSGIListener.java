@@ -39,8 +39,6 @@
  */
 package com.sun.corba.se.impl.osgi.loader ;
 
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction;
-
 import java.util.Dictionary;
 import java.util.Map;
 
@@ -57,7 +55,6 @@ import org.osgi.service.packageadmin.ExportedPackage ;
 import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.Osgi;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,6 +65,8 @@ import java.security.PrivilegedAction ;
 import java.security.PrivilegedExceptionAction ;
 import java.security.PrivilegedActionException ;
 import java.security.AccessController ;
+import org.glassfish.pfl.basic.func.UnaryFunction;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /** OSGi class that monitors which bundles provide classes that the ORB
  * needs to instantiate for initialization.  

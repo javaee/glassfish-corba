@@ -49,9 +49,6 @@ import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicStub ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
-import com.sun.corba.se.spi.orbutil.proxy.InvocationHandlerFactory ;
-import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler ;
-
 public abstract class StubFactoryBase implements PresentationManager.StubFactory 
 {
     private String[] typeIds = null ;

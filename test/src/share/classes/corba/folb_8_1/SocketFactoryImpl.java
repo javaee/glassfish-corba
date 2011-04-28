@@ -53,8 +53,8 @@ import com.sun.corba.se.spi.transport.Acceptor;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.ORBSocketFactory;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 public class SocketFactoryImpl
     implements ORBSocketFactory

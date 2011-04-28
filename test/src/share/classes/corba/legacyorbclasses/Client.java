@@ -49,7 +49,7 @@ import corba.framework.Controller;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.*;
 import org.omg.CosNaming.NamingContextPackage.*;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 public class Client 
 {

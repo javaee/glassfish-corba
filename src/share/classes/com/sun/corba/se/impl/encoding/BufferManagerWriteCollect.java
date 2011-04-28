@@ -45,7 +45,7 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.transport.Connection;
 import com.sun.corba.se.spi.transport.ByteBufferPool;
 import com.sun.corba.se.impl.encoding.CDROutputObject;

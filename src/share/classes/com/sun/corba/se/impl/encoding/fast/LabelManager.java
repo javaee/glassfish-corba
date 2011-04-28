@@ -41,12 +41,11 @@ package com.sun.corba.se.impl.encoding.fast ;
 
 import java.util.concurrent.atomic.AtomicLong ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.generic.Holder ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
-
 import com.sun.corba.se.impl.encoding.fast.bytebuffer.Reader ;
 import com.sun.corba.se.impl.encoding.fast.bytebuffer.Writer ;
+import org.glassfish.pfl.basic.contain.Holder;
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.basic.func.UnaryFunction;
 
 /** Maintains the assignment of Labels to Objects for an OutputStream
  * New labels are allocated as needed, and all context determinations

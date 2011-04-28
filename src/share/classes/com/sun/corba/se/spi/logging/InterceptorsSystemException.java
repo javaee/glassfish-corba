@@ -47,11 +47,11 @@ import org.glassfish.pfl.basic.logex.Log;
 import org.glassfish.pfl.basic.logex.LogLevel;
 import org.glassfish.pfl.basic.logex.Message;
 import org.glassfish.pfl.basic.logex.WrapperGenerator;
-import com.sun.corba.se.spi.orbutil.logex.corba.CS;
-import com.sun.corba.se.spi.orbutil.logex.corba.CSValue;
+import com.sun.corba.se.spi.logex.corba.CS;
+import com.sun.corba.se.spi.logex.corba.CSValue;
 
-import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
-import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
+import com.sun.corba.se.spi.logex.corba.ORBException ;
+import com.sun.corba.se.spi.logex.corba.CorbaExtension ;
 import java.util.List;
 
 import org.omg.CORBA.BAD_INV_ORDER;

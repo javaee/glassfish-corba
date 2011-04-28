@@ -121,9 +121,9 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerGroup ;
 import com.sun.corba.se.spi.transport.TcpTimeouts ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.impl.misc.ORBUtility ;
 
 import com.sun.corba.se.spi.orbutil.misc.OperationTracer ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;

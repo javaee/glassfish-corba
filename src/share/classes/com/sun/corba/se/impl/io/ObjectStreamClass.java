@@ -79,7 +79,7 @@ import org.omg.CORBA.ValueMember;
 
 import sun.corba.Bridge;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 import com.sun.corba.se.spi.trace.TraceValueHandler;
 import org.glassfish.pfl.basic.concurrent.SoftCache;
 

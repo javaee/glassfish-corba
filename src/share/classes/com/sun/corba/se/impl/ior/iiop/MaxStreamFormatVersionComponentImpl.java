@@ -46,7 +46,7 @@ import org.omg.CORBA_2_3.portable.OutputStream;
 import javax.rmi.CORBA.ValueHandler;
 import javax.rmi.CORBA.ValueHandlerMultiFormat;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import com.sun.corba.se.spi.ior.TaggedComponentBase;
 

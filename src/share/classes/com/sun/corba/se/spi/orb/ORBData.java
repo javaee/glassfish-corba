@@ -49,7 +49,6 @@ import com.sun.corba.se.spi.transport.ContactInfoListFactory;
 import com.sun.corba.se.spi.transport.IORToSocketInfo;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.TcpTimeouts;
-import com.sun.corba.se.spi.orbutil.generic.Pair;
 
 import com.sun.corba.se.impl.legacy.connection.USLPort;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo ;

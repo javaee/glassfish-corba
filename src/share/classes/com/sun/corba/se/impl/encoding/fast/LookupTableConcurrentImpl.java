@@ -48,9 +48,8 @@ import java.lang.ref.SoftReference ;
 
 import java.security.AccessController ;
 import java.security.PrivilegedAction ;
-
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
-import com.sun.corba.se.spi.orbutil.generic.Holder ;
+import org.glassfish.pfl.basic.contain.Holder;
+import org.glassfish.pfl.basic.func.UnaryFunction;
 
 /** A fast, concurrent, lock-free table that associates data with a key.
  * Typically the key is a Class, and the data may also reference the key.

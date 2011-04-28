@@ -40,7 +40,7 @@
 
 package corba.rogueclient;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.spi.ior.IOR;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPAddress;
@@ -49,7 +49,7 @@ import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.protocol.ClientDelegate;
 import com.sun.corba.se.spi.transport.ContactInfoList;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
 

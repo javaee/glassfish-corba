@@ -63,7 +63,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.IIOPPrimaryToContactInfo;
 import com.sun.corba.se.spi.transport.SocketInfo;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 /**
  * This is the "sticky manager" - based on the 7.1 EE concept.

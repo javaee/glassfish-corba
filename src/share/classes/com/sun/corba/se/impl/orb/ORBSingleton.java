@@ -98,8 +98,7 @@ import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.transport.ContactInfoListFactory ;
 import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
-import com.sun.corba.se.spi.orbutil.closure.Closure;
-import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
+import com.sun.corba.se.spi.threadpool.ThreadPoolManager;
 import com.sun.corba.se.spi.copyobject.CopierManager;
 import com.sun.corba.se.spi.presentation.rmi.InvocationInterceptor;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
@@ -119,8 +118,9 @@ import com.sun.corba.se.impl.encoding.BufferManagerFactory;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
+import org.glassfish.pfl.basic.func.NullaryFunction;
 
 /*
  * The restricted singleton ORB implementation.
@@ -669,7 +669,8 @@ public class ORBSingleton extends ORB
     {
     }
 
-    public void registerInitialReference( String id, Closure closure ) 
+    public void registerInitialReference( String id, 
+        NullaryFunction<org.omg.CORBA.Object> closure )
     {
     }
 

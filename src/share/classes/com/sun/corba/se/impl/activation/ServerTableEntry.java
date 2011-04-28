@@ -55,7 +55,7 @@ import com.sun.corba.se.spi.activation.InvalidORBid;
 import com.sun.corba.se.spi.activation.ServerHeldDown;
 import com.sun.corba.se.spi.activation.RepositoryPackage.ServerDef;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.spi.logging.ActivationSystemException ;
 
 import java.util.HashMap;

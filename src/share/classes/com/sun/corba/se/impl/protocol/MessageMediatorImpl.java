@@ -71,9 +71,9 @@ import com.sun.corba.se.spi.oa.OAInvocationInfo;
 import com.sun.corba.se.spi.oa.ObjectAdapter;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.orb.ObjectKeyCacheEntry;
-import com.sun.corba.se.spi.orbutil.threadpool.NoSuchThreadPoolException;
-import com.sun.corba.se.spi.orbutil.threadpool.NoSuchWorkQueueException;
-import com.sun.corba.se.spi.orbutil.threadpool.Work;
+import com.sun.corba.se.spi.threadpool.NoSuchThreadPoolException;
+import com.sun.corba.se.spi.threadpool.NoSuchWorkQueueException;
+import com.sun.corba.se.spi.threadpool.Work;
 import com.sun.corba.se.spi.protocol.MessageMediator;
 import com.sun.corba.se.spi.protocol.ProtocolHandler;
 import com.sun.corba.se.spi.protocol.RequestId;
@@ -99,8 +99,8 @@ import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.logging.InterceptorsSystemException;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.AddressingDispositionHelper;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.CancelRequestMessage;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.FragmentMessage_1_1;
@@ -2281,9 +2281,6 @@ public class MessageMediatorImpl
     @InfoMethod
     private void releasingByteBufferToPool( int bbid ) { }
 
-    // REVISIT - this method should be migrated to orbutil.ORBUtility
-    //           since all locations that release ByteBuffers use
-    //           very similar logic and debug information.
     @Transport
     private void releaseByteBufferToPool() {
         if (dispatchByteBuffer != null) {

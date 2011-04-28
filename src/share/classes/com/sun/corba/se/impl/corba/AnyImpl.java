@@ -72,16 +72,15 @@ import com.sun.corba.se.impl.encoding.CDRInputObject;
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.io.ValueUtility;
-import com.sun.corba.se.impl.orbutil.RepositoryIdFactory;
-import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.RepositoryIdFactory;
+import com.sun.corba.se.impl.misc.RepositoryIdStrings;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import java.io.ObjectInputStream;
 
-import com.sun.corba.se.spi.orbutil.copyobject.Copy ;
-import com.sun.corba.se.spi.orbutil.copyobject.CopyType ;
-
 import com.sun.corba.se.spi.trace.DynamicType ;
+import org.glassfish.pfl.dynamic.copyobject.spi.Copy;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyType;
 
 // subclasses must provide a matching helper class
 @DynamicType

@@ -70,9 +70,6 @@ import com.sun.corba.se.spi.orb.ParserImplBase ;
 import com.sun.corba.se.spi.orb.PropertyParser ;
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.closure.Closure ;
-import com.sun.corba.se.spi.orbutil.closure.ClosureFactory ;
-
 import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 import com.sun.corba.se.spi.protocol.ServerRequestDispatcher ;
 import com.sun.corba.se.spi.protocol.RequestDispatcherDefault ;
@@ -101,9 +98,10 @@ import com.sun.corba.se.impl.legacy.connection.SocketFactoryContactInfoListImpl;
 import com.sun.corba.se.impl.legacy.connection.USLPort;
 
 import com.sun.corba.se.impl.dynamicany.DynAnyFactoryImpl ;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import com.sun.corba.se.spi.transport.Acceptor;
+import org.glassfish.pfl.basic.func.NullaryFunction;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
 
 public class ORBConfiguratorImpl implements ORBConfigurator {
@@ -400,13 +398,15 @@ public class ORBConfiguratorImpl implements ORBConfigurator {
     private void registerInitialReferences( final ORB orb ) 
     {
 	// Register the Dynamic Any factory
-        Closure closure = new Closure() {
-            public java.lang.Object evaluate() {
-                return new DynAnyFactoryImpl( orb ) ;
-            }
-        } ;
+        NullaryFunction<org.omg.CORBA.Object> closure =
+            new NullaryFunction<org.omg.CORBA.Object>() {
+                public org.omg.CORBA.Object evaluate() {
+                    return new DynAnyFactoryImpl( orb ) ;
+                }
+            } ;
 
-        Closure future = ClosureFactory.makeFuture( closure ) ;
+        NullaryFunction<org.omg.CORBA.Object> future =
+            NullaryFunction.Factory.makeFuture( closure ) ;
         orb.getLocalResolver().register( ORBConstants.DYN_ANY_FACTORY_NAME, 
 	    future ) ;
     }

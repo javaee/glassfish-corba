@@ -48,7 +48,7 @@ import com.sun.corba.se.spi.orb.ORB ;
 
 import com.sun.corba.se.impl.orbutil.copyobject.ClassCopierOrdinaryImpl ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import junit.framework.Test ;
 

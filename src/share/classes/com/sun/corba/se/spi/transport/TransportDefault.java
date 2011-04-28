@@ -52,7 +52,6 @@ import com.sun.corba.se.impl.transport.AcceptorAcceptOnlyImpl;
 import com.sun.corba.se.impl.transport.ContactInfoListImpl;
 import com.sun.corba.se.impl.transport.AcceptorImpl ;
 import com.sun.corba.se.impl.transport.AcceptorLazyImpl ;
-import com.sun.corba.se.spi.orbutil.generic.UnaryVoidFunction;
 import java.net.Socket;
 
 /** This class provices standard building blocks for the ORB, as do all Default classes

@@ -39,8 +39,6 @@
  */
 package com.sun.corba.se.impl.encoding.fast ;
 
-import com.sun.corba.se.spi.orbutil.generic.Holder ;
-
 /** A fast, concurrent, lock-free table that associates data with a key.
  * Typically the key is a Class, and the data may also reference the key.
  * This LookupTable will not pin either key or data in memory, and as

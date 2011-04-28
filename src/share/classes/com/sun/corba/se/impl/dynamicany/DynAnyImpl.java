@@ -49,7 +49,7 @@ import org.omg.DynamicAny.*;
 import org.omg.DynamicAny.DynAnyPackage.TypeMismatch;
 import org.omg.DynamicAny.DynAnyPackage.InvalidValue;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;

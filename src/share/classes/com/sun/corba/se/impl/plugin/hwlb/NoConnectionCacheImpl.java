@@ -64,7 +64,7 @@ import com.sun.corba.se.spi.protocol.RequestDispatcherRegistry ;
 
 import com.sun.corba.se.spi.ior.IOR ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import com.sun.corba.se.impl.transport.ConnectionCacheBase ;
 import com.sun.corba.se.impl.transport.ConnectionImpl ;

@@ -52,7 +52,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 
 public abstract class StubFactoryFactoryDynamicBase extends 
     StubFactoryFactoryBase

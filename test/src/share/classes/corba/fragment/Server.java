@@ -48,7 +48,7 @@ import java.util.Properties;
 import org.omg.PortableServer.*;
 import java.io.*;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 
 public class Server

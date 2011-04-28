@@ -88,7 +88,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController ;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory ;
 
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;

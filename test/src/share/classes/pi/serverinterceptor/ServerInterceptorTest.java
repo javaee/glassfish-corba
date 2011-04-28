@@ -39,7 +39,7 @@
  */
 package pi.serverinterceptor;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import corba.framework.*;
 import java.util.*;
 

@@ -93,17 +93,16 @@ import com.sun.corba.se.spi.orb.ORBVersionFactory;
 import com.sun.corba.se.spi.orb.ClassCodeBaseHandler;
 
 import com.sun.corba.se.impl.corba.TypeCodeImpl;
-import com.sun.corba.se.impl.orbutil.CacheTable;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.DprintUtil ;
-import com.sun.corba.se.impl.orbutil.RepositoryIdStrings;
-import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
-import com.sun.corba.se.impl.orbutil.RepositoryIdFactory;
+import com.sun.corba.se.impl.misc.CacheTable;
+import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.se.impl.misc.RepositoryIdStrings;
+import com.sun.corba.se.impl.misc.RepositoryIdUtility;
+import com.sun.corba.se.impl.misc.RepositoryIdFactory;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 
 import com.sun.corba.se.spi.trace.* ;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
@@ -114,7 +113,6 @@ public class CDROutputStream_1_0 extends CDROutputStreamBase
 {
     private static final int INDIRECTION_TAG = 0xffffffff;
 
-    protected final DprintUtil dputil = new DprintUtil( this ) ;
     protected boolean littleEndian;
     protected BufferManagerWrite bufferManagerWrite;
     ByteBufferWithInfo bbwi;

@@ -94,7 +94,7 @@ import com.sun.corba.se.impl.encoding.CDROutputObject;
 import com.sun.corba.se.impl.encoding.MarshalInputStream;
 import com.sun.corba.se.impl.encoding.CodeSetComponentInfo;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.logging.POASystemException;
 import com.sun.corba.se.spi.trace.Subcontract;

@@ -57,8 +57,8 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.folb.ClientGroupManager;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import corba.folb_8_1.SocketFactoryImpl;
 import corba.framework.TestngRunner;

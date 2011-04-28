@@ -52,7 +52,7 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 
 public class ExceptionHandlerImpl implements ExceptionHandler 
 {

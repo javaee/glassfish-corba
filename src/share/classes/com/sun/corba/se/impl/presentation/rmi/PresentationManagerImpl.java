@@ -61,8 +61,6 @@ import java.security.PrivilegedAction;
 import org.omg.PortableServer.POA ;
 import org.omg.PortableServer.Servant ;
 
-import com.sun.corba.se.spi.orbutil.proxy.InvocationHandlerFactory ;
-
 import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
@@ -71,11 +69,13 @@ import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
 import com.sun.corba.se.impl.util.RepositoryId ;
 
-import com.sun.corba.se.impl.orbutil.graph.Node ;
-
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 import org.glassfish.pfl.basic.concurrent.WeakCache;
-import org.glassfish.pfl.basic.algorithm.Graph ;
+import org.glassfish.pfl.basic.graph.Graph ;
+import org.glassfish.pfl.basic.graph.GraphImpl ;
+import org.glassfish.pfl.basic.graph.Node ;
+import org.glassfish.pfl.basic.graph.NodeData ;
+import org.glassfish.pfl.basic.proxy.InvocationHandlerFactory;
 
 public final class PresentationManagerImpl implements PresentationManager
 {

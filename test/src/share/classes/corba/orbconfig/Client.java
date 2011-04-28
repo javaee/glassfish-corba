@@ -79,7 +79,7 @@ import com.sun.corba.se.impl.orb.ORBDataParserImpl ;
 import com.sun.corba.se.impl.orb.DataCollectorFactory ;
 import com.sun.corba.se.impl.orb.ParserTable ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import com.sun.corba.se.spi.orbutil.generic.Pair ;
 import com.sun.corba.se.spi.orbutil.closure.Closure ;

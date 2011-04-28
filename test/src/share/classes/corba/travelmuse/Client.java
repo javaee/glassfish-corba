@@ -40,7 +40,7 @@
 
 package corba.travelmuse;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.transport.MessageData;
 import java.io.FileInputStream;

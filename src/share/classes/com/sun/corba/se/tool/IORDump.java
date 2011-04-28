@@ -52,7 +52,7 @@ import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 import com.sun.corba.se.spi.ior.TaggedProfile ;
 import com.sun.corba.se.spi.ior.ObjectKeyTemplate ;
 import com.sun.corba.se.spi.ior.TaggedComponent ;
-import org.glassfish.pfl.dynamic.codegen.impl.Printer;
+import org.glassfish.pfl.basic.algorithm.Printer;
 
 public class IORDump {
     private static Printer pr = new Printer( System.out ) ;

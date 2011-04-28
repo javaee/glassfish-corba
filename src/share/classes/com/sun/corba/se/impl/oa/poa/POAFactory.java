@@ -65,13 +65,10 @@ import com.sun.corba.se.spi.ior.ObjectAdapterId ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.closure.Closure ;
-import com.sun.corba.se.spi.orbutil.closure.ClosureFactory ;
-
 import com.sun.corba.se.spi.logging.POASystemException ;
 import com.sun.corba.se.spi.logging.OMGSystemException ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
@@ -79,6 +76,7 @@ import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.ManagedData;
 import org.glassfish.gmbal.ManagedObjectManager;
 import org.glassfish.gmbal.AMXMetadata;
+import org.glassfish.pfl.basic.func.NullaryFunction;
 
 @ManagedObject
 @Description( "The factory for all POAs and POAManagers")
@@ -200,7 +198,8 @@ public class POAFactory implements ObjectAdapterFactory
 
 	POACurrent poaCurrent = new POACurrent(orb);
 	orb.getLocalResolver().register( ORBConstants.POA_CURRENT_NAME, 
-	    ClosureFactory.makeConstant( poaCurrent ) ) ;
+	    NullaryFunction.Factory.makeConstant( 
+                (org.omg.CORBA.Object)poaCurrent ) ) ;
         this.mom = orb.mom() ;
         mom.registerAtRoot( this ) ;
     }
@@ -281,14 +280,15 @@ public class POAFactory implements ObjectAdapterFactory
 	// We delay the evaluation of makeRootPOA until
 	// a call to resolve_initial_references( "RootPOA" ).
 	// The Future guarantees that makeRootPOA is only called once.
-	Closure rpClosure = new Closure() {
-	    public Object evaluate() {
-		return POAImpl.makeRootPOA( orb ) ;
-	    }
-	} ;
+	NullaryFunction<org.omg.CORBA.Object> rpClosure =
+            new NullaryFunction<org.omg.CORBA.Object>() {
+                public org.omg.CORBA.Object evaluate() {
+                    return POAImpl.makeRootPOA( orb ) ;
+                }
+            } ;
 
 	orb.getLocalResolver().register( ORBConstants.ROOT_POA_NAME, 
-	    ClosureFactory.makeFuture( rpClosure ) ) ;
+	    NullaryFunction.Factory.makeFuture( rpClosure ) ) ;
     }
 
     public synchronized POA getRootPOA()

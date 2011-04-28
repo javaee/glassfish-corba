@@ -55,7 +55,7 @@ import org.omg.CORBA.COMM_FAILURE ;
 import org.omg.CORBA.ORB ;
 import org.omg.CORBA.Any ;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility ;
+import com.sun.corba.se.impl.misc.ORBUtility ;
 
 public class InterceptorTester extends LocalObject implements
     ORBInitializer, ClientRequestInterceptor {

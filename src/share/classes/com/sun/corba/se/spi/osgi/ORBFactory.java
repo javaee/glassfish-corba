@@ -50,7 +50,7 @@ import com.sun.corba.se.spi.orb.ClassCodeBaseHandler ;
 import com.sun.corba.se.impl.orb.ORBImpl ;
 
 import com.sun.corba.se.impl.osgi.loader.OSGIListener;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 /** A simple factory for creating our ORB that avoids the ClassLoader
  * problems with org.omg.CORBA.ORB.init, which must load the ORB impl class.

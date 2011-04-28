@@ -69,7 +69,7 @@ import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 
 import com.sun.corba.se.spi.logging.POASystemException ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 import com.sun.corba.se.spi.trace.Poa;
 import java.util.HashSet;
 import java.util.Set;

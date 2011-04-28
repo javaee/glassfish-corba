@@ -75,7 +75,7 @@ import com.sun.corba.se.spi.logging.UtilSystemException ;
 import com.sun.corba.se.spi.logging.OMGSystemException ;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
+import com.sun.corba.se.spi.misc.ORBClassLoader ;
 import java.util.IdentityHashMap;
 
 

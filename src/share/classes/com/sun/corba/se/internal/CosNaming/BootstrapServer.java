@@ -52,8 +52,8 @@ import com.sun.corba.se.spi.resolver.Resolver ;
 import com.sun.corba.se.spi.resolver.LocalResolver ;
 import com.sun.corba.se.spi.resolver.ResolverDefault ;
 
-import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.impl.misc.CorbaResourceUtil;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 /**
  * Class BootstrapServer is the main entry point for the bootstrap server

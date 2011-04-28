@@ -108,7 +108,7 @@ import com.sun.corba.se.impl.ior.POAObjectKeyTemplate ;
 import com.sun.corba.se.impl.ior.ObjectAdapterIdArray ;
 import com.sun.corba.se.spi.logging.OMGSystemException;
 import com.sun.corba.se.spi.logging.POASystemException;
-import com.sun.corba.se.spi.orbutil.ORBConstants; 
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.spi.trace.Poa;
 import java.util.ArrayList;
 import java.util.List;

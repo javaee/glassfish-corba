@@ -83,8 +83,8 @@ import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 import com.sun.corba.se.impl.util.JDKBridge;
 
 import com.sun.corba.se.spi.logging.IORSystemException;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
 import com.sun.corba.se.spi.trace.IsLocal;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
 /**
  * @author

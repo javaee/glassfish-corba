@@ -63,7 +63,7 @@ import java.io.FileInputStream ;
 import com.sun.corba.se.spi.orb.DataCollector ;
 import com.sun.corba.se.spi.orb.PropertyParser ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 public abstract class DataCollectorBase implements DataCollector {
     private Set<String> propertyNames ;

@@ -50,7 +50,7 @@ import javax.naming.InitialContext;
 
 import org.omg.CORBA.ORB;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import corba.framework.Controller;
 import corba.hcks.U;

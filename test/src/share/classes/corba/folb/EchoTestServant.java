@@ -51,7 +51,7 @@ import javax.rmi.PortableRemoteObject;
 
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 public class EchoTestServant
     extends PortableRemoteObject

@@ -46,7 +46,7 @@ import com.sun.corba.se.spi.folb.ClusterInstanceInfo;
 import com.sun.corba.se.spi.ior.TaggedComponentBase;
 import com.sun.corba.se.spi.ior.iiop.ClusterInstanceInfoComponent;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 public class ClusterInstanceInfoComponentImpl extends TaggedComponentBase 
     implements ClusterInstanceInfoComponent {

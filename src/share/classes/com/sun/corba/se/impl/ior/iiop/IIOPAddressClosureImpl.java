@@ -40,35 +40,29 @@
 
 package com.sun.corba.se.impl.ior.iiop;
 
-import org.omg.CORBA.BAD_PARAM ;
-
-import org.omg.CORBA_2_3.portable.InputStream ;
-import org.omg.CORBA_2_3.portable.OutputStream ;
-
-import com.sun.corba.se.spi.orbutil.closure.Closure ;
+import org.glassfish.pfl.basic.func.NullaryFunction;
 
 /**
  * @author 
  */
 public final class IIOPAddressClosureImpl extends IIOPAddressBase
 {
-    private Closure host;
-    private Closure port;
+    private NullaryFunction<String> host;
+    private NullaryFunction<Integer> port;
     
-    public IIOPAddressClosureImpl( Closure host, Closure port ) 
-    {
+    public IIOPAddressClosureImpl( NullaryFunction<String> host,
+        NullaryFunction<Integer> port ) {
 	this.host = host ;
 	this.port = port ;
     }
 
     public String getHost()
     {
-	return (String)(host.evaluate()) ;
+	return host.evaluate() ;
     }
 
     public int getPort()
     {
-	Integer value = (Integer)(port.evaluate()) ;
-	return value.intValue() ;
+	return port.evaluate() ;
     }
 }

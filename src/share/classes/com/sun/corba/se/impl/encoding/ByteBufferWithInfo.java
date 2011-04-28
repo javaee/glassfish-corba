@@ -44,7 +44,7 @@ import java.nio.ByteBuffer;
 
 
 import com.sun.corba.se.impl.encoding.BufferManagerWrite;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.transport.ByteBufferPool;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.trace.Transport;

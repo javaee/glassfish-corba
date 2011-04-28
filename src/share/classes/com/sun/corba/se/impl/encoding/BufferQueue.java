@@ -46,7 +46,6 @@ import java.util.LinkedList;
 /**
  * Simple unsynchronized queue implementation for ByteBufferWithInfos.
  */
-// XREVISIT - Should be in orbutil or package private
 public class BufferQueue
 {
     private LinkedList<ByteBufferWithInfo> list = 

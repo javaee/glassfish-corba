@@ -43,7 +43,7 @@ import test.Test;
 import test.Util;
 import java.io.*;
 import java.util.*;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
 
 /** Static library class to provide access to test configuration data.

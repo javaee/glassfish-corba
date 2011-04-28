@@ -59,7 +59,7 @@ import com.sun.corba.se.spi.orbutil.newtimer.TimerFactory;
 import com.sun.corba.se.spi.orbutil.newtimer.TimerEventController;
 import com.sun.corba.se.spi.orbutil.newtimer.LogEventHandler;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import com.sun.corba.se.impl.transport.ContactInfoListImpl;
 import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints;

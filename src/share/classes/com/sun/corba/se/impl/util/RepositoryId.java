@@ -62,7 +62,7 @@ import com.sun.corba.se.impl.io.ObjectStreamClass;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 import org.glassfish.pfl.basic.concurrent.SoftCache;
 
 public class RepositoryId {

@@ -49,7 +49,7 @@ import org.omg.CORBA.portable.Delegate ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 
 import com.sun.corba.se.impl.util.Utility ;
 import org.glassfish.pfl.basic.logex.OperationTracer;
@@ -91,10 +91,16 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
     // which requires an orb.
     private static ClassCopier remoteClassCopier =
 	new ClassCopierBase( "remote" ) {
-	    public Object createCopy( Object source )
-	    {
+	    public Object createCopy( Object source ) {
 		ORB orb = (ORB)localORB.get() ;
 		return Utility.autoConnect( source, orb, true ) ;
+	    }
+	} ;
+
+    private static ClassCopier identityClassCopier =
+	new ClassCopierBase( "identity" ) {
+	    public Object createCopy( Object source ) {
+                return source ;
 	    } 
 	} ;
 
@@ -102,8 +108,7 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
     // is mostly immutable.
     private static ClassCopier corbaClassCopier = 
 	new ClassCopierBase( "corba" ) {
-	    public Object createCopy( Object source) 
-	    {
+	    public Object createCopy( Object source) {
 		ObjectImpl oi = (ObjectImpl)source ;
 		Delegate del = oi._get_delegate() ;
 
@@ -140,7 +145,7 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 
 		// Need this case to handle TypeCode.
 		if (cinfo.isAORB(cls)) {
-                    return CopyobjectDefaults.();
+                    return identityClassCopier ;
                 }
 
 		return null ;

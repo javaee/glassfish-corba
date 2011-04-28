@@ -42,7 +42,7 @@ package com.sun.corba.se.impl.presentation.rmi ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 
-import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
+import com.sun.corba.se.spi.misc.ORBClassLoader ;
 
 public abstract class StubFactoryDynamicBase extends StubFactoryBase  
 {

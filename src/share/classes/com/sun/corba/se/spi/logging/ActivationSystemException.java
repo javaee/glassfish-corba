@@ -40,8 +40,8 @@
 
 package com.sun.corba.se.spi.logging ;
 
-import com.sun.corba.se.spi.orbutil.logex.corba.ORBException ;
-import com.sun.corba.se.spi.orbutil.logex.corba.CorbaExtension ;
+import com.sun.corba.se.spi.logex.corba.ORBException ;
+import com.sun.corba.se.spi.logex.corba.CorbaExtension ;
 
 import org.glassfish.pfl.basic.logex.Chain;
 import org.glassfish.pfl.basic.logex.ExceptionWrapper;

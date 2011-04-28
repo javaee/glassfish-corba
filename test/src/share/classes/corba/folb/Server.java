@@ -63,8 +63,8 @@ import com.sun.corba.se.spi.orb.DataCollector ;
 import com.sun.corba.se.spi.orb.ORB;
 
 import com.sun.corba.se.impl.folb.ServerGroupManager;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import corba.framework.Options;
 import corba.hcks.U;

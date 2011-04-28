@@ -49,8 +49,8 @@ import java.util.Properties ;
 import org.omg.CORBA.ORB ;
 import com.sun.corba.se.spi.activation.Activator ;
 import com.sun.corba.se.spi.activation.ActivatorHelper ;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
-import com.sun.corba.se.spi.orbutil.ORBClassLoader ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBClassLoader ;
 
 /**
  * @version     1.8, 99/11/02

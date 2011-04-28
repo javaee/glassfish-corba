@@ -51,7 +51,7 @@ import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketEndPointInfo;
 import com.sun.corba.se.spi.legacy.connection.LegacyServerSocketManager;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 
 public class LegacyServerSocketManagerImpl 

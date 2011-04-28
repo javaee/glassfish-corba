@@ -44,7 +44,6 @@ import org.omg.PortableInterceptor.ObjectReferenceFactory ;
 
 import org.omg.CORBA.Policy ;
 
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.IORTemplate ;
 import com.sun.corba.se.spi.ior.ObjectAdapterId;

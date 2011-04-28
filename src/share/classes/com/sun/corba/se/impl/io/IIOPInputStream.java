@@ -84,7 +84,7 @@ import com.sun.corba.se.spi.logging.OMGSystemException ;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 
 import com.sun.corba.se.impl.util.Utility ;
 import com.sun.corba.se.spi.trace.ValueHandlerRead;

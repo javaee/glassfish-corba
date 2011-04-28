@@ -77,7 +77,7 @@ import com.sun.corba.se.spi.ior.IORFactories ;
 import com.sun.corba.se.spi.ior.TaggedProfile ;
 import com.sun.corba.se.spi.ior.TaggedProfileTemplate ;
 
-import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
+import com.sun.corba.se.spi.threadpool.ThreadPoolManager;
 
 import com.sun.corba.se.spi.oa.OAInvocationInfo ;
 import com.sun.corba.se.spi.transport.TransportManager;
@@ -94,15 +94,10 @@ import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
 
 import com.sun.corba.se.spi.transport.ContactInfoList;
 
-// import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-// import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPoints ;
-// import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsDisabledImpl ;
-// import com.sun.corba.se.impl.orbutil.newtimer.generated.TimingPointsEnabledImpl ;
-
 import com.sun.corba.se.impl.corba.TypeCodeImpl ;
 import com.sun.corba.se.impl.corba.TypeCodeFactory ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler ;
 
@@ -113,7 +108,7 @@ import com.sun.corba.se.impl.transport.ByteBufferPoolImpl;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.logging.OMGSystemException ;
 
-import com.sun.corba.se.spi.orbutil.ORBClassLoader;
+import com.sun.corba.se.spi.misc.ORBClassLoader;
 
 import com.sun.corba.se.spi.protocol.ClientInvocationInfo;
 import com.sun.corba.se.spi.trace.Cdr;
@@ -472,7 +467,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
             && getORBData().timingPointsEnabled() ;
 
 	TimerManager<T> timerManager = 
-	    new TimerManager<T>( mom(), orbId, enabled ) ;
+	    new TimerManager<T>( mom().getObjectRegistrationManager(), orbId ) ;
 
         T tp = makeInstance( tpClass, timerManager.factory() ) ;
 
@@ -780,8 +775,7 @@ public abstract class ORB extends com.sun.corba.se.org.omg.CORBA.ORB
         mom.setRuntimeDebug( mbeanRuntimeDebugFlag ) ;
 
         mom.stripPrefix( "com.sun.corba.se", "com.sun.corba.se.spi", "com.sun.corba.se.spi.orb", 
-            "com.sun.corba.se.impl", "com.sun.corba.se.spi.orbutil", 
-            "com.sun.corba.se.impl.orbutil" ) ;
+            "com.sun.corba.se.impl" ) ;
 
         mom.suspendJMXRegistration() ;
 

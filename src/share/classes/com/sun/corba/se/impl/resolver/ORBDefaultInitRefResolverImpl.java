@@ -42,6 +42,7 @@ package com.sun.corba.se.impl.resolver ;
 import com.sun.corba.se.spi.resolver.Resolver ;
 
 import com.sun.corba.se.spi.orb.Operation ;
+import java.util.Set;
 
 public class ORBDefaultInitRefResolverImpl implements Resolver {
     Operation urlHandler ;
@@ -75,7 +76,7 @@ public class ORBDefaultInitRefResolverImpl implements Resolver {
 	return (org.omg.CORBA.Object)urlHandler.operate( urlString ) ;
     }
 
-    public java.util.Set list()
+    public Set<String> list()
     {
 	return new java.util.HashSet() ;
     }

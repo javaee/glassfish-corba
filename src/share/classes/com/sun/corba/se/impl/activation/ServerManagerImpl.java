@@ -90,7 +90,7 @@ import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.logging.ActivationSystemException ;
 
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.spi.transport.Acceptor;
 
 public class ServerManagerImpl extends _ServerManagerImplBase

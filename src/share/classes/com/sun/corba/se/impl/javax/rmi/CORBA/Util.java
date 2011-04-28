@@ -114,14 +114,14 @@ import com.sun.corba.se.spi.transport.ContactInfoList ;
 import com.sun.corba.se.spi.protocol.LocalClientRequestDispatcher ;
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.impl.io.ValueHandlerImpl;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.logging.OMGSystemException;
 import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.impl.util.JDKBridge;
 import com.sun.corba.se.spi.logging.UtilSystemException;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import org.glassfish.pfl.basic.logex.OperationTracer;

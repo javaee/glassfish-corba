@@ -39,7 +39,6 @@
  */
 package com.sun.corba.se.spi.trace ;
 
-import com.sun.corba.se.spi.orbutil.tf.annotation.MethodMonitorGroup;
 import java.lang.annotation.Target ;
 import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;

@@ -60,7 +60,7 @@ import com.sun.corba.se.spi.legacy.interceptor.IORInfoExt;
 import com.sun.corba.se.spi.legacy.interceptor.ORBInitInfoExt ;
 import com.sun.corba.se.spi.orb.ORB;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 /**
  * @author Harold Carr

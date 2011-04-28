@@ -48,6 +48,7 @@ import org.glassfish.pfl.basic.fsm.Guard ;
 import org.glassfish.pfl.basic.fsm.State ;
 import org.glassfish.pfl.basic.fsm.FSM ;
 import org.glassfish.pfl.basic.fsm.FSMImpl ;
+import org.glassfish.pfl.basic.fsm.Runner;
 import org.glassfish.pfl.basic.fsm.StateEngine ;
 
 public class EmergeLLP {
@@ -257,30 +258,38 @@ public class EmergeLLP {
 	    }
 	} ;
 
-	private final Action ddpc = compose( ddc, dpc ) ;
+	private final Action ddpc = Action.Base.compose( ddc, dpc ) ;
 
 	// Building blocks of Guards
-	private final Guard.Base.IntFunc df = new IntFunc( "EmergeLLP.dataCtr" ) {
-	    public int evaluate( FSM fsm, Input inp ) {
+	private final Guard.Base.IntFunc df = new Guard.Base.IntFunc( "EmergeLLP.dataCtr" ) {
+	    public Integer evaluate( FSM fsm, Input inp ) {
 		return (int)EmergeLLP.this.dataCtr ;
 	    }
 	} ;
 
-	private final IntFunc pf = new IntFunc( "EmergeLLP.partCtr" ) {
-	    public int evaluate( FSM fsm, Input inp ) {
+	private final Guard.Base.IntFunc pf = new Guard.Base.IntFunc( "EmergeLLP.partCtr" ) {
+	    public Integer evaluate( FSM fsm, Input inp ) {
 		return (int)EmergeLLP.this.partCtr ;
 	    }
 	} ;
 
-	private final IntFunc one = constant( 1 ) ;
+	private final Guard.Base.IntFunc one = Guard.Base.constant( 1 ) ;
 
 	// The guards for the transitions
-	private final Guard dataNotDone		= makeGuard( gt( df, one ) ) ; 
-	private final Guard dataDone		= makeGuard( eq( df, one ) ) ; 
-	private final Guard partNotDone		= makeGuard( gt( pf, one ) ) ; 
-	private final Guard partDone		= makeGuard( eq( pf, one ) ) ; 
-	private final Guard dataDoneMoreParts	= makeGuard( and( eq( df, one ), gt( pf, one ) ) ) ;
-	private final Guard dataDonePartsDone	= makeGuard( and( eq( df, one ), eq( pf, one ) ) ) ;
+	private final Guard dataNotDone		= 
+            Guard.Base.makeGuard( Guard.Base.gt( df, one ) ) ;
+	private final Guard dataDone		= 
+            Guard.Base.makeGuard( Guard.Base.eq( df, one ) ) ;
+	private final Guard partNotDone		= 
+            Guard.Base.makeGuard( Guard.Base.gt( pf, one ) ) ;
+	private final Guard partDone		= 
+            Guard.Base.makeGuard( Guard.Base.eq( pf, one ) ) ;
+	private final Guard dataDoneMoreParts	= 
+            Guard.Base.makeGuard( Guard.Base.and(
+                Guard.Base.eq( df, one ), Guard.Base.gt( pf, one ) ) ) ;
+	private final Guard dataDonePartsDone	= 
+            Guard.Base.makeGuard( Guard.Base.and(
+                Guard.Base.eq( df, one ), Guard.Base.eq( pf, one ) ) ) ;
     
 	private StateEngine engine ;
 

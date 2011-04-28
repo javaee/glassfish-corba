@@ -45,7 +45,7 @@ import com.sun.corba.se.spi.ior.TaggedComponentBase;
 import com.sun.corba.se.spi.ior.iiop.RequestPartitioningComponent;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 public class RequestPartitioningComponentImpl extends TaggedComponentBase 
     implements RequestPartitioningComponent

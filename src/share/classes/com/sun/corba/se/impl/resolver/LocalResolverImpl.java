@@ -41,27 +41,29 @@
 package com.sun.corba.se.impl.resolver ;
 
 import com.sun.corba.se.spi.resolver.LocalResolver ;
-import com.sun.corba.se.spi.orbutil.closure.Closure ;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import org.glassfish.pfl.basic.func.NullaryFunction;
 
 public class LocalResolverImpl implements LocalResolver {
-    java.util.Map nameToClosure = new java.util.HashMap() ;
+    Map<String,NullaryFunction<org.omg.CORBA.Object>> nameToClosure =
+        new HashMap<String,NullaryFunction<org.omg.CORBA.Object>>() ;
 
-    public synchronized org.omg.CORBA.Object resolve( String name ) 
-    {
-	Closure cl = (Closure)nameToClosure.get( name ) ;
+    public synchronized org.omg.CORBA.Object resolve( String name ) {
+	NullaryFunction<org.omg.CORBA.Object> cl = nameToClosure.get( name ) ;
 	if (cl == null)
 	    return null ;
 
-	return (org.omg.CORBA.Object)(cl.evaluate()) ;
+	return cl.evaluate() ;
     }
 
-    public synchronized java.util.Set list() 
-    {
+    public synchronized Set<String> list() {
 	return nameToClosure.keySet() ;
     }
 
-    public synchronized void register( String name, Closure closure ) 
-    {
+    public synchronized void register( String name, 
+        NullaryFunction<org.omg.CORBA.Object> closure ) {
 	nameToClosure.put( name, closure ) ;
     }
 }

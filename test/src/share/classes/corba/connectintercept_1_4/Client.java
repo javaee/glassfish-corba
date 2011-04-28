@@ -49,7 +49,7 @@ import java.util.Properties;
 import org.omg.CORBA.ORB;
 
 import com.sun.corba.se.spi.legacy.connection.ORBSocketFactory;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 public class Client
 {

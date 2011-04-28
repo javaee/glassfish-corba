@@ -70,8 +70,8 @@ import com.sun.corba.se.impl.ior.iiop.IIOPProfileTemplateImpl ;
 import com.sun.corba.se.impl.ior.iiop.RequestPartitioningComponentImpl ;
 import com.sun.corba.se.impl.ior.iiop.LoadBalancingComponentImpl ;
 import com.sun.corba.se.impl.ior.iiop.ClusterInstanceInfoComponentImpl ;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 import org.omg.IOP.TAG_ALTERNATE_IIOP_ADDRESS ;
 import org.omg.IOP.TAG_CODE_SETS ;

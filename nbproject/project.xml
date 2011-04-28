@@ -248,7 +248,7 @@
                 <package-root>test/src/share/classes/test12</package-root>
                 <package-root>test/src/share/classes/values1</package-root>
                 <package-root>test/src/share/classes/values2</package-root>
-                <classpath mode="compile">build/classes:orblib/build/classes:build/libcache/gmbal.jar:build/libcache/management-api.jar:build/libcache/org.osgi.core.jar:build/libcache/pfl-basic-tools.jar:build/libcache/pfl-basic.jar:build/libcache/pfl-dynamic.jar:build/libcache/pfl-test.jar:build/libcache/pfl-tf-tools.jar:build/libcache/pfl-tf.jar:test/build/classes:lib/testng.jar:lib/junit.jar:lib/japex.jar:lib/ejb-2_1-api.jar</classpath>
+                <classpath mode="compile">build/classes:orblib/build/classes:build/libcache/gmbal.jar:build/libcache/management-api.jar:build/libcache/org.osgi.core.jar:test/build/classes:lib/testng.jar:lib/junit.jar:lib/japex.jar:lib/ejb-2_1-api.jar:build/libcache/pfl-basic-tools.jar:build/libcache/pfl-dynamic.jar:build/libcache/pfl-test.jar:build/libcache/pfl-tf-tools.jar:build/libcache/pfl-tf.jar:build/libcache/pfl-basic.jar</classpath>
                 <built-to>build/classes</built-to>
                 <built-to>orblib/build/classes</built-to>
                 <built-to>test/build/classes</built-to>

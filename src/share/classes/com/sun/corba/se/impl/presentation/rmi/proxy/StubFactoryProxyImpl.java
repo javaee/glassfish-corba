@@ -45,9 +45,8 @@ import java.lang.reflect.Proxy ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicStub ;
-
-import com.sun.corba.se.spi.orbutil.proxy.InvocationHandlerFactory ;
-import com.sun.corba.se.spi.orbutil.proxy.LinkedInvocationHandler  ;
+import org.glassfish.pfl.basic.proxy.InvocationHandlerFactory;
+import org.glassfish.pfl.basic.proxy.LinkedInvocationHandler;
 
 public class StubFactoryProxyImpl extends StubFactoryDynamicBase  
 {

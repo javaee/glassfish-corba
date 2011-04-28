@@ -62,9 +62,9 @@ public class CompositeResolverImpl implements Resolver {
 	return result ;
     }
 
-    public java.util.Set list() 
+    public Set<String> list()
     {
-	Set result = new HashSet() ;
+	Set<String> result = new HashSet() ;
 	result.addAll( first.list() ) ;
 	result.addAll( second.list() ) ;
 	return result ;

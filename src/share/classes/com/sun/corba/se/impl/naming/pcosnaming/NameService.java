@@ -49,7 +49,7 @@ import org.omg.PortableServer.*;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 /**
  * @version     1.3, 00/04/06

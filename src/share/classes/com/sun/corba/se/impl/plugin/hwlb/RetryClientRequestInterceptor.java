@@ -52,7 +52,7 @@ import org.omg.PortableInterceptor.ORBInitInfo;
 import org.omg.PortableInterceptor.ORBInitInfoPackage.DuplicateName;
 import org.omg.CORBA.SystemException;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 public class RetryClientRequestInterceptor
     extends org.omg.CORBA.LocalObject

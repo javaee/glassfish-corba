@@ -51,7 +51,7 @@ import org.omg.CORBA.Policy;
 import org.omg.PortableServer.LifespanPolicyValue;
 import org.omg.PortableServer.POA;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 class ExIServant extends ExIPOA
 {

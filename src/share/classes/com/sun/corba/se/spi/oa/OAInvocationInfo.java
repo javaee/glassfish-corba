@@ -48,7 +48,6 @@ import org.omg.PortableServer.Servant;
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
 
 import com.sun.corba.se.spi.oa.ObjectAdapter ;
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
 
 /** This class is a holder for the information required to implement POACurrent.
 * It is also used for the ServantObject that is returned by _servant_preinvoke calls.

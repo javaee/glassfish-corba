@@ -52,7 +52,7 @@ import com.sun.corba.se.impl.resolver.FileResolverImpl ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.Operation ;
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import org.glassfish.pfl.basic.contain.Pair;
 
 /** Utility class that provides factory methods for all of the 
  * standard resolvers that we provide.

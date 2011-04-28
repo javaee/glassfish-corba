@@ -48,7 +48,7 @@ import com.sun.corba.se.spi.transport.ContactInfoList;
 import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.impl.transport.ContactInfoBase;
 
 /**

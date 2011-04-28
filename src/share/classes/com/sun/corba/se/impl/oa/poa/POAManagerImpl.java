@@ -69,7 +69,9 @@ import org.glassfish.gmbal.ManagedOperation ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.ParameterNames ;
 import org.glassfish.gmbal.NameValue ;
+
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.glassfish.pfl.basic.contain.MultiSet ;
 
 /** POAManagerImpl is the implementation of the POAManager interface.
  *  Its public methods are activate(), hold_requests(), discard_requests()

@@ -46,7 +46,7 @@ import java.io.File;
 import org.omg.CosNaming.NamingContext;
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.impl.naming.pcosnaming.NameService;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 // REVISIT: After Merlin to see if we can get rid of this Thread and
 // make the registration of PNameService for INS and BootStrap neat.

@@ -70,8 +70,7 @@ import com.sun.corba.se.impl.util.RepositoryId;
 
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
-import com.sun.corba.se.impl.orbutil.ClassInfoCache ;
-import com.sun.corba.se.spi.orbutil.tf.annotation.InfoMethod;
+import com.sun.corba.se.impl.misc.ClassInfoCache ;
 import com.sun.corba.se.spi.trace.ValueHandlerWrite;
 
 

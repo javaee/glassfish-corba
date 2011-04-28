@@ -43,7 +43,7 @@ package com.sun.corba.se.impl.encoding;
 import java.nio.ByteBuffer;
 import com.sun.org.omg.SendingContext.CodeBase;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 
 import com.sun.corba.se.spi.orb.ORB;
 

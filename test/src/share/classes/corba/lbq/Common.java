@@ -73,7 +73,7 @@ import com.sun.corba.se.spi.orb.ORBData ;
 import com.sun.corba.se.impl.orb.ORBDataParserImpl ;
 import com.sun.corba.se.impl.orb.ORBImpl ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 public class Common
 {

@@ -53,7 +53,7 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.charset.UnmappableCharacterException;
 
-import com.sun.corba.se.impl.orbutil.ORBUtility;
+import com.sun.corba.se.impl.misc.ORBUtility;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.spi.logging.OMGSystemException;
 

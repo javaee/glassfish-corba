@@ -64,8 +64,8 @@ import org.omg.CORBA.portable.OutputStream ;
 // PEORB internal classes in ways that prevent portability to
 // other vendor's ORBs.
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.spi.orbutil.ORBConstants;
+import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.se.spi.misc.ORBConstants;
 
 /**
  * This class implements a very simply IOR representation

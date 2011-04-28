@@ -49,7 +49,7 @@ import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.ServantLocatorPackage.*;
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 import corba.framework.ThreadProcess ;
 
 public class counterServer extends ThreadProcess {

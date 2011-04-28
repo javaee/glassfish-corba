@@ -121,14 +121,8 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.servicecontext.ServiceContextFactoryRegistry;
 import com.sun.corba.se.spi.servicecontext.ServiceContextDefaults;
 import com.sun.corba.se.spi.servicecontext.ServiceContextsCache;
-
-import com.sun.corba.se.spi.orbutil.threadpool.ThreadPoolManager;
-
-import com.sun.corba.se.spi.orbutil.closure.ClosureFactory;
-
-// import com.sun.corba.se.spi.orbutil.newtimer.TimerManager ;
-
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.threadpool.ThreadPoolManager;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import com.sun.corba.se.impl.corba.TypeCodeImpl;
 import com.sun.corba.se.impl.corba.NVListImpl;
@@ -147,8 +141,8 @@ import com.sun.corba.se.impl.ior.TaggedProfileTemplateFactoryFinderImpl;
 import com.sun.corba.se.impl.oa.toa.TOAFactory;
 import com.sun.corba.se.impl.oa.poa.BadServerIdHandler;
 import com.sun.corba.se.impl.oa.poa.POAFactory;
-import com.sun.corba.se.impl.orbutil.ORBUtility;
-import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolManagerImpl;
+import com.sun.corba.se.impl.misc.ORBUtility;
+import com.sun.corba.se.impl.threadpool.ThreadPoolManagerImpl;
 import com.sun.corba.se.impl.protocol.RequestDispatcherRegistryImpl;
 import com.sun.corba.se.impl.protocol.InvocationInfo;
 import com.sun.corba.se.impl.transport.TransportManagerImpl;
@@ -157,13 +151,14 @@ import com.sun.corba.se.impl.util.Utility;
 import com.sun.corba.se.spi.logging.ORBUtilSystemException;
 import com.sun.corba.se.impl.copyobject.CopierManagerImpl;
 import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
-import com.sun.corba.se.impl.orbutil.ByteArrayWrapper;
+import com.sun.corba.se.impl.misc.ByteArrayWrapper;
 import com.sun.corba.se.spi.trace.OrbLifeCycle;
 import com.sun.corba.se.spi.trace.Subcontract;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import org.glassfish.pfl.basic.algorithm.ObjectUtility;
 import org.glassfish.pfl.basic.concurrent.WeakCache;
+import org.glassfish.pfl.basic.contain.StackImpl;
 import org.glassfish.pfl.basic.func.NullaryFunction;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
          
@@ -1290,7 +1285,8 @@ public class ORBImpl extends com.sun.corba.se.spi.orb.ORB
                 throw new InvalidName(id + " already registered");
             }
 
-	    localResolver.register( id, ClosureFactory.makeConstant( obj )) ;
+	    localResolver.register( id, 
+                NullaryFunction.Factory.makeConstant( obj )) ;
 	}
       
 	synchronized (this) {

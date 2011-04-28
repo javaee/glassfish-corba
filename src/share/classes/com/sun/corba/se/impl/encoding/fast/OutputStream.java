@@ -47,10 +47,9 @@ import java.util.Queue ;
 import java.util.LinkedList ;
 import java.util.IdentityHashMap ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.generic.Holder ;
-
 import com.sun.corba.se.impl.encoding.fast.bytebuffer.Writer ;
+import org.glassfish.pfl.basic.contain.Holder;
+import org.glassfish.pfl.basic.contain.Pair;
 
 /** Encode the data types into the stream.
  * See Codes for the details of the encoding used.
@@ -656,7 +655,8 @@ public class OutputStream extends ObjectOutputStream {
 	ClassMarshaler<?> cm = ClassMarshalerFactory.getClassMarshaler(
 	    obj.getClass() ) ;
 
-        Holder<ClassMarshaler<?>> cmHolder = new Holder<ClassMarshaler<?>>( cm ) ;
+        Holder<ClassMarshaler<?>> cmHolder =
+            new Holder<ClassMarshaler<?>>( cm ) ;
 
 	Object replacement = replacements.get( obj ) ;
 	if (replacement == obj) {

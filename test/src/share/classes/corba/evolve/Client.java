@@ -55,7 +55,7 @@ import org.testng.TestNG ;
 
 import mymath.BigDecimal ;
 
-import com.sun.corba.se.spi.orbutil.ORBConstants ;
+import com.sun.corba.se.spi.misc.ORBConstants ;
 
 
 import corba.framework.TestngRunner ;

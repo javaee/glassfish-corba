@@ -58,6 +58,8 @@ import org.glassfish.gmbal.ManagedAttribute ;
 import org.glassfish.gmbal.Description ;
 import org.glassfish.gmbal.AMXMetadata ;
 
+import org.glassfish.pfl.basic.contain.Pair ;
+
 // Which attributes should become setters?  NOT everything, but only
 // those that we think might actually be useful to set.  This may change
 // over time.  On the other hande, essentially everything should be readable.

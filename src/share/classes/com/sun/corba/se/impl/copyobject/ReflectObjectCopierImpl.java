@@ -104,13 +104,6 @@ public class ReflectObjectCopierImpl implements ObjectCopier {
 	    } 
 	} ;
 
-    private static ClassCopier identityClassCopier =
-	new ClassCopierBase( "identity" ) {
-	    public Object createCopy( Object source ) {
-		return source ;
-	    } 
-	} ;
-
     // For ObjectImpl, we just make a shallow copy, since the Delegate
     // is mostly immutable.
     private static ClassCopier corbaClassCopier = 

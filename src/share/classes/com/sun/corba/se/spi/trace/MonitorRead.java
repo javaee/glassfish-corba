@@ -43,6 +43,7 @@ import java.lang.annotation.Target ;
 import java.lang.annotation.ElementType ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
+import org.glassfish.pfl.tf.spi.annotation.MethodMonitorGroup;
 
 /** This annotation is applied to a class to indicate
  * that its methods are classified as methods used to read primitive values.

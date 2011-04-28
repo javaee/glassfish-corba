@@ -54,6 +54,8 @@ import sun.corba.Bridge ;
 
 import com.sun.corba.se.impl.io.ObjectStreamField ;
 
+import org.glassfish.pfl.basic.contain.Holder ;
+
 // An implementation of this class will probably use the ClassAnalyzer, probably
 // with some optimization: using Unsafe for field access, possibly using codegen
 // to create an implementation of ClassMarshaler that is customized for a particular

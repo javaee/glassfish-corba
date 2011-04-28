@@ -159,6 +159,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import org.glassfish.pfl.basic.algorithm.ObjectUtility;
 import org.glassfish.pfl.basic.concurrent.WeakCache;
 import org.glassfish.pfl.basic.contain.StackImpl;
+import org.glassfish.pfl.basic.contain.ResourceFactory;
 import org.glassfish.pfl.basic.func.NullaryFunction;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
          

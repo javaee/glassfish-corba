@@ -55,6 +55,7 @@ import com.sun.corba.se.spi.logging.POASystemException ;
 import com.sun.corba.se.impl.oa.poa.Policies;
 import org.glassfish.gmbal.Description;
 import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
 import org.omg.PortableInterceptor.ACTIVE;
 import org.omg.PortableInterceptor.DISCARDING;
 import org.omg.PortableInterceptor.HOLDING;

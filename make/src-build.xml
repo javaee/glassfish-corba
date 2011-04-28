@@ -651,7 +651,7 @@
     <macrodef name="run-enhance">
         <attribute name="mode"/>
         <sequential>
-            <java classname="com.sun.tools.corba.se.enhancer.EnhanceTool"
+            <java classname="org.glassfish.pfl.tf.tools.enhancer.EnhanceTool"
                 classpathref="test-classpath.master" fork="true" dir="${classes.dir}">
 		<jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
                 <arg value="-dir"/>
@@ -721,7 +721,7 @@
 
     <target name="generate-orb-resources"
      depends="init, compile">
-	<java classname="com.sun.corba.se.spi.orbutil.file.ExceptionResourceGenerator"
+	<java classname="org.glassfish.pfl.basic.tools.logex.ExceptionResourceGenerator"
             fork="true"
             classpathref="classpath.master"
 	    dir="${root.dir}">

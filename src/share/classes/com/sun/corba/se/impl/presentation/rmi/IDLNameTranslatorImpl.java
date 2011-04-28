@@ -717,8 +717,13 @@ public class IDLNameTranslatorImpl implements IDLNameTranslator {
             
             String[] modules = BASE_IDL_ARRAY_MODULE_TYPE;
             if( componentIdlType.hasModule() ) {
-                modules = (String[])ObjectUtility.concatenateArrays( modules, 
-                    componentIdlType.getModules() ) ;
+                final String[] cModules = componentIdlType.getModules() ;
+                final String[] newModules = new String[ modules.length + 
+                    cModules.length ] ;
+                System.arraycopy(modules, 0, newModules, 0, modules.length);
+                System.arraycopy(cModules, 0, newModules, modules.length, 
+                    cModules.length);
+                modules = newModules ;
             }
 
             String memberName = BASE_IDL_ARRAY_ELEMENT_TYPE + 

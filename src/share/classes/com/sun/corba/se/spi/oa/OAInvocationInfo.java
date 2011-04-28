@@ -40,14 +40,10 @@
 package com.sun.corba.se.spi.oa;
 
 import javax.rmi.CORBA.Tie ;
-
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
 import org.omg.CORBA.portable.ServantObject;
-
-import org.omg.PortableServer.Servant;
-
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
 
-import com.sun.corba.se.spi.oa.ObjectAdapter ;
 
 /** This class is a holder for the information required to implement POACurrent.
 * It is also used for the ServantObject that is returned by _servant_preinvoke calls.

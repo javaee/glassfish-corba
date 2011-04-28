@@ -47,6 +47,7 @@ import java.util.Map ;
 import java.lang.reflect.Method ;
 
 import javax.rmi.CORBA.Tie ;
+import org.glassfish.pfl.basic.proxy.InvocationHandlerFactory;
 
 /** Provides access to RMI-IIOP stubs and ties.  
  * Any style of stub and tie generation may be used.  

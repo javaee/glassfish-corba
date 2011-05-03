@@ -45,7 +45,6 @@
 package corba.giopgen;
 
 import java.rmi.RemoteException;
-import javax.rmi.PortableRemoteObject;
 
 import java.util.Map ;
 import java.util.HashMap ;
@@ -54,13 +53,8 @@ import java.io.Serializable ;
 
 import javax.rmi.PortableRemoteObject ;
 
-import org.omg.CORBA.CompletionStatus ;
-
-import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.spi.orbutil.generic.SPair ;
-
 import com.sun.corba.se.spi.logging.UtilSystemException ;
+import org.glassfish.pfl.basic.contain.SPair;
 
 public class TestServant
     extends PortableRemoteObject

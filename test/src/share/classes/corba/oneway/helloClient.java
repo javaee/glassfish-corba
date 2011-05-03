@@ -39,10 +39,13 @@
  */
 package corba.oneway;
 
-import HelloApp.*;
-import org.omg.CosNaming.*;
-import org.omg.CORBA.*;
+import HelloApp.hello;
+import HelloApp.helloHelper;
 import java.util.Properties ;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 public class helloClient 
 {

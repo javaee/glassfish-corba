@@ -49,6 +49,7 @@ import com.sun.corba.se.spi.transport.concurrent.ConcurrentQueue.Handle;
 import com.sun.corba.se.spi.trace.Transport;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 
+@Transport
 public abstract class ConnectionCacheBase<C extends Connection> 
     implements ConnectionCache<C> {
 

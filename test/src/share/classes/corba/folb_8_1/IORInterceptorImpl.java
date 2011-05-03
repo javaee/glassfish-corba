@@ -45,7 +45,6 @@
 package corba.folb_8_1;
 
 import java.net.InetAddress;
-import java.util.Iterator;
 
 import org.omg.CORBA.Any;
 import org.omg.IOP.TaggedComponent;

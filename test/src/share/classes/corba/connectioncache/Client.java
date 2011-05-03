@@ -46,8 +46,6 @@ import java.util.ArrayList ;
 import java.util.Set ;
 import java.util.HashSet ;
 
-
-
 import java.util.logging.Logger ;
 import java.util.logging.Handler ;
 import java.util.logging.Level ;
@@ -138,13 +136,6 @@ public class Client {
 	ConnectionCacheFactory.<ConnectionImpl>
 	    makeBlockingInboundConnectionCache(
 		"BlockingInboundCache", HIGH_WATER_MARK, NUMBER_TO_RECLAIM, TTL ) ;
-
-    static {
-        if (DEBUG) {
-            obcache.debug( true ) ;
-            ibcache.debug( true ) ;
-        }
-    }
 
     private void testBanner( String msg ) {
 	if (DEBUG) {

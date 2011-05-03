@@ -39,10 +39,14 @@
  */
 
 package corba.poatest;
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
-import org.omg.CORBA.*;
-import HelloA.*;
+
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+
+import HelloA.hello ;
+import HelloA.helloHelper;
 
 public class helloClient
 {

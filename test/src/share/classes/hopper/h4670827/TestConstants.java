@@ -75,7 +75,7 @@ public class TestConstants {
          + ORBInitialPort + "/" + INSServiceName;
      public static final String returnString = "HELLO";
 
-     Object[][] data = new Object[][] {
+     public static Object[][] data = new Object[][] {
          { "testIIOPVersionAndPort", corbalocURL1, true },
          { "testIIOPNoVersionAndPort", corbalocURL2, true },
          { "testIIOPVersionAndNoPort", corbalocURL3, true },

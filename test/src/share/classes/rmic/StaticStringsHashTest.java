@@ -53,8 +53,7 @@ import test.Test;
 import sun.rmi.rmic.iiop.StaticStringsHash;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.test.JUnitReportHelper;
 
 /*
  * @test

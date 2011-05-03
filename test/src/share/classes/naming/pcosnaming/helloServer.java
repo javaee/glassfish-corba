@@ -48,21 +48,27 @@
  */
 package naming.pcosnaming;
 
-import HelloApp.*;
+import HelloApp._helloImplBase ;
+import corba.framework.Controller;
+import corba.framework.InternalProcess;
+import java.io.PrintStream;
 
-import java.io.*;
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
-import org.omg.CORBA.*;
 import java.util.Properties;
 import java.util.Hashtable;
-import corba.framework.*;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 class helloServant extends _helloImplBase
 {
     public void sayHello()
     {
         helloServer.output.println("Servant: In helloServant.sayHello()");
+    }
+
+    public void shutdown() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
 

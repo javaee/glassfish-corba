@@ -39,10 +39,8 @@
  */
 package hopper.h4670827;
 
+import org.glassfish.pfl.test.JUnitReportHelper;
 import org.omg.CORBA.ORB;
-import org.omg.CORBA.Object;
-import java.util.*;
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class Client implements Runnable {
     private JUnitReportHelper helper ;
@@ -56,28 +54,27 @@ public class Client implements Runnable {
 
     public void run() {
         helper = new JUnitReportHelper( Client.class.getName() ) ;
-        try {
-            orb = ORB.init( (String[]) null, null );
+        orb = ORB.init( (String[]) null, null );
 
-            for (Object[] arr : TestConstants.data) {
-                String name = arr[0] ;
-                String url = arr[1] ;
-                boolean shouldSucceed = arr[2] ;
-                helper.start( name ) ;
-                try {
-                    if (testURL( url, shouldSucceed )) {
-                        System.out.println( "Passed test " + name ) ;
-                        helper.pass() ;
-                    } else {
-                        System.out.println( "Test " + name + " failed" ) ;
-                        helper.fail( "failed" ) ;
-                        failed = true ;
-                    }
-                } catch (Exception exc) {
-                    helper.fail( exc ) ;
+        for (Object[] arr : TestConstants.data) {
+            String name = (String)arr[0] ;
+            String url = (String)arr[1] ;
+            boolean shouldSucceed = (Boolean)arr[2] ;
+            helper.start( name ) ;
+            try {
+                if (testURL( url, shouldSucceed )) {
+                    System.out.println( "Passed test " + name ) ;
+                    helper.pass() ;
+                } else {
+                    System.out.println( "Test " + name + " failed" ) ;
+                    helper.fail( "failed" ) ;
                     failed = true ;
                 }
+            } catch (Exception exc) {
+                helper.fail( exc ) ;
+                failed = true ;
             }
+        }
 
         System.out.println("Thread "+ Thread.currentThread()+" done.");
         if (failed)

@@ -40,21 +40,19 @@
 
 package pi.ort;
 
-import org.omg.CORBA.*;
-import org.omg.CosNaming.*;
-import org.omg.CORBA.ORBPackage.InvalidName;
-import org.omg.PortableServer.*;
-import org.omg.PortableInterceptor.*;
 import com.sun.corba.se.spi.misc.ORBConstants;
-import org.omg.IOP.*;
-import corba.framework.*;
-
-import java.util.*;
-import java.io.*;
-
 import IORInterceptorTest.*;    // for IDL
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import corba.framework.InternalProcess;
+import java.io.PrintStream;
+import java.util.Hashtable;
+import java.util.Properties;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Policy;
+import org.omg.PortableInterceptor.NON_EXISTENT;
+import org.omg.PortableServer.IdUniquenessPolicyValue;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAManager;
 
 public class Server 
     implements InternalProcess 

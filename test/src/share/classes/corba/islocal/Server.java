@@ -57,7 +57,6 @@ import corba.hcks.U;
 
 import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.impl.legacy.connection.LegacyServerSocketManagerImpl;
 
 public class Server 
 {

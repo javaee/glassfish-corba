@@ -39,13 +39,12 @@
  */
 package corba.codeset;
 
-import CodeSetTester.*;
-import CodeSetTester.VerifierPackage.*;
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
-import org.omg.CORBA.*;
-import java.util.Properties ;
-import org.omg.PortableServer.*;
+import CodeSetTester.VerifierPOA;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.PortableServer.POA;
 
 public class Server extends VerifierPOA
 {

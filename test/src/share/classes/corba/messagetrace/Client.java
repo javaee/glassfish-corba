@@ -44,7 +44,6 @@ import java.util.Properties ;
 
 import java.rmi.Remote ;
 import java.rmi.RemoteException ;
-import java.rmi.NoSuchObjectException ;
 
 import javax.rmi.PortableRemoteObject ;
 import javax.rmi.CORBA.Util ;
@@ -54,10 +53,8 @@ import java.nio.ByteBuffer ;
 
 import org.omg.CORBA.TypeCode ;
 import org.omg.CORBA.ValueMember ;
-import org.omg.CORBA.TCKind ;
 import org.omg.CORBA.PUBLIC_MEMBER ;
 import org.omg.CORBA.PRIVATE_MEMBER ;
-import org.omg.CORBA.VM_NONE ;
 
 // I have removed some weblogic test code for bug 5034649.
 // We need to check to see if we can include this, because
@@ -65,22 +62,14 @@ import org.omg.CORBA.VM_NONE ;
 // import weblogic.management.WebLogicObjectName ;
 // import weblogic.management.internal.WebLogicAttribute ;
 
-import javax.management.MalformedObjectNameException ;
 import javax.management.ObjectName ;
 import javax.management.Attribute ;
 
-import junit.framework.AssertionFailedError ;
 import junit.framework.TestCase ;
 import junit.framework.Test ;
 import junit.framework.TestResult ;
 import junit.framework.TestSuite ;
-import junit.framework.TestListener ;
-import junit.extensions.RepeatedTest ;
 import junit.extensions.TestSetup ;
-import junit.textui.TestRunner ;
-
-import corba.framework.TestCaseTools ;
-import corba.framework.TimedTest ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -96,6 +85,7 @@ import com.sun.corba.se.spi.misc.ORBConstants ;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.Message ;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject ;
+import org.glassfish.pfl.test.TestCaseTools;
 
 public class Client extends TestCase
 {

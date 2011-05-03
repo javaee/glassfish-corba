@@ -39,12 +39,7 @@
  */
 package corba.poaandequals;
 
-import org.omg.CORBA.*;
-import org.omg.CORBA.ORBPackage.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
-import WombatStuff.*;
-import java.io.*;
+import WombatStuff.WombatPOA;
 
 public class WombatImpl extends WombatPOA
 {

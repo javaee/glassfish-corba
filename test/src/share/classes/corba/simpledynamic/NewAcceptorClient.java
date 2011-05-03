@@ -46,9 +46,9 @@ import java.rmi.RemoteException ;
 
 import com.sun.corba.se.spi.orb.ORB;
 import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.orbutil.generic.UnaryVoidFunction;
 import com.sun.corba.se.spi.transport.Acceptor;
 import com.sun.corba.se.spi.transport.TransportDefault;
+import org.glassfish.pfl.basic.func.UnaryVoidFunction;
 
 import org.testng.Assert ;
 import org.testng.annotations.Test ;

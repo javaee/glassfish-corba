@@ -57,7 +57,6 @@
 // until that problem is fixed.
 // -test corba.mixedorb.MixedOrbTest
 -test corba.resolve_deadlock.ResolveDeadlockTest
-
 -test corba.lb.LBTest -ifpresent
 
 // I don't think this is needed, and it takes 4.5 minutes to run, so comment it out for now
@@ -65,7 +64,6 @@
 
 -test corba.giopgen.GIOPGenTest
 -test corba.rfm.TestRFM
-// now run directly from ant junit task: -test corba.codegen.CodegenTest -ifpresent
 // now run directly from ant junit task: -test corba.messagetrace.MessageTraceTest
 // now run directly from ant junit task: -test corba.misc.MiscTest
 // now run directly from ant junit task: -test corba.dynamicrmiiiop.DynamicRmiIIOPTest
@@ -89,8 +87,6 @@
 -test corba.orbconfigappserv.ORBConfigAppServTest
 -test corba.iorintsockfact.IorIntSockFactTest
 -test corba.connectintercept_1_4.ConnectIntercept_1_4Test
-// connections is commented out until we fix the connection management
-// failure on J2SE 5.
 -test corba.connections.ConnectionsTest
 -test corba.cdrext.CDRExtTest
 -test corba.serialization.zerolengthstring.ZeroLengthStringTest
@@ -113,7 +109,6 @@
 -test corba.giopheaderpadding.GIOPHeaderPaddingTest
 -test corba.systemexceptions.SystemExceptionsTest
 -test corba.rmic.RmicTest
--test corba.jsg.JSGTest
 -test corba.repid.RepIdTest
 -test corba.invocation.InvocationTest
 -test corba.custom.CustomTest
@@ -125,13 +120,3 @@
 -test corba.fragment2.FragmentTest
 -test corba.fragment.FragmentTest 
 -test corba.msgtypes.MsgTypesTest 
-
-// If JSG is ON, the following tests internally skip all tests,
-// because they have been excluded programmatically.
-//
-// corba.messagetrace.MessageTraceTest
-// corba.strm2.Strm2Test
-// corba.ortremote.ORTRemoteTest
-// corba.codebase.CodeBaseTest
-// corba.cdrstreams.CDRTests
-// corba.giopheaderpadding.GIOPHeaderPaddingTest

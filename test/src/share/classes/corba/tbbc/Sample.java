@@ -40,12 +40,12 @@
 
 package corba.tbbc ;
 
+import org.glassfish.pfl.dynamic.codegen.spi.Expression;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
 import java.lang.reflect.Method ;
 
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-import com.sun.corba.se.spi.orbutil.codegen.Expression ;
 import static java.lang.reflect.Modifier.* ;
-import static com.sun.corba.se.spi.orbutil.codegen.Wrapper.* ;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.* ;
 
 public class Sample {
 

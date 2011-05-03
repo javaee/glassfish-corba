@@ -39,14 +39,8 @@
  */
 package corba.poamanager;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
-
-import java.io.*;
-import java.util.*;
-
-import Util.*;
+import Util.GenericFactoryHelper;
+import org.omg.PortableServer.POA;
 
 public class HelloServer {
     public static void main(String[] args) {
@@ -60,7 +54,8 @@ public class HelloServer {
 
             byte[] id = rootPoa.activate_object(theFactory);
 	    
-	    u.writeFactory(GenericFactoryHelper.narrow(rootPoa.servant_to_reference(theFactory)));	    
+	    u.writeFactory(GenericFactoryHelper.narrow(
+                rootPoa.servant_to_reference(theFactory)));
 	    
 	    poa.the_POAManager().activate();
 

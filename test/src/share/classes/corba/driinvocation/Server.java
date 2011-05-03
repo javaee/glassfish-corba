@@ -40,20 +40,29 @@
 package corba.driinvocation;
 
 import javax.rmi.PortableRemoteObject ;
-import java.io.*;
-import java.io.DataOutputStream ;
-import java.util.*;
 import java.rmi.RemoteException ;
-
-import org.omg.CosNaming.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.ServantLocatorPackage.*;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
-
 import com.sun.corba.se.spi.misc.ORBConstants ;
+import corba.adapteractivator.AdapterActivator;
+import corba.driinvocation.Echo ;
+import corba.driinvocation.EchoHelper ;
+import java.util.Properties;
+import javax.rmi.CORBA.Tie;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.Policy;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.PortableServer.LifespanPolicyValue;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.RequestProcessingPolicyValue;
+import org.omg.PortableServer.Servant;
+import org.omg.PortableServer.ServantActivator;
+import org.omg.PortableServer.ServantLocator;
+import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
+import org.omg.PortableServer.ServantRetentionPolicyValue;
 
 public class Server {
     public static boolean debug = true;
@@ -77,7 +86,7 @@ public class Server {
             p.put("org.omg.CORBA.ORBClass", 
                   System.getProperty("org.omg.CORBA.ORBClass"));
             p.put( ORBConstants.ORB_SERVER_ID_PROPERTY, "9999");
-            ORB orb = ORB.init(args, p);
+            ORB orb = (ORB) ORB.init(args, p);
 
 	    if (debug) {
 		System.out.println("Server: ORB initialized");
@@ -127,7 +136,8 @@ public class Server {
         // create a persistent POA
         Policy[] tpolicy = new Policy[2];
         tpolicy[0] = rootPOA.create_lifespan_policy(LifespanPolicyValue.PERSISTENT);
-        tpolicy[1] = rootPOA.create_request_processing_policy(RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
+        tpolicy[1] = rootPOA.create_request_processing_policy(
+            RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
         POA tpoa = rootPOA.create_POA("PersistentPOA", null, tpolicy);
  
         // register the ServantActivator with the POA, then activate POA
@@ -147,7 +157,7 @@ public class Server {
 	    // ignore
 	}
 
-	Tie tie = (Servant)ORB.getPresentationManager().getTie() ;
+	Tie tie = ORB.getPresentationManager().getTie() ;
 	tie.setTarget( impl ) ;
 
 	return tie ;
@@ -178,7 +188,8 @@ public class Server {
 
         // invoke on the local objref to test local invocations
         if ( Server.debug ) 
-	    System.out.println("\nTesting local invocation: Client thread is "+Thread.currentThread());
+	    System.out.println("\nTesting local invocation: Client thread is "
+                +Thread.currentThread());
         int value = echoRef.double(1);
         if ( Server.debug ) 
 	    System.out.println(value);
@@ -189,9 +200,12 @@ public class Server {
     {
         // create another persistent, non-retaining POA
         Policy[] tpolicy = new Policy[3];
-        tpolicy[0] = rootPOA.create_lifespan_policy(LifespanPolicyValue.PERSISTENT);
-        tpolicy[1] = rootPOA.create_request_processing_policy(RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
-        tpolicy[2] = rootPOA.create_servant_retention_policy(ServantRetentionPolicyValue.NON_RETAIN);
+        tpolicy[0] = rootPOA.create_lifespan_policy(
+            LifespanPolicyValue.PERSISTENT);
+        tpolicy[1] = rootPOA.create_request_processing_policy(
+            RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
+        tpolicy[2] = rootPOA.create_servant_retention_policy(
+            ServantRetentionPolicyValue.NON_RETAIN);
         POA tpoa = rootPOA.create_POA("NonRetainPOA", null, tpolicy);
         
         // register the ServantLocator with the POA, then activate POA
@@ -199,7 +213,7 @@ public class Server {
         tpoa.set_servant_manager(csl);
         tpoa.the_POAManager().activate();
 	return tpoa;
-    int
+    }
 
     static void createEcho2(ORB orb, POA tpoa)
 	throws Exception
@@ -221,7 +235,7 @@ public class Server {
 }
 
 
-class MyAdapterActivator extends org.omg.CORBA.LocalObject implements AdapterActivator
+class MyAdapterActivator extends LocalObject implements AdapterActivator
 {
     private ORB orb;
 

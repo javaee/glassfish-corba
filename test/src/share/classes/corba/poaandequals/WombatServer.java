@@ -39,16 +39,18 @@
  */
 package corba.poaandequals;
 
-import org.omg.CORBA.*;
-import org.omg.CORBA.ORBPackage.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
-import WombatStuff.*;
-import corba.framework.*;
-import java.io.*;
-import java.util.*;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import WombatStuff.WombatHelper;
+import corba.framework.Controller;
+import corba.framework.InternalProcess;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Hashtable;
+import java.util.Properties;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.ORBPackage.InvalidName;
+import org.omg.PortableServer.POA;
 
 public class WombatServer implements InternalProcess 
 {
@@ -101,10 +103,9 @@ public class WombatServer implements InternalProcess
             try {
                 helper.start( "ActivationTest" ) ;
                 id = poa.activate_object(w);
-                writeObjref(poa.create_reference_with_id(id,
-                                                         WombatHelper.id()),
-                            "WombatObjRef",
-                            environment.getProperty("output.dir"));
+                writeObjref(poa.create_reference_with_id(id, 
+                    WombatHelper.id()), "WombatObjRef",
+                    environment.getProperty("output.dir"));
                 poa.the_POAManager().activate();
                 helper.pass() ;
             } catch (Exception ex) {

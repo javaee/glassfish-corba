@@ -39,14 +39,14 @@
  */
 package corba.poaandequals;
 
-import org.omg.CORBA.*;
-import org.omg.CORBA.ORBPackage.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
-import WombatStuff.*;
-import corba.framework.*;
-import java.io.*;
-import java.util.*;
+import WombatStuff.Wombat;
+import WombatStuff.WombatHelper;
+import corba.framework.Controller;
+import corba.framework.ThreadProcess;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import org.omg.CORBA.ORB;
 
 public class WombatClient extends ThreadProcess
 {

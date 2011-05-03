@@ -55,16 +55,9 @@
 
 package anytest;
 
-import org.omg.CORBA.*;
-import com.sun.corba.se.impl.corba.*;
-import javax.rmi.CORBA.serialization.*;
-import javax.rmi.CORBA.*;
-import rmic.ObjectByValue;
-
-import java.io.*;
-import java.util.*;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.TypeCode;
 
 public class AnyTest extends test.Test
 {

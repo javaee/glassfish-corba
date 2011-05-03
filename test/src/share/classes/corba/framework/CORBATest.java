@@ -40,7 +40,6 @@
 package corba.framework;
 
 import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -60,6 +59,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import org.glassfish.pfl.test.JUnitReportHelper;
 
 import test.RemoteTest;
 import test.ServantContext;

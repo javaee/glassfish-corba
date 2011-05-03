@@ -46,13 +46,12 @@ import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBConfigurator ;
 import com.sun.corba.se.spi.orb.DataCollector ;
 
-import com.sun.corba.se.spi.orbutil.copyobject.ObjectCopierFactory ;
-
 import com.sun.corba.se.spi.copyobject.CopierManager ;
 import com.sun.corba.se.spi.copyobject.CopyobjectDefaults ;
 
 import corba.framework.TraceAccumulator ;
 import corba.framework.ProxyInterceptor ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
 
 public class UserConfigurator implements ORBConfigurator 
 {

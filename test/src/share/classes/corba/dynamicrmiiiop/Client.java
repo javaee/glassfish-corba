@@ -66,11 +66,7 @@ import junit.framework.Test ;
 import junit.framework.TestResult ;
 import junit.framework.TestSuite ;
 
-import corba.framework.TestCaseTools ;
-
 import com.sun.corba.se.spi.orb.ORB ;
-
-import com.sun.corba.se.spi.orbutil.copyobject.LibraryClassLoader ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
@@ -80,10 +76,6 @@ import com.sun.corba.se.spi.presentation.rmi.StubAdapter;
 import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import com.sun.corba.se.impl.presentation.rmi.IDLType ;
-
-import com.sun.corba.se.impl.orbutil.graph.Node ;
-import com.sun.corba.se.impl.orbutil.graph.Graph ;
-import com.sun.corba.se.impl.orbutil.graph.GraphImpl ;
 
 import corba.dynamicrmiiiop.testclasses.A ;
 import corba.dynamicrmiiiop.testclasses.B ;
@@ -104,15 +96,18 @@ import corba.dynamicrmiiiop.testclasses.TieTest ;
 import corba.dynamicrmiiiop.testclasses.TieTestImpl ;
 import corba.dynamicrmiiiop.testclasses.DMMImplTestClasses ;
 
-
 import com.sun.corba.se.impl.presentation.rmi.ExceptionHandlerImpl ;
-
 
 // Included to directly test makeReaderWriter, which is not
 // needed in the PresentationManager API.
 import com.sun.corba.se.impl.presentation.rmi.DynamicMethodMarshallerImpl ;
 
 import com.sun.corba.se.impl.util.RepositoryId ;
+import org.glassfish.pfl.basic.graph.Graph;
+import org.glassfish.pfl.basic.graph.GraphImpl;
+import org.glassfish.pfl.basic.graph.Node;
+import org.glassfish.pfl.dynamic.copyobject.spi.LibraryClassLoader;
+import org.glassfish.pfl.test.TestCaseTools;
 
 public class Client extends TestCase
 {
@@ -407,11 +402,13 @@ public class Client extends TestCase
 		children.add( node ) ;
 	    }
 
+            @Override
 	    public String toString()
 	    {
 		return "NodeTestImpl[" + name + "]" ;
 	    }
 
+            @Override
 	    public boolean equals( Object obj ) 
 	    {
 		if (this == obj)
@@ -425,6 +422,7 @@ public class Client extends TestCase
 		return name.equals( other.name ) ;
 	    }
 
+            @Override
 	    public int hashCode()
 	    {
 		return name.hashCode() ;
@@ -490,7 +488,7 @@ public class Client extends TestCase
 	{
 	    Graph g = new GraphImpl() ;
 	    Set roots = g.getRoots() ;
-	    assertTrue( roots.size() == 0 ) ;
+	    assertTrue( roots.isEmpty()) ;
 	}
 
 	public void testSingeltonGraph()

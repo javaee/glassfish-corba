@@ -73,7 +73,7 @@ class idlIServantPOA
     {
 	U.sop("return_after_client_gives_up about to wait");
 	try {
-	    Thread.sleep(4 * orb.getORBData().getClientTCPReadTimeout());
+	    Thread.sleep(4 * orb.getORBData().getWaitForResponseTimeout());
 	} catch (InterruptedException e) {
 	    RuntimeException rte = new RuntimeException();
 	    rte.initCause(e);

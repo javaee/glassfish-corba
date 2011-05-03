@@ -40,14 +40,11 @@
 
 package naming.instest;
 
-import java.io.*;
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
-import org.omg.CORBA.*;
 import java.util.Properties;
 import java.util.Hashtable;
-import corba.framework.*;
 import com.sun.corba.se.spi.misc.ORBConstants;
+import java.io.PrintStream;
+import org.omg.CORBA.ORB;
 
 public class INSServer
 {

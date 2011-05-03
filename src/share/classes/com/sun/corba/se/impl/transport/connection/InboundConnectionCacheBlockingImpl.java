@@ -130,6 +130,7 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
         }
     }
 
+    @Transport
     public synchronized void requestProcessed( final C conn, 
 	final int numResponsesExpected ) {
         final ConnectionState<C> cs = connectionMap.get( conn ) ;
@@ -166,6 +167,7 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
     /** Decrement the number of expected responses.  When a connection is idle 
      * and has no expected responses, it can be reclaimed.
      */
+    @Transport
     public synchronized void responseSent( final C conn ) {
         final ConnectionState<C> cs = connectionMap.get( conn ) ;
         final int waitCount = --cs.expectedResponseCount ;
@@ -186,6 +188,7 @@ public final class InboundConnectionCacheBlockingImpl<C extends Connection>
     /** Close a connection, regardless of whether the connection is busy
      * or not.
      */
+    @Transport
     public synchronized void close( final C conn ) {
         final ConnectionState<C> cs = connectionMap.remove( conn ) ;
         display( "connection state", cs ) ;

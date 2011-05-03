@@ -39,15 +39,13 @@
  */
 package corba.poamanager;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-
-import java.io.*;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.util.*;
-
 import com.sun.corba.se.spi.misc.ORBConstants;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.util.Properties;
+import org.omg.CORBA.ORB;
 
 public class Utility {
     private ORB orb;

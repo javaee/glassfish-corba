@@ -54,7 +54,7 @@ import org.omg.CORBA.SystemException ;
 import org.omg.CORBA.portable.UnknownException ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
+import org.glassfish.pfl.test.ObjectUtility;
 
 public class TieTestImpl implements TieTest 
 {

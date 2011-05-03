@@ -40,13 +40,8 @@
 
 package corba.poapolicies;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-
-import java.io.*;
-import java.util.*;
-
-import Util.*;
+import Util.FactoryHelper;
+import org.omg.PortableServer.POA;
 
 class Waiter extends Thread {
     BasicObjectFactoryImpl f;

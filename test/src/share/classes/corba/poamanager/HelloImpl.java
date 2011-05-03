@@ -39,7 +39,7 @@
  */
 package corba.poamanager;
 
-import HelloStuff.*;
+import HelloStuff.HelloPOA;
 
 public class HelloImpl extends HelloPOA
 {

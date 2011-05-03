@@ -40,10 +40,10 @@
 
 package corba.poapolicies;
 
-import org.omg.CORBA.*;
-
-import Util.*;
-import HelloStuff.*;
+import HelloStuff.Hello;
+import HelloStuff.HelloHelper;
+import Util.CreationMethods;
+import Util.Factory;
 
 public class HelloClient {
     public static Hello createHello(CreationMethods c, Factory f) {

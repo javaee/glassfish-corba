@@ -39,13 +39,17 @@
  */
 package corba.codeset;
 
-import CodeSetTester.*;
-import CodeSetTester.VerifierPackage.*;
-import org.omg.CosNaming.*;
-import org.omg.CORBA.*;
+import CodeSetTester.Verifier ;
+import CodeSetTester.VerifierHelper ;
+import CodeSetTester.VerifierPackage.TestCharSeqHolder;
+import CodeSetTester.VerifierPackage.TestWCharSeqHolder;
 import java.util.Properties;
 import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 public class Client
 {

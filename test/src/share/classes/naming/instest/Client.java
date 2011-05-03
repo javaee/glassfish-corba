@@ -39,9 +39,9 @@
  */
 package naming.instest;
 
+import java.util.Properties;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Object;
-import java.util.*;
 
 public class Client implements Runnable {
 

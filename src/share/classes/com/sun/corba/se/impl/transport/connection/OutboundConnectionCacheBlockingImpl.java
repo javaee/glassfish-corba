@@ -410,6 +410,7 @@ public final class OutboundConnectionCacheBlockingImpl<C extends Connection>
         }
     }
 
+    @Transport
     private void decrementTotalBusy() {
         if (totalBusy > 0) {
             totalBusy-- ;

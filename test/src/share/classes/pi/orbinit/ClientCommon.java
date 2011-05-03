@@ -40,19 +40,13 @@
 
 package pi.orbinit;
 
-import org.omg.CORBA.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
-import com.sun.corba.se.spi.misc.ORBConstants;
-import org.omg.PortableInterceptor.*;
-import org.omg.IOP.*;
-import org.omg.IOP.CodecPackage.*;
-import org.omg.IOP.CodecFactoryPackage.*;
-import corba.framework.*;
-
-import java.util.*;
-import java.io.*;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import corba.framework.InternalProcess;
+import java.io.PrintStream;
+import java.util.Hashtable;
+import java.util.Properties;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.ORB;
+import org.omg.IOP.CodecFactory;
 
 public abstract class ClientCommon
     implements InternalProcess 

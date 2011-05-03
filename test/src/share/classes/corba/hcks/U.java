@@ -50,7 +50,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -66,24 +65,15 @@ import org.omg.CORBA.Policy;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
-import org.omg.PortableInterceptor.ClientRequestInfo;
-import org.omg.PortableInterceptor.ServerRequestInfo;
-
-import org.omg.PortableInterceptor.Current;
 import org.omg.PortableInterceptor.InvalidSlot;
 import org.omg.PortableInterceptor.RequestInfo;
 import org.omg.PortableInterceptor.ServerRequestInfo;
 
-//import org.omg.PortableServer.Current;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.RequestProcessingPolicyValue;
 import org.omg.PortableServer.Servant;
 import org.omg.PortableServer.ServantManager;
 import org.omg.PortableServer.ServantRetentionPolicyValue;
-
-//import org.omg.PortableServer.CurrentHelper; REVISIT
 
 import com.sun.corba.se.spi.transport.Acceptor;
 import com.sun.corba.se.spi.transport.Connection;
@@ -91,8 +81,10 @@ import com.sun.corba.se.spi.transport.TransportManager;
 import com.sun.corba.se.spi.transport.SocketInfo;
 
 import com.sun.corba.se.impl.transport.AcceptorImpl;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 public class U
 {
@@ -123,9 +115,9 @@ public class U
     // KMC: helper support
     private static void testComplete() {
         List<ErrorAccumulator.MessageAndException> errors = ea.getTestErrors() ;
-        if (errors.size() == 0)
+        if (errors.isEmpty()) {
             helper.pass() ;
-        else {
+        }  else {
             StringBuilder sb = new StringBuilder() ;
             sb.append( "Errors in test:\n" ) ;
             for (ErrorAccumulator.MessageAndException mea : errors) {

@@ -70,10 +70,7 @@ import com.sun.corba.se.spi.orb.PropertyParser ;
 import com.sun.corba.se.spi.orb.ParserImplBase ;
 import com.sun.corba.se.spi.orb.ParserData ;
 import com.sun.corba.se.spi.orb.ORB ;
-import com.sun.corba.se.spi.orb.ORBConfigurator ;
 import com.sun.corba.se.spi.orb.ORBData ;
-
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
 import com.sun.corba.se.impl.orb.ORBDataParserImpl ;
 import com.sun.corba.se.impl.orb.DataCollectorFactory ;
@@ -81,11 +78,12 @@ import com.sun.corba.se.impl.orb.ParserTable ;
 
 import com.sun.corba.se.spi.misc.ORBConstants ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-import com.sun.corba.se.spi.orbutil.closure.Closure ;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion ;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.basic.func.NullaryFunction;
+import org.glassfish.pfl.basic.func.NullaryPredicate;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.glassfish.pfl.test.ObjectUtility;
 
 public class Client 
 {
@@ -267,7 +265,7 @@ public class Client
 	res = ObjectUtility.make( false, false ).objectToString( y1 ) ;
 	System.out.println( res ) ;
 
-	Closure closure1 = new Closure() {
+	NullaryFunction<Object> closure1 = new NullaryFunction<Object>() {
 	    public Object evaluate() {
 		return Boolean.valueOf( ObjectUtility.equals( y1, y1 ) ) ;
 	    }
@@ -276,7 +274,7 @@ public class Client
 	session.testForPass( "Testing structural equals: 1", closure1,
 	    Boolean.TRUE ) ;
 
-	Closure closure2 = new Closure() {
+	NullaryFunction<Object> closure2 = new NullaryFunction<Object>() {
 	    public Object evaluate() {
 		return Boolean.valueOf( ObjectUtility.equals( y1, y2 ) ) ;
 	    }
@@ -285,7 +283,7 @@ public class Client
 	session.testForPass( "Testing structural equals: 2", closure2,
 	    Boolean.TRUE ) ;
 
-	Closure closure3 = new Closure() {
+	NullaryFunction<Object> closure3 = new NullaryFunction<Object>() {
 	    public Object evaluate() {
 		return Boolean.valueOf( ObjectUtility.equals( y1, y3 ) ) ;
 	    }
@@ -294,7 +292,7 @@ public class Client
 	session.testForPass( "Testing structural equals: 3", closure3,
 	    Boolean.FALSE ) ;
 
-	Closure closure4 = new Closure() {
+	NullaryFunction<Object> closure4 = new NullaryFunction<Object>() {
 	    public Object evaluate() {
 		return Boolean.valueOf( ObjectUtility.equals( y3, y4 ) ) ;
 	    }
@@ -306,11 +304,13 @@ public class Client
 	session.end() ;
     }
 
-    private Closure makeActionEvaluator( final Operation action, final Object data )
+    private NullaryFunction<Object> makeActionEvaluator( final Operation action,
+        final Object data )
     {
-	return new Closure() {
+	return new NullaryFunction<Object>() {
 	    public Object evaluate() {
-		return action.operate( data )  ;
+		action.operate( data )  ;
+                return true ;
 	    }
 	} ;
     }
@@ -466,9 +466,9 @@ public class Client
 	return props ;
     }
 
-    private Map makeResult() 
+    private Map<String,Object> makeResult()
     {
-	Map map = new HashMap() ;
+	Map<String,Object> map = new HashMap<String,Object>() ;
 	map.put( "arg", Integer.valueOf( 273 ) ) ;
 	map.put( "flag", Boolean.valueOf( true ) ) ;
 	map.put( "str", "AValue" ) ;
@@ -499,13 +499,14 @@ public class Client
 	
 	final PropertyParser parser = makeParser() ;
 	final Properties props = makeTestProperties() ;
-	Closure closure = new Closure() {
-	    public Object evaluate() { 
+	NullaryFunction<Object> closure  =
+            new NullaryFunction<Object>() {
+	    public Map<String,Object> evaluate() {
 		return parser.parse( props )  ; 
 	    }
 	} ;
 
-	Map expectedResult = makeResult() ;
+	Map<String,Object> expectedResult = makeResult() ;
 
 	session.testForPass( "parser", closure, expectedResult ) ;
 
@@ -769,28 +770,30 @@ public class Client
 	final DataCollector dc, boolean expectedAppletResult, 
 	Properties expectedProperties )
     {
-	Closure isAppletClosure = new Closure() {
+	NullaryFunction<Object> isAppletNullaryFunction =
+            new NullaryFunction<Object>() {
 	    public Object evaluate() {
 		return Boolean.valueOf( dc.isApplet() ) ;
 	    }
 	} ;
 
-	session.testForPass( name + "isApplet", isAppletClosure, 
+	session.testForPass( name + "isApplet", isAppletNullaryFunction,
 	    Boolean.valueOf( expectedAppletResult ) ) ;
 
-	Closure getPropertiesClosure = new Closure() {
+	NullaryFunction<Object> getPropertiesNullaryFunction =
+            new NullaryFunction<Object>() {
 	    public Object evaluate() {
 		return dc.getProperties() ;
 	    }
 	} ;
 
 	session.testForException( name + "getProperties before setParser", 
-	    getPropertiesClosure, IllegalStateException.class ) ;
+	    getPropertiesNullaryFunction, IllegalStateException.class ) ;
 
 	dc.setParser( parser ) ;
 
 	session.testForPass( name + "getProperties after setParser", 
-	    getPropertiesClosure, expectedProperties ) ;
+	    getPropertiesNullaryFunction, expectedProperties ) ;
     }
 
     private void setupDCEnvironment()
@@ -1100,7 +1103,7 @@ public class Client
 	final ORBDataParserImpl od2 = new ORBDataParserImpl( orb, 
 	    new PropertyDataCollector( props ) ) ;
 
-	Closure closure = new Closure() {
+	NullaryFunction<Object>  closure = new NullaryFunction<Object> () {
 	    public Object evaluate() {
 		if (compareORBDataByInterface( od1, od2)) 
 		    return Boolean.TRUE ;
@@ -1131,7 +1134,7 @@ public class Client
 	    "corba.orbconfig.MyConfigurator", "1" ) ;
 	String[] args = null ;
 	ORB.init( args, props ) ;
-	Closure closure = new Closure() {
+	NullaryFunction<Object> closure = new NullaryFunction<Object>() {
 	    public Object evaluate() {
 		return Boolean.valueOf( MyConfigurator.wasCalled ) ;
 	    }

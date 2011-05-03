@@ -46,7 +46,6 @@ import org.omg.CORBA_2_3.portable.InputStream ;
 import java.util.Properties ;
 
 import com.sun.corba.se.spi.orb.ORB;
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
 
 import com.sun.corba.se.impl.encoding.CDRInputObject ;
 import com.sun.corba.se.impl.encoding.CDROutputObject ;
@@ -56,6 +55,7 @@ import com.sun.corba.se.impl.encoding.EncapsOutputStream ;
 import org.testng.annotations.Test ;
 
 import corba.framework.TestngRunner ;
+import org.glassfish.pfl.test.ObjectUtility;
 
 public class Client
 {

@@ -41,13 +41,14 @@
 package corba.adapteractivator ;
 
 import org.omg.CORBA.ORB;
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
 
 import corba.framework.statusU;
 import corba.framework.RTMConstants;
 import corba.framework.GetID;
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 /**
 * Purpose			: To verify that AdapterActivator implementation registered, recreates

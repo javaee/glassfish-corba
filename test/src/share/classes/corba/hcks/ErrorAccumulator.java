@@ -48,8 +48,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
+import org.glassfish.pfl.basic.contain.Pair;
 
 public class ErrorAccumulator
 {

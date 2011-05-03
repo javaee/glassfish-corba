@@ -52,20 +52,15 @@ package javax.rmi.download;
 import org.omg.CORBA.ORB;
 
 import java.util.Properties;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import javax.rmi.PortableRemoteObject;
 import javax.naming.InitialContext;
 import javax.naming.Context;
 import test.Util;
-import test.Test;
 import java.util.Hashtable;
 import java.util.Vector;
+import org.glassfish.pfl.test.JUnitReportHelper;
 import test.WebServer;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /*
  * @test

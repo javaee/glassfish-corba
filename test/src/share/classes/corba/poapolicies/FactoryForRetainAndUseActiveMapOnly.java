@@ -39,14 +39,12 @@
  */
 package corba.poapolicies;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
-
-import java.io.*;
-import java.util.*;
-
-import Util.*;
+import org.omg.CORBA.Policy;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAPackage.AdapterAlreadyExists;
+import org.omg.PortableServer.POAPackage.InvalidPolicy;
+import org.omg.PortableServer.RequestProcessingPolicyValue;
+import org.omg.PortableServer.ServantRetentionPolicyValue;
 
 public class FactoryForRetainAndUseActiveMapOnly implements POAFactory
 {
@@ -59,12 +57,14 @@ public class FactoryForRetainAndUseActiveMapOnly implements POAFactory
         System.out.println("createPOA1");
 
 	policies[0] =
-	    parent.create_servant_retention_policy(ServantRetentionPolicyValue.RETAIN);
+	    parent.create_servant_retention_policy(
+                ServantRetentionPolicyValue.RETAIN);
 
         System.out.println("createPOA2");
 
 	policies[1] =
-	    parent.create_request_processing_policy(RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY);
+	    parent.create_request_processing_policy(
+                RequestProcessingPolicyValue.USE_ACTIVE_OBJECT_MAP_ONLY);
 
 
         System.out.println("createPOA3");

@@ -40,9 +40,6 @@
 
 package corba.adapteractivator;
 
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POA;
-import org.omg.PortableServer.Servant;
 import org.omg.CORBA.ORB;
 
 

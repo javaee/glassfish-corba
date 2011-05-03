@@ -70,7 +70,7 @@
 	<property name="test-classes.dir"               location="${test-build.dir}/classes"/>
 	<property name="test-values1.dir"               location="${test-build.dir}/values1/classes"/>
 	<property name="test-values2.dir"               location="${test-build.dir}/values2/classes"/>
-	<property name="test-gensrc.dir"                location="${test-classes.dir}/gensrc"/>
+	<property name="test-gensrc.dir"                location="${test-build.dir}/gensrc"/>
 
 	<mkdir dir="${test-classes.dir}"/>
 	<mkdir dir="${test-values1.dir}"/>
@@ -129,9 +129,11 @@
     <!-- This target compiles all the ORB unit tests -->
     <target name="build-tests" depends="init, run-all-test-idl, run-all-test-rmic, compile-tests"/>
 
-    <target name="compile-tests" depends="init, compile-tests-main, enhance-tests, compile-tests-values"/>
+    <target name="compile-tests" depends="init, compile-tests-main, compile-tests-values"/>
 
-    <target name="compile-tests-main" depends="init">
+    <target name="compile-tests-main" depends="init, compile-tests-main-gen, compile-tests-main-nongen"/>
+
+    <target name="compile-tests-main-gen" depends="init">
 	<echo message="Compiling all tests"/>
 	<javac destdir="${test-classes.dir}" 
 		classpathref="test-classpath.master"
@@ -141,13 +143,14 @@
 		fork="true"
 		memoryMaximumSize="512m"> 
 	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
-	    <src path="${test.src.dir}"/>
 	    <src path="${test-gensrc.dir}"/>
 	    <include name="**"/>
+
 	    <!-- Exclude these files because they are compiled to a different
 	         destdir in the compile-values target -->
 	    <exclude name="values1/**"/>
 	    <exclude name="values2/**"/>
+
 	    <!-- Following files are excluded from compilation
 		because they are either compiled during running of the tests
 		or not compiled at all.  -->
@@ -158,6 +161,10 @@
 	    <exclude name="corba/example/Server.java"/>
 	    <exclude name="corba/driinvocation/**"/>
 	    <exclude name="corba/tcpreadtimeout/**"/>
+
+            <!-- Exclude test where the generated IDL REQUIRES a value impl (ugh! what a bad idea!) -->
+            <exclude name="corba/hcks/**"/>
+            <exclude name="CodeSetTester/**"/>
 
 	    <!-- Excluded until we get the test moved to the JDK XML classes -->
 	    <exclude name="corba/genericRPCMSGFramework/**"/>
@@ -183,21 +190,53 @@
 	</javac>
     </target>
 
-    <target name="enhance-tests" depends="compile-tests-main">
-        <!-- Run the tracing enhancer on the class files for corba.tf -->
-	<java classname="com.sun.tools.corba.se.enhancer.EnhanceTool" classpathref="test-classpath.master" fork="true" dir="${test-classes.dir}">
-            <jvmarg value="-Dnet.sourceforge.cobertura.datafile=../../../${cobertura.datafile}"/>
-            <arg value="-dir"/>
-            <arg value="corba/tf"/>
-            <arg value="-debug"/>
-            <arg value="false"/>
-            <arg value="-verbose"/>
-            <arg value="1"/>
-            <arg value="-rf"/>
-            <arg value="corba/tf/tfannotations.properties"/>
-            <arg value="-mode"/>
-            <arg value="TraceEnhance"/>
-        </java>
+    <target name="compile-tests-main-nongen" depends="init">
+	<echo message="Compiling all tests"/>
+	<javac destdir="${test-classes.dir}" 
+		classpathref="test-classpath.master"
+		deprecation="${deprecation}"
+		debug="${javac.debug}" 
+		optimize="${javac.optimize}"
+		fork="true"
+		memoryMaximumSize="512m"> 
+	    <compilerarg value="-Xbootclasspath/p:${classes.dir}:${orblib.classes.dir}"/>
+	    <src path="${test-gensrc.dir}"/>
+	    <src path="${test.src.dir}"/>
+	    <include name="**"/>
+	    <!-- Exclude these files because they are compiled to a different
+	         destdir in the compile-values target -->
+	    <exclude name="values1/**"/>
+	    <exclude name="values2/**"/>
+	    <!-- Following files are excluded from compilation
+		because they are either compiled during running of the tests
+		or not compiled at all.  -->
+	    <exclude name="corba/strm2/class*/**"/>
+	    <exclude name="corba/evolve/original/**"/>
+	    <exclude name="corba/evolve/evolved/UserName.java"/>
+	    <exclude name="corba/example/Client.java"/>
+	    <exclude name="corba/example/Server.java"/>
+	    <exclude name="corba/driinvocation/**"/>
+	    <exclude name="corba/tcpreadtimeout/**"/>
+
+	    <exclude name="hopper/h4549085/Server.java"/>
+	    <exclude name="hopper/h4549085/Client.java"/>
+	    <exclude name="hopper/h4620926/Server.java"/>
+	    <exclude name="hopper/h4620926/Client.java"/>
+	    <exclude name="hopper/h4670827/HelloImpl.java"/>
+	    <exclude name="hopper/h4670827/Client.java"/>
+	    <exclude name="hopper/h4670827/INSServer.java"/>
+	    <exclude name="hopper/h4670827/TestConstants.java"/>
+
+	    <exclude name="naming/pcosnaming/hello*"/>
+	    <exclude name="naming/instest/Client.java*"/>
+	    <exclude name="naming/instest/INSServer.java"/>
+	    <exclude name="naming/instest/HelloImpl.java"/>
+
+	    <exclude name="javax/rmi/CORBA/io/**"/>
+	    <exclude name="java/**"/>
+
+            <!--exclude name="corba/dynamicrmiiiop/testclasses/**"/-->
+	</javac>
     </target>
 
     <target name="compile-tests-values" depends="init">
@@ -364,7 +403,7 @@
 
     <!-- Run all idl invocations for the tests that use idl and generate
          sources for them -->
-    <target name="run-all-test-idl">
+    <target name="run-all-test-idl" depends="init">
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
             <param name="td-value" value="-td ${test-gensrc.dir}"/>
             <param name="includes-value" value=""/>
@@ -727,58 +766,6 @@
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/pept/idlI.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/pept"/>
-            <param name="generated-files" value="*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fallTIE"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/pept/idlI.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/pept"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value="-oldImplBase"/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/pept/idlI.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/pept"/>
-            <param name="generated-files" value="_*ImplBase.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fallTIE"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value="-oldImplBase"/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/pept/idlI.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/pept"/>
-            <param name="generated-files" value="*_Tie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
             <param name="idl-value" value="${test.src.dir}/corba/purgecalls/purgecalls.idl"/>
             <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/purgecalls"/>
             <param name="generated-files" value="*.java"/>
@@ -820,58 +807,6 @@
             <param name="pkg-prefixes" value=""/>
             <param name="idl-value" value="${test.src.dir}/corba/purgecalls/purgecalls.idl"/>
             <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/purgecalls"/>
-            <param name="generated-files" value="*_Tie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/genericRPCMSGFramework/g.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/genericRPCMSGFramework/"/>
-            <param name="generated-files" value="*.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fallTIE"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/genericRPCMSGFramework/g.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/genericRPCMSGFramework/"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value="-oldImplBase"/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/genericRPCMSGFramework/g.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/genericRPCMSGFramework/"/>
-            <param name="generated-files" value="_*ImplBase.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fallTIE"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value="-oldImplBase"/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/genericRPCMSGFramework/g.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/genericRPCMSGFramework/"/>
             <param name="generated-files" value="*_Tie.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
@@ -937,19 +872,6 @@
             <param name="pkg-prefixes" value=""/>
             <param name="idl-value" value="${test.src.dir}/pi/ort/iorinterceptor.idl"/>
             <param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/ort"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value="-oldImplBase"/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/pi/picurrent/hello.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/pi/picurrent"/>
             <param name="generated-files" value="*POATie.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
@@ -1093,19 +1015,6 @@
             <param name="pkg-prefixes" value=""/>
             <param name="idl-value" value="${test.src.dir}/corba/fwddecl/legal.idl"/>
             <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/fwddecl"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/copyobject/typecode.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/copyobject/fwddecl"/>
             <param name="generated-files" value="*POATie.java"/>
         </antcall>
         <antcall target="call-idl" inheritAll="true" inheritRefs="true">
@@ -1273,19 +1182,6 @@
             <param name="oldImplBase-value" value=""/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/jsg/idlI.idl"/>
-            <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/jsg"/>
-            <param name="generated-files" value="*POATie.java"/>
-        </antcall>
-        <antcall target="call-idl" inheritAll="true" inheritRefs="true">
-            <param name="td-value" value="-td ${test-gensrc.dir}"/>
-            <param name="includes-value" value=""/>
-            <param name="corba-value" value=""/>
-            <param name="fall-value" value="-fall"/>
-            <param name="D-value" value=""/>
-            <param name="oldImplBase-value" value=""/>
-            <param name="pkg-translate" value=""/>
-            <param name="pkg-prefixes" value=""/>
             <param name="idl-value" value="${test.src.dir}/corba/repid/BoxedValueTypes.idl"/>
             <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/repid"/>
             <param name="generated-files" value="*POATie.java"/>
@@ -1312,7 +1208,7 @@
             <param name="oldImplBase-value" value="-oldImplBase"/>
             <param name="pkg-translate" value=""/>
             <param name="pkg-prefixes" value=""/>
-            <param name="idl-value" value="${test.src.dir}/corba/tcpreadtimeout/ildI.idl"/>
+            <param name="idl-value" value="${test.src.dir}/corba/tcpreadtimeout/idlI.idl"/>
             <param name="idl-gensrc-dir" value="${test-gensrc.dir}/corba/tcpreadtimeout"/>
             <param name="generated-files" value="*POATie.java"/>
         </antcall>
@@ -1432,18 +1328,6 @@
             <param name="sourcefile-name" value="corba/islocal/rmiiIServantPOA.java"/>
         </antcall>
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value=""/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/pept/rmiiIServantConnect.class"/>
-            <param name="sourcefile-name" value="corba/pept/rmiiIServantConnect.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/pept/rmiiIServantPOA.class"/>
-            <param name="sourcefile-name" value="corba/pept/rmiiIServantPOA.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value="-poa"/>
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
             <param name="classfile-name" value="corba/misc/EchoImpl.class"/>
@@ -1490,12 +1374,6 @@
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
             <param name="classfile-name" value="corba/cmvt/GIOPComboImpl.class"/>
             <param name="sourcefile-name" value="corba/cmvt/GIOPComboImpl.java"/>
-        </antcall>
-        <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
-            <param name="rmic-args-value" value="-poa"/>
-            <param name="output-dir-value" value="${test-gensrc.dir}"/>
-            <param name="classfile-name" value="corba/copyobject/RemoteTestImpl.class"/>
-            <param name="sourcefile-name" value="corba/copyobject/RemoteTest.java"/>
         </antcall>
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value="-poa"/>
@@ -1581,12 +1459,14 @@
             <param name="classfile-name" value="corba/rogueclient/TesterImpl.class"/>
             <param name="sourcefile-name" value="corba/rogueclient/TesterImpl.java"/>
         </antcall>
+        <!-- JSG not supported
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value="-poa -nolocalstubs"/>
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
             <param name="classfile-name" value="corba/jsg/rmiiIServantPOA.class"/>
             <param name="sourcefile-name" value="corba/jsg/rmiiIServantPOA.java"/>
         </antcall>
+        -->
         <antcall target="call-rmic" inheritAll="true" inheritRefs="true">
             <param name="rmic-args-value" value="-poa -always"/>
             <param name="output-dir-value" value="${test-gensrc.dir}"/>
@@ -1775,7 +1655,7 @@
 
     <target name="test" depends="test-init, build-tests, test-all"/>
 
-    <target name="test-all" depends="clean-test-output, test-init, test-rmi-iiop, test-copyobject, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
+    <target name="test-all" depends="clean-test-output, test-init, test-rmi-iiop, test-corba, test-pi, test-naming, test-hopper, test-mantis, test-perf"/>
 
     <target name="archive-test-results" depends="test-init">
         <jar jarfile="${releaselib.dir}/test-results.jar">
@@ -1810,18 +1690,6 @@
                 <!-- <test name="corba.messagetrace.Client" todir="${junit.reports}"/> -->
                 <test name="corba.misc.Client" todir="${junit.reports}"/>
                 <test name="corba.dynamicrmiiiop.Client" todir="${junit.reports}"/>
-            </test-cases>
-        </run-junit-test>
-    </target>
-
-    <target name="test-copyobject" depends="test-init">
-        <run-junit-test>
-            <test-cases>
-                <test name="corba.copyobject.NewReflectTest" todir="${junit.reports}"/>
-                <test name="corba.copyobject.NewReflectFallbackTest" todir="${junit.reports}"/>
-                <test name="corba.copyobject.OldReflectTest" todir="${junit.reports}"/>
-                <test name="corba.copyobject.JavaStreamTest" todir="${junit.reports}"/>
-                <test name="corba.copyobject.ORBStreamTest" todir="${junit.reports}"/>
             </test-cases>
         </run-junit-test>
     </target>

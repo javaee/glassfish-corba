@@ -58,16 +58,18 @@
 
 package javax.rmi.CORBA.serialization;
 
-import javax.rmi.CORBA.serialization.*;
-import javax.rmi.CORBA.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Properties;
+import java.util.Vector;
+import org.glassfish.pfl.test.JUnitReportHelper;
 import rmic.ObjectByValue;
 import org.omg.CORBA.WStringValueHelper;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.CompletionStatus;
 import org.omg.CORBA.MARSHAL;
-import java.io.*;
-import java.util.*;
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class SerializationTest extends test.Test
 {
@@ -109,14 +111,16 @@ public class SerializationTest extends test.Test
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    ObjectOutputStream oos = new ObjectOutputStream(baos);
 	    oos.writeObject(_bitset);
-	    ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
+	    ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(baos.toByteArray()));
 	    BitSet __bitset = (BitSet)ois.readObject();
 														   
 
             org.omg.CORBA_2_3.portable.OutputStream sos =
                 (org.omg.CORBA_2_3.portable.OutputStream)orb.create_output_stream();
 
-	    ((org.omg.CORBA_2_3.ORB)orb).register_value_factory(DateHelper.id(), new DateDefaultFactory());
+	    ((org.omg.CORBA_2_3.ORB)orb).register_value_factory(DateHelper.id(),
+                new DateDefaultFactory());
 
 // Start of writing phase:
 
@@ -131,7 +135,8 @@ public class SerializationTest extends test.Test
 	    seq1_StockHelper.write(sos, stocks);
 
             test( "writeMARSHAL" ) ;
-	    SystemException sex = new MARSHAL("dummy exception", 37, CompletionStatus.COMPLETED_MAYBE);
+	    SystemException sex = new MARSHAL("dummy exception", 37,
+                CompletionStatus.COMPLETED_MAYBE);
 	    sos.write_value(sex);
 
             test( "writeString" ) ;
@@ -156,7 +161,7 @@ public class SerializationTest extends test.Test
 	    sos.write_value(aDate);
 
             test( "writeVector" ) ;
-	    Vector vector1 = new Vector();
+            Vector vector1 = new Vector();
 	    sos.write_value(vector1);
 
             test( "writeStringValue" ) ;

@@ -40,13 +40,12 @@
 
 package corba.poapolicies;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-
-import java.io.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
+import org.omg.CORBA.ORB;
 
 public class Utility {
     private ORB orb;

@@ -40,18 +40,25 @@
 
 package pi.codec;
 
-import org.omg.CORBA.*;
-import org.omg.PortableInterceptor.*;
-import org.omg.IOP.*;
-import org.omg.IOP.CodecPackage.*;
-import org.omg.IOP.CodecFactoryPackage.*;
-import corba.framework.*;
-import CodecTest.*; // for IDL struct definitions
-
-import java.util.*;
-import java.io.*;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import CodecTest.TestStruct;
+import CodecTest.TestStructHelper;
+import CodecTest.TestUnion;
+import CodecTest.TestUnionHelper;
+import corba.framework.InternalProcess;
+import java.io.PrintStream;
+import java.util.Hashtable;
+import java.util.Properties;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TypeCode;
+import org.omg.IOP.Codec;
+import org.omg.IOP.CodecFactory;
+import org.omg.IOP.CodecFactoryHelper;
+import org.omg.IOP.CodecFactoryPackage.UnknownEncoding;
+import org.omg.IOP.CodecPackage.FormatMismatch;
+import org.omg.IOP.ENCODING_CDR_ENCAPS;
+import org.omg.IOP.Encoding;
 
 public class Client 
     implements InternalProcess 

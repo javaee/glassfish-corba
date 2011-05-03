@@ -39,12 +39,14 @@
  */
 package corba.multiorb;
 
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
-import org.omg.CORBA.*;
-import java.util.*;
-import examples.*;
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import examples.policy_2;
+import examples.policy_2Helper;
+import java.util.Properties;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 public class policy2Client {
     private static final String msgPassed = "policy_2: **PASSED**";

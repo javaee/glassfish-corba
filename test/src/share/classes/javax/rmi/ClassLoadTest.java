@@ -55,8 +55,7 @@ import java.io.File;
 import com.sun.corba.se.impl.util.JDKBridge;
 import javax.rmi.CORBA.Util;
 import java.rmi.server.RMIClassLoader;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.test.JUnitReportHelper;
 
 public class ClassLoadTest extends Test {
     private static int SUCCEED = 0;
@@ -78,7 +77,8 @@ public class ClassLoadTest extends Test {
     private static boolean isPre12VM = false;
     private static boolean is12VM = true;
     
-    private JUnitReportHelper helper = new JUnitReportHelper( this.getClass().getName() ) ;
+    private JUnitReportHelper helper = new JUnitReportHelper(
+        this.getClass().getName() ) ;
 
     private String makeTestName( String className ) {
         if (className == null)

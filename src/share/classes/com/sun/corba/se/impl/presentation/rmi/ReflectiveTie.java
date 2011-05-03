@@ -60,6 +60,7 @@ import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller ;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 
+import org.glassfish.pfl.basic.proxy.DynamicAccessPermission ;
 
 public final class ReflectiveTie extends Servant implements Tie 
 {

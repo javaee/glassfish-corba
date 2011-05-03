@@ -39,11 +39,11 @@
  */
 package corba.poamanager;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAManagerPackage.*;
-
-import Util.*;
+import Util.CreationMethods;
+import Util.GenericFactoryPOA;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
+import org.omg.PortableServer.Servant;
 
 public final class FactoryImpl extends GenericFactoryPOA
 {

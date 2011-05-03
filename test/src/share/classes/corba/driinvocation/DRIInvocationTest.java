@@ -39,18 +39,22 @@
  */
 package corba.driinvocation;
 
-import test.Test;
-import corba.framework.*;
-import java.util.*;
 import com.sun.corba.se.spi.misc.ORBConstants;
+import corba.framework.CORBATest;
+import corba.framework.Controller;
+import corba.framework.InternalExec;
+import corba.framework.Options;
+import java.util.Properties;
 
 public class DRIInvocationTest extends CORBATest
 {
+    @Override
     protected Controller newClientController()
     {
         return new InternalExec();
     }
 
+    @Override
     protected void doTest() throws Throwable
     {
         // try this one. the report dir was already set to gen/corba/rmipoacounter

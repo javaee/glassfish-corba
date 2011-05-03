@@ -104,12 +104,6 @@ import com.sun.corba.se.impl.javax.rmi.CORBA.Util ;
 
 import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 
-import com.sun.corba.se.spi.orbutil.argparser.DefaultValue ;
-import com.sun.corba.se.spi.orbutil.argparser.ArgParser ;
-
-import com.sun.corba.se.spi.orbutil.codegen.GenericClass ;
-import com.sun.corba.se.spi.orbutil.codegen.Type ;
-
 import performance.eesample.wspex.Address ;
 import performance.eesample.wspex.ArrayOfLineItem ;
 import performance.eesample.wspex.Customer ;
@@ -126,7 +120,11 @@ import performance.eesample.wspex.components.OrderBL;
 
 import com.sun.japex.JapexDriverBase ;
 import com.sun.japex.TestCase ;
-import corba.framework.TestBase;
+import org.glassfish.pfl.basic.tools.argparser.ArgParser;
+import org.glassfish.pfl.basic.tools.argparser.DefaultValue;
+import org.glassfish.pfl.dynamic.codegen.spi.GenericClass;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.test.TestBase;
 
 /** Standard top-level ORB test.  Does the following:
  * <OL>
@@ -1177,7 +1175,7 @@ public class StandardTest extends JapexDriverBase {
     }
     */
 
-    @corba.framework.TestCase( "null" )
+    @org.glassfish.pfl.test.TestCase( "null" )
     public void testNullCall() {
 	for ( Object[] data : objrefData) {
 	    String oname = (String)data[0] ;
@@ -1187,7 +1185,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
    
-    @corba.framework.TestCase( "data" )
+    @org.glassfish.pfl.test.TestCase( "data" )
     public void testDataCall() {
 	for ( Object[] data : objrefData) {
 	    String oname = (String)data[0] ;
@@ -1197,7 +1195,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
     
-    @corba.framework.TestCase( "data-array" )
+    @org.glassfish.pfl.test.TestCase( "data-array" )
     public void testDataArrayCall() {
 	for ( Object[] data : objrefData) {
 	    String oname = (String)data[0] ;
@@ -1207,7 +1205,7 @@ public class StandardTest extends JapexDriverBase {
 	}
     }
     
-    @corba.framework.TestCase( "get-test-refs" )
+    @org.glassfish.pfl.test.TestCase( "get-test-refs" )
     public void testGetTestRefsCall() {
 	for ( Object[] data : objrefData) {
 	    String oname = (String)data[0] ;

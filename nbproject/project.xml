@@ -42,6 +42,9 @@
     <type>org.netbeans.modules.ant.freeform</type>
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>Java CORBA Development: master workspace</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
             <!--Do not use Project Properties customizer when editing this file manually.-->
             <name>Java CORBA Development: master workspace</name>
             <properties>
@@ -53,36 +56,48 @@
                     <label>src/share/classes</label>
                     <type>java</type>
                     <location>src/share/classes</location>
-                </source-folder>
-                <source-folder>
-                    <label>orblib/src/share/classes</label>
-                    <type>java</type>
-                    <location>orblib/src/share/classes</location>
-                </source-folder>
-                <source-folder>
-                    <label>test/src/share/classes</label>
-                    <type>java</type>
-                    <location>test/src/share/classes</location>
+                    <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
                     <label>build/gensrc</label>
                     <type>java</type>
                     <location>build/gensrc</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>test/src/share/classes</label>
+                    <type>java</type>
+                    <location>test/src/share/classes</location>
+                    <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
                     <label>test/src/share/classes/test12</label>
                     <type>java</type>
                     <location>test/src/share/classes/test12</location>
+                    <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
                     <label>test/src/share/classes/values1</label>
                     <type>java</type>
                     <location>test/src/share/classes/values1</location>
+                    <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
                     <label>test/src/share/classes/values2</label>
                     <type>java</type>
                     <location>test/src/share/classes/values2</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>test/build/gensrc</label>
+                    <type>java</type>
+                    <location>test/build/gensrc</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>Java CORBA Development: master workspace</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
                 </source-folder>
             </folders>
             <ide-actions>
@@ -116,25 +131,7 @@
             </export>
             <export>
                 <type>folder</type>
-                <location>orblib/build/classes</location>
-                <script>${ant.script}</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
                 <location>test/build/classes</location>
-                <script>${ant.script}</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
-                <location>experimental/build/classes</location>
-                <script>${ant.script}</script>
-                <build-target>build</build-target>
-            </export>
-            <export>
-                <type>folder</type>
-                <location>experimental/test/build/classes</location>
                 <script>${ant.script}</script>
                 <build-target>build</build-target>
             </export>
@@ -145,16 +142,12 @@
                         <location>src/share/classes</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>orblib/src/share/classes</label>
-                        <location>orblib/src/share/classes</location>
+                        <label>build/gensrc</label>
+                        <location>build/gensrc</location>
                     </source-folder>
                     <source-folder style="packages">
                         <label>test/src/share/classes</label>
                         <location>test/src/share/classes</location>
-                    </source-folder>
-                    <source-folder style="packages">
-                        <label>build/gensrc</label>
-                        <location>build/gensrc</location>
                     </source-folder>
                     <source-folder style="packages">
                         <label>test/src/share/classes/test12</label>
@@ -167,6 +160,10 @@
                     <source-folder style="packages">
                         <label>test/src/share/classes/values2</label>
                         <location>test/src/share/classes/values2</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test/build/gensrc</label>
+                        <location>test/build/gensrc</location>
                     </source-folder>
                     <source-file>
                         <location>${ant.script}</location>
@@ -242,18 +239,15 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
             <compilation-unit>
                 <package-root>src/share/classes</package-root>
-                <package-root>orblib/src/share/classes</package-root>
                 <package-root>test/src/share/classes</package-root>
                 <package-root>build/gensrc</package-root>
                 <package-root>test/src/share/classes/test12</package-root>
                 <package-root>test/src/share/classes/values1</package-root>
                 <package-root>test/src/share/classes/values2</package-root>
-                <classpath mode="compile">build/classes:orblib/build/classes:build/libcache/gmbal.jar:build/libcache/management-api.jar:build/libcache/org.osgi.core.jar:test/build/classes:lib/testng.jar:lib/junit.jar:lib/japex.jar:lib/ejb-2_1-api.jar:build/libcache/pfl-basic-tools.jar:build/libcache/pfl-dynamic.jar:build/libcache/pfl-test.jar:build/libcache/pfl-tf-tools.jar:build/libcache/pfl-tf.jar:build/libcache/pfl-basic.jar</classpath>
+                <package-root>test/build/gensrc</package-root>
+                <classpath mode="compile">test/build/classes:build/classes:build/libcache/gmbal.jar:build/libcache/management-api.jar:build/libcache/org.osgi.core.jar:lib/testng.jar:lib/junit.jar:lib/japex.jar:lib/ejb-2_1-api.jar:build/libcache/pfl-basic-tools.jar:build/libcache/pfl-dynamic.jar:build/libcache/pfl-test.jar:build/libcache/pfl-tf-tools.jar:build/libcache/pfl-tf.jar:build/libcache/pfl-basic.jar</classpath>
                 <built-to>build/classes</built-to>
-                <built-to>orblib/build/classes</built-to>
                 <built-to>test/build/classes</built-to>
-                <built-to>experimental/build/classes</built-to>
-                <built-to>experimental/test/build/classes</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
         </java-data>

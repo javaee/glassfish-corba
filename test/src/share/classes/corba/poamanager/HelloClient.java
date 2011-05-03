@@ -39,14 +39,17 @@
  */
 package corba.poamanager;
 
-import org.omg.CORBA.*;
+import HelloStuff.Hello;
+import HelloStuff.HelloHelper;
+import Util.CreationMethods;
+import Util.GenericFactory;
 import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
-
-import Util.*;
-import HelloStuff.*;
 
 import com.sun.corba.se.spi.logging.ORBUtilSystemException ;
 import com.sun.corba.se.spi.logging.POASystemException ;
+import org.omg.CORBA.COMM_FAILURE;
+import org.omg.CORBA.OBJ_ADAPTER;
+import org.omg.CORBA.SystemException;
 
 // Will this test exit with value 1 when errors in WorkerThreads?  REVISIT
 

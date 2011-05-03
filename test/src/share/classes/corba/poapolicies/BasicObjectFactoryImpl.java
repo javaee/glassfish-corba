@@ -39,10 +39,10 @@
  */
 package corba.poapolicies;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-
-import Util.*;
+import Util.CreationMethods;
+import Util.FactoryPOA;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.Servant;
 
 public class BasicObjectFactoryImpl extends FactoryPOA 
 {

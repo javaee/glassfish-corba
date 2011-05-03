@@ -67,8 +67,7 @@ import com.sun.corba.se.spi.ior.IOR ;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 import com.sun.corba.se.spi.orb.ORB ;
 import com.sun.corba.se.spi.orb.ORBData ;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.test.JUnitReportHelper;
 
 /*
  * @test

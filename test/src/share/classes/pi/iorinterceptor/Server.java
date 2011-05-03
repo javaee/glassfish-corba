@@ -40,9 +40,6 @@
 
 package pi.iorinterceptor;
 
-import org.omg.CORBA.*;
-import org.omg.CosNaming.*;
-import org.omg.PortableServer.*;
 import com.sun.corba.se.spi.ior.iiop.GIOPVersion;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfile ;
 import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate ;
@@ -53,15 +50,22 @@ import com.sun.corba.se.spi.misc.ORBConstants;
 import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import com.sun.corba.se.impl.encoding.EncapsOutputStream;
 import com.sun.corba.se.impl.ior.GenericIdentifiable ;
-
-import corba.framework.*;
-
-import java.util.*;
-import java.io.*;
-
-import IORInterceptorTest.*;    // for IDL
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import corba.framework.InternalProcess;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Properties;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Policy;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.PortableServer.IdUniquenessPolicyValue;
+import org.omg.PortableServer.POA;
 
 public class Server 
     implements InternalProcess 

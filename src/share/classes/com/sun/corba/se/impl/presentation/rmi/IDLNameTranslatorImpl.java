@@ -54,6 +54,7 @@ import java.util.StringTokenizer;
 import com.sun.corba.se.spi.presentation.rmi.IDLNameTranslator ;
 import com.sun.corba.se.spi.presentation.rmi.PresentationDefaults ;
 import org.glassfish.pfl.basic.algorithm.ObjectUtility;
+import org.glassfish.pfl.basic.proxy.DynamicAccessPermission ;
 
 /**
  * Bidirectional translator between RMI-IIOP interface methods and

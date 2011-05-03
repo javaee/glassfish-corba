@@ -48,8 +48,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.omg.CORBA.CompletionStatus;
-import org.omg.CORBA.INTERNAL;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.Policy;
 import org.omg.PortableServer.LifespanPolicyValue;

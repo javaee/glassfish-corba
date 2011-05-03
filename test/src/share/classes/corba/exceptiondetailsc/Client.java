@@ -46,7 +46,6 @@ package corba.exceptiondetailsc;
 
 import java.rmi.RemoteException;
 import javax.naming.InitialContext;
-import javax.rmi.CORBA.Util;
 import org.omg.CORBA.FREE_MEM;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.UNKNOWN;

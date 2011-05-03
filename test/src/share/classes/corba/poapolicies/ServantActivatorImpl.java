@@ -39,11 +39,12 @@
  */
 package corba.poapolicies;
 
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.*;
-
 //public class ServantActivatorImpl extends org.omg.CORBA.LocalObject implements ServantActivator {
+
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.Servant;
+import org.omg.PortableServer.ServantActivatorPOA;
+
 public class ServantActivatorImpl extends ServantActivatorPOA {
     public Servant incarnate(byte[] oid, POA adapter)
 	throws org.omg.PortableServer.ForwardRequest {

@@ -49,11 +49,8 @@
 
 package test12;
 
-import javax.rmi.CORBA.*;
-
-import java.io.*;
 import java.util.Properties ;
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.test.JUnitReportHelper;
 
 public class SerializationTest extends test.Test {
     public void run() {

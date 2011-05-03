@@ -48,12 +48,11 @@ import javax.rmi.PortableRemoteObject ;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-
 import com.sun.corba.se.spi.logging.UtilSystemException ;
 
 import corba.misc.BuckPasserAL  ;
 import corba.misc.BuckPasserV  ;
+import org.glassfish.pfl.basic.contain.Pair;
 
 public class EchoImpl extends PortableRemoteObject implements Echo {
     private String name ;

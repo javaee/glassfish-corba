@@ -213,11 +213,6 @@ public class StressClient {
                 makeBlockingInboundConnectionCache(
                     "BlockingInboundCache", HIGH_WATER_MARK, NUMBER_TO_RECLAIM, TTL ) ;
 
-        if (DEBUG) {
-            obcache.debug( true ) ;
-            ibcache.debug( true ) ;
-        }
-
         cinfos = new ArrayList<ContactInfoImpl>() ;
         for (int ctr = 0; ctr < NUM_CONTACT_INFO; ctr++ ) {
             cinfos.add( ContactInfoImpl.get( "ContactInfo:"+ctr, 

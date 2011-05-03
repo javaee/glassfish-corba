@@ -39,26 +39,12 @@
  */
 package pi.policyfactory;
 
-import com.sun.corba.se.impl.interceptors.*;
 import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.corba.*;
-import org.omg.PortableInterceptor.*;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.BAD_POLICY;
-import org.omg.CORBA.Request;
 import org.omg.CORBA.Any;
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.StructMember;
-import org.omg.CORBA.NamedValue;
-import org.omg.CORBA.NVList;
-import org.omg.CORBA.ExceptionList;
-import org.omg.CORBA.ContextList;
-import org.omg.CORBA.Context;
-import org.omg.CORBA.Object;
 import java.util.Properties;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.test.JUnitReportHelper;
 
 public class Client implements Runnable
 {

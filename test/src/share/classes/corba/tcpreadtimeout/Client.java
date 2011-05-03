@@ -45,11 +45,9 @@
 
 package corba.tcpreadtimeout;
 
-import org.omg.CORBA.COMM_FAILURE;
 import org.omg.CORBA.ORB;
 
 import corba.framework.Controller;
-import corba.hcks.C;
 import corba.hcks.U;
 
 public class Client 

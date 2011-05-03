@@ -48,7 +48,6 @@ import java.util.Properties;
 import org.omg.CORBA.ORB;
 import corba.framework.Controller;
 import corba.framework.Options;
-import com.sun.corba.se.spi.misc.ORBConstants;
 
 public class Server 
 {

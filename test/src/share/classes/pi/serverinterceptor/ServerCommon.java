@@ -40,21 +40,12 @@
 
 package pi.serverinterceptor;
 
-import org.omg.CORBA.*;
-import org.omg.CORBA.ORBPackage.*;
-import org.omg.CosNaming.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableInterceptor.*;
-import com.sun.corba.se.impl.interceptors.*;
-import corba.framework.*;
 import com.sun.corba.se.spi.misc.ORBConstants;
-
-import java.util.*;
-import java.io.*;
-
-import ServerRequestInterceptor.*;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import corba.framework.InternalProcess;
+import java.io.PrintStream;
+import java.util.Properties;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.ORB;
 
 /**
  * Common methods for Server implementations in this test to use

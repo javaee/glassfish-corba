@@ -39,7 +39,7 @@
  */
 package corba.lbq ;
 
-import com.sun.corba.se.spi.orbutil.generic.UnaryFunction ;
+import org.glassfish.pfl.basic.func.UnaryFunction;
 
 public class CommandQueue {
     private Command end ; // always points to sink

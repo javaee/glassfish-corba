@@ -51,8 +51,8 @@ package rmic;
 
 import java.io.ByteArrayOutputStream;
 import java.util.StringTokenizer;
+import org.glassfish.pfl.test.JUnitReportHelper;
 
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 /*
  * @test

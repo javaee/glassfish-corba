@@ -45,14 +45,12 @@
 package corba.islocal;
 
 import javax.naming.InitialContext;
-import javax.rmi.CORBA.Util;
 import org.omg.CORBA.ORB;
 
 import corba.framework.Controller;
 import corba.hcks.C;
 import corba.hcks.U;
 
-import com.sun.corba.se.impl.legacy.connection.LegacyServerSocketManagerImpl;
 import com.sun.corba.se.spi.presentation.rmi.StubAdapter ;
 
 public class Client 

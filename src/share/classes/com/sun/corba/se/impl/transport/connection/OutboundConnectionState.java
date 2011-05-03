@@ -229,6 +229,7 @@ public class OutboundConnectionState<C extends Connection> {
         connection.close() ;
     }
 
+    @Transport
     private void removeFromReclaim() {
         if (reclaimableHandle != null) {
             if (!reclaimableHandle.remove()) {

@@ -41,23 +41,14 @@
 -->
 
 <!--
-    The source code is divided into 2 areas:
-        orb-library (orblib/src, orblib/build):
-            Contents: Contains libraries that can be used independently of the 
-                ORB.  This includes some ORB-specific classes that are not general
-		enough to put into PFL.  These classes may be moved at some point.
-            Dependencies: May not depend on classes from the main src branch.  
-            Delivery: as OSGi bundles:
-		???
-        main (src dir, build dir):
-            Contents: The core of the ORB.
-            Dependencies: Depends only on orb-library.
-            Delivery: as OSGi bundles:
-                glassfish-corba-orb
-                glassfish-corba-omgapi
-                glassfish-corba-csiv2-idl
-		glassfish-corba-internal-api
-		glassfish-osgi-test (testing osgi only; not delivered)
+    main (src dir, build dir):
+        Contents: The core of the ORB.
+        Delivery: as OSGi bundles:
+            glassfish-corba-orb
+            glassfish-corba-omgapi
+            glassfish-corba-csiv2-idl
+            glassfish-corba-internal-api
+            glassfish-osgi-test (testing osgi only; not delivered)
 
     Runtime dependencies:
         Standard for source build:
@@ -85,6 +76,7 @@
     <property name="root.dir"			value="${basedir}"/>
     <property file="make/build.properties"/>
     <property name="orb.version"		value="${release.version}-${build.version}"/>
+    <property name="pfl.version"                value="1.0.0-b001"/>
     <echo message="Version is ${release.version}-${build.version}"/>
 
     <target name="init" depends="modules.init">
@@ -109,11 +101,6 @@
 	<property name="releaselib.dir"         location="${build.dir}/release/lib"/>   
         <property name="libcache.dir"           location="${build.dir}/libcache"/>
 
-        <!-- ORB library build directories -->
-	<property name="orblib.src.dir"         location="orblib/src/share/classes"/>
-	<property name="orblib.build.dir"       location="orblib/build"/>
-	<property name="orblib.classes.dir"     location="${orblib.build.dir}/classes"/>
-
         <!-- Main ORB build directories -->
         <property name="src.dir"		value="src/share/classes"/>
         <property name="javadoc.dir"		value="www/javadoc"/>
@@ -125,7 +112,6 @@
         <property name="javac.debug"		value="true"/>
 
 	<mkdir dir="${build.dir}"/>
-	<mkdir dir="${orblib.classes.dir}"/>
 	<mkdir dir="${lib.dir}"/>
 	<mkdir dir="${gensrc.dir}"/>
 	<mkdir dir="${classes.dir}"/>
@@ -136,7 +122,7 @@
 	<property name="copyright.file"
             value="${root.dir}/make/copyright-information/copyright.txt"/>
 	<property name="copyright.roots"
-            value="lib,make,nbproject,orblib,src,test,tools,www"/>
+            value="lib,make,nbproject,src,test,tools,www"/>
 	<property name="copyright.skip"
             value=".hg,.DS_Store,copyright-information,apache,objectweb,build,webrev,test-output,gen,lib,pom,felix-cache"/>
 
@@ -183,7 +169,6 @@
 	<path id="classpath.master">
             <path refid="dependency.classpath"/>
 
-	    <pathelement location="${orblib.classes.dir}"/>
 	    <pathelement location="${classes.dir}"/>
 	    <pathelement location="${tools-jar}"/> <!-- needed to build rmic -->
 	</path>
@@ -192,13 +177,6 @@
 
 	<patternset id="asm.export">
 	    <include name="org.objectweb.asm"/>
-	</patternset>
-
-	<patternset id="codegen.export">
-	    <include name="com.sun.corba.se.spi.orbutil.copyobject"/>
-	    <include name="com.sun.corba.se.impl.orbutil.copyobject"/>
-	    <include name="com.sun.corba.se.spi.orbutil.codegen"/>
-	    <include name="com.sun.corba.se.impl.orbutil.codegen"/>
 	</patternset>
 
 	<patternset id="csiv2-idl.export">
@@ -211,12 +189,6 @@
 	    <include name="com.sun.corba.se.impl.txpoa"/>
 	    <include name="com.sun.corba.se.spi.costransactions"/>
 	    <include name="com.sun.corba.se.spi.folb"/>
-	</patternset>
-
-	<patternset id="newtimer.export">
-	    <include name="com.sun.corba.se.spi.orbutil.newtimer"/>
-	    <include name="com.sun.corba.se.spi.orbutil.tf"/>
-	    <include name="com.sun.corba.se.impl.orbutil.newtimer"/>
 	</patternset>
 
 	<patternset id="omgapi.export">
@@ -255,31 +227,6 @@
 	</patternset>
 
 	<patternset id="orb.export">
-	    <include name="com.sun.corba.se.spi.copyobject"/>
-	    <include name="com.sun.corba.se.spi.extension"/>
-	    <include name="com.sun.corba.se.spi.ior"/>
-	    <include name="com.sun.corba.se.spi.ior.iiop"/>
-	    <include name="com.sun.corba.se.spi.legacy.connection"/>
-	    <include name="com.sun.corba.se.spi.legacy.interceptor"/>
-	    <include name="com.sun.corba.se.spi.oa"/>
-	    <include name="com.sun.corba.se.spi.oa.rfm"/>
-	    <include name="com.sun.corba.se.spi.orb"/>
-	    <include name="com.sun.corba.se.spi.orbutil"/>
-	    <include name="com.sun.corba.se.spi.orbutil.logex.corba"/>
-	    <include name="com.sun.corba.se.spi.presentation.rmi"/>
-	    <include name="com.sun.corba.se.spi.protocol"/>
-	    <include name="com.sun.corba.se.spi.resolver"/>
-	    <include name="com.sun.corba.se.spi.servicecontext"/>
-	    <include name="com.sun.corba.se.spi.transport"/>
-	    <include name="com.sun.corba.se.spi.logging"/>
-	    <include name="com.sun.corba.se.spi.trace"/>
-	    <include name="com.sun.corba.se.spi.osgi"/>
-	    <include name="com.sun.org.omg.CORBA"/>
-	    <include name="com.sun.org.omg.CORBA.ValueDefPackage"/>
-	    <include name="com.sun.org.omg.CORBA.portable"/>
-	    <include name="com.sun.org.omg.SendingContext"/>
-	    <include name="com.sun.org.omg.SendingContext.CodeBasePackage"/>
-	    <include name="com.sun.corba.se.impl.orbutil"/>
 	    <include name="com.sun.corba.se.impl.naming.cosnaming"/>
 	    <include name="com.sun.corba.se.impl.presentation.rmi.codegen"/>
 	    <include name="com.sun.corba.se.impl.orb"/>
@@ -287,30 +234,55 @@
 	    <include name="com.sun.corba.se.impl.javax.rmi.CORBA"/>
 	    <include name="com.sun.corba.se.impl.encoding"/>
 	    <include name="com.sun.corba.se.impl.folb"/>
+	    <include name="com.sun.corba.se.impl.misc"/>
+	    <include name="com.sun.corba.se.spi.copyobject"/>
+	    <include name="com.sun.corba.se.spi.extension"/>
+	    <include name="com.sun.corba.se.spi.ior"/>
+	    <include name="com.sun.corba.se.spi.ior.iiop"/>
+	    <include name="com.sun.corba.se.spi.legacy.connection"/>
+	    <include name="com.sun.corba.se.spi.legacy.interceptor"/>
+	    <include name="com.sun.corba.se.spi.logging"/>
+	    <include name="com.sun.corba.se.spi.logex.corba"/>
+	    <include name="com.sun.corba.se.spi.logex.stdcorba"/>
+	    <include name="com.sun.corba.se.spi.oa"/>
+	    <include name="com.sun.corba.se.spi.oa.rfm"/>
+	    <include name="com.sun.corba.se.spi.orb"/>
+	    <include name="com.sun.corba.se.spi.osgi"/>
+	    <include name="com.sun.corba.se.spi.presentation.rmi"/>
+	    <include name="com.sun.corba.se.spi.protocol"/>
+	    <include name="com.sun.corba.se.spi.resolver"/>
+	    <include name="com.sun.corba.se.spi.servicecontext"/>
+	    <include name="com.sun.corba.se.spi.transport"/>
+	    <include name="com.sun.corba.se.spi.trace"/>
+	    <include name="com.sun.org.omg.CORBA"/>
+	    <include name="com.sun.org.omg.CORBA.ValueDefPackage"/>
+	    <include name="com.sun.org.omg.CORBA.portable"/>
+	    <include name="com.sun.org.omg.SendingContext"/>
+	    <include name="com.sun.org.omg.SendingContext.CodeBasePackage"/>
 	</patternset>
 
 	<patternset id="orb.private">
+	    <include name="com.sun.corba.se.impl.corba"/>
+	    <include name="com.sun.corba.se.impl.copyobject"/>
+	    <include name="com.sun.corba.se.impl.dynamicany"/>
 	    <include name="com.sun.corba.se.impl.interceptors"/>
 	    <include name="com.sun.corba.se.impl.io"/>
 	    <include name="com.sun.corba.se.impl.ior"/>
 	    <include name="com.sun.corba.se.impl.ior.iiop"/>
 	    <include name="com.sun.corba.se.impl.legacy.connection"/>
+	    <include name="com.sun.corba.se.impl.util"/>
 	    <include name="com.sun.corba.se.impl.oa"/>
 	    <include name="com.sun.corba.se.impl.oa.poa"/>
 	    <include name="com.sun.corba.se.impl.oa.toa"/>
 	    <include name="com.sun.corba.se.impl.oa.rfm"/>
+	    <include name="com.sun.corba.se.impl.osgi.loader"/>
 	    <include name="com.sun.corba.se.impl.plugin.hwlb"/>
+	    <include name="com.sun.corba.se.impl.presentation.rmi"/>
 	    <include name="com.sun.corba.se.impl.protocol"/>
 	    <include name="com.sun.corba.se.impl.protocol.giopmsgheaders"/>
 	    <include name="com.sun.corba.se.impl.resolver"/>
 	    <include name="com.sun.corba.se.impl.servicecontext"/>
 	    <include name="com.sun.corba.se.impl.transport"/>
-	    <include name="com.sun.corba.se.impl.util"/>
-	    <include name="com.sun.corba.se.impl.osgi.loader"/>
-	    <include name="com.sun.corba.se.impl.corba"/>
-	    <include name="com.sun.corba.se.impl.dynamicany"/>
-	    <include name="com.sun.corba.se.impl.naming.namingutil"/>
-	    <include name="com.sun.corba.se.impl.presentation.rmi"/>
 	</patternset>
 
 	<patternset id="orb.orb-class-provider">
@@ -326,23 +298,6 @@
 	    <include name="com.sun.corba.se.impl.transport.CorbaOutboundConnectionCacheProbeProvider"/>
 	</patternset>
 
-	<patternset id="orbgeneric.export">
-	    <include name="com.sun.corba.se.spi.orbutil.generic"/>
-	    <include name="com.sun.corba.se.spi.orbutil.closure"/>
-	    <include name="com.sun.corba.se.spi.orbutil.proxy"/>
-	    <include name="com.sun.corba.se.impl.orbutil.graph"/>
-	    <include name="com.sun.corba.se.spi.orbutil.fsm"/>
-	    <include name="com.sun.corba.se.spi.orbutil.misc"/>
-	    <include name="com.sun.corba.se.spi.orbutil.logex"/>
-	    <include name="com.sun.corba.se.spi.orbutil.logex.stdcorba"/>
-	    <include name="com.sun.corba.se.spi.orbutil.threadpool"/>
-	    <include name="com.sun.corba.se.impl.orbutil.threadpool"/>
-	</patternset>
-
-	<patternset id="orbgeneric.private">
-	    <include name="com.sun.corba.se.impl.orbutil.closure"/>
-	</patternset>
-
 	<patternset id="osgi-test.private">
 	    <include name="com.sun.corba.se.impl.osgi.main"/>
 	</patternset>
@@ -351,14 +306,6 @@
 	    <patternset refid="internal-api.export"/>
 	    <patternset refid="orb.private"/>
 	    <patternset refid="orb.export"/>
-	</patternset>
-
-	<patternset id="orblib.testable.source">
-	    <patternset refid="codegen.export"/>
-	    <patternset refid="newtimer.export"/>
-	    <patternset refid="codegen.export"/>
-	    <patternset refid="orbgeneric.private"/>
-	    <patternset refid="orbgeneric.export"/>
 	</patternset>
     </target>
 
@@ -371,9 +318,6 @@
                 <include name="**/*.java"/>
             </fileset>
             <fileset dir="${gensrc.dir}">
-                <include name="**/*.java"/>
-            </fileset>
-            <fileset dir="${orblib.src.dir}">
                 <include name="**/*.java"/>
             </fileset>
         </jar>
@@ -433,45 +377,6 @@
 		<directive type="Bundle-Activator" value="com.sun.corba.se.impl.osgi.main"/>
 	    </directive-list>
 	</make-bundle>
-
-	<make-bundle 
-	    classpath="${orblib.classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
-	    outFile="glassfish-corba-codegen.jar">
-	    <directive-list>
-		<directive type="Export-Package" name="codegen.export"/>
-	    </directive-list>
-	</make-bundle>
-	<make-bundle 
-	    classpath="${orblib.classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
-	    outFile="glassfish-corba-newtimer.jar">
-	    <directive-list>
-		<directive type="Export-Package" name="newtimer.export"/>
-		<directive type="Agent-Class" value="com.sun.corba.se.spi.orbutil.tf.InstrumentationAgent"/>
-	    </directive-list>
-	</make-bundle>
-	<make-bundle 
-	    classpath="${orblib.classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
-	    outFile="glassfish-corba-orbgeneric.jar">
-	    <directive-list>
-		<directive type="Export-Package" name="orbgeneric.export"/>
-		<directive type="Private-Package" name="orbgeneric.private"/>
-	    </directive-list>
-	</make-bundle>
-	<make-bundle 
-	    classpath="${orblib.classes.dir}" 
-	    version="${orb.version}"
-	    outDir="${releaselib.dir}/bundles"
-	    outFile="glassfish-corba-asm.jar">
-	    <directive-list>
-		<directive type="Export-Package" name="asm.export"/>
-	    </directive-list>
-	</make-bundle>
     </target>
 
     <!-- Maven POM files and release targets -->
@@ -509,40 +414,11 @@
     </macrodef>
 
     <target name="make-poms" depends="init">
-	<make-corba-pom artifactid="glassfish-corba-asm" 
-	    description="ASM version used in the ORB">
-	</make-corba-pom>
-	<make-corba-pom artifactid="glassfish-corba-codegen" 
-	    description="Dynamic code generation library">
-	    <dep-list>
-		<dependency
-		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-asm"
-		    version="${orb.version}"/>
-		<dependency
-		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-orbgeneric"
-		    version="${orb.version}"/>
-	    </dep-list>
-	</make-corba-pom>
 	<make-corba-pom artifactid="glassfish-corba-csiv2-idl" 
 	    description="IDL generated definitions for CSIv2">
 	</make-corba-pom>
 	<make-corba-pom artifactid="glassfish-corba-internal-api" 
 	    description="ORB API for IIOP FOLB">
-	</make-corba-pom>
-	<make-corba-pom artifactid="glassfish-corba-newtimer" 
-	    description="ORB timer library">
-	    <dep-list>
-		<dependency
-		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-orbgeneric"
-		    version="orb.version}"/>
-		<dependency
-		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-codegen"
-		    version="${orb.version}"/>
-	    </dep-list>
 	</make-corba-pom>
 	<make-corba-pom artifactid="glassfish-corba-omgapi" 
 	    description="OMG standard CORBA APIs">
@@ -556,16 +432,16 @@
 		    version="${orb.version}"/>
 		<dependency
 		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-orbgeneric"
-		    version="${orb.version}"/>
+		    artifactId="pfl-basic"
+		    version="${pfl.version}"/>
 		<dependency
 		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-newtimer"
-		    version="${orb.version}"/>
+		    artifactId="pfl-tf"
+		    version="${pfl.version}"/>
 		<dependency
 		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-codegen"
-		    version="${orb.version}"/>
+		    artifactId="pfl-dynamic"
+		    version="${pfl.version}"/>
 		<dependency
 		    groupId="org.glassfish.external"
 		    artifactId="management-api"
@@ -573,11 +449,8 @@
 		<dependency
 		    groupId="org.glassfish.gmbal"
 		    artifactId="gmbal"
-		    version="3.1.0-b001"/>
+		    version="3.2.0-b001"/>
 	    </dep-list>
-	</make-corba-pom>
-	<make-corba-pom artifactid="glassfish-corba-orbgeneric" 
-	    description="Generic Libraries">
 	</make-corba-pom>
 	<make-corba-pom artifactid="glassfish-corba-source" 
 	    description="All ORB source code">
@@ -605,14 +478,10 @@
         <attribute name="destination"/>
         <sequential>
             <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-asm"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-codegen" />
             <corba-push-to-maven destination="@{destination}" module="glassfish-corba-csiv2-idl"/>
             <corba-push-to-maven destination="@{destination}" module="glassfish-corba-internal-api"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-newtimer"/>
             <corba-push-to-maven destination="@{destination}" module="glassfish-corba-omgapi"/>
             <corba-push-to-maven destination="@{destination}" module="glassfish-corba-orb"/>
-            <corba-push-to-maven destination="@{destination}" module="glassfish-corba-orbgeneric"/>
             <corba-push-to-maven destination="@{destination}" module="glassfish-corba-source"/>
         </sequential>
     </macrodef>
@@ -620,14 +489,10 @@
     <macrodef name="release-to-local-maven">
         <sequential>
             <echo message="Releasing modules with version ${orb.version} to @{destination}"/>
-            <corba-push-to-local-maven module="glassfish-corba-asm"/>
-            <corba-push-to-local-maven module="glassfish-corba-codegen"/>
             <corba-push-to-local-maven module="glassfish-corba-csiv2-idl"/>
             <corba-push-to-local-maven module="glassfish-corba-internal-api"/>
-            <corba-push-to-local-maven module="glassfish-corba-newtimer"/>
             <corba-push-to-local-maven module="glassfish-corba-omgapi"/>
             <corba-push-to-local-maven module="glassfish-corba-orb"/>
-            <corba-push-to-local-maven module="glassfish-corba-orbgeneric"/>
             <corba-push-to-local-maven module="glassfish-corba-source"/>
         </sequential>
     </macrodef>
@@ -933,47 +798,6 @@
         OSGi bundles for GFv3.
      -->
 
-    <target name="generate-orb-lib-resources"
-     depends="init, compile-orb-library">
-	<java classname="com.sun.corba.se.spi.orbutil.file.ExceptionResourceGenerator"
-            fork="true"
-	    dir="${root.dir}">
-	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-            <!--
-	    <jvmarg value="-Xdebug"/>
-	    <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=12321"/>
-            -->
-	    <classpath>
-		<pathelement location="${orblib.classes.dir}:${gmbal-jar}:${mnagement-api-jar}"/>
-	    </classpath>
-	    <arg value="-verbose"/>
-	    <arg value="1"/>
-            <arg value="-source"/>
-            <arg value="${orblib.classes.dir}"/>
-            <arg value="-destination"/>
-            <arg value="${orblib.classes.dir}"/>
-	</java>
-    </target>
-   
-    <target name="compile-orb-library" depends="init">
-	<echo message="Compiling ORB library"/>
-	<javac destdir="${orblib.classes.dir}" 
-		classpathref="classpath.master"
-		deprecation="${deprecation}"
-		debug="${javac.debug}" 
-		optimize="${javac.optimize}"
-	       	failonerror="true"
-		fork="true"
-		memoryMaximumSize="512m"> 
-	    <src path="${orblib.src.dir}"/>
-	    <include name="**"/>
-	    <compilerarg
-                value="-Xlint:-unchecked,-deprecation,-fallthrough,path,-serial,finally"/>
-	    <compilerarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	</javac>
-    </target>
-
     <!-- =================== Copyright header mainenance ================== -->
 
     <target name="update-copyright-headers" depends="init">
@@ -1124,7 +948,6 @@
     <target name="clean"
         depends="init,clean-cobertura,clean-emma,clean-tests">
 	<delete dir="${build.dir}"/>
-	<delete dir="${orblib.build.dir}"/>
 	<delete dir="${test-build.dir}"/>
 	<delete dir="${javadoc.dir}"/>
     </target>
@@ -1146,7 +969,7 @@
     <target name="javadoc" depends="init">
         <mkdir dir="${javadoc.dir}"/>
 	<javadoc packagenames="com.sun.corba.se.spi.*"
-	         sourcepath="${src.dir}:${orblib.src.dir}:${gensrc.dir}"
+	         sourcepath="${src.dir}:${gensrc.dir}"
 		 classpathref="classpath.master"
 		 destdir="${javadoc.dir}"
 		 author="true"
@@ -1159,11 +982,10 @@
 
     <target name="rename" depends="init">
 	<mkdir dir="build/rename/ee"/>
-	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename"
-         fork="true"
+	<java classname="org.glassfish.pfl.basic.tools.file.WorkspaceRename"
+         fork="true" classpathref="classpath.master"
 	    dir="${root.dir}" failonerror="true">
 	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	    <classpathref refid="classpath.master"/>
 	    <arg value="-verbose"/>
 	    <arg value="1"/>
 	    <arg value="-dryrun"/>
@@ -1174,16 +996,17 @@
 	    <arg value="build/rename/ee"/>
 	    <arg value="-version"/>
 	    <arg value="ee"/>
+            <arg value="-patterns"/>
+            <arg value="com.sun.corba.se:com.sun.corba.VERSION"/>
 	</java>
     </target>
 
     <target name="rename-quiet" depends="init">
 	<mkdir dir="build/rename/ee"/>
-	<java classname="com.sun.corba.se.spi.orbutil.file.WorkspaceRename"
-         fork="true"
+	<java classname="org.glassfish.pfl.basic.tools.file.WorkspaceRename"
+         fork="true" classpathref="classpath.master"
 	    dir="${root.dir}" failonerror="true">
 	    <jvmarg value="-Xbootclasspath/p:${toString:classpath.master}"/>
-	    <classpathref refid="classpath.master"/>
 	    <arg value="-verbose"/>
 	    <arg value="0"/>
 	    <arg value="-dryrun"/>
@@ -1194,6 +1017,8 @@
 	    <arg value="build/rename/ee"/>
 	    <arg value="-version"/>
 	    <arg value="ee"/>
+            <arg value="-patterns"/>
+            <arg value="com.sun.corba.se:com.sun.corba.VERSION"/>
 	</java>
     </target>
 
@@ -1492,7 +1317,7 @@
     <target name="archive-workspace" depends="init">
         <delete file="${releaselib.dir}/ws.zip"/>
         <zip destfile="${root.dir}/ws.zip" basedir="${root.dir}" level="9"
-         includes="build/**,lib/**,make/**,orblib/**,src/**,test/**"/>
+         includes="build/**,lib/**,make/**,src/**,test/**"/>
         <move file="${root.dir}/ws.zip" todir="${releaselib.dir}"/>
     </target>
 </project>

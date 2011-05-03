@@ -65,6 +65,7 @@ import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
  *
  * @author Ken Cavanaugh
  */
+@Transport
 public final class InboundConnectionCacheImpl<C extends Connection> 
     extends ConnectionCacheNonBlockingBase<C> 
     implements InboundConnectionCache<C> {
@@ -170,6 +171,7 @@ public final class InboundConnectionCacheImpl<C extends Connection>
     /** Decrement the number of expected responses.  When a connection is idle 
      * and has no expected responses, it can be reclaimed.
      */
+    @Transport
     public void responseSent( final C conn ) {
 	final ConnectionState<C> cs = connectionMap.get( conn ) ;
 	final int waitCount = cs.expectedResponseCount.decrementAndGet() ;

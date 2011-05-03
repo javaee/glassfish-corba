@@ -48,30 +48,18 @@
  */
 package ibmspace.spacetest;
 
+import ibmspace.common.BudgetSummary;
+import ibmspace.common.GameView;
+import ibmspace.common.Planet;
+import ibmspace.common.PlanetView;
+import ibmspace.common.SpaceConquest;
 import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.rmi.NoSuchObjectException;
-import java.rmi.server.ExportException;
 import test.ServantContext;
 import test.RemoteTest;
-import com.sun.corba.se.impl.util.Utility;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.BAD_OPERATION;
-import org.omg.CORBA.portable.ObjectImpl;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-import javax.naming.Context;
-import com.sun.org.omg.SendingContext.CodeBase;
 import javax.rmi.PortableRemoteObject;
 
-
 import java.lang.reflect.Array;
-import ibmspace.common.*;
-import ibmspace.server.*;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.test.JUnitReportHelper;
 
 public class SpaceTest extends RemoteTest {
 

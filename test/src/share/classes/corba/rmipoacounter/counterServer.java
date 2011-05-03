@@ -41,15 +41,28 @@
 package corba.rmipoacounter;
 
 import javax.rmi.PortableRemoteObject ;
-import java.io.*;
 import java.io.DataOutputStream ;
-import java.util.*;
 import java.rmi.RemoteException ;
-import org.omg.CORBA.*;
-import org.omg.CosNaming.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.ServantLocatorPackage.*;
 import com.sun.corba.se.spi.misc.ORBConstants ;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.Properties;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Policy;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.PortableServer.AdapterActivator;
+import org.omg.PortableServer.ForwardRequest;
+import org.omg.PortableServer.LifespanPolicyValue;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.RequestProcessingPolicyValue;
+import org.omg.PortableServer.Servant;
+import org.omg.PortableServer.ServantActivator;
+import org.omg.PortableServer.ServantLocator;
+import org.omg.PortableServer.ServantLocatorPackage.CookieHolder;
+import org.omg.PortableServer.ServantRetentionPolicyValue;
 
 public class counterServer {
     public static boolean debug = true;
@@ -145,8 +158,10 @@ public class counterServer {
     {
         // create a persistent POA
         Policy[] tpolicy = new Policy[2];
-        tpolicy[0] = rootPOA.create_lifespan_policy(LifespanPolicyValue.PERSISTENT);
-        tpolicy[1] = rootPOA.create_request_processing_policy(RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
+        tpolicy[0] = rootPOA.create_lifespan_policy(
+            LifespanPolicyValue.PERSISTENT);
+        tpolicy[1] = rootPOA.create_request_processing_policy(
+            RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
         POA tpoa = rootPOA.create_POA("PersistentPOA", null, tpolicy);
  
         // register the ServantActivator with the POA, then activate POA
@@ -209,8 +224,10 @@ public class counterServer {
         // create another persistent, non-retaining POA
         Policy[] tpolicy = new Policy[3];
         tpolicy[0] = rootPOA.create_lifespan_policy(LifespanPolicyValue.PERSISTENT);
-        tpolicy[1] = rootPOA.create_request_processing_policy(RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
-        tpolicy[2] = rootPOA.create_servant_retention_policy(ServantRetentionPolicyValue.NON_RETAIN);
+        tpolicy[1] = rootPOA.create_request_processing_policy(
+            RequestProcessingPolicyValue.USE_SERVANT_MANAGER);
+        tpolicy[2] = rootPOA.create_servant_retention_policy(
+            ServantRetentionPolicyValue.NON_RETAIN);
         POA tpoa = rootPOA.create_POA("NonRetainPOA", null, tpolicy);
         
         // register the ServantLocator with the POA, then activate POA
@@ -225,8 +242,8 @@ public class counterServer {
     {
         // create a servant and get an objref using persistent POA
         byte[] id = Counter2Id.getBytes();
-        org.omg.CORBA.Object obj = tpoa.create_reference_with_id(id, 
-								 new _counterImpl_Tie()._all_interfaces(tpoa,id)[0]);
+        org.omg.CORBA.Object obj = tpoa.create_reference_with_id(id,
+            new _counterImpl_Tie()._all_interfaces(tpoa,id)[0]);
         counterIF counterRef = (counterIF)PortableRemoteObject.narrow(obj, counterIF.class );
 
 	/********8
@@ -340,8 +357,8 @@ class CounterServantLocator extends org.omg.CORBA.LocalObject implements Servant
             byte[] id = newidStr.getBytes();
             org.omg.CORBA.Object obj = null;
 	    try {
-                obj = adapter.create_reference_with_id(id, 
-						       new _counterImpl_Tie()._all_interfaces(adapter,oid)[0]);
+                obj = adapter.create_reference_with_id(id,
+                    new _counterImpl_Tie()._all_interfaces(adapter,oid)[0]);
 	    } catch ( Exception ex ) {}
             counterIF counterRef = (counterIF)PortableRemoteObject.narrow(obj, counterIF.class );
 

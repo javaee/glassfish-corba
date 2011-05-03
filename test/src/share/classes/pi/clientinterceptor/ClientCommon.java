@@ -40,20 +40,12 @@
 
 package pi.clientinterceptor;
 
-import org.omg.CORBA.*;
-import org.omg.CosNaming.*;
-import com.sun.corba.se.impl.corba.AnyImpl;
 import com.sun.corba.se.spi.misc.ORBConstants;
-import com.sun.corba.se.impl.interceptors.*;
-import org.omg.PortableInterceptor.*; 
-import corba.framework.*;
-
-import java.util.*;
-import java.io.*;
-
-import ClientRequestInterceptor.*;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import java.io.PrintStream;
+import java.util.Properties;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.UNKNOWN;
 
 /**
  * Common methods for Client implementations in this test to use

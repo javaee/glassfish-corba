@@ -40,24 +40,9 @@
 package corba.ortremote ;
 
 import java.io.PrintStream ;
-
-import java.util.Properties ;
-import java.util.LinkedList ;
-import java.util.Iterator ;
-import java.util.StringTokenizer ;
-import java.util.Arrays ;
-import java.util.Map ;
-import java.util.Set ;
-import java.util.List ;
-import java.util.ListIterator ;
-import java.util.Map.Entry ;
-import java.util.HashMap ;
-
-import com.sun.corba.se.spi.orbutil.closure.Closure ;
-
-import com.sun.corba.se.spi.orbutil.misc.ObjectUtility ;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
+import org.glassfish.pfl.basic.func.NullaryFunction;
+import org.glassfish.pfl.test.JUnitReportHelper;
+import org.glassfish.pfl.test.ObjectUtility;
 
 /** TestSession manages running of tests and checking results within
 * a test session.  If the session fails any test, the whole session 
@@ -102,7 +87,7 @@ public class TestSession
 	    throw new Error( "Test session " + sessionName + " failed" ) ;
     }
 
-    public void testForPass( String name, Closure closure, Object expectedResult )
+    public void testForPass( String name, NullaryFunction<Object> closure, Object expectedResult )
     {
 	try {
 	    testStart( name ) ;
@@ -123,7 +108,7 @@ public class TestSession
 	}
     }
     
-    public void testForException( String name, Closure closure,
+    public void testForException( String name, NullaryFunction<Object> closure,
 	Class expectedExceptionClass )
     {
 	try {

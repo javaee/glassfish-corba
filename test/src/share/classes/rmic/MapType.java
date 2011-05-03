@@ -50,14 +50,10 @@
 package rmic;
 
 import sun.rmi.rmic.Names;
-import sun.rmi.rmic.IndentingWriter;
 import sun.rmi.rmic.iiop.Type;
 import sun.rmi.rmic.iiop.CompoundType;
-import sun.rmi.rmic.iiop.BatchEnvironment;
 import sun.rmi.rmic.iiop.ContextStack;
 import sun.tools.java.ClassPath;
-import java.io.OutputStreamWriter;
-import sun.tools.java.ClassDefinition;
 import sun.tools.java.ClassDeclaration;
 import sun.tools.java.Identifier;
 

@@ -40,16 +40,18 @@
 
 package corba.adapteractivator ;
 
-import org.omg.CORBA.*;
 import org.omg.PortableServer.POA ;
-import org.omg.PortableServer.POAManager ;
 import org.omg.PortableServer.AdapterActivator ;
 import org.omg.PortableServer.LifespanPolicyValue ;
 import org.omg.PortableServer.IdAssignmentPolicyValue ;
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
 
 import corba.framework.RTMConstants;
+import org.omg.CORBA.LocalObject;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.Policy;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextHelper;
 
 public class AdapterActivatorServer {
 

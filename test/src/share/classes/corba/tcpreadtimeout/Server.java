@@ -47,7 +47,6 @@ package corba.tcpreadtimeout;
 
 import java.util.Properties;
 
-import javax.naming.InitialContext;
 import org.omg.PortableServer.POA;
 
 import com.sun.corba.se.spi.transport.Acceptor;
@@ -58,7 +57,6 @@ import com.sun.corba.se.impl.transport.AcceptorImpl;
 
 import corba.framework.Controller;
 import corba.framework.Options;
-import corba.hcks.C;
 import corba.hcks.U;
 
 public class Server 

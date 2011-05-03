@@ -49,19 +49,17 @@
 
 package rmic;
 
-import test.Util;
 import test.Test;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.io.Serializable;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import org.glassfish.pfl.test.JUnitReportHelper;
 import sun.rmi.rmic.iiop.Constants;
 import sun.rmi.rmic.iiop.CompoundType;
 import sun.rmi.rmic.iiop.ContextStack;
 import sun.tools.java.ClassPath;
-
-import com.sun.corba.se.spi.orbutil.test.JUnitReportHelper ;
 
 public class InnerTest extends Test implements Constants {
 

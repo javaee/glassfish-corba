@@ -76,8 +76,6 @@ import org.omg.PortableServer.ServantLocator ;
 
 import org.omg.PortableServer.ServantLocatorPackage.CookieHolder ;
 
-import corba.framework.CORBATest ;
-
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactory ;
 import com.sun.corba.se.spi.oa.rfm.ReferenceFactoryManager ;
 
@@ -85,11 +83,10 @@ import com.sun.corba.se.spi.extension.ServantCachingPolicy ;
 
 import com.sun.corba.se.spi.presentation.rmi.PresentationManager ;
 
-import com.sun.corba.se.spi.orbutil.generic.Pair ;
-
 import com.sun.corba.se.spi.misc.ORBConstants ;
 
 import com.sun.corba.se.impl.naming.cosnaming.TransientNameService ;
+import org.glassfish.pfl.basic.contain.Pair;
 
 /** This is a test for the ReferenceFactoryManager.
  * The basic idea is to start up a number of client threads,

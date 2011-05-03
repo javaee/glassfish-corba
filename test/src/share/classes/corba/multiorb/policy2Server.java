@@ -40,13 +40,7 @@
 package corba.multiorb;
 
 import java.util.Properties;
-import org.omg.CORBA.Object;
-import org.omg.CORBA.*;
-import org.omg.CosNaming.*;
 import org.omg.CosNaming.NamingContextHelper;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POAPackage.AdapterAlreadyExists;
-import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
 import org.omg.PortableServer.IdAssignmentPolicyValue;
 import org.omg.PortableServer.ThreadPolicyValue;
 import org.omg.PortableServer.LifespanPolicyValue;
@@ -56,9 +50,13 @@ import org.omg.PortableServer.RequestProcessingPolicyValue;
 import org.omg.PortableServer.ImplicitActivationPolicyValue;
 import org.omg.CORBA.Policy;
 import org.omg.PortableServer.Servant;
-import examples.*;
 
 import com.sun.corba.se.spi.misc.ORBConstants ;
+import examples.policy_2POA;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.PortableServer.POA;
 
 class policy2_servantA extends policy_2POA
 {

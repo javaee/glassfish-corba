@@ -40,9 +40,10 @@
 package naming.instest;
 
 import com.sun.corba.se.spi.misc.ORBConstants;
-import test.Test;
-import corba.framework.*;
-import java.util.*;
+import corba.framework.CORBATest;
+import corba.framework.Controller;
+import corba.framework.Options;
+import java.util.Properties;
 
 /**
  * This is a test for INS.

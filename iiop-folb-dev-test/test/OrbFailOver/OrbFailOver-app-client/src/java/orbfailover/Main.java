@@ -41,6 +41,8 @@ package orbfailover;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -329,7 +331,9 @@ public class Main extends Base {
                     inst.numInstances(), inst.serverORBDebug() ) ;
                 gfCluster.startCluster() ;
                 if (!inst.testEjb().isEmpty()) {
-                    ac.deploy( CLUSTER_NAME, EJB_NAME, inst.testEjb() ) ;
+                    boolean availabilityEnabled = true ;
+                    ac.deploy( CLUSTER_NAME, EJB_NAME, inst.testEjb(),
+                               availabilityEnabled  ) ;
                 }
             } else {
                 gfCluster.startCluster() ;
@@ -1031,10 +1035,77 @@ public class Main extends Base {
             String inst2 = invokeMethod(slsb) ;
             gfCluster.stopInstance(inst2);
 
+            // String inst2_1 = invokeMethod(sfsb) ;
+            // gfCluster.stopInstance(inst2_1);
+
             String inst3 = invokeMethod(sfsb) ;
         } finally {
             clearORBDebug(flags);
         }
+    }
+    
+    // Test scenario:
+    // 1. Run a 3 instance cluster
+    // 2. Create initialContext with running instances.
+    // 3. Lookup stateless (b1) Session bean.
+    // 4. inst1 = access b1
+    // 5. shutdown inst1
+    // 6. Lookup stateful (b2) Session bean.
+    // 7. inst2 = access b2
+    // 8. shutdown inst2
+    // 9. inst3 = access b2
+    @Test( "15804sfsb" )
+    public void test15804sfsb() throws NamingException {
+        Set<String> running = gfCluster.runningInstances() ;
+        if (running.size() < 3) {
+            fail( "Must have cluster with at least three instances") ;
+            return ;
+        } else {
+            note("test15804sfsb: Cluster Size= "  +  running.size());
+        }
+        
+        InitialContext ic = makeIC() ;
+        Location slsb = lookup( ic, BeanType.SLSB ) ;
+        
+        String inst1 = invokeMethod(slsb) ;
+        gfCluster.stopInstance(inst1);
+
+        Location sfsb = lookup( ic, BeanType.SFSB ) ;
+        String inst2 = invokeMethod(sfsb) ;
+        gfCluster.stopInstance(inst2);
+        String inst3 = invokeMethod(sfsb) ;
+    }
+    
+    // Test scenario:
+    // 1. Run a 3 instance cluster
+    // 2. Create initialContext with running instances.
+    // 3. Lookup stateful (b1) Session bean.
+    // 4. inst1 = access b1
+    // 5. shutdown inst1
+    // 6. Lookup stateless (b2) Session bean.
+    // 7. inst2 = access b2
+    // 8. shutdown inst2
+    // 9. inst3 = access b2
+    @Test( "15804slsb" )
+    public void test15804slsb() throws NamingException {
+        Set<String> running = gfCluster.runningInstances() ;
+        if (running.size() < 3) {
+            fail( "Must have cluster with at least three instances") ;
+            return ;
+        } else {
+            note("test15804slsb: Cluster Size= "  +  running.size());
+        }
+        
+        InitialContext ic = makeIC() ;
+        Location sfsb = lookup( ic, BeanType.SFSB ) ;
+        
+        String inst1 = invokeMethod(sfsb) ;
+        gfCluster.stopInstance(inst1);
+
+        Location slsb = lookup( ic, BeanType.SLSB ) ;
+        String inst2 = invokeMethod(slsb) ;
+        gfCluster.stopInstance(inst2);
+        String inst3 = invokeMethod(slsb) ;
     }
 
     // Test scenario:

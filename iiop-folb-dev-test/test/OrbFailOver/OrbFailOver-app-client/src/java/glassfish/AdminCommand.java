@@ -273,6 +273,15 @@ public class AdminCommand {
         return adminCommand( cmd ) ;
     }
 
+    public boolean deploy( String clusterName, String componentName,
+        String jarFile, boolean availabilityEnabled ) {
+
+        String cmd = String.format( "deploy --target %s --name %s --availabilityenabled=%b --force %s",
+            clusterName, componentName, availabilityEnabled, jarFile)  ;
+
+        return adminCommand( cmd ) ;
+    }
+
     public boolean undeploy( String clusterName, String componentName ) {
 
         String cmd = String.format( "undeploy --target %s --name %s --force",

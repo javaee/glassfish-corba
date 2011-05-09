@@ -1686,7 +1686,6 @@
     <target name="test-corba-junit" depends="test-init">
         <run-junit-test>
             <test-cases>
-                <test name="corba.codegen.Client" todir="${junit.reports}"/>
                 <!-- <test name="corba.messagetrace.Client" todir="${junit.reports}"/> -->
                 <test name="corba.misc.Client" todir="${junit.reports}"/>
                 <test name="corba.dynamicrmiiiop.Client" todir="${junit.reports}"/>

@@ -174,6 +174,12 @@
 
 	<patternset id="asm.export">
 	    <include name="org.objectweb.asm"/>
+	    <include name="org.objectweb.asm.util"/>
+	    <include name="org.objectweb.asm.tree"/>
+	    <include name="org.objectweb.asm.tree.analysis"/>
+	    <include name="org.objectweb.asm.signature"/>
+	    <include name="org.objectweb.asm.commons"/>
+	    <include name="org.objectweb.asm.optimizer"/>
 	</patternset>
 
 	<patternset id="codegen.export">
@@ -198,6 +204,7 @@
 	<patternset id="newtimer.export">
 	    <include name="com.sun.corba.se.spi.orbutil.newtimer"/>
 	    <include name="com.sun.corba.se.spi.orbutil.tf"/>
+	    <include name="com.sun.corba.se.spi.orbutil.tf.annotation"/>
 	    <include name="com.sun.corba.se.impl.orbutil.newtimer"/>
 	</patternset>
 
@@ -238,6 +245,7 @@
 
 	<patternset id="orb.export">
 	    <include name="com.sun.corba.se.spi.copyobject"/>
+	    <include name="com.sun.corba.se.impl.copyobject"/>
 	    <include name="com.sun.corba.se.spi.extension"/>
 	    <include name="com.sun.corba.se.spi.ior"/>
 	    <include name="com.sun.corba.se.spi.ior.iiop"/>

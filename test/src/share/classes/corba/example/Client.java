@@ -45,6 +45,7 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContext;
 import org.omg.CosNaming.NamingContextHelper;
+import HelloApp.* ;
 
 public class Client implements Runnable
 {

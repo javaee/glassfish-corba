@@ -51,6 +51,8 @@ package com.sun.corba.se.impl.protocol;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentMap ;
+import java.util.concurrent.ConcurrentHashMap ;
 
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.portable.RemarshalException;
@@ -121,6 +123,9 @@ public class ClientRequestDispatcherImpl
 
     private MaxStreamFormatVersionServiceContext msfvc = 
                             ServiceContextDefaults.getMaxStreamFormatVersionServiceContext();
+
+    private ConcurrentMap<ContactInfo,Object> locks =
+        new ConcurrentHashMap<ContactInfo,Object>() ;
 
     @InfoMethod
     private void usingCachedConnection( Connection conn ) { }
@@ -202,10 +207,25 @@ public class ClientRequestDispatcherImpl
 
         Connection connection = null;
 
+        Object lock = locks.get( contactInfo ) ;
+
+        if (lock == null) {
+            Object newLock = new Object() ;
+            lock = locks.putIfAbsent( contactInfo, newLock ) ;
+            if (lock == null) {
+                lock = newLock ;
+            }
+        }
+
         // This locking is done so that multiple connections are not created
-        // for the same endpoint
+        // for the same endpoint.  Note that we are locking here on the
+        // same lock for different contactInfos that are equal, which is really
+        // what's required.  This is a fix for 7016182.
+        //
         // TODO NEW CACHE: all of this is replaced with the get() call, except
         // the code needed to add the connection to the selector.
+        //
+        // Is the fix for 7016182 still needed with the new caches?
         synchronized (lock) {
             if (contactInfo.isConnectionBased()) {
                 try {

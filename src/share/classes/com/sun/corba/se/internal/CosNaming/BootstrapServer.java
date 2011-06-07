@@ -40,11 +40,9 @@
 
 package com.sun.corba.se.internal.CosNaming;
 
-import java.util.Enumeration;
 import java.util.Properties;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 import com.sun.corba.se.spi.orb.ORB ;
 
@@ -52,7 +50,6 @@ import com.sun.corba.se.spi.resolver.Resolver ;
 import com.sun.corba.se.spi.resolver.LocalResolver ;
 import com.sun.corba.se.spi.resolver.ResolverDefault ;
 
-import com.sun.corba.se.impl.misc.CorbaResourceUtil;
 import com.sun.corba.se.spi.misc.ORBConstants;
 
 /**
@@ -96,8 +93,9 @@ public class BootstrapServer
 	}
 
 	if (propertiesFilename == null) {
-	    System.out.println( CorbaResourceUtil.getText("bootstrap.usage", 
-		"BootstrapServer"));
+	    System.out.println( 
+                "Bootstrapserver -InitialServicesFile <filename> "
+                    + "-ORBInitialPort <num>" ) ;
 	    return;
 	}
 
@@ -106,15 +104,15 @@ public class BootstrapServer
 
 	// Verify that if it exists, it is readable
 	if (file.exists() == true && file.canRead() == false) {
-	    System.err.println(CorbaResourceUtil.getText(
-		"bootstrap.filenotreadable", file.getAbsolutePath()));
+	    System.err.println( "File " + file.getAbsolutePath() 
+                + " is not readable" ) ;
 	    return;
 	}
 
 	// Success: start up
-	System.out.println(CorbaResourceUtil.getText(
-	    "bootstrap.success", Integer.toString(initialPort), 
-	    file.getAbsolutePath()));
+	System.out.println(
+            "Bootstrapserver started on port " + Integer.toString(initialPort) 
+                + " wirh InitialServicesFile " + file.getAbsolutePath());
 
 	Properties props = new Properties() ;
 
@@ -138,9 +136,7 @@ public class BootstrapServer
 	    // This causes the acceptors to start listening.
 	    orb.resolve_initial_references(ORBConstants.ROOT_POA_NAME);
 	} catch (org.omg.CORBA.ORBPackage.InvalidName e) {
-	    RuntimeException rte = new RuntimeException("This should not happen");
-	    rte.initCause(e);
-	    throw rte;
+	    throw new RuntimeException("This should not happen", e);
 	}
 
 	orb.run() ;

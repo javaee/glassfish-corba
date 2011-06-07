@@ -50,7 +50,6 @@
 -test corba.simpledynamic.NewAcceptor
 -test corba.copyobjectpolicy.CopyObjectPolicyTest
 -test corba.connectioncache.ConnectionCacheTest
--test corba.timer.TimerTest
 // MixedOrbTest passes when run outside of the framework,
 // but fails in the framework.  It is commented out
 // until that problem is fixed.

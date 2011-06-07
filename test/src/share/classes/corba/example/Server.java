@@ -45,6 +45,7 @@ import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContext;
 import org.omg.CosNaming.NamingContextHelper;
 import org.omg.PortableServer.POA;
+import HelloApp.* ;
 
 /**
  * Servant implementation

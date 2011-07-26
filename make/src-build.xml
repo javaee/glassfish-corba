@@ -76,7 +76,8 @@
     <property name="root.dir"			value="${basedir}"/>
     <property file="make/build.properties"/>
     <property name="orb.version"		value="${release.version}-${build.version}"/>
-    <property name="pfl.version"                value="1.0.0-b001"/>
+    <property name="gmbal.version"              value="3.2.0-b003"/>
+    <property name="pfl.version"                value="3.2.0-b001"/>
     <echo message="Version is ${release.version}-${build.version}"/>
 
     <target name="init" depends="modules.init">
@@ -135,7 +136,7 @@
             <dependency-list>
                 <dependency groupId="org.glassfish.gmbal" 
                     artifactId="gmbal"
-                    version="3.2.0-b001" scope="runtime"/>
+                    version="${gmbal.version}" scope="runtime"/>
                 <dependency groupId="org.glassfish.external" 
                     artifactId="management-api"
                     version="3.1.0-b001" scope="runtime"/>
@@ -144,25 +145,25 @@
                     version="1.2.0" scope="runtime"/>
                 <dependency groupId="org.glassfish.pfl" 
                     artifactId="pfl-asm"
-                    version="1.0.0-b001" scope="runtime"/>
+                    version="${pfl.version}" scope="runtime"/>
                 <dependency groupId="org.glassfish.pfl" 
                     artifactId="pfl-basic"
-                    version="1.0.0-b001" scope="runtime"/>
+                    version="${pfl.version}" scope="runtime"/>
                 <dependency groupId="org.glassfish.pfl" 
                     artifactId="pfl-basic-tools"
-                    version="1.0.0-b001" scope="runtime"/>
+                    version="${pfl.version}" scope="runtime"/>
                 <dependency groupId="org.glassfish.pfl" 
                     artifactId="pfl-dynamic"
-                    version="1.0.0-b001" scope="runtime"/>
+                    version="${pfl.version}" scope="runtime"/>
                 <dependency groupId="org.glassfish.pfl" 
                     artifactId="pfl-tf"
-                    version="1.0.0-b001" scope="runtime"/>
+                    version="${pfl.version}" scope="runtime"/>
                 <dependency groupId="org.glassfish.pfl" 
                     artifactId="pfl-tf-tools"
-                    version="1.0.0-b001" scope="runtime"/>
+                    version="${pfl.version}" scope="runtime"/>
                 <dependency groupId="org.glassfish.pfl" 
                     artifactId="pfl-test"
-                    version="1.0.0-b001" scope="runtime"/>
+                    version="${pfl.version}" scope="runtime"/>
             </dependency-list>
         </get-and-copy-dependencies>
 
@@ -195,6 +196,9 @@
 	    <include name="com.sun.corba.se.impl.txpoa"/>
 	    <include name="com.sun.corba.se.spi.costransactions"/>
 	    <include name="com.sun.corba.se.spi.folb"/>
+	    <include name="com.sun.corba.se.spi.threadpool"/>
+	    <include name="com.sun.corba.se.spi.logex.stdcorba"/>
+	    <include name="com.sun.corba.se.impl.threadpool"/>
 	</patternset>
 
 	<patternset id="newtimer.export">
@@ -239,14 +243,17 @@
 	    <include name="javax.rmi.CORBA"/>
 	</patternset>
 
+
 	<patternset id="orb.export">
 	    <include name="com.sun.corba.se.impl.naming.cosnaming"/>
+	    <include name="com.sun.corba.se.impl.naming.namingutil"/>
 	    <include name="com.sun.corba.se.impl.presentation.rmi.codegen"/>
 	    <include name="com.sun.corba.se.impl.orb"/>
 	    <include name="com.sun.corba.se.impl.javax.rmi"/>
 	    <include name="com.sun.corba.se.impl.javax.rmi.CORBA"/>
 	    <include name="com.sun.corba.se.impl.encoding"/>
 	    <include name="com.sun.corba.se.impl.folb"/>
+	    <include name="com.sun.corba.se.spi.misc"/>
 	    <include name="com.sun.corba.se.impl.misc"/>
 	    <include name="com.sun.corba.se.spi.copyobject"/>
 	    <include name="com.sun.corba.se.impl.copyobject"/>
@@ -257,7 +264,6 @@
 	    <include name="com.sun.corba.se.spi.legacy.interceptor"/>
 	    <include name="com.sun.corba.se.spi.logging"/>
 	    <include name="com.sun.corba.se.spi.logex.corba"/>
-	    <include name="com.sun.corba.se.spi.logex.stdcorba"/>
 	    <include name="com.sun.corba.se.spi.oa"/>
 	    <include name="com.sun.corba.se.spi.oa.rfm"/>
 	    <include name="com.sun.corba.se.spi.orb"/>
@@ -308,8 +314,8 @@
 	</patternset>
 
 	<patternset id="orb.probe-provider-class-names">
-	    <include name="com.sun.corba.se.impl.transport.CorbaInboundConnectionCacheProbeProvider"/>
-	    <include name="com.sun.corba.se.impl.transport.CorbaOutboundConnectionCacheProbeProvider"/>
+	    <include name="com.sun.corba.se.impl.transport.InboundConnectionCacheProbeProvider"/>
+	    <include name="com.sun.corba.se.impl.transport.OutboundConnectionCacheProbeProvider"/>
 	</patternset>
 
 	<patternset id="osgi-test.private">
@@ -342,6 +348,7 @@
 	    classpath="${classes.dir}" 
 	    version="${orb.version}"
 	    outDir="${releaselib.dir}/bundles"
+            bundlename="glassfish-corba-orb"
 	    outFile="glassfish-corba-orb.jar">
 	    <directive-list>
 		<directive type="Export-Package" name="orb.export"/>
@@ -356,6 +363,7 @@
 	    classpath="${classes.dir}" 
 	    version="${orb.version}"
 	    outDir="${releaselib.dir}/bundles"
+            bundlename="glassfish-corba-omgapi"
 	    outFile="glassfish-corba-omgapi.jar">
 	    <directive-list>
 		<directive type="Export-Package" name="omgapi.export"/>
@@ -367,6 +375,7 @@
 	    classpath="${classes.dir}" 
 	    version="${orb.version}"
 	    outDir="${releaselib.dir}/bundles"
+            bundlename="glassfish-corba-csiv2-idl"
 	    outFile="glassfish-corba-csiv2-idl.jar">
 	    <directive-list>
 		<directive type="Export-Package" name="csiv2-idl.export"/>
@@ -376,6 +385,7 @@
 	    classpath="${classes.dir}" 
 	    version="${orb.version}"
 	    outDir="${releaselib.dir}/bundles"
+            bundlename="glassfish-corba-internal-api"
 	    outFile="glassfish-corba-internal-api.jar">
 	    <directive-list>
 		<directive type="Export-Package" name="internal-api.export"/>
@@ -385,6 +395,7 @@
 	    classpath="${classes.dir}" 
 	    version="${orb.version}"
 	    outDir="${releaselib.dir}/bundles"
+            bundlename="glassfish-corba-osgi-test"
 	    outFile="glassfish-corba-osgi-test.jar">
 	    <directive-list>
 		<directive type="Private-Package" name="osgi-test.private"/>
@@ -442,18 +453,22 @@
 	    <dep-list>
 		<dependency
 		    groupId="com.sun.corba"
-		    artifactId="glassfish-corba-omgapi"
+		    artifactId="glassfish-corba-internal-api"
 		    version="${orb.version}"/>
 		<dependency
 		    groupId="com.sun.corba"
+		    artifactId="glassfish-corba-omgapi"
+		    version="${orb.version}"/>
+		<dependency
+		    groupId="org.glassfish.pfl"
 		    artifactId="pfl-basic"
 		    version="${pfl.version}"/>
 		<dependency
-		    groupId="com.sun.corba"
+		    groupId="org.glassfish.pfl"
 		    artifactId="pfl-tf"
 		    version="${pfl.version}"/>
 		<dependency
-		    groupId="com.sun.corba"
+		    groupId="org.glassfish.pfl"
 		    artifactId="pfl-dynamic"
 		    version="${pfl.version}"/>
 		<dependency
@@ -463,7 +478,7 @@
 		<dependency
 		    groupId="org.glassfish.gmbal"
 		    artifactId="gmbal"
-		    version="3.2.0-b001"/>
+		    version="${gmbal.version}"/>
 	    </dep-list>
 	</make-corba-pom>
 	<make-corba-pom artifactid="glassfish-corba-source" 
@@ -483,7 +498,7 @@
 	<attribute name="module"/>
 	<attribute name="destination"/>
 	<sequential>
-	    <push-to-local-maven outdir="${releaselib.dir}/bundles"
+	    <push-to-maven outdir="${releaselib.dir}/bundles"
 		module="@{module}" destination="@{destination}"/>
 	</sequential>
     </macrodef>

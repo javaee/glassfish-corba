@@ -40,7 +40,7 @@
   holder.
 -->
 
-<project name="modules" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant"> 
+<project name="modules" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant"> 
 
     <!-- An importer of modules.xml MUST make sure that the init target is called. 
 	 The importer must also have a copy maven-ant-tasks-2.1.1.jar available.
@@ -88,7 +88,6 @@
             <artifact:dependencies versionsId="@{name}.versions"
                 filesetId="@{name}.fileset" pathId="@{name}.classpath">
                <remoteRepository id="@{name}.repid" url="@{repository}"/>
-	       <localRepository path="${env.HOME}/.m2/repository"/>
                <dependency-list/>
             </artifact:dependencies>
 
@@ -109,6 +108,7 @@
     <scriptdef name="make-bundle-file" language="javascript">
 	<attribute name="version"/>
 	<attribute name="outfile"/>
+        <attribute name="bundlename"/>
 	<element name="directive" classname="org.apache.tools.ant.types.Parameter"/>
 	<![CDATA[
 	    function openFile( name ) {
@@ -146,6 +146,7 @@
 
 	    var version = attributes.get("version") ; 
 	    var outfile = attributes.get("outfile") ; 
+	    var bundlename = attributes.get("bundlename") ; 
 
 	    // Write out the bnd control file
 
@@ -153,6 +154,7 @@
 
 	    try {
 		writeString( file, "Bundle-Version=" + version ) ;
+                writeString( file, "Bundle-SymbolicName=" + bundlename ) ;
 		var directives = elements.get("directive") ;
 		for (var ctr = 0; ctr<directives.size(); ctr++) {
 		    var directive = directives.get(ctr) ;
@@ -203,16 +205,17 @@
 	<attribute name="classpath"/>
 	<attribute name="outDir"/>
 	<attribute name="outFile"/>
+        <attribute name="bundlename"/>
 	<element name="directive-list"/>
 	<sequential>
-	    <make-bundle-file version="@{version}" outfile="bndfile.temp">
+	    <make-bundle-file version="@{version}" outfile="@{bundlename}.bfile" bundlename="@{bundlename}">
 		<directive-list/>
 	    </make-bundle-file>
 	
 	    <!-- Use bnd to generate the bundle jar file. -->
 
 	    <java classpathref="bnd.classpath" classname="aQute.bnd.main.bnd" 
-		fork="true" failonerror="true">
+		dir="make" fork="true" failonerror="true">
 
 		<arg value="build"/>
 		<arg value="-noeclipse"/>
@@ -220,10 +223,10 @@
 		<arg value="@{classpath}"/>
 		<arg value="-output"/>
 		<arg value="@{outDir}/@{outFile}"/>
-		<arg value="make/bndfile.temp"/>
+		<arg value="@{bundlename}.bfile"/>
 	    </java>
 
-	    <delete file="bndfile.temp"/>
+	    <!--<delete file="@{bundlename}.bfile"/> -->
 	</sequential>
     </macrodef>	
 
@@ -268,6 +271,7 @@
             <echo message="Releasing module @{module} to local repository"/>
 
 	    <artifact:pom id="@{module}.pom" file="@{outdir}/@{module}.pom.xml"/>
+            <property environment="env"/>
             <artifact:install file="@{outdir}/@{module}.jar">
                 <pom refid="@{module}.pom"/>
             </artifact:install>
@@ -282,7 +286,7 @@
             <echo message="Releasing module @{module} to @{destination}"/>
 
 	    <artifact:pom id="@{module}.pom" file="@{outdir}/@{module}.pom.xml"/>
-            <artifact:deploy file="${releaselib.dir}/bundles/@{module}.jar">
+            <artifact:deploy file="@{outdir}/@{module}.jar">
                 <remoteRepository url="@{destination}">
                     <authentication id="java.net.maven2.repository"/> <!-- this is java.net specific -->
                 </remoteRepository>

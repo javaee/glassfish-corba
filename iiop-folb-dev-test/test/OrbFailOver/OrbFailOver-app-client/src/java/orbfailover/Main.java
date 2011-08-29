@@ -74,7 +74,7 @@ import testtools.Post;
 import testtools.Pre;
 
 import com.sun.corba.ee.spi.orb.ORB ;
-import com.sun.corba.ee.spi.protocol.CorbaClientDelegate;
+import com.sun.corba.ee.spi.protocol.ClientDelegate;
 import java.lang.reflect.Field;
 import javax.rmi.CORBA.Stub;
 import orb.folb.Location;
@@ -230,8 +230,8 @@ public class Main extends Base {
                 // delegateSuperClass should be a CodegenStubBase
                 // final Class<?> delegateSuperClass = delegateClass.getSuperclass() ;
                 // final Field fld = getField( delegateSuperClass, "__delegate");
-                final CorbaClientDelegate cdel = 
-                    (CorbaClientDelegate)stub._get_delegate() ;
+                final ClientDelegate cdel =
+                    (ClientDelegate)stub._get_delegate() ;
 
                 orb = cdel.getBroker();
                 if (orbDebugFlags != null)  {

@@ -38,7 +38,7 @@ AVAILABLE_NODES="localhost:5"
 # Only installgfv3 is needed for a fresh install; the others
 # are for use if some of the GF or ORB code has been modified
 # without rebuilding all of GF.
-# scripts/installgfv3
+ scripts/installgfv3
 # scripts/installgforb
 # scripts/installgfnaming
 # scripts/installgfejbsec
@@ -75,10 +75,14 @@ set -x
 # echo ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
 
 if [ "${DEBUGGER}" = "1" ];
-then ${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
-else ${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ ;
+then 
+    CMD="${APPCLIENT} ${DEBUG_ARGS} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ "    
+else 
+    CMD="${APPCLIENT} ${SETUP_ARGS} ${CLIENT_ARGS} ${TEST_ARGS} $@ "
 fi
 
+echo $CMD
+$CMD
 exitStatus=$?
 
 # For testing with externally supplied endpoints

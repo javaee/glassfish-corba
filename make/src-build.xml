@@ -329,6 +329,53 @@
 	</patternset>
     </target>
 
+    <!-- artifact subsets delivered to GlassFish -->
+
+	<!-- =================== The ORB implementation ========================= -->
+        <property name="subset1" value="glassfish-corba-orb"/>
+        <property name="subset1-doc-includes" value="com.sun.corba.se.spi.*,com.sun.corba.se.impl.*,com.sun.org.omg.CORBA.*,com.sun.org.omg.SendingConext.*"/>
+        <property name="subset1-doc-excludes" value="com.sun.corba.se.impl.threadpool.*,com.sun.corba.se.impl.txpoa.*,com.sun.corba.se.spi.costransactions.*,com.sun.corba.se.spi.folb.*,com.sun.corba.se.spi.logex.*,com.sun.corba.se.spi.threadpool.*"/>
+	<patternset id="subset1-patternset">
+                <include name="com/sun/corba/se/spi/**/*.java"/>
+                <include name="com/sun/corba/se/impl/**/*.java"/>
+                <include name="com/sun/org/omg/CORBA/**/*.java"/>
+                <include name="com/sun/org/omg/SendingContext/**/*.java"/>
+                <exclude name="com/sun/corba/se/impl/threadpool/**/*.java"/>
+                <exclude name="com/sun/corba/se/impl/txpoa/**/*.java"/>
+                <exclude name="com/sun/corba/se/spi/costransactions/**/*.java"/>
+                <exclude name="com/sun/corba/se/spi/folb/**/*.java"/>
+                <exclude name="com/sun/corba/se/spi/logex/**/*.java"/>
+                <exclude name="com/sun/corba/se/spi/threadpool/**/*.java"/>
+	</patternset>
+        <!-- ================= ORB API for IIOP FOLB ========================== -->
+        <property name="subset2" value="glassfish-corba-internal-api"/>
+        <property name="subset2-doc-includes" value="com.sun.corba.se.impl.threadpool.*,com.sun.corba.se.impl.txpoa.*,com.sun.corba.se.spi.costransactions.*,com.sun.corba.se.spi.folb.*,com.sun.corba.se.spi.logex.*,com.sun.corba.se.spi.threadpool.*"/>
+	<patternset id="subset2-patternset">
+                <include name="com/sun/corba/se/impl/threadpool/**/*.java"/>
+                <include name="com/sun/corba/se/impl/txpoa/**/*.java"/>
+                <include name="com/sun/corba/se/spi/costransactions/**/*.java"/>
+                <include name="com/sun/corba/se/spi/folb/**/*.java"/>
+                <include name="com/sun/corba/se/spi/logex/**/*.java"/>
+                <include name="com/sun/corba/se/spi/threadpool/**/*.java"/>
+	</patternset>
+        <!-- ============= OMG standard CORBA APIs ============================ -->
+
+        <property name="subset3" value="glassfish-corba-omgapi"/>
+        <property name="subset3-doc-includes" value="com.sun.corba.se.org.omg.CORBA.*,javax.rmi.CORBA.*,org.omg.*"/>
+	<patternset id="subset3-patternset">
+                <include name="com/sun/corba/se/org/omg/CORBA/**/*.java"/>
+                <include name="javax/rmi/CORBA/**/*.java"/>
+                <include name="org/omg/**/*.java"/>
+	</patternset>
+        <!-- ================ IDL generated definitions for CSIv2 ==================== -->
+        <property name="subset4" value="glassfish-corba-csiv2-idl"/>
+        <property name="subset4-doc-includes" value="com.sun.corba.se.org.omg.CSI.*,com.sun.corba.se.org.omg.CSIIOP.*,com.sun.corba.se.org.omg.GSSUP.*"/>
+	<patternset id="subset4-patternset">
+                <include name="com/sun/corba/se/org/omg/CSI/**/*.java"/>
+                <include name="com/sun/corba/se/org/omg/CSIIOP/**/*.java"/>
+                <include name="com/sun/corba/se/org/omg/GSSUP/**/*.java"/>
+	</patternset>
+
     <!-- OSGi bundle construction -->
 
     <target name="make-src-bundle" depends="init">
@@ -339,6 +386,45 @@
             </fileset>
             <fileset dir="${gensrc.dir}">
                 <include name="**/*.java"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="src-bundle-subsets" depends="init">
+        <jar jarfile="${releaselib.dir}/bundles/${subset1}-source.jar"
+            duplicate="fail">
+            <fileset dir="${src.dir}">
+		<patternset refid="subset1-patternset"/>
+            </fileset>
+            <fileset dir="${gensrc.dir}">   
+		<patternset refid="subset1-patternset"/>             
+            </fileset>
+        </jar>
+        <jar jarfile="${releaselib.dir}/bundles/${subset2}-source.jar"
+            duplicate="fail">
+            <fileset dir="${src.dir}">
+		<patternset refid="subset2-patternset"/>
+            </fileset>
+            <fileset dir="${gensrc.dir}">   
+		<patternset refid="subset2-patternset"/>             
+            </fileset>
+        </jar>
+        <jar jarfile="${releaselib.dir}/bundles/${subset3}-source.jar"
+            duplicate="fail">
+            <fileset dir="${src.dir}">
+		<patternset refid="subset3-patternset"/>
+            </fileset>
+            <fileset dir="${gensrc.dir}">   
+		<patternset refid="subset3-patternset"/>             
+            </fileset>
+        </jar>
+        <jar jarfile="${releaselib.dir}/bundles/${subset4}-source.jar"
+            duplicate="fail">
+            <fileset dir="${src.dir}">
+		<patternset refid="subset4-patternset"/>
+            </fileset>
+            <fileset dir="${gensrc.dir}">   
+		<patternset refid="subset4-patternset"/>             
             </fileset>
         </jar>
     </target>
@@ -404,6 +490,9 @@
 	</make-bundle>
     </target>
 
+    <target name="make-subset-bundles" depends="src-bundle-subsets, javadoc-bundle-subsets">
+
+    </target>
     <!-- Maven POM files and release targets -->
 
     <macrodef name="make-corba-pom">
@@ -420,9 +509,9 @@
 		url="http://kenai.com/hg/gf-corba-v3-mirror~staging">
 		<element-list>
 		    <developer
-			id="kcavanaugh"
-			name="Ken Cavanaugh"
-			email="ken.cavanaugh@oracle.com"/>
+                        id="hvilekar"
+                        name="Harshad Vilekar"
+                        email="harshad.vilekar@oracle.com"/>
 		    <license
 			name="CDDL+GPL"
 			url="https://glassfish.java.net/public/CDDL+GPL.html"/>
@@ -483,6 +572,36 @@
 	</make-corba-pom>
 	<make-corba-pom artifactid="glassfish-corba-source" 
 	    description="All ORB source code">
+	</make-corba-pom>
+    </target>
+
+    <target name="make-subset-poms" depends="make-poms">
+        <make-corba-pom artifactid="${subset1}-source" 
+            description="The ORB implementation: source code">
+        </make-corba-pom>
+        <make-corba-pom artifactid="${subset1}-javadocs" 
+            description="The ORB implementation: javadocs">
+	</make-corba-pom>
+	<!-- =================== -->
+        <make-corba-pom artifactid="${subset2}-source" 
+            description="ORB API for IIOP FOLB: source code">
+        </make-corba-pom>
+        <make-corba-pom artifactid="${subset2}-javadocs" 
+            description="ORB API for IIOP FOLB: javadocs">
+        </make-corba-pom>
+	<!-- =================== -->
+        <make-corba-pom artifactid="${subset3}-source" 
+            description="OMG standard CORBA APIs: source code">
+        </make-corba-pom>
+        <make-corba-pom artifactid="${subset3}-javadocs" 
+            description="OMG standard CORBA APIs: javadocs">
+	</make-corba-pom>
+	<!-- =================== -->
+        <make-corba-pom artifactid="${subset4}-source" 
+            description="IDL generated definitions for CSIv2: source code">
+        </make-corba-pom>
+        <make-corba-pom artifactid="${subset4}-javadocs" 
+            description="IDL generated definitions for CSIv2: javadocs">
 	</make-corba-pom>
     </target>
 
@@ -1000,11 +1119,89 @@
 	<javadoc packagenames="com.sun.corba.se.spi.*"
 	         sourcepath="${src.dir}:${gensrc.dir}"
 		 classpathref="classpath.master"
-		 destdir="${javadoc.dir}"
+                 destdir="${javadoc.dir}/glassfish-corba"
 		 author="true"
 		 version="true"
 		 use="true"
 		 windowtitle="Sun Java CORBA ORB SPI"/>
+    </target>
+
+    <target name="javadoc-subsets" depends="init">
+        <mkdir dir="${javadoc.dir}/${subset1}"/>
+        <javadoc packagenames="${subset1-doc-includes}"
+                 excludepackagenames="${subset1-doc-excludes}"
+	         sourcepath="${src.dir}:${gensrc.dir}"
+		 classpathref="classpath.master"
+                 destdir="${javadoc.dir}/${subset1}"
+		 author="true"
+		 version="true"
+		 use="true"
+                 windowtitle="${subset1}"/>
+
+	<!-- =================================================== -->
+        <mkdir dir="${javadoc.dir}/${subset2}"/>
+        <javadoc packagenames="${subset2-doc-includes}"
+	         sourcepath="${src.dir}:${gensrc.dir}"
+		 classpathref="classpath.master"
+                 destdir="${javadoc.dir}/${subset2}"
+		 author="true"
+		 version="true"
+		 use="true"
+                 windowtitle="${subset2}"/>
+
+	<!-- =================================================== -->
+
+        <mkdir dir="${javadoc.dir}/${subset3}"/>
+        <javadoc packagenames="${subset3-doc-includes}"
+	         sourcepath="${src.dir}:${gensrc.dir}"
+		 classpathref="classpath.master"
+                 destdir="${javadoc.dir}/${subset3}"
+		 author="true"
+		 version="true"
+		 use="true"
+                 windowtitle="${subset3}"/>
+	<!-- =================================================== -->
+
+        <mkdir dir="${javadoc.dir}/${subset4}"/>
+        <javadoc packagenames="${subset4-doc-includes}"
+	         sourcepath="${src.dir}:${gensrc.dir}"
+		 classpathref="classpath.master"
+                 destdir="${javadoc.dir}/${subset4}"
+		 author="true"
+		 version="true"
+		 use="true"
+                 windowtitle="${subset4}"/>
+    </target>
+
+    <target name="javadoc-bundle-subsets" depends="javadoc-subsets">
+        <jar jarfile="${releaselib.dir}/bundles/${subset1}-javadocs.jar"
+            duplicate="fail">
+            <fileset dir="${javadoc.dir}/${subset1}">
+		<include name="**/**"/>
+            </fileset>
+        </jar>
+
+        <jar jarfile="${releaselib.dir}/bundles/${subset2}-javadocs.jar"
+            duplicate="fail">
+            <fileset dir="${javadoc.dir}/${subset2}">
+		<include name="**/**"/>
+            </fileset>
+        </jar>
+
+        <jar jarfile="${releaselib.dir}/bundles/${subset3}-javadocs.jar"
+            duplicate="fail">
+            <fileset dir="${javadoc.dir}/${subset3}">
+		<include name="**/**"/>
+            </fileset>
+        </jar>
+
+        <jar jarfile="${releaselib.dir}/bundles/${subset4}-javadocs.jar"
+            duplicate="fail">
+            <fileset dir="${javadoc.dir}/${subset4}">
+		<include name="**/**"/>
+            </fileset>
+        </jar>
+
     </target>
 
     <!-- ========================= Renaming ========================= -->
@@ -1310,7 +1507,9 @@
 
     <target name="build" depends="init, compile, 
         generate-orb-resources, enhance-orb,
-        compile-timing-points, make-bundles, make-poms, archive-bundles"/>
+        compile-timing-points, make-bundles, make-poms, subset-build, archive-bundles"/>
+
+    <target name="subset-build" depends="make-subset-bundles, make-subset-poms"/>
 
     <!-- no-enhance is used for Cobertura coverage, which fails miserable with enhanced classes -->
 
@@ -1333,7 +1532,8 @@
         <copy todir="${releaselib.dir}/glassfish/modules">
             <fileset dir="${releaselib.dir}/bundles">
                 <include name="glassfish-corba-*.jar"/>
-                <exclude name="glassfish-corba-source.jar"/>
+                <exclude name="glassfish-corba-*source.jar"/>
+                <exclude name="glassfish-corba-*javadocs.jar"/>
                 <exclude name="glassfish-corba-osgi-test.jar"/> 
             </fileset>
         </copy>

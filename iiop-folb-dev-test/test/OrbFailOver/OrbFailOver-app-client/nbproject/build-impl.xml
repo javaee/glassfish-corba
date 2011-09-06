@@ -131,8 +131,23 @@
         <property name="excludes" value=""/>
         <path id="endorsed.classpath.path" path="${endorsed.classpath}"/>
         <condition else="" property="endorsed.classpath.cmd.line.arg" value="-Xbootclasspath/p:'${toString:endorsed.classpath.path}'">
-            <length length="0" string="${endorsed.classpath}" when="greater"/>
+            <and>
+                <isset property="endorsed.classpath"/>
+                <length length="0" string="${endorsed.classpath}" when="greater"/>
+            </and>
         </condition>
+        <condition property="is.server.weblogic" value="true">
+            <equals arg1="${j2ee.server.type}" arg2="WebLogic9"/>
+        </condition>
+        <condition else="false" property="jdkBug6558476">
+            <and>
+                <matches pattern="1\.[56]" string="${java.specification.version}"/>
+                <not>
+                    <os family="unix"/>
+                </not>
+            </and>
+        </condition>
+        <property name="javac.fork" value="${jdkBug6558476}"/>
     </target>
     <target name="-post-init">
         <!-- Empty placeholder for easier customization. -->
@@ -197,7 +212,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                 <property location="${build.dir}/empty" name="empty.dir"/>
                 <mkdir dir="${empty.dir}"/>
                 <mkdir dir="@{apgeneratedsrcdir}"/>
-                <javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" excludes="@{excludes}" includeantruntime="false" includes="@{includes}" source="${javac.source}" srcdir="@{srcdir}" target="${javac.target}">
+                <javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" excludes="@{excludes}" fork="${javac.fork}" includeantruntime="false" includes="@{includes}" source="${javac.source}" srcdir="@{srcdir}" target="${javac.target}">
                     <src>
                         <dirset dir="@{gensrcdir}" erroronmissingdir="false">
                             <include name="*"/>
@@ -267,15 +282,18 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
             <attribute default="${build.classes.dir}" name="destdir"/>
             <sequential>
                 <fail unless="javac.includes">Must set javac.includes</fail>
-                <pathconvert pathsep="," property="javac.includes.binary">
+                <pathconvert pathsep="${line.separator}" property="javac.includes.binary">
                     <path>
                         <filelist dir="@{destdir}" files="${javac.includes}"/>
                     </path>
                     <globmapper from="*.java" to="*.class"/>
                 </pathconvert>
+                <tempfile deleteonexit="true" property="javac.includesfile.binary"/>
+                <echo file="${javac.includesfile.binary}" message="${javac.includes.binary}"/>
                 <delete>
-                    <files includes="${javac.includes.binary}"/>
+                    <files includesfile="${javac.includesfile.binary}"/>
                 </delete>
+                <delete file="${javac.includesfile.binary}"/>
             </sequential>
         </macrodef>
     </target>
@@ -302,6 +320,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                     <formatter type="brief" usefile="false"/>
                     <formatter type="xml"/>
                     <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
+                    <jvmarg value="-ea"/>
                     <jvmarg line="${run.jvmargs.param}"/>
                 </junit>
             </sequential>
@@ -334,7 +353,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
             <attribute default="${debug.classpath}" name="classpath"/>
             <attribute default="" name="stopclassname"/>
             <sequential>
-                <nbjpdastart addressproperty="jpda.address" name="@{name}" stopclassname="@{stopclassname}" transport="${debug-transport}">
+                <nbjpdastart addressproperty="jpda.address.appclient" name="@{name}" stopclassname="@{stopclassname}" transport="${debug-transport-appclient}">
                     <classpath>
                         <path path="@{classpath}"/>
                     </classpath>
@@ -373,7 +392,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         <condition else="dt_socket" property="debug-transport-by-os" value="dt_shmem">
             <os family="windows"/>
         </condition>
-        <condition else="${debug-transport-by-os}" property="debug-transport" value="${debug.transport}">
+        <condition else="${debug-transport-by-os}" property="debug-transport-appclient" value="${debug.transport}">
             <isset property="debug.transport"/>
         </condition>
     </target>
@@ -387,7 +406,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                 <java classname="@{classname}" dir="${work.dir}" fork="true">
                     <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
                     <jvmarg line="${debug-args-line}"/>
-                    <jvmarg value="-Xrunjdwp:transport=${debug-transport},address=${jpda.address}"/>
+                    <jvmarg value="-Xrunjdwp:transport=${debug-transport-appclient},address=${jpda.address.appclient}"/>
                     <jvmarg line="${run.jvmargs.param}"/>
                     <classpath>
                         <path path="@{classpath}"/>
@@ -399,44 +418,6 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                     <arg line="@{args}"/>
                     <customize/>
                 </java>
-            </sequential>
-        </macrodef>
-    </target>
-    <target depends="-init-debug-args" name="-init-macrodef-debug-appclient">
-        <macrodef name="debug-appclient" uri="http://www.netbeans.org/ns/car-project/1">
-            <attribute name="mainclass"/>
-            <attribute default="${debug.classpath}" name="classpath"/>
-            <element name="customize" optional="true"/>
-            <attribute default="${application.args.param}" name="args"/>
-            <sequential>
-                <parallel>
-                    <java classname="@{mainclass}" dir="${work.dir}" fork="true">
-                        <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
-                        <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
-                        <jvmarg line="${debug-args-line}"/>
-                        <jvmarg value="-Xrunjdwp:transport=${jpda.transport},server=y,address=${jpda.address},suspend=y"/>
-                        <jvmarg line="${run.jvmargs.param}"/>
-                        <arg line="@{args}"/>
-                        <classpath>
-                            <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
-                            <path path="@{classpath}"/>
-                        </classpath>
-                        <syspropertyset>
-                            <propertyref prefix="run-sys-prop."/>
-                            <mapper from="run-sys-prop.*" to="*" type="glob"/>
-                        </syspropertyset>
-                        <customize/>
-                    </java>
-                    <nbjpdaconnect address="${jpda.address}" host="${jpda.host}" name="${name}" transport="${jpda.transport}">
-                        <classpath>
-                            <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
-                            <path path="@{classpath}"/>
-                        </classpath>
-                        <sourcepath>
-                            <path path="${src.dir}"/>
-                        </sourcepath>
-                    </nbjpdaconnect>
-                </parallel>
             </sequential>
         </macrodef>
     </target>
@@ -476,7 +457,7 @@ exists or setup the property manually. For example like this:
     <target depends="-init-ap-cmdline-properties,-init-ap-cmdline-supported" name="-init-ap-cmdline">
         <property name="ap.cmd.line.internal" value=""/>
     </target>
-    <target depends="-pre-init,-pre-init-am,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check,-init-macrodef-property,-init-macrodef-javac,-init-macrodef-junit,-init-macrodef-java,-init-macrodef-nbjpda,-init-macrodef-debug,-init-macrodef-debug-appclient,-init-taskdefs,-init-ap-cmdline" name="init"/>
+    <target depends="-pre-init,-pre-init-am,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check,-init-macrodef-property,-init-macrodef-javac,-init-macrodef-junit,-init-macrodef-java,-init-macrodef-nbjpda,-init-macrodef-debug,-init-taskdefs,-init-ap-cmdline" name="init"/>
     <!--
                 ===================
                 COMPILATION SECTION
@@ -505,32 +486,29 @@ exists or setup the property manually. For example like this:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target depends="compile" name="library-inclusion-in-archive">
-        <mkdir dir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${libs.javaee-api-6.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-asm.jar}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-codegen.jar}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-internal-api.jar}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-newtimer.jar}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-omgapi.jar}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-orb.jar}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-orbgeneric.jar}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.management-api.jar}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${file.reference.gmbal.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+    <target depends="compile" if="is.server.weblogic" name="library-inclusion-in-archive">
+        <basename file="${file.reference.javaee.jar}" property="manifest.file.reference.javaee.jar"/>
+        <basename file="${file.reference.glassfish-corba-csiv2-idl.jar}" property="manifest.file.reference.glassfish-corba-csiv2-idl.jar"/>
+        <basename file="${file.reference.glassfish-corba-internal-api.jar}" property="manifest.file.reference.glassfish-corba-internal-api.jar"/>
+        <basename file="${file.reference.glassfish-corba-omgapi.jar}" property="manifest.file.reference.glassfish-corba-omgapi.jar"/>
+        <basename file="${file.reference.glassfish-corba-orb.jar}" property="manifest.file.reference.glassfish-corba-orb.jar"/>
+        <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
+            <attribute name="Extension-List" value="jar-1 jar-2 jar-3 jar-4 jar-5 "/>
+            <attribute name="jar-1-Extension-Name" value="${manifest.file.reference.javaee.jar}"/>
+            <attribute name="jar-2-Extension-Name" value="${manifest.file.reference.glassfish-corba-csiv2-idl.jar}"/>
+            <attribute name="jar-3-Extension-Name" value="${manifest.file.reference.glassfish-corba-internal-api.jar}"/>
+            <attribute name="jar-4-Extension-Name" value="${manifest.file.reference.glassfish-corba-omgapi.jar}"/>
+            <attribute name="jar-5-Extension-Name" value="${manifest.file.reference.glassfish-corba-orb.jar}"/>
+        </manifest>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
-        <copyfiles files="${libs.javaee-api-6.0.classpath}" manifestproperty="manifest.libs.javaee-api-6.0.classpath" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-asm.jar}" manifestproperty="manifest.file.reference.glassfish-corba-asm.jar" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-codegen.jar}" manifestproperty="manifest.file.reference.glassfish-corba-codegen.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.javaee.jar}" manifestproperty="manifest.file.reference.javaee.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.glassfish-corba-csiv2-idl.jar}" manifestproperty="manifest.file.reference.glassfish-corba-csiv2-idl.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-internal-api.jar}" manifestproperty="manifest.file.reference.glassfish-corba-internal-api.jar" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-newtimer.jar}" manifestproperty="manifest.file.reference.glassfish-corba-newtimer.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-omgapi.jar}" manifestproperty="manifest.file.reference.glassfish-corba-omgapi.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-orb.jar}" manifestproperty="manifest.file.reference.glassfish-corba-orb.jar" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-orbgeneric.jar}" manifestproperty="manifest.file.reference.glassfish-corba-orbgeneric.jar" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.management-api.jar}" manifestproperty="manifest.file.reference.management-api.jar" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.gmbal.jar}" manifestproperty="manifest.file.reference.gmbal.jar" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.libs.javaee-api-6.0.classpath} lib/${manifest.libs.javaee-api-6.0.classpath} ${manifest.file.reference.glassfish-corba-asm.jar} lib/${manifest.file.reference.glassfish-corba-asm.jar} ${manifest.file.reference.glassfish-corba-codegen.jar} lib/${manifest.file.reference.glassfish-corba-codegen.jar} ${manifest.file.reference.glassfish-corba-internal-api.jar} lib/${manifest.file.reference.glassfish-corba-internal-api.jar} ${manifest.file.reference.glassfish-corba-newtimer.jar} lib/${manifest.file.reference.glassfish-corba-newtimer.jar} ${manifest.file.reference.glassfish-corba-omgapi.jar} lib/${manifest.file.reference.glassfish-corba-omgapi.jar} ${manifest.file.reference.glassfish-corba-orb.jar} lib/${manifest.file.reference.glassfish-corba-orb.jar} ${manifest.file.reference.glassfish-corba-orbgeneric.jar} lib/${manifest.file.reference.glassfish-corba-orbgeneric.jar} ${manifest.file.reference.management-api.jar} lib/${manifest.file.reference.management-api.jar} ${manifest.file.reference.gmbal.jar} lib/${manifest.file.reference.gmbal.jar} "/>
+            <attribute name="Class-Path" value="${manifest.file.reference.javaee.jar} lib/${manifest.file.reference.javaee.jar} ${manifest.file.reference.glassfish-corba-csiv2-idl.jar} lib/${manifest.file.reference.glassfish-corba-csiv2-idl.jar} ${manifest.file.reference.glassfish-corba-internal-api.jar} lib/${manifest.file.reference.glassfish-corba-internal-api.jar} ${manifest.file.reference.glassfish-corba-omgapi.jar} lib/${manifest.file.reference.glassfish-corba-omgapi.jar} ${manifest.file.reference.glassfish-corba-orb.jar} lib/${manifest.file.reference.glassfish-corba-orb.jar} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">
@@ -625,57 +603,78 @@ exists or setup the property manually. For example like this:
                 EXECUTION SECTION
                 =================
             -->
-    <target depends="dist,run-deploy,run-tool2,old-run-jar,run-display-browser" description="Run a main class." name="run"/>
-    <target depends="dist,run-deploy" description="Run a main class." if="j2ee.appclient.tool.args" name="old-run-jar">
-        <antcall target="run-tool"/>
-        <antcall target="run-jar"/>
+    <target depends="dist,run-deploy,-as-retrieve-option-workaround,-init-run-macros,-run-pregfv3,-run" description="Run a main class." name="run"/>
+    <target if="j2ee.appclient.tool.args" name="-run-pregfv3">
+        <carproject:run-appclient-pregfv3/>
     </target>
-    <target depends="init" description="Run a main class." if="j2ee.clientName" name="run-jar" unless="j2ee.appclient.mainclass.args">
-        <carproject:java classname="${main.class}">
-            <customize>
-                <arg line="${application.args.param}"/>
-            </customize>
-        </carproject:java>
+    <target name="-run" unless="j2ee.appclient.tool.args">
+        <carproject:run-appclient/>
     </target>
-    <target depends="init,-as-retrieve-option-workaround" description="Run a main class." if="j2ee.appclient.mainclass.args" name="run-tool" unless="j2ee.clientName">
-        <java classname="${j2ee.appclient.tool.mainclass}" dir="${work.dir}" fork="true">
-            <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
-            <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
-            <jvmarg line="${run.jvmargs.param}"/>
-            <arg line="${j2ee.appclient.tool.args}"/>
-            <arg line="-client ${client.jar}"/>
-            <arg line="${application.args.param}"/>
-            <classpath>
-                <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
-            </classpath>
-            <syspropertyset>
-                <propertyref prefix="run-sys-prop."/>
-                <mapper from="run-sys-prop.*" to="*" type="glob"/>
-            </syspropertyset>
-        </java>
-    </target>
-    <target depends="init,run-deploy,-as-retrieve-option-workaround" description="Run a main class." name="run-tool2" unless="j2ee.appclient.tool.args">
-        <mkdir dir="${dist.dir}/OrbFailOver-app-clientClient"/>
-        <copy file="${dist.jar}" todir="${dist.dir}/OrbFailOver-app-clientClient"/>
-        <java dir="${work.dir}" fork="true" jar="${client.jar}">
-            <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
-            <jvmarg line="${j2ee.appclient.tool.jvmoptions}${client.jar}"/>
-            <jvmarg line="${run.jvmargs.param}"/>
-            <arg line="${application.args.param}"/>
-            <syspropertyset>
-                <propertyref prefix="run-sys-prop."/>
-                <mapper from="run-sys-prop.*" to="*" type="glob"/>
-            </syspropertyset>
-        </java>
-    </target>
-    <target depends="init,compile-single" name="run-single">
+    <target depends="dist,run-deploy,-as-retrieve-option-workaround,-init-run-macros,-run-single-pregfv3,-run-single" description="Run a single class." name="run-single"/>
+    <target depends="dist,run-deploy,-as-retrieve-option-workaround,-init-run-macros" name="-run-single" unless="j2ee.appclient.tool.args">
         <fail unless="run.class">Must select one file in the IDE or set run.class</fail>
-        <carproject:java classname="${run.class}"/>
+        <carproject:run-appclient serverparams="${j2ee.appclient.tool.jvmoptions.class}${run.class}"/>
+    </target>
+    <target depends="dist,run-deploy,-as-retrieve-option-workaround,-init-run-macros" if="j2ee.appclient.tool.args" name="-run-single-pregfv3">
+        <fail unless="run.class">Must select one file in the IDE or set run.class</fail>
+        <carproject:run-appclient-pregfv3/>
+    </target>
+    <target depends="init" name="-init-run-macros">
+        <macrodef name="run-appclient" uri="http://www.netbeans.org/ns/car-project/1">
+            <attribute default="${application.args.param}" name="args"/>
+            <attribute default="${j2ee.appclient.tool.jvmoptions}${client.jar}" name="serverparams"/>
+            <element name="customize" optional="true"/>
+            <sequential>
+                <java dir="${basedir}" fork="true" jar="${client.jar}">
+                    <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
+                    <jvmarg line="@{serverparams}"/>
+                    <jvmarg line="${run.jvmargs.param}"/>
+                    <arg line="@{args}"/>
+                    <syspropertyset>
+                        <propertyref prefix="run-sys-prop."/>
+                        <mapper from="run-sys-prop.*" to="*" type="glob"/>
+                    </syspropertyset>
+                    <env key="APPCPATH" path="${javac.classpath}"/>
+                    <sysproperty key="java.system.class.loader" value="org.glassfish.appclient.client.acc.agent.ACCAgentClassLoader"/>
+                    <customize/>
+                </java>
+            </sequential>
+        </macrodef>
+        <macrodef name="run-appclient-pregfv3" uri="http://www.netbeans.org/ns/car-project/1">
+            <element name="customize" optional="true"/>
+            <sequential>
+                <java classname="${j2ee.appclient.tool.mainclass}" fork="true">
+                    <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
+                    <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
+                    <jvmarg line="${run.jvmargs.param}"/>
+                    <arg line="${j2ee.appclient.tool.args}"/>
+                    <arg line="-client ${client.jar}"/>
+                    <arg line="${application.args.param}"/>
+                    <classpath>
+                        <path path="${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
+                    </classpath>
+                    <syspropertyset>
+                        <propertyref prefix="run-sys-prop."/>
+                        <mapper from="run-sys-prop.*" to="*" type="glob"/>
+                    </syspropertyset>
+                    <customize/>
+                </java>
+            </sequential>
+        </macrodef>
     </target>
     <target if="j2ee.appclient.mainclass.args" name="-as-retrieve-option-workaround" unless="j2ee.clientName">
         <property name="client.jar" value="${dist.dir}/OrbFailOver-app-clientClient.jar"/>
         <sleep seconds="3"/>
-        <copy file="${wa.copy.client.jar.from}/OrbFailOver-app-client/OrbFailOver-app-clientClient.jar" todir="${dist.dir}"/>
+        <copy failonerror="false" file="${wa.copy.client.jar.from}/OrbFailOver-app-client/OrbFailOver-app-clientClient.jar" todir="${dist.dir}"/>
+        <copy failonerror="false" flatten="true" todir="${dist.dir}/">
+            <fileset dir="${wa.copy.client.jar.from}/OrbFailOver-app-client" includes="**/OrbFailOver-app-clientClient.jar"/>
+        </copy>
+        <copy flatten="true" todir="${dist.dir}/OrbFailOver-app-clientClient">
+            <fileset dir="${wa.copy.client.jar.from}/OrbFailOver-app-client" includes="**/*.*ar"/>
+        </copy>
+        <copy failonerror="false" flatten="false" todir="${dist.dir}/OrbFailOver-app-clientClient">
+            <fileset dir="${dist.dir}/gfdeploy/OrbFailOver-app-client" includes="**/*.jar"/>
+        </copy>
     </target>
     <target name="pre-run-deploy">
         <!-- Empty placeholder for easier customization. -->
@@ -787,6 +786,39 @@ exists or setup the property manually. For example like this:
                 DEBUGGING SECTION
                 =================
             -->
+    <target depends="init,-init-debug-args,-as-retrieve-option-workaround,-init-run-macros" name="-init-debug-macros">
+        <macrodef name="debug-appclient" uri="http://www.netbeans.org/ns/car-project/1">
+            <attribute default="${j2ee.appclient.tool.jvmoptions}${client.jar}" name="serverparams"/>
+            <sequential>
+                <carproject:run-appclient serverparams="@{serverparams}">
+                    <customize>
+                        <jvmarg value="-Xrunjdwp:transport=${debug-transport-appclient},address=${jpda.address.appclient}"/>
+                        <jvmarg line="${debug-args-line}"/>
+                    </customize>
+                </carproject:run-appclient>
+            </sequential>
+        </macrodef>
+        <macrodef name="debug-appclient-pregfv3" uri="http://www.netbeans.org/ns/car-project/1">
+            <sequential>
+                <carproject:run-appclient-pregfv3>
+                    <customize>
+                        <jvmarg value="-Xrunjdwp:transport=${debug-transport-appclient},address=${jpda.address.appclient}"/>
+                        <jvmarg line="${debug-args-line}"/>
+                    </customize>
+                </carproject:run-appclient-pregfv3>
+            </sequential>
+        </macrodef>
+    </target>
+    <target depends="init,compile,run-deploy,-init-debug-args,-as-retrieve-option-workaround,-init-debug-macros,-debug-appclient-start-nbjpda,-debug-appclient-pregfv3,-debug-appclient" description="Debug project in IDE." if="netbeans.home" name="debug"/>
+    <target name="-debug-appclient-start-nbjpda">
+        <carproject:nbjpdastart classpath="" name="${app.client}"/>
+    </target>
+    <target if="j2ee.appclient.tool.args" name="-debug-appclient-pregfv3">
+        <carproject:debug-appclient-pregfv3/>
+    </target>
+    <target name="-debug-appclient" unless="j2ee.appclient.tool.args">
+        <carproject:debug-appclient/>
+    </target>
     <target depends="init" if="netbeans.home" name="-debug-start-debugger">
         <carproject:nbjpdastart name="${debug.class}"/>
     </target>
@@ -797,22 +829,17 @@ exists or setup the property manually. For example like this:
             </customize>
         </carproject:debug>
     </target>
-    <target if="j2ee.clientName" name="debug-jar" unless="j2ee.appclient.mainclass.args">
-        <carproject:debug-appclient args="${application.args.param}" mainclass="${main.class}"/>
+    <target depends="debug-single" if="netbeans.home" name="debug-stepinto"/>
+    <target name="-debug-start-nbjpda-single">
+        <carproject:nbjpdastart classpath="" name="${app.client}" stopclassname="${debug.class}"/>
     </target>
-    <target depends="init,-as-retrieve-option-workaround" if="j2ee.appclient.mainclass.args" name="debug-tool" unless="j2ee.clientName">
-        <carproject:debug-appclient args="${j2ee.appclient.mainclass.args} ${application.args.param}" mainclass="${j2ee.appclient.tool.mainclass}"/>
+    <target name="-debug-single" unless="j2ee.appclient.tool.args">
+        <carproject:debug-appclient serverparams="${j2ee.appclient.tool.jvmoptions.class}${debug.class}"/>
     </target>
-    <target depends="init,compile,run-deploy,debug-tool,debug-jar" description="Debug project in IDE." if="netbeans.home" name="debug"/>
-    <target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto">
-        <carproject:nbjpdastart stopclassname="${main.class}"/>
+    <target if="j2ee.appclient.tool.args" name="-debug-single-pregfv3">
+        <carproject:debug-appclient serverparams="${j2ee.appclient.tool.jvmoptions.class}${debug.class}"/>
     </target>
-    <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee" if="netbeans.home" name="debug-stepinto"/>
-    <target depends="init,compile-single" if="netbeans.home" name="-debug-start-debuggee-single">
-        <fail unless="debug.class">Must select one file in the IDE or set debug.class</fail>
-        <carproject:debug classname="${debug.class}"/>
-    </target>
-    <target depends="init,compile-single,-debug-start-debugger,-debug-start-debuggee-single" if="netbeans.home" name="debug-single"/>
+    <target depends="init,compile,run-deploy,-init-debug-args,-as-retrieve-option-workaround,-init-debug-macros,-debug-start-nbjpda-single,-debug-single,-debug-single-pregfv3" if="netbeans.home" name="debug-single"/>
     <target depends="init" name="-pre-debug-fix">
         <fail unless="fix.includes">Must set fix.includes</fail>
         <property name="javac.includes" value="${fix.includes}.java"/>

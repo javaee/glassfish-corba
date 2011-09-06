@@ -10,4 +10,4 @@ rm ${RUN}/glassfish.zip
 rm -rf ${RUN}/glassfish3
 cp ${BUILD}/distributions/glassfish/target/glassfish.zip ${RUN}
 cd ${RUN}
-unzip glassfish.zip
+unzip -q glassfish.zip

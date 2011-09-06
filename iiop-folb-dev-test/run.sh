@@ -38,7 +38,7 @@ AVAILABLE_NODES="localhost:5"
 # Only installgfv3 is needed for a fresh install; the others
 # are for use if some of the GF or ORB code has been modified
 # without rebuilding all of GF.
- scripts/installgfv3
+# scripts/installgfv3
 # scripts/installgforb
 # scripts/installgfnaming
 # scripts/installgfejbsec

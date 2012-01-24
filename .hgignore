@@ -29,4 +29,5 @@ make/bnd.properties
 gmbal/**
 libcache/**
 glassfish3/**
+tmp/**
 

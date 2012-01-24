@@ -1075,7 +1075,29 @@ public class Main extends Base {
         gfCluster.stopInstance(inst2);
         String inst3 = invokeMethod(sfsb) ;
     }
-    
+   
+    // same as 15804sfsb, except that we use manual kill instance
+    @Test( "15804sfsb_kill" )
+    public void test15804sfsb_kill() throws NamingException {
+        Set<String> running = gfCluster.runningInstances() ;
+        if (running.size() < 3) {
+            fail( "Must have cluster with at least three instances") ;
+            return ;
+        } else {
+            note("test15804sfsb: Cluster Size= "  +  running.size());
+        }
+        
+        InitialContext ic = makeIC() ;
+        Location slsb = lookup( ic, BeanType.SLSB ) ;
+        
+        String inst1 = invokeMethod(slsb) ;
+        gfCluster.killInstance(inst1);
+
+        Location sfsb = lookup( ic, BeanType.SFSB ) ;
+        String inst2 = invokeMethod(sfsb) ;
+        gfCluster.killInstance(inst2);
+        String inst3 = invokeMethod(sfsb) ;
+    }
     // Test scenario:
     // 1. Run a 3 instance cluster
     // 2. Create initialContext with running instances.

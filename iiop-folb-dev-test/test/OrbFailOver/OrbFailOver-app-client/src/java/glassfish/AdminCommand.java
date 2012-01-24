@@ -42,6 +42,7 @@ package glassfish;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,11 +98,13 @@ public class AdminCommand {
             return diff/1000 ;
         }
     }
-
     private boolean adminCommand( String command ) {
+        return Command(asadmin + " " + command);
+    }
+
+    private boolean Command( String cmd ) {
         commandOutput.clear() ;
-        base.note( "Command " + command ) ;
-        final String cmd = asadmin + " " + command ;
+        base.note( "Command " + cmd ) ;
 
         if (!echoOnly) {
             try {
@@ -119,7 +122,7 @@ public class AdminCommand {
 
                 final int result = proc.waitFor();
                 if (result != 0) {
-                    throw new RuntimeException( "Command " + command
+                    throw new RuntimeException( "Command " + cmd
                         + " failed with result " + result ) ;
                 }
             } catch (Exception ex) {
@@ -127,7 +130,7 @@ public class AdminCommand {
                 // ex.printStackTrace();
                 return false ;
             } finally {
-                base.note( "Command " + command + " executed in "
+                base.note( "Command " + cmd + " executed in "
                     + timer.interval() + " microseconds\n" ) ;
             }
         }
@@ -260,6 +263,16 @@ public class AdminCommand {
         return result ;
     }
 
+    public boolean killInstance( String name ) {
+        // uniquely identify the process id
+        String processCommandContains = name + "/config" ;
+        if (!Command("scripts/kill " + processCommandContains)) {
+            System.out.println("SEVERE ERROR: Failed to kill instance "  + name + ", trying stop instance!");
+            return stopInstance(name);
+        }   
+        return true ;
+    }
+    
     public boolean destroyCluster(String clusterName) {
         return adminCommand( "delete-cluster " + clusterName ) ;
     }

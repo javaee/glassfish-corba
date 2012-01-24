@@ -264,7 +264,15 @@ public class GlassFishCluster {
             }
         }
     }
-
+    
+    public void killInstance( String instanceName ) {
+        if (instanceInfoMap.keySet().contains(instanceName)) {
+            if (gfInst.ac().killInstance( instanceName )) {
+                runningInstances.remove( instanceName ) ;
+            }
+        }
+    }
+    
     public Set<String> runningInstances() {
         return new HashSet<String>( runningInstances ) ;
     }

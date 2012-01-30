@@ -1086,16 +1086,27 @@ public class Main extends Base {
         } else {
             note("test15804sfsb: Cluster Size= "  +  running.size());
         }
-        
+               
         InitialContext ic = makeIC() ;
         Location slsb = lookup( ic, BeanType.SLSB ) ;
         
         String inst1 = invokeMethod(slsb) ;
+        
         gfCluster.killInstance(inst1);
-
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            //ignore
+        }
         Location sfsb = lookup( ic, BeanType.SFSB ) ;
-        String inst2 = invokeMethod(sfsb) ;
+        String inst2 = invokeMethod(sfsb) ;    
+        
         gfCluster.killInstance(inst2);
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            //ignore
+        }
         String inst3 = invokeMethod(sfsb) ;
     }
     // Test scenario:

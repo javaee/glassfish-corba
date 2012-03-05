@@ -1109,6 +1109,66 @@ public class Main extends Base {
         }
         String inst3 = invokeMethod(sfsb) ;
     }
+    
+    // same as 15804sfsb_kill, except that we delete an instance midway
+    // 1. Run a 3 instance cluster
+    // 2. Create initialContext with running instances.
+    // 3. Lookup stateless (b1) Session bean.
+    // 4. inst1 = access b1
+    // 5.1 kill inst1
+    // 5.2 delete inst1
+    // 6. Lookup stateful (b2) Session bean.
+    // 7. inst2 = access b2
+    // 8. kill inst2
+    // 9. inst3 = access b2
+    //Deploy MultiEJBApp.ear
+//stop-cluster st-cluster
+//start-instance instance110; start-instance instance109
+//Kill the instance with message [SFSB1Bean.getName]
+//Delete the instance  with message [SFSB1Bean.getName]
+//start-cluster st-cluster
+//Kill the instance with message [SFSB1Bean.getName]
+//Run test with appclient: appclient ... com.sun.appserver.ee.tests.client.ClientDynamicClusterRemoveInstance MultipleFO
+//Exception was throw on client side.
+        
+    @Test( "15804sfsb_kill_delete" )
+    public void test15804sfsb_kill_delete() throws NamingException {
+        Set<String> running = gfCluster.runningInstances() ;
+        if (running.size() < 3) {
+            fail( "Must have cluster with at least three instances") ;
+            return ;
+        } else {
+            note("test15804sfsb: Cluster Size= "  +  running.size());
+        }
+               
+        InitialContext ic = makeIC() ;
+        Location slsb = lookup( ic, BeanType.SLSB ) ;
+        
+        String inst1 = invokeMethod(slsb) ;
+        
+        gfCluster.killInstance(inst1);
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            //ignore
+        }
+        gfCluster.destroyInstance(inst1);
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            //ignore
+        }
+        Location sfsb = lookup( ic, BeanType.SFSB ) ;
+        String inst2 = invokeMethod(sfsb) ;    
+        
+        gfCluster.killInstance(inst2);
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            //ignore
+        }
+        String inst3 = invokeMethod(sfsb) ;
+    }
     // Test scenario:
     // 1. Run a 3 instance cluster
     // 2. Create initialContext with running instances.

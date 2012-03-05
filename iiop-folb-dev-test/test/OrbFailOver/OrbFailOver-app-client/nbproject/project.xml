@@ -11,13 +11,12 @@
             <test-roots>
                 <root id="test.src.dir"/>
             </test-roots>
-            <included-library dirs="200">file.reference.javaee.jar</included-library>
             <included-library dirs="200">file.reference.glassfish-corba-csiv2-idl.jar</included-library>
             <included-library dirs="200">file.reference.glassfish-corba-internal-api.jar</included-library>
             <included-library dirs="200">file.reference.glassfish-corba-omgapi.jar</included-library>
             <included-library dirs="200">file.reference.glassfish-corba-orb.jar</included-library>
             <included-library dirs="200">file.reference.gmbal.jar</included-library>
-            <included-library dirs="200">file.reference.glassfish-corba-newtimer.jar</included-library>
+            <included-library dirs="200">file.reference.javaee.jar</included-library>
         </data>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1"/>
     </configuration>

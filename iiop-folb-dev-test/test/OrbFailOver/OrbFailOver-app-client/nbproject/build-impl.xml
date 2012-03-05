@@ -487,34 +487,31 @@ exists or setup the property manually. For example like this:
         <!-- You can override this target in the ../build.xml file. -->
     </target>
     <target depends="compile" if="is.server.weblogic" name="library-inclusion-in-archive">
-        <basename file="${file.reference.javaee.jar}" property="manifest.file.reference.javaee.jar"/>
         <basename file="${file.reference.glassfish-corba-csiv2-idl.jar}" property="manifest.file.reference.glassfish-corba-csiv2-idl.jar"/>
         <basename file="${file.reference.glassfish-corba-internal-api.jar}" property="manifest.file.reference.glassfish-corba-internal-api.jar"/>
         <basename file="${file.reference.glassfish-corba-omgapi.jar}" property="manifest.file.reference.glassfish-corba-omgapi.jar"/>
         <basename file="${file.reference.glassfish-corba-orb.jar}" property="manifest.file.reference.glassfish-corba-orb.jar"/>
         <basename file="${file.reference.gmbal.jar}" property="manifest.file.reference.gmbal.jar"/>
-        <basename file="${file.reference.glassfish-corba-newtimer.jar}" property="manifest.file.reference.glassfish-corba-newtimer.jar"/>
+        <basename file="${file.reference.javaee.jar}" property="manifest.file.reference.javaee.jar"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Extension-List" value="jar-1 jar-2 jar-3 jar-4 jar-5 jar-6 jar-7 "/>
-            <attribute name="jar-1-Extension-Name" value="${manifest.file.reference.javaee.jar}"/>
-            <attribute name="jar-2-Extension-Name" value="${manifest.file.reference.glassfish-corba-csiv2-idl.jar}"/>
-            <attribute name="jar-3-Extension-Name" value="${manifest.file.reference.glassfish-corba-internal-api.jar}"/>
-            <attribute name="jar-4-Extension-Name" value="${manifest.file.reference.glassfish-corba-omgapi.jar}"/>
-            <attribute name="jar-5-Extension-Name" value="${manifest.file.reference.glassfish-corba-orb.jar}"/>
-            <attribute name="jar-6-Extension-Name" value="${manifest.file.reference.gmbal.jar}"/>
-            <attribute name="jar-7-Extension-Name" value="${manifest.file.reference.glassfish-corba-newtimer.jar}"/>
+            <attribute name="Extension-List" value="jar-1 jar-2 jar-3 jar-4 jar-5 jar-6 "/>
+            <attribute name="jar-1-Extension-Name" value="${manifest.file.reference.glassfish-corba-csiv2-idl.jar}"/>
+            <attribute name="jar-2-Extension-Name" value="${manifest.file.reference.glassfish-corba-internal-api.jar}"/>
+            <attribute name="jar-3-Extension-Name" value="${manifest.file.reference.glassfish-corba-omgapi.jar}"/>
+            <attribute name="jar-4-Extension-Name" value="${manifest.file.reference.glassfish-corba-orb.jar}"/>
+            <attribute name="jar-5-Extension-Name" value="${manifest.file.reference.gmbal.jar}"/>
+            <attribute name="jar-6-Extension-Name" value="${manifest.file.reference.javaee.jar}"/>
         </manifest>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
-        <copyfiles files="${file.reference.javaee.jar}" manifestproperty="manifest.file.reference.javaee.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-csiv2-idl.jar}" manifestproperty="manifest.file.reference.glassfish-corba-csiv2-idl.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-internal-api.jar}" manifestproperty="manifest.file.reference.glassfish-corba-internal-api.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-omgapi.jar}" manifestproperty="manifest.file.reference.glassfish-corba-omgapi.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.glassfish-corba-orb.jar}" manifestproperty="manifest.file.reference.glassfish-corba-orb.jar" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.gmbal.jar}" manifestproperty="manifest.file.reference.gmbal.jar" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.glassfish-corba-newtimer.jar}" manifestproperty="manifest.file.reference.glassfish-corba-newtimer.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.javaee.jar}" manifestproperty="manifest.file.reference.javaee.jar" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.file.reference.javaee.jar} lib/${manifest.file.reference.javaee.jar} ${manifest.file.reference.glassfish-corba-csiv2-idl.jar} lib/${manifest.file.reference.glassfish-corba-csiv2-idl.jar} ${manifest.file.reference.glassfish-corba-internal-api.jar} lib/${manifest.file.reference.glassfish-corba-internal-api.jar} ${manifest.file.reference.glassfish-corba-omgapi.jar} lib/${manifest.file.reference.glassfish-corba-omgapi.jar} ${manifest.file.reference.glassfish-corba-orb.jar} lib/${manifest.file.reference.glassfish-corba-orb.jar} ${manifest.file.reference.gmbal.jar} lib/${manifest.file.reference.gmbal.jar} ${manifest.file.reference.glassfish-corba-newtimer.jar} lib/${manifest.file.reference.glassfish-corba-newtimer.jar} "/>
+            <attribute name="Class-Path" value="${manifest.file.reference.glassfish-corba-csiv2-idl.jar} lib/${manifest.file.reference.glassfish-corba-csiv2-idl.jar} ${manifest.file.reference.glassfish-corba-internal-api.jar} lib/${manifest.file.reference.glassfish-corba-internal-api.jar} ${manifest.file.reference.glassfish-corba-omgapi.jar} lib/${manifest.file.reference.glassfish-corba-omgapi.jar} ${manifest.file.reference.glassfish-corba-orb.jar} lib/${manifest.file.reference.glassfish-corba-orb.jar} ${manifest.file.reference.gmbal.jar} lib/${manifest.file.reference.gmbal.jar} ${manifest.file.reference.javaee.jar} lib/${manifest.file.reference.javaee.jar} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">

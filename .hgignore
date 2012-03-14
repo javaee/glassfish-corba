@@ -26,3 +26,6 @@ webrev*
 felix/felix-cache
 make/bnd/bnd.properties
 nbproject/private/**
+.idea/**
+*.iml
+
